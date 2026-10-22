@@ -279,6 +279,8 @@ export function eRechnungLesen(xml: string): GeleseneERechnung {
 /**
  * Umsatz des Kalenderjahres aus den gestellten Rechnungen in Amtlos (netto, Stornos abgezogen), in Euro.
  * null, wenn das Unternehmen in Amtlos keine Rechnung gestellt hat – dann gibt es den Fakt nicht (E-088, G-06).
+ * Nach Rechnungsdatum: app.rechnung kennt keine Zahlungseingänge. Für den vereinnahmten Umsatz (§ 19 Abs. 2 UStG,
+ * `finanzen.umsatz.vereinnahmt_*`) ist das die Ersatzregel für Rechnungen ohne Zahlungsvermerk (fakten.json).
  */
 export async function umsatzLaufendesJahr(tx: Tx, unternehmenId: string, jahr: number): Promise<number | null> {
   const r = await tx.eine<{ anzahl: number; summe: string | null }>(

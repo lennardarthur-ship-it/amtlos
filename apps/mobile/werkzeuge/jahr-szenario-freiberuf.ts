@@ -37,6 +37,7 @@ import { unzipSync } from "fflate";
 import { LEERER_STAND, anlegen, ausgeben, belegSetzen, bezahltSetzen, felderSetzen, personSetzen, profilSetzen, steuerberatungSetzen, stornieren, type Stand, type Unterlage } from "../src/unterlagen/speicher";
 import { euerUebernahme, steuerpaket, type PaketErgebnis } from "../src/unterlagen/steuerpaket";
 import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
+import { umsatzFakten } from "../src/unterlagen/kuUmsatz";
 import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { mitSchriften } from "../src/unterlagen/schriften";
 import { auswertung, type Profil } from "../src/pflichten/check";
@@ -499,6 +500,16 @@ export function standBauen(): Bau {
       weiteres: eintraege("steuererklaerung", "weiteres", [{ was: "Kranken- und Pflegeversicherung (freiwillig gesetzlich)", betrag: "3.120,00", beleg: true }, { was: "Basisrente (Rürup), Beiträge 2026", betrag: "1.200,00", beleg: true }], h),
       notiz: `Kleinunternehmerin (§ 19 UStG): keine Umsatzsteuer-Jahreserklärung; § 13b-Steuer (Adobe, ${euro(eu.ust13b)} €) mit der Voranmeldung Q1 angemeldet. Freier Beruf: keine Gewerbesteuer. Kleinunternehmergrenze: Gesamtumsatz 2026 (Inland, vereinnahmt) ${euro(ku.inland)} € – unter 25.000 €, also auch 2027 Kleinunternehmerin.` }) });
   vergleich("Steuererklärung", "Gewinn = EÜR (unabhängig)", ausEuro(gewinn[1]) * (gewinn[0] === "Verlust" ? -1 : 1), eu.ergebnis);
+  // Kleinunternehmer-Wächter (C.23, StB Busch 22.10.2026): vereinnahmter Gesamtumsatz laut App (§ 19 Abs. 2 UStG) gegen die
+  // unabhängige Rechnung – Zahlungseingänge im Inland plus die Ersatzregel für Rechnungen ohne Zahlungsvermerk; keine Warnung
+  {
+    const f = umsatzFakten(s, "2026-12-31");
+    vergleich("Kleinunternehmergrenze", "Gesamtumsatz 2026 nach vereinnahmten Entgelten (Inland) + Rechnungen ohne Zahlungsvermerk", Math.round((f["finanzen.umsatz.vereinnahmt_laufendes_jahr"] ?? -1) * 100), ku.inland + ku.ersatz);
+    vergleich("Kleinunternehmergrenze", "Gesamtumsatz 2025 laut App (keine Rechnungen 2025 in der App)", Math.round((f["finanzen.umsatz.vereinnahmt_vorjahr"] ?? -1) * 100), 0);
+    const w = auswertung(PROFIL, "2026-12-31", s.unterlagen, [], f);
+    const kuIds = [...w.gilt, ...w.gruendung].map((p) => p.id).filter((id) => /^steuern\.kleinunternehmer_(warnung|grenze|naechstes)/.test(id));
+    vergleichText("Kleinunternehmergrenze", "Wächter (80 %, 95 %, überschritten, ab 1. Januar) zum 31.12.2026", kuIds.join(", ") || "keiner", ku.inland + ku.ersatz > 2_500_000 ? "steuern.kleinunternehmer_naechstes_jahr" : "keiner");
+  }
 
   // ---------------------------------------------------------------- übersprungene Vorlagen
   const keinPersonal = "Keine Beschäftigten.";

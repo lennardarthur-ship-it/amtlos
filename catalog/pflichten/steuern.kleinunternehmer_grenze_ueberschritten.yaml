@@ -1,7 +1,7 @@
-# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt bis auf den Auslöser (Zahlungseingänge)
+# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt; Auslöser seit v5 nach Zahlungseingängen (vereinnahmte Entgelte)
 schema_version: 1
 id: steuern.kleinunternehmer_grenze_ueberschritten
-version: 4
+version: 5
 katalog_nr: C.23
 titel:
   de: 'Kleinunternehmergrenze überschritten: Umsatzsteuer prüfen'
@@ -12,8 +12,11 @@ erklaerung:
     der gestellten Rechnungen nach Rechnungsdatum. Bis einschließlich 25.000 € bzw. 100.000 € bleibt dein Umsatz steuerfrei. Ab
     dem Umsatz, mit dem du die Grenze überschreitest, gilt die Regelbesteuerung – du stellst Rechnungen mit Umsatzsteuer und gibst
     Voranmeldungen ab; eine eigene Frist gibt es dafür nicht. Lag dein Umsatz im Vorjahr über 25.000 €, gilt die Regelung in diesem
-    Jahr von Anfang an nicht. Amtlos zählt bisher die Rechnungen, die du in Amtlos gestellt hast (netto, nach Rechnungsdatum) –
-    ob und wann sie bezahlt wurden, ist darin noch nicht berücksichtigt.
+    Jahr von Anfang an nicht. Amtlos zählt dafür die Zahlungseingänge auf deine Rechnungen in Amtlos (netto) und deine
+    Kasseneinnahmen laut Tagesabschlüssen; Leistungen an Unternehmen im Ausland zählen nicht mit. Hast du bei einer Rechnung
+    keinen Zahlungseingang vermerkt, zählt Amtlos sie vorsichtshalber mit dem Rechnungsdatum – vermerke Zahlungseingänge, dann
+    rechnet Amtlos genauer. Steuerfreie Umsätze wie Heilbehandlungen und Verkäufe von Anlagevermögen zählen für die Grenze nicht
+    mit; Amtlos kann sie nicht unterscheiden und zählt sie mit. Einnahmen außerhalb von Amtlos sind nicht enthalten.
 rechtsgrundlage:
 - § 19 UStG
 kategorie: steuern
@@ -63,27 +66,42 @@ ausloeser:
         label:
           de: Du hast dein Unternehmen in diesem Jahr gegründet.
       - &id001
-        feld: finanzen.umsatz.laufendes_jahr
+        feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
         op: vorhanden
         label:
-          de: Du stellst Rechnungen mit Amtlos.
-      - feld: finanzen.umsatz.laufendes_jahr
+          de: Du erfasst Rechnungen oder Kasseneinnahmen in Amtlos.
+      - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
         op: '>'
         wert:
           regelwert: steuern.ustg19.grenze_gruendungsjahr
         label:
-          de: Deine Rechnungen in Amtlos summieren sich im Gründungsjahr auf mehr als 25.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
+          de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) liegen im Gründungsjahr über 25.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
     - all:
       - feld: abgeleitet.ist_gruendungsjahr
         op: ==
         wert: false
       - *id001
-      - feld: finanzen.umsatz.laufendes_jahr
+      - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
         op: '>'
         wert:
           regelwert: steuern.ustg19.grenze_laufendes_jahr
         label:
-          de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mehr als 100.000 €; die Grenze liegt bei 100.000 €.
+          de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) liegen in diesem Jahr über 100.000 €; die Grenze liegt bei 100.000 €.
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: false
+      - feld: abgeleitet.noch_nicht_gestartet
+        op: ==
+        wert: false
+      - feld: finanzen.umsatz.vereinnahmt_vorjahr
+        op: vorhanden
+      - feld: finanzen.umsatz.vereinnahmt_vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_vorjahr
+        label:
+          de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) lagen im Vorjahr über 25.000 €.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -108,7 +126,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'StB Busch 22.10.2026: Umsatzbegriff sind die vereinnahmten Entgelte (netto, Zufluss); der Auslöser soll auf Zahlungseingänge in Amtlos umgestellt werden – nicht umgesetzt: finanzen.umsatz.laufendes_jahr zählt gestellte Rechnungen nach Rechnungsdatum, der Server speichert keine Zahlungseingänge und die App liefert den Fakt nicht. Bis dahin nur Hinweis im Text'
+- 'StB Busch 22.10.2026: Umsatzbegriff sind die vereinnahmten Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.) – umgesetzt (v5): Auslöser über finanzen.umsatz.vereinnahmt_laufendes_jahr und …_vorjahr (Zahlungseingänge auf Rechnungen, Kasse, Sachentnahmen; App: unterlagen/kuUmsatz.ts). Zu prüfen: Ersatzregel für Rechnungen ohne Zahlungsvermerk (zählen mit dem Rechnungsdatum), Einbezug der Sachentnahmen (§ 3 Abs. 1b UStG), keine Kürzung um steuerfreie Umsätze und Anlagevermögen (App kann sie nicht unterscheiden); der Server kennt keine Zahlungseingänge und zählt dort alle Rechnungen nach Rechnungsdatum'
 pruefung:
   status: entwurf
   geprueft_von: null

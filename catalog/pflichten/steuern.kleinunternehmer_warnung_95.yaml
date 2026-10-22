@@ -1,17 +1,20 @@
-# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt bis auf den Auslöser (Zahlungseingänge)
+# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt; Auslöser seit v5 nach Zahlungseingängen (vereinnahmte Entgelte)
 schema_version: 1
 id: steuern.kleinunternehmer_warnung_95
-version: 4
+version: 5
 katalog_nr: C.23
 titel:
   de: Kleinunternehmergrenze zu 95 % erreicht
 kurz:
-  de: Deine Rechnungen in Amtlos summieren sich auf mindestens 95 % der Kleinunternehmergrenze; die Grenze liegt bei 100.000 €, im Gründungsjahr bei 25.000 €.
+  de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen mindestens 95 % der Kleinunternehmergrenze; die Grenze liegt bei 100.000 €, im Gründungsjahr bei 25.000 €.
 erklaerung:
   de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Maßgeblich ist der Umsatz nach vereinnahmten
-    Entgelten – die Zahlungen, die du netto erhältst, nicht die Rechnungen nach Rechnungsdatum. Amtlos zählt bisher die Rechnungen,
-    die du in Amtlos gestellt hast (netto, nach Rechnungsdatum); ob sie bezahlt sind, ist darin noch nicht berücksichtigt. Rechnungen
-    außerhalb von Amtlos sind nicht enthalten.
+    Entgelten – die Zahlungen, die du netto erhältst, nicht die Rechnungen nach Rechnungsdatum. Amtlos zählt dafür die
+    Zahlungseingänge auf deine Rechnungen in Amtlos (netto) und deine Kasseneinnahmen laut Tagesabschlüssen; Leistungen an
+    Unternehmen im Ausland zählen nicht mit. Hast du bei einer Rechnung keinen Zahlungseingang vermerkt, zählt Amtlos sie
+    vorsichtshalber mit dem Rechnungsdatum – vermerke Zahlungseingänge, dann rechnet Amtlos genauer. Steuerfreie Umsätze wie
+    Heilbehandlungen und Verkäufe von Anlagevermögen zählen für die Grenze nicht mit; Amtlos kann sie nicht unterscheiden und
+    zählt sie mit. Einnahmen außerhalb von Amtlos sind nicht enthalten.
 rechtsgrundlage:
 - § 19 UStG
 kategorie: steuern
@@ -31,18 +34,18 @@ ausloeser:
           de: Du hast dein Unternehmen in diesem Jahr gegründet.
       - all:
         - &id001
-          feld: finanzen.umsatz.laufendes_jahr
+          feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
           op: vorhanden
           label:
-            de: Du stellst Rechnungen mit Amtlos.
-        - feld: finanzen.umsatz.laufendes_jahr
+            de: Du erfasst Rechnungen oder Kasseneinnahmen in Amtlos.
+        - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
           op: '>='
           wert:
             regelwert: steuern.ustg19.grenze_gruendungsjahr
             faktor: 0.95
           label:
-            de: Deine Rechnungen in Amtlos summieren sich im Gründungsjahr auf mindestens 23.750 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
-        - feld: finanzen.umsatz.laufendes_jahr
+            de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen im Gründungsjahr mindestens 23.750 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
+        - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
           op: <=
           wert:
             regelwert: steuern.ustg19.grenze_gruendungsjahr
@@ -53,14 +56,14 @@ ausloeser:
         wert: false
       - all:
         - *id001
-        - feld: finanzen.umsatz.laufendes_jahr
+        - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
           op: '>='
           wert:
             regelwert: steuern.ustg19.grenze_laufendes_jahr
             faktor: 0.95
           label:
-            de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mindestens 95.000 €; die Grenze liegt bei 100.000 €.
-        - feld: finanzen.umsatz.laufendes_jahr
+            de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen in diesem Jahr mindestens 95.000 €; die Grenze liegt bei 100.000 €.
+        - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
           op: <=
           wert:
             regelwert: steuern.ustg19.grenze_laufendes_jahr
@@ -89,7 +92,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'StB Busch 22.10.2026 (G-06): Umsatzbegriff sind die vereinnahmten Entgelte (netto) statt gestellter Rechnungen nach Rechnungsdatum – der Auslöser über finanzen.umsatz.laufendes_jahr zählt weiter die Rechnungen (keine Zahlungsdaten im Fakt); nur Hinweis im Text'
+- 'StB Busch 22.10.2026: Umsatzbegriff sind die vereinnahmten Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.) – umgesetzt (v5): Auslöser über finanzen.umsatz.vereinnahmt_laufendes_jahr (Zahlungseingänge auf Rechnungen, Kasse, Sachentnahmen; App: unterlagen/kuUmsatz.ts). Zu prüfen: Ersatzregel für Rechnungen ohne Zahlungsvermerk (zählen mit dem Rechnungsdatum), Einbezug der Sachentnahmen (§ 3 Abs. 1b UStG), keine Kürzung um steuerfreie Umsätze und Anlagevermögen (App kann sie nicht unterscheiden); der Server kennt keine Zahlungseingänge und zählt dort alle Rechnungen nach Rechnungsdatum'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf

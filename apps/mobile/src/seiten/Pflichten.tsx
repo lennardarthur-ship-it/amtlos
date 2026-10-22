@@ -9,7 +9,8 @@ import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, SCHRIFT, useFarben, weich } from "../ui/thema";
 import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringendOhneTermin, dringlichkeit, erinnerungsPlan, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, zaehlung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
-import { heute } from "../unterlagen/speicher";
+import { LEERER_STAND, heute } from "../unterlagen/speicher";
+import { umsatzFakten } from "../unterlagen/kuUmsatz";
 import { useAmtlos, useStandWahl } from "../zustand";
 import { Antwort, CheckAblauf } from "./Check";
 import { SicherungsKarte } from "./Sicherung";
@@ -40,8 +41,16 @@ export function useAuswertung() {
   // R10: aus „Mitarbeiter“ zählen Geburtsdatum (unter 18) und „Beschäftigt seit“ (Neueinstellung)
   // R12 (Zoll #1, #6): Name, Art und „Beschäftigt bis“ bestimmen die Nachweise je Person
   const personen = mitarbeiter.map((m) => `${m.name ?? ""}:${m.geburtsdatum ?? ""}:${m.beginn ?? ""}:${m.art ?? ""}:${m.ende ?? ""}:${m.staatsangehoerigkeit ?? ""}`).join("|");
-  // `schluessel` und `personen` stehen für alles, was die Auswertung daraus liest – bewusst statt der Listen
-  return useMemo(() => auswertung(profil, tag, unterweisungen, mitarbeiter), [profil, schluessel, personen, tag]);
+  // Kleinunternehmer-Wächter (C.23, StB Busch 22.10.2026): vereinnahmter Umsatz aus Rechnungen, Zahlungseingängen und Kasse
+  const kasse = useStandWahl((s) => s.kasse);
+  const sachentnahmen = useStandWahl((s) => s.sachentnahmen);
+  const betrieb = useStandWahl((s) => s.betrieb);
+  // nur festgeschriebene Rechnungen zählen (unveränderlich) – neu gerechnet wird bei neuen Rechnungen, Zahlungsvermerken und Stornos
+  const rechnungen = useMemo(() => unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben).map((u) => `${u.id}:${u.bezahlt ?? ""}:${JSON.stringify(u.zahlungen ?? [])}:${u.storniertDurch ?? ""}:${u.konfliktKopieVon ?? ""}`).join("|"), [unterlagen]);
+  const finanzen = useMemo(() => umsatzFakten({ ...LEERER_STAND, profil, unterlagen, kasse, sachentnahmen, betrieb }, tag), [profil, rechnungen, kasse, sachentnahmen, betrieb, tag]);
+  const umsatz = JSON.stringify(finanzen);
+  // `schluessel`, `personen` und `umsatz` stehen für alles, was die Auswertung daraus liest – bewusst statt der Listen
+  return useMemo(() => auswertung(profil, tag, unterweisungen, mitarbeiter, finanzen), [profil, schluessel, personen, umsatz, tag]);
 }
 
 /** Hat jemand den Check schon gemacht? (die erste Frage ist beantwortet) */
