@@ -1,7 +1,7 @@
 # Katalog G.67 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.preisangaben
-version: 2
+version: 3
 katalog_nr: G.67
 titel:
   de: Preise richtig angeben
@@ -30,7 +30,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 25.000 €, wenn Gesamt- oder Grundpreis nicht, nicht richtig oder nicht vollständig angegeben sind (§ 20 Nr. 1 PAngV in Verbindung mit § 3 Abs. 1 Satz 1 Nr. 2, Abs. 2 WiStrG 1954). Nach dem Gesetz vom 19.10.2026 (BGBl. 2026 I Nr. 314) künftig bis 100.000 € (§ 3 Abs. 1, 3 PAngG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -40,10 +40,22 @@ quellen:
 - titel: Preisangabenverordnung
   url: https://www.gesetze-im-internet.de/pangv_2022/
   abgerufen: null
+- titel: Preisangabenverordnung § 20 (Ordnungswidrigkeiten)
+  url: https://www.gesetze-im-internet.de/pangv_2022/__20.html
+  abgerufen: '2026-10-22'
+- titel: Wirtschaftsstrafgesetz 1954 § 3
+  url: https://www.gesetze-im-internet.de/wistrg_1954/__3.html
+  abgerufen: '2026-10-22'
+- titel: Gesetzentwurf zur Änderung des Preisangabenrechts (BT-Drs. 21/5873, Art. 1 § 3 PAngG, Art. 3, Art. 4)
+  url: https://dserver.bundestag.de/btd/21/058/2105873.pdf
+  abgerufen: '2026-10-22'
+- titel: BR-Drs. 499/26 – Gesetzesbeschluss des Bundestages vom 9.7.2026 (unverändert angenommen)
+  url: https://dserver.bundestag.de/brd/2026/0499-26.pdf
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Ausnahmen und Einzelheiten (z. B. Grundpreis-Einheiten) fachlich ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 20 Nr. 1 PAngV (§ 3 Abs. 1, § 4 Abs. 1 Satz 1, Abs. 2, § 6 Abs. 1, 2) und § 3 Abs. 1 Satz 1 Nr. 2, Abs. 2 WiStrG 1954 gelesen; künftiger Rahmen bis 100.000 € nach § 3 Abs. 1, 3 PAngG aus dem Gesetzentwurf BT-Drs. 21/5873 (laut BR-Drs. 499/26 unverändert beschlossen, laut buzer verkündet am 19.10.2026, BGBl. 2026 I Nr. 314); Inkrafttreten laut Entwurf am ersten Tag des auf die Verkündung folgenden Quartals – Datum im BGBl. prüfen – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

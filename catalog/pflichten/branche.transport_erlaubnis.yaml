@@ -1,7 +1,7 @@
 # Katalog H.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.transport_erlaubnis
-version: 3
+version: 4
 katalog_nr: H.5
 titel:
   de: Erlaubnis oder Lizenz für den Güterkraftverkehr
@@ -54,7 +54,7 @@ kanal: post
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 20.000 €, wenn gewerblicher Güterkraftverkehr ohne die nach § 3 Abs. 1 GüKG erforderliche Gemeinschaftslizenz durchgeführt wird (§ 19 Abs. 1 Nr. 1b, Abs. 7 GüKG); ebenso grenzüberschreitend ohne Gemeinschaftslizenz nach Art. 3 VO (EG) Nr. 1072/2009 (§ 19 Abs. 2 Nr. 1, Abs. 7 GüKG).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -68,11 +68,17 @@ quellen:
 - titel: IHK Berlin – Güterkraftverkehr
   url: https://www.ihk.de/berlin/produktmarken/branchen/verkehr/gueterkraftverkehr
   abgerufen: '2026-10-21'
+- titel: Güterkraftverkehrsgesetz § 19 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/g_kg_1998/__19.html
+  abgerufen: '2026-10-22'
+- titel: Güterkraftverkehrsgesetz § 3 (Gemeinschaftslizenz)
+  url: https://www.gesetze-im-internet.de/g_kg_1998/__3.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Kurier #3): Erlaubnis über 3,5 t (§§ 1, 3 GüKG), Gemeinschaftslizenz über 2,5 t grenzüberschreitend seit 21.5.2022 (IHK Berlin) – Ausnahmen nach § 2 GüKG nicht abgebildet'
 - Personenbeförderung (Taxi, Mietwagen, PBefG) nur im Text – eigener Auslöser fehlt
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 3 Abs. 1 und § 19 Abs. 1 Nr. 1b, Abs. 2 Nr. 1, Abs. 7 GüKG gelesen; § 3 Abs. 1 GüKG verlangt inzwischen eine Gemeinschaftslizenz (keine „Erlaubnis“) – Titel, Kurztext und Erklärung prüfen; Folgen für die Personenbeförderung (PBefG) nicht ergänzt – fachlich zu bestätigen'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:

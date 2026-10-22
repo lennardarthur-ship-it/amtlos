@@ -2,7 +2,7 @@
 # Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 12): Nachweis, jährliche Wiederholung, Abgrenzung zur IfSG-Belehrung
 schema_version: 1
 id: branche.gastro_hygieneschulung
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Lebensmittelhygiene schulen
@@ -44,7 +44,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 50.000 €, wenn leicht verderbliche Lebensmittel von Personen ohne die nötige Schulung hergestellt, behandelt oder in den Verkehr gebracht werden (§ 10 Nr. 3 in Verbindung mit § 4 Abs. 1 Satz 1 LMHV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB).'
   schwere: mittel
 automatisierung: hinweis
 erledigung:
@@ -58,14 +58,20 @@ gueltig_bis: null
 quellen:
 - titel: Lebensmittelhygiene-Verordnung § 4
   url: https://www.gesetze-im-internet.de/lmhv_2007/__4.html
-  abgerufen: null
+  abgerufen: '2026-10-22'
 - titel: Verordnung (EG) Nr. 852/2004
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852
   abgerufen: null
+- titel: Lebensmittelhygiene-Verordnung § 10
+  url: https://www.gesetze-im-internet.de/lmhv_2007/__10.html
+  abgerufen: '2026-10-22'
+- titel: Lebensmittel- und Futtermittelgesetzbuch § 60 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/lfgb/__60.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 12, ✎): Nachweis nach § 4 Abs. 1 Satz 2 LMHV, jährliche Wiederholung (DIN 10514), Abgrenzung zur IfSG-Belehrung und Ausnahme § 4 Abs. 2 LMHV ergänzt – Bericht noch nicht unterschrieben; Vorlage „Schulungsnachweis Lebensmittelhygiene“ wird verknüpft'
 - 'Wiederholung „einmal im Jahr“ als Kalenderjahr umgesetzt (erledigung laufend/jahr) – DIN 10514 selbst nicht eingesehen'
-- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen'
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 10 Nr. 3 und § 4 Abs. 1 LMHV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB gelesen; der Nachweis auf Verlangen (§ 4 Abs. 1 Satz 2 LMHV) ist in § 10 LMHV nicht genannt – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

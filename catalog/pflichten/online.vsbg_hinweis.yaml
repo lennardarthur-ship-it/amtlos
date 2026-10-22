@@ -1,7 +1,7 @@
 # Katalog G.69 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.vsbg_hinweis
-version: 3
+version: 4
 katalog_nr: G.69
 titel:
   de: Hinweis zur Verbraucherstreitbeilegung
@@ -41,7 +41,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Kein eigenes Bußgeld vorgesehen.'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -54,11 +54,17 @@ quellen:
 - titel: § 36 VSBG, Wortlaut (lxgesetze.de)
   url: https://lxgesetze.de/vsbg/36
   abgerufen: '2026-10-21'
+- titel: Verbraucherstreitbeilegungsgesetz § 41 (Wortlaut über lxgesetze, amtliche Seite nicht erreichbar)
+  url: https://lxgesetze.de/vsbg/41
+  abgerufen: '2026-10-22'
+- titel: Verbraucherstreitbeilegungsgesetz – Inhaltsübersicht (umwelt-online)
+  url: https://umwelt-online.de/recht/allgemei/wirtschaft/vsbg_in.htm
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Zählweise (G-05)
 - Auslöser „Website oder AGB“ – AGB sind nicht im Profil
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 41 VSBG (einzige Bußgeldvorschrift laut Inhaltsübersicht; erfasst nur § 2 Abs. 2 – unberechtigte Bezeichnung als Verbraucherschlichtungsstelle; über lxgesetze) gelesen; wettbewerbsrechtliche Folgen (UWG) nicht geprüft – fachlich zu bestätigen'
 - 'Vorprüfung 21.10.2026 (G-05): § 36 Abs. 3 VSBG gelesen (Stichtag 31.12. des Vorjahres, zehn oder weniger Personen) – Stichtag ist im Auslöser nicht abgebildet'
 pruefung:
   status: entwurf

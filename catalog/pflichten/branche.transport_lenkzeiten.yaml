@@ -1,7 +1,7 @@
 # Katalog H.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.transport_lenkzeiten
-version: 3
+version: 4
 katalog_nr: H.5
 titel:
   de: Lenk- und Ruhezeiten einhalten und mit dem Fahrtenschreiber aufzeichnen
@@ -53,7 +53,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 30.000 € für dich als Unternehmer, wenn du nicht dafür sorgst, dass deine Fahrer Lenkzeiten, Fahrtunterbrechungen und Ruhezeiten einhalten (§ 8a Abs. 1 Nr. 2, Abs. 4 FPersG); für Fahrer bis 5.000 € (§ 8a Abs. 2 Nr. 1, Abs. 4 FPersG).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -67,10 +67,13 @@ quellen:
 - titel: IHK München – Handzettel Kleinfahrzeuge (Stand 05/2026)
   url: https://www.ihk-muenchen.de/ihk/Verkehr/Verkehrsausschuss/Handzettel-Kleinfahrzeuge-Stand-22_05_2026.pdf
   abgerufen: '2026-10-21'
+- titel: Fahrpersonalgesetz § 8a (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/fahrpersstg/__8a.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Kurier #2): Auslöser nach zulässiger Gesamtmasse und grenzüberschreitenden Fahrten (seit 1.7.2026 ab 2,5 t, IHK München) – Ausnahmen (Werkverkehr Art. 3 Buchst. ha, Handwerkerregelung) sowie Auslese- und Aufbewahrungsfristen fachlich ergänzen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 8a Abs. 1 Nr. 2 (Art. 6, 7, 8 VO (EG) Nr. 561/2006), Abs. 2 Nr. 1 und Abs. 4 FPersG gelesen; Verstöße beim Fahrtenschreiber (VO (EU) Nr. 165/2014) laufen über § 8 Abs. 1 Nr. 1 Buchst. b FPersG und die FPersV – nicht ergänzt – fachlich zu bestätigen'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf

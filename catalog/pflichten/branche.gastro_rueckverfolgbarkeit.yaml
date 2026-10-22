@@ -1,7 +1,7 @@
 # E-166 (Prüfmappe Lebensmittelhygiene, Frage 14): Rückverfolgbarkeit nach Art. 18 VO (EG) Nr. 178/2002
 schema_version: 1
 id: branche.gastro_rueckverfolgbarkeit
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Rückverfolgbarkeit sicherstellen
@@ -54,7 +54,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 50.000 €, wenn keine Systeme und Verfahren zur Rückverfolgbarkeit eingerichtet sind oder die Informationen der Behörde nicht rechtzeitig zur Verfügung gestellt werden (§ 60 Abs. 3 Nr. 1 Buchst. b, c, Abs. 5 LFGB); ebenso bei Verstößen gegen die Rücknahme- und Unterrichtungspflichten nach Art. 19 VO (EG) Nr. 178/2002 (§ 60 Abs. 3 Nr. 1 Buchst. d bis g LFGB).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -75,11 +75,14 @@ quellen:
 - titel: Verordnung (EG) Nr. 178/2002 (EUR-Lex)
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32002R0178
   abgerufen: null
+- titel: Lebensmittel- und Futtermittelgesetzbuch § 60 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/lfgb/__60.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu (E-166): Art. 18 Abs. 2 und 3 am Wortlaut geprüft (gesetze.legal); Geltung ab 1.1.2005 (Art. 65 VO (EG) Nr. 178/2002) an EUR-Lex gegenlesen'
 - 'Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14, ✔): Text und Auslöser richtig; DVO (EU) Nr. 931/2011 als Hinweis so belassen; auch bei Onlinehändlern mit Lebensmitteln auslösen (Branche Onlinehandel und „Was verkaufst du?“ Lebensmittel) und Rückruf-Satz nach Art. 19 VO (EG) Nr. 178/2002 ergänzt – umgesetzt, Bericht noch nicht unterschrieben'
 - 'Lebensmittel ohne Branche Gastronomie oder Onlinehandel (z. B. Kiosk mit „Sonstige“) lösen den Eintrag weiter nicht aus'
-- Folgen bei Nichterfüllung (Bußgeld nach LFGB bzw. Lebensmittelrechtlicher Straf- und Bußgeldverordnung) nicht geprüft – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 60 Abs. 3 Nr. 1 Buchst. b bis g, Abs. 5 LFGB (Art. 18 Abs. 2 UAbs. 2, Abs. 3 Satz 1, 2 und Art. 19 VO (EG) Nr. 178/2002) gelesen; DVO (EU) Nr. 931/2011 zusätzlich nach § 9 LMRStV bußgeldbewehrt (Tatbestände nicht gelesen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

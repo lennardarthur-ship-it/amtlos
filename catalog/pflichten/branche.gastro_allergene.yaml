@@ -1,7 +1,7 @@
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gastro_allergene
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Allergene kennzeichnen
@@ -32,7 +32,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 50.000 €, wenn Lebensmittel ohne die vorgeschriebene Allergeninformation in den Verkehr gebracht oder abgegeben werden (§ 6 Abs. 4 Nr. 1, 2 LMIDV in Verbindung mit § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: dokument_generator
@@ -46,11 +46,20 @@ quellen:
 - titel: Verordnung (EU) Nr. 1169/2011
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32011R1169
   abgerufen: null
+- titel: Lebensmittelinformations-Durchführungsverordnung (§§ 4 bis 6)
+  url: https://www.gesetze-im-internet.de/lmidv/BJNR227210017.html
+  abgerufen: '2026-10-22'
+- titel: LMIDV § 6 (Wortlaut über lexmea)
+  url: https://lexmea.de/de/gesetz/lmidv/6
+  abgerufen: '2026-10-22'
+- titel: Lebensmittel- und Futtermittelgesetzbuch § 60 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/lfgb/__60.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Liste der 14 Allergene (Anhang II LMIV) im Werkzeug prüfen
 - Form der Information bei loser Ware (LMIDV) erläutern
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 6 Abs. 4 Nr. 1 (§ 4 Abs. 1 Satz 1, Abs. 2 Satz 1) und Nr. 2 (§ 5 Abs. 1 Nr. 3) LMIDV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB gelesen – fachlich zu bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:

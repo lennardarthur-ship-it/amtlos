@@ -1,7 +1,7 @@
 # Katalog H.4 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog H.4): Rolle Bauherr ↔ Auftragnehmer
 schema_version: 1
 id: branche.bau_baustellenverordnung
-version: 2
+version: 3
 katalog_nr: H.4
 titel:
   de: Baustellenverordnung beachten
@@ -31,7 +31,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Für die Pflichten der ausführenden Firma nach § 5 BaustellV gibt es kein eigenes Bußgeld – § 7 BaustellV erfasst nur Vorankündigung und SiGe-Plan des Bauherrn. Die Aufsicht kann Maßnahmen anordnen; ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3 Satz 1 Nr. 1, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -43,8 +43,18 @@ quellen:
 - titel: Baustellenverordnung
   url: https://www.gesetze-im-internet.de/baustellv/BJNR128300998.html
   abgerufen: '2026-10-22'
+- titel: Baustellenverordnung § 7 (Ordnungswidrigkeiten und Strafvorschriften)
+  url: https://www.gesetze-im-internet.de/baustellv/__7.html
+  abgerufen: '2026-10-22'
+- titel: Arbeitsschutzgesetz § 25 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/arbschg/__25.html
+  abgerufen: '2026-10-22'
+- titel: Arbeitsschutzgesetz § 22 (Wortlaut über lxgesetze)
+  url: https://lxgesetze.de/arbschg/22
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Prüfergebnis Sifa 22.10.2026 umgesetzt (Bauherrenpflichten §§ 2, 3; Auftragnehmer § 5 BaustellV) – Bußgeld nach § 7 BaustellV betrifft nur Vorankündigung und SiGe-Plan (Bauherr); Folgen für ausführende Firmen fachlich ergänzen'
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 7 Abs. 1 BaustellV (nur § 2 Abs. 2 Satz 1 und Abs. 3 Satz 1), § 22 Abs. 3 Satz 1 Nr. 1 und § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG gelesen – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

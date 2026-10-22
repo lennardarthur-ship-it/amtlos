@@ -1,7 +1,7 @@
 # R11 (Rechtsprüfung T-112): Informationspflicht nach § 37 VSBG nach Entstehen einer Streitigkeit – unabhängig von der Betriebsgröße
 schema_version: 1
 id: online.vsbg_streitfall
-version: 1
+version: 2
 katalog_nr: G.69
 titel:
   de: Im Streitfall auf die Verbraucherschlichtung hinweisen
@@ -30,7 +30,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Kein eigenes Bußgeld vorgesehen.'
   schwere: niedrig
 automatisierung: hinweis
 einordnung: hinweis
@@ -41,9 +41,16 @@ quellen:
 - titel: Verbraucherstreitbeilegungsgesetz § 37
   url: https://www.gesetze-im-internet.de/vsbg/__37.html
   abgerufen: null
+- titel: Verbraucherstreitbeilegungsgesetz § 41 (Wortlaut über lxgesetze, amtliche Seite nicht erreichbar)
+  url: https://lxgesetze.de/vsbg/41
+  abgerufen: '2026-10-22'
+- titel: Verbraucherstreitbeilegungsgesetz – Inhaltsübersicht (umwelt-online)
+  url: https://umwelt-online.de/recht/allgemei/wirtschaft/vsbg_in.htm
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Rechtsprüfung R11 (T-112) – ob das VSBG 2025/26 geändert wurde, ist laut Prüferin unsicher; Wortlaut bestätigen'
 - 'Als Hinweis geführt, weil die Pflicht erst mit einer Streitigkeit entsteht'
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 41 VSBG (einzige Bußgeldvorschrift laut Inhaltsübersicht; erfasst nur § 2 Abs. 2 – unberechtigte Bezeichnung als Verbraucherschlichtungsstelle; über lxgesetze) gelesen; wettbewerbsrechtliche Folgen (UWG) nicht geprüft – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

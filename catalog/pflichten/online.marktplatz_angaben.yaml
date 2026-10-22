@@ -1,7 +1,7 @@
 # Katalog G.74 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.marktplatz_angaben
-version: 2
+version: 3
 katalog_nr: G.74
 titel:
   de: Händlerangaben auf Marktplätzen
@@ -31,7 +31,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 50.000 €, wenn die Pflichtangaben nach § 5 Abs. 1 DDG nicht, nicht richtig oder nicht vollständig verfügbar sind (§ 33 Abs. 2 Nr. 1, Abs. 6 Nr. 3 DDG). Die Bußgelder zu Art. 30 DSA (§ 33 Abs. 5 Nr. 27 bis 31 DDG) treffen den Betreiber des Marktplatzes.'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -41,10 +41,13 @@ quellen:
 - titel: Digitale-Dienste-Gesetz § 5
   url: https://www.gesetze-im-internet.de/ddg/__5.html
   abgerufen: null
+- titel: Digitale-Dienste-Gesetz § 33 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/ddg/__33.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Rechtsgrundlagen ergänzt – prüfen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 33 Abs. 2 Nr. 1, Abs. 5 Nr. 27 bis 31, Abs. 6 DDG gelesen; dass Art. 30 DSA nur den Plattformbetreiber verpflichtet, ist aus dem Aufbau des Art. 30 abgeleitet (Art. 30 DSA selbst nicht gelesen) – fachlich zu bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

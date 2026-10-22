@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kfz #2): Klimaanlagen-Service an Fahrzeugen – Sachkunde für F-Gase
 schema_version: 1
 id: umwelt.klima_sachkunde
-version: 1
+version: 2
 katalog_nr: U.5
 titel:
   de: Klimaanlagen an Fahrzeugen nur mit Sachkunde warten
@@ -31,7 +31,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 50.000 €, wenn jemand ohne die erforderliche Sachkundebescheinigung an der Klimaanlage arbeitet (§ 16 Abs. 2 Nr. 3 in Verbindung mit § 5 Abs. 1 Satz 1 ChemKlimaschutzV, § 26 Abs. 1 Nr. 7 Buchst. a, Abs. 3 ChemG).'
   schwere: mittel
 automatisierung: hinweis
 erledigung:
@@ -44,9 +44,19 @@ gueltig_bis: null
 quellen:
 - titel: Umweltbundesamt – Übersicht über Sachkundebescheinigungen und Unternehmenszertifikate
   url: https://www.umweltbundesamt.de/system/files/medien/10594/bilder/dateien/%C3%9Cbersicht%20%C3%BCber%20Sachkundebescheinigungen%20und%20Unternehmenszertifikate.pdf
-  abgerufen: null
+  abgerufen: '2026-10-22'
+- titel: Chemikalien-Klimaschutzverordnung 2026 § 16 (Ordnungswidrigkeiten)
+  url: https://www.gesetze-im-internet.de/chemklimaschutzv_2026/__16.html
+  abgerufen: '2026-10-22'
+- titel: Chemikalien-Klimaschutzverordnung 2026 § 5
+  url: https://www.gesetze-im-internet.de/chemklimaschutzv_2026/__5.html
+  abgerufen: '2026-10-22'
+- titel: Chemikaliengesetz § 26 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/chemg/__26.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Kfz #2) – genaue Artikel der VO (EU) 2024/573 und § 5 ChemKlimaschutzV, Übergangsregeln für ältere Bescheinigungen unsicher; Folgen fachlich ergänzen'
+- 'Neu nach Nutzertest R12 (Kfz #2) – genaue Artikel der VO (EU) 2024/573 und § 5 ChemKlimaschutzV, Übergangsregeln für ältere Bescheinigungen unsicher'
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 5 Abs. 1 und § 16 Abs. 2 Nr. 3 ChemKlimaschutzV 2026, § 26 Abs. 1 Nr. 7 Buchst. a, Abs. 3 ChemG; Zuordnung der Kfz-Klimaanlagen zu Art. 10 Abs. 1 UAbs. 2 VO (EU) 2024/573 laut UBA-Übersicht gelesen; Rechtsgrundlage auf ChemKlimaschutzV 2026 (§§ 5, 6) präzisieren – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

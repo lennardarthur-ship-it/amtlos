@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kurier #2): Lenk- und Ruhezeiten im Inland für Fahrzeuge über 2,8 bis 3,5 t
 schema_version: 1
 id: branche.transport_lenkzeiten_national
-version: 3
+version: 4
 katalog_nr: H.5
 titel:
   de: Lenk- und Ruhezeiten bei Transportern über 2,8 t
@@ -37,7 +37,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 30.000 € für dich als Unternehmer, wenn du nicht dafür sorgst, dass die Lenk- und Ruhezeiten eingehalten werden, keine Vordrucke aushändigst oder die Aufzeichnungen nicht prüfst, aufbewahrst oder vorlegst (§ 21 Abs. 1 Nr. 1, 1a, 2 FPersV in Verbindung mit § 8 Abs. 1 Nr. 1 Buchst. a, Abs. 2 FPersG); für Fahrer bis 5.000 € (§ 21 Abs. 2 Nr. 1, 2 FPersV).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -54,10 +54,17 @@ quellen:
 - titel: Fahrpersonalverordnung § 1
   url: https://www.gesetze-im-internet.de/fpersv/__1.html
   abgerufen: '2026-10-22'
+- titel: Fahrpersonalverordnung § 21 (Ordnungswidrigkeiten)
+  url: https://www.gesetze-im-internet.de/fpersv/__21.html
+  abgerufen: '2026-10-22'
+- titel: Fahrpersonalgesetz § 8 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/fahrpersstg/__8.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Fundstelle § 1 Abs. 1 Nr. 1, Abs. 6 FPersV am 22.10.2026 gelesen (Prüfergebnis Sifa: offen, nicht Kern der sicherheitstechnischen Prüfung) – Ausnahmen für Werkverkehr bestätigen'
-- § 21a ArbZG für Fahrer zwischen 2,8 und 3,5 t im Inlandsverkehr unsicher; Folgen fachlich ergänzen
+- § 21a ArbZG für Fahrer zwischen 2,8 und 3,5 t im Inlandsverkehr unsicher
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 1 Abs. 5 Satz 1, Abs. 6 Satz 1, 7 und § 21 Abs. 1 Nr. 1, 1a, 2, Abs. 2 Nr. 1, 2 FPersV, § 8 Abs. 1 Nr. 1 Buchst. a, Nr. 2 Buchst. a, Abs. 2 FPersG gelesen – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

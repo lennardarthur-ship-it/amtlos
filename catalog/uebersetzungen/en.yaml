@@ -276,12 +276,34 @@ eintraege:
 - de: Bußgeld bis 10.000 €, wenn Erste-Hilfe-Material oder Meldeeinrichtungen fehlen oder Erste-Hilfe-Leistungen nicht dokumentiert werden (§ 32 DGUV Vorschrift 1 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs.
     3 SGB VII).
   en: Fine of up to €10,000 if first-aid supplies or alarm facilities are missing or first aid given is not documented (§ 32 DGUV Regulation 1 in conjunction with § 209(1) no. 1, (3) SGB VII).
+- de: 'Bußgeld bis 10.000 €, wenn Herstellerangaben oder Sicherheitsinformationen fehlen oder im Fernabsatz die Pflichtangaben nach Art. 19 GPSR fehlen (§ 28 Abs. 2 Nr. 5, 6, 26, Abs. 3 ProdSG).'
+  en: 'Fine of up to €10,000 if manufacturer details or safety information are missing or, in distance selling, the mandatory information under Art. 19 GPSR is missing (§ 28(2) nos. 5, 6, 26, (3) ProdSG).'
 - de: Bußgeld bis 10.000 €, wenn die Betreuung fehlt (Bußgeldvorschrift der DGUV Vorschrift 2 deiner BG in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
   en: Fine of up to €10,000 if support is missing (the fine provision of your BG's DGUV Regulation 2 in conjunction with § 209(1) no. 1, (3) SGB VII).
+- de: 'Bußgeld bis 10.000 €, wenn die Ware nicht auch in Mehrwegverpackungen angeboten wird, Mehrweg teurer oder zu schlechteren Bedingungen angeboten wird oder der Hinweis fehlt (§ 66 Abs. 1 Nr. 26, 28, 29, Abs. 3 VerpackDG).'
+  en: 'Fine of up to €10,000 if the goods are not also offered in reusable packaging, reusable packaging is offered at a higher price or on worse terms, or the notice is missing (§ 66(1) nos. 26, 28, 29, (3) VerpackDG).'
 - de: Bußgeld bis 10.000 €, wenn die erforderlichen Ersthelfer fehlen (§ 32 DGUV Vorschrift 1 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
   en: Fine of up to €10,000 if the required first aiders are missing (§ 32 DGUV Regulation 1 in conjunction with § 209(1) no. 1, (3) SGB VII).
 - de: Bußgeld bis 10.000 €, wenn elektrische Anlagen und Betriebsmittel nicht geprüft werden (§ 9 DGUV Vorschrift 3 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
   en: Fine of up to €10,000 if electrical installations and equipment are not inspected (§ 9 DGUV Regulation 3 in conjunction with § 209(1) no. 1, (3) SGB VII).
+- de: 'Bußgeld bis 100.000 €, wenn Abfälle nicht richtig getrennt gesammelt werden (§ 13 Abs. 1 Nr. 1 GewAbfV in Verbindung mit § 69 Abs. 1 Nr. 8, Abs. 3 KrWG), und bis 10.000 €, wenn die Dokumentation fehlt oder nicht rechtzeitig vorgelegt wird (§ 13 Abs. 2 Nr. 1, 2 GewAbfV in Verbindung mit § 69 Abs. 2 Nr. 15, Abs. 3 KrWG).'
+  en: 'Fine of up to €100,000 if waste is not collected separately as required (§ 13(1) no. 1 GewAbfV in conjunction with § 69(1) no. 8, (3) KrWG), and up to €10,000 if the documentation is missing or not presented in time (§ 13(2) nos. 1, 2 GewAbfV in conjunction with § 69(2) no. 15, (3) KrWG).'
+- de: 'Bußgeld bis 100.000 €, wenn du Batterien bereitstellst, ohne deine Rücknahmepflichten zu erfüllen (§ 60 Abs. 1 Nr. 1, Abs. 3 in Verbindung mit § 4 Abs. 2 und § 18 Abs. 1 Satz 1 BattDG).'
+  en: 'Fine of up to €100,000 if you make batteries available without meeting your take-back obligations (§ 60(1) no. 1, (3) in conjunction with § 4(2) and § 18(1) sentence 1 BattDG).'
+- de: 'Bußgeld bis 100.000 €, wenn du dich nicht registrieren lässt oder Elektrogeräte ohne Registrierung in Verkehr bringst oder anbietest (§ 45 Abs. 1 Nr. 1, 3, 4, Abs. 2 ElektroG).'
+  en: 'Fine of up to €100,000 if you do not register, or place on the market or offer electrical equipment without registration (§ 45(1) nos. 1, 3, 4, (2) ElektroG).'
+- de: 'Bußgeld bis 100.000 €, wenn du dich nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig registrierst oder Batterien ohne Registrierung bereitstellst (§ 60 Abs. 1 Nr. 1, Abs. 2 Nr. 23, Abs. 3 in Verbindung mit § 4 Abs. 1 BattDG).'
+  en: 'Fine of up to €100,000 if you do not register, or not correctly, completely or in time, or make batteries available without registration (§ 60(1) no. 1, (2) no. 23, (3) in conjunction with § 4(1) BattDG).'
+- de: 'Bußgeld bis 100.000 €, wenn ein Produkt in Verkehr gebracht oder auf dem Markt bereitgestellt wird, das die Barrierefreiheitsanforderungen nicht erfüllt (§ 37 Abs. 1 Nr. 1, 7, Abs. 2 BFSG).'
+  en: 'Fine of up to €100,000 if a product is placed or made available on the market that does not meet the accessibility requirements (§ 37(1) nos. 1, 7, (2) BFSG).'
+- de: 'Bußgeld bis 100.000 €, wenn eine Dienstleistung angeboten oder erbracht wird, die die Barrierefreiheitsanforderungen nicht erfüllt oder für die die Informationen nach Anlage 3 fehlen (§ 37 Abs. 1 Nr. 8, Abs. 2 in Verbindung mit § 14 Abs. 1 BFSG).'
+  en: 'Fine of up to €100,000 if a service is offered or provided that does not meet the accessibility requirements or for which the information under Annex 3 is missing (§ 37(1) no. 8, (2) in conjunction with § 14(1) BFSG).'
+- de: 'Bußgeld bis 100.000 €, wenn gefährliche Abfälle vermischt werden (§ 69 Abs. 1 Nr. 1, Abs. 3 KrWG), und bis 10.000 €, wenn Register oder Nachweise nicht richtig geführt, vorgelegt oder aufbewahrt werden (§ 69 Abs. 2 Nr. 8 bis 12, Abs. 3 KrWG).'
+  en: 'Fine of up to €100,000 if hazardous waste is mixed (§ 69(1) no. 1, (3) KrWG), and up to €10,000 if registers or records are not kept, presented or retained correctly (§ 69(2) nos. 8 to 12, (3) KrWG).'
+- de: 'Bußgeld bis 100.000 €, wenn keine Annahmestelle eingerichtet oder nachgewiesen wird oder der Hinweis fehlt (§ 10 Abs. 1 Nr. 6 AltölV in Verbindung mit § 69 Abs. 1 Nr. 8, Abs. 3 KrWG).'
+  en: 'Fine of up to €100,000 if no collection point is set up or proven, or the notice is missing (§ 10(1) no. 6 AltölV in conjunction with § 69(1) no. 8, (3) KrWG).'
+- de: 'Bußgeld bis 150.000 € bei Vorsatz, sonst bis 100.000 €, etwa wenn Risikoanalyse, interne Sicherungsmaßnahmen oder die Identifizierung fehlen; bei schwerwiegenden, wiederholten oder systematischen Verstößen bis 1 Mio. € oder bis zum Zweifachen des wirtschaftlichen Vorteils, für Verpflichtete nach § 2 Abs. 1 Nr. 1 bis 3 und 6 bis 9 GwG auch mehr (§ 56 Abs. 1 Satz 1 Nr. 1, 3, 15, Abs. 3 GwG).'
+  en: 'Fine of up to €150,000 for intent, otherwise up to €100,000, for example if the risk analysis, internal safeguards or identification are missing; for serious, repeated or systematic violations up to €1 million or up to twice the economic benefit, and more for obliged entities under § 2(1) nos. 1 to 3 and 6 to 9 GwG (§ 56(1) sentence 1 nos. 1, 3, 15, (3) GwG).'
 - de: Bußgeld bis 2.500 €, wenn die Anzeige nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig erstattet wird (§ 209 Abs. 1 Nr. 9, Abs. 3 SGB VII).
   en: Fine of up to €2,500 if the report is not filed, not filed correctly, completely or on time (§ 209(1) no. 9, (3) SGB VII).
 - de: 'Bußgeld bis 2.500 €, wenn die Mitteilung zum Unternehmensbeginn nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig gemacht wird (§ 209 Abs. 1 Nr. 8, Abs. 3 SGB VII). Eine Gewerbeanzeige in derselben Woche erfüllt die Pflicht (§ 192 Abs. 1 SGB VII).'
@@ -294,6 +316,22 @@ eintraege:
   en: 'Fine of up to €25,000 if the cash register is not used or not used correctly, or not protected or not correctly protected by a TSE, and this makes tax evasion possible (§ 379(1) sentence 1 nos. 4, 5, (6) AO). § 379 AO provides no fine for failing to issue receipts under § 146a(2) AO.'
 - de: 'Bußgeld bis 30.000 €, wenn eine meldepflichtige Zahlung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig gemeldet wird (§ 81 Abs. 2 Nr. 19 AWV in Verbindung mit § 19 Abs. 3 Nr. 1 Buchst. b, Abs. 6 AWG).'
   en: 'Fine of up to €30,000 if a reportable payment is not reported, or not reported correctly, completely or on time (§ 81(2) no. 19 AWV in conjunction with § 19(3) no. 1 letter b, (6) AWG).'
+- de: 'Bußgeld bis 20.000 €, wenn gewerblicher Güterkraftverkehr ohne die nach § 3 Abs. 1 GüKG erforderliche Gemeinschaftslizenz durchgeführt wird (§ 19 Abs. 1 Nr. 1b, Abs. 7 GüKG); ebenso grenzüberschreitend ohne Gemeinschaftslizenz nach Art. 3 VO (EG) Nr. 1072/2009 (§ 19 Abs. 2 Nr. 1, Abs. 7 GüKG).'
+  en: 'Fine of up to €20,000 if commercial road haulage is carried out without the Community licence required under § 3(1) GüKG (§ 19(1) no. 1b, (7) GüKG); the same applies to cross-border haulage without a Community licence under Art. 3 Regulation (EC) No 1072/2009 (§ 19(2) no. 1, (7) GüKG).'
+- de: 'Bußgeld bis 200.000 €, wenn kein System zum Befüllen mitgebrachter Behälter vorgesehen oder die Mehrwegmöglichkeit nicht eingeräumt wird; bis 10.000 €, wenn das Befüllen oder Mehrweg teurer oder zu schlechteren Bedingungen angeboten wird oder der Hinweis fehlt (§ 66 Abs. 2 Nr. 29 bis 32, Abs. 3 VerpackDG).'
+  en: 'Fine of up to €200,000 if no system for filling containers brought by customers is provided or the reusable option is not offered; up to €10,000 if filling or reusable packaging is offered at a higher price or on worse terms, or the notice is missing (§ 66(2) nos. 29 to 32, (3) VerpackDG).'
+- de: 'Bußgeld bis 25.000 €, wenn Gesamt- oder Grundpreis nicht, nicht richtig oder nicht vollständig angegeben sind (§ 20 Nr. 1 PAngV in Verbindung mit § 3 Abs. 1 Satz 1 Nr. 2, Abs. 2 WiStrG 1954). Nach dem Gesetz vom 19.10.2026 (BGBl. 2026 I Nr. 314) künftig bis 100.000 € (§ 3 Abs. 1, 3 PAngG).'
+  en: 'Fine of up to €25,000 if the total or unit price is not stated, or not stated correctly or completely (§ 20 no. 1 PAngV in conjunction with § 3(1) sentence 1 no. 2, (2) WiStrG 1954). Under the Act of 19.10.2026 (BGBl. 2026 I No. 314), up to €100,000 in future (§ 3(1), (3) PAngG).'
+- de: 'Bußgeld bis 25.000 €, wenn Preise nicht in einem Preisverzeichnis angegeben sind oder das Preisverzeichnis nach § 13 Abs. 2 Satz 1 PAngV nicht oder nicht rechtzeitig vorgelegt wird (§ 20 Nr. 1, 4 PAngV in Verbindung mit § 3 Abs. 1 Satz 1 Nr. 2, Abs. 2 WiStrG 1954). Das Preisverzeichnis neben dem Eingang (§ 13 Abs. 2 Satz 2 PAngV) ist in § 20 PAngV nicht genannt. Nach dem Gesetz vom 19.10.2026 (BGBl. 2026 I Nr. 314) künftig bis 100.000 € (§ 3 Abs. 1, 3 PAngG).'
+  en: 'Fine of up to €25,000 if prices are not stated in a price list or the price list under § 13(2) sentence 1 PAngV is not presented or not presented in time (§ 20 nos. 1, 4 PAngV in conjunction with § 3(1) sentence 1 no. 2, (2) WiStrG 1954). The price list next to the entrance (§ 13(2) sentence 2 PAngV) is not listed in § 20 PAngV. Under the Act of 19.10.2026 (BGBl. 2026 I No. 314), up to €100,000 in future (§ 3(1), (3) PAngG).'
+- de: 'Bußgeld bis 25.000 €, wenn das Preisverzeichnis bei unzumutbarem Aushang nicht zur Einsicht bereitgehalten wird (§ 20 Nr. 2 PAngV) oder Gesamt- oder Grundpreise nicht richtig angegeben sind (§ 20 Nr. 1 PAngV), jeweils in Verbindung mit § 3 Abs. 1 Satz 1 Nr. 2, Abs. 2 WiStrG 1954. Der Aushang selbst (§ 12 Abs. 2 Satz 1, 2 PAngV) ist in § 20 PAngV nicht genannt. Nach dem Gesetz vom 19.10.2026 (BGBl. 2026 I Nr. 314) künftig bis 100.000 € (§ 3 Abs. 1, 3 PAngG).'
+  en: 'Fine of up to €25,000 if, where posting is unreasonable, the price list is not kept available for inspection (§ 20 no. 2 PAngV) or total or unit prices are not stated correctly (§ 20 no. 1 PAngV), in each case in conjunction with § 3(1) sentence 1 no. 2, (2) WiStrG 1954. Posting the list itself (§ 12(2) sentences 1, 2 PAngV) is not listed in § 20 PAngV. Under the Act of 19.10.2026 (BGBl. 2026 I No. 314), up to €100,000 in future (§ 3(1), (3) PAngG).'
+- de: 'Bußgeld bis 25.000 €, wenn die Anzeige nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig erstattet wird (§ 72 Nr. 1 TrinkwV in Verbindung mit § 73 Abs. 1a Nr. 24, Abs. 2 IfSG).'
+  en: 'Fine of up to €25,000 if the notification is not made, or not made correctly, completely or in time (§ 72 no. 1 TrinkwV in conjunction with § 73(1a) no. 24, (2) IfSG).'
+- de: 'Bußgeld bis 30.000 € für dich als Unternehmer, wenn du nicht dafür sorgst, dass deine Fahrer Lenkzeiten, Fahrtunterbrechungen und Ruhezeiten einhalten (§ 8a Abs. 1 Nr. 2, Abs. 4 FPersG); für Fahrer bis 5.000 € (§ 8a Abs. 2 Nr. 1, Abs. 4 FPersG).'
+  en: 'Fine of up to €30,000 for you as the business owner if you do not ensure that your drivers comply with driving times, breaks and rest periods (§ 8a(1) no. 2, (4) FPersG); for drivers up to €5,000 (§ 8a(2) no. 1, (4) FPersG).'
+- de: 'Bußgeld bis 30.000 € für dich als Unternehmer, wenn du nicht dafür sorgst, dass die Lenk- und Ruhezeiten eingehalten werden, keine Vordrucke aushändigst oder die Aufzeichnungen nicht prüfst, aufbewahrst oder vorlegst (§ 21 Abs. 1 Nr. 1, 1a, 2 FPersV in Verbindung mit § 8 Abs. 1 Nr. 1 Buchst. a, Abs. 2 FPersG); für Fahrer bis 5.000 € (§ 21 Abs. 2 Nr. 1, 2 FPersV).'
+  en: 'Fine of up to €30,000 for you as the business owner if you do not ensure that driving and rest times are observed, do not hand out forms, or do not check, keep or present the records (§ 21(1) nos. 1, 1a, 2 FPersV in conjunction with § 8(1) no. 1 letter a, (2) FPersG); for drivers up to €5,000 (§ 21(2) nos. 1, 2 FPersV).'
 - de: Bußgeld bis 5.000 € bei Verstößen gegen die Lärm- und Vibrations-Arbeitsschutzverordnung, etwa ohne Gefährdungsbeurteilung, Gehörschutz oder Unterweisung (§ 16 Abs. 1 LärmVibrationsArbSchV in Verbindung
     mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
   en: Fine of up to €5,000 for breaches of the Noise and Vibration Occupational Safety Ordinance, for example without a risk assessment, hearing protection or instruction (§ 16(1) LärmVibrationsArbSchV
@@ -310,9 +348,15 @@ eintraege:
   en: 'Fine of up to €5,000 if, as an insurance or financial investment broker, you do not register, or not correctly or on time, or do not report changes, or not correctly, completely or on time (§ 144(2) nos. 8, 9, (4) GewO).'
 - de: 'Bußgeld bis 5.000 €, wenn du ein Reisegewerbe ohne die erforderliche Erlaubnis nach § 55 Abs. 2 GewO betreibst (§ 145 Abs. 1 Nr. 1 Buchst. b, Abs. 4 GewO).'
   en: 'Fine of up to €5,000 if you carry on an itinerant trade without the required permit under § 55(2) GewO (§ 145(1) no. 1 letter b, (4) GewO).'
+- de: 'Bußgeld bis 5.000 €, wenn du dich nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig weiterbildest (§ 144 Abs. 2 Nr. 5a, 7d, Abs. 4 GewO).'
+  en: 'Fine of up to €5,000 if you do not complete the required training, or not correctly, completely or in time (§ 144(2) nos. 5a, 7d, (4) GewO).'
 - de: Bußgeld bis 5.000 €, wenn ein Arbeitsmittel nicht oder nicht rechtzeitig geprüft wird oder das Ergebnis nicht aufgezeichnet wird (§ 22 Abs. 1 Nr. 28, 30 BetrSichV in Verbindung mit § 25 Abs. 1 Nr.
     1, Abs. 2 ArbSchG).
   en: Fine of up to €5,000 if work equipment is not inspected or not inspected on time, or the result is not recorded (§ 22(1) nos. 28, 30 BetrSichV in conjunction with § 25(1) no. 1, (2) ArbSchG).
+- de: 'Bußgeld bis 50.000 €, etwa wenn die Produktinformationsdatei fehlt, das Produkt nicht notifiziert ist, Kennzeichnungsangaben fehlen oder ernste unerwünschte Wirkungen nicht gemeldet werden (§ 9 Abs. 2 Nr. 4, 6, 12, 14 KosmetikV in Verbindung mit § 60 Abs. 4 Nr. 2 Buchst. a, Abs. 5 LFGB).'
+  en: 'Fine of up to €50,000, for example if the product information file is missing, the product has not been notified, labelling particulars are missing or serious undesirable effects are not reported (§ 9(2) nos. 4, 6, 12, 14 KosmetikV in conjunction with § 60(4) no. 2 letter a, (5) LFGB).'
+- de: 'Bußgeld bis 50.000 €, wenn Lebensmittel ohne die vorgeschriebene Allergeninformation in den Verkehr gebracht oder abgegeben werden (§ 6 Abs. 4 Nr. 1, 2 LMIDV in Verbindung mit § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB).'
+  en: 'Fine of up to €50,000 if food is placed on the market or supplied without the required allergen information (§ 6(4) nos. 1, 2 LMIDV in conjunction with § 60(2) no. 26 letter a, (5) LFGB).'
 - de: Bußgeld bis 50.000 €, wenn das Expositionsverzeichnis nicht, nicht richtig oder nicht vollständig geführt oder nicht lange genug aufbewahrt wird (§ 22 Abs. 1 Nr. 17a, 17b GefStoffV in Verbindung mit
     § 26 Abs. 1 Nr. 8 Buchst. b, Abs. 3 ChemG).
   en: Fine of up to €50,000 if the exposure register is not kept, not kept correctly or completely, or not retained long enough (§ 22(1) nos. 17a, 17b GefStoffV in conjunction with § 26(1) no. 8 letter
@@ -321,6 +365,16 @@ eintraege:
     § 26 Abs. 1 Nr. 8 Buchst. b, Abs. 3 ChemG).
   en: Fine of up to €50,000 if the hazardous substances register is missing, the operating instructions are not accessible or no oral instruction is given (§ 22(1) nos. 2, 24, 25 GefStoffV in conjunction
     with § 26(1) no. 8 letter b, (3) ChemG).
+- de: 'Bußgeld bis 50.000 €, wenn die Pflichtangaben nach § 5 Abs. 1 DDG nicht, nicht richtig oder nicht vollständig verfügbar sind (§ 33 Abs. 2 Nr. 1, Abs. 6 Nr. 3 DDG). Die Bußgelder zu Art. 30 DSA (§ 33 Abs. 5 Nr. 27 bis 31 DDG) treffen den Betreiber des Marktplatzes.'
+  en: 'Fine of up to €50,000 if the mandatory information under § 5(1) DDG is not available, or not correctly or completely available (§ 33(2) no. 1, (6) no. 3 DDG). The fines relating to Art. 30 DSA (§ 33(5) nos. 27 to 31 DDG) apply to the marketplace operator.'
+- de: 'Bußgeld bis 50.000 €, wenn jemand ohne die erforderliche Sachkundebescheinigung an der Klimaanlage arbeitet (§ 16 Abs. 2 Nr. 3 in Verbindung mit § 5 Abs. 1 Satz 1 ChemKlimaschutzV, § 26 Abs. 1 Nr. 7 Buchst. a, Abs. 3 ChemG).'
+  en: 'Fine of up to €50,000 if someone works on the air-conditioning system without the required certificate of competence (§ 16(2) no. 3 in conjunction with § 5(1) sentence 1 ChemKlimaschutzV, § 26(1) no. 7 letter a, (3) ChemG).'
+- de: 'Bußgeld bis 50.000 €, wenn keine Systeme und Verfahren zur Rückverfolgbarkeit eingerichtet sind oder die Informationen der Behörde nicht rechtzeitig zur Verfügung gestellt werden (§ 60 Abs. 3 Nr. 1 Buchst. b, c, Abs. 5 LFGB); ebenso bei Verstößen gegen die Rücknahme- und Unterrichtungspflichten nach Art. 19 VO (EG) Nr. 178/2002 (§ 60 Abs. 3 Nr. 1 Buchst. d bis g LFGB).'
+  en: 'Fine of up to €50,000 if no traceability systems and procedures are in place or the information is not made available to the authority in time (§ 60(3) no. 1 letters b, c, (5) LFGB); the same applies to breaches of the withdrawal and notification duties under Art. 19 Regulation (EC) No 178/2002 (§ 60(3) no. 1 letters d to g LFGB).'
+- de: 'Bußgeld bis 50.000 €, wenn leicht verderbliche Lebensmittel von Personen ohne die nötige Schulung hergestellt, behandelt oder in den Verkehr gebracht werden (§ 10 Nr. 3 in Verbindung mit § 4 Abs. 1 Satz 1 LMHV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB).'
+  en: 'Fine of up to €50,000 if perishable food is produced, handled or placed on the market by people without the necessary training (§ 10 no. 3 in conjunction with § 4(1) sentence 1 LMHV, § 60(2) no. 26 letter a, (5) LFGB).'
+- de: 'Bußgeld bis 50.000 €, wenn vorverpackte Lebensmittel ohne die vorgeschriebenen Pflichtangaben in den Verkehr gebracht werden (§ 6 Abs. 4 Nr. 2 in Verbindung mit § 5 Abs. 1 LMIDV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB); einzelne Verstöße sind Straftaten (§ 6 Abs. 1 LMIDV, § 59 Abs. 1 Nr. 21 Buchst. a LFGB).'
+  en: 'Fine of up to €50,000 if prepacked food is placed on the market without the mandatory particulars (§ 6(4) no. 2 in conjunction with § 5(1) LMIDV, § 60(2) no. 26 letter a, (5) LFGB); certain breaches are criminal offences (§ 6(1) LMIDV, § 59(1) no. 21 letter a LFGB).'
 - de: Damit Amtlos die Termine der Lohnsteuer-Anmeldung berechnen kann, brauchst du den Anmeldezeitraum.
   en: So that Amtlos can calculate the dates for the payroll tax return (Lohnsteuer-Anmeldung), you need the filing period.
 - de: Das BFSG nennt die betroffenen Produkte abschließend. Prüfe, ob deine Produkte dazugehören.
@@ -977,6 +1031,8 @@ eintraege:
     by the Driving Personnel Ordinance. If no tachograph is installed, drivers keep handwritten daily record sheets; if one is installed, it is used. Drivers carry the records for the current day and the
     previous 28 calendar days (§ 1(6) FPersV). You provide the forms, check the records promptly and keep them outside the vehicle for one year. There are exceptions for own-account transport under certain
     conditions.
+- de: 'Für die Pflichten der ausführenden Firma nach § 5 BaustellV gibt es kein eigenes Bußgeld – § 7 BaustellV erfasst nur Vorankündigung und SiGe-Plan des Bauherrn. Die Aufsicht kann Maßnahmen anordnen; ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3 Satz 1 Nr. 1, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG).'
+  en: 'There is no separate fine for the duties of the executing company under § 5 BaustellV – § 7 BaustellV only covers the client''s advance notice and health and safety plan. The authority can order measures; a breach of the enforceable order costs up to €30,000 (§ 22(3) sentence 1 no. 1, § 25(1) no. 2 letter a, (2) ArbSchG).'
 - de: Für eine UG oder GmbH lässt du den Gesellschaftsvertrag notariell beurkunden – auch online möglich.
   en: For a UG or GmbH, you have the articles of association (Gesellschaftsvertrag) notarised – this is also possible online.
 - de: Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in zulässiger Form fest.
@@ -1161,6 +1217,8 @@ eintraege:
   en: Corporations pay corporate income tax and file an annual return for it – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
 - de: Kasse mit TSE betreiben und Belege ausgeben
   en: Operate a cash register with TSE and issue receipts
+- de: 'Kein eigenes Bußgeld vorgesehen.'
+  en: 'No separate fine is provided for.'
 - de: Keine Handlung nötig; der Beitrag wird festgesetzt.
   en: No action needed; the fee will be set for you.
 - de: Keine Pflicht.
@@ -1635,6 +1693,8 @@ eintraege:
   en: '§ 379(2) no. 1 AO only covers notifications under § 138(2) AO – no separate fine is provided for the information for tax registration. The tax office can enforce it with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
 - de: '§ 5b EStG nennt kein eigenes Bußgeld. Das Finanzamt kann die Übermittlung mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   en: '§ 5b EStG provides no separate fine. The tax office can enforce the transmission with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
+- de: '§§ 5, 6 ArbSchG sind nicht unmittelbar bußgeldbewehrt: Die Aufsicht kann die nötigen Maßnahmen anordnen, ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3 Satz 1 Nr. 1, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG). Für die Dokumentation gelten außerdem die Bußgelder bei „Gefährdungsbeurteilung erstellen“.'
+  en: '§§ 5, 6 ArbSchG are not directly subject to fines: the authority can order the necessary measures, and a breach of the enforceable order costs up to €30,000 (§ 22(3) sentence 1 no. 1, § 25(1) no. 2 letter a, (2) ArbSchG). For the documentation, the fines listed under “Create a risk assessment” also apply.'
 - de: Änderungen im Gesellschafterkreis werden notariell abgewickelt; die aktualisierte Gesellschafterliste wird beim Handelsregister eingereicht.
   en: Changes among the shareholders are handled by a notary; the updated list of shareholders is filed with the commercial register (Handelsregister).
 - de: Ärztliche Erstuntersuchung Jugendlicher vor Beginn
