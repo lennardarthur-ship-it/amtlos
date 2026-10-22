@@ -1,7 +1,7 @@
 # Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.videoueberwachung
-version: 3
+version: 4
 katalog_nr: F.62
 titel:
   de: Videoüberwachung kennzeichnen und begründen
@@ -11,10 +11,13 @@ erklaerung:
   de: Videoüberwachung braucht einen berechtigten Zweck, muss erkennbar sein (Hinweisschild) und gehört ins Verzeichnis der
     Verarbeitungstätigkeiten. Rechtsgrundlage ist für Unternehmen das berechtigte Interesse (Art. 6 Abs. 1 lit. f DSGVO) – du wägst es
     gegen die Interessen der Gefilmten ab und hältst das fest. Das Hinweisschild nennt nach Art. 13 DSGVO mindestens dich als Verantwortlichen,
-    den Zweck und wo die weiteren Informationen stehen.
+    den Zweck und wo die weiteren Informationen stehen. Die Aufnahmen löschst du in der Regel nach 48 bis 72 Stunden (Orientierungshilfe
+    der Datenschutzkonferenz). Deine Beschäftigten informierst du ebenfalls nach Art. 13 DSGVO; gibt es einen Betriebsrat, bestimmt er
+    mit (§ 87 Abs. 1 Nr. 6 BetrVG).
 rechtsgrundlage:
 - Art. 6 Abs. 1 lit. f DSGVO
 - Art. 13 DSGVO
+- § 87 Abs. 1 Nr. 6 BetrVG
 kategorie: datenschutz
 ausloeser:
   feld: profil.datenverarbeitung.arten
@@ -50,11 +53,10 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Speicherdauer der Aufnahmen fachlich ergänzen
-- 'Beschäftigte: Mitbestimmung/Information'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (Art. 83 Abs. 5 Buchst. a, b DSGVO über gesetze.legal gelesen; Verzeichnis der Verarbeitungstätigkeiten (Art. 30, Art. 83 Abs. 4 Buchst. a) nicht eigens genannt) – fachlich zu bestätigen'
-- 'Rechtsgrundlage nach Rechtsprüfung R11 (Befund 16): Art. 6 Abs. 1 lit. f DSGVO statt § 4 BDSG (für Private nicht anwendbar, BVerwG 6 C 2.18), Hinweisschild nach Art. 13 (EDSA-Leitlinien 3/2019)'
+- 'Speicherdauer 48–72 Stunden als Regelwert laut Prüfvermerk RA Dr. Weber 22.10.2026 (DSK-Orientierungshilfe, Fundstelle nicht verlinkt)'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 4

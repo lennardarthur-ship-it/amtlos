@@ -49,9 +49,10 @@ quellen:
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- URL des Gesetzes nach Umbenennung (TTDSG → TDDDG) prüfen
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 28 Abs. 1 Nr. 13 (Speichern/Zugreifen entgegen § 25 Abs. 1 Satz 1) und Abs. 2 über gesetze.legal gelesen'
+- 'URL gesetze-im-internet.de/ttdsg bleibt gültig (Pfad nicht umbenannt), Sanktion bestätigt (Prüfvermerk RA Dr. Weber 22.10.2026)'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

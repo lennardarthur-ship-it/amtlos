@@ -4,7 +4,8 @@ Freigaben aus einer zurückgeschickten Freigabe-Mappe in den Katalog übernehmen
     python3 docs/freigabe-katalog/uebernehmen.py <mappe.xlsx> "<Prüfer>" <JJJJ-MM-TT> [--umgesetzt id1,id2,...]
 
 - Einträge mit Entscheidung „freigegeben“ werden freigegeben.
-- Einträge mit „ändern“ nur, wenn ihre ID in --umgesetzt steht (Änderung umgesetzt und geprüft).
+- Einträge mit „ändern“ nur, wenn ihre ID in --umgesetzt steht (Änderung umgesetzt und geprüft). Mit --umgesetzt
+  werden auch „freigegeben“-Einträge nur übernommen, wenn sie in der Liste stehen (Anmerkung umgesetzt, Wortlaut bestätigt).
 - „streichen“ und leere Zeilen bleiben unverändert.
 Gesetzt wird `pruefung: {status: freigegeben, geprueft_von: [<Prüfer>], geprueft_am, geprueft_version: <aktuelle version>}`.
 Danach: `node apps/mobile/werkzeuge/katalog-buendel.mjs` und `pnpm katalog:pruefen`.
@@ -31,7 +32,8 @@ for r in ws.iter_rows(min_row=2, values_only=True):
     pid, ent = r[i_id], (r[i_ent] or "").strip()
     if not pid:
         continue
-    if not (ent == "freigegeben" or (ent == "ändern" and pid in umgesetzt)):
+    # mit --umgesetzt gilt die Liste für alle (auch „freigegeben“ mit umgesetzter Anmerkung); sonst nur „freigegeben“
+    if not ((ent == "freigegeben" and (not umgesetzt or pid in umgesetzt)) or (ent == "ändern" and pid in umgesetzt)):
         uebersprungen.append((pid, ent or "leer"))
         continue
     pfad = os.path.join(ROOT, "catalog/pflichten", f"{pid}.yaml")

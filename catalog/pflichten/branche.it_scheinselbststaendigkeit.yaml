@@ -1,7 +1,7 @@
 # Katalog H.6 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.it_scheinselbststaendigkeit
-version: 3
+version: 4
 katalog_nr: H.6
 titel:
   de: Scheinselbstständigkeit vermeiden
@@ -23,17 +23,17 @@ ausloeser:
     wert: it_agentur_freelancer
     label:
       de: Du arbeitest im IT-, Agentur- oder Freelancer-Bereich.
-  - any:
-    - feld: profil.rentenversicherung.pflichtgruppe
-      op: enthaelt
-      wert: ein_auftraggeber
-      label:
-        de: Du arbeitest im Wesentlichen für einen Auftraggeber.
-    - feld: abgeleitet.hat_beschaeftigte
+  # Prüfvermerk RA Dr. Weber 22.10.2026: nur die Freelancer-Seite – die Auftraggeber-Seite steht in personal.statusfeststellung_auftraggeber
+  - feld: profil.rentenversicherung.pflichtgruppe
+    op: enthaelt
+    wert: ein_auftraggeber
+    label:
+      de: Du arbeitest im Wesentlichen für einen Auftraggeber.
+  # UG, GmbH, GmbH & Co. KG sind keine Freelancer – die Frage nach der Rentenversicherungspflicht stellt die App dort nicht
+  - not:
+      feld: abgeleitet.ist_kapitalgesellschaft_oder_co_kg
       op: ==
       wert: true
-      label:
-        de: Du beschäftigst mindestens eine Person.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -44,7 +44,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Wird die Tätigkeit als Beschäftigung eingestuft, schuldet dein Auftraggeber die Beiträge bis zu vier Jahre nach (§ 28e, § 25 SGB IV); du verlierst den Unternehmerstatus, und Rechnungen mit Umsatzsteuer sind zu berichtigen.'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -57,12 +57,12 @@ quellen:
   url: https://www.gesetze-im-internet.de/sgb_4/__7a.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Auslöser: auch Auftraggeber-Seite (Einsatz von Freelancern) abbilden?'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Folgen (Freelancer-Seite) eingetragen, Frist „keine“; Auslöser „beschäftigt mindestens eine Person“ entfernt (Auftraggeber-Seite in personal.statusfeststellung_auftraggeber, Doppelung vermeiden)'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 4

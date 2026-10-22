@@ -1,7 +1,7 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: ki.kompetenz
-version: 5
+version: 6
 katalog_nr: F.65
 titel:
   de: KI-Kompetenz der Beschäftigten fördern
@@ -41,7 +41,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Keine – Art. 4 ist in Art. 99 KI-VO nicht bußgeldbewehrt; ein Nachweis kann aber bei Schadensfällen und gegenüber der Aufsicht wichtig sein.
   schwere: niedrig
 automatisierung: dokument_generator
 aenderungsnotiz:
@@ -72,9 +72,10 @@ quellen:
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Inhalt und Umfang einer ausreichenden Schulung fachlich festlegen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- 'Vorprüfung 21.10.2026 (F.65): Titel und Kurztext auf „fördern“ umgestellt, Schwere niedrig, Änderung als aenderungsnotiz (gültig_ab bleibt 2.2.2025, weil Art. 4 seitdem gilt). Neuer Wortlaut von Art. 4 nur sinngemäß belegt (IHK Lüneburg-Wolfsburg: „Maßnahmen ergreifen, um die KI-Kompetenz … zu fördern“; Opsio: „unterstützen“) – EUR-Lex war für das Recherchewerkzeug nicht abrufbar, Wortlaut im Amtsblatt gegenlesen; Einordnung als Hinweis statt Pflicht prüfen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Titel, Kurztext, Schwere niedrig bestätigt, Folgen übernommen; Einordnung als Hinweis „vertretbar“ – nicht umgestellt (bleibt Pflicht). Neuer Art. 4 am 22.10.2026 im Amtsblatt (VO (EU) 2026/1744) gelesen: Anbieter und Betreiber „ergreifen Maßnahmen, um die Entwicklung der KI-Kompetenz ihres Personals“ zu fördern, ein bestimmtes Niveau ist nicht garantiert'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 6

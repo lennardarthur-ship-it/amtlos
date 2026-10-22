@@ -1,7 +1,7 @@
 # Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.tom
-version: 2
+version: 3
 katalog_nr: F.58
 titel:
   de: Technische und organisatorische Maßnahmen festlegen
@@ -46,7 +46,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Bußgeld nach Art. 83 Abs. 4 DSGVO.
+    de: Bußgeld bis 10 Mio. € oder bei Unternehmen bis 2 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 4 Buchst. a DSGVO).
   schwere: mittel
 automatisierung: dokument_generator
 aktion:
@@ -62,10 +62,10 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Gliederung nach Art. 32 Abs. 1 DSGVO – Wortlaut prüfen
 - Vorschlagsliste typischer Maßnahmen für Kleinbetriebe fachlich erstellen
-- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

@@ -61,6 +61,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'StB Busch 22.10.2026: Stand 22.10.2026 keine Verlängerung von § 18 Abs. 2 Satz 6 UStG über 2026 hinaus bekannt – bis zum Start und noch einmal zum Jahreswechsel prüfen (Jahressteuergesetz)'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - StB Lutz Busch
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

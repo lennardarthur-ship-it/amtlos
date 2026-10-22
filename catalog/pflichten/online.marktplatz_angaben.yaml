@@ -46,10 +46,10 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Rechtsgrundlagen ergänzt – prüfen
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 33 Abs. 2 Nr. 1, Abs. 5 Nr. 27 bis 31, Abs. 6 DDG gelesen; dass Art. 30 DSA nur den Plattformbetreiber verpflichtet, ist aus dem Aufbau des Art. 30 abgeleitet (Art. 30 DSA selbst nicht gelesen) – fachlich zu bestätigen'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- '§ 5 DDG für den Händler, Art. 30 DSA für den Plattformbetreiber und Sanktion § 33 Abs. 2 Nr. 1, Abs. 6 DDG bestätigt (Prüfvermerk RA Dr. Weber 22.10.2026)'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

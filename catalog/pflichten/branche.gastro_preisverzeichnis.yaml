@@ -1,7 +1,7 @@
-# R11 (Rechtsprüfung T-114): Preisverzeichnis in Gaststätten nach § 7 PAngV
+# R11 (Rechtsprüfung T-114): Preisverzeichnis in Gaststätten nach § 13 PAngV (Prüfvermerk RA Dr. Weber 22.10.2026: nicht § 7)
 schema_version: 1
 id: branche.gastro_preisverzeichnis
-version: 2
+version: 3
 katalog_nr: G.70
 titel:
   de: Preisverzeichnis für Speisen und Getränke
@@ -10,10 +10,10 @@ kurz:
 erklaerung:
   de: Gaststätten legen Preisverzeichnisse für Speisen und Getränke auf den Tischen aus oder legen sie jedem Gast vor der Bestellung
     und auf Verlangen bei der Abrechnung vor; alternativ hängen sie sie gut lesbar aus. Zusätzlich hängt neben dem Eingang ein
-    Verzeichnis mit den Preisen der wesentlichen Speisen und Getränke (§ 7 PAngV). Die Preise sind Endpreise einschließlich
+    Verzeichnis mit den Preisen der wesentlichen Speisen und Getränke (§ 13 PAngV). Die Preise sind Endpreise einschließlich
     Umsatzsteuer und Bedienung.
 rechtsgrundlage:
-- § 7 PAngV
+- § 13 PAngV
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
@@ -33,16 +33,13 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: 'Bußgeld bis 25.000 €, wenn Preise nicht in einem Preisverzeichnis angegeben sind oder das Preisverzeichnis nach § 13 Abs. 2 Satz 1 PAngV nicht oder nicht rechtzeitig vorgelegt wird (§ 20 Nr. 1, 4 PAngV in Verbindung mit § 3 Abs. 1 Satz 1 Nr. 2, Abs. 2 WiStrG 1954). Das Preisverzeichnis neben dem Eingang (§ 13 Abs. 2 Satz 2 PAngV) ist in § 20 PAngV nicht genannt. Nach dem Gesetz vom 19.10.2026 (BGBl. 2026 I Nr. 314) künftig bis 100.000 € (§ 3 Abs. 1, 3 PAngG).'
+    de: 'Bußgeld bis 25.000 €, wenn Preise nicht in einem Preisverzeichnis angegeben sind oder das Preisverzeichnis nach § 13 Abs. 2 Satz 1 PAngV nicht oder nicht rechtzeitig vorgelegt wird (§ 20 Nr. 1, 4 PAngV in Verbindung mit § 3 Abs. 1 Satz 1 Nr. 2, Abs. 2 WiStrG 1954). Das Preisverzeichnis neben dem Eingang (§ 13 Abs. 2 Satz 2 PAngV) ist in § 20 PAngV nicht genannt.'
   schwere: niedrig
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
-- titel: Preisangabenverordnung § 7
-  url: https://www.gesetze-im-internet.de/pangv_2022/__7.html
-  abgerufen: null
 - titel: Preisangabenverordnung § 20 (Ordnungswidrigkeiten)
   url: https://www.gesetze-im-internet.de/pangv_2022/__20.html
   abgerufen: '2026-10-22'
@@ -52,16 +49,11 @@ quellen:
 - titel: Wirtschaftsstrafgesetz 1954 § 3
   url: https://www.gesetze-im-internet.de/wistrg_1954/__3.html
   abgerufen: '2026-10-22'
-- titel: Gesetzentwurf zur Änderung des Preisangabenrechts (BT-Drs. 21/5873, Art. 1 § 3 PAngG, Art. 3, Art. 4)
-  url: https://dserver.bundestag.de/btd/21/058/2105873.pdf
-  abgerufen: '2026-10-22'
-- titel: BR-Drs. 499/26 – Gesetzesbeschluss des Bundestages vom 9.7.2026 (unverändert angenommen)
-  url: https://dserver.bundestag.de/brd/2026/0499-26.pdf
-  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Rechtsprüfung R11 (T-114) – Wortlaut § 7 PAngV (Tisch, Vorlage, Aushang, Eingang) bestätigen'
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 13 und § 20 Nr. 1 (§ 13 Abs. 1 Satz 1), Nr. 4 (§ 13 Abs. 2 Satz 1) PAngV, § 3 Abs. 1 Satz 1 Nr. 2, Abs. 2 WiStrG 1954 gelesen; künftiger Rahmen bis 100.000 € nach § 3 Abs. 1, 3 PAngG aus dem Gesetzentwurf BT-Drs. 21/5873 (laut BR-Drs. 499/26 unverändert beschlossen, laut buzer verkündet am 19.10.2026, BGBl. 2026 I Nr. 314); Inkrafttreten laut Entwurf am ersten Tag des auf die Verkündung folgenden Quartals – Datum im BGBl. prüfen; Rechtsgrundlage und Quelle nennen § 7 PAngV – § 7 ist laut Inhaltsübersicht „Rückerstattbare Sicherheit“, Gaststätten stehen in § 13 PAngV: Rechtsgrundlage korrigieren – fachlich zu bestätigen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Rechtsgrundlage auf § 13 PAngV korrigiert, Inhalt und Sanktion § 20 Nr. 1, 4 PAngV i. V. m. WiStrG (25.000 €) bestätigt. Zusatz „künftig bis 100.000 € nach PAngG (G. v. 19.10.2026, BGBl. 2026 I Nr. 314)“ nach Prüfvermerk RA Dr. Weber 22.10.2026 gestrichen, bis die Fundstelle mit Inkrafttretensdatum vorliegt und geprüft ist (am 22.10.2026 nicht geprüft); Quellen BT-Drs. 21/5873 und BR-Drs. 499/26 dafür entfernt'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

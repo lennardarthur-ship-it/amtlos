@@ -1,15 +1,14 @@
 # Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.avv
-version: 3
+version: 4
 katalog_nr: F.58
 titel:
   de: Auftragsverarbeitungsverträge abschließen
 kurz:
-  de: Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, Lohnbüro, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.
+  de: Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, IT-Hoster, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.
 erklaerung:
-  de: Der Vertrag regelt, wie der Dienstleister die Daten nach deinen Weisungen verarbeitet. Amtlos führt die Liste deiner
-    Dienstleister und legt die Verträge ab.
+  de: 'Der Vertrag regelt, wie der Dienstleister die Daten nach deinen Weisungen verarbeitet; du schließt ihn vor Beginn der Verarbeitung ab. Einen Auftragsverarbeitungsvertrag brauchst du etwa mit IT-Hoster, Cloud-Anbieter, Newsletter-Tool oder Kassen-Cloud. Keinen brauchst du mit Steuerberatung, Rechtsanwälten, Banken, der Post oder einem Lohnbüro mit eigener Fachverantwortung – sie sind selbst Verantwortliche. Amtlos führt die Liste deiner Dienstleister und legt die Verträge ab.'
 begriffe:
 - begriff:
     de: Auftragsverarbeitung
@@ -71,10 +70,10 @@ quellen:
   url: https://gesetze.legal/eu/vo_eu_2016_679/83
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Abgrenzung Auftragsverarbeitung ↔ eigene Verantwortung (z. B. Steuerberatung) als Hinweis ergänzen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (Art. 83 Abs. 4 Buchst. a DSGVO (Art. 25 bis 39) über gesetze.legal gelesen, EUR-Lex im Abruf nicht erreichbar) – fachlich zu bestätigen'
+- 'Frist „vor Beginn der Verarbeitung“ (Prüfvermerk RA Dr. Weber 22.10.2026) nur im Text – kein Ereignis „Dienstleister beauftragt“'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 4

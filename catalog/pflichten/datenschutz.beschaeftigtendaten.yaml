@@ -1,19 +1,18 @@
 # Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.beschaeftigtendaten
-version: 3
+version: 4
 katalog_nr: F.62
 titel:
   de: Beschäftigtendaten schützen
 kurz:
   de: Daten deiner Beschäftigten verarbeitest du nur, soweit es für das Arbeitsverhältnis nötig ist.
 erklaerung:
-  de: Daten deiner Beschäftigten verarbeitest du, soweit es für die Durchführung des Arbeitsvertrags erforderlich ist oder ein Gesetz
-    es verlangt, zum Beispiel für Lohn, Sozialversicherung und Steuer. Amtlos selbst speichert nur das Nötigste (Name, Beschäftigungsart,
-    Eintritt und Austritt).
+  de: 'Daten deiner Beschäftigten verarbeitest du, soweit es für die Durchführung des Arbeitsvertrags erforderlich ist oder ein Gesetz es verlangt, zum Beispiel für Lohn, Sozialversicherung und Steuer. Gesundheitsdaten wie Krankmeldungen oder die elektronische Arbeitsunfähigkeitsbescheinigung verarbeitest du, soweit du sie für deine Pflichten aus dem Arbeitsrecht und dem Recht der sozialen Sicherheit brauchst (Art. 9 Abs. 2 Buchst. b DSGVO). Amtlos selbst speichert nur das Nötigste (Name, Beschäftigungsart, Eintritt und Austritt).'
 rechtsgrundlage:
 - Art. 6 Abs. 1 lit. b DSGVO
 - Art. 6 Abs. 1 lit. c DSGVO
+- Art. 9 Abs. 2 lit. b DSGVO
 kategorie: datenschutz
 ausloeser:
   any:
@@ -58,10 +57,10 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- '§ 26 BDSG nach EuGH C-34/21 nicht mehr als eigene Grundlage genannt (R10, Rechtsprüfung); Art. 9 DSGVO für Gesundheitsdaten von Beschäftigten (z. B. eAU) gesondert prüfen'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (Art. 83 Abs. 5 Buchst. a DSGVO über gesetze.legal gelesen; § 26 BDSG und Rechtsprechung (C-34/21) nicht einbezogen) – fachlich zu bestätigen'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- '§ 26 BDSG könnte laut Prüfvermerk RA Dr. Weber 22.10.2026 als Konkretisierung erwähnt werden (freigestellt) – nicht aufgenommen'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 4

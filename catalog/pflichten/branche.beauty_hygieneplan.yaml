@@ -1,7 +1,7 @@
 # Katalog H.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.beauty_hygieneplan
-version: 1
+version: 2
 katalog_nr: H.3
 titel:
   de: Hygieneplan führen
@@ -9,10 +9,11 @@ kurz:
   de: In Beauty- und Kosmetikbetrieben legst du in einem Hygieneplan fest, wie Geräte, Flächen und Hände gereinigt und desinfiziert
     werden.
 erklaerung:
-  de: Die Anforderungen ergeben sich aus dem Infektionsschutz und den Hygieneverordnungen der Länder.
+  de: 'Betriebe mit Tätigkeiten am Menschen – Friseur, Kosmetik, Tattoo, Piercing, Fußpflege – brauchen nach den Hygieneverordnungen der Länder einen Hygieneplan. Die Länder erlassen diese Verordnungen auf Grundlage von § 17 Abs. 4 IfSG, zum Beispiel die HygieneVO in Baden-Württemberg, die HygV in Bayern und die HygVO in Nordrhein-Westfalen. Den Hygieneplan legst du vor Aufnahme der Tätigkeit fest und hältst ihn laufend aktuell. Für Lebensmittelbetriebe gilt stattdessen die Lebensmittelhygiene nach der Verordnung (EG) Nr. 852/2004.'
 rechtsgrundlage:
-- IfSG
-- Hygieneverordnungen der Länder
+- § 17 Abs. 4 IfSG
+- Hygieneverordnungen der Länder (z. B. BW HygieneVO, BY HygV, NRW HygVO)
+- § 73 Abs. 1a Nr. 24, Abs. 2 IfSG
 kategorie: branche
 branchen:
 - beauty_kosmetik
@@ -32,7 +33,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 25.000 €, soweit die Hygieneverordnung deines Landes für den Verstoß auf § 73 Abs. 1a Nr. 24 IfSG verweist (§ 73 Abs. 1a Nr. 24, Abs. 2 IfSG).'
   schwere: mittel
 automatisierung: dokument_generator
 status_recht: in_kraft
@@ -42,13 +43,16 @@ quellen:
 - titel: Infektionsschutzgesetz
   url: https://www.gesetze-im-internet.de/ifsg/
   abgerufen: null
+- titel: Infektionsschutzgesetz § 73 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/ifsg/__73.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Rechtsgrundlage je Land ergänzen
 - Vorlage Hygieneplan nach Prüfung (6.4)
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Prüfvermerk RA Dr. Weber 22.10.2026 (Nummer am Wortlaut prüfen): § 73 Abs. 1a Nr. 24 IfSG am 22.10.2026 gelesen – erfasst Rechtsverordnungen nach § 17 Abs. 4 Satz 1, „soweit die Rechtsverordnung für einen bestimmten Tatbestand auf diese Bußgeldvorschrift verweist“; Abs. 2: bis 25.000 €. Landesverordnungen (BW HygieneVO, BY HygV, NRW HygVO) nicht einzeln gelesen'
+- 'Frist „vor Aufnahme der Tätigkeit, laufend aktualisieren“ (Prüfvermerk RA Dr. Weber 22.10.2026) nur im Text – Frist bleibt dauerhaft'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 2

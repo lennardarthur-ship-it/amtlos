@@ -1,16 +1,17 @@
 # Katalog D.49 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.lohnabrechnung
-version: 1
+version: 2
 katalog_nr: D.49
 titel:
   de: Lohnabrechnung über geprüfte Software
 kurz:
-  de: Meldungen zur Sozialversicherung erfordern zertifizierte Software – Amtlos arbeitet dafür mit einem Lohnpartner.
+  de: Meldungen zur Sozialversicherung gehen nur über systemgeprüfte Programme oder Ausfüllhilfen wie sv.net – Amtlos arbeitet dafür mit einem Lohnpartner.
 erklaerung:
-  de: Die Lohnabrechnung selbst macht ein systemgeprüfter Partner; Amtlos liefert Stammdaten und Fristen.
+  de: Meldungen zur Sozialversicherung erstattest du nur über systemgeprüfte Programme oder maschinelle Ausfüllhilfen wie sv.net (§§ 95 ff. SGB IV). Die Lohnabrechnung selbst macht ein systemgeprüfter Partner; Amtlos liefert Stammdaten und Fristen.
 rechtsgrundlage:
 - § 18 DEÜV (Systemprüfung)
+- §§ 95 ff. SGB IV
 kategorie: personal
 ausloeser:
   feld: abgeleitet.hat_beschaeftigte
@@ -28,7 +29,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Ohne geprüfte Software sind die Meldungen nicht möglich.
+    de: Ohne systemgeprüftes Programm oder Ausfüllhilfe sind die Meldungen nicht möglich.
   schwere: mittel
 automatisierung: partner
 status_recht: in_kraft
@@ -41,8 +42,10 @@ quellen:
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Partner noch nicht gewählt (Abschnitt 5, Integration offen)
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: als Hinweis in Ordnung (§§ 95 ff. SGB IV). „Amtlos durch Markennamen ersetzen“: erledigt das Katalog-Bündel (werkzeuge/katalog-buendel.mjs ersetzt „Amtlos“ durch MARKE.name, docs/14-marke.md) – im Katalogtext bleibt „Amtlos“'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 2

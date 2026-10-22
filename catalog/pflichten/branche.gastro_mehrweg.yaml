@@ -2,14 +2,14 @@
 # Rechtsstand 21.10.2026: seit 12.8.2026 §§ 60, 61 VerpackDG (BGBl. 2026 I Nr. 207), inhaltlich gleich
 schema_version: 1
 id: branche.gastro_mehrweg
-version: 3
+version: 4
 katalog_nr: G.73
 titel:
   de: Mehrweg zum Mitnehmen anbieten
 kurz:
   de: Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen aus Kunststoff oder Einwegbechern, bietest du auch Mehrweg an.
 erklaerung:
-  de: 'Wer Speisen in Einwegkunststoffverpackungen oder Getränke in Einwegbechern erst beim Verkauf befüllt, muss sie auch in einer Mehrwegverpackung anbieten – nicht teurer und gut sichtbar mit einem Hinweis (§ 60 VerpackDG). Ausgenommen sind kleine Betriebe mit höchstens fünf Beschäftigten und höchstens 80 m² Verkaufsfläche; sie müssen stattdessen auf Wunsch mitgebrachte Behälter der Kundschaft befüllen und darauf hinweisen (§ 61 VerpackDG). Seit 12.8.2026 steht die Pflicht im Verpackungsrecht-Durchführungsgesetz, das das Verpackungsgesetz abgelöst hat.'
+  de: 'Wer Speisen in Einwegkunststoffverpackungen oder Getränke in Einwegbechern erst beim Verkauf befüllt, muss sie auch in einer Mehrwegverpackung anbieten – nicht teurer und gut sichtbar mit einem Hinweis (§ 60 VerpackDG). Ausgenommen sind kleine Betriebe mit höchstens fünf Beschäftigten und höchstens 80 m² Verkaufsfläche; sie müssen stattdessen auf Wunsch mitgebrachte Behälter der Kundschaft befüllen und darauf hinweisen (§ 61 VerpackDG). Teilzeitkräfte zählen dabei mit 0,5 (bis 20 Wochenstunden) bzw. 0,75 (bis 30 Wochenstunden). Beim Foodtruck ist die Verkaufsfläche die Fläche des Fahrzeugs; lieferst du aus, zählen auch Lager- und Versandflächen. Seit 12.8.2026 steht die Pflicht im Verpackungsrecht-Durchführungsgesetz, das das Verpackungsgesetz abgelöst hat.'
 rechtsgrundlage:
 - § 60 VerpackDG
 - § 61 VerpackDG
@@ -58,10 +58,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/verpackdg/__66.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Rechtsstand 21.10.2026: Fundstellen von §§ 33, 34 VerpackG auf §§ 60, 61 VerpackDG umgestellt (VerpackDG seit 12.8.2026); Inhalt laut Gesetzestext gleich – Teilzeitzählung (0,5 bis 20 Std., 0,75 bis 30 Std.) und Lager-/Versandflächen bei Lieferung (§ 61 Abs. 1) ggf. als Hinweis ergänzen'
-- 'Neu nach Rechtsprüfung R11 (T-114): Ausnahme nur bei höchstens 5 Beschäftigten UND höchstens 80 m² – Zählweise der Beschäftigten und Verkaufsfläche beim Foodtruck prüfen'
-- 'LUCID-Registrierung für Serviceverpackungen (§ 6 VerpackDG) und Herstellereigenschaft nach EWKFondsG offen (Nutzertest Gründerin)'
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 60 Abs. 1 Satz 1, 3, Abs. 2 Satz 1 und § 66 Abs. 1 Nr. 26, 28, 29, Abs. 3 VerpackDG gelesen; § 61 Abs. 1 Satz 1 (Kleinbetriebe: mitgebrachte Behälter befüllen) ist in § 66 nicht genannt, nur § 61 Abs. 1 Satz 3 und Abs. 4 Satz 1 – fachlich zu bestätigen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Ausnahme (höchstens fünf Beschäftigte UND höchstens 80 m²), Teilzeitzählung, Foodtruck- und Lieferflächen sowie Sanktion bestätigt und im Text'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: „LUCID für Serviceverpackungen – Pflicht liegt beim Vorvertreiber, wenn er die Beteiligung übernimmt (§ 7 Abs. 2 VerpackDG)“ – nicht übernommen: § 7 Abs. 2 VerpackDG (am 22.10.2026 gelesen) lässt die Systembeteiligung und insoweit die Pflichten nach §§ 6, 9, 10 auf den Vorvertreiber übergehen, „der Hersteller nach Absatz 1 Satz 1 bleibt jedoch zusätzlich selbst zur Registrierung nach § 6 verpflichtet“ – Rückfrage an den Prüfer; Herstellereigenschaft nach EWKFondsG offen'
 pruefung:
   status: entwurf
   geprueft_von: null

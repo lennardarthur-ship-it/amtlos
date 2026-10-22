@@ -1,17 +1,17 @@
 # Katalog G.70 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.barrierefreiheit
-version: 4
+version: 5
 katalog_nr: G.70
 titel:
   de: Barrierefreiheit von Onlineshop und Buchungstools (BFSG)
 kurz:
   de: Seit 28.6.2025 müssen bestimmte Dienstleistungen wie Onlineshops barrierefrei sein – mit Barrierefreiheitserklärung.
 erklaerung:
-  de: Ausgenommen sind Kleinstunternehmen mit weniger als 10 Beschäftigten und höchstens 2 Mio. € Umsatz oder Bilanzsumme
-    – diese Ausnahme gilt für Dienstleistungen. Der Online-Check macht automatisierte Basistests nach WCAG.
+  de: 'Betroffen sind Dienstleistungen im elektronischen Geschäftsverkehr (§ 1 Abs. 3 BFSG) – etwa Onlineshops und Buchungstools – sowie unter anderem Bankdienstleistungen, Telekommunikationsdienste, Dienste im Personenverkehr und E-Books. Ausgenommen sind Kleinstunternehmen mit weniger als 10 Beschäftigten und höchstens 2 Mio. € Jahresumsatz oder höchstens 2 Mio. € Jahresbilanzsumme (§ 3 Abs. 3 BFSG) – diese Ausnahme gilt nur für Dienstleistungen. Amtlos fragt nur den Umsatz ab; liegt deine Bilanzsumme bei höchstens 2 Mio. €, greift die Ausnahme auch bei höherem Umsatz. Der Online-Check macht automatisierte Basistests nach WCAG.'
 rechtsgrundlage:
-- BFSG
+- § 1 Abs. 3 BFSG
+- § 3 Abs. 3 BFSG
 kategorie: online
 branchen:
 - onlinehandel
@@ -58,8 +58,7 @@ kosten: null
 sanktion:
   text:
     de: 'Bußgeld bis 100.000 €, wenn eine Dienstleistung angeboten oder erbracht wird, die die Barrierefreiheitsanforderungen nicht erfüllt oder für die die Informationen nach Anlage 3 fehlen (§ 37 Abs. 1 Nr. 8, Abs. 2 in Verbindung mit § 14 Abs. 1 BFSG).'
-  schwere: mittel
-dringend_ohne_termin: true
+  schwere: hoch
 automatisierung: hinweis
 aktion:
   art: link
@@ -79,12 +78,12 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Bilanzsumme als Alternative zum Umsatz fehlt im Profil
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: „Bilanzsumme als Alternative ergänzen“ – nur im Text umgesetzt; der Auslöser kennt nur den Vorjahresumsatz (keine Frage nach der Bilanzsumme, bei Einnahmenüberschussrechnung gibt es keine Bilanz – Abbildung offen)'
 - Zählweise (G-05)
-- Welche Dienstleistungen genau (Buchungstools, Bankdienste …) – Liste ergänzen
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 14 Abs. 1 und § 37 Abs. 1 Nr. 8, Abs. 2 BFSG gelesen – fachlich zu bestätigen'
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: § 1 Abs. 3, § 3 Abs. 3 BFSG, Sanktion § 37 Abs. 1 Nr. 8, Abs. 2 (100.000 €) bestätigt, Schwere „hoch“, Liste der Dienstleistungen im Text'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 5

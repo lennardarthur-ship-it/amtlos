@@ -1,7 +1,7 @@
 # Katalog H.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.beauty_kosmetikverordnung
-version: 5
+version: 6
 katalog_nr: H.3
 titel:
   de: Kosmetikverordnung bei eigenen Produkten
@@ -47,8 +47,7 @@ kosten: null
 sanktion:
   text:
     de: 'Bußgeld bis 50.000 €, etwa wenn die Produktinformationsdatei fehlt, das Produkt nicht notifiziert ist, Kennzeichnungsangaben fehlen oder ernste unerwünschte Wirkungen nicht gemeldet werden (§ 9 Abs. 2 Nr. 4, 6, 12, 14 KosmetikV in Verbindung mit § 60 Abs. 4 Nr. 2 Buchst. a, Abs. 5 LFGB).'
-  schwere: mittel
-dringend_ohne_termin: true
+  schwere: hoch
 automatisierung: hinweis
 aenderungsnotiz:
   de: Gilt erst, wenn du eigene Kosmetik herstellst, unter deinem Namen verkaufst oder von außerhalb der EU importierst – nicht beim
@@ -68,11 +67,10 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'CPNP (Art. 13), Kennzeichnung (Art. 19), GMP (Art. 8), ernste unerwünschte Wirkungen (Art. 23), Herstellerbegriff (Art. 2 Abs. 1 lit. d) und verantwortliche Person (Art. 4) im Text (R11, Nutzertest Kosmetik) – Frist „vor dem ersten Inverkehrbringen“ ohne Termin; bestätigen'
-- 'Auslöser an die Frage „eigene Produkte, Eigenmarke oder Import von außerhalb der EU“ gekoppelt (R10) – Abgrenzung Herstellung ↔ Weiterverkauf bestätigen'
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 9 Abs. 2 KosmetikV (Nr. 4: Art. 11, Nr. 6: Art. 13, Nr. 12: Art. 19, Nr. 14: Art. 23 VO (EG) Nr. 1223/2009; über gesetze.legal) und § 60 Abs. 4 Nr. 2 Buchst. a, Abs. 5 LFGB gelesen; GMP (Art. 8) und Sicherheitsbewertung (Art. 10) sind in § 9 KosmetikV nicht genannt – fachlich zu bestätigen'
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Pflichten (Art. 4, 8, 10, 11, 13, 19, 23), Abgrenzung zum Weiterverkauf (Art. 6), Auslöser und Sanktion § 9 KosmetikV i. V. m. § 60 LFGB (50.000 €) bestätigt; Schwere wieder „hoch“'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 6

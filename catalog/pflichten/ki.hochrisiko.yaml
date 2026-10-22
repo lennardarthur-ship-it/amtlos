@@ -2,7 +2,7 @@
 # Rechtsstand 21.10.2026: Digital-Omnibus VO (EU) 2026/1744 (ABl. 24.7.2026, in Kraft 27.7.2026) – Anhang III ab 2.12.2027, Anhang I ab 2.8.2028
 schema_version: 1
 id: ki.hochrisiko
-version: 3
+version: 4
 katalog_nr: F.65
 titel:
   de: Pflichten für Hochrisiko-KI (ab 2.12.2027)
@@ -50,6 +50,10 @@ quellen:
 - titel: Verordnung (EU) 2026/1744 (Digital Omnibus zur KI)
   url: https://eur-lex.europa.eu/eli/reg/2026/1744/oj?locale=de
   abgerufen: null
+- titel: Verordnung (EU) 2026/1744 vom 8.7.2026, ABl. L vom 24.7.2026 (HTML-Fassung)
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX%3A32026R1744
+  abgerufen: '2026-10-22'
+  fundstelle: Erwägungsgründe 40 und 46
 - titel: Otto Schmidt – Wann gilt die KI-VO infolge der Änderungen durch die Digital-Omnibus-VO zur KI? (14.8.2026)
   url: https://www.otto-schmidt.de/news//wann-gilt-die-ki-vo-infolge-der-anderungen-durch-die-digital-omnibus-vo-zur-ki-2026-08-14.html
   abgerufen: '2026-10-21'
@@ -57,7 +61,7 @@ quellen:
   url: https://www.fgs.de/news-and-insights/blog/detail/eu-ai-act-was-ab-dem-2-august-2026-gilt-und-was-verschoben-wurde
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Rechtsstand 21.10.2026: Termine (Anhang III 2.12.2027, Anhang I 2.8.2028, Art. 113 Buchst. c) laut Otto Schmidt und FGS – Amtsblatttext (EUR-Lex) nicht direkt abgerufen, gegenlesen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026 (Amtsblatt gegenlesen): am 22.10.2026 im Amtsblatt gelesen – Erwägungsgrund 40 nennt 2.12.2027 (Anhang III) und 2.8.2028 (Anhang I), Erwägungsgrund 46 und ELI-Daten das Inkrafttreten am 27.7.2026 (ABl. L vom 24.7.2026); den verfügenden Text der Änderung von Art. 113 konnte das Werkzeug nicht abrufen (EUR-Lex-Seite nach rund 97.000 Zeichen abgeschnitten) – noch am Artikeltext gegenlesen'
 - 'Status bleibt „beschlossen“ bis 2.12.2027; Anhang-I-Fälle (2.8.2028) und Bestandssysteme (Art. 111: bis 2.8.2030) nicht als eigene Regel abgebildet'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Vorbereitungs-Checkliste fachlich prüfen

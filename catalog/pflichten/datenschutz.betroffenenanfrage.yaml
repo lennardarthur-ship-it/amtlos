@@ -1,18 +1,18 @@
 # Katalog F.59 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.betroffenenanfrage
-version: 2
+version: 3
 katalog_nr: F.59
 titel:
   de: Anfrage einer betroffenen Person beantworten
 kurz:
   de: Fragt jemand nach seinen Daten oder verlangt Löschung, antwortest du innerhalb eines Monats.
 erklaerung:
-  de: Betroffene haben unter anderem Rechte auf Auskunft, Berichtigung, Löschung und Widerspruch. Amtlos zeigt die Frist ab
-    Eingang und führt die Anfrage bis zur Antwort.
+  de: 'Betroffene haben unter anderem Rechte auf Auskunft, Berichtigung, Löschung und Widerspruch. Du antwortest innerhalb eines Monats ab Eingang (Art. 12 Abs. 3 DSGVO); fällt das Fristende auf einen Samstag, Sonntag oder Feiertag, endet die Frist am nächsten Werktag (Art. 3 Verordnung (EWG, Euratom) Nr. 1182/71). Ist eine Anfrage komplex oder sind es viele, kannst du die Frist um zwei Monate verlängern – das teilst du der Person innerhalb des ersten Monats mit. Amtlos zeigt die Frist ab Eingang und führt die Anfrage bis zur Antwort.'
 rechtsgrundlage:
 - Art. 12 Abs. 3 DSGVO
 - Art. 15–22 DSGVO
+- Art. 3 Verordnung (EWG, Euratom) Nr. 1182/71
 kategorie: datenschutz
 ausloeser:
   ereignis: betroffenenanfrage
@@ -27,7 +27,7 @@ frist:
   zeitpunkt: spaetestens
   je_ereignis: true
   verschiebung:
-    regel: keine
+    regel: naechster_werktag
     kalender: bundeseinheitlich
 wiederholung:
   art: einmalig
@@ -54,11 +54,11 @@ quellen:
   url: https://gdpr-text.com/es/read/article-83
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- Verlängerung um zwei Monate bei komplexen Anfragen (Art. 12 Abs. 3 Satz 2) abbilden?
 - Mehrere Anfragen am selben Tag ergeben eine Instanz (T-15)
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – Art. 83 Abs. 5 Buchst. b (Betroffenenrechte Art. 12 bis 22); Wortlaut über gdpr-text.com gelesen'
+- 'Verlängerung um zwei Monate (Art. 12 Abs. 3 Satz 2) nur als Hinweis im Text (Prüfvermerk RA Dr. Weber 22.10.2026); die Frist rechnet immer mit einem Monat'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

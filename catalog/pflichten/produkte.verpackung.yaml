@@ -1,8 +1,8 @@
 # Katalog G.71 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
-# Rechtsstand 21.10.2026: VerpackG seit 12.8.2026 durch VerpackDG (BGBl. 2026 I Nr. 207) abgelöst
+# Rechtsstand 21.10.2026: VerpackG seit 12.8.2026 durch VerpackDG (BGBl. 2026 I Nr. 207) abgelöst – Fundstelle am 22.10.2026 belegt
 schema_version: 1
 id: produkte.verpackung
-version: 4
+version: 5
 katalog_nr: G.71
 titel:
   de: Verpackungen registrieren und lizenzieren
@@ -10,7 +10,7 @@ kurz:
   de: Bevor du verpackte Waren erstmals in Verkehr bringst, registrierst du dich im LUCID-Register und beteiligst dich an
     einem System.
 erklaerung:
-  de: 'Seit 12.8.2026 gelten die EU-Verpackungsverordnung (EU) 2025/40 und das Verpackungsrecht-Durchführungsgesetz (VerpackDG), das das Verpackungsgesetz abgelöst hat. Du registrierst dich weiterhin bei der Zentralen Stelle Verpackungsregister (LUCID) und beteiligst Verpackungen, die typischerweise bei privaten Endverbrauchern anfallen, an einem System (§§ 6, 7 VerpackDG).'
+  de: 'Seit 12.8.2026 gelten die EU-Verpackungsverordnung (EU) 2025/40 und das Verpackungsrecht-Durchführungsgesetz (VerpackDG), das das Verpackungsgesetz abgelöst hat. Du registrierst dich weiterhin vor dem erstmaligen Bereitstellen bei der Zentralen Stelle Verpackungsregister (LUCID) und beteiligst Verpackungen, die typischerweise bei privaten Endverbrauchern anfallen, vor der Bereitstellung an einem System (§§ 6, 7 VerpackDG).'
 rechtsgrundlage:
 - § 6 VerpackDG
 - § 7 VerpackDG
@@ -44,6 +44,10 @@ quellen:
 - titel: Verpackungsrecht-Durchführungsgesetz
   url: https://www.gesetze-im-internet.de/verpackdg/
   abgerufen: null
+- titel: Verpackungsrecht-Durchführungsgesetz vom 13.7.2026 (BGBl. 2026 I Nr. 207), in Kraft seit 12.8.2026
+  url: https://www.gesetze-im-internet.de/verpackdg/BJNR0CF0B0026.html
+  abgerufen: '2026-10-22'
+  fundstelle: § 6 Abs. 1 Satz 1, § 7 Abs. 1 Satz 1
 - titel: IHK Karlsruhe – VerpackDG, deutsches Verpackungsgesetz novelliert (24.7.2026)
   url: https://www.ihk.de/karlsruhe/fachthemen/umwelt/abfall/neues-verpackungsgesetz/verpackdg-deutsches-verpackungsgesetz-novelliert-7128006
   abgerufen: '2026-10-21'
@@ -54,10 +58,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/verpackdg/__66.html
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Rechtsstand 21.10.2026: Rechtsgrundlage von VerpackG auf §§ 6, 7 VerpackDG umgestellt (Inhaltsübersicht VerpackDG, IHK Karlsruhe); Wortlaut von §§ 6, 7 nicht abgerufen – Zeitpunkt „vor dem ersten Inverkehrbringen“ und Abgrenzung systembeteiligungspflichtig gegen den Gesetzestext lesen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026 (Fundstelle belegen): VerpackDG vom 13.7.2026, BGBl. 2026 I Nr. 207, in Kraft 12.8.2026 (Art. 8 Abs. 7) am 22.10.2026 auf gesetze-im-internet.de belegt; § 6 Abs. 1 Satz 1 „vor dem erstmaligen Bereitstellen“, § 7 Abs. 1 Satz 1 „vor der Bereitstellung“ gelesen. Abgrenzung systembeteiligungspflichtig nicht weiter geprüft'
 - 'Neue Herstellerpflichten aus der PPWR (z. B. Herstellerregister nach Art. 44, Kennzeichnung) und B2B-Verpackungen (§ 68 Abs. 9 VerpackDG, Übergang bis 31.12.2027) nicht abgebildet'
-- „Vor dem ersten Inverkehrbringen“ als Frist mit Ereignis abbilden?
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 66 Abs. 1 Nr. 1 (Registrierung, § 6) und Nr. 3 (Systembeteiligung, § 7), Abs. 3 gelesen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Frist mit Ereignis „erstes Inverkehrbringen“ abbilden – nicht umgesetzt (kein Ereignis im Ereigniskatalog, bräuchte eine neue Datumsfrage; Bestandsbetriebe bekämen eine überfällige Frist), nur im Text; Sanktionen plausibel'
 pruefung:
   status: entwurf
   geprueft_von: null

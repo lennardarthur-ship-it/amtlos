@@ -1,17 +1,18 @@
 # R12 (Rechtsprüfung Befund 2): Fernabsatz per Telefon, E-Mail oder Messenger – Widerrufsbelehrung
 schema_version: 1
 id: branche.widerruf_fernabsatz
-version: 2
+version: 3
 katalog_nr: G.68
 titel:
   de: Bei Aufträgen per Telefon, E-Mail oder Messenger über das Widerrufsrecht belehren
 kurz:
   de: Nimmst du Aufträge von Privatkunden per Telefon, E-Mail oder Messenger an, haben sie meist 14 Tage Widerrufsrecht – darüber belehrst du vor Vertragsschluss.
 erklaerung:
-  de: Schließt du einen Vertrag mit einem Verbraucher ausschließlich über Fernkommunikationsmittel – Telefon, E-Mail, Brief oder Messenger –, ist das ein Fernabsatzvertrag, wenn dein Betrieb für solche Verträge eingerichtet ist (§ 312c BGB). Der Kunde kann ihn 14 Tage lang widerrufen (§ 312g, § 355 BGB). Darüber informierst du vor Vertragsschluss und bestätigst den Vertrag mit der Belehrung auf einem dauerhaften Datenträger, etwa per E-Mail. Fehlt die Belehrung, läuft die Widerrufsfrist bis zu 12 Monate und 14 Tage (§ 356 Abs. 3, 4 BGB); widerruft der Kunde dann, schuldet er für erbrachte Leistungen keinen Wertersatz (§ 357a Abs. 2 BGB). Bei Dienstleistungen erlischt das Widerrufsrecht, wenn du vollständig geleistet hast und der Kunde vorher ausdrücklich zugestimmt und bestätigt hat, dass er sein Widerrufsrecht dann verliert (§ 356 Abs. 5 Nr. 2 BGB). Willst du vor Ablauf der Frist anfangen, lass dir das ausdrücklich vom Kunden verlangen und halte es fest.
+  de: Schließt du einen Vertrag mit einem Verbraucher ausschließlich über Fernkommunikationsmittel – Telefon, E-Mail, Brief oder Messenger –, ist das ein Fernabsatzvertrag, wenn dein Betrieb für solche Verträge eingerichtet ist (§ 312c BGB) – dafür genügt nach der Rechtsprechung des BGH, dass du regelmäßig Aufträge per Telefon oder E-Mail annimmst. Der Kunde kann ihn 14 Tage lang widerrufen (§ 312g, § 355 BGB). Darüber informierst du vor Vertragsschluss und bestätigst den Vertrag mit der Belehrung auf einem dauerhaften Datenträger, etwa per E-Mail. Fehlt die Belehrung, läuft die Widerrufsfrist bis zu 12 Monate und 14 Tage (§ 356 Abs. 3, 4 BGB); widerruft der Kunde dann, schuldet er für erbrachte Leistungen keinen Wertersatz (§ 357a Abs. 2 BGB). Bei Dienstleistungen erlischt das Widerrufsrecht, wenn du vollständig geleistet hast und der Kunde vorher ausdrücklich zugestimmt und bestätigt hat, dass er sein Widerrufsrecht dann verliert (§ 356 Abs. 5 Nr. 2 BGB). Bei Freizeitkursen und anderen Freizeitangeboten mit festem Termin besteht kein Widerrufsrecht, auch wenn sie online stattfinden (§ 312g Abs. 2 Nr. 9 BGB, EuGH C-96/21). Willst du vor Ablauf der Frist anfangen, lass dir das ausdrücklich vom Kunden verlangen und halte es fest.
 rechtsgrundlage:
 - § 312c BGB
 - § 312g BGB
+- § 312g Abs. 2 Nr. 9 BGB
 - § 356 Abs. 3, 4 BGB
 - § 356 Abs. 5 BGB
 - § 357a Abs. 2 BGB
@@ -55,12 +56,11 @@ quellen:
   url: https://www.buzer.de/356_BGB.htm
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- Neu nach Rechtsprüfung R12 (Befund 2) – Abgrenzung „für den Fernabsatz organisiertes Vertriebs- oder Dienstleistungssystem“ im Einzelfall unsicher
 - Muster-Widerrufsbelehrung und -formular für Dienstleistungen erst nach Prüfung
-- Ausnahme für Freizeitbetätigungen mit festem Termin (§ 312g Abs. 2 Nr. 9 BGB) bei Kursen unsicher
-- 'Vorprüfung 21.10.2026: Fundstelle der Höchstfrist (zwölf Monate und 14 Tage) seit 19.6.2026 in § 356 Abs. 4 Satz 1 BGB (BGBl. 2026 I Nr. 28, buzer.de) – Zitat auf „Abs. 3, 4“ angepasst (3 Stellen)'
-- 'Vorprüfung 21.10.2026: Erlöschen bei Dienstleistungen seit 19.6.2026 in § 356 Abs. 5 Nr. 2 BGB (vorher Abs. 4, buzer.de) – Zitat angepasst'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: „meist“ als Vorsicht richtig (BGH: regelmäßige Aufträge per Telefon/E-Mail genügen); § 312g Abs. 2 Nr. 9 erfasst Kurse mit festem Datum, auch online (EuGH C-96/21); Zitate n. F. bestätigt. BGH-Aktenzeichen nicht genannt'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

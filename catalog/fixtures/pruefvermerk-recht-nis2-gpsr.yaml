@@ -1,0 +1,29 @@
+persona: onlinehandel
+beschreibung: "Prüfvermerk RA Dr. Weber 22.10.2026: Onlinehändler mit eigener Marke, 60 Beschäftigte, seit 15.9.2026 unter NIS2 – Registrierung drei Monate ab Betroffenheit, GPSR getrennt nach Händler, Hersteller und Fernabsatz, VSBG-Hinweis über die Website"
+stichtag: "2026-10-22"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2015-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [onlinehandel]
+  profil.beschaeftigte.gesamt: 60
+  profil.umsatz.vorjahr: 12000000
+  profil.kunden.segmente: [b2c]
+  profil.vertrieb.kanaele: [onlineshop]
+  profil.produkte.arten: [physisch]
+  profil.produkte.hersteller: true
+  profil.online.website: true
+  profil.nis2.betroffen: ja
+  profil.nis2.betroffen_seit: "2026-09-15"
+  profil.bundesland: BW
+  profil.gemeinde_ags: "08111000"
+erwartet:
+  it_sicherheit.nis2_registrierung: gilt
+  it_sicherheit.nis2_pruefen: gilt_nicht
+  produkte.gpsr: gilt
+  produkte.gpsr_hersteller: gilt
+  produkte.gpsr_fernabsatz: gilt
+  online.vsbg_hinweis: unbekannt
+termine_enthaelt:
+  # § 33 BSIG: spätestens drei Monate ab Betroffenheit
+  it_sicherheit.nis2_registrierung: [["einmalig", "2026-12-15"]]

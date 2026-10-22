@@ -1,19 +1,20 @@
 # R12 (Nutzertest Kurier #8): GPS- und Telematik-Ortung
 schema_version: 1
 id: datenschutz.ortung
-version: 2
+version: 3
 katalog_nr: F.63
 titel:
   de: Ortung von Fahrzeugen und Beschäftigten datenschutzgerecht gestalten
 kurz:
   de: Ortest du Fahrzeuge oder Beschäftigte per GPS oder Telematik, brauchst du eine Rechtsgrundlage, informierst die Betroffenen, legst Zweck und Löschfrist fest und schließt mit dem Anbieter einen Vertrag.
 erklaerung:
-  de: Ortungsdaten von Fahrzeugen, die Beschäftigte fahren, sind personenbezogene Daten. Du brauchst dafür eine Rechtsgrundlage, etwa die Erfüllung des Vertrags oder ein berechtigtes Interesse wie Tourenplanung, Diebstahlschutz oder Nachweise gegenüber Kunden (Art. 6 Abs. 1 Buchst. b oder f DSGVO), und wägst die Interessen der Beschäftigten ab. Lege fest, wofür du die Daten nutzt, und verwende sie nur dafür (Art. 5 Abs. 1 Buchst. b DSGVO); eine dauerhafte Leistungs- und Verhaltenskontrolle ist in der Regel unzulässig, in Pausen und Freizeit sollte die Ortung aus sein. Informiere die Beschäftigten vorher (Art. 13 DSGVO), lege eine Löschfrist fest und schließe mit dem Telematik-Anbieter einen Vertrag zur Auftragsverarbeitung (Art. 28 DSGVO). Ob eine Datenschutz-Folgenabschätzung nötig ist, prüfst du gesondert.
+  de: Ortungsdaten von Fahrzeugen, die Beschäftigte fahren, sind personenbezogene Daten. Rechtsgrundlage ist in der Regel ein berechtigtes Interesse wie Tourenplanung oder Diebstahlschutz (Art. 6 Abs. 1 Buchst. f DSGVO); du wägst es gegen die Interessen der Beschäftigten ab. Lege fest, wofür du die Daten nutzt, und verwende sie nur dafür (Art. 5 Abs. 1 Buchst. b DSGVO); eine dauerhafte Leistungs- und Verhaltenskontrolle ist in der Regel unzulässig, außerhalb der Arbeitszeit ortest du nicht. Informiere die Beschäftigten vorher (Art. 13 DSGVO), lege eine Löschfrist fest und schließe mit dem Telematik-Anbieter einen Vertrag zur Auftragsverarbeitung (Art. 28 DSGVO). Die Ortung von Beschäftigten steht auf der Liste der Datenschutzkonferenz, für die immer eine Datenschutz-Folgenabschätzung nötig ist – führe sie vor dem Einsatz durch (Art. 35 DSGVO). Zustelldaten wie die Unterschrift der Empfänger oder ein Foto der Zustellung sind eigene Verarbeitungen, die du gesondert betrachtest.
 rechtsgrundlage:
-- Art. 6 Abs. 1 DSGVO
+- Art. 6 Abs. 1 Buchst. f DSGVO
 - Art. 5 Abs. 1 DSGVO
 - Art. 13 DSGVO
 - Art. 28 DSGVO
+- Art. 35 DSGVO
 kategorie: datenschutz
 branchen:
 - transport_logistik
@@ -47,10 +48,10 @@ quellen:
   url: https://gesetze.legal/eu/vo_eu_2016_679/83
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Kurier #8) – Rechtsgrundlage (§ 26 BDSG nach EuGH C-34/21 zweifelhaft) und DSFA (Muss-Liste der Datenschutzkonferenz, Ortung von Beschäftigten) unsicher'
-- Ohne Betriebsrat keine Betriebsvereinbarung – Rechtsgrundlage muss trotzdem tragen; Zustelldaten (Empfänger, Unterschrift, Foto) nicht abgebildet
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (Art. 83 Abs. 4 Buchst. a und Abs. 5 Buchst. a, b DSGVO über gesetze.legal gelesen) – fachlich zu bestätigen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Rechtsgrundlage Art. 6 Abs. 1 lit. f (§ 26 BDSG nur ergänzend, nicht genannt), DSFA nach Muss-Liste, Zustelldaten als Hinweis – umgesetzt; Zustelldaten nicht als eigene Pflicht abgebildet'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

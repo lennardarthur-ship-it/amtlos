@@ -1,15 +1,14 @@
 # Katalog F.60 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.datenpanne_meldung
-version: 2
+version: 3
 katalog_nr: F.60
 titel:
   de: Datenpanne der Aufsichtsbehörde melden
 kurz:
   de: Bei einer Datenpanne meldest du sie binnen 72 Stunden der Datenschutz-Aufsichtsbehörde.
 erklaerung:
-  de: Die Frist beginnt, sobald du von der Panne erfährst. Keine Meldung ist nötig, wenn voraussichtlich kein Risiko für die
-    Betroffenen besteht – das entscheidest und dokumentierst du. Amtlos zeigt einen Countdown und erstellt einen Meldeentwurf.
+  de: 'Die 72 Stunden laufen stundengenau ab dem Zeitpunkt, an dem du von der Panne erfährst, auch über das Wochenende (Art. 33 Abs. 1 DSGVO). Keine Meldung ist nötig, wenn voraussichtlich kein Risiko für die Betroffenen besteht – das entscheidest und dokumentierst du. Zuständig ist die Datenschutz-Aufsichtsbehörde deines Landes, in Baden-Württemberg zum Beispiel der Landesbeauftragte für den Datenschutz und die Informationsfreiheit in Stuttgart, in Bayern das Bayerische Landesamt für Datenschutzaufsicht in Ansbach; Amtlos nennt dir die Behörde zu deinem Bundesland. Amtlos zeigt einen Countdown und erstellt einen Meldeentwurf.'
 rechtsgrundlage:
 - Art. 33 DSGVO
 kategorie: datenschutz
@@ -36,7 +35,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Bußgeld nach Art. 83 Abs. 4 DSGVO.
+    de: Bußgeld bis 10 Mio. € oder bei Unternehmen bis 2 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 4 Buchst. a DSGVO).
   schwere: hoch
 automatisierung: dokument_generator
 aktion:
@@ -51,9 +50,8 @@ quellen:
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
   abgerufen: null
 fachlich_zu_pruefen:
-- 72 Stunden tagesgenau als 3 Tage ab dem Tag der Entdeckung umgesetzt; der Countdown in der App rechnet stundengenau – bestätigen
-- Benachrichtigung der Betroffenen bei hohem Risiko (Art. 34) als eigene Pflicht?
-- Zuständige Aufsichtsbehörde je Land
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Katalogfrist auf PT72H (stundengenau ab Kenntnis) – nicht umgesetzt, weil Schema (dauer ohne Uhrzeit) und Fristen-Engine keine Stunden kennen; bleibt P3D, der Countdown der App rechnet stundengenau'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Benachrichtigung der Betroffenen bei hohem Risiko (Art. 34 DSGVO) als eigene Pflicht – Eintrag fehlt noch'
 pruefung:
   status: entwurf
   geprueft_von: null

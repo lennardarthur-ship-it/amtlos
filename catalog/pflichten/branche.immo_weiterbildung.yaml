@@ -1,17 +1,18 @@
 # Katalog H.8 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.immo_weiterbildung
-version: 3
+version: 4
 katalog_nr: H.8
 titel:
   de: Weiterbildungspflicht (Immobilien und Finanzen)
 kurz:
-  de: Für bestimmte erlaubnispflichtige Tätigkeiten gilt eine regelmäßige Weiterbildungspflicht – nur wo sie noch gilt.
+  de: Als Immobilienmakler, Wohnimmobilienverwalter, Versicherungs- oder Finanzanlagenvermittler bildest du dich regelmäßig weiter.
 erklaerung:
-  de: Immobilienmakler und Wohnimmobilienverwalter bilden sich innerhalb von drei Kalenderjahren 20 Stunden weiter (§ 34c Abs. 2a GewO), Versicherungsvermittler 15 Stunden je Kalenderjahr (§ 34d Abs. 9 GewO). Die Nachweise bewahrst du auf und legst sie der Behörde auf Verlangen vor.
+  de: Immobilienmakler und Wohnimmobilienverwalter bilden sich innerhalb von drei Kalenderjahren 20 Stunden weiter (§ 34c Abs. 2a GewO), Versicherungsvermittler 15 Stunden je Kalenderjahr (§ 34d Abs. 9 GewO), Finanzanlagenvermittler und Honorar-Finanzanlagenberater (§ 34f, § 34h GewO) ebenfalls 15 Stunden je Kalenderjahr (§ 15b FinVermV). Die Nachweise bewahrst du auf und legst sie der Behörde auf Verlangen vor.
 rechtsgrundlage:
 - § 34c Abs. 2a GewO
 - § 34d Abs. 9 GewO
+- § 15b FinVermV
 kategorie: branche
 branchen:
 - immobilien_finanzen
@@ -28,8 +29,9 @@ ausloeser:
     - 34c
     - 34d
     - 34f
+    - 34h
     label:
-      de: Du hast eine Erlaubnis nach § 34c, § 34d oder § 34f GewO.
+      de: Du hast eine Erlaubnis nach § 34c, § 34d, § 34f oder § 34h GewO.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -40,7 +42,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: 'Bußgeld bis 5.000 €, wenn du dich nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig weiterbildest (§ 144 Abs. 2 Nr. 5a, 7d, Abs. 4 GewO).'
+    de: 'Bußgeld bis 5.000 €, wenn du dich nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig weiterbildest (§ 144 Abs. 2 Nr. 5a, 7d, Abs. 4 GewO). Für Finanzanlagenvermittler und Honorar-Finanzanlagenberater ist ein Verstoß nach § 26 FinVermV bußgeldbewehrt.'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -54,13 +56,12 @@ quellen:
   url: https://lxgesetze.de/gewo/144
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'R12 (Rechtsprüfung Befund 6): Stunden ergänzt (§ 34c Abs. 2a: 20 Std. in 3 Jahren, § 34d Abs. 9: 15 Std. je Jahr); § 34f im Auslöser – eine gesetzliche Weiterbildungspflicht nach § 34f ist der Rechtsprüfung nicht bekannt, prüfen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- '„nur wo noch geltend“ – aktuellen Stand je Vorschrift prüfen'
 - Umfang (Stunden) und Zeitraum als Regelwerte
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 144 Abs. 2 Nr. 5a (§ 34c Abs. 2a Satz 1), Nr. 7d (§ 34d Abs. 9 Satz 2) und Abs. 4 GewO (über lxgesetze) gelesen; Aufbewahrung der Nachweise zusätzlich nach § 18 Abs. 1 Nr. 9 MaBV (§ 15b Abs. 2 Satz 3) bußgeldbewehrt – fachlich zu bestätigen'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: § 34c Abs. 2a, § 34d Abs. 9 GewO und Sanktion § 144 bestätigt; § 15b FinVermV (15 Std./Jahr) für § 34f/§ 34h ergänzt, § 34h in den Auslöser aufgenommen; „nur wo sie noch gilt“ gestrichen. § 15b, § 26 FinVermV nicht am Wortlaut gelesen, Höhe des Bußgelds nach § 26 FinVermV nicht genannt'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 4

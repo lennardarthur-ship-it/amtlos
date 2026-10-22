@@ -1,7 +1,7 @@
 # Katalog G.72 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.elektrogeraete
-version: 5
+version: 6
 katalog_nr: G.72
 titel:
   de: Elektrogeräte bei der stiftung ear registrieren
@@ -9,10 +9,12 @@ kurz:
   de: Bringst du Elektrogeräte selbst erstmals in Deutschland in Verkehr, registrierst du dich vorher bei der stiftung ear.
 erklaerung:
   de: Hersteller und Händler, die als Hersteller gelten, müssen sich nach dem ElektroG vor dem Verkauf registrieren. Als Hersteller
-    gilt auch, wer unter eigener Marke verkauft oder Geräte nach Deutschland einführt. Wer bei einem Händler in Deutschland kauft
+    gilt auch, wer unter eigener Marke verkauft, Geräte nach Deutschland einführt oder sie aus dem Ausland im Fernabsatz an Kunden in
+    Deutschland verkauft (§ 3 Nr. 9 ElektroG). Wer bei einem Händler in Deutschland kauft
     und weiterverkauft oder einbaut, ist in der Regel nicht Hersteller.
 rechtsgrundlage:
 - ElektroG
+- § 3 Nr. 9 ElektroG
 kategorie: produkte
 branchen:
 - onlinehandel
@@ -56,12 +58,12 @@ quellen:
   url: https://lxgesetze.de/elektrog/45
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Rückfrage „selbst erstmals in Deutschland in Verkehr (Herstellung, Eigenmarke, Import)“ vor dem Auslösen (R10, K-430) – Installateur mit Einkauf im inländischen Großhandel als Nicht-Hersteller bestätigen; Pflichten als Vertreiber (Rücknahme) nicht abgebildet'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Herstellerbegriff § 3 Nr. 9 ElektroG und Inlandsgroßhandel = Vertreiber bestätigt; Pflichten als Vertreiber (Rücknahme) nicht abgebildet'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Wer gilt als Hersteller (Import, Eigenmarke)?
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 45 Abs. 1 Nr. 1 (§ 6 Abs. 1 Satz 1), Nr. 3 (§ 6 Abs. 2 Satz 1), Nr. 4 (§ 6 Abs. 2 Satz 2 Nr. 1) und Abs. 2 ElektroG (über lxgesetze) gelesen – fachlich zu bestätigen'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 6

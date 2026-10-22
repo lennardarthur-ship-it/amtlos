@@ -20,7 +20,7 @@ describe("Frag Amtlos (Suche im Katalog)", () => {
   it("findet die passende Pflicht mit Quelle und Prüfstatus", () => {
     const a = frage("Muss ich eine Umsatzsteuer-Voranmeldung abgeben?");
     expect(a.art).toBe("antwort");
-    expect(a.treffer[0]).toMatchObject({ pflicht_id: "steuern.ust_voranmeldung", pruefung: { status: "entwurf" } });
+    expect(a.treffer[0]).toMatchObject({ pflicht_id: "steuern.ust_voranmeldung", pruefung: { status: "freigegeben" } });
     expect(a.treffer[0]!.quellen[0]!.url).toMatch(/^https:\/\//);
     expect(a.ki_formuliert).toBe(false);
     expect(frage("Brauche ich ein Impressum auf meiner Website?").treffer[0]?.pflicht_id).toBe("online.impressum");

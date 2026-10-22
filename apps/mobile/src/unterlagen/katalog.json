@@ -259,16 +259,21 @@
   "titel": "Hygieneplan führen",
   "kurz": "In Beauty- und Kosmetikbetrieben legst du in einem Hygieneplan fest, wie Geräte, Flächen und Hände gereinigt und desinfiziert werden.",
   "rechtsgrundlage": [
-   "IfSG",
-   "Hygieneverordnungen der Länder"
+   "§ 17 Abs. 4 IfSG",
+   "Hygieneverordnungen der Länder (z. B. BW HygieneVO, BY HygV, NRW HygVO)",
+   "§ 73 Abs. 1a Nr. 24, Abs. 2 IfSG"
   ],
   "quellen": [
    {
     "titel": "Infektionsschutzgesetz",
     "url": "https://www.gesetze-im-internet.de/ifsg/"
+   },
+   {
+    "titel": "Infektionsschutzgesetz § 73 (Bußgeldvorschriften)",
+    "url": "https://www.gesetze-im-internet.de/ifsg/__73.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "branche.gastro_allergene",
@@ -403,7 +408,7 @@
  {
   "id": "datenschutz.avv",
   "titel": "Auftragsverarbeitungsverträge abschließen",
-  "kurz": "Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, Lohnbüro, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.",
+  "kurz": "Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, IT-Hoster, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.",
   "rechtsgrundlage": [
    "Art. 28 DSGVO"
   ],
@@ -417,7 +422,7 @@
     "url": "https://gesetze.legal/eu/vo_eu_2016_679/83"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.datenpanne_meldung",
@@ -448,7 +453,7 @@
     "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.tom",
@@ -463,7 +468,7 @@
     "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.videoueberwachung",
@@ -471,7 +476,8 @@
   "kurz": "Wenn du Videoüberwachung einsetzt, machst du sie erkennbar und dokumentierst den Zweck.",
   "rechtsgrundlage": [
    "Art. 6 Abs. 1 lit. f DSGVO",
-   "Art. 13 DSGVO"
+   "Art. 13 DSGVO",
+   "§ 87 Abs. 1 Nr. 6 BetrVG"
   ],
   "quellen": [
    {
@@ -487,12 +493,12 @@
     "url": "https://gesetze.legal/eu/vo_eu_2016_679/83"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.vvt",
   "titel": "Verzeichnis der Verarbeitungstätigkeiten führen",
-  "kurz": "Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest.",
+  "kurz": "Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest – auch als Kleinbetrieb.",
   "rechtsgrundlage": [
    "Art. 30 DSGVO"
   ],
@@ -502,7 +508,7 @@
     "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "gesellschaft.handelsregister_anmeldung",
@@ -544,7 +550,7 @@
     "url": "https://www.gesetze-im-internet.de/partgg/__5.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "gesellschaft.transparenzregister",
@@ -572,7 +578,7 @@
     "url": "https://gesetze.legal/bund/gwg/56"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "gruendung.gewerbeanzeige",
@@ -588,7 +594,7 @@
     "url": "https://www.gesetze-im-internet.de/gewo/__14.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "ki.kompetenz",
@@ -619,14 +625,15 @@
     "url": "https://www.ihk.de/ihklw/produkte/beratung-und-service/ecommerce-und-internet/digital-omnibus-verordnung-zur-ki-tritt-in-kraft-7142858"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "online.datenschutzerklaerung",
   "titel": "Datenschutzerklärung auf der Website",
   "kurz": "Auf deiner Website informierst du in einer Datenschutzerklärung über die Verarbeitung von Daten.",
   "rechtsgrundlage": [
-   "Art. 13 DSGVO"
+   "Art. 13 DSGVO",
+   "§ 25 TDDDG"
   ],
   "quellen": [
    {
@@ -638,7 +645,7 @@
     "url": "https://gdpr-text.com/es/read/article-83"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "online.impressum",
@@ -653,7 +660,7 @@
     "url": "https://www.gesetze-im-internet.de/ddg/__5.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.arbeitszeit_aufzeichnung",
@@ -677,7 +684,7 @@
     "url": "https://www.gesetze-im-internet.de/arbschg/__25.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.arbeitszeit_milog",
@@ -705,7 +712,7 @@
     "url": "https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.ausweis_hinweis",
@@ -733,7 +740,7 @@
     "url": "https://www.gesetze-im-internet.de/schwarzarbg_2004/__8.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.lohnsteuer_anmeldung",
@@ -752,7 +759,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.mutterschutz_gefaehrdungsbeurteilung",
@@ -771,7 +778,7 @@
     "url": "https://www.gesetze-im-internet.de/muschg_2018/__32.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.nachweisgesetz",
@@ -794,7 +801,7 @@
     "url": "https://www.buzer.de/gesetz/5010/al0-210457.htm"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.sofortmeldung",
@@ -821,7 +828,7 @@
     "url": "https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.sv_anmeldung",
@@ -837,7 +844,7 @@
     "url": "https://www.gesetze-im-internet.de/sgb_4/__28a.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.aufbewahrung",
@@ -878,7 +885,7 @@
     "url": "https://www.gesetze-im-internet.de/stgb/__283.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.buchfuehrungspflicht",
@@ -914,7 +921,7 @@
     "url": "https://www.gesetze-im-internet.de/stgb/__283.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.e_bilanz",
@@ -946,7 +953,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.est_erklaerung",
@@ -1026,7 +1033,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.feststellungserklaerung",
@@ -1136,7 +1143,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__379.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.kassenmeldung",
@@ -1163,7 +1170,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.kassenmeldung_ausserbetriebnahme",
@@ -1190,7 +1197,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.kst_erklaerung",
@@ -1263,7 +1270,7 @@
     "url": "https://www.bzst.de/DE/Unternehmen/Umsatzsteuer/One-Stop-Shop_EU/one_stop_shop_eu_node.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.rechnungen_pflichtangaben",
@@ -1300,7 +1307,7 @@
     "url": "https://www.gesetze-im-internet.de/ustdv_1980/__34a.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.ust_jahreserklaerung",
@@ -1379,7 +1386,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__370.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.zusammenfassende_meldung",
@@ -1398,6 +1405,6 @@
     "url": "https://www.gesetze-im-internet.de/ustg_1980/__26a.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  }
 ]

@@ -55,6 +55,8 @@ quellen:
   url: https://lxgesetze.de/sgb-iv/28f
   abgerufen: '2026-10-22'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

@@ -63,11 +63,13 @@ quellen:
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'Rechtsstand 21.10.2026: kein deutsches Umsetzungsgesetz, kein veröffentlichter Referentenentwurf (BT-Drs. 21/7026: Vorbereitungen laufen) – nationale Stichtage und Schwellen nach Verkündung übernehmen'
-- 'Schwelle auf „mindestens 150“ (≥) korrigiert: Art. 9 Abs. 1 lit. b RL „150 bis 249 Arbeitnehmer“ (laut AfA und weiteren Quellen; Richtlinientext in EUR-Lex gegenlesen); Gruppe 100–149 (ab 2031) nicht als eigene Regel abgebildet'
+- 'Gruppe 100–149 Beschäftigte (ab 7.6.2031, Art. 9 Abs. 1 lit. c RL) nicht als eigene Regel abgebildet; Schwelle ≥ 150 und Termine bestätigt (Prüfvermerk RA Dr. Weber 22.10.2026)'
 - Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie)
 - Zählweise und Inhalt des Berichts nach Umsetzungsgesetz
 - Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

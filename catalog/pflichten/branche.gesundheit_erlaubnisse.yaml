@@ -1,17 +1,18 @@
 # Katalog H.7 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gesundheit_erlaubnisse
-version: 2
+version: 3
 katalog_nr: H.7
 titel:
   de: Berufserlaubnis und Zulassung
 kurz:
   de: Gesundheits- und Pflegeberufe brauchen je nach Tätigkeit eine Approbation, Erlaubnis oder Zulassung.
 erklaerung:
-  de: Welche Erlaubnis nötig ist, hängt vom Beruf ab (z. B. Heilpraktiker, Pflege, Physiotherapie). Ohne sie darfst du die
-    Tätigkeit nicht ausüben.
+  de: 'Welche Erlaubnis nötig ist, hängt vom Beruf ab – etwa die Approbation für Ärztinnen und Ärzte (BÄO), die Heilpraktikererlaubnis (HeilprG) oder die Erlaubnis für Physiotherapie (MPhG), Ergotherapie, Logopädie und Pflege (PflBG). Kosmetik und Massage ohne Heilkunde sind erlaubnisfrei. Ohne die nötige Erlaubnis darfst du die Tätigkeit nicht ausüben.'
 rechtsgrundlage:
 - Berufsgesetze der Gesundheitsberufe
+- § 5 HeilprG
+- § 132a StGB
 kategorie: branche
 branchen:
 - gesundheit_pflege
@@ -32,9 +33,8 @@ kanal: post
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: 'Wer Heilkunde ohne Approbation oder Heilpraktikererlaubnis ausübt, macht sich strafbar (§ 5 HeilprG: Freiheitsstrafe bis zu einem Jahr oder Geldstrafe); das unbefugte Führen geschützter Berufsbezeichnungen ist strafbar (§ 132a StGB) bzw. nach den Berufsgesetzen bußgeldbewehrt.'
+  schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -45,11 +45,10 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Liste der Berufe und zuständigen Stellen ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Folgen, Liste der Berufe und Schwere „hoch“ übernommen; zuständige Stellen je Beruf nicht ergänzt'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

@@ -1,14 +1,14 @@
 # Katalog H.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.transport_erlaubnis
-version: 4
+version: 5
 katalog_nr: H.5
 titel:
   de: Erlaubnis oder Lizenz für den Güterkraftverkehr
 kurz:
-  de: Für gewerblichen Güterkraftverkehr mit Fahrzeugen über 3,5 t ist eine Erlaubnis vorgesehen, grenzüberschreitend schon über 2,5 t eine Gemeinschaftslizenz. Ob sie für dich gilt, klärt die Erlaubnisbehörde.
+  de: Für gewerblichen Güterkraftverkehr mit Fahrzeugen über 3,5 t ist eine Erlaubnis oder Gemeinschaftslizenz vorgesehen, grenzüberschreitend schon über 2,5 t eine Gemeinschaftslizenz; Werkverkehr mit eigenen Gütern ist erlaubnisfrei. Ob sie für dich gilt, klärt die Erlaubnisbehörde.
 erklaerung:
-  de: Eine Erlaubnis nach dem Güterkraftverkehrsgesetz brauchst du für die gewerbliche Beförderung von Gütern mit Fahrzeugen, die einschließlich Anhänger mehr als 3,5 t zulässige Gesamtmasse haben (§§ 1, 3 GüKG). Für grenzüberschreitende Fahrten und Kabotage brauchst du eine Gemeinschaftslizenz – seit dem 21.5.2022 auch für Fahrzeuge über 2,5 t bis 3,5 t (Verordnung (EG) Nr. 1072/2009). Werkverkehr, also die Beförderung eigener Güter für eigene Zwecke, ist erlaubnisfrei (§ 1 Abs. 2, 3 GüKG). Für Taxi- und Mietwagenverkehr brauchst du unabhängig davon eine Genehmigung nach dem Personenbeförderungsgesetz.
+  de: Eine Erlaubnis nach dem Güterkraftverkehrsgesetz oder eine Gemeinschaftslizenz brauchst du für die gewerbliche Beförderung von Gütern mit Fahrzeugen, die einschließlich Anhänger mehr als 3,5 t zulässige Gesamtmasse haben (§§ 1, 3 GüKG). Für grenzüberschreitende Fahrten und Kabotage brauchst du eine Gemeinschaftslizenz – seit dem 21.5.2022 auch für Fahrzeuge über 2,5 t bis 3,5 t (Verordnung (EG) Nr. 1072/2009); seit 2022 wird die Gemeinschaftslizenz auch für den Inlandsverkehr erteilt. Werkverkehr, also die Beförderung eigener Güter mit eigenen Fahrzeugen für eigene Zwecke, ist erlaubnisfrei (§ 1 Abs. 2, 3 GüKG) – das betrifft etwa Handwerksbetriebe, Bäckereien und Händler. Für Taxi- und Mietwagenverkehr brauchst du unabhängig davon eine Genehmigung nach dem Personenbeförderungsgesetz.
 rechtsgrundlage:
 - §§ 1, 3 GüKG
 - Verordnung (EG) Nr. 1072/2009
@@ -76,9 +76,9 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Kurier #3): Erlaubnis über 3,5 t (§§ 1, 3 GüKG), Gemeinschaftslizenz über 2,5 t grenzüberschreitend seit 21.5.2022 (IHK Berlin) – Ausnahmen nach § 2 GüKG nicht abgebildet'
-- Personenbeförderung (Taxi, Mietwagen, PBefG) nur im Text – eigener Auslöser fehlt
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Personenbeförderung (PBefG) als eigener Auslöser – nicht umgesetzt: keine Angabe „Personenbeförderung“ im Profil außer der Sofortmeldebranche (nur mit Beschäftigten gefragt); nur im Text'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Werkverkehr als Ausnahme „in Auslöser/Text“ – nur im Text: das Profil kennt Werkverkehr nicht (keine Frage); der Auslöser setzt die Branche Transport und Logistik voraus'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 3 Abs. 1 und § 19 Abs. 1 Nr. 1b, Abs. 2 Nr. 1, Abs. 7 GüKG gelesen; § 3 Abs. 1 GüKG verlangt inzwischen eine Gemeinschaftslizenz (keine „Erlaubnis“) – Titel, Kurztext und Erklärung prüfen; Folgen für die Personenbeförderung (PBefG) nicht ergänzt – fachlich zu bestätigen'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
