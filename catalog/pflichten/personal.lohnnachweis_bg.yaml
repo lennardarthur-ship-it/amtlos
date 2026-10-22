@@ -1,7 +1,7 @@
 # R11 (Nutzertest Tischlerei Befund 16): digitaler Lohnnachweis an die Unfallversicherung nach § 99 SGB VII
 schema_version: 1
 id: personal.lohnnachweis_bg
-version: 1
+version: 2
 katalog_nr: D.40
 titel:
   de: Lohnnachweis an die Berufsgenossenschaft
@@ -37,7 +37,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 25.000 €, wenn der Lohnnachweis nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig übermittelt wird (§ 111 Abs. 1 Nr. 5, Abs. 4 SGB IV in Verbindung mit § 99 Abs. 1 Satz 1 SGB IV).'
   schwere: mittel
 automatisierung: partner
 erledigung:
@@ -51,8 +51,15 @@ quellen:
 - titel: Sozialgesetzbuch VII § 99
   url: https://www.gesetze-im-internet.de/sgb_7/__99.html
   abgerufen: null
+- titel: 'Sozialgesetzbuch IV § 111'
+  url: https://www.gesetze-im-internet.de/sgb_4/__111.html
+  abgerufen: '2026-10-22'
+- titel: 'Sozialgesetzbuch IV § 99'
+  url: https://www.gesetze-im-internet.de/sgb_4/__99.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Nutzertest R11 (Tischlerei; der Bericht nennt § 99 SGB IV, richtig SGB VII) – Termin 16.02. des Folgejahres aus dem DGUV-Verfahren, bestätigen; Abgrenzung zur UV-Jahresmeldung (§ 28a Abs. 2a SGB IV)'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 111 Abs. 1 Nr. 5 SGB IV und § 99 Abs. 1 Satz 1 SGB IV (Übermittlung bis 16. Februar, Pflicht nach § 165 Abs. 1 Satz 1 SGB VII) amtlich gelesen; Rechtsgrundlage nennt „§ 99 SGB VII“ – vermutlich § 165 Abs. 1 SGB VII mit § 99 SGB IV gemeint; Verhältnis zu § 209 Abs. 1 Nr. 5a SGB VII (bis 2.500 €) klären) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

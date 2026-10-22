@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kfz #10): Ausbildungsvertrag eintragen lassen (§ 36 BBiG)
 schema_version: 1
 id: personal.azubi_eintragung
-version: 1
+version: 2
 katalog_nr: D.45
 titel:
   de: Ausbildungsvertrag ins Verzeichnis eintragen lassen
@@ -44,7 +44,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 1.000 €, wenn du die Eintragung nicht, nicht richtig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig beantragst (§ 101 Abs. 1 Nr. 9, Abs. 2 BBiG).'
   schwere: mittel
 automatisierung: hinweis
 erledigung:
@@ -58,8 +58,12 @@ quellen:
 - titel: Berufsbildungsgesetz § 36
   url: https://www.gesetze-im-internet.de/bbig_2005/__36.html
   abgerufen: null
+- titel: 'Berufsbildungsgesetz § 101'
+  url: https://www.gesetze-im-internet.de/bbig_2005/__101.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Nutzertest R12 (Kfz #10) – Termin „unverzüglich nach Vertragsschluss“ als spätestens Ausbildungsbeginn abgebildet; Bußgeld (§ 101 BBiG) fachlich ergänzen'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 101 Abs. 1 Nr. 9 (§ 36 Abs. 1 Satz 1, auch i. V. m. Satz 4) und Abs. 2 BBiG amtlich gelesen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

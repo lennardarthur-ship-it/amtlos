@@ -1,7 +1,7 @@
 # R12 (Rechtsprüfung Befund 6): Bewachungsgewerbe – Wachpersonen vor dem Einsatz anmelden
 schema_version: 1
 id: personal.bewacherregister
-version: 2
+version: 3
 katalog_nr: A.3
 titel:
   de: Wachpersonen im Bewacherregister anmelden
@@ -42,7 +42,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 3.000 €, wenn du eine Person mit Bewachungsaufgaben betraust, ohne das Anmeldeverfahren über das Bewacherregister einzuhalten und die Mitteilung der Behörde erhalten zu haben (§ 22 Abs. 1 Nr. 1 in Verbindung mit § 16 Abs. 1 BewachV, § 144 Abs. 2 Nr. 1b, Abs. 4 GewO).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -60,9 +60,16 @@ quellen:
 - titel: Gewerbeordnung § 11b (lxgesetze)
   url: https://lxgesetze.de/gewo/11b
   abgerufen: '2026-10-21'
+- titel: 'Bewachungsverordnung § 22'
+  url: https://www.gesetze-im-internet.de/bewachv_2019/__22.html
+  abgerufen: '2026-10-22'
+- titel: 'Gewerbeordnung § 144 (lxgesetze.de)'
+  url: https://lxgesetze.de/gewo/144
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Neu nach Rechtsprüfung R12 (Befund 6) – § 11b GewO und § 16 BewachV geprüft; Folgen bei Nichterfüllung fachlich ergänzen
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 22 Abs. 1 Nr. 1, § 16 Abs. 1 BewachV amtlich gelesen, § 144 Abs. 4 GewO über lxgesetze.de (Stand 20.7.2026); Abmeldung nach § 11b GewO nicht geprüft; Schwere bleibt bis zur fachlichen Bestätigung „mittel“ (Vorschlag: „hoch“)) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

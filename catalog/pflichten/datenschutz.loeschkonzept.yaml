@@ -1,7 +1,7 @@
 # Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.loeschkonzept
-version: 1
+version: 2
 katalog_nr: F.58
 titel:
   de: Löschkonzept festlegen
@@ -42,7 +42,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 20 Mio. € oder bei Unternehmen bis 4 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist, bei Verstößen gegen den Grundsatz der Speicherbegrenzung oder gegen das Recht auf Löschung (Art. 83 Abs. 5 Buchst. a, b DSGVO in Verbindung mit Art. 5 Abs. 1 Buchst. e, Art. 17 DSGVO).'
   schwere: niedrig
 automatisierung: hinweis
 aktion:
@@ -55,10 +55,13 @@ quellen:
 - titel: DSGVO Art. 17
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
   abgerufen: null
+- titel: 'DSGVO Art. 83 (gesetze.legal)'
+  url: https://gesetze.legal/eu/vo_eu_2016_679/83
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Zusammenspiel mit Aufbewahrungsfristen (C.32, G-21) erläutern
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (Art. 83 Abs. 5 Buchst. a (Art. 5) und b (Art. 12 bis 22) DSGVO über gesetze.legal gelesen) – fachlich zu bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

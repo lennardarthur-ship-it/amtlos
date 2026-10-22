@@ -1,7 +1,7 @@
 # Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.sv_jahresmeldung
-version: 2
+version: 3
 katalog_nr: D.38
 titel:
   de: Jahresmeldung zur Sozialversicherung
@@ -38,7 +38,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 25.000 €, wenn die Meldung nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig erstattet wird (§ 111 Abs. 1 Nr. 2, Abs. 4 SGB IV).'
   schwere: mittel
 automatisierung: partner
 status_recht: in_kraft
@@ -48,10 +48,13 @@ quellen:
 - titel: Sozialgesetzbuch IV § 28a
   url: https://www.gesetze-im-internet.de/sgb_4/__28a.html
   abgerufen: null
+- titel: 'Sozialgesetzbuch IV § 111'
+  url: https://www.gesetze-im-internet.de/sgb_4/__111.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Termin 15.02. des Folgejahres nach Rechtsprüfung R11 (Befund 5, § 10 DEÜV) – Verschiebung bei Wochenende bestätigen'
 - 'UV-Jahresmeldung (§ 28a Abs. 2a SGB IV) gesondert – Termin unsicher, prüfen'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 111 Abs. 1 Nr. 2 (§ 28a Abs. 1 bis 3 i. V. m. der Verordnung nach § 28c Nr. 1) und Abs. 4 SGB IV amtlich gelesen; vorsätzlich oder leichtfertig) – fachlich zu bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

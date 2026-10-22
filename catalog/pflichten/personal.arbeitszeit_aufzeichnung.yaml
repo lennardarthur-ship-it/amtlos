@@ -1,7 +1,7 @@
 # Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.arbeitszeit_aufzeichnung
-version: 4
+version: 5
 katalog_nr: D.42
 titel:
   de: Arbeitszeit aufzeichnen
@@ -29,7 +29,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 30.000 €, wenn die Aufzeichnungen nach § 16 Abs. 2 ArbZG nicht oder nicht richtig erstellt oder nicht für die vorgeschriebene Dauer aufbewahrt werden (§ 22 Abs. 1 Nr. 9, Abs. 2 ArbZG). Für die allgemeine Erfassungspflicht nach § 3 Abs. 2 Nr. 1 ArbSchG ist kein eigenes Bußgeld vorgesehen.'
   schwere: mittel
 automatisierung: hinweis
 erledigung:
@@ -45,11 +45,17 @@ quellen:
 - titel: Arbeitsschutzgesetz § 3
   url: https://www.gesetze-im-internet.de/arbschg/__3.html
   abgerufen: null
+- titel: 'Arbeitszeitgesetz § 22'
+  url: https://www.gesetze-im-internet.de/arbzg/__22.html
+  abgerufen: '2026-10-22'
+- titel: 'Arbeitsschutzgesetz § 25'
+  url: https://www.gesetze-im-internet.de/arbschg/__25.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Bäckerei #9): § 16 Abs. 2 ArbZG ergänzt – Aufzeichnung der Sonn- und Feiertagsarbeit bestätigen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Anforderungen an die Form (bis zur Neuregelung) fachlich formulieren
-- 'Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (Prüfergebnis Sifa 22.10.2026 – offen, Rechtsanwalt)'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 22 Abs. 1 Nr. 9, Abs. 2 ArbZG amtlich gelesen; § 25 ArbSchG nennt § 3 nicht (Prüfergebnis Sifa: offen für Rechtsanwalt)) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

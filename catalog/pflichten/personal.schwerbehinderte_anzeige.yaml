@@ -1,7 +1,7 @@
 # Katalog D.45 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.schwerbehinderte_anzeige
-version: 2
+version: 3
 katalog_nr: D.45
 titel:
   de: Anzeige und Ausgleichsabgabe (Schwerbehinderte)
@@ -45,7 +45,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 10.000 €, wenn die Anzeige nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig erstattet wird (§ 238 Abs. 1 Nr. 3, Abs. 2 SGB IX).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -59,10 +59,13 @@ quellen:
 - titel: § 156 SGB IX, Wortlaut (gesetze.legal)
   url: https://gesetze.legal/bund/sgb_ix/156
   abgerufen: '2026-10-21'
+- titel: 'Sozialgesetzbuch IX § 238'
+  url: https://www.gesetze-im-internet.de/sgb_9_2018/__238.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Quote und Höhe der Abgabe als Regelwerte
 - Verschiebung bei 31.3. am Wochenende
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 238 Abs. 1 Nr. 3 (§ 163 Abs. 2 Satz 1 oder Abs. 4) und Abs. 2 SGB IX amtlich gelesen; Folgen bei nicht gezahlter Ausgleichsabgabe nicht geprüft; Schwere bleibt bis zur fachlichen Bestätigung „mittel“ (Vorschlag: „hoch“)) – fachlich zu bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 - 'Vorprüfung 21.10.2026 (G-05/T-16): Zählweise nach § 156 Abs. 1, 3 SGB IX (gelesen) – unter 18 Wochenstunden und bis acht Wochen zählen nicht; Teilzeit ab 18 Std. voll, nicht anteilig (der Prüfbericht nennt „Teilzeit anteilig“ – das gilt für § 23 KSchG, nicht für das SGB IX). Ausbildungsstellen nach § 157 Abs. 1 SGB IX nicht abgerufen. Die App zählt keine Arbeitsplätze (abgeleitet.beschaeftigte.arbeitsplaetze_sgb9 bleibt unbekannt), die Zahl der Beschäftigten dient nur als Obergrenze – bestätigen; Einzelvorschriften §§ 154, 163 SGB IX ohne Abruf zugeordnet'

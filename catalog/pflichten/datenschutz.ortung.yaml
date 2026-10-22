@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kurier #8): GPS- und Telematik-Ortung
 schema_version: 1
 id: datenschutz.ortung
-version: 1
+version: 2
 katalog_nr: F.63
 titel:
   de: Ortung von Fahrzeugen und Beschäftigten datenschutzgerecht gestalten
@@ -33,7 +33,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 20 Mio. € oder bei Unternehmen bis 4 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist, bei Verstößen gegen die Grundsätze der Verarbeitung, die Rechtsgrundlage oder die Informationspflicht (Art. 83 Abs. 5 Buchst. a, b DSGVO in Verbindung mit Art. 5, 6, 13 DSGVO); bis 10 Mio. € oder bei Unternehmen bis 2 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist, bei Verstößen gegen Art. 28 DSGVO (Art. 83 Abs. 4 Buchst. a DSGVO).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -43,9 +43,13 @@ quellen:
 - titel: Datenschutz-Grundverordnung
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
   abgerufen: null
+- titel: 'DSGVO Art. 83 (gesetze.legal)'
+  url: https://gesetze.legal/eu/vo_eu_2016_679/83
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Nutzertest R12 (Kurier #8) – Rechtsgrundlage (§ 26 BDSG nach EuGH C-34/21 zweifelhaft) und DSFA (Muss-Liste der Datenschutzkonferenz, Ortung von Beschäftigten) unsicher'
 - Ohne Betriebsrat keine Betriebsvereinbarung – Rechtsgrundlage muss trotzdem tragen; Zustelldaten (Empfänger, Unterschrift, Foto) nicht abgebildet
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (Art. 83 Abs. 4 Buchst. a und Abs. 5 Buchst. a, b DSGVO über gesetze.legal gelesen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

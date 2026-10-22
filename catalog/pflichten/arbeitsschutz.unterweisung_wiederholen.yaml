@@ -1,7 +1,7 @@
 # Katalog E.51 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.unterweisung_wiederholen
-version: 4
+version: 5
 katalog_nr: E.51
 titel:
   de: Unterweisung jährlich wiederholen
@@ -40,7 +40,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Die Wiederholung nach § 12 ArbSchG und § 4 Abs. 1 DGUV Vorschrift 1 ist nicht unmittelbar bußgeldbewehrt. Die Aufsichtsbehörde kann die Unterweisung im Einzelfall anordnen; ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3 Satz 1 Nr. 1, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG). Für Unterweisungen nach besonderen Verordnungen, etwa bei Gefahrstoffen, gelten eigene Bußgeldvorschriften.'
   schwere: mittel
 automatisierung: dokument_generator
 aktion:
@@ -57,9 +57,12 @@ quellen:
 - titel: DGUV Vorschrift 1 (UKBW, § 4)
   url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
   abgerufen: '2026-10-22'
+- titel: 'Arbeitsschutzgesetz (§§ 22, 25)'
+  url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Kürzere Frist für Jugendliche als eigene Pflicht arbeitsschutz.unterweisung_jugendliche (R11)'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 25 ArbSchG nennt § 12 nicht, § 32 DGUV Vorschrift 1 nennt § 4 nicht; Höhe der Anordnung nach § 25 Abs. 2 ArbSchG 30.000 € (abweichend vom Text bei arbeitsschutz.erstunterweisung, dort 5.000 €)) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

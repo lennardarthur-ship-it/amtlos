@@ -1,7 +1,7 @@
 # R11 (Rechtsprüfung T-100/T-111, Nutzertest Tischlerei Befund 7): halbjährliche Unterweisung Jugendlicher als eigene Pflicht
 schema_version: 1
 id: arbeitsschutz.unterweisung_jugendliche
-version: 2
+version: 3
 katalog_nr: E.51
 titel:
   de: Jugendliche halbjährlich unterweisen
@@ -39,7 +39,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 5.000 €, wenn du Jugendliche nicht, nicht richtig oder nicht rechtzeitig über die Gefahren unterweist (§ 59 Abs. 1 Nr. 3, Abs. 3 JArbSchG).'
   schwere: mittel
 automatisierung: dokument_generator
 aktion:
@@ -56,9 +56,12 @@ quellen:
 - titel: Jugendarbeitsschutzgesetz (§ 29)
   url: https://www.gesetze-im-internet.de/jarbschg/BJNR009650976.html
   abgerufen: '2026-10-22'
+- titel: 'Jugendarbeitsschutzgesetz § 59 (lxgesetze.de)'
+  url: https://lxgesetze.de/jarbschg/59
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Prüfergebnis Sifa 22.10.2026 (offen, Technik): Frist je Jugendlichem ab dessen letzter Unterweisung führen – Amtlos rechnet ab der letzten erfassten Unterweisung im Betrieb, ohne Personen zu unterscheiden'
-- 'Folgen bei Nichterfüllung (§ 58 JArbSchG) – Sanktion fachlich ergänzen'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 59 JArbSchG über lxgesetze.de gelesen (Stand dort 23.10.2024), amtliche Seite im Abruf abgeschnitten – Absatz der Höhe (Abs. 3) am amtlichen Text gegenlesen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

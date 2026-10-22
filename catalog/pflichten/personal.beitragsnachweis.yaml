@@ -1,7 +1,7 @@
 # Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.beitragsnachweis
-version: 2
+version: 3
 katalog_nr: D.40
 titel:
   de: Beitragsnachweis übermitteln
@@ -37,7 +37,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Kein eigenes Bußgeld vorgesehen (§ 111 SGB IV nennt § 28f Abs. 3 nicht). Liegt der Beitragsnachweis nicht zwei Arbeitstage vor Fälligkeit vor, kann die Einzugsstelle das Arbeitsentgelt schätzen, bis der Nachweis ordnungsgemäß übermittelt ist (§ 28f Abs. 3 Satz 2 SGB IV).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: partner
@@ -48,9 +48,15 @@ quellen:
 - titel: Sozialgesetzbuch IV § 28f
   url: https://www.gesetze-im-internet.de/sgb_4/__28f.html
   abgerufen: null
+- titel: 'Sozialgesetzbuch IV § 111'
+  url: https://www.gesetze-im-internet.de/sgb_4/__111.html
+  abgerufen: '2026-10-22'
+- titel: 'Sozialgesetzbuch IV § 28f (lxgesetze.de)'
+  url: https://lxgesetze.de/sgb-iv/28f
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - „Arbeitstage“ als Bankarbeitstage umgesetzt – bestätigen (G-13)
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 111 SGB IV amtlich gelesen, § 28f Abs. 3 Satz 2 über lxgesetze.de; Säumniszuschläge (§ 24 SGB IV) nicht geprüft; Schwere bleibt bis zur fachlichen Bestätigung „mittel“) – fachlich zu bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (§ 111 Abs. 1 SGB IV (gelesen) nennt § 28f Abs. 3 nicht; Folgen (Schätzung durch die Einzugsstelle, Säumniszuschläge) fachlich klären) – nach Ergänzung wieder „hoch“'
 pruefung:
