@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "backgroundColor": "#063b29",
+      "backgroundColor": "#120E3A",
       "image": "./assets/splash.png",
       "resizeMode": "contain"
     },
@@ -71,8 +71,8 @@
       "package": "de.amtlos.app",
       "versionCode": 2,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/splash.png",
-        "backgroundColor": "#063b29"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#120E3A"
       }
     },
     "plugins": [
@@ -83,9 +83,9 @@
           "image": "./assets/splash.png",
           "imageWidth": 160,
           "resizeMode": "contain",
-          "backgroundColor": "#063b29",
+          "backgroundColor": "#120E3A",
           "dark": {
-            "backgroundColor": "#11171d"
+            "backgroundColor": "#120E3A"
           }
         }
       ],

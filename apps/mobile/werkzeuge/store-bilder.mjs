@@ -179,7 +179,7 @@ for (const [i, b] of texte.bilder.entries()) {
   if (b.lupe?.bildschirm && !roh[b.lupe.bildschirm]) throw new Error(`Bildschirm der Lupe fehlt: ${b.lupe.bildschirm}`);
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>${css}
   html,body{margin:0;width:1290px;height:2796px;overflow:hidden}
-  body{background:#063b29;font-family:A;color:#fff;position:relative}
+  body{background:#120E3A;font-family:A;color:#fff;position:relative}
   .text{position:absolute;top:150px;left:110px;right:110px}
   h1{font-family:S;font-weight:800;font-size:104px;line-height:1.04;margin:0;letter-spacing:-3px}
   p{font-size:52px;line-height:1.3;margin:36px 0 0;color:#7fe3b8}
@@ -210,7 +210,7 @@ if (WEB) {
   const titel = texte.bilder[0].titel;
   await og.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>${css}
   html,body{margin:0;width:1200px;height:630px;overflow:hidden}
-  body{background:#063b29;font-family:A;color:#fff;position:relative}
+  body{background:#120E3A;font-family:A;color:#fff;position:relative}
   .text{position:absolute;left:72px;top:96px;width:600px}
   .marke{font-weight:600;font-size:34px;color:#7fe3b8;letter-spacing:.5px}
   h1{font-family:S;font-weight:800;font-size:66px;line-height:1.04;margin:24px 0 0;letter-spacing:-2px}
