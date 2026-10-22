@@ -1566,7 +1566,7 @@ export function aufenthaltLaeuftAb(s: Pick<Stand, "mitarbeiter">, tag = heute(),
 }
 
 /** R12 (Bäckerei #7): Vorlagen, die sich einer Betriebsstätte zuordnen lassen (Hygiene, Lebensmittel, Arbeitszeit). */
-export const STAETTEN_VORLAGEN = new Set(["haccp", "ifsg_belehrung", "hygieneplan", "allergene", "reinigungsplan", "arbeitszeitnachweis"]);
+export const STAETTEN_VORLAGEN = new Set(["haccp", "ifsg_belehrung", "hygieneschulung", "hygieneplan", "allergene", "reinigungsplan", "arbeitszeitnachweis"]);
 
 /**
  * R12: Betriebsstätte einer Unterlage setzen – Zuordnung, kein Inhalt: geht auch bei festgeschriebenen Unterlagen

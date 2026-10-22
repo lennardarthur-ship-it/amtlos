@@ -301,6 +301,26 @@
   "geprueft": false
  },
  {
+  "id": "branche.gastro_hygieneschulung",
+  "titel": "Lebensmittelhygiene schulen",
+  "kurz": "Wer bei dir mit leicht verderblichen Lebensmitteln arbeitet – auch du selbst –, braucht eine Schulung in Lebensmittelhygiene.",
+  "rechtsgrundlage": [
+   "§ 4 LMHV",
+   "Anhang II Kapitel XII VO (EG) Nr. 852/2004"
+  ],
+  "quellen": [
+   {
+    "titel": "Lebensmittelhygiene-Verordnung § 4",
+    "url": "https://www.gesetze-im-internet.de/lmhv_2007/__4.html"
+   },
+   {
+    "titel": "Verordnung (EG) Nr. 852/2004",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852"
+   }
+  ],
+  "geprueft": false
+ },
+ {
   "id": "branche.gastro_ifsg_belehrung",
   "titel": "Belehrung nach § 43 IfSG durch den Arbeitgeber",
   "kurz": "Wer neu bei dir mit Lebensmitteln arbeitet, belehrst du nach Aufnahme der Tätigkeit selbst und dokumentierst das.",

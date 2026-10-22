@@ -308,7 +308,8 @@ export const entsorgungsbelege = (belege: readonly Beleg[], heute = heuteBerlin(
 export type Kontrollart = "alle" | "hygiene" | "zoll" | "bg" | "datenschutz" | "kasse" | "umwelt";
 export const KONTROLLARTEN: Kontrollart[] = ["alle", "hygiene", "zoll", "bg", "umwelt", "datenschutz", "kasse"];
 const JE_KONTROLLE: Record<Exclude<Kontrollart, "alle" | "kasse">, ReadonlySet<string>> = {
-  hygiene: new Set(["ifsg_belehrung", "allergene", "haccp", "hygieneplan"]),
+  // Prüfbericht Lebensmittelhygiene (22.10.2026, Frage 15): dazu der Schulungsnachweis nach § 4 LMHV
+  hygiene: new Set(["ifsg_belehrung", "hygieneschulung", "allergene", "haccp", "hygieneplan"]),
   // R12: dazu Kopien der Aufenthaltstitel und – auf Verlangen – Lohnkonten (eigene Einträge ohne Vorlage)
   zoll: new Set(["arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ausweis_hinweis", "aufenthaltstitel", "lohnkonto"]),
   umwelt: new Set(["entsorgungsbelege", "gefahrstoffverzeichnis"]),
@@ -316,6 +317,12 @@ const JE_KONTROLLE: Record<Exclude<Kontrollart, "alle" | "kasse">, ReadonlySet<s
   bg: new Set(["gefaehrdungsbeurteilung", "unterweisung", "gefahrstoffverzeichnis", "betriebsanweisung", "betriebsanweisung_maschine", "betriebsanweisung_biostoffe", "expositionsverzeichnis", "pruefprotokoll_elektro", "hautschutzplan"]),
   datenschutz: new Set(["datenschutz_dokumentation", "avv", "datenschutzinformation", "datenpanne"]),
 };
+
+/**
+ * Prüfbericht Lebensmittelhygiene (22.10.2026, Frage 15): Steht eine Belehrung nach § 43 IfSG in der Mappe, erinnert das
+ * Deckblatt an die Bescheinigungen des Gesundheitsamts – sie gibt es nur auf Papier und gehören dazu (§ 43 Abs. 5 IfSG).
+ */
+export const mitIfsgBescheinigungen = (vorlagen: readonly string[]) => vorlagen.includes("ifsg_belehrung");
 
 /** Gehört eine Vorlage in die Mappe für diese Kontrollart? */
 export function fuerKontrolle(vorlageId: string, art: Kontrollart): boolean {

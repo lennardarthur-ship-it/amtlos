@@ -9,12 +9,16 @@ import type { Betrieb, Daten, Eintrag, Option, Vorlage, Vorschlag } from "./type
 import { MARKE } from "@amtlos/marke";
 
 /** Teilnahmeliste mit Unterschriftsspalte; leere Zeilen zum Nachtragen von Hand. */
-export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; feld: string; datum?: boolean }): string {
-  const kopf = ["Name", ...(extra ? [extra.kopf] : []), "Unterschrift"];
-  const zeilen = eintraege.filter((e) => text(e, "name")).map((e) => [zelle(text(e, "name")), ...(extra ? [zelle(extra.datum ? datumDe(text(e, extra.feld)) : text(e, extra.feld))] : []), ""]);
+type TeilnahmeSpalte = { kopf: string; feld: string; datum?: boolean };
+/** Teilnahmeliste mit Unterschrift; `extra`: eine oder zwei weitere Spalten zwischen Name und Unterschrift. */
+export function teilnahmeTabelle(eintraege: Eintrag[], extra?: TeilnahmeSpalte | TeilnahmeSpalte[]): string {
+  const sp = extra ? (Array.isArray(extra) ? extra : [extra]) : [];
+  const kopf = ["Name", ...sp.map((x) => x.kopf), "Unterschrift"];
+  const zeilen = eintraege.filter((e) => text(e, "name")).map((e) => [zelle(text(e, "name")), ...sp.map((x) => zelle(x.datum ? datumDe(text(e, x.feld)) : text(e, x.feld))), ""]);
+  const breiten = sp.length >= 2 ? ["30%", ...sp.map(() => `${(36 / sp.length).toFixed(0)}%`), "34%"] : sp.length ? ["38%", "22%", "40%"] : ["45%", "55%"];
   // mit Namen: zwei Leerzeilen zum Nachtragen, die mit dem letzten Namen zusammenbleiben (keine Seite nur mit Kopf und
   // Leerzeilen); ohne Namen (Liste zum Ausdrucken): sechs Zeilen
-  return tabelle(kopf, zeilen, { breiten: extra ? ["38%", "22%", "40%"] : ["45%", "55%"], ...(zeilen.length ? { leerzeilen: 2, schluss: 3 } : { mindestens: 6 }), hoch: true, klasse: "teilnahme" });
+  return tabelle(kopf, zeilen, { breiten, ...(zeilen.length ? { leerzeilen: 2, schluss: 3 } : { mindestens: 6 }), hoch: true, klasse: "teilnahme" });
 }
 
 export const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Reinigungsobjekte beim Kunden", "Behandlungsräume der Praxis", "Büro"];

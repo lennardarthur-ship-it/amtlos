@@ -6,9 +6,17 @@
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { ALLERGENE_UMFANG, HACCP, HAUTSCHUTZ_FRISEUR, HYGIENE, IFSG, LOSE_WARE } from "./bausteine.js";
 import { AUFZEICHNUNGEN, CCP_BEGRUENDUNG, CCP_FRAGEN, CCP_FRAGEN_QUELLE, CCP_VORSCHLAEGE, GEFAHRENANALYSE, GEFAHR_ARTEN, GEFAHR_KURZ, HACCP_AUFBEWAHRUNG, HACCP_FLEXIBEL, HYGIENE_BAECKEREI, HYGIENE_FOODTRUCK, PROZESSSCHRITTE, VERIFIZIERUNG } from "./haccp.js";
-import { KOPF_LINIE, ZELLE_LINIE, abschnitt, absatz, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, neufassung, plusMonate, punkte, stabileOption, tabelle, text, unterschriften, zelle, zusammen } from "./html.js";
-import { ALLERGENE, optionen } from "./konstanten.js";
+import { KOPF_LINIE, LINIE, ZELLE_LINIE, abschnitt, absatz, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, neufassung, plusMonate, punkte, stabileOption, tabelle, text, unterschriften, zelle, zusammen } from "./html.js";
+import { ALLERGENE, GETREIDEARTEN, NUSSARTEN, WEIZENARTEN_FUSSNOTE, ZUSATZSTOFFE, ZUSATZSTOFFE_QUELLE, optionen } from "./konstanten.js";
 import type { Betrieb, Daten, Eintrag, Vorlage, Vorschlag } from "./typen.js";
+
+/**
+ * Prüfbericht Lebensmittelhygiene (22.10.2026, D, ✎): auch Haushaltsfälle sind ein Grund zur Meldung (Behördenbogen:
+ * Verdachtsgrund). Anrede wie im übrigen Text der Belehrung („Sie“).
+ */
+export const IFSG_HAUSHALT = "Sagen Sie auch Bescheid, wenn jemand in Ihrem Haushalt Durchfall oder Erbrechen hat.";
+/** Prüfbericht Lebensmittelhygiene (D): Hinweis für den Hilfetext – für wen die Liste gilt. */
+export const IFSG_WER = "Belehren musst du alle, die mit den Lebensmitteln der Liste nach § 42 Abs. 2 IfSG umgehen. In Küchen von Gaststätten und in der Gemeinschaftsverpflegung gilt das für alle Tätigkeiten – also auch für Spülkräfte und den Service, wenn sie in der Küche arbeiten. Im Café sind das praktisch alle, die Speisen zubereiten oder belegen.";
 
 export const ifsgBelehrung: Vorlage = {
   id: "ifsg_belehrung",
@@ -32,6 +40,8 @@ export const ifsgBelehrung: Vorlage = {
     },
     {
       titel: "Teilnehmende",
+      // Prüfbericht Lebensmittelhygiene (22.10.2026, D): wer zu belehren ist
+      hilfe: IFSG_WER,
       felder: [
         {
           id: "teilnehmer",
@@ -42,6 +52,9 @@ export const ifsgBelehrung: Vorlage = {
           felder: [
             { id: "name", art: "text", label: "Name", pflicht: true },
             { id: "erstbelehrung_am", art: "datum", label: "Bescheinigung der Erstbelehrung vom" },
+            // Prüfbericht Lebensmittelhygiene (D, ✎): letzte Belehrung durch den Arbeitgeber je Person – so ist der
+            // Zwei-Jahres-Abstand auch bei verschiedenen Eintrittsdaten auf dem Papier prüfbar
+            { id: "letzte_belehrung_am", art: "datum", label: "Letzte Belehrung durch den Arbeitgeber am", hilfe: "die Belehrung vor dieser – leer lassen bei der ersten Belehrung nach Aufnahme der Tätigkeit" },
             // für die Drei-Monats-Frist der Bescheinigung (§ 43 Abs. 1 IfSG) bei der ersten Tätigkeit (R10)
             { id: "erster_arbeitstag", art: "datum", label: "Erster Arbeitstag" },
             { id: "erstmals", art: "schalter", label: "Erste Tätigkeit mit Lebensmitteln", hilfe: "Dann darf die Bescheinigung bei Arbeitsbeginn höchstens drei Monate alt sein (§ 43 Abs. 1 IfSG)", wenn: { feld: "erster_arbeitstag" } },
@@ -53,10 +66,17 @@ export const ifsgBelehrung: Vorlage = {
   hinweise(d) {
     // Bescheinigung bei erster Tätigkeit höchstens drei Monate alt (§ 43 Abs. 1 IfSG) – nur ein Hinweis, die Belehrung
     // durch den Arbeitgeber bleibt trotzdem zu dokumentieren
-    return liste(d, "teilnehmer")
-      .filter((x) => text(x, "name") && ja(x, "erstmals") && text(x, "erstbelehrung_am") && text(x, "erster_arbeitstag"))
+    const t = liste(d, "teilnehmer").filter((x) => text(x, "name"));
+    const bescheinigung = t
+      .filter((x) => ja(x, "erstmals") && text(x, "erstbelehrung_am") && text(x, "erster_arbeitstag"))
       .filter((x) => plusMonateIso(text(x, "erstbelehrung_am"), 3) < text(x, "erster_arbeitstag"))
       .map((x) => `${text(x, "name")}: Die Bescheinigung vom ${datumDe(text(x, "erstbelehrung_am"))} war am ersten Arbeitstag älter als drei Monate (§ 43 Abs. 1 IfSG) – vor der Tätigkeit ist eine neue Belehrung durch das Gesundheitsamt nötig.`);
+    // Prüfbericht Lebensmittelhygiene (D): Abstand zur letzten Belehrung durch den Arbeitgeber höchstens zwei Jahre
+    const datum = text(d, "datum");
+    const abstand = /^\d{4}-\d{2}-\d{2}$/.test(datum)
+      ? t.filter((x) => /^\d{4}-\d{2}-\d{2}$/.test(text(x, "letzte_belehrung_am")) && plusMonateIso(text(x, "letzte_belehrung_am"), 24) < datum).map((x) => `${text(x, "name")}: Die letzte Belehrung durch den Arbeitgeber am ${datumDe(text(x, "letzte_belehrung_am"))} liegt mehr als zwei Jahre zurück (§ 43 Abs. 4 IfSG) – künftig spätestens nach zwei Jahren wiederholen.`)
+      : [];
+    return [...bescheinigung, ...abstand];
   },
   html(d, b) {
     const naechste = plusMonate(text(d, "datum"), 24);
@@ -71,11 +91,11 @@ export const ifsgBelehrung: Vorlage = {
         (ja(d, "liste_anhaengen")
           ? abschnitt(
               "Tätigkeitsverbote nach § 42 Abs. 1 IfSG",
-              `<p>Folgende Personen dürfen nicht tätig sein oder beschäftigt werden a) beim Herstellen, Behandeln oder Inverkehrbringen der unten genannten Lebensmittel, wenn sie dabei mit diesen in Berührung kommen, oder b) in Küchen von Gaststätten und sonstigen Einrichtungen mit oder zur Gemeinschaftsverpflegung:</p>${punkte(IFSG.personen)}<h3>Woran Sie das erkennen</h3><p>Nicht arbeiten und den Arbeitgeber sofort informieren bei:</p>${punkte(IFSG.symptome)}<p>Bei solchen Krankheitszeichen ärztlichen Rat einholen und sagen, dass Sie mit Lebensmitteln arbeiten.</p><h3>Lebensmittel nach § 42 Abs. 2 IfSG</h3>${nummernListe(IFSG.lebensmittel)}`,
+              `<p>Folgende Personen dürfen nicht tätig sein oder beschäftigt werden a) beim Herstellen, Behandeln oder Inverkehrbringen der unten genannten Lebensmittel, wenn sie dabei mit diesen in Berührung kommen, oder b) in Küchen von Gaststätten und sonstigen Einrichtungen mit oder zur Gemeinschaftsverpflegung:</p>${punkte(IFSG.personen)}<h3>Woran Sie das erkennen</h3><p>Nicht arbeiten und den Arbeitgeber sofort informieren bei:</p>${punkte(IFSG.symptome)}<p>${esc(IFSG_HAUSHALT)}</p><p>Bei solchen Krankheitszeichen ärztlichen Rat einholen und sagen, dass Sie mit Lebensmitteln arbeiten.</p><h3>Lebensmittel nach § 42 Abs. 2 IfSG</h3>${nummernListe(IFSG.lebensmittel)}`,
             )
           : "") +
         (ja(d, "merkblatt") ? `<p>Anlage: Merkblatt zur Belehrung nach § 43 Abs. 1 Nr. 1 IfSG (Gesundheitsamt), ausgehändigt an alle Teilnehmenden.</p>` : "") +
-        abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich, dass ich belehrt wurde und mir keine Tatsachen für ein Tätigkeitsverbot bekannt sind. Treten Hinderungsgründe auf, teile ich dies unverzüglich mit.</p>${teilnahmeTabelle(liste(d, "teilnehmer"), { kopf: "Erstbelehrung vom", feld: "erstbelehrung_am", datum: true })}`) +
+        abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich, dass ich belehrt wurde und mir keine Tatsachen für ein Tätigkeitsverbot bekannt sind. Treten Hinderungsgründe auf, teile ich dies unverzüglich mit.</p>${teilnahmeTabelle(liste(d, "teilnehmer"), [{ kopf: "Erstbelehrung vom", feld: "erstbelehrung_am", datum: true }, { kopf: "Letzte Belehrung (Arbeitgeber)", feld: "letzte_belehrung_am", datum: true }])}`) +
         nachsatz(`Die Belehrung ist nach Aufnahme der Tätigkeit und danach alle zwei Jahre zu wiederholen und zu dokumentieren (§ 43 Abs. 4 IfSG)${naechste ? `, nächste Belehrung spätestens am ${naechste}` : ""}.`) +
         unterschriften(["Ort, Datum", "Unterschrift der belehrenden Person"]),
     });
@@ -84,18 +104,67 @@ export const ifsgBelehrung: Vorlage = {
 
 const LOSE_HINWEIS = "Informationen zu Allergenen erhalten Sie in dieser Übersicht und auf Nachfrage bei unserem Personal.";
 
+/**
+ * Prüfbericht Lebensmittelhygiene (22.10.2026, Fragen 9, 10, 13): Hilfetexte der Allergenliste – Sulfite, Zugänglichkeit vor
+ * dem Kauf, Spurenhinweis, Aktualität der Liste, Zusatzstoffe.
+ */
+export const ALLERGENE_HILFE = {
+  liste: "Häng die Liste gut sichtbar an der Theke oder im Gastraum aus oder leg sie dort aus: Gäste müssen sie vor dem Kauf sehen können, nicht erst auf Nachfrage. Bei Ware im Verkaufsregal muss am Produkt oder per Aushang stehen, wo die Information zu finden ist.",
+  stand: "Bei Rezept- oder Lieferantenwechsel sofort aktualisieren (Zutatenlisten der Zulieferer aufbewahren).",
+  sulfit: "Schwefeldioxid und Sulphite: Ankreuzen, wenn eine Zutat „geschwefelt“ oder „Sulfit“ in der Zutatenliste nennt.",
+  spuren: "Ein Spurenhinweis wie „Kann Spuren von Nüssen enthalten“ ist freiwillig und ersetzt keine Kennzeichnung – ankreuzen nur, was als Zutat enthalten ist, nicht pauschal alles.",
+  zusatzstoffe: "Die Ziffer steht auf dem Aushang hinter dem Namen, die Erklärung darunter. 1 bis 11: Kenntlichmachung nach § 5 LMZDV – ankreuzen, wenn die Zutatenliste einen solchen Zusatzstoff nennt. 12 koffeinhaltig (Getränke ab 150 mg Koffein je Liter) und 13 chininhaltig (z. B. Tonic Water): nach Anhang III Nr. 4 LMIV i. V. m. § 2 LMIDV.",
+};
+
+/** Kurzname eines Allergens in der Zeile „Enthält:“ unter der Speise (Milch ohne Klammerzusatz). */
+const ENTHAELT_KURZ: Record<string, string> = { milch: "Milch" };
+const optionText = (l: { wert: string; text: string }[], w: string) => l.find((o) => o.wert === w)?.text ?? w;
+/** Lateinische Namen weglassen (Prüfbericht Frage 9, Empfehlung): „Mandeln (Amygdalus communis L.), …“ → „Mandeln, …“. */
+export const ohneLatein = (t: string) => t.replace(/\s\([A-Z][a-z]+ [a-z]+[^()]*(?:\([^()]*\)[^()]*)?\)/g, "");
+
+/**
+ * „Enthält: Weizen (Dinkel), Eier, Milch, Haselnüsse“ (§ 4 LMIDV, Prüfbericht Frage 10) – bei Getreide und Schalenfrüchten
+ * die gewählten Arten; fehlt die Art, steht eine Linie zum Eintragen (die App meldet sie unter „Fehlt noch“). Ältere
+ * Listen mit der Sorte als Freitext (Felder „getreide“, „nuesse“) zeigen diesen Text, bis die Art gewählt ist.
+ */
+function enthaelt(x: Eintrag, a: string[]): string {
+  const teile: string[] = [];
+  for (const id of Object.keys(ALLERGENE)) {
+    if (!a.includes(id)) continue;
+    if (id === "gluten") {
+      const arten = auswahl(x, "getreidearten");
+      const weizen = arten.filter((w) => w === "dinkel" || w === "khorasan").map((w) => (w === "dinkel" ? "Dinkel" : "Khorasan"));
+      const t = [
+        ...(arten.includes("weizen") || weizen.length ? [`Weizen${weizen.length ? ` (${weizen.join(", ")})` : ""}`] : []),
+        ...arten.filter((w) => !["weizen", "dinkel", "khorasan"].includes(w)).map((w) => optionText(GETREIDEARTEN, w)),
+      ];
+      teile.push(t.length ? esc(t.join(", ")) : text(x, "getreide") ? zelle(text(x, "getreide")) : `glutenhaltiges Getreide (Art: ${LINIE})`);
+    } else if (id === "schalenfruechte") {
+      const arten = auswahl(x, "nussarten").map((w) => optionText(NUSSARTEN, w));
+      teile.push(arten.length ? esc(arten.join(", ")) : text(x, "nuesse") ? zelle(text(x, "nuesse")) : `Schalenfrüchte (Art: ${LINIE})`);
+    } else teile.push(esc(ENTHAELT_KURZ[id] ?? ALLERGENE[id]!));
+  }
+  return teile.length ? `Enthält: ${teile.join(", ")}` : "";
+}
+/** Ziffern der Zusatzstoffe einer Speise (Stelle in ZUSATZSTOFFE, 1-basiert). */
+const ziffern = (x: Eintrag) => ZUSATZSTOFFE.map((o, i) => (auswahl(x, "zusatzstoffe").includes(o.wert) ? i + 1 : 0)).filter(Boolean);
+
 export const allergenAushang: Vorlage = {
   id: "allergene",
   gestalt: "aushang",
   titel: "Allergenliste",
-  beschreibung: "Je Speise und Getränk die enthaltenen 14 Hauptallergene nach Anhang II LMIV – zum Auslegen oder Aushängen, mit Erläuterung der Allergene.",
+  beschreibung: "Je Speise und Getränk die enthaltenen 14 Hauptallergene nach Anhang II LMIV mit Getreide- und Nussart, dazu kenntlich zu machende Zusatzstoffe als Ziffern – zum Auslegen oder Aushängen, mit Erläuterung der Allergene.",
   bereich: "gastro",
   pflichten: ["branche.gastro_allergene"],
   grundlage: "Art. 9, 44 LMIV; § 4 LMIDV",
   // Aushang für Gäste: ohne interne Bereichsangabe und Rechtsgrundlage im Kopf (die steht als Fußnote am Ende)
   ohneKopfangaben: true,
   abschnitte: [
-    { titel: "Stand", felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" }, { id: "legende", art: "schalter", label: "Erläuterung der 14 Allergene anfügen", vorbelegung: true }] },
+    {
+      titel: "Stand",
+      hilfe: ALLERGENE_HILFE.liste,
+      felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute", hilfe: ALLERGENE_HILFE.stand }, { id: "legende", art: "schalter", label: "Erläuterung der 14 Allergene anfügen", vorbelegung: true }],
+    },
     {
       titel: "Speisen und Getränke",
       felder: [
@@ -109,12 +178,18 @@ export const allergenAushang: Vorlage = {
           felder: [
             { id: "name", art: "text", label: "Name", pflicht: true },
             { id: "kategorie", art: "text", label: "Kategorie", vorschlaege: ["Frühstück", "Vorspeisen", "Hauptgerichte", "Desserts", "Kuchen und Torten", "Snacks", "Heißgetränke", "Kaltgetränke"] },
-            { id: "allergene", art: "mehrfach", label: "Enthält", optionen: optionen(ALLERGENE) },
-            // welche Sorte (R10): Gäste mit Allergie fragen nach dem Getreide bzw. der Nuss – steht unter dem Namen
-            { id: "getreide", art: "text", label: "Welches Getreide", hilfe: "optional, z. B. Weizen, Dinkel", wenn: { feld: "allergene", ist: "gluten" } },
-            { id: "nuesse", art: "text", label: "Welche Schalenfrüchte (Nüsse)", hilfe: "optional, z. B. Haselnuss, Walnuss", wenn: { feld: "allergene", ist: "schalenfruechte" } },
+            { id: "allergene", art: "mehrfach", label: "Enthält", optionen: optionen(ALLERGENE), hilfe: `${ALLERGENE_HILFE.sulfit} ${ALLERGENE_HILFE.spuren}` },
+            // Prüfbericht Lebensmittelhygiene (Frage 9, ✎): die Art ist Pflicht – Anhang II LMIV nennt Weizen, Roggen …
+            // bzw. die acht Nussarten, „Glutenhaltiges Getreide“ allein genügt nicht. Neue Felder (Mehrfachauswahl); die
+            // früheren Freitextfelder „getreide“ und „nuesse“ bleiben in gespeicherten Listen erhalten und erscheinen im
+            // Aushang, bis die Art gewählt ist.
+            { id: "getreidearten", art: "mehrfach", label: "Welches Getreide", optionen: GETREIDEARTEN, pflicht: true, hilfe: `Pflicht bei glutenhaltigem Getreide. ${WEIZENARTEN_FUSSNOTE}`, wenn: { feld: "allergene", ist: "gluten" } },
+            { id: "nussarten", art: "mehrfach", label: "Welche Schalenfrüchte (Nüsse)", optionen: NUSSARTEN, pflicht: true, hilfe: "Pflicht bei Schalenfrüchten – Erdnüsse sind ein eigenes Allergen.", wenn: { feld: "allergene", ist: "schalenfruechte" } },
             // ausdrückliche Bestätigung: ohne sie steht kein „keines der 14 Hauptallergene“ auf dem Aushang
             { id: "keine", art: "schalter", label: "Enthält keines der 14 Hauptallergene" },
+            // Prüfbericht Frage 13: Zusatzstoffe in der Allergenliste statt einer eigenen Vorlage
+            { id: "zusatzstoffe", art: "mehrfach", label: "Zusatzstoffe und weitere Angaben (Ziffern)", optionen: ZUSATZSTOFFE.map((o, i) => ({ wert: o.wert, text: `${i + 1} ${o.text}` })), hilfe: ALLERGENE_HILFE.zusatzstoffe },
+            { id: "spuren", selten: true, art: "text", label: "Spurenhinweis (freiwillig)", hilfe: ALLERGENE_HILFE.spuren, vorschlaege: ["Kann Spuren von Nüssen enthalten."] },
           ],
         },
       ],
@@ -146,20 +221,29 @@ export const allergenAushang: Vorlage = {
           const a = auswahl(x, "allergene");
           // „keines“ nur ausdrücklich bestätigt und ohne angekreuztes Allergen; sonst (nicht ausgefüllt, Widerspruch) kein Vermerk
           const keine = ja(x, "keine") && !a.length;
-          const sorte = [a.includes("gluten") && text(x, "getreide") ? `Getreide: ${text(x, "getreide")}` : "", a.includes("schalenfruechte") && text(x, "nuesse") ? `Nüsse: ${text(x, "nuesse")}` : ""].filter(Boolean).join(" · ");
-          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${keine ? '<br><span class="klein">keines der 14 Hauptallergene</span>' : ""}${sorte ? `<br><span class="klein">${zelle(sorte)}</span>` : ""}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "●" : ""}</td>`).join("")}</tr>`;
+          // § 4 LMIDV (Prüfbericht Frage 10): „Enthält:“ als Textzeile unter der Speise zusätzlich zu den Punkten
+          const e = enthaelt(x, a);
+          const z = ziffern(x);
+          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${z.length ? `<sup>${z.join(",")}</sup>` : ""}${keine ? '<br><span class="klein">keines der 14 Hauptallergene</span>' : ""}${e ? `<br><span class="klein">${e}</span>` : ""}${text(x, "spuren") ? `<br><span class="klein">${zelle(text(x, "spuren"))}</span>` : ""}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "●" : ""}</td>`).join("")}</tr>`;
         });
         return `<tbody${k ? ' class="gruppe-block"' : ""}>${k ? `<tr class="gruppe"><td colspan="${nummern.length + 1}"><strong>${zelle(k)}</strong></td></tr>` : ""}${zeilen.join("")}</tbody>`;
       })
       .join("");
     // ohne Gerichte: Matrix mit leeren Zeilen zum Ausfüllen von Hand
     const leereZeilen = `<tbody>${Array.from({ length: 12 }, () => `<tr><td>&nbsp;</td>${nummern.map(() => '<td class="x"></td>').join("")}</tr>`).join("")}</tbody>`;
-    const schluessel = `<p class="schluessel">${nummern.map((id, i) => `<span class="nb"><b>${kz(i)}</b> ${esc(ALLERGENE[id]!)}</span>`).join(" · ")}</p>`;
-    const inhalt = `<table class="liste matrix${g.length ? "" : " hoch"}"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}${g.length ? zeilenHtml : leereZeilen}</table>${schluessel}`;
+    // „Enthält:“ als Überschrift der Legende (§ 4 LMIDV), Fußnote zu den Weizenarten (Prüfbericht Frage 9)
+    const schluessel = `<p class="schluessel"><b>Enthält:</b> ${nummern.map((id, i) => `<span class="nb"><b>${kz(i)}</b> ${esc(ALLERGENE[id]!)}</span>`).join(" · ")}<br>${esc(WEIZENARTEN_FUSSNOTE)}</p>`;
+    // Zusatzstoffe (Prüfbericht Frage 13): Legende unter der Allergen-Legende – die verwendeten Ziffern, auf dem leeren
+    // Blatt alle; Quelle getrennt nach LMZDV und LMIV/LMIDV
+    const benutzt = new Set(g.flatMap(ziffern));
+    const zz = ZUSATZSTOFFE.map((o, i) => ({ ...o, nr: i + 1 })).filter((o) => !g.length || benutzt.has(o.nr));
+    const quelle = [zz.some((o) => o.lmzdv) ? `1–11: Kenntlichmachung nach ${ZUSATZSTOFFE_QUELLE.lmzdv}` : "", zz.some((o) => !o.lmzdv) ? `12, 13: nach ${ZUSATZSTOFFE_QUELLE.weitere}` : ""].filter(Boolean).join("; ");
+    const zusatz = zz.length ? `<p class="schluessel"><b>Zusatzstoffe und weitere Angaben:</b> ${zz.map((o) => `<span class="nb"><b>${o.nr}</b> ${esc(o.text)}</span>`).join(" · ")}<br>${esc(quelle)}</p>` : "";
+    const inhalt = `<table class="liste matrix${g.length ? "" : " hoch"}"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}${g.length ? zeilenHtml : leereZeilen}</table>${schluessel}${zusatz}`;
     // leeres Blatt: die Matrix füllt die erste Seite, die Erläuterung folgt als eigenes Blatt; die Erläuterung bricht
-    // nicht über zwei Seiten (Klasse „zusammen“)
+    // nicht über zwei Seiten (Klasse „zusammen“). Lateinische Namen der Schalenfrüchte entfallen (Prüfbericht Frage 9).
     const legende = ja(d, "legende")
-      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["", "Allergen", "Umfasst"], nummern.map((id, i) => [kz(i), esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["6%", "28%", "66%"], klasse: "legende" }), g.length ? "zusammen" : "neue-seite zusammen")
+      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["", "Allergen", "Umfasst"], nummern.map((id, i) => [kz(i), esc(ALLERGENE[id]!), esc(ohneLatein(ALLERGENE_UMFANG[i]?.umfasst ?? ""))]), { breiten: ["6%", "28%", "66%"], klasse: "legende" }), g.length ? "zusammen" : "neue-seite zusammen")
       : "";
     return dokument({
       titel: "Allergene in unseren Speisen und Getränken",

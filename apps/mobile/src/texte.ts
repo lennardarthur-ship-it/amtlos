@@ -1005,6 +1005,8 @@ export const T = {
   r12p_mappe_staette_label: "Für welche Betriebsstätte?",
   r12p_mappe_alle_staetten: "Alle",
   r12p_mappe_bereithalten: "Tipp: Druck die Zoll-Mappe aus und bewahre sie im Betrieb auf. Bei einer Prüfung muss jemand vor Ort die Unterlagen vorlegen können, auch wenn du nicht da bist (§ 17 Abs. 2 MiLoG).",
+  // Prüfbericht Lebensmittelhygiene (22.10.2026, Frage 15): Ablage der Bescheinigungen des Gesundheitsamts
+  lm_mappe_ifsg_bescheinigungen: "Tipp: Leg die Bescheinigungen des Gesundheitsamts über die Belehrung nach § 43 Abs. 1 IfSG (Kopien) zu dieser Mappe. Sie sind mit der letzten Belehrung an der Betriebsstätte verfügbar zu halten und auf Verlangen vorzulegen (§ 43 Abs. 5 IfSG).",
   r12p_mappe_geteilt_am: (datum: string, am: string) => `${datum} · geteilt am ${am}`,
   r12p_mappe_dienstplan_titel: "Dienstplan heute",
   r12p_mappe_dienstplan_hilfe: "Die erste Frage bei einer Prüfung: Wer arbeitet heute? Das steht mit der Personalübersicht auf dem Deckblatt.",

@@ -673,7 +673,8 @@ describe("Vorlagen, vierte Durchsicht", () => {
     expect(h.match(/keines der 14 Hauptallergene<\/span>/g)).toHaveLength(1);
     expect(h).toContain("<strong>Wasser</strong><br><span class=\"klein\">keines der 14 Hauptallergene</span>");
     expect(h).toContain("<strong>Suppe</strong></td>");
-    expect(h).toContain("<strong>Kuchen</strong></td>");
+    // Prüfbericht Lebensmittelhygiene (Frage 10): „Enthält:“ als Textzeile; ohne Getreideart eine Linie zum Eintragen
+    expect(h).toContain('<strong>Kuchen</strong><br><span class="klein">Enthält: glutenhaltiges Getreide (Art: <span class="fuellen"></span>)</span></td>');
     const p = pruefe("allergene", { gerichte });
     expect(p).toContain("Gericht „Suppe“: Allergene ankreuzen oder „enthält keines“ bestätigen");
     expect(p.some((x) => x.startsWith("Gericht „Kuchen“:") && x.includes("bitte prüfen"))).toBe(true);
@@ -887,7 +888,7 @@ describe("Vorlagen, fünfte Durchsicht (Jahres-Szenario Café)", () => {
     expect(beauty.sort()).toEqual(["hautschutzplan", "hygieneplan"]);
     for (const a of ANLAESSE) if (a.id !== "beauty") for (const id of beauty) expect(a.vorlagen, `${a.id}: ${id}`).not.toContain(id);
     expect(ANLAESSE.find((a) => a.id === "beauty")!.vorlagen).toEqual(expect.arrayContaining(beauty));
-    expect(ANLAESSE.find((a) => a.id === "gastro")!.vorlagen).toEqual(["allergene", "haccp", "ifsg_belehrung"]);
+    expect(ANLAESSE.find((a) => a.id === "gastro")!.vorlagen).toEqual(["allergene", "haccp", "ifsg_belehrung", "hygieneschulung"]);
   });
 
   it("Datenschutz: Baustein Kundenverwaltung ohne Friseur-Beispiel", () => {

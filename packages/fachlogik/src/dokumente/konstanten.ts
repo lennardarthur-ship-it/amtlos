@@ -96,7 +96,10 @@ export const DATENPANNE_RISIKO: Record<string, string> = {
   hohes_risiko: "hohes Risiko – Meldung und Benachrichtigung der Betroffenen prüfen",
 };
 
-/** Die 14 Hauptallergene nach Anhang II der LMIV (Bezeichnungen fachlich zu prüfen, E-099). */
+/**
+ * Die 14 Hauptallergene nach Anhang II der LMIV (E-099). Bezeichnungen fachlich bestätigt (Prüfbericht Lebensmittelhygiene
+ * vom 22.10.2026, Frage 9, L-007 bis L-020 ✔).
+ */
 export const ALLERGENE: Record<string, string> = {
   gluten: "Glutenhaltiges Getreide",
   krebstiere: "Krebstiere",
@@ -113,5 +116,56 @@ export const ALLERGENE: Record<string, string> = {
   lupinen: "Lupinen",
   weichtiere: "Weichtiere",
 };
+
+/**
+ * Prüfbericht Lebensmittelhygiene (22.10.2026, Frage 9, ✎): Anhang II Nr. 1 und 8 LMIV nennen die Arten – bei
+ * „Glutenhaltiges Getreide“ und „Schalenfrüchte“ fragt die Allergenliste sie verpflichtend ab (Mehrfachauswahl). Dinkel
+ * und Khorasan sind Weizenarten (Fußnote auf dem Aushang); Hybridstämme stehen nicht zur Auswahl.
+ */
+export const GETREIDEARTEN: Option[] = [
+  { wert: "weizen", text: "Weizen" },
+  { wert: "dinkel", text: "Dinkel" },
+  { wert: "khorasan", text: "Khorasan-Weizen" },
+  { wert: "roggen", text: "Roggen" },
+  { wert: "gerste", text: "Gerste" },
+  { wert: "hafer", text: "Hafer" },
+];
+/** Die acht Schalenfrüchte nach Anhang II Nr. 8 LMIV – ohne lateinische Namen (Prüfbericht Frage 9: lesbarer für Gäste). */
+export const NUSSARTEN: Option[] = [
+  { wert: "mandeln", text: "Mandeln" },
+  { wert: "haselnuesse", text: "Haselnüsse" },
+  { wert: "walnuesse", text: "Walnüsse" },
+  { wert: "kaschu", text: "Kaschunüsse (Cashew)" },
+  { wert: "pecan", text: "Pecannüsse" },
+  { wert: "para", text: "Paranüsse" },
+  { wert: "pistazien", text: "Pistazien" },
+  { wert: "macadamia", text: "Macadamia- oder Queenslandnüsse" },
+];
+/** Fußnote des Aushangs (Prüfbericht Frage 9, wie Merkblatt Allergene der Landeshauptstadt Dresden 2023). */
+export const WEIZENARTEN_FUSSNOTE = "Dinkel und Khorasan sind Weizenarten.";
+
+/**
+ * Prüfbericht Lebensmittelhygiene (22.10.2026, Fragen 12 und 13): Zusatzstoffe in der Allergenliste – je Speise Ziffern für
+ * die Kenntlichmachungen nach § 5 LMZDV (1–11, Wortlaut laut Bericht) und für „koffeinhaltig“ und „chininhaltig“ (12, 13).
+ * Diese beiden stammen nicht aus der LMZDV, sondern laut Bericht aus Anhang III Nr. 4 LMIV i. V. m. § 2 LMIDV – die
+ * Quelle steht deshalb getrennt. Die Ziffer ist die Stelle in dieser Liste (nicht umsortieren, nur anhängen).
+ */
+export const ZUSATZSTOFFE: (Option & { lmzdv: boolean })[] = [
+  { wert: "farbstoff", text: "mit Farbstoff", lmzdv: true },
+  { wert: "konservierungsstoff", text: "mit Konservierungsstoff", lmzdv: true },
+  { wert: "antioxidationsmittel", text: "mit Antioxidationsmittel", lmzdv: true },
+  { wert: "geschmacksverstaerker", text: "mit Geschmacksverstärker", lmzdv: true },
+  { wert: "geschwefelt", text: "geschwefelt", lmzdv: true },
+  { wert: "geschwaerzt", text: "geschwärzt", lmzdv: true },
+  { wert: "gewachst", text: "gewachst", lmzdv: true },
+  { wert: "phosphat", text: "mit Phosphat", lmzdv: true },
+  { wert: "suessungsmittel", text: "mit Süßungsmittel(n)", lmzdv: true },
+  { wert: "phenylalanin", text: "enthält eine Phenylalaninquelle", lmzdv: true },
+  { wert: "abfuehrend", text: "kann bei übermäßigem Verzehr abführend wirken", lmzdv: true },
+  { wert: "koffein", text: "koffeinhaltig", lmzdv: false },
+  { wert: "chinin", text: "chininhaltig", lmzdv: false },
+];
+/** Quellen der Ziffern (getrennt: LMZDV und LMIV/LMIDV). */
+export const ZUSATZSTOFFE_QUELLE = { lmzdv: "§ 5 LMZDV", weitere: "Anhang III Nr. 4 LMIV i. V. m. § 2 LMIDV" };
 
 export const optionen = (r: Record<string, string>): Option[] => Object.entries(r).map(([wert, text]) => ({ wert, text }));

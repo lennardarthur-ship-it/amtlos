@@ -6,6 +6,7 @@ import { aufbewahrung, bilanzGuv, euer, kassenbuch, kassenmeldung, rechnung, ste
 import { arbeitszeitnachweis, lohnkonto, svMeldedaten } from "./lohn.js";
 import { auftragsverarbeitung, datenschutzerklaerungWebsite, impressum } from "./website.js";
 import { allergenAushang, haccp, hautschutzplan, hygieneplan, ifsgBelehrung } from "./branchen.js";
+import { hygieneschulung } from "./schulung.js";
 import { anamnese, datenpanne, datenschutzDokumentation, datenschutzinformation, videoHinweis } from "./datenschutz.js";
 import { ausweisHinweis, kiKompetenz, nachweisArbeitsbedingungen, schluesselquittung } from "./personal.js";
 import { verfahrensdokumentation } from "./steuern.js";
@@ -15,7 +16,7 @@ import { GESTALT_MARKE, GRUNDLAGE_MARKE, RAENDER, RAENDER_MARKE, SEITE_MARKE, ce
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Option, Vorlage, Vorschlag } from "./typen.js";
 
 export * from "./typen.js";
-export { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, HANDLUNGSBEDARF, RISIKO_MATRIX, RISIKO_STUFEN, SCHUTZZIELE, SCHWERE, SONSTIGE_UNTERPUNKTE, WAHRSCHEINLICHKEIT, risikoAus } from "./konstanten.js";
+export { ALLERGENE, GETREIDEARTEN, NUSSARTEN, WEIZENARTEN_FUSSNOTE, ZUSATZSTOFFE, ZUSATZSTOFFE_QUELLE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, HANDLUNGSBEDARF, RISIKO_MATRIX, RISIKO_STUFEN, SCHUTZZIELE, SCHWERE, SONSTIGE_UNTERPUNKTE, WAHRSCHEINLICHKEIT, risikoAus } from "./konstanten.js";
 // E-167 (Sifa-Durchsicht Arbeitsschutz)
 export { ELEKTRO_GRENZWERTE, EXPO_HINWEIS, GHS, PRUEF_VORSCHLAEGE, RISIKO_SKALA, UNTERSCHRIFT_FEHLT, UNTERSCHRIFT_TEXT, UNTERSCHRIFT_THEMEN, mitUnterschriftPflicht, naechstePruefung, risikoEintrag } from "./arbeitsschutz.js";
 export { HAUTSCHUTZ_WEITERE } from "./branchen.js";
@@ -24,6 +25,9 @@ export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } 
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
 export { NACHWG_AUSSCHLUSSFRIST_BEISPIEL, NACHWG_AUSSCHLUSSFRIST_UEBERSTUNDEN, NACHWG_SCHRIFTFORM_HINWEIS, NACHWG_SCHRIFTFORM_PDF, mindestlohnAm, mindesturlaub, minijobGrenzeAm, stundenlohn } from "./personal.js";
 export { HYGIENE_LEBENSMITTEL, HYGIENE_THEMEN_LEBENSMITTEL, HYGIENE_VERWEIS_HACCP } from "./branchen.js";
+// Prüfbericht Lebensmittelhygiene (22.10.2026): Allergenliste mit Arten und Zusatzstoffen, IfSG-Ergänzungen, Schulungsnachweis § 4 LMHV
+export { ALLERGENE_HILFE, IFSG_HAUSHALT, IFSG_WER, ohneLatein } from "./branchen.js";
+export { SCHULUNG_HILFE, SCHULUNG_THEMEN } from "./schulung.js";
 // E-166: HACCP-Kern (Gefahrenanalyse, CCP, Verifizierung) und Hygieneplan-Zeilen für Bäckerei und Foodtruck
 export { AUFZEICHNUNGEN, CCP_BEGRUENDUNG, CCP_FRAGEN, CCP_FRAGEN_QUELLE, CCP_VORSCHLAEGE, GEFAHRENANALYSE, GEFAHR_ARTEN, HACCP_AUFBEWAHRUNG, HACCP_FLEXIBEL, HYGIENE_BAECKEREI, HYGIENE_FOODTRUCK, PROZESSSCHRITTE, VERIFIZIERUNG } from "./haccp.js";
 export { bausteinText } from "./website.js";
@@ -102,6 +106,8 @@ export const VORLAGEN: Vorlage[] = [
   haccp,
   hautschutzplan,
   hygieneplan,
+  // Prüfbericht Lebensmittelhygiene (22.10.2026, Frage 12): Schulungsnachweis nach § 4 LMHV
+  hygieneschulung,
   anamnese,
 ];
 
