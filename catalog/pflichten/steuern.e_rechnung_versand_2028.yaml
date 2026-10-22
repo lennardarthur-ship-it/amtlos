@@ -1,7 +1,7 @@
-# Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.e_rechnung_versand_2028
-version: 2
+version: 3
 katalog_nr: C.30
 titel:
   de: E-Rechnungen versenden (ab 2028)
@@ -9,7 +9,7 @@ kurz:
   de: Ab dem 1. Januar 2028 schickst du an Unternehmen nur noch E-Rechnungen – Kleinunternehmer sind befreit.
 erklaerung:
   de: Ab 1.1.2028 gilt die Pflicht zum Versand strukturierter E-Rechnungen für alle Unternehmen im B2B-Geschäft, außer Kleinunternehmern
-    nach § 19 UStG.
+    nach § 19 UStG. Ausgenommen sind Kleinbetragsrechnungen bis 250 € und Fahrausweise (§§ 33, 34 UStDV).
 rechtsgrundlage:
 - § 14 UStG
 kategorie: steuern
@@ -48,7 +48,8 @@ automatisierung: hinweis
 aktion:
   art: abhaken
 status_recht: in_kraft
-gueltig_ab: null
+# StB Busch 22.10.2026: in Kraft, gültig ab 01.01.2028
+gueltig_ab: '2028-01-01'
 gueltig_bis: null
 quellen:
 - titel: Umsatzsteuergesetz § 14
@@ -63,9 +64,14 @@ quellen:
 - titel: § 14 UStG, Wortlaut (lxgesetze.de)
   url: https://lxgesetze.de/ustg/14
   abgerufen: '2026-10-22'
+- titel: Umsatzsteuer-Durchführungsverordnung § 33 (Rechnungen über Kleinbeträge)
+  url: https://www.gesetze-im-internet.de/ustdv_1980/__33.html
+  abgerufen: null
+- titel: Umsatzsteuer-Durchführungsverordnung § 34 (Fahrausweise als Rechnungen)
+  url: https://www.gesetze-im-internet.de/ustdv_1980/__34.html
+  abgerufen: null
 fachlich_zu_pruefen:
-- Rechtsstatus und gueltig_ab festlegen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Text wie steuern.e_rechnung_versand_2027; ob eine Papierrechnung im Pflichtbereich als „nicht ausgestellt“ im Sinne von § 26a Abs. 2 Nr. 1 gilt, offen)'
+- 'StB Busch 22.10.2026: Übergangsfristen am 22.10.2026 unverändert („sonst wie 2027“, siehe steuern.e_rechnung_versand_2027) – vor dem Start erneut prüfen'
 pruefung:
   status: entwurf
   geprueft_von: null

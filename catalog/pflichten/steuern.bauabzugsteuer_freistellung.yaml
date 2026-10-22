@@ -1,38 +1,43 @@
-# Katalog C.35 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.35 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt (Höchstdauer drei Jahre nicht, siehe fachlich_zu_pruefen)
 schema_version: 1
 id: steuern.bauabzugsteuer_freistellung
-version: 3
+version: 4
 katalog_nr: C.35
 titel:
   de: Freistellungsbescheinigung für Bauleistungen beantragen
 kurz:
-  de: Wenn du Bauleistungen erbringst, beantragst du beim Finanzamt eine Freistellungsbescheinigung, damit deine Auftraggeber
-    keine Bauabzugsteuer einbehalten.
+  de: Wenn du Bauleistungen für Unternehmen oder öffentliche Auftraggeber erbringst, beantragst du beim Finanzamt eine Freistellungsbescheinigung,
+    damit deine Auftraggeber keine Bauabzugsteuer einbehalten.
 erklaerung:
-  de: Ohne Freistellungsbescheinigung müssen Auftraggeber einen Teil deiner Rechnung als Bauabzugsteuer einbehalten.
+  de: Ohne Freistellungsbescheinigung müssen Auftraggeber einen Teil deiner Rechnung als Bauabzugsteuer einbehalten. Das gilt
+    nur für Bauleistungen an Unternehmer oder juristische Personen des öffentlichen Rechts; Privatleute als Bauherren behalten
+    nichts ein (§ 48 Abs. 1 EStG). Bauleistungen sind alle Leistungen, die der Herstellung, Instandsetzung, Instandhaltung, Änderung
+    oder Beseitigung von Bauwerken dienen – auch im Handwerk, z. B. eine Elektroinstallation. Eine Frist gibt es nicht; beantrage
+    die Bescheinigung vor der ersten Bauleistung. Sie gilt befristet – die Geltungsdauer steht in der Bescheinigung (§ 48b Abs. 3
+    EStG); beantrage rechtzeitig vor Ablauf eine neue.
 rechtsgrundlage:
+- § 48 Abs. 1 EStG
 - § 48b EStG
 kategorie: steuern
 branchen:
 - bau
 - handwerk
-# Branche „Bau“ oder – im Handwerk – die Angabe, Bauleistungen für andere Unternehmen zu erbringen (z. B. Elektro, Sanitär)
+# StB Busch 22.10.2026: nur bei Bauleistungen an Unternehmer oder juristische Personen des öffentlichen Rechts (§ 48 Abs. 1 EStG);
+# Bau und Handwerk über die Angabe, solche Bauleistungen zu erbringen
 ausloeser:
-  any:
+  all:
   - feld: profil.taetigkeit.branchen
-    op: enthaelt
-    wert: bau
+    op: enthaelt_eines
+    wert:
+    - bau
+    - handwerk
     label:
-      de: Du erbringst Bauleistungen.
-  - all:
-    - feld: profil.taetigkeit.branchen
-      op: enthaelt
-      wert: handwerk
-    - feld: profil.bauleistungen.fuer_unternehmen
-      op: ==
-      wert: true
-      label:
-        de: Du erbringst Bauleistungen für andere Unternehmen.
+      de: Du bist im Bau oder im Handwerk tätig.
+  - feld: profil.bauleistungen.fuer_unternehmen
+    op: ==
+    wert: true
+    label:
+      de: Du erbringst Bauleistungen für Unternehmen oder öffentliche Auftraggeber.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -46,6 +51,8 @@ sanktion:
     de: 'Ohne gültige Freistellungsbescheinigung muss dein Auftraggeber 15 % der Gegenleistung einbehalten und für dich ans Finanzamt abführen, sofern die Gegenleistungen im Kalenderjahr 5.000 € (bei bestimmten Vermietern 15.000 €) übersteigen (§ 48 Abs. 1 Satz 1, Abs. 2 Satz 1 EStG).'
   schwere: mittel
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Gilt nur noch bei Bauleistungen für Unternehmen oder öffentliche Auftraggeber; ergänzt, dass die Bescheinigung befristet ist.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -53,14 +60,19 @@ quellen:
 - titel: Einkommensteuergesetz § 48b
   url: https://www.gesetze-im-internet.de/estg/__48b.html
   abgerufen: null
+- titel: § 48b EStG, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/estg/48b
+  abgerufen: '2026-10-22'
+  fundstelle: § 48b Abs. 3 Satz 1 Nr. 2 EStG (Geltungsdauer)
 - titel: Einkommensteuergesetz § 48
   url: https://www.gesetze-im-internet.de/estg/__48.html
   abgerufen: '2026-10-22'
+- titel: § 48 EStG, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/estg/48
+  abgerufen: '2026-10-22'
+  fundstelle: § 48 Abs. 1 Satz 1 und 3 EStG
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Auch Handwerksbetriebe mit Bauleistungen erfassen (Branche handwerk)?
-- Gültigkeitsdauer der Bescheinigung und Erneuerung ergänzen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Grenze 15.000 € gilt für Leistungsempfänger mit ausschließlich steuerfreien Umsätzen nach § 4 Nr. 12 UStG)'
+- 'StB Busch 22.10.2026: „Gültigkeit befristet, höchstens drei Jahre (§ 48b Abs. 3 EStG) – Erinnerung vor Ablauf“ – nicht übernommen: § 48b Abs. 3 EStG verlangt nur die Angabe der Geltungsdauer, eine Höchstdauer von drei Jahren steht nicht im Gesetz (Wortlaut lxgesetze.de 22.10.2026; vermutlich BMF-Schreiben) – Fundstelle bei StB Busch erfragen. Eine Erinnerung vor Ablauf bräuchte eine neue Frage nach dem Ablaufdatum; bis dahin nur Hinweis im Text'
 pruefung:
   status: entwurf
   geprueft_von: null

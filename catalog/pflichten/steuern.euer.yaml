@@ -1,7 +1,7 @@
-# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.euer
-version: 4
+version: 5
 katalog_nr: C.27
 titel:
   de: Einnahmen-Überschuss-Rechnung (Anlage EÜR) abgeben
@@ -10,9 +10,11 @@ kurz:
 erklaerung:
   de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung. Das gilt
     auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und für Gewerbetreibende, denen das Finanzamt keine Buchführungspflicht
-    mitgeteilt hat.
+    mitgeteilt hat. Die Anlage EÜR übermittelst du mit der Einkommensteuer- bzw. Feststellungserklärung, also in denselben Fristen
+    (§ 149 AO) – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres.
 rechtsgrundlage:
 - § 4 Abs. 3 EStG
+- § 149 AO
 kategorie: steuern
 ausloeser:
   # Gegenstück zu steuern.buchfuehrungspflicht (R10: § 241a HGB, § 141 AO erst nach Mitteilung)
@@ -108,7 +110,18 @@ ausloeser:
   label:
     de: Du bist nicht zur doppelten Buchführung verpflichtet.
 frist:
-  typ: dauerhaft
+  typ: wiederkehrend
+  rhythmus: jaehrlich
+  # StB Busch 22.10.2026: mit der Einkommensteuer- bzw. Feststellungserklärung – Fristen wie dort (§ 149 Abs. 2, 3 AO, § 108 Abs. 3 AO)
+  faellig:
+    art: tag_nach_periodenende
+    monate_nach: 7
+    tag: 31
+  verlaengerung:
+    wenn: { feld: profil.steuerberater, op: "==", wert: true }
+    versatz: P7M
+  verschiebung: { regel: naechster_werktag, kalender: bundesland }
+  erinnerung: [P30D, P7D]
 wiederholung:
   art: periodisch
 stelle:
@@ -121,7 +134,7 @@ sanktion:
   schwere: mittel
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
-  de: Gilt jetzt auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und bis zur Mitteilung des Finanzamts nach § 141 AO.
+  de: Jetzt mit Termin – die Anlage EÜR übermittelst du in denselben Fristen wie die Einkommensteuer- bzw. Feststellungserklärung.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -129,6 +142,9 @@ quellen:
 - titel: Einkommensteuergesetz § 4
   url: https://www.gesetze-im-internet.de/estg/__4.html
   abgerufen: null
+- titel: Abgabenordnung § 149 (Abgabe der Steuererklärungen)
+  url: https://dejure.org/gesetze/AO/149.html
+  abgerufen: 2026-10-13
 - titel: Einkommensteuer-Durchführungsverordnung § 60
   url: https://www.gesetze-im-internet.de/estdv_1955/__60.html
   abgerufen: '2026-10-22'
@@ -141,12 +157,7 @@ quellen:
 - titel: Abgabenordnung § 152 (Verspätungszuschlag)
   url: https://www.gesetze-im-internet.de/ao_1977/__152.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender
-  I)
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Kein Bußgeldtatbestand für die Anlage EÜR gesucht außer § 379 AO)'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

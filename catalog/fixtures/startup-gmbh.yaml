@@ -42,9 +42,7 @@ erwartet:
   # Kapitalgesellschaft: buchführungspflichtig nach HGB, keine EÜR – unabhängig vom negativen Gewinn
   steuern.buchfuehrungspflicht: gilt
   steuern.euer: gilt_nicht
-  # Vorjahr 60.000 €, aber Prognose 2026 über 800.000 € → Versandpflicht 2027 (Prüfpunkt: Bezugsjahr)
-  steuern.e_rechnung_versand_2027: gilt
-  steuern.e_rechnung_versand_2028: gilt
+  # E-Rechnung-Versand 2027/2028: gültig erst ab 01.01.2027 bzw. 2028 (StB Busch 22.10.2026) – siehe grenzfall-e-rechnung-*
   arbeitsschutz.gefaehrdungsbeurteilung: gilt
   # Katalog B: eingetragene GmbH – Gründungsschritte entfallen, laufende Pflichten gelten
   gesellschaft.gesellschaftsvertrag_notar: gilt_nicht
@@ -70,4 +68,5 @@ termine_enthaelt:
   gesellschaft.offenlegung: [["2025", "2026-12-31"]]
   # Vorjahr Gründungsjahr → Voranmeldung gilt; Zahllast 3.000 € ≤ 9.000 € → vierteljährlich
   steuern.ust_voranmeldung: [["2026-Q3", "2026-10-12"]]
-  steuern.e_rechnung_versand_2027: [["einmalig", "2027-01-01"]]
+  # StB Busch 22.10.2026: E-Bilanz mit der KSt-Erklärung, ohne Angabe zur Steuerberatung der frühere Termin 31.07. (§ 149 Abs. 2 AO)
+  steuern.e_bilanz: [["2025", "2026-07-31"]]

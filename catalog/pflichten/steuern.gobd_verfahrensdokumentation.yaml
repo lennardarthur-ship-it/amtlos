@@ -1,7 +1,7 @@
-# Katalog C.31 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.31 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.gobd_verfahrensdokumentation
-version: 1
+version: 2
 katalog_nr: C.31
 titel:
   de: GoBD einhalten und Verfahrensdokumentation führen
@@ -9,14 +9,14 @@ kurz:
   de: Bewahre Belege nachvollziehbar und unveränderbar auf und beschreibe in einer Verfahrensdokumentation, wie du das machst.
 erklaerung:
   de: Die GoBD regeln, wie Bücher und Belege elektronisch geführt und aufbewahrt werden. Die Verfahrensdokumentation beschreibt
-    deine Abläufe.
+    deine Abläufe. Maßgeblich ist das BMF-Schreiben vom 28.11.2019, geändert am 11.03.2024 und am 14.07.2025.
 begriffe:
 - begriff:
     de: GoBD
   erklaerung:
     de: Regeln der Finanzverwaltung, wie Bücher und Belege elektronisch geführt und aufbewahrt werden.
 rechtsgrundlage:
-- GoBD (BMF-Schreiben)
+- GoBD (BMF-Schreiben vom 28.11.2019, geändert am 11.03.2024 und 14.07.2025)
 - § 146 AO
 - § 147 AO
 kategorie: steuern
@@ -32,9 +32,14 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Die GoBD selbst sehen kein Bußgeld vor. Sind Bücher und Aufzeichnungen nicht ordnungsgemäß, verlieren sie ihre Beweiskraft
+      (§ 158 AO) und das Finanzamt kann schätzen (§ 162 AO). Bußgeld bis 25.000 €, wenn dadurch Steuerverkürzungen ermöglicht werden
+      (§ 379 Abs. 1 Satz 1 Nr. 3, Abs. 6 AO). Eine fehlende Verfahrensdokumentation allein führt nicht zur Verwerfung, wenn die
+      Nachvollziehbarkeit gegeben ist (GoBD Rz. 155).
   schwere: mittel
 automatisierung: dokument_generator
+aenderungsnotiz:
+  de: Die Folgen sind jetzt beschrieben, und die Fundstelle des aktuellen GoBD-Schreibens ist ergänzt.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -42,11 +47,20 @@ quellen:
 - titel: Bundesministerium der Finanzen
   url: https://www.bundesfinanzministerium.de/
   abgerufen: null
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Fundstelle des aktuellen GoBD-Schreibens ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+  fundstelle: BMF-Schreiben vom 28.11.2019, geändert durch BMF-Schreiben vom 11.03.2024 und 14.07.2025 (GoBD), Rz. 155
+- titel: KPMG – Zweite Änderung der GoBD (BMF-Schreiben vom 14.07.2025)
+  url: https://kpmg.com/de/de/themen/2025/07/bmf-gobd-zweite-aenderung.html
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 158 (Beweiskraft der Buchführung)
+  url: https://www.gesetze-im-internet.de/ao_1977/__158.html
+  abgerufen: null
+- titel: Abgabenordnung § 162 (Schätzung von Besteuerungsgrundlagen)
+  url: https://www.gesetze-im-internet.de/ao_1977/__162.html
+  abgerufen: null
+- titel: Abgabenordnung § 379 (Steuergefährdung)
+  url: https://www.gesetze-im-internet.de/ao_1977/__379.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

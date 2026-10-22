@@ -29,7 +29,8 @@ erwartet:
   steuern.kassenmeldung: gilt
   steuern.gewst_erklaerung: gilt_nicht
 termine_enthaelt:
-  steuern.zusammenfassende_meldung: [["2026-Q3", "2026-10-26"]]
+  # StB Busch 22.10.2026: den 25. nennen, ohne Verschiebung (25.10.2026 ist ein Sonntag)
+  steuern.zusammenfassende_meldung: [["2026-Q3", "2026-10-25"]]
   personal.sv_abmeldung: [["aenderung-20260930", "2026-11-11"]]
   personal.sv_jahresmeldung: [["2027-02", "2027-02-15"]]
   steuern.kassenmeldung: [["einmalig", "2026-10-12"]]

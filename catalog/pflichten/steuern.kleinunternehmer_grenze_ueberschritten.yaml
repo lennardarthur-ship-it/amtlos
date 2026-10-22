@@ -1,14 +1,19 @@
-# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt bis auf den Auslöser (Zahlungseingänge)
 schema_version: 1
 id: steuern.kleinunternehmer_grenze_ueberschritten
-version: 3
+version: 4
 katalog_nr: C.23
 titel:
   de: 'Kleinunternehmergrenze überschritten: Umsatzsteuer prüfen'
 kurz:
-  de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Für Umsätze über der Grenze sieht § 19 UStG Umsatzsteuer vor – ab wann genau, klären Finanzamt oder Steuerberatung.
+  de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Überschreitest du im laufenden Jahr 100.000 € (im Gründungsjahr 25.000 €), ist schon der Umsatz, mit dem du die Grenze überschreitest, steuerpflichtig.
 erklaerung:
-  de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Ab wann du Umsatzsteuer ausweist und anmeldest, klären Finanzamt oder Steuerberatung mit dir.
+  de: Maßgeblich ist der Gesamtumsatz nach vereinnahmten Entgelten – also die Zahlungen, die du netto erhältst, nicht die Summe
+    der gestellten Rechnungen nach Rechnungsdatum. Bis einschließlich 25.000 € bzw. 100.000 € bleibt dein Umsatz steuerfrei. Ab
+    dem Umsatz, mit dem du die Grenze überschreitest, gilt die Regelbesteuerung – du stellst Rechnungen mit Umsatzsteuer und gibst
+    Voranmeldungen ab; eine eigene Frist gibt es dafür nicht. Lag dein Umsatz im Vorjahr über 25.000 €, gilt die Regelung in diesem
+    Jahr von Anfang an nicht. Amtlos zählt bisher die Rechnungen, die du in Amtlos gestellt hast (netto, nach Rechnungsdatum) –
+    ob und wann sie bezahlt wurden, ist darin noch nicht berücksichtigt.
 rechtsgrundlage:
 - § 19 UStG
 kategorie: steuern
@@ -103,11 +108,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Vor dem Start gibt es keinen Vorjahresumsatz – Vorjahresgrenze dann nicht geprüft
-- 'Prognose statt tatsächlicher Umsatz: bis Abschnitt 4 nur Profilangaben – Formulierung „nach deinen Angaben“ bestätigen'
-- Grenze inklusive/exklusive (K-18)
-- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
+- 'StB Busch 22.10.2026: Umsatzbegriff sind die vereinnahmten Entgelte (netto, Zufluss); der Auslöser soll auf Zahlungseingänge in Amtlos umgestellt werden – nicht umgesetzt: finanzen.umsatz.laufendes_jahr zählt gestellte Rechnungen nach Rechnungsdatum, der Server speichert keine Zahlungseingänge und die App liefert den Fakt nicht. Bis dahin nur Hinweis im Text'
 pruefung:
   status: entwurf
   geprueft_von: null

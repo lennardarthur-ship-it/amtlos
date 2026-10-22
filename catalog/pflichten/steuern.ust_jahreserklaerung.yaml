@@ -1,14 +1,14 @@
-# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt (bis auf 19 Monate, siehe fachlich_zu_pruefen)
 schema_version: 1
 id: steuern.ust_jahreserklaerung
-version: 2
+version: 3
 katalog_nr: C.27
 titel:
   de: Umsatzsteuer-Jahreserklärung abgeben
 kurz:
   de: Einmal im Jahr gibst du elektronisch die Umsatzsteuer-Jahreserklärung ab.
 erklaerung:
-  de: Die Jahreserklärung fasst die Umsatzsteuer des ganzen Jahres zusammen – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
+  de: Die Jahreserklärung fasst die Umsatzsteuer des ganzen Jahres zusammen – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO). Das Finanzamt kann die Erklärung früher anfordern oder die Frist auf Antrag verlängern (§ 149 Abs. 4, § 109 AO).
 rechtsgrundlage:
 - § 18 UStG
 - § 149 AO
@@ -41,7 +41,7 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel (§ 152 Abs. 1 bis 3 AO). Er beträgt für jeden angefangenen Monat 0,25 % der festgesetzten Steuer abzüglich Vorauszahlungen und anzurechnender Steuerabzugsbeträge, mindestens 25 €, höchstens 25.000 € (§ 152 Abs. 5 Satz 2, Abs. 10 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
+    de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel (§ 152 Abs. 1 bis 3 AO). Er beträgt für jeden angefangenen Monat 0,25 % der festgesetzten Steuer abzüglich Vorauszahlungen und anzurechnender Steuerabzugsbeträge, mindestens 25 € für jeden angefangenen Monat, höchstens 25.000 € (§ 152 Abs. 5 Satz 2, Abs. 10 AO). Das Finanzamt kann die Besteuerungsgrundlagen schätzen (§ 162 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   schwere: mittel
 automatisierung: formular_vorausfuellen
 status_recht: in_kraft
@@ -63,6 +63,9 @@ quellen:
 - titel: Abgabenordnung § 152 (Verspätungszuschlag)
   url: https://www.gesetze-im-internet.de/ao_1977/__152.html
   abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 162 (Schätzung von Besteuerungsgrundlagen)
+  url: https://www.gesetze-im-internet.de/ao_1977/__162.html
+  abgerufen: null
 - titel: Abgabenordnung § 328 (Zwangsmittel)
   url: https://www.gesetze-im-internet.de/ao_1977/__328.html
   abgerufen: '2026-10-22'
@@ -70,12 +73,7 @@ quellen:
   url: https://lexetius.com/AO/329,2
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Fristen nach § 149 Abs. 2 und 3 AO ergänzt (E-129, Quelle Recherche 13.10.2026 über dejure.org und Finanzamt BW) – gegen amtliche Fassung prüfen
-- Übergangsfristen Art. 97 § 36 EGAO (Veranlagungszeiträume bis 2024) sind nicht abgebildet – ab Veranlagungszeitraum 2025 gilt § 149 AO regulär
-- Vorabanforderung nach § 149 Abs. 4 AO (frühere Frist im Einzelfall) und Fristverlängerung auf Antrag nicht abgebildet
-- 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO – Feiertagskalender des Bundeslands prüfen'
-- 'Kleinunternehmer: Erklärungspflicht prüfen'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen'
+- 'StB Busch 22.10.2026 verlangt „zwingender Zuschlag in beratenen Fällen (§ 149 Abs. 3 AO) nach 19 Monaten (§ 152 Abs. 2 Nr. 1 AO)“ – nicht übernommen: § 152 Abs. 2 Nr. 1 AO nennt 14 Monate; die 19 Monate (Nr. 2) gelten nur in den Fällen des § 149 Abs. 2 Satz 2 AO (Land- und Forstwirtschaft mit abweichendem Wirtschaftsjahr). Wortlaut gesetze-im-internet.de am 22.10.2026 – Rückfrage an StB Busch'
 pruefung:
   status: entwurf
   geprueft_von: null

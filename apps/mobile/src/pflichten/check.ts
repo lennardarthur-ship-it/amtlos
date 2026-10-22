@@ -34,6 +34,8 @@ export const CHECK_FELDER = [
   "gesellschaft.handelsregister",
   // R12 (UX #20): das Startdatum steuert Gründungsschritte und „Was hast du schon?“ – direkt nach der Rechtsform
   "gruendungsdatum",
+  // StB Busch 22.10.2026: bei eingetragenen Gesellschaften der Beginn der Tätigkeit (Frist des Fragebogens, § 138 Abs. 4 AO)
+  "taetigkeit_beginn",
   "taetigkeit.einordnung",
   "bundesland",
   // R12 (Rechtsprüfung Befund 7, Bäckerei #4, Kfz #9): Betriebsstätten für Rundfunkbeitrag, Gewerbeabfall, Registrierung
@@ -138,6 +140,8 @@ function passtImmer(feld: string, p: Profil): boolean {
   if (VORJAHR_FRAGEN.includes(feld) && ohneVorjahr(p)) return false;
   // R11 (Nutzertest Kosmetik #1): wer die Kleinunternehmerregelung nutzt, gibt keine Voranmeldung ab – keine Frage nach der Zahllast
   if ((feld === "ust.zahllast_vorjahr" || feld === "ust.dauerfristverlaengerung") && p["ust.kleinunternehmer"] === true) return false;
+  // StB Busch 22.10.2026: Kleinunternehmer geben keine Zusammenfassende Meldung ab (§ 18a Abs. 4 UStG)
+  if (feld === "ust.zm_meldezeitraum" && p["ust.kleinunternehmer"] === true) return false;
   if (feld === "taetigkeit.einordnung" && typeof p.rechtsform === "string" && KRAFT_RECHTSFORM_GEWERBE.includes(p.rechtsform)) return false;
   // R11: Lebensmittel-Fragen nach § 42 IfSG nur in der Gastronomie und Lebensmittelbranche
   if ((feld === "ifsg.beschaeftigte" || feld === "ifsg.selbst" || feld === "gastro.to_go" || feld === "gastro.vorverpackt" || feld === "gastro.wassertank") && !inBranche(p, "gastronomie_lebensmittel")) return false;

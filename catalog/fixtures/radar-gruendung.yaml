@@ -1,5 +1,5 @@
 persona: gruenderin
-beschreibung: Gründung im laufenden Jahr – Radar zur USt-Voranmeldung für Neugründer und zum Gründungsbeschleunigungsgesetz
+beschreibung: Gründung im laufenden Jahr – Radar zum Gründungsbeschleunigungsgesetz (die USt-Voranmeldung für Neugründer ist seit StB Busch 22.10.2026 in Kraft ab 2027, siehe busch-neugruender-2027)
 stichtag: "2026-10-11"
 fakten:
   profil.rechtsform: einzelunternehmen
@@ -8,5 +8,4 @@ fakten:
   profil.bundesland: BY
   profil.gemeinde_ags: "09162000"
 erwartet:
-  steuern.ust_va_neugruender_radar: gilt
   gruendung.gruendungsbeschleunigung_radar: gilt

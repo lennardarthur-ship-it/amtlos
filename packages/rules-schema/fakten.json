@@ -27,6 +27,12 @@
       "ab": 2
     },
     {
+      "pfad": "profil.taetigkeit_beginn",
+      "typ": "datum",
+      "herleitung": "Onboarding (StB Busch 22.10.2026): Eröffnung des Betriebs bzw. Aufnahme der Tätigkeit (§ 138 Abs. 1b Satz 1, Abs. 4 AO) – gefragt bei eingetragenen Gesellschaften, bei denen Beurkundung, Registereintrag und erste Tätigkeit auseinanderliegen können",
+      "ab": 2
+    },
+    {
       "pfad": "profil.taetigkeit.einordnung",
       "typ": "enum",
       "werte": [
@@ -215,6 +221,24 @@
         "drittland"
       ],
       "herleitung": "Onboarding",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.einkauf.eu_unternehmen",
+      "typ": "bool",
+      "herleitung": "Onboarding (StB Busch 22.10.2026): kauft Waren oder Leistungen bei Unternehmen in anderen EU-Ländern ein, z. B. Software oder Werbung – USt-IdNr. auch für Einkäufe (§ 27a UStG)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.ust.zm_meldezeitraum",
+      "typ": "enum",
+      "werte": [
+        "monatlich",
+        "quartalsweise",
+        "keine_warenlieferungen",
+        "unklar"
+      ],
+      "herleitung": "Onboarding (StB Busch 22.10.2026): Meldezeitraum der Zusammenfassenden Meldung bei innergemeinschaftlichen Warenlieferungen – monatlich als Regel, vierteljährlich wählbar, wenn die Lieferungen weder im laufenden noch in einem der vier vorangegangenen Quartale jeweils 50.000 € übersteigen (§ 18a Abs. 1 Satz 2 UStG); „keine_warenlieferungen“ = nur sonstige Leistungen, vierteljährlich (§ 18a Abs. 2 UStG)",
       "ab": 2
     },
     {
@@ -648,7 +672,7 @@
     {
       "pfad": "profil.bauleistungen.fuer_unternehmen",
       "typ": "bool",
-      "herleitung": "Onboarding (Bauleistungen nach § 48 Abs. 1 EStG an Unternehmen)",
+      "herleitung": "Onboarding (Bauleistungen nach § 48 Abs. 1 EStG an Unternehmer oder juristische Personen des öffentlichen Rechts; Privatbauherren behalten nichts ein – StB Busch 22.10.2026)",
       "ab": 2
     },
     {
@@ -751,6 +775,12 @@
       "ab": 2
     },
     {
+      "pfad": "abgeleitet.taetigkeit_beginn",
+      "typ": "datum",
+      "herleitung": "taetigkeit_beginn, ohne diese Angabe gruendungsdatum (die Startfrage lautet „Wann hast du angefangen?“) – Bezug der Frist nach § 138 Abs. 4 AO (StB Busch 22.10.2026)",
+      "ab": 2
+    },
+    {
       "pfad": "abgeleitet.hat_beschaeftigte",
       "typ": "bool",
       "herleitung": "beschaeftigte.gesamt ≥ 1",
@@ -759,7 +789,7 @@
     {
       "pfad": "finanzen.umsatz.laufendes_jahr",
       "typ": "betrag",
-      "herleitung": "Summe Ausgangsrechnungen/Einnahmen im Kalenderjahr bis Stichtag; [FACHLICH ZU PRÜFEN] Umsatzbegriff § 19 UStG",
+      "herleitung": "Summe der in Amtlos gestellten Ausgangsrechnungen (netto, Stornos abgezogen) im Kalenderjahr nach Rechnungsdatum bis Stichtag; [FACHLICH ZU PRÜFEN] Umsatzbegriff § 19 UStG: maßgeblich sind die vereinnahmten Entgelte (netto, Zufluss; StB Busch 22.10.2026) – Umstellung auf Zahlungseingänge offen, der Server kennt bisher keine Zahlungen",
       "ab": 4
     },
     {

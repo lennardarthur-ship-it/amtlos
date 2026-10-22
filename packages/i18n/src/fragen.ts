@@ -110,6 +110,16 @@ export const SCHRITTE: Schritt[] = [
         },
       },
       { feld: "gesellschafter.anzahl", art: "zahl", frage: { de: "Wie viele Gesellschafter gibt es?", en: "How many shareholders are there?" } },
+      // StB Busch 22.10.2026: Frist für den Fragebogen zur steuerlichen Erfassung ab Eröffnung bzw. Aufnahme der Tätigkeit (§ 138 Abs. 4 AO)
+      {
+        feld: "taetigkeit_beginn",
+        art: "datum",
+        frage: { de: "Wann hat eure Gesellschaft ihre Tätigkeit aufgenommen – oder wann nimmt sie sie auf?", en: "When did your company start its business activity – or when will it start?" },
+        hilfe: {
+          de: "Gemeint ist die Eröffnung des Betriebs bzw. die Aufnahme der Tätigkeit. Sie liegt oft nicht am Tag der Beurkundung oder der Eintragung ins Register. Ab diesem Tag läuft die Monatsfrist für den Fragebogen zur steuerlichen Erfassung.",
+          en: "This means opening the business or starting the activity. It is often not the day of notarisation or of entry in the register. The one-month deadline for the tax registration questionnaire runs from this day.",
+        },
+      },
     ],
   },
   {
@@ -397,6 +407,22 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Hast du eine Dauerfristverlängerung?", en: "Do you have a permanent filing extension (Dauerfristverlängerung)?" },
         hilfe: { de: "Damit gibst du die Voranmeldung einen Monat später ab.", en: "It lets you file advance returns one month later." },
       },
+      // StB Busch 22.10.2026: Meldezeitraum der Zusammenfassenden Meldung abfragen (§ 18a Abs. 1 Satz 2 UStG)
+      {
+        feld: "ust.zm_meldezeitraum",
+        art: "auswahl",
+        frage: { de: "Wie oft gibst du die Zusammenfassende Meldung für deine Warenlieferungen in andere EU-Länder ab?", en: "How often do you file the recapitulative statement for your goods deliveries to other EU countries?" },
+        hilfe: {
+          de: "Monatlich ist die Regel. Vierteljährlich darfst du melden, wenn deine Lieferungen an Unternehmen in anderen EU-Ländern weder im laufenden noch in einem der vier vorangegangenen Quartale jeweils 50.000 € übersteigen.",
+          en: "Monthly is the rule. You may file quarterly if your deliveries to businesses in other EU countries do not exceed €50,000 in the current quarter or in any of the four preceding quarters.",
+        },
+        optionen: {
+          monatlich: { de: "Monatlich", en: "Monthly" },
+          quartalsweise: { de: "Vierteljährlich", en: "Quarterly" },
+          keine_warenlieferungen: { de: "Ich liefere keine Waren in andere EU-Länder (nur Dienstleistungen)", en: "I don't deliver goods to other EU countries (services only)" },
+          unklar: { de: "Weiß ich nicht", en: "I don't know" },
+        },
+      },
       {
         feld: "gewinn.vorjahr",
         art: "betrag",
@@ -436,6 +462,13 @@ export const SCHRITTE: Schritt[] = [
         art: "mehrfach",
         frage: { de: "Wo sitzen deine Kunden?", en: "Where are your customers?" },
         optionen: { inland: { de: "Deutschland", en: "Germany" }, eu: { de: "Andere EU-Länder", en: "Other EU countries" }, drittland: { de: "Außerhalb der EU", en: "Outside the EU" } },
+      },
+      // StB Busch 22.10.2026: die USt-IdNr. braucht auch, wer bei Unternehmen in anderen EU-Ländern einkauft (§ 27a UStG)
+      {
+        feld: "einkauf.eu_unternehmen",
+        art: "janein",
+        frage: { de: "Kaufst du Waren oder Leistungen bei Unternehmen in anderen EU-Ländern ein?", en: "Do you buy goods or services from businesses in other EU countries?" },
+        hilfe: { de: "Zum Beispiel Software, Werbung oder Waren von Lieferanten aus anderen EU-Ländern.", en: "For example software, advertising or goods from suppliers in other EU countries." },
       },
       {
         feld: "vertrieb.kanaele",
@@ -555,10 +588,10 @@ export const SCHRITTE: Schritt[] = [
       {
         feld: "bauleistungen.fuer_unternehmen",
         art: "janein",
-        frage: { de: "Erbringst du Bauleistungen für andere Unternehmen?", en: "Do you provide construction work for other businesses?" },
+        frage: { de: "Erbringst du Bauleistungen für andere Unternehmen oder öffentliche Auftraggeber?", en: "Do you provide construction work for other businesses or public-sector clients?" },
         hilfe: {
-          de: "Bauleistungen sind alle Leistungen, die der Herstellung, Instandsetzung, Instandhaltung, Änderung oder Beseitigung von Bauwerken dienen (§ 48 Abs. 1 EStG) – auch Elektro-, Sanitär- oder Malerarbeiten, zum Beispiel als Subunternehmer.",
-          en: "Construction work means any work serving the construction, repair, maintenance, alteration or demolition of buildings (§ 48(1) EStG) – including electrical, plumbing or painting work, e.g. as a subcontractor.",
+          de: "Bauleistungen sind alle Leistungen, die der Herstellung, Instandsetzung, Instandhaltung, Änderung oder Beseitigung von Bauwerken dienen (§ 48 Abs. 1 EStG) – auch Elektro-, Sanitär- oder Malerarbeiten, zum Beispiel als Subunternehmer. Öffentliche Auftraggeber sind z. B. Gemeinden. Arbeitest du nur für Privatleute, antworte mit Nein.",
+          en: "Construction work means any work serving the construction, repair, maintenance, alteration or demolition of buildings (§ 48(1) EStG) – including electrical, plumbing or painting work, e.g. as a subcontractor. Public-sector clients are e.g. municipalities. If you only work for private individuals, answer No.",
         },
       },
       { feld: "online.website", art: "janein", frage: { de: "Hast du eine eigene Website?", en: "Do you have your own website?" } },

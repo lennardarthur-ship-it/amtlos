@@ -1,6 +1,6 @@
 persona: grenzfall
-beschreibung: Vorjahresumsatz 800.000,01 € – Versandpflicht ab 1.1.2027
-stichtag: '2026-10-11'
+beschreibung: Vorjahresumsatz 800.000,01 € – Versandpflicht ab 1.1.2027 (gültig ab 01.01.2027, StB Busch 22.10.2026 – Stichtag daher 1.1.2027)
+stichtag: '2027-01-01'
 fakten:
   profil.rechtsform: gmbh
   profil.gruendungsdatum: '2015-01-01'
@@ -12,3 +12,5 @@ fakten:
   profil.umsatz.vorjahr: 800000.01
 erwartet:
   steuern.e_rechnung_versand_2027: gilt
+termine_enthaelt:
+  steuern.e_rechnung_versand_2027: [["einmalig", "2027-01-01"]]

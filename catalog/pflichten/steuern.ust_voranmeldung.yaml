@@ -1,7 +1,7 @@
-# Katalog C.24. Zeigt: Rhythmus abhängig von Fakten, Regelwerte, Dauerfristverlängerung.
+# Katalog C.24. Zeigt: Rhythmus abhängig von Fakten, Regelwerte, Dauerfristverlängerung. StB-Durchsicht Busch 22.10.2026 umgesetzt.
 schema_version: 1
 id: steuern.ust_voranmeldung
-version: 5
+version: 6
 katalog_nr: C.24
 titel:
   de: Umsatzsteuer-Voranmeldung abgeben
@@ -12,9 +12,11 @@ erklaerung:
     Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr
     monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Liegt dein Umsatz über
     der Kleinunternehmergrenze, gilt die Pflicht sicher – offen ist dann nur, ob monatlich
-    oder vierteljährlich. Den Rhythmus legt das Finanzamt fest – er steht in deinen Bescheiden.
+    oder vierteljährlich. Den Rhythmus legt das Finanzamt fest – er steht im Schreiben des Finanzamts.
     Weißt du ihn nicht und kennt Amtlos die Steuer des Vorjahres nicht, rechnet Amtlos
-    vorläufig mit vierteljährlich. Amtlos bereitet die Zahlen vor; du übermittelst selbst.
+    vorläufig mit vierteljährlich. Hast du 2026 oder später gegründet, gibst du ab 2027 im
+    Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG). Amtlos bereitet
+    die Zahlen vor; du übermittelst selbst.
 rechtsgrundlage: ["§ 18 UStG"]
 kategorie: steuern
 ausloeser:
@@ -127,15 +129,16 @@ stelle:
 kanal: elster
 kosten: null
 sanktion:
-  text: { de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO). Wer die Vorauszahlung nicht, nicht vollständig oder nicht rechtzeitig zahlt, riskiert außerdem ein Bußgeld bis 30.000 € (§ 26a Abs. 1, 3 UStG in Verbindung mit § 18 Abs. 1 Satz 4 UStG). Für eine verspätete Voranmeldung kann das Finanzamt einen Verspätungszuschlag festsetzen (§ 152 Abs. 1 AO).' }
-  schwere: mittel
+  text: { de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO). Wer die Vorauszahlung nicht, nicht vollständig oder nicht rechtzeitig zahlt, riskiert außerdem ein Bußgeld bis 30.000 € (§ 26a Abs. 1, 3 UStG in Verbindung mit § 18 Abs. 1 Satz 4 UStG). Für eine verspätete Voranmeldung kann das Finanzamt einen Verspätungszuschlag festsetzen (§ 152 Abs. 1 AO). Gibst du keine Voranmeldung ab, kann das Finanzamt die Steuer schätzen (§ 162 AO); die Nichtabgabe kann als Steuerhinterziehung strafbar sein (§ 370 Abs. 1 Nr. 2 AO).' }
+  # StB Busch 22.10.2026: „hoch“ – Bußgeld bis 30.000 €, Strafbarkeit, die Zahllast ist fremdes Geld
+  schwere: hoch
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
-  de: Über der Kleinunternehmergrenze gilt die Voranmeldung jetzt sicher, auch wenn die Steuer des Vorjahres nicht bekannt ist – du
-    kannst den Rhythmus direkt angeben.
+  de: Die Folgen sind jetzt vollständig beschrieben (Schätzung, Strafbarkeit) und als „hoch“ eingestuft.
 aktion: { art: uebermittlung, ziel: elster.ust_va, nachweis_erforderlich: true }
 status_recht: in_kraft
-gueltig_ab: null
+# StB Busch 22.10.2026: Fassung der Grenzen 9.000 € / 2.000 € ab 01.01.2025
+gueltig_ab: '2025-01-01'
 gueltig_bis: null
 quellen:
   - titel: Umsatzsteuergesetz § 18
@@ -150,13 +153,12 @@ quellen:
   - titel: Abgabenordnung § 152 (Verspätungszuschlag)
     url: https://www.gesetze-im-internet.de/ao_1977/__152.html
     abgerufen: '2026-10-22'
+  - titel: Abgabenordnung § 162 (Schätzung von Besteuerungsgrundlagen)
+    url: https://www.gesetze-im-internet.de/ao_1977/__162.html
+    abgerufen: null
+  - titel: Abgabenordnung § 370 (Steuerhinterziehung)
+    url: https://www.gesetze-im-internet.de/ao_1977/__370.html
+    abgerufen: null
 fachlich_zu_pruefen:
-  - "R10: Pflicht gilt bei Umsatz über der Kleinunternehmergrenze ohne Regelung nach § 19 auch ohne bekannte Vorjahres-Zahllast (Hinweis Nutzertest) – Sonderfälle (Befreiung bis 2.000 €) bestätigen"
-  - 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Schwere „mittel“ belassen – „hoch“ fachlich erwägen)'
-  - "Befreiung bis Grenze ist laut Spezifikation 'möglich' (Ermessen Finanzamt?) – Auslöser bildet das als 'gilt nicht' ab; Formulierung prüfen"
-  - "Neugründer: Aussetzung der monatlichen Pflicht 2021–2026 (Radar) – Rhythmus im Gründungs- und Folgejahr festlegen"
-  - "R12 (UX #3): Rhythmus „weiß ich nicht“ ohne Vorjahressteuer ⇒ vorläufig vierteljährlich (Produktentscheidung) – Rechtsfolge durch die Steuerprüfung bestätigen"
-  - "Sondervorauszahlung 1/11 bei monatlicher Dauerfristverlängerung als eigene Pflicht anlegen"
-  - "Verschiebung auf nächsten Werktag und Feiertagskalender (Bundesland) bestätigen"
-  - "gueltig_ab: Datum der heutigen Fassung der Grenzen eintragen"
+  - "StB Busch 22.10.2026: Neugründer ab 2027 im Gründungs- und Folgejahr monatlich (§ 18 Abs. 2 Satz 4 UStG) – nur als Hinweis im Text; der Rhythmus bei „weiß ich nicht“ bzw. ohne Angabe rechnet dann weiter vierteljährlich, weil die Regeln das Kalenderjahr des Stichtags nicht abfragen können"
 pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

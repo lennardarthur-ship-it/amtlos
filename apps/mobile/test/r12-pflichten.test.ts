@@ -115,10 +115,14 @@ describe("R12: abgeleitete Antworten und künftige Pflichten", () => {
   });
 
   it("E-Rechnungen versenden ab 2028 gilt erst in der Zukunft – nicht als „schon erledigt“ abhakbar", () => {
-    const a = auswertung({ "taetigkeit.branchen": ["handwerk"], rechtsform: "einzelunternehmen", "kunden.segmente": ["b2b"], "ust.kleinunternehmer": false, gruendungsdatum: "2018-01-01" }, "2026-10-21");
-    const p = finde(a, "steuern.e_rechnung_versand_2028")!;
+    // StB Busch 22.10.2026: in Kraft, gültig ab 01.01.2028 – vorher nicht unter „gilt“, in den zwölf Monaten davor als „kommend“
+    const profil = { "taetigkeit.branchen": ["handwerk"], rechtsform: "einzelunternehmen", "kunden.segmente": ["b2b"], "ust.kleinunternehmer": false, gruendungsdatum: "2018-01-01" };
+    const a = auswertung(profil, "2026-10-21");
+    expect(finde(a, "steuern.e_rechnung_versand_2028")).toBeUndefined();
+    const spaeter = auswertung(profil, "2027-03-01");
+    const p = spaeter.kommend.find((x) => x.id === "steuern.e_rechnung_versand_2028")!;
     expect(p.giltAb).toBe("2028-01-01");
-    expect(inZukunft(p, "2026-10-21")).toBe(true);
+    expect(inZukunft(p, "2027-03-01")).toBe(true);
     expect(inZukunft(finde(a, "steuern.aufbewahrung") ?? { giltAb: null }, "2026-10-21")).toBe(false);
   });
 

@@ -1,14 +1,15 @@
-# Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.e_rechnung_empfang
-version: 3
+version: 4
 katalog_nr: C.30
 titel:
   de: E-Rechnungen empfangen können
 kurz:
   de: Seit 2025 müssen Unternehmen elektronische Rechnungen (XRechnung, ZUGFeRD) von anderen Unternehmen empfangen können.
 erklaerung:
-  de: Eine E-Rechnung ist ein strukturierter Datensatz. Eine PDF-Rechnung ist keine E-Rechnung.
+  de: Eine E-Rechnung ist ein strukturierter Datensatz. Eine PDF-Rechnung ist keine E-Rechnung. Für den Empfang genügt ein
+    E-Mail-Postfach (BMF-Schreiben vom 15.10.2024). Das gilt für alle Unternehmen, auch für Kleinunternehmer.
 begriffe:
 - begriff:
     de: E-Rechnung
@@ -48,9 +49,6 @@ quellen:
   url: https://lxgesetze.de/ustg/14
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Gilt für alle Unternehmen, auch Kleinunternehmer – bestätigen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Empfangspflicht folgt nur mittelbar aus § 14 Abs. 1 Satz 5 UStG (keine Zustimmung bei Pflicht nach Abs. 2 Satz 2 Nr. 1); Schwere „niedrig“ fachlich erwägen)'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf

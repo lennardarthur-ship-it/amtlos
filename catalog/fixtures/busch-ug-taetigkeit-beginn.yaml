@@ -1,0 +1,26 @@
+persona: gruenderin
+beschreibung: StB Busch 22.10.2026 – UG, Beurkundung im September, Tätigkeit ab Mitte November; Kleinunternehmerin mit Onlineshop für Privatkunden in der EU, kauft bei EU-Unternehmen ein
+stichtag: "2026-10-22"
+fakten:
+  profil.rechtsform: ug
+  profil.gruendungsdatum: "2026-09-01"
+  # Fragebogen-Frist ab Eröffnung bzw. Aufnahme der Tätigkeit (§ 138 Abs. 1b Satz 1, Abs. 4 AO), nicht ab Gründung
+  profil.taetigkeit_beginn: "2026-11-16"
+  profil.gesellschaft.handelsregister: beantragt
+  profil.taetigkeit.einordnung: gewerbe
+  profil.ust.kleinunternehmer: true
+  profil.kunden.segmente: [b2c]
+  profil.kunden.regionen: [inland, eu]
+  profil.vertrieb.kanaele: [onlineshop]
+  profil.einkauf.eu_unternehmen: true
+  profil.bundesland: BW
+  profil.gemeinde_ags: "08111000"
+erwartet:
+  gruendung.fragebogen_steuerliche_erfassung: gilt
+  # USt-IdNr. auch bei Einkäufen in anderen EU-Ländern, auch für Kleinunternehmer
+  gruendung.ust_idnr: gilt
+  # OSS: Kleinunternehmer nicht ausgeschlossen (§ 19 UStG gilt nur für Inlandsumsätze)
+  steuern.oss_erklaerung: gilt
+  steuern.zusammenfassende_meldung: gilt_nicht
+termine_enthaelt:
+  gruendung.fragebogen_steuerliche_erfassung: [["einmalig", "2026-12-16"]]

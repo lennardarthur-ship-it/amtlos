@@ -1,23 +1,42 @@
-# Katalog A.6 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog A.6 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: gruendung.ust_idnr
-version: 1
+version: 2
 katalog_nr: A.6
 titel:
   de: Umsatzsteuer-Identifikationsnummer beantragen
 kurz:
-  de: Wenn du Geschäfte mit Kunden in anderen EU-Ländern machst, beantragst du eine USt-IdNr. beim Bundeszentralamt für Steuern.
+  de: Wenn du mit Unternehmen in anderen EU-Ländern Geschäfte machst – als Kunde oder als Lieferant –, beantragst du eine USt-IdNr.
+    beim Bundeszentralamt für Steuern.
 erklaerung:
-  de: Die Umsatzsteuer-Identifikationsnummer brauchst du für Geschäfte innerhalb der EU.
+  de: Die Umsatzsteuer-Identifikationsnummer brauchst du für Geschäfte mit Unternehmen in anderen EU-Ländern – wenn du an sie
+    lieferst oder leistest, aber auch, wenn du bei ihnen einkaufst, z. B. Software oder Werbung. Eine Frist gibt es nicht; du
+    beantragst sie online beim Bundeszentralamt für Steuern oder gleich im Fragebogen zur steuerlichen Erfassung. Verkaufst du
+    nur an Privatpersonen in anderen EU-Ländern (One-Stop-Shop), ist sie nicht erforderlich, für die Registrierung im One-Stop-Shop
+    aber üblich. Auch als Kleinunternehmer kannst du sie beantragen und solltest es bei Einkäufen in anderen EU-Ländern tun –
+    die Steuer, die du dabei schuldest (§ 13b UStG), fällt auch für Kleinunternehmer an.
 rechtsgrundlage:
 - § 27a UStG
 kategorie: gruendung
 ausloeser:
-  feld: profil.kunden.regionen
-  op: enthaelt
-  wert: eu
-  label:
-    de: Du hast Kunden in anderen EU-Ländern.
+  # StB Busch 22.10.2026: nur bei Geschäften mit Unternehmen (B2B) – als Kunde oder als Lieferant
+  any:
+  - all:
+    - feld: profil.kunden.regionen
+      op: enthaelt
+      wert: eu
+      label:
+        de: Du hast Kunden in anderen EU-Ländern.
+    - feld: profil.kunden.segmente
+      op: enthaelt
+      wert: b2b
+      label:
+        de: Du verkaufst an Unternehmen.
+  - feld: profil.einkauf.eu_unternehmen
+    op: ==
+    wert: true
+    label:
+      de: Du kaufst bei Unternehmen in anderen EU-Ländern ein.
 phase: gruendung
 frist:
   typ: dauerhaft
@@ -29,9 +48,13 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Keine Pflicht und kein Bußgeld. Ohne USt-IdNr. kannst du keine steuerfreie innergemeinschaftliche Lieferung abrechnen und
+      keine Zusammenfassende Meldung abgeben (§ 14a Abs. 3, § 18a UStG). Lieferanten aus anderen EU-Ländern berechnen dir dann
+      in der Regel ihre eigene Umsatzsteuer.
   schwere: mittel
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Gilt jetzt auch, wenn du bei Unternehmen in anderen EU-Ländern einkaufst, und nur noch bei Geschäften mit Unternehmen.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -39,11 +62,13 @@ quellen:
 - titel: Umsatzsteuergesetz § 27a
   url: https://www.gesetze-im-internet.de/ustg_1980/__27a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Nur bei B2B-Geschäft oder bei jedem EU-Geschäft?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- titel: Umsatzsteuergesetz § 14a
+  url: https://www.gesetze-im-internet.de/ustg_1980/__14a.html
+  abgerufen: null
+- titel: Umsatzsteuergesetz § 18a
+  url: https://www.gesetze-im-internet.de/ustg_1980/__18a.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

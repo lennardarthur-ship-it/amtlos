@@ -1,7 +1,8 @@
-# Katalog C.32 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.32 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
+# Ablaufhemmung: in der ab 01.01.2025 geltenden Fassung § 147 Abs. 3 Satz 5 AO (Satz 3, 4: Lieferscheine) – lxgesetze.de 22.10.2026
 schema_version: 1
 id: steuern.aufbewahrung
-version: 3
+version: 4
 katalog_nr: C.32
 titel:
   de: Unterlagen aufbewahren
@@ -9,7 +10,10 @@ kurz:
   de: Bewahre Belege und Rechnungen 8 Jahre, Jahresabschlüsse und Bücher 10 Jahre und Geschäftsbriefe 6 Jahre auf.
 erklaerung:
   de: 'Buchungsbelege einschließlich Rechnungen: 8 Jahre. Jahresabschlüsse, Bücher und Organisationsunterlagen: 10 Jahre.
-    Handels- und Geschäftsbriefe: 6 Jahre. Die Frist läuft aber nicht ab, solange die Unterlagen für Steuern von Bedeutung sind,
+    Handels- und Geschäftsbriefe: 6 Jahre. Die Frist beginnt mit dem Schluss des Kalenderjahres, in dem du die letzte Eintragung
+    gemacht, den Brief erhalten oder abgesandt hast oder der Beleg entstanden ist (§ 147 Abs. 4 AO). Lieferscheine, die keine
+    Buchungsbelege sind, musst du seit 2025 nur bis zum Erhalt bzw. Versand der Rechnung aufbewahren (§ 147 Abs. 3 Satz 3, 4 AO).
+    Die Frist läuft aber nicht ab, solange die Unterlagen für Steuern von Bedeutung sind,
     deren Festsetzungsfrist noch nicht abgelaufen ist – zum Beispiel bei einer laufenden Betriebsprüfung oder einem offenen Einspruch.
     Amtlos zeigt dir, ab wann du Unterlagen frühestens löschen darfst; ob noch etwas offen ist, klärst du vorher mit deiner Steuerberatung.'
 rechtsgrundlage:
@@ -33,7 +37,7 @@ sanktion:
   schwere: mittel
 automatisierung: hinweis
 aenderungsnotiz:
-  de: 'Ergänzt: Die Aufbewahrungsfrist läuft nicht ab, solange für die Unterlagen eine Festsetzungsfrist noch offen ist (§ 147 Abs. 3 S. 5 AO).'
+  de: 'Ergänzt: Wann die Frist beginnt, und dass Lieferscheine, die keine Buchungsbelege sind, nur bis zur Rechnung aufbewahrt werden müssen.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -41,6 +45,10 @@ quellen:
 - titel: Abgabenordnung § 147
   url: https://www.gesetze-im-internet.de/ao_1977/__147.html
   abgerufen: null
+- titel: § 147 AO, Wortlaut in der ab 2025 geltenden Fassung (lxgesetze.de)
+  url: https://lxgesetze.de/ao/147
+  abgerufen: '2026-10-22'
+  fundstelle: § 147 Abs. 3 Satz 1, 3, 4, 5 und Abs. 4 AO
 - titel: Handelsgesetzbuch § 257
   url: https://www.gesetze-im-internet.de/hgb/__257.html
   abgerufen: null
@@ -56,10 +64,7 @@ quellen:
 - titel: Strafgesetzbuch § 283 (Abs. 6)
   url: https://www.gesetze-im-internet.de/stgb/__283.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- Fristbeginn (Ende des Kalenderjahres) und Aufbewahrungsdauern als Regelwerte führen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 379 Abs. 1 Nr. 7 setzt voraus, dass Steuerverkürzungen ermöglicht werden; Schwere „mittel“ belassen – „hoch“ fachlich erwägen)'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null
