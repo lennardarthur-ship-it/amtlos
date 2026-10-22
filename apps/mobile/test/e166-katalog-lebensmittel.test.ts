@@ -69,8 +69,14 @@ describe("Prüfbericht Lebensmittelhygiene: neue und geänderte Katalogeinträge
     expect(t).toMatch(/§ 4 Abs\. 2 LMHV/);
     expect(finde(auswertung(cafe, "2026-10-22"), "branche.gastro_hygieneschulung")!.erledigung).toEqual({ art: "laufend", zeitraum: "jahr" });
   });
-  it("Zusatzstoffe: koffeinhaltig und chininhaltig nach LMIV, nicht LMZDV; Registrierung: Foodtruck am Betriebssitz", () => {
-    expect(text(pflicht("branche.gastro_zusatzstoffe").erklaerung)).toMatch(/„koffeinhaltig“ und „chininhaltig“[^.]*Anhang III Nr\. 4 LMIV in Verbindung mit § 2 LMIDV/);
+  it("Zusatzstoffe (berichtigter Prüfbericht): Azofarbstoffe, chininhaltig nach AromenDV, Koffeinhinweis nach FrSaftErfrischGetrV; Registrierung: Foodtruck am Betriebssitz", () => {
+    const z = text(pflicht("branche.gastro_zusatzstoffe").erklaerung);
+    expect(z).toMatch(/E 102, E 104, E 110, E 122, E 124 oder E 129[^.]*„Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen“ \(Art\. 24 in Verbindung mit Anhang V Verordnung \(EG\) Nr\. 1333\/2008/);
+    expect(z).toMatch(/„chininhaltig“ bei nicht vorverpackten Getränken mit Chinin bis 1,2 % vol \(§ 5 Abs\. 1 AromenDV\)/);
+    expect(z).toMatch(/mehr als 150 mg Koffein je Liter der Hinweis „Erhöhter Koffeingehalt\. Für Kinder und schwangere oder stillende Frauen nicht empfohlen“ mit dem Koffeingehalt in mg\/100 ml – nicht bei Kaffee und Tee \(§ 6 FrSaftErfrischGetrV in Verbindung mit Anhang III Nr\. 4\.1 LMIV\)/);
+    expect(z).not.toMatch(/LMIDV|koffeinhaltig/);
+    // Acrylamid: kleine Betriebe Anhang II Teil A, Teil B nur zusätzlich für Filial- und Franchisebetriebe
+    expect(text(pflicht("branche.gastro_acrylamid").erklaerung)).toMatch(/Anhang II Teil A \(Art\. 2 Abs\. 2\); die Maßnahmen nach Anhang II Teil B kommen nur für zentral gesteuerte Filial- und Franchisebetriebe hinzu \(Art\. 2 Abs\. 3\)/);
     expect(text(pflicht("branche.gastro_lebensmittelregistrierung").erklaerung)).toMatch(/Betriebssitz – dort, wo das Fahrzeug steht bzw. wo du wohnst –, nicht bei der am Verkaufsplatz/);
   });
 });

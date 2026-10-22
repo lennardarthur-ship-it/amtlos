@@ -1,14 +1,14 @@
 # Katalog E.57 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.57, bestätigt) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.unfallanzeige
-version: 3
+version: 4
 katalog_nr: E.57
 titel:
   de: Arbeitsunfall der Berufsgenossenschaft anzeigen
 kurz:
   de: Stirbt jemand durch einen Arbeitsunfall oder ist er danach mehr als drei Tage arbeitsunfähig, zeigst du den Unfall binnen drei Tagen der BG an, nachdem du davon erfahren hast.
 erklaerung:
-  de: 'Anzeigen musst du einen Unfall, wenn die verletzte Person stirbt oder mehr als drei Tage arbeitsunfähig ist; den Unfalltag zählst du dabei nicht mit (§ 193 Abs. 1 SGB VII). Das gilt auch für Wegeunfälle auf dem Weg zur oder von der Arbeit. Die Anzeige erstattest du binnen drei Tagen, nachdem du vom Unfall erfahren hast (§ 193 Abs. 4 SGB VII), mit dem Formular nach der Unfallversicherungs-Anzeigeverordnung (UVAV), meist im Portal deiner BG. Tödliche Unfälle und Unfälle mit vielen Verletzten meldest du sofort, zum Beispiel telefonisch. Amtlos legt die Aufgabe bei jedem gemeldeten Arbeitsunfall an, weil die Dauer der Arbeitsunfähigkeit oft erst später feststeht, und rechnet ab dem Tag, den du beim Unfall einträgst – hast du später davon erfahren, trag diesen Tag ein. Bleibt die Arbeitsunfähigkeit bei höchstens drei Tagen, trifft die Anzeige nicht zu; den Eintrag ins Verbandbuch brauchst du trotzdem.'
+  de: 'Anzeigen musst du einen Unfall, wenn die verletzte Person stirbt oder mehr als drei Tage arbeitsunfähig ist; den Unfalltag zählst du dabei nicht mit (§ 193 Abs. 1 SGB VII). Das gilt auch für Wegeunfälle auf dem Weg zur oder von der Arbeit. Die Anzeige erstattest du binnen drei Tagen, nachdem du vom Unfall erfahren hast (§ 193 Abs. 4 SGB VII), mit dem Formular nach der Unfallversicherungs-Anzeigeverordnung (UVAV), meist im Portal deiner BG. Tödliche Unfälle und Massenunfälle meldest du zusätzlich sofort telefonisch oder per E-Mail. Amtlos legt die Aufgabe bei jedem gemeldeten Arbeitsunfall an, weil die Dauer der Arbeitsunfähigkeit oft erst später feststeht, und rechnet ab dem Tag, den du beim Unfall einträgst – hast du später davon erfahren, trag diesen Tag ein. Bleibt die Arbeitsunfähigkeit bei höchstens drei Tagen, trifft die Anzeige nicht zu; den Eintrag ins Verbandbuch brauchst du trotzdem.'
 rechtsgrundlage:
 - § 193 Abs. 1, 4 SGB VII
 - UVAV
@@ -55,7 +55,7 @@ quellen:
   url: https://vorschriften.bgn-branchenwissen.de/daten/gv/sgb7/209.htm
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026 (bestätigt): Auslöser Tod oder mehr als drei Tage AU – Amtlos kennt die AU-Tage beim Melden nicht (Ereignis ohne Payload auswertbar), deshalb Aufgabe bei jedem Unfall mit „trifft nicht zu“; Bedingung auf au_tage > 3 oder tödlich umstellen, sobald das Meldeformular die Angaben erfasst und die Engine Payload auswertet (Technik)'
+- 'Amtlos kennt die AU-Tage beim Melden nicht (Ereignis ohne Payload auswertbar), deshalb Aufgabe bei jedem Unfall mit „trifft nicht zu“ (laut Freigabe Sifa 22.10.2026 als Übergang vertretbar, solange der Kurztext die Schwelle nennt); Bedingung auf au_tage > 3 oder tödlich umstellen, sobald das Meldeformular die Angaben erfasst und die Engine Payload auswertet (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

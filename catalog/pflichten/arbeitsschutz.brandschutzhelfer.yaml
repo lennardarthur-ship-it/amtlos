@@ -1,12 +1,12 @@
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Brandschutzhelfer“; C Katalog E.53/E.54): aus Erste Hilfe herausgelöst
 schema_version: 1
 id: arbeitsschutz.brandschutzhelfer
-version: 2
+version: 3
 katalog_nr: E.54
 titel:
   de: Brandschutzhelfer benennen und ausbilden
 kurz:
-  de: Du benennst genug Beschäftigte als Brandschutzhelfer – in der Regel 5 Prozent – und lässt sie im Umgang mit Feuerlöschern ausbilden.
+  de: Du benennst genug Beschäftigte als Brandschutzhelfer und lässt sie im Umgang mit Feuerlöschern ausbilden – in der Regel 5 Prozent der Beschäftigten, in kleinen Betrieben mindestens eine Person, die während der Arbeitszeit anwesend ist (ASR A2.2 Nr. 7.3).
 erklaerung:
   de: 'Eine ausreichende Zahl von Beschäftigten machst du durch Unterweisung und Übung mit dem Löschen von Entstehungsbränden vertraut (§ 10 Abs. 2 ArbSchG, § 22 Abs. 2 DGUV Vorschrift 1). Nach ASR A2.2 Abschnitt 7.3 ergibt sich die Zahl aus der Gefährdungsbeurteilung; ein Anteil von 5 Prozent der Beschäftigten reicht in der Regel. Mehr brauchst du bei erhöhter Brandgefährdung, vielen Personen oder großen Flächen; Schichtbetrieb, Urlaub und Krankheit planst du ein. Die Ausbildung besteht aus Theorie und einer praktischen Löschübung; empfohlen ist eine Auffrischung alle drei bis fünf Jahre (DGUV Information 205-023). In kleinen Betrieben bist oft du selbst die erste Brandschutzhelferin oder der erste Brandschutzhelfer.'
 rechtsgrundlage:
@@ -50,9 +50,7 @@ quellen:
 - titel: 'Arbeitsschutzgesetz (§§ 22, 25)'
   url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Neu nach Prüfergebnis Sifa 22.10.2026 – Auffrischung alle drei bis fünf Jahre nur Empfehlung (DGUV Information 205-023, nicht abgerufen); Sanktion fachlich ergänzen (§ 22 DGUV Vorschrift 1 steht nicht in § 32)'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 25 ArbSchG nennt § 10 Abs. 2 ArbSchG nicht, § 32 DGUV Vorschrift 1 (Fassung UKBW) nennt § 22 Abs. 2 nicht; Anordnung nach § 22 Abs. 3 ArbSchG, Höhe nach § 25 Abs. 2 ArbSchG gelesen (30.000 €, nicht 5.000 €)) – fachlich zu bestätigen'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

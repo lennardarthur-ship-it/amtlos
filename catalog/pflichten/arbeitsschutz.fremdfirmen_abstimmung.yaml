@@ -62,8 +62,7 @@ quellen:
   url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Prüfergebnis Sifa 22.10.2026 – § 8 ArbSchG und §§ 5, 6 DGUV Vorschrift 1 nicht unmittelbar bußgeldbewehrt (§§ 5, 6 nicht in § 32 DGUV V1); Unterweisungsthema „Arbeit beim Kunden“ in der Vorlage'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 25 ArbSchG nennt § 8 ArbSchG nicht, § 32 DGUV Vorschrift 1 (Fassung UKBW) nennt §§ 5, 6 nicht; Anordnung nach § 22 Abs. 3 ArbSchG; Baustellenverordnung nicht geprüft) – fachlich zu bestätigen'
+- 'Unterweisungsthema „Arbeit beim Kunden“ in der Unterweisungsvorlage (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,12 +1,12 @@
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Verbandbuch für jeden Unfall“, C Katalog E.57): eigene Pflicht je Unfall
 schema_version: 1
 id: arbeitsschutz.verbandbuch
-version: 1
+version: 2
 katalog_nr: E.57
 titel:
   de: Unfall und Erste Hilfe im Verbandbuch eintragen
 kurz:
-  de: Jeden Unfall und jede Erste-Hilfe-Leistung trägst du ins Verbandbuch ein – auch kleine Verletzungen ohne Arbeitsunfähigkeit.
+  de: Jeden Unfall und jede Erste-Hilfe-Leistung trägst du ins Verbandbuch ein – auch kleine Verletzungen ohne Arbeitsunfähigkeit – und hältst die Aufzeichnungen fünf Jahre lang verfügbar.
 erklaerung:
   de: 'Jede Erste-Hilfe-Leistung wird dokumentiert, und die Dokumentation wird fünf Jahre lang verfügbar gehalten und vertraulich behandelt (§ 24 Abs. 6 DGUV Vorschrift 1). Halte fest, wann, wo und wie es passiert ist, die Art der Verletzung, die Erste-Hilfe-Maßnahme sowie die Namen der verletzten und der helfenden Person. Der Eintrag ist wichtig, wenn sich später Folgen zeigen: Er belegt den Arbeitsunfall gegenüber der BG. Eine feste Frist nennt die Vorschrift nicht – Amtlos erinnert am Tag des gemeldeten Unfalls. Ob der Unfall zusätzlich der BG anzuzeigen ist, steht in der Pflicht zur Unfallanzeige.'
 rechtsgrundlage:
@@ -46,7 +46,7 @@ quellen:
   url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Prüfergebnis Sifa 22.10.2026 – Termin am Unfalltag ist Erinnerung von Amtlos, keine Rechtsfrist; Erste-Hilfe-Leistungen ohne gemeldeten Arbeitsunfall erfasst Amtlos nicht; Vorlage Verbandbuch fehlt'
+- 'Erste-Hilfe-Leistungen ohne gemeldeten Arbeitsunfall erfasst Amtlos nicht; Vorlage Verbandbuch fehlt (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

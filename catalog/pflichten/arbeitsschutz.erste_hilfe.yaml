@@ -2,14 +2,14 @@
 # Erste-Hilfe-Organisation (arbeitsschutz.erste_hilfe_organisation), Ersthelfer (diese Pflicht) und Brandschutzhelfer (arbeitsschutz.brandschutzhelfer)
 schema_version: 1
 id: arbeitsschutz.erste_hilfe
-version: 2
+version: 3
 katalog_nr: E.53
 titel:
   de: Ersthelfer bestimmen und fortbilden
 kurz:
   de: Sind bei der Arbeit mindestens zwei Personen anwesend, sorgst du für ausgebildete Ersthelfer und lässt sie alle zwei Jahre fortbilden.
 erklaerung:
-  de: 'Bei 2 bis 20 anwesenden Versicherten brauchst du mindestens einen Ersthelfer, bei mehr Anwesenden je nach Betriebsart 5 oder 10 Prozent (§ 26 Abs. 1 DGUV Vorschrift 1). Ersthelfer werden bei einer von der BG ermächtigten Stelle ausgebildet und in der Regel alle zwei Jahre fortgebildet (§ 26 Abs. 2, 3 DGUV Vorschrift 1); die Kosten der Lehrgänge trägt meist die BG. Als Inhaberin oder Inhaber zählst du nur mit, wenn du selbst versichert bist – Amtlos zählt vorsichtshalber alle Anwesenden, also schon ab der ersten beschäftigten Person. Plane Vertretungen für Urlaub, Krankheit und Schichten ein. Verbandkasten, Notruf-Aushang und Verbandbuch sind eine eigene Pflicht, Brandschutzhelfer ebenfalls.'
+  de: 'Bei 2 bis 20 anwesenden Versicherten brauchst du mindestens einen Ersthelfer, bei mehr Anwesenden 5 Prozent in Verwaltungs- und Handelsbetrieben und 10 Prozent in sonstigen Betrieben (§ 26 Abs. 1 DGUV Vorschrift 1). Ersthelfer werden bei einer von der BG ermächtigten Stelle ausgebildet und in der Regel alle zwei Jahre fortgebildet (§ 26 Abs. 2, 3 DGUV Vorschrift 1); die Kosten der Lehrgänge trägt meist die BG. Als Inhaberin oder Inhaber zählst du nur mit, wenn du selbst versichert bist – Amtlos zählt vorsichtshalber alle Anwesenden, also schon ab der ersten beschäftigten Person. Plane Vertretungen für Urlaub, Krankheit und Schichten ein. Verbandkasten, Notruf-Aushang und Verbandbuch sind eine eigene Pflicht, Brandschutzhelfer ebenfalls.'
 rechtsgrundlage:
 - § 26 DGUV Vorschrift 1
 kategorie: arbeitsschutz
@@ -44,9 +44,7 @@ quellen:
 - titel: DGUV Vorschrift 1 (UKBW, §§ 24, 32)
   url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026: „Versicherte“ – Inhaber zählt nur, wenn selbst versichert; konservativ alle Anwesenden gezählt, Auslöser deshalb ab einer beschäftigten Person (Regelwert arbeitsschutz.ersthelfer.schwelle_versicherte = 2 bleibt Rechtsstand, wird im Auslöser nicht mehr verglichen)'
-- Anzahl der Ersthelfer über 20 Anwesende (5 % bzw. 10 % je Betriebsart) als Regelwerte
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

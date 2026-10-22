@@ -1,7 +1,7 @@
 # Beispiel aus Spezifikation 3.2 / Katalog E.50, in das Schema v1 überführt.
 schema_version: 1
 id: arbeitsschutz.gefaehrdungsbeurteilung
-version: 6
+version: 7
 katalog_nr: E.50
 titel:
   de: Gefährdungsbeurteilung erstellen
@@ -12,7 +12,7 @@ erklaerung:
     Sobald du mindestens eine Person beschäftigst, sind die Gefährdungen an jedem
     Arbeitsplatz zu beurteilen, Schutzmaßnahmen festzulegen und das zu dokumentieren.
     Amtlos erstellt dir dafür eine Vorlage passend zu deiner Branche. Überprüfe die Beurteilung bei Änderungen der
-    Arbeitsstätte, der Tätigkeiten, Arbeitsmittel oder Arbeitsstoffe, nach Unfällen und Beinaheunfällen, bei
+    Arbeitsstätte oder der Tätigkeiten, bei neuen Arbeitsmitteln oder Arbeitsstoffen, nach Unfällen und Beinaheunfällen, bei
     Berufskrankheiten oder Gesundheitsbeschwerden, nach Ergebnissen der arbeitsmedizinischen Vorsorge, bei neuen
     Vorschriften oder Erkenntnissen und wenn du Jugendliche beschäftigst oder eine Beschäftigte dir ihre
     Schwangerschaft mitteilt.
@@ -72,9 +72,5 @@ quellen:
     url: https://www.gesetze-im-internet.de/chemg/__26.html
     abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-  - "Frist: 'vor Arbeitsbeginn' als Auslegung bestätigen"
-  - "Prüfergebnis Sifa 22.10.2026 (B-117, plausibel): Anlässe im Text ergänzt; als Auslöser nur die Ereignisse, die Amtlos kennt (neuer Arbeitsplatz, neue Tätigkeit, Arbeitsunfall, Mitteilung einer Schwangerschaft) – Fundstellen § 3 Abs. 7 BetrSichV, § 6 Abs. 9 GefStoffV im Wortlaut prüfen"
-  - "gueltig_ab 1996-08-21 aus Spezifikation übernommen"
-  - "Prüfergebnis Sifa 22.10.2026 (plausibel, Nummern gegenprüfen): § 22 Abs. 1 Nr. 1, 6 BetrSichV und § 22 Abs. 1 Nr. 1a GefStoffV gelesen – GefStoffV verweist auf § 26 ChemG (bis 50.000 €), nicht auf das ArbSchG; § 9 Abs. 1 Nr. 1 ArbStättV nicht erneut abgerufen"
-  - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
+- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

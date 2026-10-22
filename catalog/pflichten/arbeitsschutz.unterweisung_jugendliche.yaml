@@ -1,7 +1,7 @@
 # R11 (Rechtsprüfung T-100/T-111, Nutzertest Tischlerei Befund 7): halbjährliche Unterweisung Jugendlicher als eigene Pflicht
 schema_version: 1
 id: arbeitsschutz.unterweisung_jugendliche
-version: 3
+version: 4
 katalog_nr: E.51
 titel:
   de: Jugendliche halbjährlich unterweisen
@@ -10,8 +10,9 @@ kurz:
 erklaerung:
   de: Für Jugendliche gilt ein kürzerer Abstand als die jährliche Unterweisung der übrigen Beschäftigten. Vor Beginn der Beschäftigung
     und bei wesentlichen Änderungen unterweist du sie über die Gefahren und die Schutzmaßnahmen; danach wiederholst du die Unterweisung
-    mindestens halbjährlich (§ 29 JArbSchG). Die Frist läuft für jede jugendliche Person ab ihrer letzten Unterweisung. Amtlos erinnert
-    sechs Monate nach der letzten Unterweisung, die du in Amtlos erfasst – unterweist du Jugendliche einzeln, erfasse jede Unterweisung.
+    mindestens halbjährlich (§ 29 JArbSchG). Jede jugendliche Person muss einzeln spätestens sechs Monate nach ihrer letzten Unterweisung
+    wieder unterwiesen sein. Amtlos erinnert sechs Monate nach der letzten Unterweisung, die du in Amtlos erfasst, und unterscheidet dabei
+    noch nicht nach Personen – unterweist du Jugendliche einzeln, achte selbst auf die Frist jeder Person und erfasse jede Unterweisung.
 rechtsgrundlage:
 - § 29 JArbSchG
 kategorie: arbeitsschutz
@@ -60,8 +61,7 @@ quellen:
   url: https://lxgesetze.de/jarbschg/59
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026 (offen, Technik): Frist je Jugendlichem ab dessen letzter Unterweisung führen – Amtlos rechnet ab der letzten erfassten Unterweisung im Betrieb, ohne Personen zu unterscheiden'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 59 JArbSchG über lxgesetze.de gelesen (Stand dort 23.10.2024), amtliche Seite im Abruf abgeschnitten – Absatz der Höhe (Abs. 3) am amtlichen Text gegenlesen) – fachlich zu bestätigen'
+- 'Frist je Jugendlichem ab dessen letzter Unterweisung führen (laut Freigabe Sifa 22.10.2026 fachlich gewünscht, Technik) – Amtlos rechnet ab der letzten erfassten Unterweisung im Betrieb, ohne Personen zu unterscheiden; bis dahin Hinweis im Text'
 pruefung:
   status: entwurf
   geprueft_von: null

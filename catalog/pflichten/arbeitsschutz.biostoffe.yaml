@@ -1,17 +1,18 @@
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Biostoffe: GB, Betriebsanweisung, Unterweisung“, Hinweise Nr. 5, 6): §§ 4, 14 BioStoffV
 schema_version: 1
 id: arbeitsschutz.biostoffe
-version: 1
+version: 2
 katalog_nr: E.55
 titel:
   de: 'Biostoffe: Gefährdung beurteilen, Betriebsanweisung und Unterweisung'
 kurz:
   de: Haben Beschäftigte Kontakt mit Blut, Körperflüssigkeiten, Schimmel oder Keimen, beurteilst du das, schreibst eine Betriebsanweisung und unterweist jährlich mit Unterschrift.
 erklaerung:
-  de: 'Biostoffe sind Bakterien, Viren, Pilze und Parasiten – etwa bei der Behandlung von Patientinnen und Patienten, beim Umgang mit Blut, bei Kosmetik, Nagel- und Fußpflege oder bei der Reinigung von Sanitärräumen. Vor Aufnahme der Tätigkeit beurteilst du die Gefährdung fachkundig (§ 4 BioStoffV) und dokumentierst sie (§ 7 BioStoffV); überprüft wird mindestens alle zwei Jahre. Für jeden Arbeitsbereich schreibst du eine schriftliche Betriebsanweisung (§ 14 Abs. 1 BioStoffV) – nicht nötig nur bei Tätigkeiten ausschließlich mit Biostoffen der Risikogruppe 1 ohne sensibilisierende oder toxische Wirkung. Anhand der Betriebsanweisung unterweist du mündlich vor Aufnahme der Beschäftigung und danach mindestens jährlich; Inhalt und Zeitpunkt hältst du schriftlich fest, die Unterwiesenen bestätigen durch Unterschrift (§ 14 Abs. 2, 3 BioStoffV). Für Praxen gilt zusätzlich die TRBA 250; arbeitsmedizinische Vorsorge und Impfangebote sind Teil der Pflicht zur Vorsorge.'
+  de: 'Biostoffe sind Bakterien, Viren, Pilze und Parasiten – etwa bei der Behandlung von Patientinnen und Patienten, beim Umgang mit Blut, bei Kosmetik, Nagel- und Fußpflege oder bei der Reinigung von Sanitärräumen. Vor Aufnahme der Tätigkeit beurteilst du die Gefährdung fachkundig (§ 4 BioStoffV) und dokumentierst sie (§ 7 BioStoffV); überprüft wird mindestens alle zwei Jahre. Für jeden Arbeitsbereich schreibst du eine schriftliche Betriebsanweisung (§ 14 Abs. 1 BioStoffV) – nicht nötig nur bei Tätigkeiten ausschließlich mit Biostoffen der Risikogruppe 1 ohne sensibilisierende oder toxische Wirkung. Anhand der Betriebsanweisung unterweist du mündlich vor Aufnahme der Beschäftigung und danach mindestens jährlich (§ 14 Abs. 2 BioStoffV); Inhalt und Zeitpunkt hältst du schriftlich fest, die Unterwiesenen bestätigen durch Unterschrift (§ 14 Abs. 3 BioStoffV). Für Praxen gilt zusätzlich die TRBA 250; arbeitsmedizinische Vorsorge und Impfangebote sind Teil der Pflicht zur Vorsorge.'
 rechtsgrundlage:
 - §§ 4, 7 BioStoffV
-- § 14 BioStoffV
+- § 14 Abs. 1, 2 BioStoffV
+- § 14 Abs. 3 BioStoffV (Unterweisung mit Unterschrift)
 - TRBA 250
 kategorie: arbeitsschutz
 branchen:
@@ -43,7 +44,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Bußgeld bis 5.000 €, wenn die Gefährdung nicht beurteilt oder dokumentiert ist, die Betriebsanweisung fehlt oder nicht unterwiesen wird (§ 20 Abs. 1 Nr. 1 bis 4, 22, 23 BioStoffV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
+    de: Bußgeld bis 5.000 €, wenn die Gefährdung nicht beurteilt oder dokumentiert ist, die Betriebsanweisung fehlt oder nicht unterwiesen wird (§ 20 Abs. 1 Nr. 1 bis 4, 22, 23 BioStoffV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG). Die schriftliche Dokumentation der Unterweisung selbst ist nicht bußgeldbewehrt, nur die fehlende Unterweisung (§ 14 Abs. 2 Satz 1 BioStoffV).
   schwere: hoch
 automatisierung: dokument_generator
 dokumente:
@@ -58,8 +59,7 @@ quellen:
 - titel: Biostoffverordnung § 14
   url: https://www.gesetze-im-internet.de/biostoffv_2013/__14.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Neu nach Prüfergebnis Sifa 22.10.2026 – Auslöser über Branchen (Praxis, Kosmetik, Gebäudereinigung); Vorlage „Betriebsanweisung Biostoffe“ (vorlage.betriebsanweisung_biostoffe) verknüpft; Unterweisung mit Unterschrift in der Unterweisungsvorlage prüfen; Nummern in § 20 BioStoffV gegen den Wortlaut prüfen'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

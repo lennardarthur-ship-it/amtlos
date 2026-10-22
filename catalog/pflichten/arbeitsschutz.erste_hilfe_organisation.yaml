@@ -44,7 +44,7 @@ quellen:
   url: https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A4-3.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Neu nach Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten) – Anzahl der Verbandkästen je Beschäftigtenzahl und Betriebsart (ASR A4.3 Tabelle) als Regelwerte; Vorlage Verbandbuch fehlt'
+- 'Anzahl der Verbandkästen nach ASR A4.3 Tabelle 1 (Betriebsart × Beschäftigtenzahl) als Regelwerte – laut Freigabe Sifa 22.10.2026 sinnvoll; Vorlage Verbandbuch empfohlen (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

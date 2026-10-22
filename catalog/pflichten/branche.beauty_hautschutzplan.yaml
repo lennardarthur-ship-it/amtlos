@@ -1,7 +1,7 @@
 # Katalog H.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog H.3): auf weitere Branchen ausgeweitet
 schema_version: 1
 id: branche.beauty_hautschutzplan
-version: 2
+version: 3
 katalog_nr: H.3
 titel:
   de: Hautschutzplan aushängen
@@ -9,7 +9,7 @@ kurz:
   de: Für Tätigkeiten mit Feuchtarbeit oder hautbelastenden Stoffen legst du in einem Hautschutzplan Schutz, Reinigung und
     Pflege fest.
 erklaerung:
-  de: 'Feuchtarbeit und hautbelastende Stoffe gibt es nicht nur im Salon: in Küche und Spülbereich, bei der Gebäudereinigung, in Praxen (häufige Händedesinfektion, Handschuhe), in der Kfz-Werkstatt (Öle, Kühlschmierstoffe, Lösemittel), in der Backstube und auf dem Bau (Zement, Epoxidharz). Im Hautschutzplan legst du je Tätigkeit fest, welche Schutzhandschuhe, welcher Hautschutz, welche Reinigung und welche Pflege zu verwenden sind, und hängst ihn am Arbeitsplatz aus. Er ergänzt die Gefährdungsbeurteilung und die Unterweisung (TRGS 401 in Verbindung mit §§ 7, 14 GefStoffV). Für das Friseurhandwerk konkretisiert die TRGS 530 den Hautschutz.'
+  de: 'Feuchtarbeit und hautbelastende Stoffe gibt es nicht nur im Salon: in Küche und Spülbereich, bei der Gebäudereinigung, in Praxen (häufige Händedesinfektion, Handschuhe), in der Kfz-Werkstatt (Öle, Kühlschmierstoffe, Lösemittel), in der Backstube und auf dem Bau (Zement, Epoxidharz). Im Hautschutzplan legst du je Tätigkeit fest, welche Schutzhandschuhe, welcher Hautschutz, welche Reinigung und welche Pflege zu verwenden sind, und hängst ihn am Arbeitsplatz aus. Er ergänzt die Gefährdungsbeurteilung und die Unterweisung (TRGS 401 in Verbindung mit §§ 7, 14 GefStoffV). Für das Friseurhandwerk konkretisiert die TRGS 530 den Hautschutz. Eine eigene Frist gibt es nicht: Der Plan muss vor Aufnahme der hautbelastenden Tätigkeit vorliegen.'
 rechtsgrundlage:
 - TRGS 401 in Verbindung mit §§ 7, 14 GefStoffV
 - TRGS 530
@@ -61,7 +61,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Für den Hautschutzplan selbst gibt es kein eigenes Bußgeld; er konkretisiert die Schutzmaßnahmen nach TRGS 401. Bußgeldbewehrt sind fehlende Gefährdungsbeurteilung, Betriebsanweisung oder Unterweisung bei Gefahrstoffen (bis 50.000 €, siehe ‚Gefahrstoffverzeichnis und Betriebsanweisungen‘); die Aufsicht kann außerdem Maßnahmen anordnen.'
   schwere: mittel
 automatisierung: dokument_generator
 status_recht: in_kraft
@@ -79,10 +79,7 @@ quellen:
 - titel: Gefahrstoffverordnung (Stand 17.12.2025)
   url: https://www.gesetze-im-internet.de/gefstoffv_2010/BJNR164400010.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026: Auslöser auf Gastronomie, Gebäudereinigung, Praxis, Kfz/Handwerk, Bäckerei und Bau ausgeweitet – Handwerk und Bau nur mit Gefahrstoffen; TRGS 530 gilt nur für das Friseurhandwerk; ID bleibt branche.beauty_hautschutzplan'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

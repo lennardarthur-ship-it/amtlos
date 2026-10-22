@@ -3,7 +3,7 @@
  * Abschnitte C, D, E Fragen 12/13, Änderungsliste L-001 bis L-020.
  */
 import { describe, expect, it } from "vitest";
-import { ANLAESSE, KURZ, LEERER_BETRIEB, VORLAGEN, ZUSATZSTOFFE, dokumentHtml, fehlendeAngaben, leereDaten, vorlageFuer, type Betrieb, type Daten, type Feld } from "../src/index.js";
+import { ANLAESSE, KURZ, LEERER_BETRIEB, VORLAGEN, WARNFARBSTOFFE, ZUSATZSTOFFE, dokumentHtml, fehlendeAngaben, leereDaten, vorlageFuer, type Betrieb, type Daten, type Feld } from "../src/index.js";
 import { IFSG_HAUSHALT, ohneLatein } from "../src/dokumente/branchen.js";
 import { ALLERGENE_UMFANG } from "../src/dokumente/bausteine.js";
 
@@ -66,24 +66,39 @@ describe("Allergenliste (Prüfbericht C, Fragen 9 und 10)", () => {
 });
 
 describe("Zusatzstoffe in der Allergenliste (Prüfbericht E, Fragen 12 und 13)", () => {
-  it("bietet die elf Kenntlichmachungen nach § 5 LMZDV und koffein-/chininhaltig mit getrennter Quelle", () => {
-    expect(ZUSATZSTOFFE.map((o) => o.text)).toEqual(["mit Farbstoff", "mit Konservierungsstoff", "mit Antioxidationsmittel", "mit Geschmacksverstärker", "geschwefelt", "geschwärzt", "gewachst", "mit Phosphat", "mit Süßungsmittel(n)", "enthält eine Phenylalaninquelle", "kann bei übermäßigem Verzehr abführend wirken", "koffeinhaltig", "chininhaltig"]);
+  it("bietet die elf Kenntlichmachungen nach § 5 LMZDV, Koffeinhinweis, chininhaltig und Warnhinweis Farbstoff je mit eigener Quelle (berichtigter Bericht)", () => {
+    expect(ZUSATZSTOFFE.map((o) => o.text)).toEqual(["mit Farbstoff", "mit Konservierungsstoff", "mit Antioxidationsmittel", "mit Geschmacksverstärker", "geschwefelt", "geschwärzt", "gewachst", "mit Phosphat", "mit Süßungsmittel(n)", "enthält eine Phenylalaninquelle", "kann bei übermäßigem Verzehr abführend wirken", "Erhöhter Koffeingehalt. Für Kinder und schwangere oder stillende Frauen nicht empfohlen", "chininhaltig", "Farbstoff (an der Speise genannt): Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen"]);
     expect(ZUSATZSTOFFE.filter((o) => o.lmzdv)).toHaveLength(11);
+    // Werte-Schlüssel stabil: gespeicherte Auswahl „koffein“ lädt weiter und zeigt den neuen Wortlaut
+    expect(ZUSATZSTOFFE.map((o) => o.wert).slice(11)).toEqual(["koffein", "chinin", "azofarbstoff"]);
+    expect(ZUSATZSTOFFE.slice(11).map((o) => o.quelle)).toEqual(["§ 6 FrSaftErfrischGetrV i. V. m. Anhang III Nr. 4.1 LMIV", "§ 5 Abs. 1 AromenDV", "Art. 24 i. V. m. Anhang V VO (EG) Nr. 1333/2008"]);
+    expect(WARNFARBSTOFFE.map((o) => o.text.split(" ").slice(0, 2).join(" "))).toEqual(["E 102", "E 104", "E 110", "E 122", "E 124", "E 129"]);
     const f = felderVon("allergene", "gerichte").find((x) => x.id === "zusatzstoffe") as { optionen: { text: string }[] };
     expect(f.optionen[0]!.text).toBe("1 mit Farbstoff");
+    expect(f.optionen[11]!.text).toBe("12 Koffeinhinweis (Erfrischungsgetränk über 150 mg/l, nicht Kaffee oder Tee)");
     expect(f.optionen[12]!.text).toBe("13 chininhaltig");
+    expect(f.optionen[13]!.text).toBe("14 Warnhinweis Farbstoff (E 102, 104, 110, 122, 124, 129)");
   });
 
   it("druckt Ziffern hinter dem Namen und die Legende unter der Allergen-Legende – nur die verwendeten", () => {
-    const h = html("allergene", { gerichte: [{ name: "Cola", allergene: [], keine: true, zusatzstoffe: ["farbstoff", "koffein"] }, { name: "Trockenobst", allergene: ["schwefeldioxid"], zusatzstoffe: ["geschwefelt"] }] });
+    const h = html("allergene", { gerichte: [{ name: "Cola", allergene: [], keine: true, zusatzstoffe: ["farbstoff", "koffein"], koffein_mg: "10" }, { name: "Trockenobst", allergene: ["schwefeldioxid"], zusatzstoffe: ["geschwefelt"] }] });
     expect(h).toContain("<strong>Cola</strong><sup>1,12</sup>");
+    expect(h).toContain('<span class="klein">Koffeingehalt: 10 mg/100 ml</span>');
     expect(h).toContain("<strong>Trockenobst</strong><sup>5</sup>");
-    expect(h).toMatch(/Weizenarten\.<\/p><p class="schluessel"><b>Zusatzstoffe und weitere Angaben:<\/b> <span class="nb"><b>1<\/b> mit Farbstoff<\/span> · <span class="nb"><b>5<\/b> geschwefelt<\/span> · <span class="nb"><b>12<\/b> koffeinhaltig<\/span>/);
+    expect(h).toMatch(/Weizenarten\.<\/p><p class="schluessel"><b>Zusatzstoffe und weitere Angaben:<\/b> <span class="nb"><b>1<\/b> mit Farbstoff<\/span> · <span class="nb"><b>5<\/b> geschwefelt<\/span> · <span class="nb"><b>12<\/b> Erhöhter Koffeingehalt\. Für Kinder und schwangere oder stillende Frauen nicht empfohlen<\/span>/);
     expect(h).not.toContain("mit Phosphat");
-    expect(h).toContain("1–11: Kenntlichmachung nach § 5 LMZDV; 12, 13: nach Anhang III Nr. 4 LMIV i. V. m. § 2 LMIDV");
+    expect(h).toContain("1–11: Kenntlichmachung nach § 5 LMZDV; 12: § 6 FrSaftErfrischGetrV i. V. m. Anhang III Nr. 4.1 LMIV");
+    // Warnhinweis Farbstoff: Farbstoff an der Speise, Ziffer 1 kommt dazu; ohne Farbstoff bzw. Koffeingehalt meldet die App die Lücke
+    const s = html("allergene", { gerichte: [{ name: "Götterspeise", allergene: [], keine: true, zusatzstoffe: ["azofarbstoff"], warnfarbstoffe: ["e129"] }] });
+    expect(s).toContain("<strong>Götterspeise</strong><sup>1,14</sup>");
+    expect(s).toContain('<span class="klein">E 129 Allurarot AC</span>');
+    expect(s).toContain("<b>14</b> Farbstoff (an der Speise genannt): Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen");
+    expect(s).toContain("14: Art. 24 i. V. m. Anhang V VO (EG) Nr. 1333/2008");
+    expect(fehlendeAngaben(v("allergene"), { ...leereDaten(v("allergene"), B, HEUTE), gerichte: [{ name: "Energy", allergene: [], keine: true, zusatzstoffe: ["koffein", "azofarbstoff"] }] } as Daten, B)).toEqual(["Gericht: Koffeingehalt (mg/100 ml)", "Gericht: Welcher Farbstoff"]);
     // ohne Zusatzstoffe keine Legende; auf dem leeren Blatt alle Ziffern
     expect(html("allergene", { gerichte: [{ name: "Brot", allergene: ["gluten"], getreidearten: ["roggen"] }] })).not.toContain("Zusatzstoffe und weitere Angaben");
     expect(html("allergene", { gerichte: [] })).toContain("<b>13</b> chininhaltig");
+    expect(html("allergene", { gerichte: [] })).toContain("13: § 5 Abs. 1 AromenDV");
   });
 });
 

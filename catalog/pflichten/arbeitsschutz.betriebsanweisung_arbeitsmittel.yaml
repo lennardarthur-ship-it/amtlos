@@ -67,8 +67,7 @@ quellen:
 - titel: Arbeitsschutzgesetz (§ 25)
   url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Neu nach Prüfergebnis Sifa 22.10.2026 – Auslöser über Branchen mit Maschinen (Büro, Onlinehandel, IT ausgenommen); Vorlage „Betriebsanweisung Maschinen“ (vorlage.betriebsanweisung_maschine) verknüpft'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null
