@@ -1,7 +1,7 @@
 # Katalog G.70 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.barrierefreiheit
-version: 2
+version: 3
 katalog_nr: G.70
 titel:
   de: Prüfen, ob deine Produkte unter das BFSG fallen
@@ -29,7 +29,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 100.000 €, wenn ein Produkt in Verkehr gebracht oder auf dem Markt bereitgestellt wird, das die Barrierefreiheitsanforderungen nicht erfüllt (§ 37 Abs. 1 Nr. 1, 7, Abs. 2 BFSG).'
   schwere: mittel
 automatisierung: hinweis
 einordnung: hinweis
@@ -40,10 +40,16 @@ quellen:
 - titel: Barrierefreiheitsstärkungsgesetz
   url: https://www.gesetze-im-internet.de/bfsg/
   abgerufen: null
+- titel: Barrierefreiheitsstärkungsgesetz § 37 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/bfsg/__37.html
+  abgerufen: '2026-10-22'
+- titel: Barrierefreiheitsstärkungsgesetz § 6
+  url: https://www.gesetze-im-internet.de/bfsg/__6.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Produktliste (§ 1 BFSG) als Auswahl ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 6 Abs. 1 Nr. 1 und § 37 Abs. 1 Nr. 1 (§ 6 Abs. 1 Nr. 1, § 9 Abs. 1), Nr. 7 (§ 11 Abs. 1 Nr. 1, Abs. 2 Satz 1), Abs. 2 BFSG gelesen; §§ 9, 11 BFSG (Importeur, Händler) nicht im Wortlaut gelesen – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

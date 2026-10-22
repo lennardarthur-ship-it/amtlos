@@ -1,7 +1,7 @@
 # Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (a)): Kennzeichnung vorverpackter Lebensmittel nach Art. 9 LMIV
 schema_version: 1
 id: branche.gastro_kennzeichnung_vorverpackt
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
   de: Selbst abgepackte Lebensmittel kennzeichnen
@@ -43,7 +43,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 50.000 €, wenn vorverpackte Lebensmittel ohne die vorgeschriebenen Pflichtangaben in den Verkehr gebracht werden (§ 6 Abs. 4 Nr. 2 in Verbindung mit § 5 Abs. 1 LMIDV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB); einzelne Verstöße sind Straftaten (§ 6 Abs. 1 LMIDV, § 59 Abs. 1 Nr. 21 Buchst. a LFGB).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -57,11 +57,20 @@ quellen:
 - titel: Verordnung (EU) Nr. 1169/2011, Artikel 9 (Wortlaut über gesetze.legal)
   url: https://gesetze.legal/eu/vo_eu_2011_1169/9
   abgerufen: '2026-10-22'
+- titel: Lebensmittelinformations-Durchführungsverordnung (§§ 4 bis 6)
+  url: https://www.gesetze-im-internet.de/lmidv/BJNR227210017.html
+  abgerufen: '2026-10-22'
+- titel: LMIDV § 6 (Wortlaut über lexmea)
+  url: https://lexmea.de/de/gesetz/lmidv/6
+  abgerufen: '2026-10-22'
+- titel: Lebensmittel- und Futtermittelgesetzbuch § 60 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/lfgb/__60.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (a), ✎) – Bericht noch nicht unterschrieben; Art. 9 Abs. 1 am Wortlaut gelesen (gesetze.legal), Anhang V Nr. 19 LMIV nicht am Wortlaut gelesen'
 - 'Abgrenzung „vorverpackt“ gegen lose bzw. auf Wunsch der Kundschaft verpackte Ware (Begriff in Art. 2 LMIV) nicht im Text – fachlich klären, ob die App das erklären soll'
 - 'Nur über die Branche Gastronomie/Lebensmittel und die neue Frage „Verkaufst du selbst abgepackte Lebensmittel?“ – Onlinehändler mit eigenen Lebensmitteln sehen den Eintrag nicht'
-- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen (laut Bericht nicht Gegenstand der fachlichen Prüfung)'
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 5 Abs. 1 und § 6 Abs. 1, 4 Nr. 2 LMIDV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB gelesen; die Nettofüllmenge (Art. 9 Abs. 1 Buchst. e LMIV) ist in § 5 Abs. 1 LMIDV nicht genannt; Höhe der Strafe nach § 59 LFGB nicht gelesen – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

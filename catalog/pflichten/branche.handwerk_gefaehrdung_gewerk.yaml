@@ -1,7 +1,7 @@
 # Katalog H.2 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.handwerk_gefaehrdung_gewerk
-version: 3
+version: 4
 katalog_nr: H.2
 titel:
   de: Gefährdungsbeurteilung je Gewerk und Einsatzort ergänzen
@@ -37,7 +37,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: '§§ 5, 6 ArbSchG sind nicht unmittelbar bußgeldbewehrt: Die Aufsicht kann die nötigen Maßnahmen anordnen, ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3 Satz 1 Nr. 1, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG). Für die Dokumentation gelten außerdem die Bußgelder bei „Gefährdungsbeurteilung erstellen“.'
   schwere: mittel
 automatisierung: dokument_generator
 einordnung: hinweis
@@ -51,11 +51,17 @@ quellen:
 - titel: Arbeitsschutzgesetz § 5
   url: https://www.gesetze-im-internet.de/arbschg/__5.html
   abgerufen: null
+- titel: Arbeitsschutzgesetz § 25 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/arbschg/__25.html
+  abgerufen: '2026-10-22'
+- titel: Arbeitsschutzgesetz § 22 (Wortlaut über lxgesetze)
+  url: https://lxgesetze.de/arbschg/22
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Kfz #12): als Hinweis zur Gefährdungsbeurteilung zusammengelegt statt doppelter Pflicht; Text nicht nur für Baustellen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Vorlagen je Gewerk (BG-Handlungshilfen) – T-20
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 25 Abs. 1, 2 ArbSchG (Nr. 2 Buchst. a: bis 30.000 €) und § 22 Abs. 3 Satz 1 Nr. 1 ArbSchG gelesen – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

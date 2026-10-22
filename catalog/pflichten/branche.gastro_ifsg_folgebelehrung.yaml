@@ -1,7 +1,7 @@
 # R10: aus branche.gastro_ifsg_belehrung herausgelöst (Rechtsprüfung: Belehrung durch den Arbeitgeber „im Weiteren alle zwei Jahre“, § 43 Abs. 4 IfSG)
 schema_version: 1
 id: branche.gastro_ifsg_folgebelehrung
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Belehrung nach § 43 IfSG alle zwei Jahre wiederholen
@@ -55,7 +55,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 25.000 €, wenn die Belehrung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig durchgeführt wird (§ 73 Abs. 1a Nr. 16b, Abs. 2 IfSG).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -68,10 +68,13 @@ gueltig_bis: null
 quellen:
 - titel: Infektionsschutzgesetz § 43
   url: https://www.gesetze-im-internet.de/ifsg/__43.html
-  abgerufen: null
+  abgerufen: '2026-10-22'
+- titel: IfSG § 73
+  url: https://www.gesetze-im-internet.de/ifsg/__73.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Abstand „alle zwei Jahre“ ab der letzten erfassten Belehrung (Ereignis ifsg_belehrung_durchgefuehrt) umgesetzt (R10, Rechtsprüfung § 43 Abs. 4 IfSG)'
-- Höhe und Nummer der Bußgeldvorschrift in § 73 IfSG unsicher – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 73 Abs. 1a Nr. 16b (§ 43 Abs. 4 Satz 1: „im Weiteren alle zwei Jahre“) und Abs. 2 IfSG gelesen – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

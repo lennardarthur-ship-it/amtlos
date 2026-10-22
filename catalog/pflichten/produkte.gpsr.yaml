@@ -1,7 +1,7 @@
 # Katalog G.73 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.gpsr
-version: 6
+version: 7
 katalog_nr: G.73
 titel:
   de: 'Produktsicherheit (GPSR): Angaben und verantwortliche Person'
@@ -46,7 +46,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 10.000 €, wenn Herstellerangaben oder Sicherheitsinformationen fehlen oder im Fernabsatz die Pflichtangaben nach Art. 19 GPSR fehlen (§ 28 Abs. 2 Nr. 5, 6, 26, Abs. 3 ProdSG).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -63,12 +63,15 @@ quellen:
 - titel: Verordnung (EU) 2023/988
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32023R0988
   abgerufen: null
+- titel: Produktsicherheitsgesetz § 28 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/prodsg_2021/__28.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Pflichten für Händler vs. Hersteller trennen
 - 'Lebensmittel als Auslöser entfernt (Art. 2 Abs. 3 GPSR, R10); Abgrenzung zur Kosmetikverordnung offen – bei Kosmetik geht die Kosmetikverordnung vor, GPSR nur ergänzend (Art. 2 Abs. 1); Umfang nach Art. 19 GPSR prüfen (Nutzertest Kosmetik R11)'
 - 'Händlerin fremder Markenware im Laden ohne Fernabsatz: nur Sorgfaltspflichten nach Art. 12 – Auslöser auf Hersteller/Importeur/Fernabsatz einschränken? Schwere „hoch“ für Händler angemessen?'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 28 Abs. 2 Nr. 5 (Art. 9 Abs. 6, Art. 11 Abs. 3), Nr. 6 (Art. 9 Abs. 7, Art. 11 Abs. 4), Nr. 26 (Art. 19) und Abs. 3 ProdSG gelesen; Art. 12 Abs. 1 GPSR (Sorgfaltspflichten der Händler) ist in § 28 Abs. 2 ProdSG nicht genannt; Art. 16 GPSR (Nr. 24, 25) nicht zugeordnet – fachlich zu bestätigen'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf

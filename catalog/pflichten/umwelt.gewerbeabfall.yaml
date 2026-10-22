@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kfz #1): Gewerbeabfallverordnung – Getrenntsammlung und Dokumentation
 schema_version: 1
 id: umwelt.gewerbeabfall
-version: 1
+version: 2
 katalog_nr: U.1
 titel:
   de: Gewerbeabfälle getrennt sammeln und dokumentieren
@@ -28,7 +28,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 100.000 €, wenn Abfälle nicht richtig getrennt gesammelt werden (§ 13 Abs. 1 Nr. 1 GewAbfV in Verbindung mit § 69 Abs. 1 Nr. 8, Abs. 3 KrWG), und bis 10.000 €, wenn die Dokumentation fehlt oder nicht rechtzeitig vorgelegt wird (§ 13 Abs. 2 Nr. 1, 2 GewAbfV in Verbindung mit § 69 Abs. 2 Nr. 15, Abs. 3 KrWG).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -40,9 +40,16 @@ quellen:
 - titel: Gewerbeabfallverordnung
   url: https://www.gesetze-im-internet.de/gewabfv_2017/
   abgerufen: null
+- titel: Gewerbeabfallverordnung § 13 (Ordnungswidrigkeiten)
+  url: https://www.gesetze-im-internet.de/gewabfv_2017/__13.html
+  abgerufen: '2026-10-22'
+- titel: Kreislaufwirtschaftsgesetz § 69 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/krwg/__69.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Nutzertest R12 (Kfz #1, § 3 GewAbfV) – Auslöser über eine Betriebsstätte außerhalb der Wohnung; Kleinstbetriebe, die nur Behälter der Gemeinde nutzen, abgrenzen'
-- Ausnahmen (§ 3 Abs. 2) und Dokumentationsform (§ 3 Abs. 3) bestätigen; Folgen (§ 13 GewAbfV) fachlich ergänzen
+- Ausnahmen (§ 3 Abs. 2) und Dokumentationsform (§ 3 Abs. 3) bestätigen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 13 Abs. 1 Nr. 1 (§ 3 Abs. 1 Satz 1), Abs. 2 Nr. 1, 2 (§ 3 Abs. 3 Satz 1, 3) GewAbfV und § 69 Abs. 3 KrWG gelesen – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

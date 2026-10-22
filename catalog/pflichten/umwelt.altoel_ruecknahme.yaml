@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kfz #1): Altölverordnung – Rücknahme beim Ölverkauf
 schema_version: 1
 id: umwelt.altoel_ruecknahme
-version: 1
+version: 2
 katalog_nr: U.3
 titel:
   de: Altöl zurücknehmen, wenn du Motor- oder Getriebeöl verkaufst
@@ -30,7 +30,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 100.000 €, wenn keine Annahmestelle eingerichtet oder nachgewiesen wird oder der Hinweis fehlt (§ 10 Abs. 1 Nr. 6 AltölV in Verbindung mit § 69 Abs. 1 Nr. 8, Abs. 3 KrWG).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -42,8 +42,15 @@ quellen:
 - titel: Altölverordnung § 8
   url: https://www.gesetze-im-internet.de/alt_lv/__8.html
   abgerufen: '2026-10-21'
+- titel: Altölverordnung § 10 (Wortlaut über lxgesetze, amtliche Seite nicht erreichbar)
+  url: https://lxgesetze.de/alt%C3%B6lv/10
+  abgerufen: '2026-10-22'
+- titel: Kreislaufwirtschaftsgesetz § 69 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/krwg/__69.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Kfz #1) – § 8 Abs. 1 AltölV geprüft; Annahme bis zur Menge des gekauften Öls (§ 8 Abs. 2) und Folgen fachlich ergänzen'
+- 'Neu nach Nutzertest R12 (Kfz #1) – § 8 Abs. 1 AltölV geprüft; Annahme bis zur Menge des gekauften Öls (§ 8 Abs. 2) fachlich ergänzen'
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 10 Abs. 1 Nr. 6 AltölV (§ 8 Abs. 1; über lxgesetze) und § 69 Abs. 1 Nr. 8, Abs. 3 KrWG gelesen – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

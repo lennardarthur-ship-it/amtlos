@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kfz #7): Händler von Fahrzeugbatterien – Rücknahme
 schema_version: 1
 id: produkte.starterbatterien_ruecknahme
-version: 1
+version: 2
 katalog_nr: G.72
 titel:
   de: Altbatterien zurücknehmen, wenn du Fahrzeugbatterien verkaufst
@@ -30,7 +30,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 100.000 €, wenn du Batterien bereitstellst, ohne deine Rücknahmepflichten zu erfüllen (§ 60 Abs. 1 Nr. 1, Abs. 3 in Verbindung mit § 4 Abs. 2 und § 18 Abs. 1 Satz 1 BattDG).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -42,8 +42,18 @@ quellen:
 - titel: Batterierecht-Durchführungsgesetz § 18 (lxgesetze)
   url: https://lxgesetze.de/battdg/18
   abgerufen: '2026-10-21'
+- titel: Batterierecht-Durchführungsgesetz § 60 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/battdg/__60.html
+  abgerufen: '2026-10-22'
+- titel: Batterierecht-Durchführungsgesetz § 4 (Verkehrsverbote)
+  url: https://www.gesetze-im-internet.de/battdg/__4.html
+  abgerufen: '2026-10-22'
+- titel: Batterierecht-Durchführungsgesetz § 18 (Rücknahmepflichten der Händler)
+  url: https://www.gesetze-im-internet.de/battdg/__18.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Nutzertest R12 (Kfz #7) – Rücknahme nach § 18 BattDG geprüft; Pfand auf Starterbatterien (früher § 10 BattG) unter dem BattDG unsicher; Händlerpflichten für Gerätebatterien nicht abgebildet'
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 4 Abs. 2, § 18 Abs. 1 und § 60 Abs. 1 Nr. 1, Abs. 3 BattDG gelesen; § 18 BattDG selbst ist in § 60 nicht genannt – der Verstoß läuft über das Bereitstellungsverbot des § 4 Abs. 2; ein Pfand regelt § 18 nicht – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

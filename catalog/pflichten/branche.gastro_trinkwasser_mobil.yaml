@@ -1,7 +1,7 @@
 # E-166 (Prüfmappe Lebensmittelhygiene, Frage 14): Wassertank im Foodtruck – mobile Wasserversorgungsanlage nach TrinkwV
 schema_version: 1
 id: branche.gastro_trinkwasser_mobil
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Wassertank im Foodtruck beim Gesundheitsamt anzeigen
@@ -70,7 +70,7 @@ kanal: post
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 25.000 €, wenn die Anzeige nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig erstattet wird (§ 72 Nr. 1 TrinkwV in Verbindung mit § 73 Abs. 1a Nr. 24, Abs. 2 IfSG).'
   schwere: mittel
 automatisierung: hinweis
 aenderungsnotiz:
@@ -88,13 +88,19 @@ quellen:
 - titel: Gesundheitsamt Dortmund – Merkblatt für Betreiber von mobilen Versorgungsanlagen an Bord von Land-, Wasser- und Luftfahrzeugen (Stand Juli 2025)
   url: https://www.dortmund.de/dortmund/projekte/rathaus/verwaltung/gesundheitsamt/downloads/merkblatt_fuer_betreiber_von__mobilen_versorgungsanlagen_an_bord_von_land-_wasser-_und_luftfahrzeugen.pdf
   abgerufen: '2026-10-22'
+- titel: Trinkwasserverordnung § 72 (Ordnungswidrigkeiten)
+  url: https://www.gesetze-im-internet.de/trinkwv_2023/__72.html
+  abgerufen: '2026-10-22'
+- titel: IfSG § 73
+  url: https://www.gesetze-im-internet.de/ifsg/__73.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu (E-166): § 2 Nr. 1 Buchst. b, Nr. 2 Buchst. d, f und § 11 Abs. 2 TrinkwV am Wortlaut geprüft (gesetze-im-internet.de, 22.10.2026)'
 - 'Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14, ✔): Anzeige auch, wenn das Tankwasser nur zum Zubereiten und Händewaschen dient (§ 2 Nr. 1 Buchst. b, Nr. 2 Buchst. d TrinkwV); Untersuchung nach Vorgabe des Gesundheitsamts, üblich jährlich; Check fragt den Wassertank ab, Frist ab Inbetriebnahme – umgesetzt, Bericht noch nicht unterschrieben'
 - 'Untersuchungspflichten: Fundstelle in der TrinkwV 2023 nicht genannt (laut Prüfbericht „Umfang und Turnus nach Festlegung des Gesundheitsamts“)'
 - 'Wiederinbetriebnahme (z. B. nach der Saisonpause) und Stilllegung nur im Text – keine eigene Frist'
 - 'Gültig ab: Inkrafttreten der TrinkwV 2023 (24.6.2023) laut Verordnung gegenlesen'
-- Folgen bei Nichterfüllung (Ordnungswidrigkeit nach TrinkwV) nicht geprüft – Sanktion fachlich ergänzen
+- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 72 Nr. 1 TrinkwV (§ 11 Abs. 1, Abs. 2 Satz 1 bis 3, Abs. 3) und § 73 Abs. 2 IfSG (Nr. 24 nicht unter den Fällen bis 2.500 €) gelesen; Folgen bei Mängeln der Wasserqualität nicht ergänzt – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null
