@@ -1,16 +1,17 @@
 # R12 (Nutzertest Kurier #4, 3a): Fahrer beauftragen und unterweisen (§ 35 DGUV Vorschrift 70), Ladungssicherung (§ 22 StVO)
 schema_version: 1
 id: arbeitsschutz.fahrer_unterweisung
-version: 2
+version: 3
 katalog_nr: E.52
 titel:
   de: Fahrerinnen und Fahrer beauftragen, unterweisen und Ladung sichern
 kurz:
   de: Firmenfahrzeuge lässt du nur von geeigneten, unterwiesenen Personen fahren, die du ausdrücklich beauftragst – und sorgst dafür, dass die Ladung gesichert ist.
 erklaerung:
-  de: Mit dem selbstständigen Führen von Fahrzeugen beauftragst du nur Personen, die mindestens 18 Jahre alt, körperlich und geistig geeignet, im Führen des Fahrzeugs unterwiesen sind und ihre Befähigung nachgewiesen haben (§ 35 DGUV Vorschrift 70). Die Beauftragung schriftlich festzuhalten ist nicht vorgeschrieben, aber als Nachweis empfehlenswert. Unterweise sie zu Abfahrtkontrolle, Verhalten bei Pannen und Ladungssicherung. Die Ladung ist so zu verstauen und zu sichern, dass sie selbst bei Vollbremsung oder plötzlicher Ausweichbewegung nicht verrutscht, umfällt, hin- und herrollt oder herabfällt (§ 22 Abs. 1 StVO).
+  de: Mit dem selbstständigen Führen von Fahrzeugen beauftragst du nur Personen, die mindestens 18 Jahre alt, körperlich und geistig geeignet, im Führen des Fahrzeugs unterwiesen sind und ihre Befähigung nachgewiesen haben (§ 35 DGUV Vorschrift 70). Die Beauftragung schriftlich festzuhalten ist nicht vorgeschrieben, aber als Nachweis empfehlenswert. Unterweise sie zu Abfahrtkontrolle, Verhalten bei Pannen und Ladungssicherung. Die Ladung ist so zu verstauen und zu sichern, dass sie selbst bei Vollbremsung oder plötzlicher Ausweichbewegung nicht verrutscht, umfällt, hin- und herrollt oder herabfällt (§ 22 Abs. 1 StVO). Maßgeblich ist die Unfallverhütungsvorschrift „Fahrzeuge“ deiner Berufsgenossenschaft.
 rechtsgrundlage:
 - § 35 DGUV Vorschrift 70
+- § 58 DGUV Vorschrift 70
 - § 22 Abs. 1 StVO
 kategorie: arbeitsschutz
 branchen:
@@ -40,7 +41,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 10.000 €, wenn Fahrzeuge von Personen geführt werden, die nicht mindestens 18 Jahre alt, nicht unterwiesen oder nicht vom Unternehmer bestimmt sind (§ 58 in Verbindung mit § 35 Abs. 1 DGUV Vorschrift 70, § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII). Mangelhafte Ladungssicherung ist eine Ordnungswidrigkeit nach der StVO (§ 22 in Verbindung mit § 49 StVO, Bußgeldkatalog) – für Fahrer, Verlader und Halter.'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -50,8 +51,14 @@ quellen:
 - titel: Straßenverkehrs-Ordnung § 22
   url: https://www.gesetze-im-internet.de/stvo_2013/__22.html
   abgerufen: null
+- titel: 'DGUV Vorschrift 70 Fahrzeuge (§§ 35, 58)'
+  url: https://publikationen.dguv.de/widgets/pdf/download/article/1125
+  abgerufen: null
+- titel: 'Sozialgesetzbuch VII § 209'
+  url: https://www.gesetze-im-internet.de/sgb_7/__209.html
+  abgerufen: null
 fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026 (frei): § 35 DGUV Vorschrift 70 verlangt die Bestimmung durch den Unternehmer, Schriftform empfohlen, nicht vorgeschrieben – Unterweisungsthemen Fahrzeug in der Vorlage fehlen; Sanktion fachlich ergänzen'
+- 'Unterweisungsthemen Fahrzeug (Abfahrtkontrolle, Pannen, Ladungssicherung) fehlen in der Unterweisungsvorlage (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

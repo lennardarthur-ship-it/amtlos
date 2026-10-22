@@ -145,27 +145,41 @@ export const NUSSARTEN: Option[] = [
 export const WEIZENARTEN_FUSSNOTE = "Dinkel und Khorasan sind Weizenarten.";
 
 /**
- * Prüfbericht Lebensmittelhygiene (22.10.2026, Fragen 12 und 13): Zusatzstoffe in der Allergenliste – je Speise Ziffern für
- * die Kenntlichmachungen nach § 5 LMZDV (1–11, Wortlaut laut Bericht) und für „koffeinhaltig“ und „chininhaltig“ (12, 13).
- * Diese beiden stammen nicht aus der LMZDV, sondern laut Bericht aus Anhang III Nr. 4 LMIV i. V. m. § 2 LMIDV – die
- * Quelle steht deshalb getrennt. Die Ziffer ist die Stelle in dieser Liste (nicht umsortieren, nur anhängen).
+ * Prüfbericht Lebensmittelhygiene (22.10.2026, Fragen 12 und 13; berichtigte Fassung vom selben Tag): Zusatzstoffe in der
+ * Allergenliste – je Speise Ziffern für die Kenntlichmachungen nach § 5 LMZDV (1–11, Wortlaut laut Bericht) und für drei
+ * Angaben, die nicht aus der LMZDV stammen und deshalb je eine eigene Quelle haben: 12 Koffeinhinweis für
+ * Erfrischungsgetränke über 150 mg/l (§ 6 FrSaftErfrischGetrV i. V. m. Anhang III Nr. 4.1 LMIV, Gehalt in mg/100 ml),
+ * 13 „chininhaltig“ (§ 5 Abs. 1 AromenDV), 14 Warnhinweis bei den Farbstoffen nach Anhang V VO (EG) Nr. 1333/2008
+ * (Art. 24). Koffeingehalt und Farbstoff stehen an der Speise, der Wortlaut des Hinweises in der Legende.
+ * Die Ziffer ist die Stelle in dieser Liste (nicht umsortieren, nur anhängen); die Werte-Schlüssel bleiben stabil –
+ * eine gespeicherte Auswahl „koffein“ (früher „koffeinhaltig“) zeigt den neuen Wortlaut.
  */
-export const ZUSATZSTOFFE: (Option & { lmzdv: boolean })[] = [
-  { wert: "farbstoff", text: "mit Farbstoff", lmzdv: true },
-  { wert: "konservierungsstoff", text: "mit Konservierungsstoff", lmzdv: true },
-  { wert: "antioxidationsmittel", text: "mit Antioxidationsmittel", lmzdv: true },
-  { wert: "geschmacksverstaerker", text: "mit Geschmacksverstärker", lmzdv: true },
-  { wert: "geschwefelt", text: "geschwefelt", lmzdv: true },
-  { wert: "geschwaerzt", text: "geschwärzt", lmzdv: true },
-  { wert: "gewachst", text: "gewachst", lmzdv: true },
-  { wert: "phosphat", text: "mit Phosphat", lmzdv: true },
-  { wert: "suessungsmittel", text: "mit Süßungsmittel(n)", lmzdv: true },
-  { wert: "phenylalanin", text: "enthält eine Phenylalaninquelle", lmzdv: true },
-  { wert: "abfuehrend", text: "kann bei übermäßigem Verzehr abführend wirken", lmzdv: true },
-  { wert: "koffein", text: "koffeinhaltig", lmzdv: false },
-  { wert: "chinin", text: "chininhaltig", lmzdv: false },
+export const ZUSATZSTOFFE: (Option & { lmzdv: boolean; quelle: string; /** Text in der Auswahl, wenn er vom Aushang abweicht */ auswahl?: string })[] = [
+  { wert: "farbstoff", text: "mit Farbstoff", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "konservierungsstoff", text: "mit Konservierungsstoff", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "antioxidationsmittel", text: "mit Antioxidationsmittel", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "geschmacksverstaerker", text: "mit Geschmacksverstärker", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "geschwefelt", text: "geschwefelt", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "geschwaerzt", text: "geschwärzt", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "gewachst", text: "gewachst", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "phosphat", text: "mit Phosphat", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "suessungsmittel", text: "mit Süßungsmittel(n)", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "phenylalanin", text: "enthält eine Phenylalaninquelle", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "abfuehrend", text: "kann bei übermäßigem Verzehr abführend wirken", lmzdv: true, quelle: "§ 5 LMZDV" },
+  { wert: "koffein", text: "Erhöhter Koffeingehalt. Für Kinder und schwangere oder stillende Frauen nicht empfohlen", auswahl: "Koffeinhinweis (Erfrischungsgetränk über 150 mg/l, nicht Kaffee oder Tee)", lmzdv: false, quelle: "§ 6 FrSaftErfrischGetrV i. V. m. Anhang III Nr. 4.1 LMIV" },
+  { wert: "chinin", text: "chininhaltig", lmzdv: false, quelle: "§ 5 Abs. 1 AromenDV" },
+  { wert: "azofarbstoff", text: "Farbstoff (an der Speise genannt): Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen", auswahl: "Warnhinweis Farbstoff (E 102, 104, 110, 122, 124, 129)", lmzdv: false, quelle: "Art. 24 i. V. m. Anhang V VO (EG) Nr. 1333/2008" },
 ];
-/** Quellen der Ziffern (getrennt: LMZDV und LMIV/LMIDV). */
-export const ZUSATZSTOFFE_QUELLE = { lmzdv: "§ 5 LMZDV", weitere: "Anhang III Nr. 4 LMIV i. V. m. § 2 LMIDV" };
+/** Quelle der Ziffern 1–11 (die übrigen Ziffern tragen ihre Quelle in ZUSATZSTOFFE). */
+export const ZUSATZSTOFFE_QUELLE = { lmzdv: "§ 5 LMZDV" };
+/** Farbstoffe nach Anhang V VO (EG) Nr. 1333/2008 (Warnhinweis Ziffer 14): auf dem Aushang steht die E-Nummer mit Namen an der Speise. */
+export const WARNFARBSTOFFE: Option[] = [
+  { wert: "e102", text: "E 102 Tartrazin" },
+  { wert: "e104", text: "E 104 Chinolingelb" },
+  { wert: "e110", text: "E 110 Gelborange S" },
+  { wert: "e122", text: "E 122 Azorubin" },
+  { wert: "e124", text: "E 124 Cochenillerot A" },
+  { wert: "e129", text: "E 129 Allurarot AC" },
+];
 
 export const optionen = (r: Record<string, string>): Option[] => Object.entries(r).map(([wert, text]) => ({ wert, text }));

@@ -1,14 +1,14 @@
 # Katalog H.2 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.handwerk_gefaehrdung_gewerk
-version: 4
+version: 5
 katalog_nr: H.2
 titel:
   de: Gefährdungsbeurteilung je Gewerk und Einsatzort ergänzen
 kurz:
   de: Im Handwerk ergänzt du die Gefährdungsbeurteilung um die Gefährdungen deines Gewerks – in der Werkstatt und bei Arbeiten beim Kunden.
 erklaerung:
-  de: 'Das ist keine zweite Gefährdungsbeurteilung, sondern ein Teil der einen: Du konkretisierst sie je Gewerk und Tätigkeit – etwa für Maschinen, Hebebühnen, Stäube, Abgase, Lärm und Gefahrstoffe in der Werkstatt und für Arbeiten auf Baustellen oder in Wohnungen beim Kunden. Die Handlungshilfen deiner Berufsgenossenschaft helfen dabei.'
+  de: 'Das ist keine zweite Gefährdungsbeurteilung, sondern ein Teil der einen: Du konkretisierst sie je Gewerk und Tätigkeit – etwa für Maschinen, Hebebühnen, Stäube, Abgase, Lärm und Gefahrstoffe in der Werkstatt und für Arbeiten auf Baustellen oder in Wohnungen beim Kunden. Die Handlungshilfen deiner Berufsgenossenschaft helfen dabei. Eine eigene Frist gibt es nicht: Wie die Gefährdungsbeurteilung muss die Ergänzung vor Aufnahme der Tätigkeit beim Kunden bzw. im Gewerk vorliegen.'
 rechtsgrundlage:
 - §§ 5, 6 ArbSchG
 kategorie: branche
@@ -58,10 +58,7 @@ quellen:
   url: https://lxgesetze.de/arbschg/22
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'R12 (Nutzertest Kfz #12): als Hinweis zur Gefährdungsbeurteilung zusammengelegt statt doppelter Pflicht; Text nicht nur für Baustellen'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Vorlagen je Gewerk (BG-Handlungshilfen) – T-20
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 25 Abs. 1, 2 ArbSchG (Nr. 2 Buchst. a: bis 30.000 €) und § 22 Abs. 3 Satz 1 Nr. 1 ArbSchG gelesen – fachlich zu bestätigen'
+- 'Vorlagen je Gewerk (BG-Handlungshilfen) – T-20 (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

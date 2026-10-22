@@ -96,7 +96,8 @@ for (const v of VORLAGEN) {
     // Lebensmittelhygiene vom 22.10.2026 (Frage 9, L-007 bis L-020 ✔) – die Markierung „fachlich zu prüfen (E-099)“ entfällt.
     // Getreide- und Nussarten sowie Zusatzstoffe (neu nach dem Prüfbericht) stehen unter „Feste Texte“, nicht als
     // nummerierte Bausteine – so bleiben die Nummern L-001 bis L-120 des Prüfberichts gleich.
-    const allergen = f.art === "mehrfach" && f.optionen.length === Object.keys(F.ALLERGENE).length;
+    // nur das Feld „Enthält“ – die Zusatzstoff-Auswahl hat seit der Berichtigung (Ziffer 14) ebenfalls 14 Optionen
+    const allergen = f.art === "mehrfach" && f.id === "allergene" && f.optionen.length === Object.keys(F.ALLERGENE).length;
     if (f.optionen && (f.art === "bausteine" || allergen || f.optionen.some((o) => o.quelle))) for (const o of f.optionen) neu({ art: f.art === "bausteine" ? "Textbaustein" : "Auswahl", gruppeApp: (o.gruppen ?? []).join(", "), titel: o.text, inhalt: allergen ? "Bezeichnung bestätigt (Prüfbericht 22.10.2026, Frage 9)" : "", quelle: o.quelle ?? (allergen ? "Anhang II LMIV" : (ausBausteinen.get(o.text)?.quelle ?? "")), unsicher: Boolean(o.unsicher || ausBausteinen.get(o.text)?.unsicher) });
     if (f.art !== "liste") for (const s of (f.vorschlaege ?? []).filter((s) => !BEAUTY.test(s))) neu({ art: "Formulierung", gruppeApp: (f.vorschlagGruppen?.[s] ?? []).join(", "), titel: s, inhalt: "", quelle: ausBausteinen.get(s)?.quelle ?? "", unsicher: Boolean(ausBausteinen.get(s)?.unsicher) });
   }
@@ -166,8 +167,10 @@ bm.push(
   "",
   "Je Speise steht unter dem Namen „Enthält: …“ (§ 4 LMIDV); die Legende der Kennbuchstaben beginnt mit „Enthält:“.",
   "",
-  `Zusatzstoffe als Ziffern hinter dem Namen, Legende unter der Allergen-Legende (1–11: ${F.ZUSATZSTOFFE_QUELLE.lmzdv}; 12, 13: ${F.ZUSATZSTOFFE_QUELLE.weitere}):`,
-  ...F.ZUSATZSTOFFE.map((o, i) => `${i + 1}. ${o.text}`),
+  "Zusatzstoffe als Ziffern hinter dem Namen, Legende unter der Allergen-Legende (je Ziffer mit Fundstelle; berichtigter Prüfbericht 22.10.2026):",
+  ...F.ZUSATZSTOFFE.map((o, i) => `${i + 1}. ${o.text}${o.auswahl ? ` (Auswahl in der App: „${o.auswahl}“)` : ""} – ${o.quelle}`),
+  "",
+  `An der Speise: bei Ziffer 12 der Koffeingehalt in mg/100 ml (Pflichtfeld), bei Ziffer 14 der Farbstoff (Pflichtfeld, Auswahl: ${F.WARNFARBSTOFFE.map((o) => o.text).join(", ")}); Ziffer 14 schließt Ziffer 1 „mit Farbstoff“ ein.`,
   "",
   "Hilfetexte in der App:",
   ...Object.values(F.ALLERGENE_HILFE).map((t) => `- ${t}`),

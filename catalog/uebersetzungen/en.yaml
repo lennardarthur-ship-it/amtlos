@@ -54,16 +54,6 @@ eintraege:
   en: Enter the payroll tax filing period
 - de: Anzeige und Ausgleichsabgabe (Schwerbehinderte)
   en: Report and compensatory levy (severely disabled persons)
-- de: Anzeigen musst du einen Unfall, wenn die verletzte Person stirbt oder mehr als drei Tage arbeitsunfähig ist; den Unfalltag zählst du dabei nicht mit (§ 193 Abs. 1 SGB VII). Das gilt auch für Wegeunfälle
-    auf dem Weg zur oder von der Arbeit. Die Anzeige erstattest du binnen drei Tagen, nachdem du vom Unfall erfahren hast (§ 193 Abs. 4 SGB VII), mit dem Formular nach der Unfallversicherungs-Anzeigeverordnung
-    (UVAV), meist im Portal deiner BG. Tödliche Unfälle und Unfälle mit vielen Verletzten meldest du sofort, zum Beispiel telefonisch. Amtlos legt die Aufgabe bei jedem gemeldeten Arbeitsunfall an, weil
-    die Dauer der Arbeitsunfähigkeit oft erst später feststeht, und rechnet ab dem Tag, den du beim Unfall einträgst – hast du später davon erfahren, trag diesen Tag ein. Bleibt die Arbeitsunfähigkeit bei
-    höchstens drei Tagen, trifft die Anzeige nicht zu; den Eintrag ins Verbandbuch brauchst du trotzdem.
-  en: You must report an accident if the injured person dies or is unable to work for more than three days; the day of the accident does not count (§ 193(1) SGB VII). This also applies to commuting accidents
-    on the way to or from work. You file the report within three days of learning of the accident (§ 193(4) SGB VII), using the form under the Accident Insurance Notification Ordinance (UVAV), usually in
-    your BG's portal. Report fatal accidents and accidents with many injured people immediately, for example by phone. Amtlos creates the task for every reported accident at work, because the length of
-    the incapacity is often only known later, and counts from the day you enter for the accident – if you learned of it later, enter that day. If the incapacity lasts no more than three days, the report
-    does not apply; you still need the entry in the first-aid log.
 - de: Anzuzeigen ist ein Arbeitsunfall nur bei Tod oder mehr als drei Tagen Arbeitsunfähigkeit; das Verbandbuch ist jetzt eine eigene Pflicht.
   en: An accident at work only has to be reported in case of death or more than three days of incapacity for work; the first-aid log is now a separate obligation.
 - de: Arbeiten Beschäftigte mehrerer Arbeitgeber an einem Arbeitsplatz, arbeiten die Arbeitgeber zusammen, unterrichten sich gegenseitig über die Gefahren und stimmen die Schutzmaßnahmen ab (§ 8 Abs. 1
@@ -86,19 +76,6 @@ eintraege:
   en: Record working conditions in writing
 - de: Arbeitsmedizinische Vorsorge anbieten
   en: Offer occupational health check-ups
-- de: 'Arbeitsmittel gibt es in fast jedem Betrieb: Leitern und Tritte, Lagerregale, Aufschnitt- und Knetmaschinen, Hebebühnen und Hubgeräte, Kompressoren, Druckluftgeräte und Getränkeschankanlagen. Arbeitsmittel,
-    deren Sicherheit von der Montage abhängt, lässt du vor der ersten Verwendung prüfen; Arbeitsmittel, die schädigenden Einflüssen ausgesetzt sind, prüft eine zur Prüfung befähigte Person wiederkehrend
-    (§ 14 BetrSichV). Art, Umfang und Abstände der Prüfungen legst du in der Gefährdungsbeurteilung fest (§ 3 Abs. 6 BetrSichV); die Ergebnisse zeichnest du auf und bewahrst sie auf (§ 14 Abs. 7 BetrSichV).
-    Für Leitern und Tritte hilft die DGUV Information 208-016, für Lagerregale die DIN EN 15635 (Sichtkontrollen und jährliche Inspektion durch eine fachkundige Person). In Kfz-Werkstätten gehören Hebebühnen
-    dazu: Sie werden vor der ersten Inbetriebnahme und danach in der Regel jährlich geprüft (DGUV Grundsatz 308-002). Druckbehälter wie der Druckluftbehälter eines Kompressors werden nach §§ 15, 16 und
-    Anhang 2 Abschnitt 4 BetrSichV geprüft – ab bestimmten Größen durch eine zugelassene Überwachungsstelle. Firmenfahrzeuge (DGUV Vorschrift 70) und elektrische Geräte (DGUV Vorschrift 3) haben eigene
-    Pflichten.'
-  en: 'Work equipment exists in almost every business: ladders and steps, storage racks, slicing and kneading machines, lifting platforms and hoists, compressors, compressed-air tools and beverage dispensing
-    systems. Work equipment whose safety depends on its assembly is inspected before first use; work equipment exposed to damaging influences is inspected regularly by a person qualified to carry out inspections
-    (§ 14 BetrSichV). You set the type, scope and intervals of the inspections in the risk assessment (§ 3(6) BetrSichV); you record and keep the results (§ 14(7) BetrSichV). For ladders and steps, DGUV
-    Information 208-016 helps, for storage racks DIN EN 15635 (visual checks and an annual inspection by a competent person). In car repair shops, vehicle lifts are included: they are inspected before first
-    commissioning and then usually every year (DGUV Principle 308-002). Pressure vessels such as the air receiver of a compressor are inspected under §§ 15, 16 and Annex 2 Section 4 BetrSichV – above certain
-    sizes by an approved inspection body. Company vehicles (DGUV Regulation 70) and electrical equipment (DGUV Regulation 3) have their own obligations.'
 - de: Arbeitsplätze, ab denen die Beschäftigungsquote gilt
   en: Workplaces from which the employment quota applies
 - de: Arbeitsschutz mit Auftraggebern und anderen Firmen abstimmen
@@ -153,14 +130,6 @@ eintraege:
   en: Follow the Construction Site Ordinance (Baustellenverordnung)
 - de: Beantrage frühzeitig ein ELSTER-Konto – die Aktivierung kommt per Post und dauert einige Tage.
   en: 'Apply for an ELSTER account early: the activation comes by post and takes a few days.'
-- de: Bei 2 bis 20 anwesenden Versicherten brauchst du mindestens einen Ersthelfer, bei mehr Anwesenden je nach Betriebsart 5 oder 10 Prozent (§ 26 Abs. 1 DGUV Vorschrift 1). Ersthelfer werden bei einer
-    von der BG ermächtigten Stelle ausgebildet und in der Regel alle zwei Jahre fortgebildet (§ 26 Abs. 2, 3 DGUV Vorschrift 1); die Kosten der Lehrgänge trägt meist die BG. Als Inhaberin oder Inhaber zählst
-    du nur mit, wenn du selbst versichert bist – Amtlos zählt vorsichtshalber alle Anwesenden, also schon ab der ersten beschäftigten Person. Plane Vertretungen für Urlaub, Krankheit und Schichten ein.
-    Verbandkasten, Notruf-Aushang und Verbandbuch sind eine eigene Pflicht, Brandschutzhelfer ebenfalls.
-  en: With 2 to 20 insured persons present you need at least one first aider, with more people present 5 or 10 per cent depending on the type of business (§ 26(1) DGUV Regulation 1). First aiders are trained
-    at a body authorised by the BG and usually receive refresher training every two years (§ 26(2), (3) DGUV Regulation 1); the BG usually pays for the courses. As the owner you only count if you are insured
-    yourself – to be on the safe side, Amtlos counts everyone present, so already from the first employee. Plan substitutes for holidays, illness and shifts. First-aid kit, emergency call notice and first-aid
-    log are a separate obligation, as are fire safety assistants.
 - de: Bei Beteiligungen ausländischer Investoren an Unternehmen in sensiblen Sektoren kann der Staat die Investition prüfen. Amtlos gibt hier nur einen allgemeinen Hinweis.
   en: If foreign investors take stakes in companies in sensitive sectors, the state may review the investment. Amtlos only gives a general note here.
 - de: Bei Verträgen mit Verbrauchern über Fernabsatz belehrst du über das Widerrufsrecht.
@@ -237,16 +206,6 @@ eintraege:
   en: Keep receipts in a traceable and unalterable way and describe in a process documentation (Verfahrensdokumentation) how you do this.
 - de: Bewahre Belege und Rechnungen 8 Jahre, Jahresabschlüsse und Bücher 10 Jahre und Geschäftsbriefe 6 Jahre auf.
   en: Keep receipts and invoices for 8 years, annual financial statements and books for 10 years and business letters for 6 years.
-- de: Biostoffe sind Bakterien, Viren, Pilze und Parasiten – etwa bei der Behandlung von Patientinnen und Patienten, beim Umgang mit Blut, bei Kosmetik, Nagel- und Fußpflege oder bei der Reinigung von Sanitärräumen.
-    Vor Aufnahme der Tätigkeit beurteilst du die Gefährdung fachkundig (§ 4 BioStoffV) und dokumentierst sie (§ 7 BioStoffV); überprüft wird mindestens alle zwei Jahre. Für jeden Arbeitsbereich schreibst
-    du eine schriftliche Betriebsanweisung (§ 14 Abs. 1 BioStoffV) – nicht nötig nur bei Tätigkeiten ausschließlich mit Biostoffen der Risikogruppe 1 ohne sensibilisierende oder toxische Wirkung. Anhand
-    der Betriebsanweisung unterweist du mündlich vor Aufnahme der Beschäftigung und danach mindestens jährlich; Inhalt und Zeitpunkt hältst du schriftlich fest, die Unterwiesenen bestätigen durch Unterschrift
-    (§ 14 Abs. 2, 3 BioStoffV). Für Praxen gilt zusätzlich die TRBA 250; arbeitsmedizinische Vorsorge und Impfangebote sind Teil der Pflicht zur Vorsorge.
-  en: Biological agents are bacteria, viruses, fungi and parasites – for example when treating patients, handling blood, in cosmetics, nail care and foot care or when cleaning sanitary rooms. Before the
-    work begins, you assess the hazard with expert knowledge (§ 4 BioStoffV) and document it (§ 7 BioStoffV); it is reviewed at least every two years. For each work area you write operating instructions
-    (§ 14(1) BioStoffV) – not needed only for work exclusively with biological agents of risk group 1 without sensitising or toxic effects. Based on the operating instructions, you instruct orally before
-    employment begins and at least annually afterwards; you record the content and date in writing, and those instructed confirm by signature (§ 14(2), (3) BioStoffV). For medical practices, TRBA 250 also
-    applies; occupational health care and vaccination offers are part of the obligation on preventive care.
 - de: 'Biostoffe: Gefährdung beurteilen, Betriebsanweisung und Unterweisung'
   en: 'Biological agents: assess hazards, operating instructions and instruction'
 - de: Bis zum 10. nach Ende des Anmeldezeitraums meldest du die Lohnsteuer beim Finanzamt an.
@@ -278,8 +237,6 @@ eintraege:
   en: Fine of up to €10,000 if first-aid supplies or alarm facilities are missing or first aid given is not documented (§ 32 DGUV Regulation 1 in conjunction with § 209(1) no. 1, (3) SGB VII).
 - de: 'Bußgeld bis 10.000 €, wenn Herstellerangaben oder Sicherheitsinformationen fehlen oder im Fernabsatz die Pflichtangaben nach Art. 19 GPSR fehlen (§ 28 Abs. 2 Nr. 5, 6, 26, Abs. 3 ProdSG).'
   en: 'Fine of up to €10,000 if manufacturer details or safety information are missing or, in distance selling, the mandatory information under Art. 19 GPSR is missing (§ 28(2) nos. 5, 6, 26, (3) ProdSG).'
-- de: Bußgeld bis 10.000 €, wenn die Betreuung fehlt (Bußgeldvorschrift der DGUV Vorschrift 2 deiner BG in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
-  en: Fine of up to €10,000 if support is missing (the fine provision of your BG's DGUV Regulation 2 in conjunction with § 209(1) no. 1, (3) SGB VII).
 - de: 'Bußgeld bis 10.000 €, wenn die Ware nicht auch in Mehrwegverpackungen angeboten wird, Mehrweg teurer oder zu schlechteren Bedingungen angeboten wird oder der Hinweis fehlt (§ 66 Abs. 1 Nr. 26, 28, 29, Abs. 3 VerpackDG).'
   en: 'Fine of up to €10,000 if the goods are not also offered in reusable packaging, reusable packaging is offered at a higher price or on worse terms, or the notice is missing (§ 66(1) nos. 26, 28, 29, (3) VerpackDG).'
 - de: Bußgeld bis 10.000 €, wenn die erforderlichen Ersthelfer fehlen (§ 32 DGUV Vorschrift 1 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
@@ -338,10 +295,6 @@ eintraege:
     in conjunction with § 25(1) no. 1, (2) ArbSchG).
 - de: Bußgeld bis 5.000 €, wenn die Betriebsanweisung oder die Unterweisung fehlt oder zu spät kommt (§ 22 Abs. 1 Nr. 25 bis 27 BetrSichV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
   en: Fine of up to €5,000 if the operating instructions or the instruction are missing or come too late (§ 22(1) nos. 25 to 27 BetrSichV in conjunction with § 25(1) no. 1, (2) ArbSchG).
-- de: Bußgeld bis 5.000 €, wenn die Gefährdung nicht beurteilt oder dokumentiert ist, die Betriebsanweisung fehlt oder nicht unterwiesen wird (§ 20 Abs. 1 Nr. 1 bis 4, 22, 23 BioStoffV in Verbindung mit
-    § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
-  en: Fine of up to €5,000 if the hazard is not assessed or documented, the operating instructions are missing or no instruction is given (§ 20(1) nos. 1 to 4, 22, 23 BioStoffV in conjunction with § 25(1)
-    no. 1, (2) ArbSchG).
 - de: 'Bußgeld bis 5.000 €, wenn die Zusammenfassende Meldung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig abgegeben oder nicht rechtzeitig berichtigt wird (§ 26a Abs. 2 Nr. 5, Abs. 3 UStG).'
   en: 'Fine of up to €5,000 if the recapitulative statement is not submitted, or not correctly, completely or on time, or not corrected on time (§ 26a(2) no. 5, (3) UStG).'
 - de: 'Bußgeld bis 5.000 €, wenn du dich als Versicherungs- oder Finanzanlagenvermittler nicht, nicht richtig oder nicht rechtzeitig eintragen lässt oder Änderungen nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig mitteilst (§ 144 Abs. 2 Nr. 8, 9, Abs. 4 GewO).'
@@ -612,8 +565,6 @@ eintraege:
   en: You mainly work for one client.
 - de: Du bekommst Arbeitslosengeld I.
   en: You receive unemployment benefit I (Arbeitslosengeld I).
-- de: Du benennst genug Beschäftigte als Brandschutzhelfer – in der Regel 5 Prozent – und lässt sie im Umgang mit Feuerlöschern ausbilden.
-  en: You appoint enough employees as fire safety assistants – usually 5 per cent – and have them trained in using fire extinguishers.
 - de: Du beschäftigst Jugendliche.
   en: You employ young people.
 - de: Du beschäftigst Minijobber.
@@ -895,14 +846,6 @@ eintraege:
   en: A data subject has made a request.
 - de: Eine schriftliche Liste, welche Gefahren es bei der Arbeit gibt und wie du sie verringerst.
   en: A written list of the hazards at work and how you reduce them.
-- de: Einen Flucht- und Rettungsplan brauchst du, wenn Lage, Ausdehnung und Art der Benutzung der Arbeitsstätte es erfordern (§ 4 Abs. 4 ArbStättV) – etwa bei unübersichtlichen Fluchtwegen, mehreren Geschossen,
-    vielen Kundinnen und Kunden oder erhöhter Brandgefährdung. Ob das so ist, hältst du in der Gefährdungsbeurteilung fest. Der Plan wird an geeigneten Stellen ausgehängt oder ausgelegt; gestaltet wird
-    er nach ASR A2.3 (Grundriss, Fluchtwege, Sammelstelle, Verhalten im Brandfall und bei Unfällen). Nach dem Plan übst du in angemessenen Zeitabständen, wie die Arbeitsstätte geräumt wird. Für ein kleines
-    Ladenlokal mit direktem Ausgang ins Freie ist oft kein Plan nötig.
-  en: You need an escape and rescue plan if the location, size and type of use of the workplace require it (§ 4(4) ArbStättV) – for example with confusing escape routes, several floors, many customers or
-    increased fire risk. You record whether this is the case in the risk assessment. The plan is posted or displayed in suitable places; it is designed according to ASR A2.3 (floor plan, escape routes,
-    assembly point, what to do in case of fire and accidents). Following the plan, you practise evacuating the workplace at appropriate intervals. A small shop with a direct exit to the outside often needs
-    no plan.
 - de: Einkommensteuererklärung abgeben
   en: File your income tax return
 - de: Einmal im Jahr ermittelst du deinen Gewinn mit der Anlage EÜR und übermittelst sie elektronisch.
@@ -941,14 +884,6 @@ eintraege:
   en: What matters is the overall picture of the activity. The German Pension Insurance (Deutsche Rentenversicherung) checks the status on application.
 - de: Erfordern Lage, Ausdehnung oder Nutzung deiner Arbeitsstätte es, hängst du einen Flucht- und Rettungsplan aus und übst die Räumung.
   en: If the location, size or use of your workplace requires it, you post an escape and rescue plan and practise evacuation.
-- de: Ergibt die Gefährdungsbeurteilung eine Gefährdung durch Tätigkeiten mit krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A oder 1B, führst du ein Verzeichnis
-    der betroffenen Beschäftigten mit Art, Dauer, Häufigkeit und Höhe der Exposition (§ 10a Abs. 1 GefStoffV). Typisch sind Hartholzstaub (Eiche, Buche) in der Tischlerei, Dieselmotoremissionen in der Kfz-Werkstatt
-    und Quarzstaub oder Asbest auf Baustellen. Das Verzeichnis bewahrst du nach Ende der Exposition 40 Jahre auf, bei nur reproduktionstoxischen Stoffen 5 Jahre (§ 10a Abs. 2 GefStoffV); scheidet jemand
-    aus, händigst du ihm seinen Auszug aus. Die Aufbewahrung kannst du an die Zentrale Expositionsdatenbank (ZED) der DGUV abgeben (§ 10a Abs. 3 GefStoffV). Die Einzelheiten erläutert die TRGS 410.
-  en: If the risk assessment shows a hazard from work with carcinogenic, germ-cell mutagenic or reprotoxic hazardous substances of category 1A or 1B, you keep a register of the employees concerned with
-    the type, duration, frequency and level of exposure (§ 10a(1) GefStoffV). Typical examples are hardwood dust (oak, beech) in joinery, diesel engine emissions in car repair shops and quartz dust or asbestos
-    on construction sites. You keep the register for 40 years after exposure ends, for substances that are only reprotoxic for 5 years (§ 10a(2) GefStoffV); when someone leaves, you hand them their extract.
-    You can hand over the retention to the Central Exposure Database (ZED) of the DGUV (§ 10a(3) GefStoffV). The details are explained in TRGS 410.
 - de: Erhebliche Sicherheitsvorfälle meldest du dem BSI in festen Stufen und Fristen.
   en: You report significant security incidents to the BSI in fixed stages and deadlines.
 - de: Erlaubnis für dein Gewerbe einholen
@@ -967,24 +902,12 @@ eintraege:
   en: Keep an exposure register for carcinogenic substances
 - de: Fachkraft für Arbeitssicherheit und Betriebsarzt
   en: Occupational safety specialist and company doctor
-- de: Fahrzeuge sind bei Bedarf, mindestens aber einmal jährlich, durch einen Sachkundigen auf ihren betriebssicheren Zustand zu prüfen; die Ergebnisse hältst du schriftlich fest (§ 57 DGUV Vorschrift 70).
-    Die Hauptuntersuchung ersetzt diese Prüfung nicht automatisch – sie prüft die Verkehrssicherheit, nicht den betriebssicheren Zustand für die Arbeit, etwa Aufbauten, Ladebordwand oder Ladungssicherung.
-  en: Vehicles must be inspected by an expert for their operational safety as needed, but at least once a year; you record the results in writing (§ 57 DGUV Regulation 70). The general inspection (Hauptuntersuchung)
-    does not automatically replace this inspection – it checks road safety, not the operational condition for work, such as bodywork, tail lift or load securing.
 - de: Fehlt die Dokumentation oder ist sie unrichtig, unvollständig oder nicht rechtzeitig erstellt, droht direkt ein Bußgeld bis 5.000 € (§ 9 Abs. 1 Nr. 1 ArbStättV in Verbindung mit § 25 Abs. 1 Nr. 1
     ArbSchG; ebenso § 22 Abs. 1 Nr. 1, 6 BetrSichV); bei Gefahrstoffen bis 50.000 € (§ 22 Abs. 1 Nr. 1a GefStoffV in Verbindung mit § 26 Abs. 1 Nr. 8 Buchst. b, Abs. 3 ChemG). Bei Arbeitsunfällen besteht
     außerdem ein Haftungsrisiko.
   en: If the documentation is missing, incorrect, incomplete or not prepared on time, a fine of up to €5,000 may be imposed directly (§ 9(1) no. 1 ArbStättV in conjunction with § 25(1) no. 1 ArbSchG; likewise
     § 22(1) nos. 1, 6 BetrSichV); for hazardous substances up to €50,000 (§ 22(1) no. 1a GefStoffV in conjunction with § 26(1) no. 8 letter b, (3) ChemG). In the event of accidents at work there is also
     a liability risk.
-- de: 'Feuchtarbeit und hautbelastende Stoffe gibt es nicht nur im Salon: in Küche und Spülbereich, bei der Gebäudereinigung, in Praxen (häufige Händedesinfektion, Handschuhe), in der Kfz-Werkstatt (Öle,
-    Kühlschmierstoffe, Lösemittel), in der Backstube und auf dem Bau (Zement, Epoxidharz). Im Hautschutzplan legst du je Tätigkeit fest, welche Schutzhandschuhe, welcher Hautschutz, welche Reinigung und
-    welche Pflege zu verwenden sind, und hängst ihn am Arbeitsplatz aus. Er ergänzt die Gefährdungsbeurteilung und die Unterweisung (TRGS 401 in Verbindung mit §§ 7, 14 GefStoffV). Für das Friseurhandwerk
-    konkretisiert die TRGS 530 den Hautschutz.'
-  en: 'Wet work and substances harmful to the skin are not only found in salons: in the kitchen and dishwashing area, in building cleaning, in medical practices (frequent hand disinfection, gloves), in
-    car repair shops (oils, coolants, solvents), in the bakery and on construction sites (cement, epoxy resin). In the skin protection plan you set for each activity which protective gloves, skin protection,
-    cleaning and care products are to be used, and post it at the workplace. It supplements the risk assessment and the instruction (TRGS 401 in conjunction with §§ 7, 14 GefStoffV). For the hairdressing
-    trade, TRGS 530 specifies skin protection.'
 - de: Finanzamt
   en: Tax office (Finanzamt)
 - de: Flucht- und Rettungsplan prüfen
@@ -1007,12 +930,6 @@ eintraege:
   en: For employees, you pay levies (U1, U2, U3) and retrieve sick notes electronically.
 - de: Für Jugendliche gelten Erstuntersuchung, Arbeitszeitgrenzen und eine Aushangpflicht.
   en: For young people, an initial medical examination, working time limits and a notice posting obligation apply.
-- de: Für Jugendliche gilt ein kürzerer Abstand als die jährliche Unterweisung der übrigen Beschäftigten. Vor Beginn der Beschäftigung und bei wesentlichen Änderungen unterweist du sie über die Gefahren
-    und die Schutzmaßnahmen; danach wiederholst du die Unterweisung mindestens halbjährlich (§ 29 JArbSchG). Die Frist läuft für jede jugendliche Person ab ihrer letzten Unterweisung. Amtlos erinnert sechs
-    Monate nach der letzten Unterweisung, die du in Amtlos erfasst – unterweist du Jugendliche einzeln, erfasse jede Unterweisung.
-  en: For young people, a shorter interval applies than the annual instruction of other employees. Before employment begins and when there are significant changes, you instruct them about the hazards and
-    the protective measures; after that you repeat the instruction at least every six months (§ 29 JArbSchG). The deadline runs for each young person from their last instruction. Amtlos reminds you six
-    months after the last instruction you record in Amtlos – if you instruct young people individually, record each instruction.
 - de: Für Mitarbeiterbeteiligungen gibt es steuerliche Sonderregeln (§ 19a EStG) und virtuelle Modelle (VSOP). Amtlos erklärt die Modelle; Vorlagen folgen mit dem Dokumentengenerator.
   en: For employee participation, there are special tax rules (§ 19a EStG) and virtual models (VSOP). Amtlos explains the models; templates will follow with the document generator.
 - de: Für Tätigkeiten mit Feuchtarbeit oder hautbelastenden Stoffen legst du in einem Hautschutzplan Schutz, Reinigung und Pflege fest.
@@ -1143,8 +1060,6 @@ eintraege:
   en: Real estate agents and many financial service providers are obliged entities under the Anti-Money Laundering Act (Geldwäschegesetz).
 - de: In Beauty- und Kosmetikbetrieben legst du in einem Hygieneplan fest, wie Geräte, Flächen und Hände gereinigt und desinfiziert werden.
   en: In beauty and cosmetics businesses, you set out in a hygiene plan how equipment, surfaces and hands are cleaned and disinfected.
-- de: In Handwerk und Bau gibt es oft laute Maschinen und Werkzeuge.
-  en: In the trades and construction there are often noisy machines and tools.
 - de: In Handwerk und Bau kommen krebserzeugende Stoffe wie Hartholzstaub, Dieselabgase oder Quarzstaub häufig vor.
   en: In the trades and construction, carcinogenic substances such as hardwood dust, diesel exhaust or quartz dust are common.
 - de: In IT- und Agenturprojekten können Fehler teuer werden. Haftungsregeln in Verträgen und eine passende Versicherung begrenzen das Risiko.
@@ -1161,16 +1076,6 @@ eintraege:
   en: In your sector employees come into contact with biological agents, for example with blood, body fluids or germs.
 - de: In deiner Branche meldest du neue Beschäftigte spätestens bei Arbeitsbeginn sofort an.
   en: In your industry, you register new employees immediately, at the latest when they start work.
-- de: In der Gefährdungsbeurteilung ermittelst du, ob Beschäftigte Lärm ausgesetzt sind – wenn nötig mit Messungen durch eine fachkundige Person (§ 3, § 4 LärmVibrationsArbSchV). Die Auslösewerte liegen
-    bei 80 und 85 dB(A) Tages-Lärmexpositionspegel bzw. 135 und 137 dB(C) Spitzenschalldruckpegel (§ 6). Technische Maßnahmen wie leisere Maschinen und Kapselung gehen vor (§ 7 Abs. 1). Ab dem unteren Auslösewert
-    stellst du Gehörschutz bereit und unterweist die Beschäftigten, ab dem oberen Auslösewert müssen sie ihn tragen (§ 8, § 11). Bereiche, in denen der obere Auslösewert überschritten werden kann, kennzeichnest
-    du als Lärmbereich und stellst ein Lärmminderungsprogramm auf (§ 7 Abs. 4, 5). Arbeitsmedizinische Vorsorge ist ab 80 dB(A) anzubieten und ab 85 dB(A) Pflicht – das steht bei der Vorsorge. Für Vibrationen
-    (zum Beispiel Bohrhammer, Rüttelplatte) gilt dieselbe Verordnung.
-  en: In the risk assessment you determine whether employees are exposed to noise – if necessary with measurements by a competent person (§ 3, § 4 LärmVibrationsArbSchV). The action values are 80 and 85
-    dB(A) daily noise exposure level and 135 and 137 dB(C) peak sound pressure level (§ 6). Technical measures such as quieter machines and enclosures take priority (§ 7(1)). From the lower action value
-    you provide hearing protection and instruct employees; from the upper action value they must wear it (§ 8, § 11). Areas where the upper action value may be exceeded are marked as noise areas, and you
-    draw up a noise reduction programme (§ 7(4), (5)). Occupational health care must be offered from 80 dB(A) and is mandatory from 85 dB(A) – this is covered under preventive care. The same ordinance applies
-    to vibration (for example hammer drill, vibrating plate).
 - de: Innerhalb einer Woche nach Gründung meldest du dein Unternehmen bei der zuständigen Berufsgenossenschaft an – auch ohne Mitarbeiter.
   en: Within one week of founding, you register your business with the responsible employers' liability insurance association (Berufsgenossenschaft), even without employees.
 - de: Innerhalb eines Monats nach dem Start meldest du dich über ELSTER beim Finanzamt an.
@@ -1205,8 +1110,6 @@ eintraege:
     deadline – Amtlos reminds you on the day of the reported accident. Whether the accident must also be reported to the BG is covered by the obligation on accident reporting.'
 - de: Jede neue Person unterweist du vor Aufnahme der Tätigkeit zu den Gefahren und Schutzmaßnahmen – spätestens am ersten Arbeitstag vor Arbeitsbeginn.
   en: You instruct every new person about hazards and protective measures before they start work – at the latest on the first working day before work begins.
-- de: Jeden Unfall und jede Erste-Hilfe-Leistung trägst du ins Verbandbuch ein – auch kleine Verletzungen ohne Arbeitsunfähigkeit.
-  en: You enter every accident and every first aid given in the first-aid log – including minor injuries without incapacity for work.
 - de: Jugendarbeitsschutz beachten
   en: Follow youth employment protection rules
 - de: KI-Inhalte und KI-Interaktion kennzeichnen
@@ -1327,13 +1230,6 @@ eintraege:
   en: 'Mini-jobbers may not earn more per month than the mini-job limit: €603 (2026), €633 (2027).'
 - de: Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, Lohnbüro, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.
   en: You conclude a data processing agreement (DPA) with service providers that process data for you (e.g. cloud, payroll office, newsletter tool).
-- de: Mit dem selbstständigen Führen von Fahrzeugen beauftragst du nur Personen, die mindestens 18 Jahre alt, körperlich und geistig geeignet, im Führen des Fahrzeugs unterwiesen sind und ihre Befähigung
-    nachgewiesen haben (§ 35 DGUV Vorschrift 70). Die Beauftragung schriftlich festzuhalten ist nicht vorgeschrieben, aber als Nachweis empfehlenswert. Unterweise sie zu Abfahrtkontrolle, Verhalten bei
-    Pannen und Ladungssicherung. Die Ladung ist so zu verstauen und zu sichern, dass sie selbst bei Vollbremsung oder plötzlicher Ausweichbewegung nicht verrutscht, umfällt, hin- und herrollt oder herabfällt
-    (§ 22 Abs. 1 StVO).
-  en: You only assign the independent driving of vehicles to people who are at least 18 years old, physically and mentally suitable, instructed in driving the vehicle and have proven their competence (§
-    35 DGUV Regulation 70). Recording the assignment in writing is not required but recommended as evidence. Instruct them on departure checks, what to do in case of a breakdown and load securing. The load
-    must be stowed and secured so that it does not slip, fall over, roll back and forth or fall off even during emergency braking or a sudden evasive manoeuvre (§ 22(1) StVO).
 - de: Mit der Selbstständigkeit kann sich deine Krankenversicherung ändern. Wer hauptberuflich selbstständig ist, kümmert sich selbst um seine Versicherung und die Beiträge.
   en: Becoming self-employed can change your health insurance. If self-employment is your main occupation, you take care of your own insurance and contributions.
 - de: Mit der Steuerberatung klären, welcher Rhythmus ab 2027 gilt
@@ -1463,13 +1359,6 @@ eintraege:
   en: Report security incidents (NIS2)
 - de: Sind bei der Arbeit mindestens zwei Personen anwesend, sorgst du für ausgebildete Ersthelfer und lässt sie alle zwei Jahre fortbilden.
   en: If at least two people are present at work, you ensure trained first aiders and have them attend refresher training every two years.
-- de: Sobald du mindestens eine Person beschäftigst, sind die Gefährdungen an jedem Arbeitsplatz zu beurteilen, Schutzmaßnahmen festzulegen und das zu dokumentieren. Amtlos erstellt dir dafür eine Vorlage
-    passend zu deiner Branche. Überprüfe die Beurteilung bei Änderungen der Arbeitsstätte, der Tätigkeiten, Arbeitsmittel oder Arbeitsstoffe, nach Unfällen und Beinaheunfällen, bei Berufskrankheiten oder
-    Gesundheitsbeschwerden, nach Ergebnissen der arbeitsmedizinischen Vorsorge, bei neuen Vorschriften oder Erkenntnissen und wenn du Jugendliche beschäftigst oder eine Beschäftigte dir ihre Schwangerschaft
-    mitteilt.
-  en: As soon as you employ at least one person, the hazards at every workplace must be assessed, protective measures defined and documented. Amtlos creates a template for this suited to your sector. Review
-    the assessment when the workplace, activities, work equipment or substances change, after accidents and near misses, in case of occupational diseases or health complaints, after results of occupational
-    health care, when there are new regulations or findings, and when you employ young people or an employee informs you of her pregnancy.
 - de: Sofortmeldung bei Arbeitsbeginn
   en: Immediate notification when work starts
 - de: Sondervorauszahlung zur Umsatzsteuer leisten
@@ -2181,8 +2070,6 @@ eintraege:
   en: The Federal Office of Justice imposes an administrative fine of €2,500 to €25,000 (§ 335(1) HGB). If the disclosure is only made after the warning, the fine can be reduced – to €500 for micro companies and €1,000 for small companies (§ 335(4) HGB).
 - de: Das Registergericht kann die Anmeldung mit Zwangsgeld durchsetzen (§ 14 HGB).
   en: The registry court can enforce the registration with a coercive fine (§ 14 HGB).
-- de: 'Das ist keine zweite Gefährdungsbeurteilung, sondern ein Teil der einen: Du konkretisierst sie je Gewerk und Tätigkeit – etwa für Maschinen, Hebebühnen, Stäube, Abgase, Lärm und Gefahrstoffe in der Werkstatt und für Arbeiten auf Baustellen oder in Wohnungen beim Kunden. Die Handlungshilfen deiner Berufsgenossenschaft helfen dabei.'
-  en: 'This is not a second risk assessment but part of the one you have: you make it specific for each trade and activity – for example for machines, vehicle lifts, dusts, exhaust fumes, noise and hazardous substances in the workshop, and for work on construction sites or in customers'' homes. The guidance of your employers'' liability insurance association helps with this.'
 - de: Dein Gewerbe ist überwachungsbedürftig (§ 38 GewO).
   en: Your trade requires supervision (§ 38 GewO).
 - de: Dein Unternehmen ist eine GbR.
@@ -2297,8 +2184,6 @@ eintraege:
   en: For staff from outside the EU you keep the copy of the residence permit for the whole duration of employment and watch the expiry date.
 - de: Für Fahrzeuge über 3,5 t – grenzüberschreitend schon über 2,5 t – gelten die EU-Lenk- und Ruhezeiten; aufgezeichnet wird mit dem Fahrtenschreiber.
   en: For vehicles over 3.5 t – across borders already over 2.5 t – the EU driving and rest times apply; they are recorded with the tachograph.
-- de: 'Für Lebensmittel, die du lose abgibst – an der Theke, im Restaurant oder im Imbiss –, gibst du bestimmte Zusatzstoffe an (§ 5 LMZDV): „mit Farbstoff“, „mit Konservierungsstoff“ oder „konserviert“, „mit Antioxidationsmittel“, „mit Geschmacksverstärker“, „geschwefelt“, „geschwärzt“, „gewachst“, „mit Phosphat“, „mit Süßungsmittel(n)“, „enthält eine Phenylalaninquelle“ und „kann bei übermäßigem Verzehr abführend wirken“. Für Getränke kommen „koffeinhaltig“ und „chininhaltig“ dazu – diese Angaben stammen nicht aus der LMZDV, sondern aus Anhang III Nr. 4 LMIV in Verbindung mit § 2 LMIDV. Üblich sind Fußnoten auf der Speisekarte oder ein Schild an der Ware. Stattdessen kannst du die Angaben auch in einem Aushang, einer schriftlichen Aufstellung oder elektronisch bereithalten, wenn du deutlich darauf hinweist (§ 5 Abs. 3 LMZDV). Die Allergenkennzeichnung ist eine eigene Pflicht; in der Allergenliste von Amtlos kannst du die Zusatzstoffe gleich mit angeben – dann hängt ein Blatt mit beidem aus.'
-  en: 'For food you sell loose – at the counter, in the restaurant or at the snack bar – you indicate certain additives (§ 5 LMZDV): “mit Farbstoff” (with colouring), “mit Konservierungsstoff” or “konserviert” (with preservative / preserved), “mit Antioxidationsmittel” (with antioxidant), “mit Geschmacksverstärker” (with flavour enhancer), “geschwefelt” (sulphured), “geschwärzt” (blackened), “gewachst” (waxed), “mit Phosphat” (with phosphate), “mit Süßungsmittel(n)” (with sweetener(s)), “enthält eine Phenylalaninquelle” (contains a source of phenylalanine) and “kann bei übermäßigem Verzehr abführend wirken” (excessive consumption may have a laxative effect). For drinks, “koffeinhaltig” (contains caffeine) and “chininhaltig” (contains quinine) are added – these indications do not come from the LMZDV but from Annex III No. 4 LMIV (Food Information Regulation) in conjunction with § 2 LMIDV. Footnotes on the menu or a sign on the goods are common. Instead, you can also provide the information in a notice, a written list or electronically if you clearly point this out (§ 5(3) LMZDV). Allergen labelling is a separate obligation; in the Amtlos allergen list you can enter the additives as well – then one sheet with both is displayed.'
 - de: Für jede Betriebsstätte außerhalb deiner Wohnung und für Firmenfahrzeuge zahlst du Rundfunkbeitrag – du meldest sie an und meldest Änderungen.
   en: You pay the broadcasting fee for every business premises outside your home and for company vehicles – you register them and report changes.
 - de: Für überwachungsbedürftige Gewerbe wie Gebrauchtwarenhandel oder Schlüsseldienst beantragst du nach der Gewerbeanzeige unverzüglich ein Führungszeugnis und eine Auskunft aus dem Gewerbezentralregister.
@@ -2699,8 +2584,6 @@ eintraege:
   en: 'After the food hygiene expert review (22.10.2026): the check now asks whether you have your own water tank, and the deadline depends on when you start using it instead of when your business starts.'
 - de: Acrylamid beim Backen und Frittieren gering halten
   en: Keep acrylamide low when baking and frying
-- de: 'Acrylamid entsteht, wenn stärkehaltige Lebensmittel stark gebräunt werden – etwa Brot, feine Backwaren, Pommes frites und andere frittierte Kartoffelerzeugnisse. Betriebe, die solche Lebensmittel herstellen, wenden die Minimierungsmaßnahmen der Verordnung (EU) 2017/2158 an. Zum Beispiel: goldgelb statt dunkelbraun backen und frittieren, Backzeit und -temperatur nach Rezeptur einhalten, Frittierfett höchstens 175 °C heiß. Die Lebensmittelüberwachung prüft das vor allem bei Bäckereien. Amtlos fragt nicht ab, ob du backst oder eine Fritteuse nutzt – trifft beides nicht zu, betrifft dich das nicht.'
-  en: 'Acrylamide forms when starchy foods are strongly browned – such as bread, fine bakery wares, French fries and other fried potato products. Businesses that produce such foods apply the mitigation measures of Regulation (EU) 2017/2158. For example: bake and fry golden yellow instead of dark brown, follow the baking time and temperature in the recipe, frying fat no hotter than 175 °C. Food control checks this above all in bakeries. Amtlos does not ask whether you bake or use a deep fryer – if neither applies, this does not concern you.'
 - de: Backst du Brot oder Backwaren oder frittierst du zum Beispiel Pommes frites, hältst du mit einfachen Maßnahmen Acrylamid gering.
   en: If you bake bread or bakery products or fry, for example, French fries, you keep acrylamide low with simple measures.
 - de: Dein Fahrzeug oder Stand hat einen eigenen Wassertank.
@@ -2723,8 +2606,6 @@ eintraege:
   en: Materials and articles that come into contact with food – for example packaging, to-go cups, food storage boxes or plastic containers – must be suitable for this (Regulation (EC) No 1935/2004). For plastics, the requirements of Regulation (EU) No 10/2011 also apply. Your supplier gives you a written declaration of conformity for this (Art. 16 Regulation (EC) No 1935/2004, Art. 15 Regulation (EU) No 10/2011). Request it from the supplier and file it – food control asks for it during inspections.
 - de: 'Nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Die Schulung hältst du schriftlich fest und wiederholst sie einmal im Jahr – erledigt gilt sie jeweils für ein Kalenderjahr.'
   en: 'After the food hygiene expert review (22.10.2026): you record the training in writing and repeat it once a year – it counts as done for one calendar year at a time.'
-- de: 'Nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): vollständige Liste der Angaben, „koffeinhaltig“ und „chininhaltig“ richtig zugeordnet; die Zusatzstoffe gibst du in der Allergenliste mit an.'
-  en: 'After the food hygiene expert review (22.10.2026): complete list of indications, “koffeinhaltig” and “chininhaltig” assigned correctly; you enter the additives in the allergen list as well.'
 - de: 'Neu nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Acrylamid beim Backen und Frittieren gering halten.'
   en: 'New after the food hygiene expert review (22.10.2026): keep acrylamide low when baking and frying.'
 - de: 'Neu nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Kennzeichnung von Lebensmitteln, die du selbst abpackst.'
@@ -2791,3 +2672,179 @@ eintraege:
   en: 'Fine of up to €10,000 if the report is not made, or is made incorrectly, incompletely, not in the prescribed manner or late (§ 238(1) no. 3, (2) SGB IX).'
 - de: 'Bußgeld bis 25.000 €, wenn die Meldung nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig erstattet wird (§ 111 Abs. 1 Nr. 2, Abs. 4 SGB IV).'
   en: 'Fine of up to €25,000 if the report is not made, or is made incorrectly, incompletely, not in the prescribed manner or late (§ 111(1) no. 2, (4) SGB IV).'
+- de: 'Acrylamid entsteht, wenn stärkehaltige Lebensmittel stark gebräunt werden – etwa Brot, feine Backwaren, Pommes frites und andere frittierte Kartoffelerzeugnisse. Betriebe, die solche Lebensmittel
+    herstellen, wenden die Minimierungsmaßnahmen der Verordnung (EU) 2017/2158 an: Gibst du nur im eigenen Laden oder an örtliche Einzelhändler ab, gelten die Maßnahmen nach Anhang II Teil A (Art. 2 Abs.
+    2); die Maßnahmen nach Anhang II Teil B kommen nur für zentral gesteuerte Filial- und Franchisebetriebe hinzu (Art. 2 Abs. 3). Zum Beispiel: goldgelb statt dunkelbraun backen und frittieren, Backzeit
+    und -temperatur nach Rezeptur einhalten, Frittierfett höchstens 175 °C heiß. Die Lebensmittelüberwachung prüft das vor allem bei Bäckereien. Amtlos fragt nicht ab, ob du backst oder eine Fritteuse nutzt
+    – trifft beides nicht zu, betrifft dich das nicht.'
+  en: 'Acrylamide forms when starchy foods are strongly browned – such as bread, fine bakery wares, French fries and other fried potato products. Businesses that produce such foods apply the mitigation
+    measures of Regulation (EU) 2017/2158: if you only supply your own shop or local retailers, the measures in Annex II Part A apply (Art. 2(2)); the measures in Annex II Part B are added only for centrally
+    controlled branch and franchise businesses (Art. 2(3)). For example: bake and fry golden yellow instead of dark brown, follow the baking time and temperature in the recipe, frying fat no hotter than
+    175 °C. Food control checks this above all in bakeries. Amtlos does not ask whether you bake or use a deep fryer – if neither applies, this does not concern you.'
+- de: Anzeigen musst du einen Unfall, wenn die verletzte Person stirbt oder mehr als drei Tage arbeitsunfähig ist; den Unfalltag zählst du dabei nicht mit (§ 193 Abs. 1 SGB VII). Das gilt auch für Wegeunfälle
+    auf dem Weg zur oder von der Arbeit. Die Anzeige erstattest du binnen drei Tagen, nachdem du vom Unfall erfahren hast (§ 193 Abs. 4 SGB VII), mit dem Formular nach der Unfallversicherungs-Anzeigeverordnung
+    (UVAV), meist im Portal deiner BG. Tödliche Unfälle und Massenunfälle meldest du zusätzlich sofort telefonisch oder per E-Mail. Amtlos legt die Aufgabe bei jedem gemeldeten Arbeitsunfall an, weil die
+    Dauer der Arbeitsunfähigkeit oft erst später feststeht, und rechnet ab dem Tag, den du beim Unfall einträgst – hast du später davon erfahren, trag diesen Tag ein. Bleibt die Arbeitsunfähigkeit bei höchstens
+    drei Tagen, trifft die Anzeige nicht zu; den Eintrag ins Verbandbuch brauchst du trotzdem.
+  en: You must report an accident if the injured person dies or is unable to work for more than three days; the day of the accident does not count (§ 193(1) SGB VII). This also applies to commuting accidents
+    on the way to or from work. You file the report within three days of learning of the accident (§ 193(4) SGB VII), using the form under the Accident Insurance Notification Ordinance (UVAV), usually in
+    your BG's portal. You additionally report fatal accidents and mass accidents immediately by phone or e-mail. Amtlos creates the task for every reported accident at work, because the length of the incapacity
+    is often only known later, and counts from the day you enter for the accident – if you learned of it later, enter that day. If the incapacity lasts no more than three days, the report does not apply;
+    you still need the entry in the first-aid log.
+- de: 'Arbeitsmittel gibt es in fast jedem Betrieb: Leitern und Tritte, Lagerregale, Aufschnitt- und Knetmaschinen, Hebebühnen und Hubgeräte, Kompressoren, Druckluftgeräte und Getränkeschankanlagen. Arbeitsmittel,
+    deren Sicherheit von der Montage abhängt, lässt du vor der ersten Verwendung prüfen; Arbeitsmittel, die schädigenden Einflüssen ausgesetzt sind, prüft eine zur Prüfung befähigte Person wiederkehrend
+    (§ 14 BetrSichV). Art, Umfang und Abstände der Prüfungen legst du in der Gefährdungsbeurteilung fest (§ 3 Abs. 6 BetrSichV); die Ergebnisse zeichnest du auf und bewahrst sie auf (§ 14 Abs. 7 BetrSichV).
+    Für Leitern und Tritte hilft die DGUV Information 208-016, für Lagerregale die DIN EN 15635 (Sichtkontrollen und jährliche Inspektion durch eine fachkundige Person). In Kfz-Werkstätten gehören Hebebühnen
+    dazu: Sie werden vor der ersten Inbetriebnahme und danach in der Regel jährlich geprüft (DGUV Grundsatz 308-002). Für Druckbehälter wie den Druckluftbehälter eines Kompressors gelten besondere Prüfpflichten
+    (§§ 15, 16 und Anhang 2 Abschnitt 4 BetrSichV): Bei Druckbehältern (z. B. Kompressor) klärst du Prüfpflichten und Prüfer mit einer zugelassenen Überwachungsstelle. Firmenfahrzeuge (DGUV Vorschrift 70)
+    und elektrische Geräte (DGUV Vorschrift 3) haben eigene Pflichten.'
+  en: 'Work equipment exists in almost every business: ladders and steps, storage racks, slicing and kneading machines, lifting platforms and hoists, compressors, compressed-air tools and beverage dispensing
+    systems. Work equipment whose safety depends on its assembly is inspected before first use; work equipment exposed to damaging influences is inspected regularly by a person qualified to carry out inspections
+    (§ 14 BetrSichV). You set the type, scope and intervals of the inspections in the risk assessment (§ 3(6) BetrSichV); you record and keep the results (§ 14(7) BetrSichV). For ladders and steps, DGUV
+    Information 208-016 helps, for storage racks DIN EN 15635 (visual checks and an annual inspection by a competent person). In car repair shops, vehicle lifts are included: they are inspected before first
+    commissioning and then usually every year (DGUV Principle 308-002). Special inspection obligations apply to pressure vessels such as the air receiver of a compressor (§§ 15, 16 and Annex 2 Section 4
+    BetrSichV): for pressure vessels (e.g. compressor), you clarify the inspection obligations and the inspector with an approved inspection body. Company vehicles (DGUV Regulation 70) and electrical equipment
+    (DGUV Regulation 3) have their own obligations.'
+- de: Bei 2 bis 20 anwesenden Versicherten brauchst du mindestens einen Ersthelfer, bei mehr Anwesenden 5 Prozent in Verwaltungs- und Handelsbetrieben und 10 Prozent in sonstigen Betrieben (§ 26 Abs. 1
+    DGUV Vorschrift 1). Ersthelfer werden bei einer von der BG ermächtigten Stelle ausgebildet und in der Regel alle zwei Jahre fortgebildet (§ 26 Abs. 2, 3 DGUV Vorschrift 1); die Kosten der Lehrgänge
+    trägt meist die BG. Als Inhaberin oder Inhaber zählst du nur mit, wenn du selbst versichert bist – Amtlos zählt vorsichtshalber alle Anwesenden, also schon ab der ersten beschäftigten Person. Plane
+    Vertretungen für Urlaub, Krankheit und Schichten ein. Verbandkasten, Notruf-Aushang und Verbandbuch sind eine eigene Pflicht, Brandschutzhelfer ebenfalls.
+  en: With 2 to 20 insured persons present you need at least one first aider, with more people present 5 per cent in administrative and retail businesses and 10 per cent in other businesses (§ 26(1) DGUV
+    Regulation 1). First aiders are trained at a body authorised by the BG and usually receive refresher training every two years (§ 26(2), (3) DGUV Regulation 1); the BG usually pays for the courses. As
+    the owner you only count if you are insured yourself – to be on the safe side, Amtlos counts everyone present, so already from the first employee. Plan substitutes for holidays, illness and shifts.
+    First-aid kit, emergency call notice and first-aid log are a separate obligation, as are fire safety assistants.
+- de: Biostoffe sind Bakterien, Viren, Pilze und Parasiten – etwa bei der Behandlung von Patientinnen und Patienten, beim Umgang mit Blut, bei Kosmetik, Nagel- und Fußpflege oder bei der Reinigung von Sanitärräumen.
+    Vor Aufnahme der Tätigkeit beurteilst du die Gefährdung fachkundig (§ 4 BioStoffV) und dokumentierst sie (§ 7 BioStoffV); überprüft wird mindestens alle zwei Jahre. Für jeden Arbeitsbereich schreibst
+    du eine schriftliche Betriebsanweisung (§ 14 Abs. 1 BioStoffV) – nicht nötig nur bei Tätigkeiten ausschließlich mit Biostoffen der Risikogruppe 1 ohne sensibilisierende oder toxische Wirkung. Anhand
+    der Betriebsanweisung unterweist du mündlich vor Aufnahme der Beschäftigung und danach mindestens jährlich (§ 14 Abs. 2 BioStoffV); Inhalt und Zeitpunkt hältst du schriftlich fest, die Unterwiesenen
+    bestätigen durch Unterschrift (§ 14 Abs. 3 BioStoffV). Für Praxen gilt zusätzlich die TRBA 250; arbeitsmedizinische Vorsorge und Impfangebote sind Teil der Pflicht zur Vorsorge.
+  en: Biological agents are bacteria, viruses, fungi and parasites – for example when treating patients, handling blood, in cosmetics, nail care and foot care or when cleaning sanitary rooms. Before the
+    work begins, you assess the hazard with expert knowledge (§ 4 BioStoffV) and document it (§ 7 BioStoffV); it is reviewed at least every two years. For each work area you write operating instructions
+    (§ 14(1) BioStoffV) – not needed only for work exclusively with biological agents of risk group 1 without sensitising or toxic effects. Based on the operating instructions, you instruct orally before
+    employment begins and at least annually afterwards (§ 14(2) BioStoffV); you record the content and date in writing, and those instructed confirm by signature (§ 14(3) BioStoffV). For medical practices,
+    TRBA 250 also applies; occupational health care and vaccination offers are part of the obligation on preventive care.
+- de: Bußgeld bis 10.000 €, wenn Fahrzeuge von Personen geführt werden, die nicht mindestens 18 Jahre alt, nicht unterwiesen oder nicht vom Unternehmer bestimmt sind (§ 58 in Verbindung mit § 35 Abs. 1
+    DGUV Vorschrift 70, § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII). Mangelhafte Ladungssicherung ist eine Ordnungswidrigkeit nach der StVO (§ 22 in Verbindung mit § 49 StVO, Bußgeldkatalog) – für Fahrer, Verlader
+    und Halter.
+  en: Fine of up to €10,000 if vehicles are driven by persons who are not at least 18 years old, not instructed or not designated by the employer (§ 58 in conjunction with § 35(1) DGUV Regulation 70, §
+    209(1) no. 1, (3) SGB VII). Inadequate load securing is an administrative offence under the StVO (§ 22 in conjunction with § 49 StVO, fine catalogue) – for drivers, loaders and vehicle keepers.
+- de: Bußgeld bis 5.000 €, wenn Sicherheitseinrichtungen wie Feuerlöscher nicht regelmäßig gewartet und auf ihre Funktionsfähigkeit geprüft werden (§ 9 Abs. 1 ArbStättV in Verbindung mit § 4 Abs. 3 ArbStättV
+    und § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG). Fehlen geeignete Feuerlöscher, kann die Aufsichtsbehörde Maßnahmen anordnen; ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3, §
+    25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG).
+  en: Fine of up to €5,000 if safety equipment such as fire extinguishers is not regularly maintained and checked for proper functioning (§ 9(1) ArbStättV in conjunction with § 4(3) ArbStättV and § 25(1)
+    no. 1, (2) ArbSchG). If suitable fire extinguishers are missing, the supervisory authority can order measures; a breach of the enforceable order costs up to €30,000 (§ 22(3), § 25(1) no. 2 letter a,
+    (2) ArbSchG).
+- de: Bußgeld bis 5.000 €, wenn die Gefährdung nicht beurteilt oder dokumentiert ist, die Betriebsanweisung fehlt oder nicht unterwiesen wird (§ 20 Abs. 1 Nr. 1 bis 4, 22, 23 BioStoffV in Verbindung mit
+    § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG). Die schriftliche Dokumentation der Unterweisung selbst ist nicht bußgeldbewehrt, nur die fehlende Unterweisung (§ 14 Abs. 2 Satz 1 BioStoffV).
+  en: Fine of up to €5,000 if the hazard is not assessed or documented, the operating instructions are missing or no instruction is given (§ 20(1) nos. 1 to 4, 22, 23 BioStoffV in conjunction with § 25(1)
+    no. 1, (2) ArbSchG). The written documentation of the instruction itself is not subject to a fine, only the missing instruction (§ 14(2) sentence 1 BioStoffV).
+- de: 'Das ist keine zweite Gefährdungsbeurteilung, sondern ein Teil der einen: Du konkretisierst sie je Gewerk und Tätigkeit – etwa für Maschinen, Hebebühnen, Stäube, Abgase, Lärm und Gefahrstoffe in der
+    Werkstatt und für Arbeiten auf Baustellen oder in Wohnungen beim Kunden. Die Handlungshilfen deiner Berufsgenossenschaft helfen dabei. Eine eigene Frist gibt es nicht: Wie die Gefährdungsbeurteilung
+    muss die Ergänzung vor Aufnahme der Tätigkeit beim Kunden bzw. im Gewerk vorliegen.'
+  en: 'This is not a second risk assessment but part of the one you have: you make it specific for each trade and activity – for example for machines, vehicle lifts, dusts, exhaust fumes, noise and hazardous
+    substances in the workshop, and for work on construction sites or in customers'' homes. The guidance of your employers'' liability insurance association helps with this. There is no separate deadline:
+    like the risk assessment, the addition must be in place before work starts at the customer''s premises or in the trade.'
+- de: Du benennst genug Beschäftigte als Brandschutzhelfer und lässt sie im Umgang mit Feuerlöschern ausbilden – in der Regel 5 Prozent der Beschäftigten, in kleinen Betrieben mindestens eine Person, die
+    während der Arbeitszeit anwesend ist (ASR A2.2 Nr. 7.3).
+  en: You appoint enough employees as fire safety assistants and have them trained in using fire extinguishers – usually 5 per cent of employees, in small businesses at least one person who is present during
+    working hours (ASR A2.2 No. 7.3).
+- de: Einen Flucht- und Rettungsplan brauchst du, wenn Lage, Ausdehnung und Art der Benutzung der Arbeitsstätte es erfordern (§ 4 Abs. 4 ArbStättV) – etwa bei unübersichtlichen Fluchtwegen, mehreren Geschossen,
+    vielen Kundinnen und Kunden oder erhöhter Brandgefährdung. Ob das so ist, hältst du in der Gefährdungsbeurteilung fest. Der Plan wird an geeigneten Stellen ausgehängt oder ausgelegt; gestaltet wird
+    er nach ASR A2.3 (Grundriss, Fluchtwege, Sammelstelle, Verhalten im Brandfall und bei Unfällen). Nach dem Plan übst du in angemessenen Zeitabständen, wie die Arbeitsstätte geräumt wird – empfohlen ist
+    jährlich (ASR A2.3). Für ein kleines Ladenlokal mit direktem Ausgang ins Freie ist oft kein Plan nötig.
+  en: You need an escape and rescue plan if the location, size and type of use of the workplace require it (§ 4(4) ArbStättV) – for example with confusing escape routes, several floors, many customers or
+    increased fire risk. You record whether this is the case in the risk assessment. The plan is posted or displayed in suitable places; it is designed according to ASR A2.3 (floor plan, escape routes,
+    assembly point, what to do in case of fire and accidents). Following the plan, you practise evacuating the workplace at appropriate intervals – annually is recommended (ASR A2.3). A small shop with
+    a direct exit to the outside often needs no plan.
+- de: Ergibt die Gefährdungsbeurteilung eine Gefährdung durch Tätigkeiten mit krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A oder 1B, führst du ein Verzeichnis
+    der betroffenen Beschäftigten mit Art, Dauer, Häufigkeit und Höhe der Exposition (§ 10a Abs. 1 GefStoffV). Typisch sind Hartholzstaub (Eiche, Buche) in der Tischlerei, Dieselmotoremissionen in der Kfz-Werkstatt
+    und Quarzstaub oder Asbest auf Baustellen – dort gilt die Pflicht typischerweise; ob sie in deinem Betrieb im Einzelfall entfällt, klärst du in einer Beratung, etwa mit deiner Fachkraft für Arbeitssicherheit.
+    Das Verzeichnis bewahrst du nach Ende der Exposition 40 Jahre auf, bei nur reproduktionstoxischen Stoffen 5 Jahre (§ 10a Abs. 2 GefStoffV); scheidet jemand aus, händigst du ihm seinen Auszug aus. Die
+    Aufbewahrung kannst du an die Zentrale Expositionsdatenbank (ZED) der DGUV abgeben (§ 10a Abs. 3 GefStoffV). Die Einzelheiten erläutert die TRGS 410.
+  en: If the risk assessment shows a hazard from work with carcinogenic, germ-cell mutagenic or reprotoxic hazardous substances of category 1A or 1B, you keep a register of the employees concerned with
+    the type, duration, frequency and level of exposure (§ 10a(1) GefStoffV). Typical examples are hardwood dust (oak, beech) in joinery, diesel engine emissions in car repair shops and quartz dust or asbestos
+    on construction sites – that is where the obligation typically applies; whether it does not apply to your business in an individual case is something you clarify in a consultation, for example with
+    your occupational safety specialist. You keep the register for 40 years after exposure ends, for substances that are only reprotoxic for 5 years (§ 10a(2) GefStoffV); when someone leaves, you hand them
+    their extract. You can hand over the retention to the Central Exposure Database (ZED) of the DGUV (§ 10a(3) GefStoffV). The details are explained in TRGS 410.
+- de: Fahrzeuge sind bei Bedarf, mindestens aber einmal jährlich, durch einen Sachkundigen auf ihren betriebssicheren Zustand zu prüfen (§ 57 Abs. 1 DGUV Vorschrift 70). Die Ergebnisse hältst du schriftlich
+    fest und bewahrst sie mindestens bis zur nächsten Prüfung auf (§ 57 Abs. 2 DGUV Vorschrift 70). Die Hauptuntersuchung ersetzt diese Prüfung nicht automatisch – sie prüft die Verkehrssicherheit, nicht
+    den betriebssicheren Zustand für die Arbeit, etwa Aufbauten, Ladebordwand oder Ladungssicherung.
+  en: Vehicles must be inspected by an expert for their operational safety as needed, but at least once a year (§ 57(1) DGUV Regulation 70). You record the results in writing and keep them at least until
+    the next inspection (§ 57(2) DGUV Regulation 70). The general inspection (Hauptuntersuchung) does not automatically replace this inspection – it checks road safety, not the operational condition for
+    work, such as bodywork, tail lift or load securing.
+- de: 'Feuchtarbeit und hautbelastende Stoffe gibt es nicht nur im Salon: in Küche und Spülbereich, bei der Gebäudereinigung, in Praxen (häufige Händedesinfektion, Handschuhe), in der Kfz-Werkstatt (Öle,
+    Kühlschmierstoffe, Lösemittel), in der Backstube und auf dem Bau (Zement, Epoxidharz). Im Hautschutzplan legst du je Tätigkeit fest, welche Schutzhandschuhe, welcher Hautschutz, welche Reinigung und
+    welche Pflege zu verwenden sind, und hängst ihn am Arbeitsplatz aus. Er ergänzt die Gefährdungsbeurteilung und die Unterweisung (TRGS 401 in Verbindung mit §§ 7, 14 GefStoffV). Für das Friseurhandwerk
+    konkretisiert die TRGS 530 den Hautschutz. Eine eigene Frist gibt es nicht: Der Plan muss vor Aufnahme der hautbelastenden Tätigkeit vorliegen.'
+  en: 'Wet work and substances harmful to the skin are not only found in salons: in the kitchen and dishwashing area, in building cleaning, in medical practices (frequent hand disinfection, gloves), in
+    car repair shops (oils, coolants, solvents), in the bakery and on construction sites (cement, epoxy resin). In the skin protection plan you set for each activity which protective gloves, skin protection,
+    cleaning and care products are to be used, and post it at the workplace. It supplements the risk assessment and the instruction (TRGS 401 in conjunction with §§ 7, 14 GefStoffV). For the hairdressing
+    trade, TRGS 530 specifies skin protection. There is no separate deadline: the plan must be in place before the work that stresses the skin begins.'
+- de: Für Jugendliche gilt ein kürzerer Abstand als die jährliche Unterweisung der übrigen Beschäftigten. Vor Beginn der Beschäftigung und bei wesentlichen Änderungen unterweist du sie über die Gefahren
+    und die Schutzmaßnahmen; danach wiederholst du die Unterweisung mindestens halbjährlich (§ 29 JArbSchG). Jede jugendliche Person muss einzeln spätestens sechs Monate nach ihrer letzten Unterweisung
+    wieder unterwiesen sein. Amtlos erinnert sechs Monate nach der letzten Unterweisung, die du in Amtlos erfasst, und unterscheidet dabei noch nicht nach Personen – unterweist du Jugendliche einzeln, achte
+    selbst auf die Frist jeder Person und erfasse jede Unterweisung.
+  en: For young people, a shorter interval applies than the annual instruction of other employees. Before employment begins and when there are significant changes, you instruct them about the hazards and
+    the protective measures; after that you repeat the instruction at least every six months (§ 29 JArbSchG). Each young person must individually be instructed again no later than six months after their
+    last instruction. Amtlos reminds you six months after the last instruction you record in Amtlos and does not yet distinguish between persons – if you instruct young people individually, keep track of
+    each person's deadline yourself and record each instruction.
+- de: 'Für Lebensmittel, die du lose abgibst – an der Theke, im Restaurant oder im Imbiss –, gibst du bestimmte Zusatzstoffe an (§ 5 LMZDV): „mit Farbstoff“, „mit Konservierungsstoff“ oder „konserviert“,
+    „mit Antioxidationsmittel“, „mit Geschmacksverstärker“, „geschwefelt“, „geschwärzt“, „gewachst“, „mit Phosphat“, „mit Süßungsmittel(n)“, „enthält eine Phenylalaninquelle“ und „kann bei übermäßigem Verzehr
+    abführend wirken“. Enthält ein Lebensmittel einen der Farbstoffe E 102, E 104, E 110, E 122, E 124 oder E 129 (Azofarbstoffe), steht zum Namen oder zur E-Nummer des Farbstoffs der Warnhinweis „Kann
+    Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen“ (Art. 24 in Verbindung mit Anhang V Verordnung (EG) Nr. 1333/2008; nicht bei Getränken über 1,2 % vol). Für Getränke kommen zwei Angaben dazu,
+    die nicht aus der LMZDV stammen: „chininhaltig“ bei nicht vorverpackten Getränken mit Chinin bis 1,2 % vol (§ 5 Abs. 1 AromenDV) und bei Erfrischungsgetränken mit mehr als 150 mg Koffein je Liter der
+    Hinweis „Erhöhter Koffeingehalt. Für Kinder und schwangere oder stillende Frauen nicht empfohlen“ mit dem Koffeingehalt in mg/100 ml – nicht bei Kaffee und Tee (§ 6 FrSaftErfrischGetrV in Verbindung
+    mit Anhang III Nr. 4.1 LMIV). Üblich sind Fußnoten auf der Speisekarte oder ein Schild an der Ware. Stattdessen kannst du die Angaben auch in einem Aushang, einer schriftlichen Aufstellung oder elektronisch
+    bereithalten, wenn du deutlich darauf hinweist (§ 5 Abs. 3 LMZDV). Die Allergenkennzeichnung ist eine eigene Pflicht; in der Allergenliste von Amtlos kannst du die Zusatzstoffe gleich mit angeben –
+    dann hängt ein Blatt mit beidem aus.'
+  en: 'For food you sell loose – at the counter, in the restaurant or at the snack bar – you indicate certain additives (§ 5 LMZDV): “mit Farbstoff” (with colouring), “mit Konservierungsstoff” or “konserviert”
+    (with preservative / preserved), “mit Antioxidationsmittel” (with antioxidant), “mit Geschmacksverstärker” (with flavour enhancer), “geschwefelt” (sulphured), “geschwärzt” (blackened), “gewachst” (waxed),
+    “mit Phosphat” (with phosphate), “mit Süßungsmittel(n)” (with sweetener(s)), “enthält eine Phenylalaninquelle” (contains a source of phenylalanine) and “kann bei übermäßigem Verzehr abführend wirken”
+    (excessive consumption may have a laxative effect). If a food contains one of the colours E 102, E 104, E 110, E 122, E 124 or E 129 (azo dyes), the warning “Kann Aktivität und Aufmerksamkeit bei Kindern
+    beeinträchtigen” (may have an adverse effect on activity and attention in children) is given with the name or E number of the colour (Art. 24 in conjunction with Annex V Regulation (EC) No 1333/2008;
+    not for drinks above 1.2 % vol). For drinks, two indications are added that do not come from the LMZDV: “chininhaltig” (contains quinine) for non-prepacked drinks containing quinine with up to 1.2 %
+    vol (§ 5(1) AromenDV), and for soft drinks with more than 150 mg caffeine per litre the statement “Erhöhter Koffeingehalt. Für Kinder und schwangere oder stillende Frauen nicht empfohlen” (High caffeine
+    content. Not recommended for children or pregnant or breast-feeding women) with the caffeine content in mg/100 ml – not for coffee and tea (§ 6 FrSaftErfrischGetrV in conjunction with Annex III No.
+    4.1 LMIV (Food Information Regulation)). Footnotes on the menu or a sign on the goods are common. Instead, you can also provide the information in a notice, a written list or electronically if you clearly
+    point this out (§ 5(3) LMZDV). Allergen labelling is a separate obligation; in the Amtlos allergen list you can enter the additives as well – then one sheet with both is displayed.'
+- de: Für den Hautschutzplan selbst gibt es kein eigenes Bußgeld; er konkretisiert die Schutzmaßnahmen nach TRGS 401. Bußgeldbewehrt sind fehlende Gefährdungsbeurteilung, Betriebsanweisung oder Unterweisung
+    bei Gefahrstoffen (bis 50.000 €, siehe ‚Gefahrstoffverzeichnis und Betriebsanweisungen‘); die Aufsicht kann außerdem Maßnahmen anordnen.
+  en: There is no separate fine for the skin protection plan itself; it specifies the protective measures under TRGS 401. Fines apply to a missing risk assessment, operating instructions or instruction
+    for hazardous substances (up to €50,000, see ‘Hazardous substances register and operating instructions’); the authority can also order measures.
+- de: In Handwerk und Bau – etwa in Kfz-Werkstatt und Tischlerei – gibt es oft laute Maschinen und Werkzeuge.
+  en: In the trades and construction – for example in car repair shops and joinery – there are often noisy machines and tools.
+- de: In der Gefährdungsbeurteilung ermittelst du, ob Beschäftigte Lärm ausgesetzt sind – wenn nötig mit Messungen durch eine fachkundige Person (§ 3, § 4 LärmVibrationsArbSchV). Die Auslösewerte liegen
+    bei 80 und 85 dB(A) Tages-Lärmexpositionspegel bzw. 135 und 137 dB(C) Spitzenschalldruckpegel (§ 6). Technische Maßnahmen wie leisere Maschinen und Kapselung gehen vor (§ 7 Abs. 1). Ab dem unteren Auslösewert
+    stellst du Gehörschutz bereit und unterweist die Beschäftigten, ab dem oberen Auslösewert müssen sie ihn tragen (§ 8, § 11). Bereiche, in denen der obere Auslösewert überschritten werden kann, kennzeichnest
+    du als Lärmbereich und stellst ein Lärmminderungsprogramm auf (§ 7 Abs. 4, 5). Arbeitsmedizinische Vorsorge ist ab 80 dB(A) anzubieten und ab 85 dB(A) Pflicht – das steht bei der Vorsorge. Das betrifft
+    ausdrücklich auch die Kfz-Werkstatt und die Holzverarbeitung und Tischlerei. Für Vibrationen (zum Beispiel Bohrhammer, Rüttelplatte) gilt dieselbe Verordnung.
+  en: In the risk assessment you determine whether employees are exposed to noise – if necessary with measurements by a competent person (§ 3, § 4 LärmVibrationsArbSchV). The action values are 80 and 85
+    dB(A) daily noise exposure level and 135 and 137 dB(C) peak sound pressure level (§ 6). Technical measures such as quieter machines and enclosures take priority (§ 7(1)). From the lower action value
+    you provide hearing protection and instruct employees; from the upper action value they must wear it (§ 8, § 11). Areas where the upper action value may be exceeded are marked as noise areas, and you
+    draw up a noise reduction programme (§ 7(4), (5)). Occupational health care must be offered from 80 dB(A) and is mandatory from 85 dB(A) – this is covered under preventive care. This expressly also
+    applies to car repair shops and to woodworking and joinery. The same ordinance applies to vibration (for example hammer drill, vibrating plate).
+- de: Jeden Unfall und jede Erste-Hilfe-Leistung trägst du ins Verbandbuch ein – auch kleine Verletzungen ohne Arbeitsunfähigkeit – und hältst die Aufzeichnungen fünf Jahre lang verfügbar.
+  en: You enter every accident and every first aid given in the first-aid log – including minor injuries without incapacity for work – and keep the records available for five years.
+- de: Kein unmittelbares Bußgeld. Die Aufsichtsbehörde kann die Bestellung anordnen (§ 12 ASiG); ein Verstoß gegen die vollziehbare Anordnung kostet bis 25.000 € (§ 20 Abs. 1 Nr. 1, Abs. 2 ASiG). Auch die
+    Berufsgenossenschaft kann Anordnungen treffen (§ 19 SGB VII).
+  en: No direct fine. The supervisory authority can order the appointment (§ 12 ASiG); a breach of the enforceable order costs up to €25,000 (§ 20(1) no. 1, (2) ASiG). The employers' liability insurance
+    association (BG) can also issue orders (§ 19 SGB VII).
+- de: Mit dem selbstständigen Führen von Fahrzeugen beauftragst du nur Personen, die mindestens 18 Jahre alt, körperlich und geistig geeignet, im Führen des Fahrzeugs unterwiesen sind und ihre Befähigung
+    nachgewiesen haben (§ 35 DGUV Vorschrift 70). Die Beauftragung schriftlich festzuhalten ist nicht vorgeschrieben, aber als Nachweis empfehlenswert. Unterweise sie zu Abfahrtkontrolle, Verhalten bei
+    Pannen und Ladungssicherung. Die Ladung ist so zu verstauen und zu sichern, dass sie selbst bei Vollbremsung oder plötzlicher Ausweichbewegung nicht verrutscht, umfällt, hin- und herrollt oder herabfällt
+    (§ 22 Abs. 1 StVO). Maßgeblich ist die Unfallverhütungsvorschrift „Fahrzeuge“ deiner Berufsgenossenschaft.
+  en: You only assign the independent driving of vehicles to people who are at least 18 years old, physically and mentally suitable, instructed in driving the vehicle and have proven their competence (§
+    35 DGUV Regulation 70). Recording the assignment in writing is not required but recommended as evidence. Instruct them on departure checks, what to do in case of a breakdown and load securing. The load
+    must be stowed and secured so that it does not slip, fall over, roll back and forth or fall off even during emergency braking or a sudden evasive manoeuvre (§ 22(1) StVO). The accident prevention regulation
+    “Vehicles” of your BG is decisive.
+- de: 'Nach dem berichtigten Prüfbericht Lebensmittelhygiene (22.10.2026): Warnhinweis bei Azofarbstoffen ergänzt, „chininhaltig“ nach der Aromen-Durchführungsverordnung, Koffeinhinweis nur für Erfrischungsgetränke
+    über 150 mg/l mit Gehalt; die Zusatzstoffe gibst du in der Allergenliste mit an.'
+  en: 'After the corrected food hygiene review report (22.10.2026): warning for azo dyes added, “chininhaltig” under the Flavourings Implementing Ordinance (AromenDV), caffeine statement only for soft drinks
+    above 150 mg/l with content; you enter the additives in the allergen list as well.'
+- de: Sobald du mindestens eine Person beschäftigst, sind die Gefährdungen an jedem Arbeitsplatz zu beurteilen, Schutzmaßnahmen festzulegen und das zu dokumentieren. Amtlos erstellt dir dafür eine Vorlage
+    passend zu deiner Branche. Überprüfe die Beurteilung bei Änderungen der Arbeitsstätte oder der Tätigkeiten, bei neuen Arbeitsmitteln oder Arbeitsstoffen, nach Unfällen und Beinaheunfällen, bei Berufskrankheiten
+    oder Gesundheitsbeschwerden, nach Ergebnissen der arbeitsmedizinischen Vorsorge, bei neuen Vorschriften oder Erkenntnissen und wenn du Jugendliche beschäftigst oder eine Beschäftigte dir ihre Schwangerschaft
+    mitteilt.
+  en: As soon as you employ at least one person, the hazards at every workplace must be assessed, protective measures defined and documented. Amtlos creates a template for this suited to your sector. Review
+    the assessment when the workplace or activities change, when there are new work equipment or substances, after accidents and near misses, in case of occupational diseases or health complaints, after
+    results of occupational health care, when there are new regulations or findings, and when you employ young people or an employee informs you of her pregnancy.

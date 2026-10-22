@@ -1,7 +1,7 @@
 # Katalog E.52 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.52, Frage 13) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.fasi_betriebsarzt
-version: 3
+version: 4
 katalog_nr: E.52
 titel:
   de: Fachkraft für Arbeitssicherheit und Betriebsarzt
@@ -29,7 +29,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Bußgeld bis 10.000 €, wenn die Betreuung fehlt (Bußgeldvorschrift der DGUV Vorschrift 2 deiner BG in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
+    de: 'Kein unmittelbares Bußgeld. Die Aufsichtsbehörde kann die Bestellung anordnen (§ 12 ASiG); ein Verstoß gegen die vollziehbare Anordnung kostet bis 25.000 € (§ 20 Abs. 1 Nr. 1, Abs. 2 ASiG). Auch die Berufsgenossenschaft kann Anordnungen treffen (§ 19 SGB VII).'
   schwere: hoch
 automatisierung: partner
 status_recht: in_kraft
@@ -41,6 +41,9 @@ quellen:
 - titel: Arbeitssicherheitsgesetz
   url: https://www.gesetze-im-internet.de/asig/
   abgerufen: null
+- titel: 'Arbeitssicherheitsgesetz § 20 (lxgesetze)'
+  url: https://lxgesetze.de/asig/20
+  abgerufen: '2026-10-22'
 - titel: DGUV Vorschrift 2 (UKBW, § 2, Anlagen 1 bis 3)
   url: https://live.relaunch.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_2.pdf
   abgerufen: '2026-10-22'
@@ -48,8 +51,7 @@ quellen:
   url: https://www.bgn.de/praevention-arbeitshilfen/unsere-leistungen/arbeitsmedizinische-und-sicherheitstechnische-betreuung/unternehmermodell/Update_DGUV_Vorschrift2_Unternehmermodell.pdf
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026: Paragraf der Bußgeldvorschrift je BG prüfen – in der abgerufenen Fassung der UKBW keine eigene Bußgeldvorschrift gefunden; Höchstbetrag nach § 209 Abs. 3 SGB VII'
-- Grenzen für das Unternehmermodell je BG als Daten ergänzen
+- 'Grenzen für das Unternehmermodell je BG als Daten ergänzen (laut Freigabe Sifa 22.10.2026 richtig, da BG-spezifisch, z. B. BGN > 10 bis 50 Beschäftigte; Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

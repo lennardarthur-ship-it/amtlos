@@ -7,7 +7,7 @@ import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { ALLERGENE_UMFANG, HACCP, HAUTSCHUTZ_FRISEUR, HYGIENE, IFSG, LOSE_WARE } from "./bausteine.js";
 import { AUFZEICHNUNGEN, CCP_BEGRUENDUNG, CCP_EINSTUFUNG, CCP_FRAGEN, CCP_FRAGEN_QUELLE, CCP_HINWEIS, CCP_VORSCHLAEGE, GEFAHRENANALYSE, GEFAHR_ARTEN, GEFAHR_KURZ, GHP_HINWEIS, GHP_KURZ, GRENZWERT_HACCP, GRENZWERT_HILFE, HACCP_AUFBEWAHRUNG, HACCP_AUFBEWAHRUNG_QUELLE, HACCP_FLEXIBEL, HACCP_RUECKRUF, HACCP_VEREINFACHT, HYGIENE_BAECKEREI, HYGIENE_FOODTRUCK, PROZESSSCHRITTE, VERIFIZIERUNG } from "./haccp.js";
 import { KOPF_LINIE, LINIE, ZELLE_LINIE, abschnitt, absatz, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, neufassung, plusMonate, punkte, stabileOption, tabelle, text, unterschriften, zelle, zusammen } from "./html.js";
-import { ALLERGENE, GETREIDEARTEN, NUSSARTEN, WEIZENARTEN_FUSSNOTE, ZUSATZSTOFFE, ZUSATZSTOFFE_QUELLE, optionen } from "./konstanten.js";
+import { ALLERGENE, GETREIDEARTEN, NUSSARTEN, WARNFARBSTOFFE, WEIZENARTEN_FUSSNOTE, ZUSATZSTOFFE, ZUSATZSTOFFE_QUELLE, optionen } from "./konstanten.js";
 import type { Betrieb, Daten, Eintrag, Vorlage, Vorschlag } from "./typen.js";
 
 /**
@@ -113,7 +113,7 @@ export const ALLERGENE_HILFE = {
   stand: "Bei Rezept- oder Lieferantenwechsel sofort aktualisieren (Zutatenlisten der Zulieferer aufbewahren).",
   sulfit: "Schwefeldioxid und Sulphite: Ankreuzen, wenn eine Zutat „geschwefelt“ oder „Sulfit“ in der Zutatenliste nennt.",
   spuren: "Ein Spurenhinweis wie „Kann Spuren von Nüssen enthalten“ ist freiwillig und ersetzt keine Kennzeichnung – ankreuzen nur, was als Zutat enthalten ist, nicht pauschal alles.",
-  zusatzstoffe: "Die Ziffer steht auf dem Aushang hinter dem Namen, die Erklärung darunter. 1 bis 11: Kenntlichmachung nach § 5 LMZDV – ankreuzen, wenn die Zutatenliste einen solchen Zusatzstoff nennt. 12 koffeinhaltig (Getränke ab 150 mg Koffein je Liter) und 13 chininhaltig (z. B. Tonic Water): nach Anhang III Nr. 4 LMIV i. V. m. § 2 LMIDV.",
+  zusatzstoffe: "Die Ziffer steht auf dem Aushang hinter dem Namen, die Erklärung darunter. 1 bis 11: Kenntlichmachung nach § 5 LMZDV – ankreuzen, wenn die Zutatenliste einen solchen Zusatzstoff nennt. 12 Koffeinhinweis „Erhöhter Koffeingehalt. Für Kinder und schwangere oder stillende Frauen nicht empfohlen“: nur für Erfrischungsgetränke mit mehr als 150 mg Koffein je Liter (z. B. Cola, Energydrink), nicht für Kaffee und Tee; den Koffeingehalt in mg/100 ml gibst du an (§ 6 FrSaftErfrischGetrV i. V. m. Anhang III Nr. 4.1 LMIV). 13 chininhaltig: nicht vorverpackte Getränke mit Chinin bis 1,2 % vol, z. B. Tonic Water oder Bitter Lemon (§ 5 Abs. 1 AromenDV). 14 Warnhinweis „Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen“ bei den Farbstoffen E 102, 104, 110, 122, 124 und 129 (Azofarbstoffe; Art. 24 i. V. m. Anhang V VO (EG) Nr. 1333/2008; nicht bei Getränken über 1,2 % vol) – den Farbstoff wählst du aus, Ziffer 1 „mit Farbstoff“ kommt automatisch dazu.",
 };
 
 /** Kurzname eines Allergens in der Zeile „Enthält:“ unter der Speise (Milch ohne Klammerzusatz). */
@@ -146,8 +146,26 @@ function enthaelt(x: Eintrag, a: string[]): string {
   }
   return teile.length ? `Enthält: ${teile.join(", ")}` : "";
 }
-/** Ziffern der Zusatzstoffe einer Speise (Stelle in ZUSATZSTOFFE, 1-basiert). */
-const ziffern = (x: Eintrag) => ZUSATZSTOFFE.map((o, i) => (auswahl(x, "zusatzstoffe").includes(o.wert) ? i + 1 : 0)).filter(Boolean);
+/** Ziffern der Zusatzstoffe einer Speise (Stelle in ZUSATZSTOFFE, 1-basiert); der Warnhinweis Farbstoff (14) schließt „mit Farbstoff“ (1) ein. */
+const ziffern = (x: Eintrag) => {
+  const a = auswahl(x, "zusatzstoffe");
+  return ZUSATZSTOFFE.map((o, i) => (a.includes(o.wert) || (o.wert === "farbstoff" && a.includes("azofarbstoff")) ? i + 1 : 0)).filter(Boolean);
+};
+/**
+ * Angaben an der Speise (berichtigter Prüfbericht 22.10.2026): Koffeingehalt in mg/100 ml (Anhang III Nr. 4.1 LMIV) und die
+ * Farbstoffe nach Anhang V VO (EG) Nr. 1333/2008 mit E-Nummer und Namen; der Wortlaut der Hinweise steht in der Legende.
+ * Fehlt der Koffeingehalt, steht eine Linie zum Eintragen (die App meldet ihn unter „Fehlt noch“).
+ */
+function angabenSpeise(x: Eintrag): string {
+  const a = auswahl(x, "zusatzstoffe");
+  const teile: string[] = [];
+  if (a.includes("koffein")) teile.push(`Koffeingehalt: ${text(x, "koffein_mg") ? `${zelle(text(x, "koffein_mg"))} mg/100 ml` : `${LINIE} mg/100 ml`}`);
+  if (a.includes("azofarbstoff")) {
+    const f = auswahl(x, "warnfarbstoffe").map((w) => optionText(WARNFARBSTOFFE, w));
+    teile.push(f.length ? esc(f.join(", ")) : `Farbstoff: ${LINIE}`);
+  }
+  return teile.join(" · ");
+}
 
 export const allergenAushang: Vorlage = {
   id: "allergene",
@@ -188,7 +206,10 @@ export const allergenAushang: Vorlage = {
             // ausdrückliche Bestätigung: ohne sie steht kein „keines der 14 Hauptallergene“ auf dem Aushang
             { id: "keine", art: "schalter", label: "Enthält keines der 14 Hauptallergene" },
             // Prüfbericht Frage 13: Zusatzstoffe in der Allergenliste statt einer eigenen Vorlage
-            { id: "zusatzstoffe", art: "mehrfach", label: "Zusatzstoffe und weitere Angaben (Ziffern)", optionen: ZUSATZSTOFFE.map((o, i) => ({ wert: o.wert, text: `${i + 1} ${o.text}` })), hilfe: ALLERGENE_HILFE.zusatzstoffe },
+            { id: "zusatzstoffe", art: "mehrfach", label: "Zusatzstoffe und weitere Angaben (Ziffern)", optionen: ZUSATZSTOFFE.map((o, i) => ({ wert: o.wert, text: `${i + 1} ${o.auswahl ?? o.text}` })), hilfe: ALLERGENE_HILFE.zusatzstoffe },
+            // berichtigter Prüfbericht 22.10.2026: Koffeingehalt (Anhang III Nr. 4.1 LMIV) und Farbstoff (Anhang V VO 1333/2008) an der Speise
+            { id: "koffein_mg", art: "zahl", label: "Koffeingehalt (mg/100 ml)", pflicht: true, hilfe: "Steht auf dem Etikett des Getränks, z. B. 32 mg/100 ml bei einem Energydrink.", wenn: { feld: "zusatzstoffe", ist: "koffein" } },
+            { id: "warnfarbstoffe", art: "mehrfach", label: "Welcher Farbstoff", optionen: WARNFARBSTOFFE, pflicht: true, hilfe: "Laut Zutatenliste – auf dem Aushang steht die E-Nummer mit Namen an der Speise.", wenn: { feld: "zusatzstoffe", ist: "azofarbstoff" } },
             { id: "spuren", selten: true, art: "text", label: "Spurenhinweis (freiwillig)", hilfe: ALLERGENE_HILFE.spuren, vorschlaege: ["Kann Spuren von Nüssen enthalten."] },
           ],
         },
@@ -224,7 +245,8 @@ export const allergenAushang: Vorlage = {
           // § 4 LMIDV (Prüfbericht Frage 10): „Enthält:“ als Textzeile unter der Speise zusätzlich zu den Punkten
           const e = enthaelt(x, a);
           const z = ziffern(x);
-          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${z.length ? `<sup>${z.join(",")}</sup>` : ""}${keine ? '<br><span class="klein">keines der 14 Hauptallergene</span>' : ""}${e ? `<br><span class="klein">${e}</span>` : ""}${text(x, "spuren") ? `<br><span class="klein">${zelle(text(x, "spuren"))}</span>` : ""}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "●" : ""}</td>`).join("")}</tr>`;
+          const s = angabenSpeise(x);
+          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${z.length ? `<sup>${z.join(",")}</sup>` : ""}${keine ? '<br><span class="klein">keines der 14 Hauptallergene</span>' : ""}${e ? `<br><span class="klein">${e}</span>` : ""}${s ? `<br><span class="klein">${s}</span>` : ""}${text(x, "spuren") ? `<br><span class="klein">${zelle(text(x, "spuren"))}</span>` : ""}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "●" : ""}</td>`).join("")}</tr>`;
         });
         return `<tbody${k ? ' class="gruppe-block"' : ""}>${k ? `<tr class="gruppe"><td colspan="${nummern.length + 1}"><strong>${zelle(k)}</strong></td></tr>` : ""}${zeilen.join("")}</tbody>`;
       })
@@ -234,10 +256,10 @@ export const allergenAushang: Vorlage = {
     // „Enthält:“ als Überschrift der Legende (§ 4 LMIDV), Fußnote zu den Weizenarten (Prüfbericht Frage 9)
     const schluessel = `<p class="schluessel"><b>Enthält:</b> ${nummern.map((id, i) => `<span class="nb"><b>${kz(i)}</b> ${esc(ALLERGENE[id]!)}</span>`).join(" · ")}<br>${esc(WEIZENARTEN_FUSSNOTE)}</p>`;
     // Zusatzstoffe (Prüfbericht Frage 13): Legende unter der Allergen-Legende – die verwendeten Ziffern, auf dem leeren
-    // Blatt alle; Quelle getrennt nach LMZDV und LMIV/LMIDV
+    // Blatt alle; Quelle: 1–11 nach LMZDV, die übrigen Ziffern je mit eigener Fundstelle
     const benutzt = new Set(g.flatMap(ziffern));
     const zz = ZUSATZSTOFFE.map((o, i) => ({ ...o, nr: i + 1 })).filter((o) => !g.length || benutzt.has(o.nr));
-    const quelle = [zz.some((o) => o.lmzdv) ? `1–11: Kenntlichmachung nach ${ZUSATZSTOFFE_QUELLE.lmzdv}` : "", zz.some((o) => !o.lmzdv) ? `12, 13: nach ${ZUSATZSTOFFE_QUELLE.weitere}` : ""].filter(Boolean).join("; ");
+    const quelle = [zz.some((o) => o.lmzdv) ? `1–11: Kenntlichmachung nach ${ZUSATZSTOFFE_QUELLE.lmzdv}` : "", ...zz.filter((o) => !o.lmzdv).map((o) => `${o.nr}: ${o.quelle}`)].filter(Boolean).join("; ");
     const zusatz = zz.length ? `<p class="schluessel"><b>Zusatzstoffe und weitere Angaben:</b> ${zz.map((o) => `<span class="nb"><b>${o.nr}</b> ${esc(o.text)}</span>`).join(" · ")}<br>${esc(quelle)}</p>` : "";
     const inhalt = `<table class="liste matrix${g.length ? "" : " hoch"}"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}${g.length ? zeilenHtml : leereZeilen}</table>${schluessel}${zusatz}`;
     // leeres Blatt: die Matrix füllt die erste Seite, die Erläuterung folgt als eigenes Blatt; die Erläuterung bricht

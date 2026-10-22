@@ -61,8 +61,7 @@ quellen:
 - titel: Chemikaliengesetz § 26
   url: https://www.gesetze-im-internet.de/chemg/__26.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026: Unterschrift der Unterwiesenen nach § 14 Abs. 2 GefStoffV – die Unterweisungsvorlage bestätigt bisher mit eingetipptem Namen (Vorlage, T-13); Höchstbetrag 50.000 € über § 26 Abs. 3 ChemG statt 5.000 € nach ArbSchG – rechtlich bestätigen'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -68,8 +68,7 @@ quellen:
 - titel: Betriebssicherheitsverordnung (§§ 12, 22)
   url: https://www.gesetze-im-internet.de/betrsichv_2015/BJNR004910015.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026: Spezialnormen gegengeprüft (§ 22 Abs. 1 Nr. 25 GefStoffV, § 20 Abs. 1 Nr. 23 BioStoffV, § 22 Abs. 1 Nr. 26 BetrSichV, § 25 Abs. 1 Nr. 2 Buchst. a ArbSchG) – Schwere „hoch“ trotz nur mittelbarer Bußgeldbewehrung nach ArbSchG fachlich bestätigen'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -2,14 +2,14 @@
 # Prüfergebnis Sifa 22.10.2026 (C Katalog E.53, C Fehlende Pflichten „Prüfung Leitern/Tritte, Regale“): Auslöser auf alle Betriebe mit Beschäftigten erweitert
 schema_version: 1
 id: arbeitsschutz.arbeitsmittel_pruefen
-version: 4
+version: 5
 katalog_nr: E.53
 titel:
   de: Arbeitsmittel prüfen lassen
 kurz:
   de: Leitern, Tritte, Regale, Maschinen, Hebebühnen, Druckbehälter und andere Arbeitsmittel lässt du regelmäßig durch eine befähigte Person prüfen und hältst das fest.
 erklaerung:
-  de: 'Arbeitsmittel gibt es in fast jedem Betrieb: Leitern und Tritte, Lagerregale, Aufschnitt- und Knetmaschinen, Hebebühnen und Hubgeräte, Kompressoren, Druckluftgeräte und Getränkeschankanlagen. Arbeitsmittel, deren Sicherheit von der Montage abhängt, lässt du vor der ersten Verwendung prüfen; Arbeitsmittel, die schädigenden Einflüssen ausgesetzt sind, prüft eine zur Prüfung befähigte Person wiederkehrend (§ 14 BetrSichV). Art, Umfang und Abstände der Prüfungen legst du in der Gefährdungsbeurteilung fest (§ 3 Abs. 6 BetrSichV); die Ergebnisse zeichnest du auf und bewahrst sie auf (§ 14 Abs. 7 BetrSichV). Für Leitern und Tritte hilft die DGUV Information 208-016, für Lagerregale die DIN EN 15635 (Sichtkontrollen und jährliche Inspektion durch eine fachkundige Person). In Kfz-Werkstätten gehören Hebebühnen dazu: Sie werden vor der ersten Inbetriebnahme und danach in der Regel jährlich geprüft (DGUV Grundsatz 308-002). Druckbehälter wie der Druckluftbehälter eines Kompressors werden nach §§ 15, 16 und Anhang 2 Abschnitt 4 BetrSichV geprüft – ab bestimmten Größen durch eine zugelassene Überwachungsstelle. Firmenfahrzeuge (DGUV Vorschrift 70) und elektrische Geräte (DGUV Vorschrift 3) haben eigene Pflichten.'
+  de: 'Arbeitsmittel gibt es in fast jedem Betrieb: Leitern und Tritte, Lagerregale, Aufschnitt- und Knetmaschinen, Hebebühnen und Hubgeräte, Kompressoren, Druckluftgeräte und Getränkeschankanlagen. Arbeitsmittel, deren Sicherheit von der Montage abhängt, lässt du vor der ersten Verwendung prüfen; Arbeitsmittel, die schädigenden Einflüssen ausgesetzt sind, prüft eine zur Prüfung befähigte Person wiederkehrend (§ 14 BetrSichV). Art, Umfang und Abstände der Prüfungen legst du in der Gefährdungsbeurteilung fest (§ 3 Abs. 6 BetrSichV); die Ergebnisse zeichnest du auf und bewahrst sie auf (§ 14 Abs. 7 BetrSichV). Für Leitern und Tritte hilft die DGUV Information 208-016, für Lagerregale die DIN EN 15635 (Sichtkontrollen und jährliche Inspektion durch eine fachkundige Person). In Kfz-Werkstätten gehören Hebebühnen dazu: Sie werden vor der ersten Inbetriebnahme und danach in der Regel jährlich geprüft (DGUV Grundsatz 308-002). Für Druckbehälter wie den Druckluftbehälter eines Kompressors gelten besondere Prüfpflichten (§§ 15, 16 und Anhang 2 Abschnitt 4 BetrSichV): Bei Druckbehältern (z. B. Kompressor) klärst du Prüfpflichten und Prüfer mit einer zugelassenen Überwachungsstelle. Firmenfahrzeuge (DGUV Vorschrift 70) und elektrische Geräte (DGUV Vorschrift 3) haben eigene Pflichten.'
 rechtsgrundlage:
 - § 3 Abs. 6 BetrSichV
 - § 14 BetrSichV
@@ -67,9 +67,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026 (offen): Schwellen (Druck × Volumen) nach Anhang 2 Abschnitt 4 BetrSichV, ab denen eine zugelassene Überwachungsstelle prüft, durch einen Sachverständigen bestätigen lassen; Prüfprotokoll mit Prüfbuch als Vorlage fehlt'
-- Lärm (LärmVibrationsArbSchV) als eigene Pflicht arbeitsschutz.laerm (Prüfergebnis Sifa 22.10.2026)
-- Prüffristen kommen aus der Gefährdungsbeurteilung – als „laufend je Jahr“ abgebildet; Prüfprotokoll-Vorlage fehlt
+- 'Prüfprotokoll-Vorlage (mit Prüfbuch) fehlt; Prüffristen kommen aus der Gefährdungsbeurteilung – als „laufend je Jahr“ abgebildet (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,14 +1,14 @@
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Expositionsverzeichnis“, C Katalog E.55, Hinweise Nr. 8): § 10a GefStoffV
 schema_version: 1
 id: arbeitsschutz.expositionsverzeichnis
-version: 1
+version: 2
 katalog_nr: E.55
 titel:
   de: Expositionsverzeichnis bei krebserzeugenden Stoffen führen
 kurz:
   de: Arbeiten Beschäftigte mit krebserzeugenden, erbgutverändernden oder fortpflanzungsgefährdenden Stoffen der Kategorie 1A oder 1B, führst du ein Expositionsverzeichnis.
 erklaerung:
-  de: 'Ergibt die Gefährdungsbeurteilung eine Gefährdung durch Tätigkeiten mit krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A oder 1B, führst du ein Verzeichnis der betroffenen Beschäftigten mit Art, Dauer, Häufigkeit und Höhe der Exposition (§ 10a Abs. 1 GefStoffV). Typisch sind Hartholzstaub (Eiche, Buche) in der Tischlerei, Dieselmotoremissionen in der Kfz-Werkstatt und Quarzstaub oder Asbest auf Baustellen. Das Verzeichnis bewahrst du nach Ende der Exposition 40 Jahre auf, bei nur reproduktionstoxischen Stoffen 5 Jahre (§ 10a Abs. 2 GefStoffV); scheidet jemand aus, händigst du ihm seinen Auszug aus. Die Aufbewahrung kannst du an die Zentrale Expositionsdatenbank (ZED) der DGUV abgeben (§ 10a Abs. 3 GefStoffV). Die Einzelheiten erläutert die TRGS 410.'
+  de: 'Ergibt die Gefährdungsbeurteilung eine Gefährdung durch Tätigkeiten mit krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A oder 1B, führst du ein Verzeichnis der betroffenen Beschäftigten mit Art, Dauer, Häufigkeit und Höhe der Exposition (§ 10a Abs. 1 GefStoffV). Typisch sind Hartholzstaub (Eiche, Buche) in der Tischlerei, Dieselmotoremissionen in der Kfz-Werkstatt und Quarzstaub oder Asbest auf Baustellen – dort gilt die Pflicht typischerweise; ob sie in deinem Betrieb im Einzelfall entfällt, klärst du in einer Beratung, etwa mit deiner Fachkraft für Arbeitssicherheit. Das Verzeichnis bewahrst du nach Ende der Exposition 40 Jahre auf, bei nur reproduktionstoxischen Stoffen 5 Jahre (§ 10a Abs. 2 GefStoffV); scheidet jemand aus, händigst du ihm seinen Auszug aus. Die Aufbewahrung kannst du an die Zentrale Expositionsdatenbank (ZED) der DGUV abgeben (§ 10a Abs. 3 GefStoffV). Die Einzelheiten erläutert die TRGS 410.'
 rechtsgrundlage:
 - § 10a GefStoffV
 - TRGS 410
@@ -67,8 +67,7 @@ quellen:
 - titel: Haufe – § 10a GefStoffV Expositionsverzeichnis (laut Prüfergebnis Sifa)
   url: https://www.haufe.de/id/beitrag/novellierung-der-gefahrstoffverordnung-fokus-krebserz-11-10a-expositionsverzeichnis-auch-fuer-reproduktionstoxische-stoffe-kat-1a-oder-1b-HI16494225.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis über Branche und Gefahrstoff-Angabe (Amtlos fragt Kategorie 1A/1B nicht ab); Vorlage vorlage.expositionsverzeichnis verknüpft; Verzicht nach TRGS 410 (z. B. bei Einhaltung der Akzeptanzkonzentration) nicht abgebildet'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

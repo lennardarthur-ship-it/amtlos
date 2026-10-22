@@ -1,18 +1,19 @@
 # R12 (Rechtsprüfung Befund 12): Zusatzstoffe bei loser Ware kenntlich machen
 schema_version: 1
 id: branche.gastro_zusatzstoffe
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Zusatzstoffe bei loser Ware kenntlich machen
 kurz:
   de: Bei loser Ware und auf der Speisekarte machst du bestimmte Zusatzstoffe kenntlich, etwa „mit Farbstoff“ oder „mit Konservierungsstoff“.
 erklaerung:
-  de: 'Für Lebensmittel, die du lose abgibst – an der Theke, im Restaurant oder im Imbiss –, gibst du bestimmte Zusatzstoffe an (§ 5 LMZDV): „mit Farbstoff“, „mit Konservierungsstoff“ oder „konserviert“, „mit Antioxidationsmittel“, „mit Geschmacksverstärker“, „geschwefelt“, „geschwärzt“, „gewachst“, „mit Phosphat“, „mit Süßungsmittel(n)“, „enthält eine Phenylalaninquelle“ und „kann bei übermäßigem Verzehr abführend wirken“. Für Getränke kommen „koffeinhaltig“ und „chininhaltig“ dazu – diese Angaben stammen nicht aus der LMZDV, sondern aus Anhang III Nr. 4 LMIV in Verbindung mit § 2 LMIDV. Üblich sind Fußnoten auf der Speisekarte oder ein Schild an der Ware. Stattdessen kannst du die Angaben auch in einem Aushang, einer schriftlichen Aufstellung oder elektronisch bereithalten, wenn du deutlich darauf hinweist (§ 5 Abs. 3 LMZDV). Die Allergenkennzeichnung ist eine eigene Pflicht; in der Allergenliste von Amtlos kannst du die Zusatzstoffe gleich mit angeben – dann hängt ein Blatt mit beidem aus.'
+  de: 'Für Lebensmittel, die du lose abgibst – an der Theke, im Restaurant oder im Imbiss –, gibst du bestimmte Zusatzstoffe an (§ 5 LMZDV): „mit Farbstoff“, „mit Konservierungsstoff“ oder „konserviert“, „mit Antioxidationsmittel“, „mit Geschmacksverstärker“, „geschwefelt“, „geschwärzt“, „gewachst“, „mit Phosphat“, „mit Süßungsmittel(n)“, „enthält eine Phenylalaninquelle“ und „kann bei übermäßigem Verzehr abführend wirken“. Enthält ein Lebensmittel einen der Farbstoffe E 102, E 104, E 110, E 122, E 124 oder E 129 (Azofarbstoffe), steht zum Namen oder zur E-Nummer des Farbstoffs der Warnhinweis „Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen“ (Art. 24 in Verbindung mit Anhang V Verordnung (EG) Nr. 1333/2008; nicht bei Getränken über 1,2 % vol). Für Getränke kommen zwei Angaben dazu, die nicht aus der LMZDV stammen: „chininhaltig“ bei nicht vorverpackten Getränken mit Chinin bis 1,2 % vol (§ 5 Abs. 1 AromenDV) und bei Erfrischungsgetränken mit mehr als 150 mg Koffein je Liter der Hinweis „Erhöhter Koffeingehalt. Für Kinder und schwangere oder stillende Frauen nicht empfohlen“ mit dem Koffeingehalt in mg/100 ml – nicht bei Kaffee und Tee (§ 6 FrSaftErfrischGetrV in Verbindung mit Anhang III Nr. 4.1 LMIV). Üblich sind Fußnoten auf der Speisekarte oder ein Schild an der Ware. Stattdessen kannst du die Angaben auch in einem Aushang, einer schriftlichen Aufstellung oder elektronisch bereithalten, wenn du deutlich darauf hinweist (§ 5 Abs. 3 LMZDV). Die Allergenkennzeichnung ist eine eigene Pflicht; in der Allergenliste von Amtlos kannst du die Zusatzstoffe gleich mit angeben – dann hängt ein Blatt mit beidem aus.'
 rechtsgrundlage:
 - § 5 LMZDV
-- Verordnung (EG) Nr. 1333/2008
-- Anhang III Nr. 4 Verordnung (EU) Nr. 1169/2011 (LMIV) i. V. m. § 2 LMIDV
+- Art. 24 i. V. m. Anhang V Verordnung (EG) Nr. 1333/2008
+- § 5 Abs. 1 AromenDV
+- § 6 FrSaftErfrischGetrV i. V. m. Anhang III Nr. 4.1 Verordnung (EU) Nr. 1169/2011 (LMIV)
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
@@ -38,7 +39,7 @@ automatisierung: hinweis
 aktion:
   art: abhaken
 aenderungsnotiz:
-  de: 'Nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): vollständige Liste der Angaben, „koffeinhaltig“ und „chininhaltig“ richtig zugeordnet; die Zusatzstoffe gibst du in der Allergenliste mit an.'
+  de: 'Nach dem berichtigten Prüfbericht Lebensmittelhygiene (22.10.2026): Warnhinweis bei Azofarbstoffen ergänzt, „chininhaltig“ nach der Aromen-Durchführungsverordnung, Koffeinhinweis nur für Erfrischungsgetränke über 150 mg/l mit Gehalt; die Zusatzstoffe gibst du in der Allergenliste mit an.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -46,10 +47,21 @@ quellen:
 - titel: Lebensmittelzusatzstoff-Durchführungsverordnung (Lebensmittelüberwachung Bremen)
   url: https://www.lmtvet.bremen.de/sixcms/media.php/13/Lebensmittelzusatzstoff-Durchf%C3%BChrungsverordnung-LMZDV.pdf
   abgerufen: '2026-10-21'
+- titel: 'Anhang V VO (EG) Nr. 1333/2008 – Lebensmittelfarbstoffe nach Artikel 24 (gesetze.legal)'
+  url: https://gesetze.legal/eu/vo_eg_2008_1333/anhang_v
+  abgerufen: '2026-10-22'
+- titel: 'Aromen-Durchführungsverordnung § 5 (lxgesetze)'
+  url: https://lxgesetze.de/aromendv/5
+  abgerufen: '2026-10-22'
+- titel: 'Fruchtsaft- und Erfrischungsgetränkeverordnung § 6 (lxgesetze)'
+  url: https://lxgesetze.de/frsafterfrischgetrv/6
+  abgerufen: '2026-10-22'
+- titel: 'IT-Recht Kanzlei – Hinweispflicht Koffeingehalt (Wortlaut Anhang III Nr. 4.1 LMIV)'
+  url: https://www.it-recht-kanzlei.de/getraenke-koffeingehalt-hinweispflicht.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Neu nach Rechtsprüfung R12 (Befund 12) – Fundstelle § 5 LMZDV vom 2.6.2021 (BGBl. I S. 1362) laut Text der LMZDV (Lebensmittelüberwachung Bremen), im BGBl. gegenlesen
-- 'Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Fragen 12 und 13, ✔): Rechtsgrundlage § 5 LMZDV stimmt, Liste der Kenntlichmachungen laut Bericht übernommen; „koffeinhaltig“ und „chininhaltig“ nach Anhang III Nr. 4 LMIV i. V. m. § 2 LMIDV (§ 2 LMIDV nicht am Wortlaut gelesen); Zusatzstoffe in die Allergenliste statt eigener Vorlage – Bericht noch nicht unterschrieben'
-- 'Azofarbstoffe mit Warnhinweis: Der Bericht nennt „Anhang V LMIV“ – der Warnhinweis steht nach unserem Kenntnisstand in Anhang V VO (EG) Nr. 1333/2008; Fundstelle klären, bevor der Hinweis in den Text kommt'
+- 'Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Fragen 12 und 13, ✔; berichtigte Fassung): Rechtsgrundlage § 5 LMZDV stimmt, Liste der Kenntlichmachungen laut Bericht übernommen; Azofarbstoffe nach Art. 24 i. V. m. Anhang V VO (EG) Nr. 1333/2008, „chininhaltig“ nach § 5 Abs. 1 AromenDV, Koffeinhinweis nach § 6 FrSaftErfrischGetrV i. V. m. Anhang III Nr. 4.1 LMIV – am 22.10.2026 am Wortlaut geprüft (Anhang V über gesetze.legal, § 5 AromenDV und § 6 FrSaftErfrischGetrV über lxgesetze, Anhang III Nr. 4.1 LMIV nur über Sekundärquelle; EUR-Lex nicht abrufbar); Zusatzstoffe in die Allergenliste statt eigener Vorlage – Bericht noch nicht unterschrieben'
 - 'Höhe des Bußgelds fachlich ergänzen (laut Bericht nicht Gegenstand der fachlichen Prüfung)'
 pruefung:
   status: entwurf

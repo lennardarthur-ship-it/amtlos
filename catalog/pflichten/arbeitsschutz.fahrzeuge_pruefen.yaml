@@ -1,14 +1,14 @@
 # R12 (Nutzertest Kurier #4, 3a): Fahrzeuge jährlich prüfen (§ 57 DGUV Vorschrift 70)
 schema_version: 1
 id: arbeitsschutz.fahrzeuge_pruefen
-version: 3
+version: 4
 katalog_nr: E.53
 titel:
   de: Firmenfahrzeuge jährlich durch einen Sachkundigen prüfen lassen
 kurz:
   de: Fahrzeuge, die deine Beschäftigten fahren, lässt du mindestens einmal im Jahr durch einen Sachkundigen auf ihren betriebssicheren Zustand prüfen und hältst das fest.
 erklaerung:
-  de: Fahrzeuge sind bei Bedarf, mindestens aber einmal jährlich, durch einen Sachkundigen auf ihren betriebssicheren Zustand zu prüfen; die Ergebnisse hältst du schriftlich fest (§ 57 DGUV Vorschrift 70). Die Hauptuntersuchung ersetzt diese Prüfung nicht automatisch – sie prüft die Verkehrssicherheit, nicht den betriebssicheren Zustand für die Arbeit, etwa Aufbauten, Ladebordwand oder Ladungssicherung.
+  de: Fahrzeuge sind bei Bedarf, mindestens aber einmal jährlich, durch einen Sachkundigen auf ihren betriebssicheren Zustand zu prüfen (§ 57 Abs. 1 DGUV Vorschrift 70). Die Ergebnisse hältst du schriftlich fest und bewahrst sie mindestens bis zur nächsten Prüfung auf (§ 57 Abs. 2 DGUV Vorschrift 70). Die Hauptuntersuchung ersetzt diese Prüfung nicht automatisch – sie prüft die Verkehrssicherheit, nicht den betriebssicheren Zustand für die Arbeit, etwa Aufbauten, Ladebordwand oder Ladungssicherung.
 rechtsgrundlage:
 - § 57 DGUV Vorschrift 70
 kategorie: arbeitsschutz
@@ -59,8 +59,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/sgb_7/__209.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026 (frei): § 57 DGUV Vorschrift 70 „bei Bedarf, mindestens jährlich“ bestätigt; Aufbewahrungsdauer der Prüfergebnisse und Sanktion fachlich ergänzen; Prüfprotokoll-Vorlage fehlt'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 58 DGUV Vorschrift 70 (Musterfassung 1997, aktualisiert 2000) nennt § 57 ohne Einschränkung; maßgeblich ist die Unfallverhütungsvorschrift der zuständigen BG – Fassung dort gegenlesen) – fachlich zu bestätigen'
+- 'Prüfprotokoll-Vorlage fehlt (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

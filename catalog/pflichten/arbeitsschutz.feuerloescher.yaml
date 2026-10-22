@@ -1,7 +1,7 @@
 # R11 (Nutzertest Tischlerei Befund 6): Feuerlöscher nach ASR A2.2; Prüfergebnis Sifa 22.10.2026 (C Katalog E.54, frei): Prüfabstand bestätigt
 schema_version: 1
 id: arbeitsschutz.feuerloescher
-version: 2
+version: 3
 katalog_nr: E.54
 titel:
   de: Feuerlöscher bereitstellen und prüfen lassen
@@ -32,7 +32,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 5.000 €, wenn Sicherheitseinrichtungen wie Feuerlöscher nicht regelmäßig gewartet und auf ihre Funktionsfähigkeit geprüft werden (§ 9 Abs. 1 ArbStättV in Verbindung mit § 4 Abs. 3 ArbStättV und § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG). Fehlen geeignete Feuerlöscher, kann die Aufsichtsbehörde Maßnahmen anordnen; ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG).'
   schwere: mittel
 automatisierung: hinweis
 erledigung:
@@ -48,9 +48,14 @@ quellen:
 - titel: ASR A2.2 Maßnahmen gegen Brände (BAuA)
   url: https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-2.html
   abgerufen: null
+- titel: 'Arbeitsstättenverordnung (§§ 4, 9)'
+  url: https://www.gesetze-im-internet.de/arbst_ttv_2004/BJNR217910004.html
+  abgerufen: null
+- titel: 'Arbeitsschutzgesetz (§§ 22, 25)'
+  url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
+  abgerufen: null
 fachlich_zu_pruefen:
-- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen'
-- 'Prüfabstand „spätestens alle zwei Jahre“ laut Prüfergebnis Sifa 22.10.2026 bestätigt – die Erledigung gilt in Amtlos weiter nur für das Kalenderjahr (laufend je Jahr); Abstand aus einem Prüfnachweis übernehmen, sobald es eine Vorlage gibt (Technik)'
+- 'Prüfabstand „spätestens alle zwei Jahre“ laut Prüfergebnis Sifa 22.10.2026 bestätigt – die Erledigung gilt in Amtlos weiter nur für das Kalenderjahr (laufend je Jahr); Abstand aus einem Prüfnachweis übernehmen (laut Freigabe Sifa 22.10.2026 fachlich richtig), sobald es eine Vorlage gibt (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

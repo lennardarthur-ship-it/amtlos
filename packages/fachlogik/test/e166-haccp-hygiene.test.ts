@@ -110,6 +110,8 @@ describe("HACCP: Kern nach Art. 5 Abs. 2 VO (EG) Nr. 852/2004", () => {
     const backen = GEFAHRENANALYSE.find((x) => x.titel === "Backen")!;
     expect(backen.werte.arten).toEqual(["biologisch", "chemisch", "physikalisch"]);
     expect(backen.quelle).toContain("VO (EU) 2017/2158");
+    // berichtigter Prüfbericht: kleine Betriebe Anhang II Teil A, Teil B nur zusätzlich für Filial-/Franchisebetriebe
+    expect(backen.quelle).toContain("Art. 2 Abs. 2 mit Anhang II Teil A bei Abgabe im eigenen Laden oder an örtliche Einzelhändler; Anhang II Teil B nach Art. 2 Abs. 3 nur zusätzlich für zentral gesteuerte Filial- und Franchisebetriebe");
     expect(String(GEFAHRENANALYSE.find((x) => x.titel === "Lagerung tiefgekühlt")!.werte.lenkung)).toContain("Auftaudatum beschriften, aufgetaute Ware binnen 24 Stunden verarbeiten");
     expect(GEFAHRENANALYSE.find((x) => x.titel === "Zubereitung")!.werte.arten).toContain("chemisch");
     // Kühlzeilen bleiben in der CCP-Tabelle, gekennzeichnet; alle übrigen sind CCP

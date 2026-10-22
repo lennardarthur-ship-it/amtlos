@@ -56,8 +56,7 @@ quellen:
 - titel: DGUV Vorschrift 3
   url: https://publikationen.dguv.de/regelwerk/dguv-vorschriften/
   abgerufen: null
-fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026: Prüffristen kommen aus der Gefährdungsbeurteilung, Richtwerte Tabellen 1A/1B bestätigt; § 9 DGUV Vorschrift 3 (Verstöße gegen §§ 3, 5 Abs. 1 bis 3, 6, 7) über die VBG-Fassung gelesen'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

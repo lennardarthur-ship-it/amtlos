@@ -60,9 +60,7 @@ quellen:
 - titel: 'Arbeitsschutzgesetz (§§ 22, 25)'
   url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Kürzere Frist für Jugendliche als eigene Pflicht arbeitsschutz.unterweisung_jugendliche (R11)'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 25 ArbSchG nennt § 12 nicht, § 32 DGUV Vorschrift 1 nennt § 4 nicht; Höhe der Anordnung nach § 25 Abs. 2 ArbSchG 30.000 € (abweichend vom Text bei arbeitsschutz.erstunterweisung, dort 5.000 €)) – fachlich zu bestätigen'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null
