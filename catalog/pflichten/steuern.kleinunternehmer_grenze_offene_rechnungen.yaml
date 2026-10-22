@@ -1,0 +1,167 @@
+# Katalog C.23 · neu am 22.10.2026 nach StB Busch, Rückmeldung Runde 2: „Grenze überschritten“ und „ab 1. Januar“ zählen nur
+# tatsächliche Zahlungseingänge (finanzen.umsatz.bezahlt_*); liegt die Grenze nur zusammen mit offenen Rechnungen darüber
+# (finanzen.umsatz.vereinnahmt_*, Ersatzregel Rechnungsdatum), dieser Hinweis statt einer Aussage zur Steuerpflicht.
+# Wortlaut gelesen am 22.10.2026: § 14c Abs. 2 Satz 1 UStG (gesetze-im-internet.de)
+schema_version: 1
+id: steuern.kleinunternehmer_grenze_offene_rechnungen
+version: 1
+katalog_nr: C.23
+titel:
+  de: Mit deinen offenen Rechnungen würdest du die Grenze überschreiten
+kurz:
+  de: Zählt Amtlos deine Rechnungen ohne vermerkten Zahlungseingang mit, liegt dein Umsatz über einer Kleinunternehmergrenze. Mit den Zahlungen, die du schon bekommen hast, liegt er noch darunter.
+erklaerung:
+  de: 'Für die Kleinunternehmergrenze zählt nur Geld, das du schon bekommen hast (vereinnahmte Entgelte, netto). Die Grenze
+    liegt bei 25.000 € im Vorjahr und im Gründungsjahr und bei 100.000 € im laufenden Jahr; über 25.000 € in diesem Jahr gilt
+    ab 1. Januar die Regelbesteuerung. Amtlos zählt Rechnungen ohne vermerkten Zahlungseingang hier mit dem Rechnungsdatum mit –
+    dann liegt dein Umsatz über einer dieser Grenzen. Mit den erhaltenen Zahlungen allein liegt er noch darunter. Solange das so
+    ist, bleibst du Kleinunternehmer und weist auf deinen Rechnungen keine Umsatzsteuer aus: Wer Umsatzsteuer in einer Rechnung
+    gesondert ausweist, obwohl er dazu nicht berechtigt ist, schuldet den ausgewiesenen Betrag (§ 14c Abs. 2 UStG). Gehen die
+    offenen Beträge ein, kann die Grenze überschritten sein. Vermerke deshalb deine Zahlungseingänge in Amtlos – dann rechnet
+    Amtlos genau und zeigt dir, wenn die Grenze mit deinen Zahlungen tatsächlich überschritten ist. Steuerfreie Umsätze (z. B.
+    Heilbehandlungen) rechnet Amtlos heraus, wenn du sie auf der Rechnung mit „0 % / steuerfrei“ und dem Hinweis auf die
+    Steuerbefreiung erfasst. Verkäufe von Anlagegütern zählen nicht zur Grenze – erfasst du sie als Rechnung, kann der angezeigte
+    Wert zu hoch sein. Einnahmen außerhalb von Amtlos sind nicht enthalten.'
+rechtsgrundlage:
+- § 19 UStG
+- § 14c Abs. 2 UStG
+- Abschn. 19.2 Abs. 3, 4 UStAE (Fassung vom 18.03.2025)
+kategorie: steuern
+ausloeser:
+  all:
+  - feld: profil.ust.kleinunternehmer
+    op: ==
+    wert: true
+    label:
+      de: Du nutzt die Kleinunternehmerregelung.
+  - any:
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: true
+        label:
+          de: Du hast dein Unternehmen in diesem Jahr gegründet.
+      - &id001
+        feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
+        op: vorhanden
+        label:
+          de: Du erfasst Rechnungen oder Kasseneinnahmen in Amtlos.
+      - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_gruendungsjahr
+        label:
+          de: Mit deinen offenen Rechnungen liegen deine Einnahmen laut Amtlos im Gründungsjahr über 25.000 €.
+      - not:
+          all:
+          - &id002
+            feld: finanzen.umsatz.bezahlt_laufendes_jahr
+            op: vorhanden
+          - feld: finanzen.umsatz.bezahlt_laufendes_jahr
+            op: '>'
+            wert:
+              regelwert: steuern.ustg19.grenze_gruendungsjahr
+        label:
+          de: Mit den erhaltenen Zahlungen allein liegen sie nicht über 25.000 €.
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: false
+      - *id001
+      - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_laufendes_jahr
+        label:
+          de: Mit deinen offenen Rechnungen liegen deine Einnahmen laut Amtlos in diesem Jahr über 100.000 €.
+      - not:
+          all:
+          - *id002
+          - feld: finanzen.umsatz.bezahlt_laufendes_jahr
+            op: '>'
+            wert:
+              regelwert: steuern.ustg19.grenze_laufendes_jahr
+        label:
+          de: Mit den erhaltenen Zahlungen allein liegen sie nicht über 100.000 €.
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: false
+      - feld: abgeleitet.noch_nicht_gestartet
+        op: ==
+        wert: false
+      - *id001
+      - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_vorjahr
+        label:
+          de: Mit deinen offenen Rechnungen liegen deine Einnahmen laut Amtlos in diesem Jahr über 25.000 €.
+      - not:
+          all:
+          - *id002
+          - feld: finanzen.umsatz.bezahlt_laufendes_jahr
+            op: '>'
+            wert:
+              regelwert: steuern.ustg19.grenze_vorjahr
+        label:
+          de: Mit den erhaltenen Zahlungen allein liegen sie nicht über 25.000 €.
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: false
+      - feld: abgeleitet.noch_nicht_gestartet
+        op: ==
+        wert: false
+      - feld: finanzen.umsatz.vereinnahmt_vorjahr
+        op: vorhanden
+      - feld: finanzen.umsatz.vereinnahmt_vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_vorjahr
+        label:
+          de: Mit deinen offenen Rechnungen lagen deine Einnahmen laut Amtlos im Vorjahr über 25.000 €.
+      - not:
+          all:
+          - feld: finanzen.umsatz.bezahlt_vorjahr
+            op: vorhanden
+          - feld: finanzen.umsatz.bezahlt_vorjahr
+            op: '>'
+            wert:
+              regelwert: steuern.ustg19.grenze_vorjahr
+        label:
+          de: Mit den erhaltenen Zahlungen allein lagen sie nicht über 25.000 €.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Weist du Umsatzsteuer aus, obwohl du dazu nicht berechtigt bist, schuldest du den ausgewiesenen Betrag (§ 14c Abs. 2 UStG).
+  schwere: mittel
+automatisierung: hinweis
+einordnung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 19
+  url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
+  abgerufen: null
+- titel: Umsatzsteuergesetz § 14c
+  url: https://www.gesetze-im-internet.de/ustg_1980/__14c.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'neu am 22.10.2026, Prüfung durch StB Busch ausstehend (Steuer-Eintrag; Anlass: seine Rückmeldung Runde 2 zu steuern.kleinunternehmer_grenze_ueberschritten und …_naechstes_jahr)'
+- 'Auslöser: Zählung mit Ersatzregel (finanzen.umsatz.vereinnahmt_*, offene Rechnungen ab Rechnungsdatum) über einer Grenze, Zählung nur aus Zahlungseingängen (finanzen.umsatz.bezahlt_*) nicht – Gründungsjahr 25.000 €, laufendes Jahr 100.000 € und 25.000 € (ab 1. Januar), Vorjahr 25.000 €. Auf dem Server fehlen die Zahlungsfakten (dort keine Zahlungseingänge): Er zeigt den Hinweis, sobald seine Rechnungen nach Rechnungsdatum über einer Grenze liegen – fachlich prüfen, ob der Text dafür passt'
+- 'Formulierung „weist keine Umsatzsteuer aus, solange …“ nach Busch (§ 14c Abs. 2 UStG); RDG: als Information formuliert – prüfen. Wortlaut § 19 UStG n. F. am 22.10.2026 nicht abrufbar (Allowlist), Inhalt nach StB Busch'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -11,7 +11,10 @@ fakten:
   profil.umsatz.prognose_laufendes_jahr: 25000
   finanzen.umsatz.vereinnahmt_laufendes_jahr: 25000
   finanzen.umsatz.vereinnahmt_vorjahr: 0
+  finanzen.umsatz.bezahlt_laufendes_jahr: 25000
+  finanzen.umsatz.bezahlt_vorjahr: 0
 erwartet:
   steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht
   steuern.kleinunternehmer_warnung_95: gilt
   steuern.kleinunternehmer_warnung_80: gilt_nicht
+  steuern.kleinunternehmer_grenze_offene_rechnungen: gilt_nicht

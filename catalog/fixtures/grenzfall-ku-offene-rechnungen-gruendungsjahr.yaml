@@ -1,0 +1,21 @@
+persona: grenzfall
+beschreibung: 'StB Busch 22.10.2026, Runde 2 (C.23): Gründungsjahr, mit offenen Rechnungen 26.000 €, nur aus Zahlungseingängen
+  20.000 € – Grenze im Gründungsjahr nicht überschritten, Hinweis zu den offenen Rechnungen'
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: freiberuf
+  profil.gruendungsdatum: '2026-03-01'
+  profil.taetigkeit.einordnung: freiberuf
+  profil.ust.kleinunternehmer: true
+  profil.umsatz.prognose_laufendes_jahr: 24000
+  profil.bundesland: BY
+  profil.gemeinde_ags: 09162000
+  finanzen.umsatz.vereinnahmt_laufendes_jahr: 26000
+  finanzen.umsatz.bezahlt_laufendes_jahr: 20000
+  finanzen.umsatz.vereinnahmt_vorjahr: 0
+  finanzen.umsatz.bezahlt_vorjahr: 0
+erwartet:
+  steuern.kleinunternehmer_grenze_offene_rechnungen: gilt
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht
+  steuern.kleinunternehmer_warnung_95: gilt_nicht
+  steuern.kleinunternehmer_warnung_80: gilt_nicht

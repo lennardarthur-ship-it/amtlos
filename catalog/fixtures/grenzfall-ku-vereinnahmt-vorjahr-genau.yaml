@@ -13,6 +13,9 @@ fakten:
   profil.gemeinde_ags: 09162000
   finanzen.umsatz.vereinnahmt_vorjahr: 25000
   finanzen.umsatz.vereinnahmt_laufendes_jahr: 30000
+  finanzen.umsatz.bezahlt_vorjahr: 25000
+  finanzen.umsatz.bezahlt_laufendes_jahr: 30000
 erwartet:
   steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht
   steuern.kleinunternehmer_naechstes_jahr: gilt
+  steuern.kleinunternehmer_grenze_offene_rechnungen: gilt_nicht

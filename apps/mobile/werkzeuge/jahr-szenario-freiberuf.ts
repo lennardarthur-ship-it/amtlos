@@ -506,9 +506,12 @@ export function standBauen(): Bau {
     const f = umsatzFakten(s, "2026-12-31");
     vergleich("Kleinunternehmergrenze", "Gesamtumsatz 2026 nach vereinnahmten Entgelten (Inland) + Rechnungen ohne Zahlungsvermerk", Math.round((f["finanzen.umsatz.vereinnahmt_laufendes_jahr"] ?? -1) * 100), ku.inland + ku.ersatz);
     vergleich("Kleinunternehmergrenze", "Gesamtumsatz 2025 laut App (keine Rechnungen 2025 in der App)", Math.round((f["finanzen.umsatz.vereinnahmt_vorjahr"] ?? -1) * 100), 0);
+    // StB Busch, Runde 2: „überschritten“ und „ab 1. Januar“ nur aus tatsächlichen Zahlungseingängen (ohne offene Rechnungen)
+    vergleich("Kleinunternehmergrenze", "Gesamtumsatz 2026 nur aus Zahlungseingängen (Inland, ohne offene Rechnungen)", Math.round((f["finanzen.umsatz.bezahlt_laufendes_jahr"] ?? -1) * 100), ku.inland);
     const w = auswertung(PROFIL, "2026-12-31", s.unterlagen, [], f);
     const kuIds = [...w.gilt, ...w.gruendung].map((p) => p.id).filter((id) => /^steuern\.kleinunternehmer_(warnung|grenze|naechstes)/.test(id));
-    vergleichText("Kleinunternehmergrenze", "Wächter (80 %, 95 %, überschritten, ab 1. Januar) zum 31.12.2026", kuIds.join(", ") || "keiner", ku.inland + ku.ersatz > 2_500_000 ? "steuern.kleinunternehmer_naechstes_jahr" : "keiner");
+    const kuSoll = [...(ku.inland > 2_500_000 ? ["steuern.kleinunternehmer_naechstes_jahr"] : []), ...(ku.inland + ku.ersatz > 2_500_000 && ku.inland <= 2_500_000 ? ["steuern.kleinunternehmer_grenze_offene_rechnungen"] : [])];
+    vergleichText("Kleinunternehmergrenze", "Wächter (80 %, 95 %, überschritten, ab 1. Januar, offene Rechnungen) zum 31.12.2026", [...kuIds].sort().join(", ") || "keiner", kuSoll.sort().join(", ") || "keiner");
   }
 
   // ---------------------------------------------------------------- übersprungene Vorlagen
