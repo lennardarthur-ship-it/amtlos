@@ -1,7 +1,7 @@
 # Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gesellschaftsvertrag_notar
-version: 2
+version: 3
 katalog_nr: B.14
 titel:
   de: Gesellschaftsvertrag beim Notar beurkunden
@@ -42,9 +42,8 @@ kanal: notar
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: 'Ohne notarielle Beurkundung ist der Gesellschaftsvertrag nichtig (§ 2 Abs. 1 Satz 1 GmbHG, § 125 Satz 1 BGB). Die GmbH oder UG besteht vor der Eintragung als solche nicht; wer vorher in ihrem Namen handelt, haftet persönlich und solidarisch (§ 11 Abs. 1, 2 GmbHG).'
+  schwere: hoch
 automatisierung: hinweis
 aktion:
   art: abhaken
@@ -56,13 +55,21 @@ quellen:
 - titel: GmbH-Gesetz
   url: https://www.gesetze-im-internet.de/gmbhg/
   abgerufen: null
+- titel: GmbH-Gesetz § 2
+  url: https://www.gesetze-im-internet.de/gmbhg/__2.html
+  abgerufen: '2026-10-22'
+- titel: § 125 BGB, Wortlaut (gesetze-in-app.de)
+  url: https://gesetze-in-app.de/BGB/125
+  abgerufen: '2026-10-22'
+- titel: § 11 GmbHG, Wortlaut (lexmea.de)
+  url: https://lexmea.de/de/gesetz/gmbhg/11
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Einzelne Vorschriften (z. B. § 2 GmbHG Form, § 5 Stammkapital, § 7 Einzahlung) zuordnen
 - 'Online-Beurkundung: Voraussetzungen und Grenzen ergänzen'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Formnichtigkeit nach § 125 Satz 1 BGB; Heilung durch Eintragung nicht geprüft); Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

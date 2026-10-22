@@ -1,7 +1,7 @@
 # Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.euer
-version: 3
+version: 4
 katalog_nr: C.27
 titel:
   de: Einnahmen-Überschuss-Rechnung (Anlage EÜR) abgeben
@@ -117,7 +117,7 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Die Einnahmenüberschussrechnung übermittelst du nach amtlich vorgeschriebenem Datensatz (§ 60 Abs. 4 EStDV); das Finanzamt kann sie mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO). Wird die Steuererklärung zu spät abgegeben, droht ein Verspätungszuschlag (§ 152 AO).'
   schwere: mittel
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
@@ -129,11 +129,23 @@ quellen:
 - titel: Einkommensteuergesetz § 4
   url: https://www.gesetze-im-internet.de/estg/__4.html
   abgerufen: null
+- titel: Einkommensteuer-Durchführungsverordnung § 60
+  url: https://www.gesetze-im-internet.de/estdv_1955/__60.html
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 328 (Zwangsmittel)
+  url: https://www.gesetze-im-internet.de/ao_1977/__328.html
+  abgerufen: '2026-10-22'
+- titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
+  url: https://lexetius.com/AO/329,2
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 152 (Verspätungszuschlag)
+  url: https://www.gesetze-im-internet.de/ao_1977/__152.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender
   I)
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Kein Bußgeldtatbestand für die Anlage EÜR gesucht außer § 379 AO)'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

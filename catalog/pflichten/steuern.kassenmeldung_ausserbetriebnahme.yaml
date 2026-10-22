@@ -1,7 +1,7 @@
 # Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kassenmeldung_ausserbetriebnahme
-version: 3
+version: 4
 katalog_nr: C.33
 titel:
   de: Außerbetriebnahme einer Kasse melden
@@ -37,7 +37,7 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: '§ 379 AO nennt die Mitteilung nach § 146a Abs. 4 AO nicht – ein eigenes Bußgeld ist dafür nicht vorgesehen. Das Finanzamt kann die Mitteilung mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   schwere: mittel
 automatisierung: formular_vorausfuellen
 erledigung:
@@ -52,11 +52,20 @@ gueltig_bis: null
 quellen:
 - titel: Abgabenordnung § 146a
   url: https://www.gesetze-im-internet.de/ao_1977/__146a.html
-  abgerufen: null
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 379 (Steuergefährdung)
+  url: https://www.gesetze-im-internet.de/ao_1977/__379.html
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 328 (Zwangsmittel)
+  url: https://www.gesetze-im-internet.de/ao_1977/__328.html
+  abgerufen: '2026-10-22'
+- titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
+  url: https://lexetius.com/AO/329,2
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO (Steuerprüfung R11 Befund 19, „dürfte greifen“, unsicher) – bestätigen'
 - 'Mehrere Kassen: je Ereignis eine Meldung (derzeit Bezug auf die erste Außerbetriebnahme)'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

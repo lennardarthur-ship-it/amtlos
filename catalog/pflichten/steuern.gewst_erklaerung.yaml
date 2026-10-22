@@ -1,7 +1,7 @@
 # Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.gewst_erklaerung
-version: 2
+version: 3
 katalog_nr: C.27
 titel:
   de: Gewerbesteuererklärung abgeben
@@ -66,7 +66,7 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel. Er beträgt für jeden angefangenen Monat 25 €, höchstens 25.000 € (§ 152 Abs. 6, Abs. 10 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   schwere: mittel
 automatisierung: formular_vorausfuellen
 status_recht: in_kraft
@@ -85,6 +85,15 @@ quellen:
 - titel: Gewerbesteuergesetz
   url: https://www.gesetze-im-internet.de/gewstg/
   abgerufen: null
+- titel: Abgabenordnung § 152 (Verspätungszuschlag)
+  url: https://www.gesetze-im-internet.de/ao_1977/__152.html
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 328 (Zwangsmittel)
+  url: https://www.gesetze-im-internet.de/ao_1977/__328.html
+  abgerufen: '2026-10-22'
+- titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
+  url: https://lexetius.com/AO/329,2
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Einzelunternehmen und Personengesellschaften nur bei Gewerbeertrag über 24.500 € (§ 25 Abs. 1 Nr. 1 GewStDV), sonst auf Aufforderung des Finanzamts oder zur Feststellung eines Verlusts – Gewinn als Näherung für den Gewerbeertrag (Hinzurechnungen nicht berücksichtigt); Nutzertests R11 Kosmetik und Gründerin, bestätigen'
 - Fristen nach § 149 Abs. 2 und 3 AO ergänzt (E-129, Quelle Recherche 13.10.2026 über dejure.org und Finanzamt BW) – gegen amtliche Fassung prüfen
@@ -92,7 +101,7 @@ fachlich_zu_pruefen:
 - Vorabanforderung nach § 149 Abs. 4 AO (frühere Frist im Einzelfall) und Fristverlängerung auf Antrag nicht abgebildet
 - 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO – Feiertagskalender des Bundeslands prüfen'
 - Freibetrag (C.34) als Regelwert führen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Gewerbesteuererklärung als Erklärung zur Festsetzung des Steuermessbetrags nach § 152 Abs. 6 AO behandelt – bestätigen)'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

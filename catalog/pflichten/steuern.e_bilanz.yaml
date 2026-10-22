@@ -1,7 +1,7 @@
 # Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.e_bilanz
-version: 2
+version: 3
 katalog_nr: B.18
 titel:
   de: E-Bilanz ans Finanzamt übermitteln
@@ -113,7 +113,7 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: '§ 5b EStG nennt kein eigenes Bußgeld. Das Finanzamt kann die Übermittlung mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   schwere: mittel
 automatisierung: hinweis
 erledigung:
@@ -129,10 +129,16 @@ gueltig_bis: null
 quellen:
 - titel: Einkommensteuergesetz § 5b
   url: https://www.gesetze-im-internet.de/estg/__5b.html
-  abgerufen: null
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 328 (Zwangsmittel)
+  url: https://www.gesetze-im-internet.de/ao_1977/__328.html
+  abgerufen: '2026-10-22'
+- titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
+  url: https://lexetius.com/AO/329,2
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist (gekoppelt an die Steuererklärung) als Regeldaten ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Verspätungszuschlag über die Steuererklärung nicht geprüft)'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

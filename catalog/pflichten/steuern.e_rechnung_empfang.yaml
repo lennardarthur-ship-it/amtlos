@@ -1,7 +1,7 @@
 # Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.e_rechnung_empfang
-version: 2
+version: 3
 katalog_nr: C.30
 titel:
   de: E-Rechnungen empfangen können
@@ -29,7 +29,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: '§ 26a UStG nennt kein eigenes Bußgeld dafür, E-Rechnungen nicht empfangen zu können.'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -41,10 +41,16 @@ quellen:
 - titel: Umsatzsteuergesetz § 14
   url: https://www.gesetze-im-internet.de/ustg_1980/__14.html
   abgerufen: null
+- titel: UStG § 26a (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/ustg_1980/__26a.html
+  abgerufen: '2026-10-22'
+- titel: § 14 UStG, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/ustg/14
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Gilt für alle Unternehmen, auch Kleinunternehmer – bestätigen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Empfangspflicht folgt nur mittelbar aus § 14 Abs. 1 Satz 5 UStG (keine Zustimmung bei Pflicht nach Abs. 2 Satz 2 Nr. 1); Schwere „niedrig“ fachlich erwägen)'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf

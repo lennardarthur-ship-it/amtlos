@@ -1,7 +1,7 @@
 # R10: aus gruendung.handwerksrolle herausgelöst (Rechtsprüfung: Anlage B1/B2 kommen in das Verzeichnis nach § 19 HwO, Anzeige bei Beginn nach § 18 HwO)
 schema_version: 1
 id: gruendung.handwerk_verzeichnis
-version: 2
+version: 3
 katalog_nr: A.4
 titel:
   de: Im Verzeichnis der Handwerkskammer eintragen (Anlage B)
@@ -55,7 +55,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 1.000 €, wenn die Anzeige nach § 18 Abs. 1 HwO nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig erstattet wird (§ 118 Abs. 1 Nr. 1, Abs. 2 HwO).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -65,10 +65,13 @@ quellen:
 - titel: Handwerksordnung
   url: https://www.gesetze-im-internet.de/hwo/
   abgerufen: null
+- titel: Handwerksordnung § 118
+  url: https://www.gesetze-im-internet.de/hwo/__118.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Gebäudereinigung als Anlage B1 (Nr. 33) automatisch ausgelöst (R11) – Nummer der Anlage bestätigen'
 - 'Anzeige „bei Beginn“ (§ 18 HwO, gleichzeitig mit der Gewerbeanzeige) als „spätestens am Tag des Beginns“ umgesetzt (R10, Rechtsprüfung) – bestätigen'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

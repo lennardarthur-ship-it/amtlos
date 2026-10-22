@@ -1,7 +1,7 @@
 # Katalog C.26 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.vorauszahlung_est_kst
-version: 1
+version: 2
 katalog_nr: C.26
 titel:
   de: Vorauszahlungen zur Einkommen- oder Körperschaftsteuer zahlen
@@ -43,7 +43,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -55,10 +55,13 @@ quellen:
 - titel: Einkommensteuergesetz § 37
   url: https://www.gesetze-im-internet.de/estg/__37.html
   abgerufen: null
+- titel: § 240 AO (Säumniszuschläge), Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/ao/240
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Verschiebung auf den nächsten Werktag bei Zahlungsterminen bestätigen
 - Schonfrist bei Überweisung erwähnen?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

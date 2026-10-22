@@ -1,7 +1,7 @@
 # Katalog C.24. Zeigt: Rhythmus abhängig von Fakten, Regelwerte, Dauerfristverlängerung.
 schema_version: 1
 id: steuern.ust_voranmeldung
-version: 4
+version: 5
 katalog_nr: C.24
 titel:
   de: Umsatzsteuer-Voranmeldung abgeben
@@ -127,7 +127,7 @@ stelle:
 kanal: elster
 kosten: null
 sanktion:
-  text: { de: Die Folgen sind noch nicht fachlich erfasst. }
+  text: { de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO). Wer die Vorauszahlung nicht, nicht vollständig oder nicht rechtzeitig zahlt, riskiert außerdem ein Bußgeld bis 30.000 € (§ 26a Abs. 1, 3 UStG in Verbindung mit § 18 Abs. 1 Satz 4 UStG). Für eine verspätete Voranmeldung kann das Finanzamt einen Verspätungszuschlag festsetzen (§ 152 Abs. 1 AO).' }
   schwere: mittel
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
@@ -140,10 +140,19 @@ gueltig_bis: null
 quellen:
   - titel: Umsatzsteuergesetz § 18
     url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
-    abgerufen: null
+    abgerufen: '2026-10-22'
+  - titel: § 240 AO (Säumniszuschläge), Wortlaut (gesetze.legal)
+    url: https://gesetze.legal/bund/ao/240
+    abgerufen: '2026-10-22'
+  - titel: UStG § 26a (Bußgeldvorschriften)
+    url: https://www.gesetze-im-internet.de/ustg_1980/__26a.html
+    abgerufen: '2026-10-22'
+  - titel: Abgabenordnung § 152 (Verspätungszuschlag)
+    url: https://www.gesetze-im-internet.de/ao_1977/__152.html
+    abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
   - "R10: Pflicht gilt bei Umsatz über der Kleinunternehmergrenze ohne Regelung nach § 19 auch ohne bekannte Vorjahres-Zahllast (Hinweis Nutzertest) – Sonderfälle (Befreiung bis 2.000 €) bestätigen"
-  - "Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (früherer Text war nicht belegt)"
+  - 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Schwere „mittel“ belassen – „hoch“ fachlich erwägen)'
   - "Befreiung bis Grenze ist laut Spezifikation 'möglich' (Ermessen Finanzamt?) – Auslöser bildet das als 'gilt nicht' ab; Formulierung prüfen"
   - "Neugründer: Aussetzung der monatlichen Pflicht 2021–2026 (Radar) – Rhythmus im Gründungs- und Folgejahr festlegen"
   - "R12 (UX #3): Rhythmus „weiß ich nicht“ ohne Vorjahressteuer ⇒ vorläufig vierteljährlich (Produktentscheidung) – Rechtsfolge durch die Steuerprüfung bestätigen"

@@ -1,7 +1,7 @@
 # Katalog B.15 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.handelsregister_anmeldung
-version: 3
+version: 4
 katalog_nr: B.15
 titel:
   de: Gesellschaft im Register eintragen lassen
@@ -40,9 +40,8 @@ kanal: notar
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: 'GmbH und UG bestehen vor der Eintragung als solche nicht; wer vorher in ihrem Namen handelt, haftet persönlich und solidarisch (§ 11 Abs. 1, 2 GmbHG). Die Erstanmeldung einer GmbH erzwingt das Registergericht nicht (§ 79 Abs. 2 GmbHG). Andere Anmeldepflichten, etwa der GmbH & Co. KG oder der Partnerschaft, kann es mit Zwangsgeld bis 5.000 € durchsetzen (§ 14 HGB, § 5 Abs. 2 PartGG).'
+  schwere: hoch
 automatisierung: hinweis
 aktion:
   art: formular
@@ -60,12 +59,23 @@ quellen:
 - titel: Partnerschaftsgesellschaftsgesetz
   url: https://www.gesetze-im-internet.de/partgg/
   abgerufen: null
+- titel: § 11 GmbHG, Wortlaut (lexmea.de)
+  url: https://lexmea.de/de/gesetz/gmbhg/11
+  abgerufen: '2026-10-22'
+- titel: GmbH-Gesetz § 79
+  url: https://www.gesetze-im-internet.de/gmbhg/__79.html
+  abgerufen: '2026-10-22'
+- titel: § 14 HGB, Wortlaut (lexmea.de)
+  url: https://lexmea.de/de/gesetz/hgb/14
+  abgerufen: '2026-10-22'
+- titel: Partnerschaftsgesellschaftsgesetz § 5
+  url: https://www.gesetze-im-internet.de/partgg/__5.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG (§ 106 HGB i. V. m. § 161 Abs. 2 HGB) und Partnerschaftsgesellschaft (§ 4 PartGG) – Voraussetzung Stammkapital gilt nur für GmbH und UG; Form der Anmeldung (§ 12 HGB, § 5 PartGG) bestätigen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Haftung vor Eintragung (Vorgesellschaft) als Hinweis ergänzen?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 79 Abs. 2 GmbHG schließt Zwangsgeld nach § 14 HGB für Anmeldungen nach §§ 7, 54, 57 Abs. 1, 58 Abs. 1 Nr. 3 GmbHG aus); Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
 pruefung:
   status: entwurf
   geprueft_von: null

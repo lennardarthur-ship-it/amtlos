@@ -269,6 +269,8 @@ eintraege:
   en: Federal Central Tax Office (Bundeszentralamt für Steuern)
 - de: Bundeszentralamt für Steuern (BZSt)
   en: Federal Central Tax Office (BZSt)
+- de: 'Bußgeld bis 1.000 €, wenn die Anzeige nach § 18 Abs. 1 HwO nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig erstattet wird (§ 118 Abs. 1 Nr. 1, Abs. 2 HwO).'
+  en: 'Fine of up to €1,000 if the notification under § 18(1) HwO is not made, or not made correctly, completely or on time (§ 118(1) no. 1, (2) HwO).'
 - de: Bußgeld bis 10.000 €, wenn Erste-Hilfe-Leistungen nicht dokumentiert werden (§ 32 DGUV Vorschrift 1 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
   en: Fine of up to €10,000 if first aid given is not documented (§ 32 DGUV Regulation 1 in conjunction with § 209(1) no. 1, (3) SGB VII).
 - de: Bußgeld bis 10.000 €, wenn Erste-Hilfe-Material oder Meldeeinrichtungen fehlen oder Erste-Hilfe-Leistungen nicht dokumentiert werden (§ 32 DGUV Vorschrift 1 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs.
@@ -282,6 +284,16 @@ eintraege:
   en: Fine of up to €10,000 if electrical installations and equipment are not inspected (§ 9 DGUV Regulation 3 in conjunction with § 209(1) no. 1, (3) SGB VII).
 - de: Bußgeld bis 2.500 €, wenn die Anzeige nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig erstattet wird (§ 209 Abs. 1 Nr. 9, Abs. 3 SGB VII).
   en: Fine of up to €2,500 if the report is not filed, not filed correctly, completely or on time (§ 209(1) no. 9, (3) SGB VII).
+- de: 'Bußgeld bis 2.500 €, wenn die Mitteilung zum Unternehmensbeginn nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig gemacht wird (§ 209 Abs. 1 Nr. 8, Abs. 3 SGB VII). Eine Gewerbeanzeige in derselben Woche erfüllt die Pflicht (§ 192 Abs. 1 SGB VII).'
+  en: 'Fine of up to €2,500 if the notification of the start of the business is not made, or not made correctly, completely or on time (§ 209(1) no. 8, (3) SGB VII). A trade registration within the same week fulfils the obligation (§ 192(1) SGB VII).'
+- de: 'Bußgeld bis 25.000 €, wenn Unterlagen nach § 147 Abs. 1 AO nicht oder nicht für die vorgeschriebene Dauer aufbewahrt werden und dadurch Steuerverkürzungen ermöglicht werden (§ 379 Abs. 1 Satz 1 Nr. 7, Abs. 6 AO); für Rechnungen nach § 14b UStG bis 5.000 € (§ 26a Abs. 2 Nr. 2, Abs. 3 UStG). Werden Handelsbücher vor Ablauf der Fristen beiseitegeschafft oder vernichtet, ist das strafbar, wenn später die Zahlungen eingestellt werden oder ein Insolvenzverfahren eröffnet oder mangels Masse abgelehnt wird (§ 283b Abs. 1 Nr. 2, Abs. 3 StGB).'
+  en: 'Fine of up to €25,000 if records under § 147(1) AO are not kept, or not for the prescribed period, and this makes tax evasion possible (§ 379(1) sentence 1 no. 7, (6) AO); for invoices under § 14b UStG up to €5,000 (§ 26a(2) no. 2, (3) UStG). Removing or destroying commercial books before the end of the retention period is a criminal offence if payments are later stopped or insolvency proceedings are opened or rejected for lack of assets (§ 283b(1) no. 2, (3) StGB).'
+- de: 'Bußgeld bis 25.000 €, wenn buchungspflichtige Geschäftsvorfälle nicht oder unrichtig aufgezeichnet werden und dadurch Steuerverkürzungen ermöglicht werden (§ 379 Abs. 1 Satz 1 Nr. 3, Abs. 6 AO). Wer gesetzlich vorgeschriebene Handelsbücher nicht führt oder die Bilanz nicht rechtzeitig aufstellt, macht sich strafbar, wenn später die Zahlungen eingestellt werden oder ein Insolvenzverfahren eröffnet oder mangels Masse abgelehnt wird: Freiheitsstrafe bis zu zwei Jahren oder Geldstrafe (§ 283b Abs. 1 Nr. 1, 3, Abs. 3 StGB).'
+  en: 'Fine of up to €25,000 if transactions that must be booked are not recorded or recorded incorrectly and this makes tax evasion possible (§ 379(1) sentence 1 no. 3, (6) AO). Anyone who does not keep legally required commercial books or does not prepare the balance sheet on time commits a criminal offence if payments are later stopped or insolvency proceedings are opened or rejected for lack of assets: imprisonment of up to two years or a fine (§ 283b(1) nos. 1, 3, (3) StGB).'
+- de: 'Bußgeld bis 25.000 €, wenn die Kasse nicht oder nicht richtig verwendet oder nicht oder nicht richtig durch eine TSE geschützt wird und dadurch Steuerverkürzungen ermöglicht werden (§ 379 Abs. 1 Satz 1 Nr. 4, 5, Abs. 6 AO). Für die fehlende Belegausgabe nach § 146a Abs. 2 AO sieht § 379 AO kein Bußgeld vor.'
+  en: 'Fine of up to €25,000 if the cash register is not used or not used correctly, or not protected or not correctly protected by a TSE, and this makes tax evasion possible (§ 379(1) sentence 1 nos. 4, 5, (6) AO). § 379 AO provides no fine for failing to issue receipts under § 146a(2) AO.'
+- de: 'Bußgeld bis 30.000 €, wenn eine meldepflichtige Zahlung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig gemeldet wird (§ 81 Abs. 2 Nr. 19 AWV in Verbindung mit § 19 Abs. 3 Nr. 1 Buchst. b, Abs. 6 AWG).'
+  en: 'Fine of up to €30,000 if a reportable payment is not reported, or not reported correctly, completely or on time (§ 81(2) no. 19 AWV in conjunction with § 19(3) no. 1 letter b, (6) AWG).'
 - de: Bußgeld bis 5.000 € bei Verstößen gegen die Lärm- und Vibrations-Arbeitsschutzverordnung, etwa ohne Gefährdungsbeurteilung, Gehörschutz oder Unterweisung (§ 16 Abs. 1 LärmVibrationsArbSchV in Verbindung
     mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
   en: Fine of up to €5,000 for breaches of the Noise and Vibration Occupational Safety Ordinance, for example without a risk assessment, hearing protection or instruction (§ 16(1) LärmVibrationsArbSchV
@@ -292,6 +304,12 @@ eintraege:
     § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
   en: Fine of up to €5,000 if the hazard is not assessed or documented, the operating instructions are missing or no instruction is given (§ 20(1) nos. 1 to 4, 22, 23 BioStoffV in conjunction with § 25(1)
     no. 1, (2) ArbSchG).
+- de: 'Bußgeld bis 5.000 €, wenn die Zusammenfassende Meldung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig abgegeben oder nicht rechtzeitig berichtigt wird (§ 26a Abs. 2 Nr. 5, Abs. 3 UStG).'
+  en: 'Fine of up to €5,000 if the recapitulative statement is not submitted, or not correctly, completely or on time, or not corrected on time (§ 26a(2) no. 5, (3) UStG).'
+- de: 'Bußgeld bis 5.000 €, wenn du dich als Versicherungs- oder Finanzanlagenvermittler nicht, nicht richtig oder nicht rechtzeitig eintragen lässt oder Änderungen nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig mitteilst (§ 144 Abs. 2 Nr. 8, 9, Abs. 4 GewO).'
+  en: 'Fine of up to €5,000 if, as an insurance or financial investment broker, you do not register, or not correctly or on time, or do not report changes, or not correctly, completely or on time (§ 144(2) nos. 8, 9, (4) GewO).'
+- de: 'Bußgeld bis 5.000 €, wenn du ein Reisegewerbe ohne die erforderliche Erlaubnis nach § 55 Abs. 2 GewO betreibst (§ 145 Abs. 1 Nr. 1 Buchst. b, Abs. 4 GewO).'
+  en: 'Fine of up to €5,000 if you carry on an itinerant trade without the required permit under § 55(2) GewO (§ 145(1) no. 1 letter b, (4) GewO).'
 - de: Bußgeld bis 5.000 €, wenn ein Arbeitsmittel nicht oder nicht rechtzeitig geprüft wird oder das Ergebnis nicht aufgezeichnet wird (§ 22 Abs. 1 Nr. 28, 30 BetrSichV in Verbindung mit § 25 Abs. 1 Nr.
     1, Abs. 2 ArbSchG).
   en: Fine of up to €5,000 if work equipment is not inspected or not inspected on time, or the result is not recorded (§ 22(1) nos. 28, 30 BetrSichV in conjunction with § 25(1) no. 1, (2) ArbSchG).
@@ -437,6 +455,8 @@ eintraege:
   en: The balance sheet in electronic form, submitted to the tax office (Finanzamt).
 - de: Die Einkommensteuererklärung übermittelst du elektronisch – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
   en: You submit your income tax return electronically – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
+- de: 'Die Einnahmenüberschussrechnung übermittelst du nach amtlich vorgeschriebenem Datensatz (§ 60 Abs. 4 EStDV); das Finanzamt kann sie mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO). Wird die Steuererklärung zu spät abgegeben, droht ein Verspätungszuschlag (§ 152 AO).'
+  en: 'You transmit the income surplus calculation using the official data record (§ 60(4) EStDV); the tax office can enforce it with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO). If the tax return is filed late, a late-filing surcharge may be imposed (§ 152 AO).'
 - de: Die Folgen sind noch nicht fachlich erfasst.
   en: The consequences have not yet been reviewed by experts.
 - de: Die Frist beginnt, sobald du von der Panne erfährst. Keine Meldung ist nötig, wenn voraussichtlich kein Risiko für die Betroffenen besteht – das entscheidest und dokumentierst du. Amtlos zeigt einen
@@ -795,6 +815,8 @@ eintraege:
   en: A percentage that each municipality sets itself and that determines the amount of trade tax.
 - de: Ein Vorgang, bei dem du Daten über Menschen nutzt, z. B. Kundenverwaltung oder Lohnabrechnung.
   en: An activity in which you use data about people, e.g. customer management or payroll.
+- de: 'Ein eigenes Bußgeld für die verspätete Aufstellung nennt das Gesetz nicht. Wer die Bilanz nicht in der vorgeschriebenen Zeit aufstellt, macht sich strafbar, wenn die Gesellschaft später ihre Zahlungen einstellt oder ein Insolvenzverfahren eröffnet oder mangels Masse abgelehnt wird: Freiheitsstrafe bis zu zwei Jahren oder Geldstrafe, bei Fahrlässigkeit bis zu einem Jahr (§ 283b Abs. 1 Nr. 3 Buchst. b, Abs. 2, 3 StGB in Verbindung mit § 283 Abs. 6 StGB).'
+  en: 'The law provides no separate fine for late preparation. Anyone who does not prepare the balance sheet within the prescribed time commits a criminal offence if the company later stops payments or insolvency proceedings are opened or rejected for lack of assets: imprisonment of up to two years or a fine, in case of negligence up to one year (§ 283b(1) no. 3 letter b, (2), (3) StGB in conjunction with § 283(6) StGB).'
 - de: Eine Beschäftigte hat dir ihre Schwangerschaft mitgeteilt.
   en: An employee has told you she is pregnant.
 - de: Eine Beschäftigung endet.
@@ -977,6 +999,8 @@ eintraege:
   en: Municipality (tax office, Steueramt)
 - de: Geplant ist eine Pflicht zur elektronischen Arbeitszeiterfassung, mit Übergangsfristen nach Betriebsgröße.
   en: An obligation to record working time electronically is planned, with transition periods depending on company size.
+- de: 'Geschäftsführer, die die Liste nicht einreichen, haften denjenigen, deren Beteiligung sich geändert hat, und den Gläubigern der Gesellschaft für den daraus entstandenen Schaden als Gesamtschuldner (§ 40 Abs. 3 GmbHG).'
+  en: 'Managing directors who do not file the list are jointly and severally liable for the resulting damage to those whose shareholding has changed and to the company''s creditors (§ 40(3) GmbHG).'
 - de: Gesellschafterliste aktualisieren
   en: Update the list of shareholders
 - de: Gesellschaftsvertrag beim Notar beurkunden
@@ -1007,10 +1031,16 @@ eintraege:
   en: File the trade tax return
 - de: Gewährleistung im Blick behalten
   en: Keep warranty in mind
+- de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel (§ 152 Abs. 1 bis 3 AO). Er beträgt für jeden angefangenen Monat 0,25 % der festgesetzten Steuer abzüglich Vorauszahlungen und anzurechnender Steuerabzugsbeträge, mindestens 25 €, höchstens 25.000 € (§ 152 Abs. 5 Satz 2, Abs. 10 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
+  en: 'If you file the return late, the tax office can impose a late-filing surcharge (Verspätungszuschlag); if it is not filed within 14 months after the end of the calendar year, it must as a rule do so (§ 152(1) to (3) AO). For each month or part of a month it amounts to 0.25 % of the assessed tax less prepayments and creditable withheld taxes, at least €25, at most €25,000 (§ 152(5) sentence 2, (10) AO). The tax office can also enforce filing with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
+- de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel. Er beträgt für jeden angefangenen Monat 25 €, höchstens 25.000 € (§ 152 Abs. 6, Abs. 10 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
+  en: 'If you file the return late, the tax office can impose a late-filing surcharge (Verspätungszuschlag); if it is not filed within 14 months after the end of the calendar year, it must as a rule do so. It amounts to €25 for each month or part of a month, at most €25,000 (§ 152(6), (10) AO). The tax office can also enforce filing with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
 - de: Gilt jetzt auch für Gastronomie, Gebäudereinigung, Praxen sowie Handwerk und Bau mit Gefahrstoffen.
   en: Now also applies to hospitality, building cleaning, medical practices and to trades and construction with hazardous substances.
 - de: Gilt jetzt für alle Betriebe mit Beschäftigten – auch Leitern, Tritte und Regale sind zu prüfen.
   en: Now applies to all businesses with employees – ladders, steps and racks must also be inspected.
+- de: 'GmbH und UG bestehen vor der Eintragung als solche nicht; wer vorher in ihrem Namen handelt, haftet persönlich und solidarisch (§ 11 Abs. 1, 2 GmbHG). Die Erstanmeldung einer GmbH erzwingt das Registergericht nicht (§ 79 Abs. 2 GmbHG). Andere Anmeldepflichten, etwa der GmbH & Co. KG oder der Partnerschaft, kann es mit Zwangsgeld bis 5.000 € durchsetzen (§ 14 HGB, § 5 Abs. 2 PartGG).'
+  en: 'A GmbH or UG does not exist as such before registration; anyone who acts in its name beforehand is personally and jointly liable (§ 11(1), (2) GmbHG). The registry court does not enforce the initial registration of a GmbH (§ 79(2) GmbHG). Other registration duties, for example of a GmbH & Co. KG or a partnership, it can enforce with a coercive fine of up to €5,000 (§ 14 HGB, § 5(2) PartGG).'
 - de: GoBD
   en: GoBD
 - de: GoBD einhalten und Verfahrensdokumentation führen
@@ -1310,6 +1340,12 @@ eintraege:
   en: Without this clarification, it remains unclear whether registration and reporting obligations apply.
 - de: Ohne geprüfte Software sind die Meldungen nicht möglich.
   en: Without certified software, the notifications are not possible.
+- de: 'Ohne gültige Freistellungsbescheinigung muss dein Auftraggeber 15 % der Gegenleistung einbehalten und für dich ans Finanzamt abführen, sofern die Gegenleistungen im Kalenderjahr 5.000 € (bei bestimmten Vermietern 15.000 €) übersteigen (§ 48 Abs. 1 Satz 1, Abs. 2 Satz 1 EStG).'
+  en: 'Without a valid exemption certificate your client must withhold 15 % of the payment and pay it to the tax office on your behalf, if the payments in the calendar year exceed €5,000 (€15,000 for certain landlords) (§ 48(1) sentence 1, (2) sentence 1 EStG).'
+- de: 'Ohne notarielle Beurkundung ist der Gesellschaftsvertrag nichtig (§ 2 Abs. 1 Satz 1 GmbHG, § 125 Satz 1 BGB). Die GmbH oder UG besteht vor der Eintragung als solche nicht; wer vorher in ihrem Namen handelt, haftet persönlich und solidarisch (§ 11 Abs. 1, 2 GmbHG).'
+  en: 'Without notarisation the articles of association are void (§ 2(1) sentence 1 GmbHG, § 125 sentence 1 BGB). Before registration the GmbH or UG does not exist as such; anyone who acts in its name beforehand is personally and jointly liable (§ 11(1), (2) GmbHG).'
+- de: 'Ordnungswidrig handelt, wer den Beginn der Beitragspflicht nicht fristgerecht anzeigt oder den Beitrag länger als sechs Monate nicht zahlt; verfolgt wird nur auf Antrag der Landesrundfunkanstalt (§ 12 Abs. 1 Nr. 1, 3, Abs. 3 RBStV). Eine Höhe nennt der Staatsvertrag nicht – dann gilt bis 1.000 € (§ 17 Abs. 1 OWiG).'
+  en: 'It is an administrative offence not to report the start of the contribution obligation on time or not to pay the contribution for more than six months; it is only prosecuted at the request of the state broadcaster (§ 12(1) nos. 1, 3, (3) RBStV). The treaty sets no amount – then up to €1,000 applies (§ 17(1) OWiG).'
 - de: Personen mit ständiger automatisierter Verarbeitung, ab denen ein Datenschutzbeauftragter zu benennen ist
   en: Persons constantly involved in automated processing from which a data protection officer must be appointed
 - de: Pflichten und Haftung der Geschäftsführung kennen
@@ -1535,10 +1571,16 @@ eintraege:
     and 20 o'clock (§ 14(1) JArbSchG); in bakeries and confectioneries young people over 16 may work from 5 o'clock, young people over 17 in bakeries from 4 o'clock (§ 14(2) no. 4, (3) JArbSchG). Dangerous
     work – for example on machines with an increased risk of accidents or with hazardous substances – is only permitted to a limited extent (§ 22 JArbSchG); the risk assessment takes young people into account
     specifically (§ 28a JArbSchG). Six-monthly instruction and the follow-up examination after one year are separate obligations.
+- de: 'Wer als Geschäftsführung ihre Pflichten verletzt, haftet der Gesellschaft für den Schaden (§ 43 Abs. 2 GmbHG) und für Steuern, die deshalb nicht oder nicht rechtzeitig festgesetzt oder gezahlt werden (§ 69 AO). Zahlungen nach Eintritt der Insolvenzreife muss sie der Gesellschaft erstatten (§ 15b Abs. 1, 4 InsO). Wer Sozialversicherungsbeiträge nicht abführt, macht sich strafbar: Freiheitsstrafe bis zu fünf Jahren oder Geldstrafe (§ 266a Abs. 1 StGB). Wer den Verlust der Hälfte des Stammkapitals nicht anzeigt, wird mit Freiheitsstrafe bis zu drei Jahren oder Geldstrafe bestraft, bei Fahrlässigkeit bis zu einem Jahr (§ 84 GmbHG). Für eine nicht eingereichte Gesellschafterliste haftet die Geschäftsführung den Betroffenen und den Gläubigern (§ 40 Abs. 3 GmbHG).'
+  en: 'Managing directors who breach their duties are liable to the company for the damage (§ 43(2) GmbHG) and for taxes that are therefore not assessed or paid, or not on time (§ 69 AO). Payments made after insolvency has occurred must be reimbursed to the company (§ 15b(1), (4) InsO). Anyone who does not pay over social security contributions commits a criminal offence: imprisonment of up to five years or a fine (§ 266a(1) StGB). Anyone who does not report the loss of half the share capital faces imprisonment of up to three years or a fine, in case of negligence up to one year (§ 84 GmbHG). Management is liable to those affected and to creditors for a shareholder list that was not filed (§ 40(3) GmbHG).'
 - de: Wer bei dir als Nachtarbeitnehmer arbeitet, kann sich vor Beginn und danach alle drei Jahre, ab 50 Jahren jährlich, auf deine Kosten arbeitsmedizinisch untersuchen lassen und bekommt einen Ausgleich
     durch freie Tage oder Zuschlag.
   en: Anyone working for you as a night worker can have an occupational medical examination at your expense before starting and then every three years, from age 50 every year, and receives compensation
     through days off or a bonus.
+- de: 'Wer ein erlaubnispflichtiges Gewerbe ohne Erlaubnis betreibt, riskiert ein Bußgeld bis 5.000 €, bei Finanzanlagenvermittlung und Honorar-Finanzanlagenberatung bis 50.000 € (§ 144 Abs. 1 Nr. 1, Abs. 4 GewO). Eine Gaststätte ohne die nach § 2 Abs. 1 GastG erforderliche Erlaubnis kostet bis 5.000 € (§ 28 Abs. 1 Nr. 1, Abs. 3 GastG) – soweit in deinem Land das Gaststättengesetz des Bundes gilt.'
+  en: 'Anyone who operates a trade requiring a licence without one risks a fine of up to €5,000, for financial investment brokerage and fee-based financial investment advice up to €50,000 (§ 144(1) no. 1, (4) GewO). A restaurant or bar without the licence required under § 2(1) GastG costs up to €5,000 (§ 28(1) no. 1, (3) GastG) – where the federal Restaurant Act (Gaststättengesetz) applies in your state.'
+- de: 'Wer in der Anmeldung falsch versichert, dass die Einlagen geleistet sind, macht sich strafbar: Freiheitsstrafe bis zu drei Jahren oder Geldstrafe (§ 82 Abs. 1 Nr. 1 GmbHG). Vor der Eintragung besteht die Gesellschaft als solche nicht; wer in ihrem Namen handelt, haftet persönlich (§ 11 Abs. 1, 2 GmbHG).'
+  en: 'Anyone who falsely declares in the registration that the contributions have been made commits a criminal offence: imprisonment of up to three years or a fine (§ 82(1) no. 1 GmbHG). Before registration the company does not exist as such; anyone who acts in its name is personally liable (§ 11(1), (2) GmbHG).'
 - de: Wer wenig Umsatz macht, kann ohne Umsatzsteuer abrechnen.
   en: If you have low revenue, you can invoice without VAT.
 - de: Widerrufsbutton für Online-Verträge
@@ -1553,6 +1595,14 @@ eintraege:
   en: Knowledge and skills to use AI systems competently and to understand their opportunities and risks.
 - de: Zahl das Stammkapital auf das Geschäftskonto ein, bevor die Gesellschaft zum Handelsregister angemeldet wird.
   en: Pay the share capital into the business account before the company is registered with the commercial register (Handelsregister).
+- de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO).'
+  en: 'If you pay late, a late-payment surcharge (Säumniszuschlag) of 1 % of the overdue amount, rounded down to the nearest €50, accrues for each month or part of a month; for a delay of up to three days it is not charged (§ 240(1), (3) AO).'
+- de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO). Hast du sie nicht oder nicht richtig berechnet, kann das Finanzamt sie festsetzen (§ 48 Abs. 3 UStDV).'
+  en: 'If you pay late, a late-payment surcharge (Säumniszuschlag) of 1 % of the overdue amount, rounded down to the nearest €50, accrues for each month or part of a month; for a delay of up to three days it is not charged (§ 240(1), (3) AO). If you did not calculate it or calculated it incorrectly, the tax office can assess it (§ 48(3) UStDV).'
+- de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO). Wer die Vorauszahlung nicht, nicht vollständig oder nicht rechtzeitig zahlt, riskiert außerdem ein Bußgeld bis 30.000 € (§ 26a Abs. 1, 3 UStG in Verbindung mit § 18 Abs. 1 Satz 4 UStG). Für eine verspätete Voranmeldung kann das Finanzamt einen Verspätungszuschlag festsetzen (§ 152 Abs. 1 AO).'
+  en: 'If you pay late, a late-payment surcharge (Säumniszuschlag) of 1 % of the overdue amount, rounded down to the nearest €50, accrues for each month or part of a month; for a delay of up to three days it is not charged (§ 240(1), (3) AO). Anyone who does not pay the advance payment, or not in full or on time, also risks a fine of up to €30,000 (§ 26a(1), (3) UStG in conjunction with § 18(1) sentence 4 UStG). For a late advance return the tax office can impose a late-filing surcharge (§ 152(1) AO).'
+- de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO, für die Gewerbesteuer über § 1 Abs. 2 Nr. 5 AO).'
+  en: 'If you pay late, a late-payment surcharge (Säumniszuschlag) of 1 % of the overdue amount, rounded down to the nearest €50, accrues for each month or part of a month; for a delay of up to three days it is not charged (§ 240(1), (3) AO, for trade tax via § 1(2) no. 5 AO).'
 - de: Zentrale Stelle Verpackungsregister (LUCID)
   en: Central Agency Packaging Register (Zentrale Stelle Verpackungsregister, LUCID)
 - de: Zur Prüfung befähigte Person, z. B. Schankanlagen- oder Gasfachbetrieb
@@ -1575,8 +1625,18 @@ eintraege:
   en: stiftung elektro-altgeräte register (ear)
 - de: '§ 12 ArbSchG ist nicht unmittelbar bußgeldbewehrt: Die Aufsicht kann die Unterweisung anordnen, ein Verstoß gegen die Anordnung kostet bis 5.000 € (§ 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG). Bei Gefahrstoffen, Biostoffen und Arbeitsmitteln ist die fehlende Unterweisung direkt bußgeldbewehrt: bei Gefahrstoffen bis 50.000 € (§ 22 Abs. 1 Nr. 25 GefStoffV in Verbindung mit § 26 Abs. 1 Nr. 8 Buchst. b, Abs. 3 ChemG), bei Biostoffen und Arbeitsmitteln bis 5.000 € (§ 20 Abs. 1 Nr. 23 BioStoffV, § 22 Abs. 1 Nr. 26 BetrSichV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).'
   en: '§ 12 ArbSchG is not directly subject to fines: the authority can order the instruction, and a breach of the order costs up to €5,000 (§ 25(1) no. 2 letter a, (2) ArbSchG). For hazardous substances, biological agents and work equipment, missing instruction is directly subject to fines: for hazardous substances up to €50,000 (§ 22(1) no. 25 GefStoffV in conjunction with § 26(1) no. 8 letter b, (3) ChemG), for biological agents and work equipment up to €5,000 (§ 20(1) no. 23 BioStoffV, § 22(1) no. 26 BetrSichV in conjunction with § 25(1) no. 1, (2) ArbSchG).'
+- de: '§ 26a UStG nennt kein eigenes Bußgeld dafür, E-Rechnungen nicht empfangen zu können.'
+  en: '§ 26a UStG provides no separate fine for not being able to receive e-invoices.'
+- de: '§ 26a UStG nennt kein eigenes Bußgeld für fehlende Pflichtangaben; wer eine Rechnung nicht oder nicht rechtzeitig ausstellt, riskiert bis 5.000 € (§ 26a Abs. 2 Nr. 1, Abs. 3 UStG). Weist du mehr Umsatzsteuer aus, als du schuldest, oder Steuer, obwohl du dazu nicht berechtigt bist, schuldest du den ausgewiesenen Betrag (§ 14c Abs. 1, 2 UStG). Dein Kunde braucht eine Rechnung nach § 14 UStG für den Vorsteuerabzug (§ 15 Abs. 1 Satz 1 Nr. 1 Satz 2 UStG).'
+  en: '§ 26a UStG provides no separate fine for missing mandatory details; anyone who does not issue an invoice or does not issue it on time risks up to €5,000 (§ 26a(2) no. 1, (3) UStG). If you show more VAT than you owe, or show tax although you are not entitled to, you owe the amount shown (§ 14c(1), (2) UStG). Your customer needs an invoice under § 14 UStG for input tax deduction (§ 15(1) sentence 1 no. 1 sentence 2 UStG).'
 - de: § 312k BGB verlangt eine einfache Kündigungsmöglichkeit über die Website für Dauerschuldverhältnisse, die online geschlossen werden können.
   en: § 312k BGB requires an easy way to cancel via the website for continuing obligations that can be concluded online.
+- de: '§ 379 AO nennt die Mitteilung nach § 146a Abs. 4 AO nicht – ein eigenes Bußgeld ist dafür nicht vorgesehen. Das Finanzamt kann die Mitteilung mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
+  en: '§ 379 AO does not cover the notification under § 146a(4) AO – no separate fine is provided for it. The tax office can enforce the notification with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
+- de: '§ 379 Abs. 2 Nr. 1 AO erfasst nur Mitteilungen nach § 138 Abs. 2 AO – für die Angaben zur steuerlichen Erfassung ist kein eigenes Bußgeld vorgesehen. Das Finanzamt kann sie mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
+  en: '§ 379(2) no. 1 AO only covers notifications under § 138(2) AO – no separate fine is provided for the information for tax registration. The tax office can enforce it with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
+- de: '§ 5b EStG nennt kein eigenes Bußgeld. Das Finanzamt kann die Übermittlung mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
+  en: '§ 5b EStG provides no separate fine. The tax office can enforce the transmission with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
 - de: Änderungen im Gesellschafterkreis werden notariell abgewickelt; die aktualisierte Gesellschafterliste wird beim Handelsregister eingereicht.
   en: Changes among the shareholders are handled by a notary; the updated list of shareholders is filed with the commercial register (Handelsregister).
 - de: Ärztliche Erstuntersuchung Jugendlicher vor Beginn

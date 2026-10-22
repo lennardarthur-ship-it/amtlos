@@ -1,7 +1,7 @@
 # Katalog B.15 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gesellschafterliste_aktualisieren
-version: 1
+version: 2
 katalog_nr: B.15
 titel:
   de: Gesellschafterliste aktualisieren
@@ -36,7 +36,7 @@ kanal: notar
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Geschäftsführer, die die Liste nicht einreichen, haften denjenigen, deren Beteiligung sich geändert hat, und den Gläubigern der Gesellschaft für den daraus entstandenen Schaden als Gesamtschuldner (§ 40 Abs. 3 GmbHG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -45,10 +45,10 @@ gueltig_bis: null
 quellen:
 - titel: GmbH-Gesetz § 40
   url: https://www.gesetze-im-internet.de/gmbhg/__40.html
-  abgerufen: null
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist für die Einreichung ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 40 GmbHG enthält kein Buß- oder Zwangsgeld, nur die Haftung nach Abs. 3; bei Mitwirkung eines Notars reicht dieser die Liste ein (§ 40 Abs. 2))'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
