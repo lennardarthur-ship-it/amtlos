@@ -72,9 +72,10 @@ quellen:
 - titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
   url: https://lexetius.com/AO/329,2
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'StB Busch 22.10.2026 verlangt „zwingender Zuschlag in beratenen Fällen (§ 149 Abs. 3 AO) nach 19 Monaten (§ 152 Abs. 2 Nr. 1 AO)“ – nicht übernommen: § 152 Abs. 2 Nr. 1 AO nennt 14 Monate; die 19 Monate (Nr. 2) gelten nur in den Fällen des § 149 Abs. 2 Satz 2 AO (Land- und Forstwirtschaft mit abweichendem Wirtschaftsjahr). Wortlaut gesetze-im-internet.de am 22.10.2026 – Rückfrage an StB Busch'
+fachlich_zu_pruefen: []
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - StB Lutz Busch
+  geprueft_am: '2026-10-22'
+  geprueft_version: 3

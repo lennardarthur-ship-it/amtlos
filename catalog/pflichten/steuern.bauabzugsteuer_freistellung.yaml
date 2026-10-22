@@ -71,9 +71,11 @@ quellen:
   url: https://lxgesetze.de/estg/48
   abgerufen: '2026-10-22'
   fundstelle: § 48 Abs. 1 Satz 1 und 3 EStG
-fachlich_zu_pruefen:
-- 'StB Busch 22.10.2026: „Gültigkeit befristet, höchstens drei Jahre (§ 48b Abs. 3 EStG) – Erinnerung vor Ablauf“ – nicht übernommen: § 48b Abs. 3 EStG verlangt nur die Angabe der Geltungsdauer, eine Höchstdauer von drei Jahren steht nicht im Gesetz (Wortlaut lxgesetze.de 22.10.2026; vermutlich BMF-Schreiben) – Fundstelle bei StB Busch erfragen. Eine Erinnerung vor Ablauf bräuchte eine neue Frage nach dem Ablaufdatum; bis dahin nur Hinweis im Text'
+# StB Busch Runde 2 (22.10.2026): Höchstdauer drei Jahre steht im BMF-Schreiben vom 19.07.2022, Rz. 35 (nicht im Gesetz) – Hinweis im Text ohne Erinnerung freigegeben
+fachlich_zu_pruefen: []
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - StB Lutz Busch
+  geprueft_am: '2026-10-22'
+  geprueft_version: 4

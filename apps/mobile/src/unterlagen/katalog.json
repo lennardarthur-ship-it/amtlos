@@ -889,7 +889,7 @@
     "url": "https://www.gesetze-im-internet.de/stgb/__283.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.buchfuehrungspflicht",
@@ -957,7 +957,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.est_erklaerung",
@@ -1001,7 +1001,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.euer",
@@ -1037,7 +1037,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.feststellungserklaerung",
@@ -1074,7 +1074,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.gewst_erklaerung",
@@ -1114,7 +1114,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.gobd_verfahrensdokumentation",
@@ -1147,7 +1147,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__379.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.kassenmeldung",
@@ -1245,7 +1245,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.oss_erklaerung",
@@ -1274,7 +1274,7 @@
     "url": "https://www.bzst.de/DE/Unternehmen/Umsatzsteuer/One-Stop-Shop_EU/one_stop_shop_eu_node.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.rechnungen_pflichtangaben",
@@ -1311,7 +1311,7 @@
     "url": "https://www.gesetze-im-internet.de/ustdv_1980/__34a.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.ust_jahreserklaerung",
@@ -1355,7 +1355,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.ust_voranmeldung",
@@ -1390,7 +1390,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__370.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.zusammenfassende_meldung",
@@ -1409,6 +1409,6 @@
     "url": "https://www.gesetze-im-internet.de/ustg_1980/__26a.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  }
 ]
