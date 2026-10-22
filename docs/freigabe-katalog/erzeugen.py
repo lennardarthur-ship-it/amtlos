@@ -24,6 +24,7 @@ ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
 ZIEL = os.path.abspath(ARGS[0] if ARGS else "freigabe-katalog")
 # Runde 2: nur noch nicht (in dieser Version) freigegebene Einträge, mit unserer Rückfrage je Eintrag
 NUR_OFFEN = "--nur-offen" in sys.argv
+RUNDE = int(sys.argv[sys.argv.index("--runde") + 1]) if "--runde" in sys.argv else 2
 RUECKFRAGEN = {}
 if "--rueckfragen" in sys.argv:
     import json
@@ -149,7 +150,7 @@ for schluessel, (name, person) in PRUEFER.items():
         [f"Freigabe Pflichtenkatalog Betriebsklar – {name}"],
         [""],
         ["Betriebsklar (iPhone-App, Lang Ventures UG (haftungsbeschränkt) i. G.) zeigt kleinen Betrieben aus einem festen Katalog, welche Pflichten typischerweise gelten (regelbasiert, keine KI, keine Einzelfallprüfung)."],
-        [f"Diese Datei enthält die {len(teil)} noch offenen Einträge Ihres Fachgebiets (Runde 2). Alle anderen sind nach Ihrer ersten Rückmeldung umgesetzt und freigegeben. In der Spalte „Unsere Rückfrage“ steht je Eintrag, was wir umgesetzt haben, wo wir nach dem Gesetzeswortlaut von Ihrem Hinweis abweichen oder was neu ist. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen."] if NUR_OFFEN else [f"Diese Datei enthält die {len(teil)} Einträge Ihres Fachgebiets. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen, bei „ändern“ die Änderung daneben eintragen."],
+        [f"Diese Datei enthält die {len(teil)} noch offenen Einträge Ihres Fachgebiets (Runde {RUNDE}). Alle anderen sind nach Ihrer ersten Rückmeldung umgesetzt und freigegeben. In der Spalte „Unsere Rückfrage“ steht je Eintrag, was wir umgesetzt haben, wo wir nach dem Gesetzeswortlaut von Ihrem Hinweis abweichen oder was neu ist. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen."] if NUR_OFFEN else [f"Diese Datei enthält die {len(teil)} Einträge Ihres Fachgebiets. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen, bei „ändern“ die Änderung daneben eintragen."],
         ["Die Spalte „Folgen bei Verstoß“ haben wir am 22.10.2026 vorab aus dem Gesetzeswortlaut ergänzt (Fundstelle steht dabei; Vermerk in „Offene Fachfragen“). Bitte besonders hier prüfen."],
         ["„Offene Fachfragen“ sind unsere eigenen Zweifel zum Eintrag – bitte beantworten oder als erledigt markieren."],
         ["Geprüft wird: Rechtsgrundlage, Auslöser (für wen gilt es), Frist, Folgen, Kurztext in einfacher Sprache. Die App formuliert bedingt („gilt typischerweise, wenn …“) und verweist auf Beratung."],
@@ -184,7 +185,7 @@ for schluessel, (name, person) in PRUEFER.items():
 
     if not teil:
         continue
-    datei = f"Betriebsklar-Freigabe-Katalog-{name.replace(' ', '')}{'-Runde2' if NUR_OFFEN else ''}.xlsx"
+    datei = f"Betriebsklar-Freigabe-Katalog-{name.replace(' ', '')}{f'-Runde{RUNDE}' if NUR_OFFEN else ''}.xlsx"
     wb.save(os.path.join(ZIEL, datei))
     offen = sum(1 for d in teil if "noch nicht fachlich erfasst" in de((d.get("sanktion") or {}).get("text")))
     uebersicht.append((name, person, len(teil), offen, datei))
