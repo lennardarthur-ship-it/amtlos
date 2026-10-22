@@ -1,7 +1,7 @@
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Unterweisung/Abstimmung Fremdfirmen und Arbeit beim Kunden“): § 8 ArbSchG, §§ 5, 6 DGUV V1
 schema_version: 1
 id: arbeitsschutz.fremdfirmen_abstimmung
-version: 1
+version: 2
 katalog_nr: E.51
 titel:
   de: Arbeitsschutz mit Auftraggebern und anderen Firmen abstimmen
@@ -48,7 +48,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Kein eigenes Bußgeld vorgesehen. Die Aufsichtsbehörde kann die Zusammenarbeit und Abstimmung im Einzelfall anordnen; ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3 Satz 1 Nr. 1, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -63,6 +63,7 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Prüfergebnis Sifa 22.10.2026 – § 8 ArbSchG und §§ 5, 6 DGUV Vorschrift 1 nicht unmittelbar bußgeldbewehrt (§§ 5, 6 nicht in § 32 DGUV V1); Unterweisungsthema „Arbeit beim Kunden“ in der Vorlage'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 25 ArbSchG nennt § 8 ArbSchG nicht, § 32 DGUV Vorschrift 1 (Fassung UKBW) nennt §§ 5, 6 nicht; Anordnung nach § 22 Abs. 3 ArbSchG; Baustellenverordnung nicht geprüft) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

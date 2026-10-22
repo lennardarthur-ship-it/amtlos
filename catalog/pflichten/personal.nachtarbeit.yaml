@@ -1,7 +1,7 @@
 # R12 (Nutzertest Bäckerei #2): Nachtarbeit – Untersuchung und Ausgleich (§ 6 ArbZG)
 schema_version: 1
 id: personal.nachtarbeit
-version: 2
+version: 3
 katalog_nr: D.42
 titel:
   de: 'Nachtarbeit: Untersuchung ermöglichen und ausgleichen'
@@ -39,7 +39,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Für Untersuchung und Ausgleich ist kein eigenes Bußgeld vorgesehen (§ 22 ArbZG nennt § 6 Abs. 3 und 5 nicht). Wer über die nach § 6 Abs. 2 ArbZG zulässige Arbeitszeit hinaus beschäftigt, riskiert ein Bußgeld bis 30.000 € (§ 22 Abs. 1 Nr. 1, Abs. 2 ArbZG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -52,9 +52,13 @@ quellen:
 - titel: Arbeitszeitgesetz (§§ 2, 6, 16, 22)
   url: https://www.gesetze-im-internet.de/arbzg/BJNR117100994.html
   abgerufen: '2026-10-22'
+- titel: 'Arbeitszeitgesetz § 22'
+  url: https://www.gesetze-im-internet.de/arbzg/__22.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Nutzertest R12 (Bäckerei #2) – Folgen fachlich ergänzen (§ 6 Abs. 3 ArbZG steht nicht in § 22 Abs. 1 ArbZG); Gefährdungsbaustein Nachtarbeit fehlt'
 - 'Prüfergebnis Sifa 22.10.2026: Untersuchung nach § 6 Abs. 3 ArbZG ist keine Vorsorge nach ArbMedVV; Auslöser über die Frage „regelmäßig nachts“ mit Hilfetext nach § 2 Abs. 5 ArbZG – eigene Angabe „Nachtarbeitnehmer“ wäre genauer'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 22 Abs. 1, 2 ArbZG amtlich gelesen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

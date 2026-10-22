@@ -197,6 +197,10 @@
    {
     "titel": "Jugendarbeitsschutzgesetz (§ 29)",
     "url": "https://www.gesetze-im-internet.de/jarbschg/BJNR009650976.html"
+   },
+   {
+    "titel": "Jugendarbeitsschutzgesetz § 59 (lxgesetze.de)",
+    "url": "https://lxgesetze.de/jarbschg/59"
    }
   ],
   "geprueft": false
@@ -217,6 +221,10 @@
    {
     "titel": "DGUV Vorschrift 1 (UKBW, § 4)",
     "url": "https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf"
+   },
+   {
+    "titel": "Arbeitsschutzgesetz (§§ 22, 25)",
+    "url": "https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html"
    }
   ],
   "geprueft": false
@@ -374,6 +382,10 @@
    {
     "titel": "DSGVO Art. 28",
     "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+   },
+   {
+    "titel": "DSGVO Art. 83 (gesetze.legal)",
+    "url": "https://gesetze.legal/eu/vo_eu_2016_679/83"
    }
   ],
   "geprueft": false
@@ -440,6 +452,10 @@
    {
     "titel": "EDSA-Leitlinien 3/2019 zur Verarbeitung personenbezogener Daten durch Videogeräte",
     "url": "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-32019-processing-personal-data-through-video_de"
+   },
+   {
+    "titel": "DSGVO Art. 83 (gesetze.legal)",
+    "url": "https://gesetze.legal/eu/vo_eu_2016_679/83"
    }
   ],
   "geprueft": false
@@ -606,6 +622,14 @@
    {
     "titel": "Arbeitsschutzgesetz § 3",
     "url": "https://www.gesetze-im-internet.de/arbschg/__3.html"
+   },
+   {
+    "titel": "Arbeitszeitgesetz § 22",
+    "url": "https://www.gesetze-im-internet.de/arbzg/__22.html"
+   },
+   {
+    "titel": "Arbeitsschutzgesetz § 25",
+    "url": "https://www.gesetze-im-internet.de/arbschg/__25.html"
    }
   ],
   "geprueft": false
@@ -658,6 +682,10 @@
    {
     "titel": "CMS – Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung beschlossen",
     "url": "https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen"
+   },
+   {
+    "titel": "Schwarzarbeitsbekämpfungsgesetz § 8",
+    "url": "https://www.gesetze-im-internet.de/schwarzarbg_2004/__8.html"
    }
   ],
   "geprueft": false
@@ -673,6 +701,10 @@
    {
     "titel": "Einkommensteuergesetz § 41a",
     "url": "https://www.gesetze-im-internet.de/estg/__41a.html"
+   },
+   {
+    "titel": "Abgabenordnung § 152",
+    "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
   "geprueft": false
@@ -688,6 +720,10 @@
    {
     "titel": "Mutterschutzgesetz § 10",
     "url": "https://www.gesetze-im-internet.de/muschg_2018/__10.html"
+   },
+   {
+    "titel": "Mutterschutzgesetz § 32",
+    "url": "https://www.gesetze-im-internet.de/muschg_2018/__32.html"
    }
   ],
   "geprueft": false

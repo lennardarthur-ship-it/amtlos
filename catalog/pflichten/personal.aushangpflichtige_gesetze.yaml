@@ -1,7 +1,7 @@
 # Katalog D.48 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.aushangpflichtige_gesetze
-version: 2
+version: 3
 katalog_nr: D.48
 titel:
   de: Aushangpflichtige Gesetze aushängen
@@ -32,7 +32,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Fehlt der Aushang des Arbeitszeitgesetzes, droht ein Bußgeld bis 5.000 € (§ 22 Abs. 1 Nr. 8, Abs. 2 ArbZG); für die übrigen Aushänge sind die Folgen noch nicht fachlich erfasst.
+    de: 'Fehlt der Aushang des Arbeitszeitgesetzes, droht ein Bußgeld bis 5.000 € (§ 22 Abs. 1 Nr. 8, Abs. 2 ArbZG), ebenso beim Jugendarbeitsschutzgesetz mit der Anschrift der Aufsichtsbehörde und beim Aushang der Arbeitszeit und Pausen der Jugendlichen (§ 59 Abs. 1 Nr. 7, 8, Abs. 3 JArbSchG). Für den Aushang des Mutterschutzgesetzes sieht § 32 MuSchG kein Bußgeld vor. Für AGG und Unfallverhütungsvorschriften sind die Folgen noch nicht fachlich erfasst.'
   schwere: niedrig
 automatisierung: hinweis
 aktion:
@@ -53,10 +53,19 @@ quellen:
 - titel: Jugendarbeitsschutzgesetz (§§ 47, 48)
   url: https://www.gesetze-im-internet.de/jarbschg/BJNR009650976.html
   abgerufen: '2026-10-22'
+- titel: 'Arbeitszeitgesetz § 22'
+  url: https://www.gesetze-im-internet.de/arbzg/__22.html
+  abgerufen: '2026-10-22'
+- titel: 'Jugendarbeitsschutzgesetz § 59 (lxgesetze.de)'
+  url: https://lxgesetze.de/jarbschg/59
+  abgerufen: '2026-10-22'
+- titel: 'Mutterschutzgesetz § 32'
+  url: https://www.gesetze-im-internet.de/muschg_2018/__32.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Prüfergebnis Sifa 22.10.2026 umgesetzt (Liste je Belegschaft); abweichend vom Prüfergebnis gilt § 48 JArbSchG erst ab drei Jugendlichen (Wortlaut geprüft); Amtlos zeigt die Liste für alle, ohne nach Zahl der Frauen und Jugendlichen zu filtern'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Folgen der übrigen Aushänge (AGG, MuSchG, JArbSchG) fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 59 Abs. 1 Nr. 7, 8 JArbSchG über lxgesetze.de gelesen (Höhe Abs. 3 am amtlichen Text gegenlesen); § 32 Abs. 1 MuSchG amtlich gelesen, § 26 nicht genannt; AGG und DGUV Vorschrift 1 (§ 12, § 24 Abs. 5 nicht in § 32) offen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

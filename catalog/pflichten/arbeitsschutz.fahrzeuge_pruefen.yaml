@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kurier #4, 3a): Fahrzeuge jährlich prüfen (§ 57 DGUV Vorschrift 70)
 schema_version: 1
 id: arbeitsschutz.fahrzeuge_pruefen
-version: 2
+version: 3
 katalog_nr: E.53
 titel:
   de: Firmenfahrzeuge jährlich durch einen Sachkundigen prüfen lassen
@@ -39,7 +39,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 10.000 €, wenn Fahrzeuge nicht wie vorgeschrieben geprüft werden (§ 58 in Verbindung mit § 57 DGUV Vorschrift 70, § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).'
   schwere: mittel
 automatisierung: hinweis
 erledigung:
@@ -52,8 +52,15 @@ quellen:
 - titel: DGUV Publikationen – Vorschrift 70 Fahrzeuge
   url: https://publikationen.dguv.de/
   abgerufen: null
+- titel: 'DGUV Vorschrift 70 Fahrzeuge (§§ 57, 58)'
+  url: https://publikationen.dguv.de/widgets/pdf/download/article/1125
+  abgerufen: '2026-10-22'
+- titel: 'Sozialgesetzbuch VII § 209'
+  url: https://www.gesetze-im-internet.de/sgb_7/__209.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Prüfergebnis Sifa 22.10.2026 (frei): § 57 DGUV Vorschrift 70 „bei Bedarf, mindestens jährlich“ bestätigt; Aufbewahrungsdauer der Prüfergebnisse und Sanktion fachlich ergänzen; Prüfprotokoll-Vorlage fehlt'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 58 DGUV Vorschrift 70 (Musterfassung 1997, aktualisiert 2000) nennt § 57 ohne Einschränkung; maßgeblich ist die Unfallverhütungsvorschrift der zuständigen BG – Fassung dort gegenlesen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

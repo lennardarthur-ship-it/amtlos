@@ -1,7 +1,7 @@
 # Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.beschaeftigtendaten
-version: 2
+version: 3
 katalog_nr: F.62
 titel:
   de: Beschäftigtendaten schützen
@@ -37,7 +37,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 20 Mio. € oder bei Unternehmen bis 4 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist, wenn Daten ohne Rechtsgrundlage oder entgegen den Grundsätzen der Verarbeitung verarbeitet werden (Art. 83 Abs. 5 Buchst. a DSGVO in Verbindung mit Art. 5, 6 DSGVO).'
   schwere: niedrig
 automatisierung: hinweis
 aenderungsnotiz:
@@ -53,10 +53,13 @@ quellen:
 - titel: EuGH, Urteil vom 30.03.2023, C-34/21
   url: https://curia.europa.eu/juris/liste.jsf?num=C-34/21
   abgerufen: null
+- titel: 'DSGVO Art. 83 (gesetze.legal)'
+  url: https://gesetze.legal/eu/vo_eu_2016_679/83
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - '§ 26 BDSG nach EuGH C-34/21 nicht mehr als eigene Grundlage genannt (R10, Rechtsprüfung); Art. 9 DSGVO für Gesundheitsdaten von Beschäftigten (z. B. eAU) gesondert prüfen'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (Art. 83 Abs. 5 Buchst. a DSGVO über gesetze.legal gelesen; § 26 BDSG und Rechtsprechung (C-34/21) nicht einbezogen) – fachlich zu bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

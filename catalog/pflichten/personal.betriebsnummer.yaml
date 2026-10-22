@@ -1,7 +1,7 @@
 # Katalog D.37 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.betriebsnummer
-version: 2
+version: 3
 katalog_nr: D.37
 titel:
   de: Betriebsnummer beantragen
@@ -51,7 +51,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Für den Antrag selbst ist kein eigenes Bußgeld vorgesehen; bußgeldbewehrt ist, Änderungen oder die Einstellung des Betriebs nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig mitzuteilen (bis 5.000 €, § 111 Abs. 1 Nr. 1a, Abs. 4 SGB IV in Verbindung mit § 18i Abs. 4 SGB IV). Ohne Betriebsnummer kannst du nicht an den Meldeverfahren zur Sozialversicherung teilnehmen (§ 18i Abs. 1 SGB IV).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -61,10 +61,13 @@ gueltig_bis: null
 quellen:
 - titel: Sozialgesetzbuch IV § 18i
   url: https://www.gesetze-im-internet.de/sgb_4/__18i.html
-  abgerufen: null
+  abgerufen: '2026-10-22'
+- titel: 'Sozialgesetzbuch IV § 111'
+  url: https://www.gesetze-im-internet.de/sgb_4/__111.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - „vor der ersten Einstellung“ als spätestens am Tag vor Arbeitsbeginn umgesetzt – bestätigen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 111 Abs. 1 Nr. 1a SGB IV (nur § 18i Abs. 4) und § 18i Abs. 1, 4 amtlich gelesen; Schwere bleibt bis zur fachlichen Bestätigung „mittel“) – fachlich zu bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:

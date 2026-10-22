@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kfz #10): Ausbildungsnachweis durchsehen (§ 14 Abs. 2 BBiG)
 schema_version: 1
 id: personal.azubi_ausbildungsnachweis
-version: 1
+version: 2
 katalog_nr: D.45
 titel:
   de: Ausbildungsnachweis regelmäßig durchsehen
@@ -44,7 +44,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Kein eigenes Bußgeld vorgesehen (§ 101 BBiG nennt § 14 Abs. 2 BBiG nicht).'
   schwere: niedrig
 automatisierung: hinweis
 status_recht: in_kraft
@@ -54,8 +54,12 @@ quellen:
 - titel: Berufsbildungsgesetz § 14
   url: https://www.gesetze-im-internet.de/bbig_2005/__14.html
   abgerufen: null
+- titel: 'Berufsbildungsgesetz § 101'
+  url: https://www.gesetze-im-internet.de/bbig_2005/__101.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Nutzertest R12 (Kfz #10) – „regelmäßig“ ohne festen Abstand; Folgen fachlich ergänzen'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 101 Abs. 1 BBiG amtlich gelesen: nur § 14 Abs. 3 genannt) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

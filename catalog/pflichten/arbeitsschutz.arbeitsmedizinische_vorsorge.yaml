@@ -1,7 +1,7 @@
 # Katalog E.56 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.56, Frage 15, bestätigt) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.arbeitsmedizinische_vorsorge
-version: 4
+version: 5
 katalog_nr: E.56
 titel:
   de: Arbeitsmedizinische Vorsorge anbieten
@@ -30,7 +30,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 5.000 €, wenn du eine Pflichtvorsorge nicht oder nicht rechtzeitig veranlasst, eine Tätigkeit ohne die vorgeschriebene Pflichtvorsorge ausüben lässt, die Vorsorgekartei nicht, nicht richtig oder nicht vollständig führst oder eine Angebotsvorsorge nicht oder nicht rechtzeitig anbietest (§ 10 Abs. 1 ArbMedVV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -45,9 +45,15 @@ quellen:
 - titel: ArbMedVV Anhang
   url: https://www.gesetze-im-internet.de/arbmedvv/anhang.html
   abgerufen: '2026-10-22'
+- titel: 'Verordnung zur arbeitsmedizinischen Vorsorge § 10'
+  url: https://www.gesetze-im-internet.de/arbmedvv/__10.html
+  abgerufen: '2026-10-22'
+- titel: 'Arbeitsschutzgesetz § 25'
+  url: https://www.gesetze-im-internet.de/arbschg/__25.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Prüfergebnis Sifa 22.10.2026 (bestätigt): Fristen je Vorsorgeart nach AMR 2.1 und Bewertung Kosmetik mit Blutkontakt durch einen Betriebsarzt bestätigen lassen (Frage 15); Auslöser für alle Betriebe mit Beschäftigten – Anlässe je Branche nicht als Bedingung'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 10 Abs. 1 ArbMedVV (vier Tatbestände: § 4 Abs. 1, § 4 Abs. 2, § 3 Abs. 4 Satz 1 Halbsatz 1, § 5 Abs. 1 Satz 1) und § 25 Abs. 2 ArbSchG gelesen; Nummernfolge in § 10 Abs. 1 nicht einzeln zitiert) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

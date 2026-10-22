@@ -1,7 +1,7 @@
 # Katalog D.43 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.mutterschutz_gefaehrdungsbeurteilung
-version: 2
+version: 3
 katalog_nr: D.43
 titel:
   de: Mutterschutz in der Gefährdungsbeurteilung
@@ -37,7 +37,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 5.000 €, wenn du die Gefährdungsbeurteilung nicht, nicht richtig oder nicht rechtzeitig durchführst oder die erforderlichen Schutzmaßnahmen nicht, nicht richtig oder nicht rechtzeitig festlegst (§ 32 Abs. 1 Nr. 6, 7, Abs. 2 MuSchG); lässt du eine Frau eine nach § 10 Abs. 3 MuSchG unzulässige Tätigkeit ausüben, bis 30.000 € (§ 32 Abs. 1 Nr. 8, Abs. 2 MuSchG).'
   schwere: mittel
 automatisierung: dokument_generator
 status_recht: in_kraft
@@ -47,8 +47,11 @@ quellen:
 - titel: Mutterschutzgesetz § 10
   url: https://www.gesetze-im-internet.de/muschg_2018/__10.html
   abgerufen: null
+- titel: 'Mutterschutzgesetz § 32'
+  url: https://www.gesetze-im-internet.de/muschg_2018/__32.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 32 Abs. 1 Nr. 6 bis 8, Abs. 2 MuSchG amtlich gelesen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

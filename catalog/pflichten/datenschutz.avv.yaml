@@ -1,7 +1,7 @@
 # Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.avv
-version: 2
+version: 3
 katalog_nr: F.58
 titel:
   de: Auftragsverarbeitungsverträge abschließen
@@ -54,7 +54,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 10 Mio. € oder bei Unternehmen bis 2 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist, bei Verstößen gegen die Pflichten nach Art. 28 DSGVO (Art. 83 Abs. 4 Buchst. a DSGVO).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -67,10 +67,13 @@ quellen:
 - titel: DSGVO Art. 28
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
   abgerufen: null
+- titel: 'DSGVO Art. 83 (gesetze.legal)'
+  url: https://gesetze.legal/eu/vo_eu_2016_679/83
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Abgrenzung Auftragsverarbeitung ↔ eigene Verantwortung (z. B. Steuerberatung) als Hinweis ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (Art. 83 Abs. 4 Buchst. a DSGVO (Art. 25 bis 39) über gesetze.legal gelesen, EUR-Lex im Abruf nicht erreichbar) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

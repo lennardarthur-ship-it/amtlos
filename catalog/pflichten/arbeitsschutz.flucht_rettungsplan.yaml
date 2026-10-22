@@ -1,7 +1,7 @@
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Flucht- und Rettungsplan, Räumungsübung“)
 schema_version: 1
 id: arbeitsschutz.flucht_rettungsplan
-version: 1
+version: 2
 katalog_nr: E.54
 titel:
   de: Flucht- und Rettungsplan prüfen
@@ -30,7 +30,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Für den Plan und die Übungen ist kein eigenes Bußgeld vorgesehen; bußgeldbewehrt ist, Verkehrswege, Fluchtwege und Notausgänge nicht freizuhalten (bis 5.000 €, § 9 Abs. 1 ArbStättV in Verbindung mit § 4 Abs. 4 Satz 1 ArbStättV und § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG). Die Aufsichtsbehörde kann den Plan im Einzelfall anordnen; ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3 Satz 1 Nr. 1, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -43,8 +43,15 @@ quellen:
 - titel: ASR A2.3 Fluchtwege und Notausgänge (BAuA)
   url: https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-3.html
   abgerufen: null
+- titel: 'Arbeitsstättenverordnung (§§ 4, 9)'
+  url: https://www.gesetze-im-internet.de/arbst_ttv_2004/BJNR217910004.html
+  abgerufen: '2026-10-22'
+- titel: 'Arbeitsschutzgesetz (§§ 22, 25)'
+  url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis (nur wenn Lage, Ausdehnung oder Art der Arbeitsstätte es erfordern); Kriterien und Übungsabstand nach ASR A2.3 nicht abgerufen; Sanktion fachlich ergänzen'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 9 Abs. 1 ArbStättV nennt aus § 4 Abs. 4 nur Satz 1 (Wege freihalten), nicht den Flucht- und Rettungsplan; Nummer innerhalb von § 9 Abs. 1 nicht sicher ermittelt (Nr. 4a/4b) – daher ohne Nummer zitiert) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,7 +1,7 @@
 # R11 (Rechtsprüfung Befund 2): Hinweispflicht nach § 2a Abs. 2 SchwarzArbG für die Branchen nach § 2a Abs. 1 (SchwarzArbMoDiG)
 schema_version: 1
 id: personal.ausweis_hinweis
-version: 2
+version: 3
 katalog_nr: D.38
 titel:
   de: Schriftlich auf die Ausweispflicht hinweisen
@@ -69,7 +69,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 1.000 €, wenn du den Hinweis nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig gibst, ihn nicht für die vorgeschriebene Dauer aufbewahrst oder nicht vorlegst (§ 8 Abs. 2 Nr. 2, Abs. 5 SchwarzArbG). Wer bei der Arbeit seinen Ausweis nicht mitführt oder nicht vorlegt, riskiert bis 5.000 € (§ 8 Abs. 2 Nr. 1, Abs. 5 SchwarzArbG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -85,11 +85,15 @@ quellen:
 - titel: CMS – Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung beschlossen
   url: https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen
   abgerufen: '2026-10-20'
+- titel: 'Schwarzarbeitsbekämpfungsgesetz § 8'
+  url: https://www.gesetze-im-internet.de/schwarzarbg_2004/__8.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Rechtsprüfung Befund 13): Termin „spätestens bei Arbeitsbeginn“ statt Vortag; Mitführungspflicht auch für Inhaber und Selbstständige nach Zoll-Praxis („tätige Personen“, § 2a Abs. 1) – bestätigen; eigener Auslöser für Inhaber ohne Beschäftigte fehlt'
 - 'Wortlaut § 2a Abs. 2 SchwarzArbG n. F. im BGBl. gegenlesen: „nachweislich und schriftlich“ und Aufbewahrung laut HWK Chemnitz; „vor Erbringung der Dienst- oder Werkleistung“ laut CMS (neu); Hinweispflicht bestand schon vor dem SchwarzArbMoDiG'
 - Ob ein Satz im Arbeitsvertrag als Hinweis genügt – bestätigen
 - Bußgeld (§ 8 SchwarzArbG) – Nummer und Höhe fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 8 Abs. 2 Nr. 1, 2 und Abs. 5 SchwarzArbG amtlich gelesen (Nr. 2 fällt unter „übrige Fälle“, bis 1.000 €); Teilaufzählung „nicht aufbewahrt, nicht vorgelegt“ sinngemäß – Wortlaut bestätigen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

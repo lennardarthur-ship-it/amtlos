@@ -1,7 +1,7 @@
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Brandschutzhelfer“; C Katalog E.53/E.54): aus Erste Hilfe herausgelöst
 schema_version: 1
 id: arbeitsschutz.brandschutzhelfer
-version: 1
+version: 2
 katalog_nr: E.54
 titel:
   de: Brandschutzhelfer benennen und ausbilden
@@ -31,7 +31,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Kein eigenes Bußgeld vorgesehen. Die Aufsichtsbehörde kann die Benennung und Ausbildung im Einzelfall anordnen; ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3 Satz 1 Nr. 1, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -47,8 +47,12 @@ quellen:
 - titel: DGUV Vorschrift 1 (UKBW, § 22)
   url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
   abgerufen: '2026-10-22'
+- titel: 'Arbeitsschutzgesetz (§§ 22, 25)'
+  url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Prüfergebnis Sifa 22.10.2026 – Auffrischung alle drei bis fünf Jahre nur Empfehlung (DGUV Information 205-023, nicht abgerufen); Sanktion fachlich ergänzen (§ 22 DGUV Vorschrift 1 steht nicht in § 32)'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 25 ArbSchG nennt § 10 Abs. 2 ArbSchG nicht, § 32 DGUV Vorschrift 1 (Fassung UKBW) nennt § 22 Abs. 2 nicht; Anordnung nach § 22 Abs. 3 ArbSchG, Höhe nach § 25 Abs. 2 ArbSchG gelesen (30.000 €, nicht 5.000 €)) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

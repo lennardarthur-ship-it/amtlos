@@ -1,7 +1,7 @@
 # Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.videoueberwachung
-version: 2
+version: 3
 katalog_nr: F.62
 titel:
   de: Videoüberwachung kennzeichnen und begründen
@@ -32,7 +32,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 20 Mio. € oder bei Unternehmen bis 4 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist, wenn ohne Rechtsgrundlage überwacht wird oder die vorgeschriebenen Informationen fehlen (Art. 83 Abs. 5 Buchst. a, b DSGVO in Verbindung mit Art. 6, 13 DSGVO).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -45,11 +45,14 @@ quellen:
 - titel: EDSA-Leitlinien 3/2019 zur Verarbeitung personenbezogener Daten durch Videogeräte
   url: https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-32019-processing-personal-data-through-video_de
   abgerufen: null
+- titel: 'DSGVO Art. 83 (gesetze.legal)'
+  url: https://gesetze.legal/eu/vo_eu_2016_679/83
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Speicherdauer der Aufnahmen fachlich ergänzen
 - 'Beschäftigte: Mitbestimmung/Information'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (Art. 83 Abs. 5 Buchst. a, b DSGVO über gesetze.legal gelesen; Verzeichnis der Verarbeitungstätigkeiten (Art. 30, Art. 83 Abs. 4 Buchst. a) nicht eigens genannt) – fachlich zu bestätigen'
 - 'Rechtsgrundlage nach Rechtsprüfung R11 (Befund 16): Art. 6 Abs. 1 lit. f DSGVO statt § 4 BDSG (für Private nicht anwendbar, BVerwG 6 C 2.18), Hinweisschild nach Art. 13 (EDSA-Leitlinien 3/2019)'
 pruefung:
   status: entwurf
