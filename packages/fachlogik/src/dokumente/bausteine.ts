@@ -2561,7 +2561,7 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Tier-LMHV Anlage 5 Kap. II Nr. 3.1.3, 3.3.1; LAVES Niedersachsen; Lebensmittelüberwachung Mainz"
+  "quelle": "Tier-LMHV Anlage 5 Kap. II Nr. 3.3.1; LAVES Niedersachsen; Lebensmittelüberwachung Mainz"
  },
  {
   "titel": "Kühlung Hackfleisch – nur bei eigener Herstellung",
@@ -2571,7 +2571,7 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Tier-LMHV Anlage 5 Kap. II Nr. 3.1.3, 3.3.1; LAVES Niedersachsen"
+  "quelle": "Tier-LMHV Anlage 5 Kap. II Nr. 3.1.3; LAVES Niedersachsen"
  },
  {
   "titel": "Kühlung Fleischzubereitungen",

@@ -95,7 +95,7 @@ export const ifsgBelehrung: Vorlage = {
             )
           : "") +
         (ja(d, "merkblatt") ? `<p>Anlage: Merkblatt zur Belehrung nach § 43 Abs. 1 Nr. 1 IfSG (Gesundheitsamt), ausgehändigt an alle Teilnehmenden.</p>` : "") +
-        abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich, dass ich belehrt wurde und mir keine Tatsachen für ein Tätigkeitsverbot bekannt sind. Treten Hinderungsgründe auf, teile ich dies unverzüglich mit.</p>${teilnahmeTabelle(liste(d, "teilnehmer"), [{ kopf: "Erstbelehrung vom", feld: "erstbelehrung_am", datum: true }, { kopf: "Letzte Belehrung (Arbeitgeber)", feld: "letzte_belehrung_am", datum: true }])}`) +
+        abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich, dass ich belehrt wurde und mir keine Tatsachen für ein Tätigkeitsverbot bekannt sind. Treten Hinderungsgründe auf, teile ich dies unverzüglich mit.</p>${teilnahmeTabelle(liste(d, "teilnehmer"), [{ kopf: "Bescheinigung Gesundheitsamt vom", feld: "erstbelehrung_am", datum: true }, { kopf: "Letzte Belehrung (Arbeitgeber)", feld: "letzte_belehrung_am", datum: true }])}`) +
         nachsatz(`Die Belehrung ist nach Aufnahme der Tätigkeit und danach alle zwei Jahre zu wiederholen und zu dokumentieren (§ 43 Abs. 4 IfSG)${naechste ? `, nächste Belehrung spätestens am ${naechste}` : ""}.`) +
         unterschriften(["Ort, Datum", "Unterschrift der belehrenden Person"]),
     });
@@ -268,7 +268,8 @@ export const allergenAushang: Vorlage = {
       ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["", "Allergen", "Umfasst"], nummern.map((id, i) => [kz(i), esc(ALLERGENE[id]!), esc(ohneLatein(ALLERGENE_UMFANG[i]?.umfasst ?? ""))]), { breiten: ["6%", "28%", "66%"], klasse: "legende" }), g.length ? "zusammen" : "neue-seite zusammen")
       : "";
     return dokument({
-      titel: "Allergene in unseren Speisen und Getränken",
+      // Nachkontrolle T. Baum (23.10.2026, Hinweis 3): die Liste enthält auch die Zusatzstoffe
+      titel: "Allergene und Zusatzstoffe in unseren Speisen und Getränken",
       betrieb: b,
       meta: `Stand: ${datumDe(text(d, "stand"))}`,
       // die Rechtsgrundlage als Fußnote unter dem Hinweis – nach der Erläuterung rutschte sie allein auf eine neue Seite
@@ -278,6 +279,11 @@ export const allergenAushang: Vorlage = {
 };
 
 /** Geräte für das Monatsraster zum Antippen (neben den eigenen Kontrollpunkten). */
+/**
+ * Nachkontrolle T. Baum (23.10.2026, Antwort 5): Klarspültemperatur ist gute Hygienepraxis, kein eigener CCP – die
+ * Korrekturmaßnahme steht im Hilfetext zum Monatsraster.
+ */
+export const SPUELMASCHINE_KORREKTUR = "Spülmaschine (Nachspültemperatur) unter Richtwert: Geschirr erneut spülen, Gerät vom Kundendienst prüfen lassen.";
 const RASTER_GERAETE = ["Kühlschrank 1", "Kühlschrank 2", "Tiefkühltruhe", "Kühltheke", "Getränkekühlschrank", "Warmhaltetheke", "Spülmaschine (Nachspültemperatur)"];
 
 /** E-166: CCP-Entscheidung in der Gefahrenanalyse. */
@@ -325,7 +331,8 @@ function haccpKern(d: Daten): string {
       { rand: "Art. 5 Abs. 2 lit. a, b" },
     ) +
     abschnitt(
-      "Kritische Kontrollpunkte (CCP)",
+      // Nachkontrolle T. Baum (23.10.2026, Hinweis 5): die Tabelle führt auch Kühlstellen als „Kontrollpunkt (GHP)“
+      "Kritische Kontrollpunkte (CCP) und Temperaturkontrollen (GHP)",
       tabelle(["CCP / Prozessschritt", "Grenzwert", "Überwachung", "Korrekturmaßnahme"], cZeilen, { breiten: ["20%", "24%", "28%", "28%"], ...(c.length ? {} : { hoch: true }) }) +
         (c.some(ghp) ? `<p class="klein">${esc(GHP_HINWEIS)}</p>` : ""),
       { rand: "Art. 5 Abs. 2 lit. c–e" },
@@ -453,7 +460,7 @@ export const haccp: Vorlage = {
       felder: [
         // Monatsraster (R10): ein Blatt je Monat zum Aushängen – je Gerät eine Zeile, je Tag ein Kästchen
         { id: "raster", art: "schalter", label: "Monatsraster zum Aushängen (Gerät × Tag 1–31)", hilfe: "Ein Blatt für den Monat: je Gerät eine Zeile mit Grenzwert, je Tag ein Kästchen für Messwert und Kürzel." },
-        { id: "raster_geraete", art: "mehrzeilig", label: "Geräte im Raster", hilfe: "Ein Gerät je Zeile – deine Kontrollpunkte stehen zur Auswahl", wenn: { feld: "raster" }, vorschlaege: RASTER_GERAETE, vorschlaegeAus: { liste: "punkte", feld: "punkt" } },
+        { id: "raster_geraete", art: "mehrzeilig", label: "Geräte im Raster", hilfe: `Ein Gerät je Zeile – deine Kontrollpunkte stehen zur Auswahl. ${SPUELMASCHINE_KORREKTUR}`, wenn: { feld: "raster" }, vorschlaege: RASTER_GERAETE, vorschlaegeAus: { liste: "punkte", feld: "punkt" } },
         {
           id: "messungen",
           art: "liste",
@@ -803,37 +810,42 @@ const lm = (thema: (typeof HYGIENE_THEMEN_LEBENSMITTEL)[number], was: string, wa
   werte: { thema, was, wann, womit, wie, wer },
   quelle: geprueft ? quelle : `${quelle} – ${PRUEFEN_LM}`,
 });
+/**
+ * Nachkontrolle T. Baum (23.10.2026, Antwort 6): alle Zeilen fachlich in Ordnung, die Markierung „fachlich zu prüfen“
+ * entfällt (Prüfmappe v3: L-094, L-095, L-097 bis L-100, L-103, L-104, L-108 bis L-113); Ergänzungen bei Milchschäumer
+ * (L-097) und Schankanlage (L-099).
+ */
 export const HYGIENE_LEBENSMITTEL: Vorschlag[] = [
   // L-091: Desinfektionsmittel aus der DVG-Liste (Lebensmittelbereich) oder mit Herstellernachweis der Eignung
   lm("Reinigung und Desinfektion", "Arbeitsflächen und Schneidbretter", "nach jedem Arbeitsgang; nach rohem Fleisch, Geflügel, Fisch oder Eiern sofort; zum Arbeitsende", "Reinigungsmittel; Desinfektionsmittel aus der DVG-Liste für den Lebensmittelbereich oder mit Herstellernachweis der Eignung für Lebensmittelbetriebe (DVG-gelistetes Produkt eintragen)", "grob reinigen, desinfizieren nach Herstellerangabe (Konzentration, Einwirkzeit), mit Trinkwasser nachspülen, wenn der Hersteller es vorgibt", "Beschäftigte", "Anhang II Kap. I, II, V VO (EG) Nr. 852/2004; DVG-Desinfektionsmittelliste (Lebensmittelbereich)", true),
-  lm("Reinigung und Desinfektion", "Geräte und Maschinen (z. B. Aufschnittmaschine, Mixer, Kaffeemaschine)", "nach Gebrauch, mindestens täglich", "Reinigungsmittel, Desinfektionsmittel", "vom Strom trennen, zerlegen, reinigen, desinfizieren, trocknen lassen, zusammensetzen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004"),
-  lm("Reinigung und Desinfektion", "Kühl- und Tiefkühlgeräte", "wöchentlich und bei Verschmutzung sofort; Tiefkühlgeräte bei Eisbildung abtauen", "Reinigungsmittel, Desinfektionsmittel", "ausräumen, Ware prüfen (Mindesthaltbarkeits- und Verbrauchsdatum), auswischen, desinfizieren, trocknen, wieder einräumen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004"),
+  lm("Reinigung und Desinfektion", "Geräte und Maschinen (z. B. Aufschnittmaschine, Mixer, Kaffeemaschine)", "nach Gebrauch, mindestens täglich", "Reinigungsmittel, Desinfektionsmittel", "vom Strom trennen, zerlegen, reinigen, desinfizieren, trocknen lassen, zusammensetzen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004", true),
+  lm("Reinigung und Desinfektion", "Kühl- und Tiefkühlgeräte", "wöchentlich und bei Verschmutzung sofort; Tiefkühlgeräte bei Eisbildung abtauen", "Reinigungsmittel, Desinfektionsmittel", "ausräumen, Ware prüfen (Mindesthaltbarkeits- und Verbrauchsdatum), auswischen, desinfizieren, trocknen, wieder einräumen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004", true),
   // L-094: Klarspültemperatur als Kontrollpunkt – Richtwert nach DIN 10510/10511, die Herstellerangabe geht vor
   lm("Reinigung und Desinfektion", "Geschirr, Besteck, Gläser", "nach Gebrauch", "Geschirrspülmaschine mit Reiniger und Klarspüler", "Spül- und Klarspültemperatur nach Herstellerangabe; Klarspültemperatur täglich an der Anzeige ablesen (gewerbliche Spülmaschine: Richtwert 80–85 °C nach DIN 10510/10511, die Herstellerangabe geht vor)", "Beschäftigte", "Anhang II Kap. II Nr. 2 VO (EG) Nr. 852/2004; DIN 10510/10511", true),
   // Prüfbericht Lebensmittelhygiene (Frage 4, Café): Reinigungsintervalle nach Herstellerangabe, Milchschäumer täglich
-  lm("Reinigung und Desinfektion", "Milchschäumer und Milchlanzen", "täglich", "Reinigungsmittel nach Herstellerangabe", "zerlegen bzw. durchspülen und reinigen nach Herstellerangabe", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004"),
-  lm("Reinigung und Desinfektion", "Eiswürfelbereiter", "nach Herstellerangabe", "Reinigungs- und Desinfektionsmittel nach Herstellerangabe", "reinigen und desinfizieren nach Herstellerangabe; Eis nur aus Trinkwasser", "Beschäftigte", "Anhang II Kap. V, Kap. VII VO (EG) Nr. 852/2004"),
-  lm("Reinigung und Desinfektion", "Getränkeschankanlage", "nach Herstellerangabe", "Reinigungsmittel nach Herstellerangabe", "Leitungen und Zapfhähne reinigen nach Herstellerangabe; Reinigung eintragen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004"),
-  lm("Reinigung und Desinfektion", "Fußböden, Wände, Abflüsse", "Fußböden täglich zum Arbeitsende; Wände und Abflüsse wöchentlich", "Bodenreiniger", "kehren, nass wischen, trocknen lassen; Abflüsse reinigen", "Beschäftigte", "Anhang II Kap. II Nr. 1 VO (EG) Nr. 852/2004"),
+  lm("Reinigung und Desinfektion", "Milchschäumer und Milchlanzen", "täglich", "Reinigungsmittel nach Herstellerangabe", "zerlegen bzw. durchspülen und reinigen nach Herstellerangabe; Milch nicht länger als nötig ungekühlt, Restmilch im Kännchen verwerfen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004", true),
+  lm("Reinigung und Desinfektion", "Eiswürfelbereiter", "nach Herstellerangabe", "Reinigungs- und Desinfektionsmittel nach Herstellerangabe", "reinigen und desinfizieren nach Herstellerangabe; Eis nur aus Trinkwasser", "Beschäftigte", "Anhang II Kap. V, Kap. VII VO (EG) Nr. 852/2004", true),
+  lm("Reinigung und Desinfektion", "Getränkeschankanlage", "Reinigungsintervall nach DIN 6650-6 bzw. Herstellerangabe", "Reinigungsmittel nach Herstellerangabe", "Leitungen und Zapfhähne reinigen nach Herstellerangabe; Nachweis führen (Reinigung eintragen)", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004; DIN 6650-6", true),
+  lm("Reinigung und Desinfektion", "Fußböden, Wände, Abflüsse", "Fußböden täglich zum Arbeitsende; Wände und Abflüsse wöchentlich", "Bodenreiniger", "kehren, nass wischen, trocknen lassen; Abflüsse reinigen", "Beschäftigte", "Anhang II Kap. II Nr. 1 VO (EG) Nr. 852/2004", true),
   // L-096: übliche Praxis, keine Rechtsnorm – Markierung „Richtwert“
   lm("Reinigung und Desinfektion", "Reinigungstücher und Reinigungsgeräte", "Tücher täglich wechseln, bei Verschmutzung sofort", "Waschmaschine: mindestens 60 °C oder desinfizierendes Waschverfahren (Richtwert)", "Tücher farbig nach Bereichen trennen; Reinigungsgeräte sauber und trocken aufbewahren", "Beschäftigte", "Anhang II Kap. I VO (EG) Nr. 852/2004", true),
   // L-097: 20–30 Sekunden (BZgA/RKI)
   lm("Personalhygiene", "Händewaschen", "vor Arbeitsbeginn; nach Pausen und dem Toilettengang; nach rohem Fleisch, Geflügel oder Eiern; nach Abfall, Naseputzen, Rauchen", "Handwaschbecken mit Warm- und Kaltwasser, Flüssigseife, Einmalhandtücher", "gründlich waschen (20–30 Sekunden), mit Einmalhandtuch abtrocknen", "alle", "Anhang II Kap. I Nr. 4, Kap. VIII VO (EG) Nr. 852/2004; BZgA/RKI", true),
-  lm("Personalhygiene", "Arbeitskleidung und Schmuck", "täglich und bei Verschmutzung wechseln", "saubere Arbeitskleidung, Kopfbedeckung bzw. Haarnetz, Schürze", "Arbeitskleidung nur im Betrieb tragen; Ringe, Uhren, Armbänder ablegen; Fingernägel kurz und ohne Lack; Wunden an Händen wasserfest abdecken, Handschuh darüber", "alle", "Anhang II Kap. VIII Nr. 1 VO (EG) Nr. 852/2004"),
-  lm("Personalhygiene", "Krankheit (§ 42 IfSG)", "vor Arbeitsbeginn und sofort, wenn Krankheitszeichen auftreten", "Meldung an die verantwortliche Person", "Bei Durchfall, Erbrechen, Fieber, Gelbsucht oder infizierten Wunden: sofort melden und nicht mit Lebensmitteln arbeiten, bis ärztlich geklärt ist, dass kein Tätigkeitsverbot nach § 42 IfSG besteht", "alle", "§ 42 IfSG; Anhang II Kap. VIII Nr. 2 VO (EG) Nr. 852/2004"),
+  lm("Personalhygiene", "Arbeitskleidung und Schmuck", "täglich und bei Verschmutzung wechseln", "saubere Arbeitskleidung, Kopfbedeckung bzw. Haarnetz, Schürze", "Arbeitskleidung nur im Betrieb tragen; Ringe, Uhren, Armbänder ablegen; Fingernägel kurz und ohne Lack; Wunden an Händen wasserfest abdecken, Handschuh darüber", "alle", "Anhang II Kap. VIII Nr. 1 VO (EG) Nr. 852/2004", true),
+  lm("Personalhygiene", "Krankheit (§ 42 IfSG)", "vor Arbeitsbeginn und sofort, wenn Krankheitszeichen auftreten", "Meldung an die verantwortliche Person", "Bei Durchfall, Erbrechen, Fieber, Gelbsucht oder infizierten Wunden: sofort melden und nicht mit Lebensmitteln arbeiten, bis ärztlich geklärt ist, dass kein Tätigkeitsverbot nach § 42 IfSG besteht", "alle", "§ 42 IfSG; Anhang II Kap. VIII Nr. 2 VO (EG) Nr. 852/2004", true),
   // L-100 und L-077: einheitlich monatlich
   lm("Schädlingsbekämpfung", "Schädlingsmonitoring", "täglich Sichtkontrolle; Monitoringstellen monatlich", "Klebefallen bzw. Monitore, Lageplan der Stellen; Fliegengitter", "auf Kot, Fraßspuren, Gespinste und Tiere achten; Befall sofort melden, Fachbetrieb beauftragen; Kontrollen und Maßnahmen aufschreiben", "verantwortliche Person", "Anhang II Kap. IX Nr. 4 VO (EG) Nr. 852/2004", true),
   // L-101, L-102 (Frage 7): der Grenzwert steht nur in den Eigenkontrollen, damit nicht zwei Dokumente verschiedene Werte nennen
   lm("Temperaturkontrollen", "Kühlgeräte", "täglich zu Arbeitsbeginn", "Thermometer; Messprotokoll der Eigenkontrollen (HACCP)", `Temperatur ablesen und eintragen; ${GRENZWERT_HACCP}; bei Abweichung Ursache beheben, Ware bewerten, eintragen`, "Beschäftigte", "Anhang II Kap. IX Nr. 5 VO (EG) Nr. 852/2004", true),
   lm("Temperaturkontrollen", "Tiefkühlgeräte", "täglich zu Arbeitsbeginn", "Thermometer; Messprotokoll der Eigenkontrollen (HACCP)", `Temperatur ablesen und eintragen; ${GRENZWERT_HACCP}; bei Abweichung Ursache beheben, Ware bewerten, eintragen`, "Beschäftigte", "Anhang II Kap. IX Nr. 5 VO (EG) Nr. 852/2004", true),
-  lm("Wareneingang", "Wareneingang", "bei jeder Lieferung", "Thermometer, Lieferschein", `Verpackung, Kennzeichnung, Mindesthaltbarkeits- und Verbrauchsdatum prüfen; Temperatur gekühlter und tiefgekühlter Ware messen (${GRENZWERT_HACCP}); Mängel zurückweisen; Kühlware sofort einräumen`, "Beschäftigte", "Anhang II Kap. IX Nr. 1, 2 VO (EG) Nr. 852/2004"),
+  lm("Wareneingang", "Wareneingang", "bei jeder Lieferung", "Thermometer, Lieferschein", `Verpackung, Kennzeichnung, Mindesthaltbarkeits- und Verbrauchsdatum prüfen; Temperatur gekühlter und tiefgekühlter Ware messen (${GRENZWERT_HACCP}); Mängel zurückweisen; Kühlware sofort einräumen`, "Beschäftigte", "Anhang II Kap. IX Nr. 1, 2 VO (EG) Nr. 852/2004", true),
   // Prüfbericht Lebensmittelhygiene (Frage 6): neuer Themenbereich „Lagerung“ (Anhang II Kap. IX)
-  lm("Lagerung", "Lagerung von Lebensmitteln", "beim Einräumen und laufend", "beschriftete, verschlossene Behälter; Regale", "Mindesthaltbarkeits- und Verbrauchsdatum prüfen; zuerst verbrauchen, was zuerst eingelagert wurde (First in – first out); angebrochene Ware mit Datum beschriften; Trockenlager vom Boden abgehoben; Reinigungsmittel getrennt von Lebensmitteln lagern", "Beschäftigte", "Anhang II Kap. IX VO (EG) Nr. 852/2004"),
-  lm("Trennung rein/unrein", "Trennung rein/unrein", "ständig", "getrennte Arbeitsbereiche oder zeitliche Trennung; Schneidbretter nach Farben; abgedeckte Behälter", "rohe und verzehrfertige Lebensmittel getrennt lagern und bearbeiten (Rohes unten im Kühlgerät); Schmutzgeschirr, Abfall und Verpackungen nicht über Flächen für Lebensmittel; Reinigungsmittel getrennt von Lebensmitteln lagern", "alle", "Anhang II Kap. IX Nr. 3, Kap. I Nr. 10 VO (EG) Nr. 852/2004; § 3 LMHV"),
+  lm("Lagerung", "Lagerung von Lebensmitteln", "beim Einräumen und laufend", "beschriftete, verschlossene Behälter; Regale", "Mindesthaltbarkeits- und Verbrauchsdatum prüfen; zuerst verbrauchen, was zuerst eingelagert wurde (First in – first out); angebrochene Ware mit Datum beschriften; Trockenlager vom Boden abgehoben; Reinigungsmittel getrennt von Lebensmitteln lagern", "Beschäftigte", "Anhang II Kap. IX VO (EG) Nr. 852/2004", true),
+  lm("Trennung rein/unrein", "Trennung rein/unrein", "ständig", "getrennte Arbeitsbereiche oder zeitliche Trennung; Schneidbretter nach Farben; abgedeckte Behälter", "rohe und verzehrfertige Lebensmittel getrennt lagern und bearbeiten (Rohes unten im Kühlgerät); Schmutzgeschirr, Abfall und Verpackungen nicht über Flächen für Lebensmittel; Reinigungsmittel getrennt von Lebensmitteln lagern", "alle", "Anhang II Kap. IX Nr. 3, Kap. I Nr. 10 VO (EG) Nr. 852/2004; § 3 LMHV", true),
   // Prüfbericht Lebensmittelhygiene (Frage 6, Frage 10): neuer Themenbereich „Allergenmanagement“
-  lm("Allergenmanagement", "Allergene in Rezepturen und Auskunft", "ständig; Allergenliste bei jeder Rezept- oder Lieferantenänderung sofort aktualisieren", "Rezepturen, Zutatenlisten der Lieferanten, Allergenliste (eigene Vorlage)", "Rezepturen mit Allergenen festhalten und Zutatenlisten aufbewahren; Allergenliste aktuell halten; Personal einweisen: keine Auskunft ins Blaue, im Zweifel in Rezeptur oder Allergenliste nachsehen; getrennte Geräte bzw. Reinigung zwischen Chargen", "verantwortliche Person; alle", "Art. 44 LMIV; Anhang II Kap. IX Nr. 3 VO (EG) Nr. 852/2004"),
-  lm("Abfall", "Abfall und Speisereste", "mehrmals täglich und zum Arbeitsende leeren; Behälter wöchentlich reinigen", "verschließbare Behälter, möglichst mit Fußbedienung", "Abfall nicht in Räumen mit Lebensmitteln sammeln; Speisereste getrennt sammeln und über einen Entsorger abgeben; Abfallplatz sauber und frei von Schädlingen halten", "Beschäftigte", "Anhang II Kap. VI VO (EG) Nr. 852/2004"),
-  lm("Trinkwasser", "Trinkwasser und Eis", "laufend; nach längerem Stillstand Leitungen spülen", "Trinkwasser aus der Hausinstallation", "für Lebensmittel, Eis und das Reinigen von Flächen für Lebensmittel nur Trinkwasser verwenden; Eisbereiter und Wasserfilter nach Herstellerangabe reinigen bzw. wechseln", "Beschäftigte", "Anhang II Kap. VII VO (EG) Nr. 852/2004"),
+  lm("Allergenmanagement", "Allergene in Rezepturen und Auskunft", "ständig; Allergenliste bei jeder Rezept- oder Lieferantenänderung sofort aktualisieren", "Rezepturen, Zutatenlisten der Lieferanten, Allergenliste (eigene Vorlage)", "Rezepturen mit Allergenen festhalten und Zutatenlisten aufbewahren; Allergenliste aktuell halten; Personal einweisen: keine Auskunft ins Blaue, im Zweifel in Rezeptur oder Allergenliste nachsehen; getrennte Geräte bzw. Reinigung zwischen Chargen", "verantwortliche Person; alle", "Art. 44 LMIV; Anhang II Kap. IX Nr. 3 VO (EG) Nr. 852/2004", true),
+  lm("Abfall", "Abfall und Speisereste", "mehrmals täglich und zum Arbeitsende leeren; Behälter wöchentlich reinigen", "verschließbare Behälter, möglichst mit Fußbedienung", "Abfall nicht in Räumen mit Lebensmitteln sammeln; Speisereste getrennt sammeln und über einen Entsorger abgeben; Abfallplatz sauber und frei von Schädlingen halten", "Beschäftigte", "Anhang II Kap. VI VO (EG) Nr. 852/2004", true),
+  lm("Trinkwasser", "Trinkwasser und Eis", "laufend; nach längerem Stillstand Leitungen spülen", "Trinkwasser aus der Hausinstallation", "für Lebensmittel, Eis und das Reinigen von Flächen für Lebensmittel nur Trinkwasser verwenden; Eisbereiter und Wasserfilter nach Herstellerangabe reinigen bzw. wechseln", "Beschäftigte", "Anhang II Kap. VII VO (EG) Nr. 852/2004", true),
   // L-107: jährlich (DIN 10514); Nachweis mit der Vorlage Schulungsnachweis
   lm("Schulungen", "Schulung Lebensmittelhygiene", "vor der ersten Tätigkeit und jährlich wiederholen", "Schulung nach § 4 LMHV und Anhang II Kap. XII VO (EG) Nr. 852/2004; Belehrung nach § 43 IfSG (eigene Vorlage)", "Inhalte: Personalhygiene, Reinigung, Temperaturen, Trennung rein/unrein, Allergene; Teilnahme mit Unterschrift festhalten (Vorlage „Schulungsnachweis Lebensmittelhygiene“)", "verantwortliche Person", "§ 4 LMHV; Anhang II Kap. XII VO (EG) Nr. 852/2004; DIN 10514", true),
 ];

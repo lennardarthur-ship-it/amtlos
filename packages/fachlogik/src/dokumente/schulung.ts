@@ -33,13 +33,14 @@ export const SCHULUNG_THEMEN: Option[] = [
 export const SCHULUNG_HILFE = {
   wer: "Wer bei dir mit leicht verderblichen Lebensmitteln arbeitet – auch du selbst –, braucht Fachkenntnisse in Lebensmittelhygiene aus einer Schulung (§ 4 Abs. 1 LMHV). Ausnahme: Wer eine Berufsausbildung abgeschlossen hat, die Kenntnisse in Lebensmittelhygiene vermittelt (z. B. Bäcker/in, Koch/Köchin), gilt für eine entsprechende Tätigkeit als geschult (§ 4 Abs. 2 LMHV).",
   abgrenzung: "Nicht verwechseln mit der Belehrung nach § 43 IfSG: Die Belehrung betrifft den Infektionsschutz (Krankheiten), die Schulung die Fachkenntnisse in Hygiene. Beides geht am selben Termin, braucht aber je eine eigene Unterschriftsliste.",
-  wiederholung: "Wiederhole die Schulung jährlich (DIN 10514).",
+  // Nachkontrolle T. Baum (23.10.2026, Antwort 4, Hinweis 2): Empfehlung, keine gesetzliche Frist
+  wiederholung: "Wiederholung jährlich empfohlen (DIN 10514) – eine gesetzliche Frist gibt es nicht.",
 };
 
 export const hygieneschulung: Vorlage = {
   id: "hygieneschulung",
   titel: "Schulungsnachweis Lebensmittelhygiene (§ 4 LMHV)",
-  beschreibung: "Wann du wen in Lebensmittelhygiene geschult hast – Themen nach Anlage 1 LMHV zum Ankreuzen, mit Unterschriften der Teilnehmenden und der schulenden Person; Wiederholung jährlich.",
+  beschreibung: "Wann du wen in Lebensmittelhygiene geschult hast – Themen nach Anlage 1 LMHV zum Ankreuzen, mit Unterschriften der Teilnehmenden und der schulenden Person; Wiederholung jährlich empfohlen.",
   bereich: "gastro",
   pflichten: ["branche.gastro_hygieneschulung"],
   grundlage: "§ 4 LMHV; Anhang II Kap. XII VO (EG) Nr. 852/2004",
@@ -95,7 +96,7 @@ export const hygieneschulung: Vorlage = {
         ((a) => (a ? abschnitt("Angaben", a) : ""))(angaben([["Datum", text(d, "datum") ? null : ""], ["Dauer", text(d, "dauer") ? null : ""], ["Geschult von", text(d, "geschult_von") ? null : ""]])) +
         abschnitt("Themen der Schulung", (themen.length ? punkte(themen) : absatz("")) + (text(d, "inhalt") ? zeilen(text(d, "inhalt")) : "")) +
         abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich die Teilnahme an der Schulung zur Lebensmittelhygiene.</p>${teilnahmeTabelle(liste(d, "teilnehmer"), { kopf: "Tätigkeit", feld: "taetigkeit" })}`) +
-        nachsatz(`Schulung nach § 4 Abs. 1 LMHV; die Fachkenntnisse sind der Behörde auf Verlangen nachzuweisen. Wiederholung jährlich (DIN 10514)${naechste ? `, nächste Schulung spätestens am ${naechste}` : ""}. Die Belehrung nach § 43 IfSG (Infektionsschutz) ist ein eigener Nachweis. Als geschult gilt nach § 4 Abs. 2 LMHV auch, wer eine Berufsausbildung mit Lebensmittelhygiene abgeschlossen hat (z. B. Bäcker/in, Koch/Köchin).`) +
+        nachsatz(`Schulung nach § 4 Abs. 1 LMHV; die Fachkenntnisse sind der Behörde auf Verlangen nachzuweisen. Wiederholung jährlich empfohlen (DIN 10514)${naechste ? `, nächste Schulung bis ${naechste}` : ""}. Die Belehrung nach § 43 IfSG (Infektionsschutz) ist ein eigener Nachweis. Als geschult gilt nach § 4 Abs. 2 LMHV auch, wer eine Berufsausbildung mit Lebensmittelhygiene abgeschlossen hat (z. B. Bäcker/in, Koch/Köchin).`) +
         unterschriften(["Ort, Datum", "Unterschrift der schulenden Person"]),
     });
   },

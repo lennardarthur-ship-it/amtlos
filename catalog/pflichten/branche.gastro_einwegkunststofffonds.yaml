@@ -1,0 +1,72 @@
+# RA Dr. Weber Runde 3 (23.10.2026, zu branche.gastro_mehrweg): eigener Hinweis-Eintrag Einwegkunststofffonds (EWKFondsG)
+schema_version: 1
+id: branche.gastro_einwegkunststofffonds
+version: 1
+katalog_nr: G.73
+titel:
+  de: 'Einwegkunststoff-Serviceverpackungen: registrieren und Mengen melden'
+kurz:
+  de: 'Einwegkunststoff-Serviceverpackungen (Becher, Boxen, Tüten): Registrierung im DIVID-Portal des UBA und jährliche Mengenmeldung (§§ 7, 11, 12 EWKFondsG).'
+erklaerung:
+  de: 'Füllst du Speisen oder Getränke zum Mitnehmen in Einwegverpackungen aus Kunststoff – Becher, Boxen, Tüten –, bist du nach dem Einwegkunststofffondsgesetz Hersteller; das gilt ausdrücklich auch für den, der die Verpackungen erst befüllt (§ 3 Nr. 3 EWKFondsG). Hersteller registrieren sich vor Aufnahme der Tätigkeit beim Umweltbundesamt (§ 7 EWKFondsG), über dessen Portal DIVID. Dort meldest du jedes Jahr die Mengen, die du im Vorjahr in Verkehr gebracht hast (§ 11 EWKFondsG); danach richtet sich die Einwegkunststoffabgabe, die du zahlst (§ 12 EWKFondsG). Die Registrierungs- und Abgabepflicht gilt seit 2024; die erste Mengenmeldung (für 2024) war bis 15.5.2025 fällig.'
+rechtsgrundlage:
+- § 3 Nr. 3 EWKFondsG
+- § 7 EWKFondsG
+- § 11 EWKFondsG
+- § 12 EWKFondsG
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gastronomie_lebensmittel
+    label:
+      de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  - feld: profil.gastro.to_go
+    op: ==
+    wert: true
+    label:
+      de: Du verkaufst Essen oder Getränke zum Mitnehmen in Einwegverpackungen.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Umweltbundesamt (Portal DIVID)
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: 'Bußgeld bis 100.000 €, wenn du dich nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig registrieren lässt (§ 26 Abs. 1 Nr. 1, Abs. 2 EWKFondsG), und bis 10.000 €, wenn du die jährliche Meldung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig machst (§ 26 Abs. 1 Nr. 9, Abs. 2 EWKFondsG).'
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Einwegkunststofffondsgesetz § 3
+  url: https://www.gesetze-im-internet.de/ewkfondsg/__3.html
+  abgerufen: '2026-10-22'
+- titel: Einwegkunststofffondsgesetz § 7 (Wortlaut über gesetze.legal)
+  url: https://gesetze.legal/bund/ewkfondsg/7
+  abgerufen: '2026-10-23'
+- titel: Einwegkunststofffondsgesetz § 11
+  url: https://www.gesetze-im-internet.de/ewkfondsg/__11.html
+  abgerufen: null
+- titel: Einwegkunststofffondsgesetz § 26 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/ewkfondsg/__26.html
+  abgerufen: '2026-10-23'
+- titel: IHK Wiesbaden – Einwegkunststofffondsgesetz (DIVID, Meldung bis 15. Mai)
+  url: https://www.ihk.de/wiesbaden/recht/rechtsberatung/umwelt/umweltrecht-abfallwirtschaft/einwegkunststofffondsgesetz-6164876
+  abgerufen: '2026-10-23'
+fachlich_zu_pruefen:
+- 'Neu am 23.10.2026 auf Verlangen von RA Dr. Weber (Runde 3, zu branche.gastro_mehrweg), Prüfung der Fassung durch RA Dr. Weber ausstehend. Titel und Kurztext nach seiner Vorgabe; Schwere „mittel“ wie vorgegeben; Zahlen zu Inkrafttreten (seit 2024) und erster Meldung (für 2024 bis 15.5.2025) aus seiner Rückmeldung'
+- 'Bußgeld: RA Dr. Weber nennt „§ 24 EWKFondsG (Höhe am Wortlaut prüfen)“ – § 24 EWKFondsG regelt aber „Besetzung und Benennung“ der Einwegkunststoffkommission (gesetze-im-internet.de, 23.10.2026). Die Bußgeldvorschriften stehen in § 26: Abs. 1 Nr. 1 „entgegen § 7 Absatz 1 Satz 1 sich nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig registrieren lässt“, Nr. 9 „entgegen § 11 Absatz 1 Satz 1 eine Meldung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig macht“; Abs. 2: bis 100.000 € in den Fällen des Abs. 1 Nr. 1, 2 Buchst. a und Nr. 3 bis 6, sonst bis 10.000 € (gesetze-im-internet.de und gesetze.legal, 23.10.2026). Auf § 12 (Abgabe) verweist § 26 Abs. 1 nicht. Fundstelle § 26 mit dem Prüfer bestätigen'
+- '§ 7 Abs. 1 Satz 1 am Wortlaut gelesen („Hersteller haben sich vor der Aufnahme ihrer Tätigkeit … beim Umweltbundesamt registrieren zu lassen“, gesetze.legal); § 11 (jährlich bis 15. Mai, Plattform DIVID) und § 12 nicht selbst am Wortlaut gelesen – § 11 nur über IHK Wiesbaden („jährlich bis zum 15. Mai“), § 12 nur über die Inhaltsübersicht („Abgabepflicht“); gesetze-im-internet.de war für §§ 11, 27 am 23.10.2026 nicht erreichbar'
+- 'Jährliche Meldung bis 15. Mai nicht als Termin abgebildet (Hinweis-Eintrag nach Vorgabe, Frist dauerhaft); Auslöser wie branche.gastro_mehrweg (Frage „Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen?“ – unterscheidet nicht nach Kunststoff)'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

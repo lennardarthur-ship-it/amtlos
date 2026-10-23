@@ -114,7 +114,8 @@ describe("Belehrung nach § 43 IfSG (Prüfbericht D)", () => {
     expect(f.find((x) => x.id === "letzte_belehrung_am")).toMatchObject({ art: "datum" });
     const t = [{ name: "Tom Kessler", erstbelehrung_am: "2024-03-04", letzte_belehrung_am: "2025-03-15" }, { name: "Aylin Demir", erstbelehrung_am: "2026-09-10", letzte_belehrung_am: "" }];
     const h = html("ifsg_belehrung", { datum: "2026-10-01", teilnehmer: t });
-    expect(h).toContain("<th>Erstbelehrung vom</th><th>Letzte Belehrung (Arbeitgeber)</th><th>Unterschrift</th>");
+    // Nachkontrolle T. Baum (23.10.2026, Hinweis 4): nicht mit der ersten Belehrung durch den Arbeitgeber verwechseln
+    expect(h).toContain("<th>Bescheinigung Gesundheitsamt vom</th><th>Letzte Belehrung (Arbeitgeber)</th><th>Unterschrift</th>");
     expect(h).toContain("<td>Tom Kessler</td><td>04.03.2024</td><td>15.03.2025</td>");
     const i = v("ifsg_belehrung");
     expect(i.hinweise?.({ datum: "2026-10-01", teilnehmer: t }, B)).toEqual([]);
@@ -149,7 +150,9 @@ describe("Schulungsnachweis Lebensmittelhygiene § 4 LMHV (Prüfbericht E, Frage
     expect(h).toContain("<th>Name</th><th>Tätigkeit</th><th>Unterschrift</th>");
     expect(h).toContain("<td>Tom Kessler</td><td>Küche</td>");
     expect(h).toContain("Unterschrift der schulenden Person");
-    expect(h).toMatch(/Wiederholung jährlich \(DIN 10514\), nächste Schulung spätestens am 01\.10\.2027/);
+    // Nachkontrolle T. Baum (23.10.2026, Hinweis 2): Empfehlung, keine Frist
+    expect(h).toMatch(/Wiederholung jährlich empfohlen \(DIN 10514\), nächste Schulung bis 01\.10\.2027\./);
+    expect(h).not.toContain("spätestens");
     expect(h).toContain("Die Belehrung nach § 43 IfSG (Infektionsschutz) ist ein eigener Nachweis.");
     expect(h).toContain("§ 4 Abs. 2 LMHV");
     expect(h).toContain("Bäcker/in, Koch/Köchin");

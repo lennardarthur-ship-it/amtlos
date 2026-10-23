@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { GMBH_ANGABEN, KU_HINWEIS, PRUEFHINWEIS, betragUnplausibel, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Daten, type Vorlage } from "@amtlos/fachlogik";
+import { GMBH_ANGABEN, KU_HINWEIS, betragUnplausibel, pruefHinweisFuer, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Daten, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -328,7 +328,9 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           : null}
         {/* Phase 1 (RDG): in der App, nie im PDF – die Unterlage gehört dem Betrieb; Rechnungen ohne (Geschäftsvorgang) */}
         {mitVorlagenHinweis(v) ? <RechtsHinweis art="vorlage" oben={4} /> : null}
-        <T v="caption" leise stil={{ marginTop: 4 }}>{PRUEFHINWEIS}</T>
+        {/* Nachkontrolle T. Baum (23.10.2026): „Vorlagen fachlich durchgesehen (Stand …)“, solange die Vorlage dem
+            freigegebenen Stand entspricht (Prüfsumme) – beim Hygieneplan nur in der Fassung für Lebensmittelbetriebe */}
+        <T v="caption" leise stil={{ marginTop: 4 }}>{pruefHinweisFuer(v, d)}</T>
 
         <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11 }}>{TEXT.mehr}</T>
         {eFehlt.length ? <ERechnungFehlt v={v} fehlt={eFehlt} springen={springen} gesperrt={fest} /> : null}

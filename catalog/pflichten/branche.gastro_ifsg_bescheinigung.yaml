@@ -1,7 +1,7 @@
 # R10: aus branche.gastro_ifsg_belehrung herausgelöst (Rechtsprüfung: Bescheinigung nach § 43 Abs. 1 IfSG vor Beginn, nicht älter als drei Monate)
 schema_version: 1
 id: branche.gastro_ifsg_bescheinigung
-version: 3
+version: 4
 katalog_nr: H.1
 titel:
   de: Bescheinigung des Gesundheitsamts vor dem ersten Arbeitstag (§ 43 IfSG)
@@ -54,7 +54,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Bußgeld bis 25.000 € (§ 73 IfSG).
+    de: Bußgeld bis 25.000 €, wenn du eine Person ohne diese Bescheinigung beschäftigst (§ 73 Abs. 1a Nr. 20, Abs. 2 IfSG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -64,9 +64,13 @@ quellen:
 - titel: Infektionsschutzgesetz § 43
   url: https://www.gesetze-im-internet.de/ifsg/__43.html
   abgerufen: null
+- titel: IfSG § 73
+  url: https://www.gesetze-im-internet.de/ifsg/__73.html
+  abgerufen: '2026-10-23'
 fachlich_zu_pruefen:
 - 'Nur erstmalige Tätigkeit (§ 43 Abs. 1 IfSG, Rechtsprüfung R11 Befund 7) – Auslöser über die Frage „Arbeiten Beschäftigte mit Lebensmitteln?“ (erstmals / schon mit Bescheinigung / niemand); je Person nicht abbildbar'
-- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Kurztext um „nicht älter als drei Monate“ ergänzt (§ 43 Abs. 1 Satz 1 IfSG: „eine nicht mehr als drei Monate alte Bescheinigung“, am 22.10.2026 gelesen); Auslöser und Folgen fachlich in Ordnung, Höhe laut T. Baum von RA Dr. Weber bestätigt'
+- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Kurztext um „nicht älter als drei Monate“ ergänzt (§ 43 Abs. 1 Satz 1 IfSG: „eine nicht mehr als drei Monate alte Bescheinigung“, am 22.10.2026 gelesen); Auslöser und Folgen fachlich in Ordnung'
+- 'RA Dr. Weber Runde 3 (23.10.2026): Höhe 25.000 € bestätigt; Fundstelle auf Verlangen präzisiert – § 73 Abs. 1a Nr. 20 IfSG „entgegen § 43 Abs. 1 Satz 1, auch in Verbindung mit einer Rechtsverordnung nach Abs. 7, eine Person beschäftigt“, Abs. 2 (bis 25.000 €; nicht unter den Nummern mit 2.500 €), am 23.10.2026 auf gesetze-im-internet.de gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null
