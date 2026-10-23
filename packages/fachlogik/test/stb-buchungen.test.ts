@@ -91,6 +91,11 @@ describe("A-4: Soll-Stapel bilanzierender Betriebe mit offenen Forderungen zum 3
     expect(bilanzierend({ rechtsform: "", name: "Lang Ventures UG (haftungsbeschränkt)" })).toBe(true);
     expect(bilanzierend({ rechtsform: "GmbH & Co. KG" })).toBe(true);
     expect(bilanzierend({ rechtsform: "e. K." })).toBe(true);
+    // E-176: OHG und KG sind Handelsgesellschaften (§§ 6, 238 HGB) – § 241a HGB gilt nur für Einzelkaufleute
+    expect(bilanzierend({ rechtsform: "OHG" })).toBe(true);
+    expect(bilanzierend({ rechtsform: "KG" })).toBe(true);
+    expect(bilanzierend({ rechtsform: "", name: "Becker & Sohn KG" })).toBe(true);
+    expect(bilanzierend({ rechtsform: "GbR" })).toBe(false);
     expect(bilanzierend({ rechtsform: "Einzelunternehmen" })).toBe(false);
     expect(bilanzierend({ rechtsform: "Einzelunternehmen", buchfuehrungMitteilung: true })).toBe(true);
     expect(bilanzierend({ rechtsform: "e. K.", vorgabe: "euer" })).toBe(false);

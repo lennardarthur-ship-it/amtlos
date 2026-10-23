@@ -4,6 +4,7 @@ import {
   Regelwerte,
   auswerten,
   entscheidendeSaetze,
+  mitAbgeleitetenFakten,
   nicht,
   oder,
   und,
@@ -206,5 +207,18 @@ describe("Eine Instanz je Ereignis (je_ereignis)", () => {
   it("ohne Ereignis: kein Termin und ein Hinweis", () => {
     const r = lauf([]);
     expect(r.termine).toEqual([]);
+  });
+});
+
+describe("E-176: OHG und KG als eigene Rechtsform", () => {
+  it("eingetragene Personengesellschaft, aber weder Kapitalgesellschaft noch haftungsbeschränkt (§ 264a HGB)", () => {
+    for (const rechtsform of ["ohg", "kg"]) {
+      const f = mitAbgeleitetenFakten({ "profil.rechtsform": rechtsform }, "2026-10-23");
+      expect(f["abgeleitet.ist_eingetragene_gesellschaft"]).toBe(true);
+      expect(f["abgeleitet.ist_kapitalgesellschaft"]).toBe(false);
+      expect(f["abgeleitet.ist_kapitalgesellschaft_oder_co_kg"]).toBe(false);
+    }
+    // „Andere“ steht nicht mehr für OHG/KG
+    expect(mitAbgeleitetenFakten({ "profil.rechtsform": "sonstige" }, "2026-10-23")["abgeleitet.ist_eingetragene_gesellschaft"]).toBe(false);
   });
 });

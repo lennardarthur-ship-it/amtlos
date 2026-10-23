@@ -20,7 +20,7 @@ export interface Abschnitt {
 
 const RECHTSFORM: Record<string, T> = {
   einzelunternehmen: { de: "Einzelunternehmen", en: "Sole proprietorship" }, freiberuf: { de: "Freiberuflich", en: "Freelance" },
-  gbr: { de: "GbR", en: "GbR" }, ek: { de: "e. K.", en: "e. K." }, ug: { de: "UG (haftungsbeschränkt)", en: "UG" }, gmbh: { de: "GmbH", en: "GmbH" },
+  gbr: { de: "GbR", en: "GbR" }, ek: { de: "e. K.", en: "e. K." }, ohg: { de: "OHG", en: "OHG" }, kg: { de: "KG", en: "KG" }, ug: { de: "UG (haftungsbeschränkt)", en: "UG" }, gmbh: { de: "GmbH", en: "GmbH" },
   gmbh_co_kg: { de: "GmbH & Co. KG", en: "GmbH & Co. KG" }, partg: { de: "PartG", en: "PartG" }, partg_mbb: { de: "PartG mbB", en: "PartG mbB" }, sonstige: { de: "Andere", en: "Other" },
 };
 const EINORDNUNG: Record<string, T> = {

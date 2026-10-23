@@ -541,6 +541,8 @@
    "§§ 7, 8 GmbHG",
    "§ 106 HGB",
    "§ 161 Abs. 2 HGB",
+   "§ 162 HGB",
+   "§ 176 HGB",
    "§ 4 PartGG"
   ],
   "quellen": [
@@ -571,9 +573,21 @@
    {
     "titel": "Partnerschaftsgesellschaftsgesetz § 5",
     "url": "https://www.gesetze-im-internet.de/partgg/__5.html"
+   },
+   {
+    "titel": "§ 106 HGB, Wortlaut (lexetius.com, Fassung ab 1.1.2024)",
+    "url": "https://lexetius.com/HGB/106,1"
+   },
+   {
+    "titel": "§ 162 HGB, Wortlaut (freirecht.de)",
+    "url": "https://freirecht.de/g/HGB:162"
+   },
+   {
+    "titel": "§ 176 HGB, Wortlaut (lxgesetze.de)",
+    "url": "https://lxgesetze.de/hgb/176"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "gesellschaft.transparenzregister",
@@ -599,9 +613,13 @@
    {
     "titel": "§ 56 GwG, Wortlaut (gesetze.legal, Spiegel des Bundesrechts)",
     "url": "https://gesetze.legal/bund/gwg/56"
+   },
+   {
+    "titel": "IHK Oberfranken Bayreuth, Mitteilungspflicht an das Transparenzregister (OHG und KG als eingetragene Personengesellschaften)",
+    "url": "https://www.ihk.de/bayreuth/hauptnavigation/service/recht/geldwaesche/mitteilungspflicht-transparenzregister-4819528"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "gruendung.gewerbeanzeige",
@@ -915,7 +933,7 @@
   "titel": "Doppelte Buchführung",
   "kurz": "Nach deinen Angaben kommt die doppelte Buchführung mit Jahresabschluss in Frage – für Kapitalgesellschaften immer, für andere je nach Rechtsform und Größe.",
   "rechtsgrundlage": [
-   "§§ 238, 241a HGB",
+   "§§ 6, 238, 241a HGB",
    "§ 141 AO"
   ],
   "quellen": [
@@ -1056,7 +1074,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.feststellungserklaerung",
@@ -1093,7 +1111,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.gewst_erklaerung",

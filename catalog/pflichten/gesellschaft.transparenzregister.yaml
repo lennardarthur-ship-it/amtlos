@@ -1,14 +1,15 @@
+# E-176 (23.10.2026): OHG und KG als eigene Rechtsformen – lösen den Eintrag über abgeleitet.ist_eingetragene_gesellschaft aus; im Text genannt
 # Katalog B.16 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.transparenzregister
-version: 5
+version: 6
 katalog_nr: B.16
 titel:
   de: Wirtschaftlich Berechtigte ans Transparenzregister melden
 kurz:
   de: 'Melde unverzüglich, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.'
 erklaerung:
-  de: Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen aktualisieren. Das gilt für UG und GmbH ebenso wie für eingetragene Personengesellschaften, also auch für die GmbH & Co. KG und die Partnerschaftsgesellschaft (§ 20 Abs. 1 GwG) – seit 2024 auch für eine GbR, die sich ins Gesellschaftsregister eintragen lässt (eGbR). Die Mitteilung machst du unverzüglich nach der Eintragung und nach jeder Änderung (§ 20 Abs. 1 GwG).
+  de: Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen aktualisieren. Das gilt für UG und GmbH ebenso wie für eingetragene Personengesellschaften, also auch für OHG, KG, GmbH & Co. KG und Partnerschaftsgesellschaft (§ 20 Abs. 1 GwG) – seit 2024 auch für eine GbR, die sich ins Gesellschaftsregister eintragen lässt (eGbR). Die Mitteilung machst du unverzüglich nach der Eintragung und nach jeder Änderung (§ 20 Abs. 1 GwG).
 begriffe:
 - begriff:
     de: Wirtschaftlich Berechtigte
@@ -45,6 +46,8 @@ aktion:
   art: link
   ziel: portal.transparenzregister
   nachweis_erforderlich: true
+aenderungsnotiz:
+  de: Jetzt auch für OHG und KG, die du im Check als eigene Rechtsform wählen kannst.
 erledigung:
   art: bestaetigen
   bestaetigung:
@@ -65,9 +68,10 @@ quellen:
 - titel: § 56 GwG, Wortlaut (gesetze.legal, Spiegel des Bundesrechts)
   url: https://gesetze.legal/bund/gwg/56
   abgerufen: '2026-10-21'
+- titel: IHK Oberfranken Bayreuth, Mitteilungspflicht an das Transparenzregister (OHG und KG als eingetragene Personengesellschaften)
+  url: https://www.ihk.de/bayreuth/hauptnavigation/service/recht/geldwaesche/mitteilungspflicht-transparenzregister-4819528
+  abgerufen: '2026-10-23'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 5
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

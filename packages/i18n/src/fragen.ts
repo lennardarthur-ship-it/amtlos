@@ -71,6 +71,9 @@ export const SCHRITTE: Schritt[] = [
           freiberuf: { de: "Freiberuflich (ohne Gewerbe)", en: "Freelance profession (no trade)" },
           gbr: { de: "GbR", en: "Civil-law partnership (GbR)" },
           ek: { de: "Eingetragene Kauffrau / eingetragener Kaufmann (e. K.)", en: "Registered merchant (e. K.)" },
+          // E-176 (23.10.2026): OHG und KG als eigene Rechtsform – vorher „Andere“
+          ohg: { de: "OHG (offene Handelsgesellschaft)", en: "OHG (general commercial partnership)" },
+          kg: { de: "KG (Kommanditgesellschaft)", en: "KG (limited partnership)" },
           ug: { de: "UG (haftungsbeschränkt)", en: "UG (limited liability)" },
           gmbh: { de: "GmbH", en: "GmbH" },
           gmbh_co_kg: { de: "GmbH & Co. KG", en: "GmbH & Co. KG" },
@@ -85,8 +88,9 @@ export const SCHRITTE: Schritt[] = [
     id: "register",
     titel: { de: "Register", en: "Register" },
     // R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG und Partnerschaftsgesellschaften werden eingetragen;
-    // Freigabe Weber 22.10.2026 (B.16): die GbR kann sich ins Gesellschaftsregister eintragen lassen (eGbR, § 707 BGB)
-    nurWenn: { feld: "rechtsform", in: ["ug", "gmbh", "gmbh_co_kg", "partg", "partg_mbb", "gbr"] },
+    // Freigabe Weber 22.10.2026 (B.16): die GbR kann sich ins Gesellschaftsregister eintragen lassen (eGbR, § 707 BGB);
+    // E-176: OHG und KG werden ins Handelsregister eingetragen (§ 106 Abs. 1, § 161 Abs. 2 HGB)
+    nurWenn: { feld: "rechtsform", in: ["ug", "gmbh", "gmbh_co_kg", "ohg", "kg", "partg", "partg_mbb", "gbr"] },
     fragen: [
       {
         feld: "gesellschaft.handelsregister",
@@ -108,8 +112,8 @@ export const SCHRITTE: Schritt[] = [
   {
     id: "gesellschaft",
     titel: { de: "Gesellschaft", en: "Company" },
-    // R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG und Partnerschaftsgesellschaften werden eingetragen
-    nurWenn: { feld: "rechtsform", in: ["ug", "gmbh", "gmbh_co_kg", "partg", "partg_mbb"] },
+    // R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG und Partnerschaftsgesellschaften werden eingetragen; E-176 auch OHG und KG
+    nurWenn: { feld: "rechtsform", in: ["ug", "gmbh", "gmbh_co_kg", "ohg", "kg", "partg", "partg_mbb"] },
     fragen: [
       {
         feld: "gesellschaft.geschaeftsjahr",

@@ -1185,7 +1185,7 @@ export const T = {
   stb_kv_pk_hilfe: "Nur zum Ansehen: Die Nummern vergibt die App und ändert sie nicht mehr.",
   person_personenkonto: (nr: string) => `Personenkonto (Debitor): ${nr} – vergeben von der App, nicht änderbar`,
   stb_kv_gewinn: "Gewinnermittlung",
-  stb_kv_gewinn_hilfe: "Ohne Auswahl nach Rechtsform: GmbH, UG, GmbH & Co. KG und e. K. bilanzieren, ebenso wer vom Finanzamt zur Buchführung aufgefordert wurde.",
+  stb_kv_gewinn_hilfe: "Ohne Auswahl nach Rechtsform: GmbH, UG, GmbH & Co. KG, OHG, KG und e. K. bilanzieren, ebenso wer vom Finanzamt zur Buchführung aufgefordert wurde.",
   stb_kv_gewinn_auto: "Nach Rechtsform",
   stb_kv_gewinn_bilanz: "Bilanz",
   stb_kv_gewinn_euer: "EÜR",

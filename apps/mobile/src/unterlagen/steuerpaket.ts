@@ -177,7 +177,7 @@ export function istKleinunternehmer(s: Stand): boolean {
 }
 
 /** Rechtsform laut Pflichten-Check (Wert der Antwort) als Text – für LIESMICH, wenn „Mein Betrieb“ keine hat (R10). */
-const RECHTSFORM_TEXT: Record<string, string> = { einzelunternehmen: "Einzelunternehmen", freiberuf: "Freiberuflich (Einzelunternehmen)", gbr: "GbR", ek: "e. K.", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG", partg: "PartG", partg_mbb: "PartG mbB" };
+const RECHTSFORM_TEXT: Record<string, string> = { einzelunternehmen: "Einzelunternehmen", freiberuf: "Freiberuflich (Einzelunternehmen)", gbr: "GbR", ek: "e. K.", ohg: "OHG", kg: "KG", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG", partg: "PartG", partg_mbb: "PartG mbB" };
 /** Rechtsform aus „Mein Betrieb“, sonst aus dem Pflichten-Check (mit Herkunft). */
 export function rechtsformFuer(s: Stand): { text: string; ausCheck: boolean } | null {
   const b = s.betrieb.rechtsform?.trim();
@@ -188,7 +188,7 @@ export function rechtsformFuer(s: Stand): { text: string; ausCheck: boolean } | 
 /** Kapitalgesellschaft laut „Mein Betrieb“ oder Pflichten-Check */
 export const kapitalgesellschaft = (s: Stand) => istKapitalgesellschaft(rechtsformFuer(s)?.text, s.betrieb.name);
 /**
- * StB-Prüfung (A-4, E-4): bilanzierender Betrieb – Kapitalgesellschaft, GmbH & Co. KG, e. K. oder vom Finanzamt zur
+ * StB-Prüfung (A-4, E-4): bilanzierender Betrieb – Kapitalgesellschaft, GmbH & Co. KG, OHG, KG, e. K. oder vom Finanzamt zur
  * Buchführung aufgefordert (Pflichten-Check „steuern.buchfuehrung_mitteilung“); die Kontenvorgabe der Kanzlei geht vor.
  * Dann gibt es keine EÜR-Übernahme und das Steuerberater-Paket enthält einen Soll-Stapel mit Zahlungseingängen.
  */

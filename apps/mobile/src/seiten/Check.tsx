@@ -41,7 +41,7 @@ function herkunftFuer(feld: string, profil: Profil): Record<string, string> | un
 }
 
 /** R12 (Kfz #6): Rechtsform aus dem Check für „Mein Betrieb“ (Geschäftsbriefe, § 35a GmbHG) – nur Gesellschaften und e. K. */
-const RECHTSFORM_TEXT: Record<string, string> = { gbr: "GbR", ek: "e. K.", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG", partg: "PartG", partg_mbb: "PartG mbB" };
+const RECHTSFORM_TEXT: Record<string, string> = { gbr: "GbR", ek: "e. K.", ohg: "OHG", kg: "KG", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG", partg: "PartG", partg_mbb: "PartG mbB" };
 /** R11 (Nutzertest Gründerin #8): Ja/Nein-Fragen mit „Weiß ich nicht“ */
 const WEISS_NICHT = ["kasse.elektronisch", "ust.kleinunternehmer"];
 

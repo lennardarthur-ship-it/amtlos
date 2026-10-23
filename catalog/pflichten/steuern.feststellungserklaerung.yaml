@@ -1,8 +1,9 @@
+# E-176 (23.10.2026): OHG und KG als eigene Rechtsformen im Auslöser (Personengesellschaften, § 180 Abs. 1 Nr. 2 Buchst. a AO)
 # R10: neu (Steuerprüfung: bei Personengesellschaften gibt die Gesellschaft die Feststellungserklärung ab, § 180 AO; die Gesellschafter die ESt)
 # StB-Durchsicht Busch 22.10.2026 umgesetzt (bis auf 19 Monate, siehe fachlich_zu_pruefen)
 schema_version: 1
 id: steuern.feststellungserklaerung
-version: 3
+version: 4
 katalog_nr: C.27
 titel:
   de: Erklärung zur gesonderten und einheitlichen Feststellung abgeben
@@ -25,6 +26,8 @@ ausloeser:
   op: in
   wert:
   - gbr
+  - ohg
+  - kg
   - partg
   - partg_mbb
   - gmbh_co_kg
@@ -55,6 +58,8 @@ sanktion:
     de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel (§ 152 Abs. 2, 6 AO). Für die Feststellung von Einkünften beträgt er für jeden angefangenen Monat 0,0625 % der positiven Summe der festgestellten Einkünfte, mindestens 25 € für jeden angefangenen Monat, höchstens 25.000 € (§ 152 Abs. 7, 10 AO); die Pauschale von 25 € je angefangenem Monat (§ 152 Abs. 6 AO) gilt nur, soweit Abs. 7 nicht greift. Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   schwere: mittel
 automatisierung: formular_vorausfuellen
+aenderungsnotiz:
+  de: Jetzt auch für OHG und KG, die du im Check als eigene Rechtsform wählen kannst.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -80,8 +85,6 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen: []
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - StB Lutz Busch
-  geprueft_am: '2026-10-23'
-  geprueft_version: 3
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

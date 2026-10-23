@@ -1,8 +1,9 @@
+# E-176 (23.10.2026): OHG und KG als eigene Rechtsformen – Auslöser „Andere“ (Notlösung vom Abgleich) ersetzt durch ohg/kg
 # StB Busch Abgleich 23.10.2026: OHG und KG in Erklärung und Auslöser (über Rechtsform „Andere“)
 # Katalog C.28 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.buchfuehrungspflicht
-version: 6
+version: 7
 katalog_nr: C.28
 titel:
   de: Doppelte Buchführung
@@ -16,7 +17,7 @@ erklaerung:
     den Gewinn mit der Einnahmen-Überschuss-Rechnung. Die Buchführung ist eine laufende Pflicht; den Jahresabschluss macht in der
     Regel deine Steuerberatung.'
 rechtsgrundlage:
-- §§ 238, 241a HGB
+- §§ 6, 238, 241a HGB
 - § 141 AO
 kategorie: steuern
 ausloeser:
@@ -31,13 +32,15 @@ ausloeser:
     wert: gmbh_co_kg
     label:
       de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
-  # StB Busch 23.10.2026: OHG und KG sind als Handelsgesellschaften stets buchführungspflichtig (§§ 6, 238 HGB). Die App bietet
-  # sie nicht als eigene Rechtsform an – sie wählen „Andere“; dort erscheint die Pflicht als „kommt in Frage“.
+  # StB Busch 23.10.2026: OHG und KG sind als Handelsgesellschaften stets buchführungspflichtig (§§ 6, 238 HGB); § 241a HGB
+  # gilt nur für Einzelkaufleute. E-176: eigene Rechtsformen statt „Andere“ – „Andere“ löst die Pflicht nicht mehr aus.
   - feld: profil.rechtsform
-    op: ==
-    wert: sonstige
+    op: in
+    wert:
+    - ohg
+    - kg
     label:
-      de: Du hast „Andere“ als Rechtsform gewählt – OHG und KG sind als Handelsgesellschaften immer buchführungspflichtig.
+      de: Dein Unternehmen ist eine OHG oder KG und damit als Handelsgesellschaft nach dem Handelsgesetzbuch buchführungspflichtig.
   # e.K.: nach HGB buchführungspflichtig, außer die Grenzen des § 241a HGB werden eingehalten (zwei aufeinanderfolgende Jahre;
   # vereinfacht über das Vorjahr, im Gründungsjahr über die Schätzung für das erste Jahr)
   - all:
@@ -134,8 +137,7 @@ erledigung:
   bestaetigung:
     de: Bücher für dieses Jahr laufend geführt
 aenderungsnotiz:
-  de: 'Eingetragene Kaufleute unter den Grenzen des § 241a HGB sind nicht mehr buchführungspflichtig; die Pflicht nach § 141 AO
-    gilt erst nach Mitteilung des Finanzamts. Eine Unterlage erledigt die Buchführung nicht mehr.'
+  de: OHG und KG kannst du jetzt als eigene Rechtsform wählen – für sie gilt die doppelte Buchführung immer. Die Rechtsform „Andere“ löst die Pflicht nicht mehr aus.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
