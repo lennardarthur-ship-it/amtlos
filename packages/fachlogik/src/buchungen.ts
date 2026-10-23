@@ -317,8 +317,9 @@ export function kontenFuer(kontenrahmen: Kontenrahmen, vorgaben?: Kontenvorgaben
 }
 
 /**
- * StB-Prüfung (A-4, E-4): Gewinnermittlung durch Bilanz statt EÜR – Kapitalgesellschaften (GmbH, UG, AG), GmbH & Co. KG
- * und eingetragene Kaufleute (§ 238 HGB), außerdem wer vom Finanzamt zur Buchführung aufgefordert wurde (§ 141 AO).
+ * StB-Prüfung (A-4, E-4): Gewinnermittlung durch Bilanz statt EÜR – Kapitalgesellschaften (GmbH, UG, AG), GmbH & Co. KG,
+ * OHG und KG (Handelsgesellschaften, §§ 6, 238 HGB; E-176) und eingetragene Kaufleute (§ 238 HGB), außerdem wer vom
+ * Finanzamt zur Buchführung aufgefordert wurde (§ 141 AO).
  * Die Kontenvorgabe der Kanzlei geht vor (z. B. e. K. unter den Grenzen des § 241a HGB: EÜR).
  */
 export function bilanzierend(o: { rechtsform?: string | null; name?: string; buchfuehrungMitteilung?: boolean | null; vorgabe?: "bilanz" | "euer" | null }): boolean {
@@ -326,7 +327,7 @@ export function bilanzierend(o: { rechtsform?: string | null; name?: string; buc
   if (o.buchfuehrungMitteilung === true) return true;
   const rf = (o.rechtsform ?? "").trim();
   const form = rf ? formImNamen(rf) : formImNamen(o.name ?? "");
-  return form === "GmbH" || form === "UG (haftungsbeschränkt)" || form === "AG" || form === "GmbH & Co. KG" || form === "e. K.";
+  return form === "GmbH" || form === "UG (haftungsbeschränkt)" || form === "AG" || form === "GmbH & Co. KG" || form === "OHG" || form === "KG" || form === "e. K.";
 }
 
 /** BU-Schlüssel eines Aufwands: Automatikkonto ohne Vorsteuerabzug 40, Konto ohne Automatik mit Vorsteuer 9/8, sonst leer. */
@@ -1002,7 +1003,7 @@ export function pruefpunkteBuchungen(): string[] {
     "StB-Prüfung (3.1): Stornos als Generalumkehr (Feld 118 = 1) auf der ursprünglichen Soll/Haben-Seite; Feld 114 „Festschreibung“ = 0 in jeder Zeile (Kopf Feld 21 ebenfalls 0).",
     "Spaltenliste der Buchungszeile (125 Felder, Version 700, Formatversion 13): laut StB-Prüfung (3.1) formal konform. Feld 103 „Buchungs GUID“ bleibt leer (wird von DATEV verwendet); die stabile Kennung aus Quelle und Steuersatz steht in Beleginfo 1 (Art „Buchungs-GUID“, Inhalt die GUID).",
     "Dateikopf: „Datum vom“ und „Datum bis“ stehen als JJJJMMTT (nicht TTMMJJJJ), Feld 27 trägt den Kontenrahmen („03“/„04“), Festschreibung 0, Rechnungslegungszweck 0, Herkunft „RE“ – gegen die Formatbeschreibung prüfen. Berater- und Mandantennummer sind beim Import Pflicht.",
-    "StB-Prüfung (A-4): Bilanzierende Betriebe (GmbH, UG, AG, GmbH & Co. KG, e. K., Buchführungspflicht nach § 141 AO – Kontenvorgabe geht vor) bekommen einen Soll-Stapel: Forderungen an Erlöse zum Rechnungsdatum (Feld 115 Leistungsdatum). Zahlungseingänge Bank (SKR03 1200, SKR04 1800) an Forderungen zum Zahltag nur mit der Kontenvorgabe „Zahlungseingänge buchen“ – Standard aus (Nachtrag der Kanzlei vom 22.10.2026: die Kanzlei bucht die Bank aus dem Kontoauszug; bis dahin stehen alle Rechnungen als Forderung, LIESMICH nennt Saldo und offene Forderungen laut Rechnungsliste). EÜR-Übernahme für bilanzierende Betriebe gesperrt (E-4).",
+    "StB-Prüfung (A-4): Bilanzierende Betriebe (GmbH, UG, AG, GmbH & Co. KG, OHG, KG, e. K., Buchführungspflicht nach § 141 AO – Kontenvorgabe geht vor) bekommen einen Soll-Stapel: Forderungen an Erlöse zum Rechnungsdatum (Feld 115 Leistungsdatum). Zahlungseingänge Bank (SKR03 1200, SKR04 1800) an Forderungen zum Zahltag nur mit der Kontenvorgabe „Zahlungseingänge buchen“ – Standard aus (Nachtrag der Kanzlei vom 22.10.2026: die Kanzlei bucht die Bank aus dem Kontoauszug; bis dahin stehen alle Rechnungen als Forderung, LIESMICH nennt Saldo und offene Forderungen laut Rechnungsliste). EÜR-Übernahme für bilanzierende Betriebe gesperrt (E-4).",
     "Ist-Versteuerung (§ 20 UStG) ohne Bilanz (R11): Rechnungen stehen erst mit dem Zahlungseingang im Stapel – Forderungen (1410/1210) an Erlös mit dem Zahltag als Belegdatum und in Feld 116; unbezahlte Rechnungen stehen nur in der Rechnungsliste. Abschlagsrechnungen ebenso (auch bei Soll), weil die Steuer erst mit der Zahlung entsteht. Ob DATEV die Ist-Versteuerung so ohne OPOS richtig auflöst, ist offen – Testimport.",
     "Belegdatum im Format TTMM: das Jahr ergibt sich aus dem Stapelzeitraum. Alle Buchungen eines Stapels müssen in „Datum vom/bis“ und im Wirtschaftsjahr liegen – der Aufrufer muss je Zeitraum (Monat oder Jahr) einen eigenen Stapel erzeugen.",
     "Belege mit Zahlungsweg Bank werden gegen Verbindlichkeiten aus L+L ohne Kontokorrent gebucht, die Zahlung selbst nicht (sie kommt aus dem Kontoauszug der Steuerberatung). StB-Prüfung (B-6): Kontenvorgabe „Belege gegen Bank“ bucht sie direkt gegen Bank (SKR03 1200, SKR04 1800) – Hausregel der Kanzlei.",

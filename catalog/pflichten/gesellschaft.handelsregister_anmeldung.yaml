@@ -1,18 +1,21 @@
+# E-176 (23.10.2026): OHG und KG als eigene Rechtsformen – lösen den Eintrag über abgeleitet.ist_eingetragene_gesellschaft aus; Text um OHG/KG ergänzt (Anmeldung durch alle Gesellschafter, Kommanditisten mit Einlage, Haftung vor Eintragung § 176 HGB)
 # Katalog B.15 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.handelsregister_anmeldung
-version: 5
+version: 6
 katalog_nr: B.15
 titel:
   de: Gesellschaft im Register eintragen lassen
 kurz:
   de: Die Gesellschaft wird zum Handelsregister angemeldet, die Partnerschaftsgesellschaft zum Partnerschaftsregister – GmbH und UG entstehen erst mit der Eintragung.
 erklaerung:
-  de: GmbH und UG meldet der Notar zum Handelsregister an. Zur Anmeldung gehört die Gesellschafterliste, und die Geschäftsführung versichert, dass die Einlagen geleistet sind (§§ 7, 8 GmbHG). Die GmbH & Co. KG meldest du ebenfalls über einen Notar zum Handelsregister an (§ 106 HGB i. V. m. § 161 Abs. 2 HGB), die Partnerschaftsgesellschaft zum Partnerschaftsregister (§ 4 PartGG). Spätere Änderungen, etwa im Gesellschaftsvertrag oder bei der Geschäftsführung, werden ebenfalls angemeldet. Bis zur Eintragung haftet, wer im Namen der GmbH oder UG handelt, persönlich (§ 11 Abs. 2 GmbHG).
+  de: GmbH und UG meldet der Notar zum Handelsregister an. Zur Anmeldung gehört die Gesellschafterliste, und die Geschäftsführung versichert, dass die Einlagen geleistet sind (§§ 7, 8 GmbHG). Die OHG (§ 106 HGB), die KG und die GmbH & Co. KG (§ 106 HGB i. V. m. § 161 Abs. 2 HGB) meldest du ebenfalls über einen Notar zum Handelsregister an, die Partnerschaftsgesellschaft zum Partnerschaftsregister (§ 4 PartGG). Bei OHG, KG und GmbH & Co. KG bewirken sämtliche Gesellschafter die Anmeldung (§ 106 Abs. 7 HGB); bei KG und GmbH & Co. KG nennt sie auch die Kommanditisten und den Betrag der Einlage eines jeden von ihnen (§ 162 Abs. 1 HGB). Spätere Änderungen, etwa im Gesellschaftsvertrag oder bei der Geschäftsführung, werden ebenfalls angemeldet. Bis zur Eintragung haftet, wer im Namen der GmbH oder UG handelt, persönlich (§ 11 Abs. 2 GmbHG).
 rechtsgrundlage:
 - §§ 7, 8 GmbHG
 - § 106 HGB
 - § 161 Abs. 2 HGB
+- § 162 HGB
+- § 176 HGB
 - § 4 PartGG
 kategorie: gesellschaft
 ausloeser:
@@ -40,9 +43,11 @@ kanal: notar
 kosten: null
 sanktion:
   text:
-    de: 'GmbH und UG bestehen vor der Eintragung als solche nicht; wer vorher in ihrem Namen handelt, haftet persönlich und solidarisch (§ 11 Abs. 1, 2 GmbHG). Die Erstanmeldung einer GmbH erzwingt das Registergericht nicht (§ 79 Abs. 2 GmbHG). Andere Anmeldepflichten, etwa der GmbH & Co. KG oder der Partnerschaft, kann es mit Zwangsgeld bis 5.000 € durchsetzen (§ 14 HGB, § 5 Abs. 2 PartGG).'
+    de: 'GmbH und UG bestehen vor der Eintragung als solche nicht; wer vorher in ihrem Namen handelt, haftet persönlich und solidarisch (§ 11 Abs. 1, 2 GmbHG). Die Erstanmeldung einer GmbH erzwingt das Registergericht nicht (§ 79 Abs. 2 GmbHG). Andere Anmeldepflichten, etwa der OHG, der KG, der GmbH & Co. KG oder der Partnerschaft, kann es mit Zwangsgeld bis 5.000 € durchsetzen (§ 14 HGB, § 5 Abs. 2 PartGG). Beginnt eine KG ihre Geschäfte vor der Eintragung, haftet jeder Kommanditist, der dem zugestimmt hat, für die bis zur Eintragung begründeten Verbindlichkeiten wie ein persönlich haftender Gesellschafter, es sei denn, dem Gläubiger war seine Beteiligung als Kommanditist bekannt (§ 176 Abs. 1 HGB).'
   schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Jetzt auch für OHG und KG – alle Gesellschafter melden die Gesellschaft an, bei der KG mit den Kommanditisten und ihren Einlagen.
 aktion:
   art: formular
   ziel: onboarding.gesellschaft
@@ -71,9 +76,19 @@ quellen:
 - titel: Partnerschaftsgesellschaftsgesetz § 5
   url: https://www.gesetze-im-internet.de/partgg/__5.html
   abgerufen: '2026-10-22'
+- titel: § 106 HGB, Wortlaut (lexetius.com, Fassung ab 1.1.2024)
+  url: https://lexetius.com/HGB/106,1
+  abgerufen: '2026-10-23'
+  fundstelle: § 106 Abs. 1, 2, 6, 7 HGB
+- titel: § 162 HGB, Wortlaut (freirecht.de)
+  url: https://freirecht.de/g/HGB:162
+  abgerufen: '2026-10-23'
+  fundstelle: § 162 Abs. 1 HGB
+- titel: § 176 HGB, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/hgb/176
+  abgerufen: '2026-10-23'
+  fundstelle: § 176 Abs. 1 HGB
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 5
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

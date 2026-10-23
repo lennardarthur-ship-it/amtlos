@@ -10,6 +10,8 @@
         "freiberuf",
         "gbr",
         "ek",
+        "ohg",
+        "kg",
         "ug",
         "gmbh",
         "gmbh_co_kg",
@@ -17,7 +19,7 @@
         "partg_mbb",
         "sonstige"
       ],
-      "herleitung": "Onboarding",
+      "herleitung": "Onboarding (OHG und KG als eigene Rechtsform seit 23.10.2026, E-176 – vorher „Andere“)",
       "ab": 2
     },
     {
@@ -739,7 +741,7 @@
         "beantragt",
         "eingetragen"
       ],
-      "herleitung": "Onboarding / Gründungsassistent (Kapitalgesellschaft, R12 auch GmbH & Co. KG und Partnerschaftsgesellschaft: Handels- bzw. Partnerschaftsregister; Freigabe Weber 22.10.2026, B.16: bei der GbR das Gesellschaftsregister – „eingetragen“ = eGbR, § 707 BGB)",
+      "herleitung": "Onboarding / Gründungsassistent (Kapitalgesellschaft, R12 auch GmbH & Co. KG und Partnerschaftsgesellschaft, E-176 auch OHG und KG: Handels- bzw. Partnerschaftsregister; Freigabe Weber 22.10.2026, B.16: bei der GbR das Gesellschaftsregister – „eingetragen“ = eGbR, § 707 BGB)",
       "ab": 3
     },
     {
@@ -749,7 +751,7 @@
         "kalenderjahr",
         "abweichend"
       ],
-      "herleitung": "Onboarding (Kapitalgesellschaft, R12 auch GmbH & Co. KG)",
+      "herleitung": "Onboarding (Kapitalgesellschaft, R12 auch GmbH & Co. KG, E-176 auch OHG und KG)",
       "ab": 3
     },
     {
@@ -791,13 +793,13 @@
     {
       "pfad": "abgeleitet.ist_kapitalgesellschaft_oder_co_kg",
       "typ": "bool",
-      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg} – keine natürliche Person haftet unbeschränkt (§ 264a HGB, § 15a Abs. 1 S. 3 InsO)",
+      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg} – keine natürliche Person haftet unbeschränkt (§ 264a HGB, § 15a Abs. 1 S. 3 InsO). OHG und KG nicht: dort haftet mindestens ein Gesellschafter persönlich unbeschränkt (§ 126 HGB, § 161 Abs. 1 HGB); ist kein persönlich haftender Gesellschafter eine natürliche Person, ist die GmbH & Co. KG zu wählen (E-176)",
       "ab": 2
     },
     {
       "pfad": "abgeleitet.ist_eingetragene_gesellschaft",
       "typ": "bool",
-      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg, partg, partg_mbb} oder rechtsform = gbr und gesellschaft.handelsregister = eingetragen (eGbR, § 707 BGB; bei der GbR ohne Registerangabe unbekannt) – juristische Person oder eingetragene Personengesellschaft (§ 20 Abs. 1 GwG)",
+      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg, ohg, kg, partg, partg_mbb} oder rechtsform = gbr und gesellschaft.handelsregister = eingetragen (eGbR, § 707 BGB; bei der GbR ohne Registerangabe unbekannt) – juristische Person oder eingetragene Personengesellschaft (§ 20 Abs. 1 GwG)",
       "ab": 2
     },
     {

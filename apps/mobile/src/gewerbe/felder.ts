@@ -48,7 +48,7 @@ export interface OnlineFeld {
 }
 
 /** Rechtsform aus dem Check (Kennung) als Wort des Datenblatts */
-const RECHTSFORM_CHECK: Record<string, string> = { einzelunternehmen: "Einzelunternehmen", ek: "e. K.", gbr: "GbR", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG" };
+const RECHTSFORM_CHECK: Record<string, string> = { einzelunternehmen: "Einzelunternehmen", ek: "e. K.", gbr: "GbR", ohg: "OHG", kg: "KG", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG" };
 
 const s = (w: unknown) => (typeof w === "string" ? w.trim() : typeof w === "number" ? String(w) : "");
 const datumDe = (iso: string) => (/^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}` : iso);

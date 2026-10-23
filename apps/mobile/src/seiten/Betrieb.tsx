@@ -136,7 +136,7 @@ function mitGesellschaft(profil: Record<string, unknown>, b: BetriebDaten): bool
 }
 
 /** Rechtsform aus dem Pflichten-Check als Text für „Mein Betrieb“ (R10) – Einzelunternehmen und Freiberuf ohne Register. */
-const RECHTSFORM_AUS_CHECK: Record<string, string> = { gbr: "GbR", ek: "e. K.", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG", partg: "PartG", partg_mbb: "PartG mbB" };
+const RECHTSFORM_AUS_CHECK: Record<string, string> = { gbr: "GbR", ek: "e. K.", ohg: "OHG", kg: "KG", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG", partg: "PartG", partg_mbb: "PartG mbB" };
 
 /** Plausibilität (IBAN-Prüfsumme, PLZ, E-Mail) – nur als Hinweis am Feld, gespeichert wird trotzdem. */
 function pruefung(k: keyof BetriebDaten, w: string): string | null {

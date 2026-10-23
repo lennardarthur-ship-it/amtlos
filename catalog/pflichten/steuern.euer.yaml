@@ -1,7 +1,8 @@
+# E-176 (23.10.2026): OHG und KG als eigene Rechtsformen – sie bilanzieren immer (§§ 6, 238 HGB), daher keine EÜR (Gegenstück zu steuern.buchfuehrungspflicht)
 # Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.euer
-version: 5
+version: 6
 katalog_nr: C.27
 titel:
   de: Einnahmen-Überschuss-Rechnung (Anlage EÜR) abgeben
@@ -30,6 +31,14 @@ ausloeser:
       wert: gmbh_co_kg
       label:
         de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
+    # E-176: OHG und KG sind als Handelsgesellschaften stets buchführungspflichtig (§§ 6, 238 HGB); § 241a HGB gilt nur für Einzelkaufleute
+    - feld: profil.rechtsform
+      op: in
+      wert:
+      - ohg
+      - kg
+      label:
+        de: Dein Unternehmen ist eine OHG oder KG und damit als Handelsgesellschaft nach dem Handelsgesetzbuch buchführungspflichtig.
     # e.K.: nach HGB buchführungspflichtig, außer die Grenzen des § 241a HGB werden eingehalten (zwei aufeinanderfolgende Jahre;
     # vereinfacht über das Vorjahr, im Gründungsjahr über die Schätzung für das erste Jahr)
     - all:
@@ -134,7 +143,7 @@ sanktion:
   schwere: mittel
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
-  de: Jetzt mit Termin – die Anlage EÜR übermittelst du in denselben Fristen wie die Einkommensteuer- bzw. Feststellungserklärung.
+  de: OHG und KG kannst du jetzt als eigene Rechtsform wählen – sie bilanzieren immer und geben keine Anlage EÜR ab.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -159,8 +168,6 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen: []
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - StB Lutz Busch
-  geprueft_am: '2026-10-23'
-  geprueft_version: 5
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

@@ -1,0 +1,33 @@
+persona: gesellschaft
+beschreibung: "E-176 (23.10.2026): KG, seit 2024 im Handelsregister – Transparenzregister (§ 20 Abs. 1 GwG), doppelte Buchführung auch unter den Grenzen des § 241a HGB (nur Einzelkaufleute), E-Bilanz statt Anlage EÜR, Feststellungserklärung (§ 180 AO), Gewerbesteuer über dem Freibetrag; keine Anmeldung mehr, keine Körperschaftsteuer, keine Pflichten der GmbH & Co. KG (§ 264a HGB, § 15a InsO)"
+stichtag: "2026-10-23"
+fakten:
+  profil.rechtsform: kg
+  profil.gruendungsdatum: "2024-02-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [handwerk]
+  profil.gesellschaft.handelsregister: eingetragen
+  profil.gesellschaft.geschaeftsjahr: kalenderjahr
+  profil.umsatz.vorjahr: 400000
+  profil.gewinn.vorjahr: 60000
+  profil.steuern.buchfuehrung_mitteilung: false
+  profil.beschaeftigte.gesamt: 3
+  profil.steuerberater: true
+  profil.bundesland: NW
+erwartet:
+  gesellschaft.transparenzregister: gilt
+  gesellschaft.handelsregister_anmeldung: gilt_nicht
+  steuern.buchfuehrungspflicht: gilt
+  steuern.e_bilanz: gilt
+  steuern.euer: gilt_nicht
+  steuern.feststellungserklaerung: gilt
+  steuern.gewst_erklaerung: gilt
+  steuern.est_erklaerung: gilt_nicht
+  steuern.kst_erklaerung: gilt_nicht
+  gesellschaft.jahresabschluss: gilt_nicht
+  gesellschaft.offenlegung: gilt_nicht
+  gesellschaft.insolvenzantragspflicht: gilt_nicht
+  gesellschaft.gf_pflichten_haftung: gilt_nicht
+  gesellschaft.stammkapital_einzahlen: gilt_nicht
+  gesellschaft.egbr_hinweis: gilt_nicht
+  gesellschaft.istkaufmann_pruefen: gilt_nicht

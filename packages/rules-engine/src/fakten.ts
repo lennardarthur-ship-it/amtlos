@@ -18,10 +18,12 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
 
   if (typeof rechtsform === "string") {
     f["abgeleitet.ist_kapitalgesellschaft"] = rechtsform === "ug" || rechtsform === "gmbh";
-    // R12 (Rechtsprüfung Befund 1): GmbH & Co. KG – keine natürliche Person haftet unbeschränkt (§ 264a HGB, § 15a Abs. 1 S. 3 InsO)
+    // R12 (Rechtsprüfung Befund 1): GmbH & Co. KG – keine natürliche Person haftet unbeschränkt (§ 264a HGB, § 15a Abs. 1 S. 3 InsO).
+    // E-176: OHG und KG nicht – dort haftet mindestens ein Gesellschafter persönlich unbeschränkt (§ 126, § 161 Abs. 1 HGB)
     f["abgeleitet.ist_kapitalgesellschaft_oder_co_kg"] = rechtsform === "ug" || rechtsform === "gmbh" || rechtsform === "gmbh_co_kg";
-    // R12: juristische Personen und eingetragene Personengesellschaften (§ 20 Abs. 1 GwG, Registeranmeldung)
-    f["abgeleitet.ist_eingetragene_gesellschaft"] = ["ug", "gmbh", "gmbh_co_kg", "partg", "partg_mbb"].includes(rechtsform);
+    // R12: juristische Personen und eingetragene Personengesellschaften (§ 20 Abs. 1 GwG, Registeranmeldung).
+    // E-176: OHG und KG sind zur Eintragung ins Handelsregister anzumelden (§ 106 Abs. 1, § 161 Abs. 2 HGB) – wie GmbH & Co. KG
+    f["abgeleitet.ist_eingetragene_gesellschaft"] = ["ug", "gmbh", "gmbh_co_kg", "ohg", "kg", "partg", "partg_mbb"].includes(rechtsform);
     // Freigabe Weber 22.10.2026 (B.16): die GbR ist eingetragene Personengesellschaft erst mit dem Eintrag im
     // Gesellschaftsregister (eGbR, § 707 BGB) – Angabe wie bei den anderen Gesellschaften; ohne Angabe unbekannt (E-033)
     if (rechtsform === "gbr") {

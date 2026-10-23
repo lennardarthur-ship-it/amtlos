@@ -1,0 +1,33 @@
+persona: gesellschaft
+beschreibung: "E-176 (23.10.2026): OHG in Gründung, Registereintrag beantragt – Handelsregisteranmeldung durch alle Gesellschafter (§ 106 HGB), Transparenzregister (§ 20 Abs. 1 GwG), doppelte Buchführung ohne § 241a HGB (§§ 6, 238 HGB), E-Bilanz, Feststellungserklärung (§ 180 AO); keine Beurkundung des Gesellschaftsvertrags, kein Stammkapital, keine Insolvenzantragspflicht und keine Offenlegung (kein § 264a HGB)"
+stichtag: "2026-10-23"
+fakten:
+  profil.rechtsform: ohg
+  profil.gruendungsdatum: "2026-09-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [onlinehandel]
+  profil.gesellschaft.handelsregister: beantragt
+  profil.gesellschaft.geschaeftsjahr: kalenderjahr
+  profil.umsatz.prognose_laufendes_jahr: 60000
+  profil.gewinn.prognose_laufendes_jahr: 15000
+  profil.beschaeftigte.gesamt: 0
+  profil.steuerberater: false
+  profil.bundesland: BY
+erwartet:
+  gesellschaft.handelsregister_anmeldung: gilt
+  gesellschaft.transparenzregister: gilt
+  steuern.buchfuehrungspflicht: gilt
+  steuern.e_bilanz: gilt
+  steuern.euer: gilt_nicht
+  steuern.feststellungserklaerung: gilt
+  steuern.est_erklaerung: gilt_nicht
+  steuern.kst_erklaerung: gilt_nicht
+  gruendung.gewerbeanzeige: gilt
+  gruendung.ihk_hwk_mitgliedschaft: gilt
+  gesellschaft.gesellschaftsvertrag_notar: gilt_nicht
+  gesellschaft.stammkapital_einzahlen: gilt_nicht
+  gesellschaft.insolvenzantragspflicht: gilt_nicht
+  gesellschaft.offenlegung: gilt_nicht
+  gesellschaft.gf_pflichten_haftung: gilt_nicht
+  gesellschaft.istkaufmann_pruefen: gilt_nicht
+  gesellschaft.egbr_hinweis: gilt_nicht
