@@ -25,7 +25,9 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 PRUEFEN = "--pruefen" in sys.argv
 
-STEUER_GRUENDUNG = {"gruendung.fragebogen_steuerliche_erfassung", "gruendung.ust_idnr"}
+STEUER_GRUENDUNG = {"gruendung.fragebogen_steuerliche_erfassung", "gruendung.ust_idnr",
+                    # StB Busch 23.10.2026: Jahresabschluss der OHG, KG und e. K. (sein Vorschlag, er sieht ihn durch)
+                    "gesellschaft.jahresabschluss_personenhandel"}
 ARBEITSSCHUTZ_BRANCHE = {"branche.handwerk_gefaehrdung_gewerk", "branche.bau_baustellenverordnung", "branche.beauty_hautschutzplan", "branche.gastro_schankanlage_fluessiggas"}
 LEBENSMITTEL_RECHT = {"branche.gastro_preisverzeichnis", "branche.gastro_mehrweg", "branche.gastro_ppwr_radar", "branche.gastro_einwegkunststofffonds"}
 WEBER, BUSCH, KOCH, BAUM = "RA Dr. Ulrich Weber", "StB Lutz Busch", "Thomas Koch (Fachkraft für Arbeitssicherheit)", "Tim Baum (Lebensmittelfachbeauftragter)"

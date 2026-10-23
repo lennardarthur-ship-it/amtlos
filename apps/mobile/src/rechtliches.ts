@@ -130,7 +130,8 @@ export const PLATZHALTER_RECHT = "[vor Veröffentlichung eintragen]";
 export const NUTZUNGSBEDINGUNGEN = {
   freigegeben: false,
   /** Datum der Fassung (ISO) – eine neue Fassung fragt erneut nach der Zustimmung */
-  fassung: "2026-10-21",
+  // RA Dr. Weber 23.10.2026: Datum der Fassung, die veröffentlicht wird (vorher 21.10.2026 – passte nicht mehr zum geänderten Text)
+  fassung: "2026-10-23",
   /** Adresse auf der Website (apps/website/bauen.mjs schreibt nutzungsbedingungen.html) */
   url: `${MARKE.website}/nutzungsbedingungen.html`,
 };

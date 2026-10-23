@@ -12,7 +12,8 @@ ereignisse:
   - { typ: gesellschafterwechsel, datum: "2026-09-15" }
 erwartet:
   gesellschaft.gesellschafterliste_aktualisieren: gilt
-  gesellschaft.transparenzregister: gilt
+  # Weber 23.10.2026 (B.16): Transparenzregister erst ab Eintragung – ohne Registerangabe „Angabe fehlt“
+  gesellschaft.transparenzregister: unbekannt
   # Ohne Angabe zum Handelsregister bleibt offen, ob die Gründungsschritte noch anstehen
   gesellschaft.gesellschaftsvertrag_notar: unbekannt
   gesellschaft.handelsregister_anmeldung: unbekannt

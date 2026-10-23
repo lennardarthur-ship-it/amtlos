@@ -1,15 +1,16 @@
+# Sifa T. Koch Nachprüfung 23.10.2026 (redaktionell): Doppelung „in angemessenen Zeitabständen … – in regelmäßigen Abständen“ geglättet, ein Ausdruck mit Verweis auf ASR A2.3 Nr. 11 Abs. 2
 # Sifa Abgleich 23.10.2026: Räumungsübung ohne festen Rhythmus, wörtlich nach seinem Vorschlag
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Flucht- und Rettungsplan, Räumungsübung“)
 schema_version: 1
 id: arbeitsschutz.flucht_rettungsplan
-version: 4
+version: 5
 katalog_nr: E.54
 titel:
   de: Flucht- und Rettungsplan prüfen
 kurz:
   de: Erfordern Lage, Ausdehnung oder Nutzung deiner Arbeitsstätte es, hängst du einen Flucht- und Rettungsplan aus und übst die Räumung.
 erklaerung:
-  de: 'Einen Flucht- und Rettungsplan brauchst du, wenn Lage, Ausdehnung und Art der Benutzung der Arbeitsstätte es erfordern (§ 4 Abs. 4 ArbStättV) – etwa bei unübersichtlichen Fluchtwegen, mehreren Geschossen, vielen Kundinnen und Kunden oder erhöhter Brandgefährdung. Ob das so ist, hältst du in der Gefährdungsbeurteilung fest. Der Plan wird an geeigneten Stellen ausgehängt oder ausgelegt; gestaltet wird er nach ASR A2.3 (Grundriss, Fluchtwege, Sammelstelle, Verhalten im Brandfall und bei Unfällen). Nach dem Plan übst du in angemessenen Zeitabständen, wie die Arbeitsstätte geräumt wird – in regelmäßigen Abständen (ASR A2.3 Nr. 11 Abs. 2); einen festen Rhythmus schreibt die ASR nicht vor, üblich ist etwa einmal im Jahr. Für ein kleines Ladenlokal mit direktem Ausgang ins Freie ist oft kein Plan nötig.'
+  de: 'Einen Flucht- und Rettungsplan brauchst du, wenn Lage, Ausdehnung und Art der Benutzung der Arbeitsstätte es erfordern (§ 4 Abs. 4 ArbStättV) – etwa bei unübersichtlichen Fluchtwegen, mehreren Geschossen, vielen Kundinnen und Kunden oder erhöhter Brandgefährdung. Ob das so ist, hältst du in der Gefährdungsbeurteilung fest. Der Plan wird an geeigneten Stellen ausgehängt oder ausgelegt; gestaltet wird er nach ASR A2.3 (Grundriss, Fluchtwege, Sammelstelle, Verhalten im Brandfall und bei Unfällen). Nach dem Plan übst du in regelmäßigen Abständen, wie die Arbeitsstätte geräumt wird (ASR A2.3 Nr. 11 Abs. 2); einen festen Rhythmus schreibt die ASR nicht vor, üblich ist etwa einmal im Jahr. Für ein kleines Ladenlokal mit direktem Ausgang ins Freie ist oft kein Plan nötig.'
 rechtsgrundlage:
 - § 4 Abs. 4 ArbStättV
 - ASR A2.3
@@ -50,10 +51,9 @@ quellen:
 - titel: 'Arbeitsschutzgesetz (§§ 22, 25)'
   url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen: []
+fachlich_zu_pruefen:
+- 'Sifa T. Koch Nachprüfung 23.10.2026: v4 freigegeben, redaktionell die Doppelung geglättet (keine erneute Prüfung nötig laut seiner Anmerkung) – nur die Freigabe der neuen Fassung im Register nachtragen'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - Thomas Koch (Fachkraft für Arbeitssicherheit)
-  geprueft_am: '2026-10-23'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

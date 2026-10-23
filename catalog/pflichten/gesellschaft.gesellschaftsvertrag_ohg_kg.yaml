@@ -1,0 +1,61 @@
+# Neu nach RA Dr. Weber, Nachprüfung 23.10.2026 (zu B.15, Frage 2): kurzer Hinweis zum Gesellschaftsvertrag der OHG/KG – Text nach seinem Wortlaut
+# („formfrei (kein Notar), sollte aber schriftlich geschlossen werden; ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161 ff. HGB)“);
+# als eigener Hinweis im Gründungsablauf wie gesellschaft.gesellschaftsvertrag_notar für UG/GmbH – gesellschaft.handelsregister_anmeldung (v6, freigegeben) bleibt unverändert
+schema_version: 1
+id: gesellschaft.gesellschaftsvertrag_ohg_kg
+version: 1
+katalog_nr: B.14
+titel:
+  de: Gesellschaftsvertrag der OHG oder KG schließen
+kurz:
+  de: Den Gesellschaftsvertrag einer OHG oder KG schließt ihr ohne Notar – am besten schriftlich.
+erklaerung:
+  de: Der Gesellschaftsvertrag der OHG und der KG ist formfrei, du brauchst dafür keinen Notar. Er sollte aber schriftlich geschlossen werden. Ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161 ff. HGB).
+rechtsgrundlage:
+- §§ 105 ff. HGB
+- §§ 161 ff. HGB
+kategorie: gesellschaft
+einordnung: hinweis
+ausloeser:
+  all:
+  - feld: profil.rechtsform
+    op: in
+    wert:
+    - ohg
+    - kg
+    label:
+      de: Dein Unternehmen ist eine OHG oder KG.
+  - feld: profil.gesellschaft.handelsregister
+    op: '!='
+    wert: eingetragen
+    label:
+      de: Deine Gesellschaft ist noch nicht im Handelsregister eingetragen.
+phase: gruendung
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du und deine Mitgesellschafter
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Kein Bußgeld. Ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161 ff. HGB).
+  schwere: niedrig
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Handelsgesetzbuch
+  url: https://www.gesetze-im-internet.de/hgb/
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach RA Dr. Weber (Nachprüfung 23.10.2026, B.15 Frage 2) – Text nach seinem Wortlaut; „Kein Bußgeld“ und Schwere „niedrig“ von uns ergänzt, bitte bestätigen. Nur OHG und KG (nicht GmbH & Co. KG – dort zusätzlich der GmbH-Vertrag beim Notar), nur vor der Eintragung.'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -1,5 +1,5 @@
 persona: gesellschaft
-beschreibung: "E-176 (23.10.2026): KG, seit 2024 im Handelsregister – Transparenzregister (§ 20 Abs. 1 GwG), doppelte Buchführung auch unter den Grenzen des § 241a HGB (nur Einzelkaufleute), E-Bilanz statt Anlage EÜR, Feststellungserklärung (§ 180 AO), Gewerbesteuer über dem Freibetrag; keine Anmeldung mehr, keine Körperschaftsteuer, keine Pflichten der GmbH & Co. KG (§ 264a HGB, § 15a InsO)"
+beschreibung: "E-176 (23.10.2026): KG, seit 2024 im Handelsregister – Transparenzregister (§ 20 Abs. 1 GwG), Pflichtangaben auf Geschäftsbriefen (§ 125, § 177a HGB), Jahresabschluss ohne feste Frist (§§ 242, 243 Abs. 3 HGB), doppelte Buchführung auch unter den Grenzen des § 241a HGB (nur Einzelkaufleute), E-Bilanz statt Anlage EÜR, Feststellungserklärung (§ 180 AO), Gewerbesteuer über dem Freibetrag; keine Anmeldung mehr, keine Körperschaftsteuer, keine Pflichten der GmbH & Co. KG (§ 264a HGB, § 15a InsO)"
 stichtag: "2026-10-23"
 fakten:
   profil.rechtsform: kg
@@ -25,6 +25,9 @@ erwartet:
   steuern.est_erklaerung: gilt_nicht
   steuern.kst_erklaerung: gilt_nicht
   gesellschaft.jahresabschluss: gilt_nicht
+  gesellschaft.jahresabschluss_personenhandel: gilt
+  gesellschaft.geschaeftsbriefe_pflichtangaben: gilt
+  gesellschaft.gesellschaftsvertrag_ohg_kg: gilt_nicht
   gesellschaft.offenlegung: gilt_nicht
   gesellschaft.insolvenzantragspflicht: gilt_nicht
   gesellschaft.gf_pflichten_haftung: gilt_nicht

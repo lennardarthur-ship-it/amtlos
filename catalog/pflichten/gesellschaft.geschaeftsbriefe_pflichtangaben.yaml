@@ -1,0 +1,101 @@
+# Neu nach RA Dr. Weber, Nachprüfung 23.10.2026 (zu B.15, Frage 1): eigener Eintrag „Pflichtangaben auf Geschäftsbriefen“ für alle eingetragenen Unternehmen – § 37a HGB (e. K.), OHG/KG, § 35a GmbHG (GmbH/UG, bei der GmbH & Co. KG zusätzlich § 177a S. 2 HGB); Zwangsgeld § 14 HGB bzw. § 79 Abs. 1 GmbHG bis 5.000 €.
+# Abweichung von seinem Wortlaut: Er nennt § 125a HGB – die Vorschrift ist seit 1.1.2024 aufgehoben (MoPeG, Synopse buzer.de/gesetz/3486/v276633-2024-01-01.htm); die Angaben stehen jetzt in § 125 HGB „Angaben auf Geschäftsbriefen“, § 177a S. 1 HGB verweist auf § 125. Bitte bestätigen.
+# Wortlaut gelesen 23.10.2026: § 37a HGB (buzer.de/37a_HGB.htm), § 19 Abs. 1 Nr. 1 HGB (lxgesetze.de/hgb/19), § 125 HGB (lexmea.de/de/gesetz/hgb/125, gesetze.legal/bund/hgb/125), § 177a HGB (lexmea.de/de/gesetz/hgb/177a), § 35a GmbHG (gesetze.legal/bund/gmbhg/35a), § 79 Abs. 1 GmbHG (lxgesetze.de/gmbhg/79); § 14 HGB wie in gesellschaft.handelsregister_anmeldung (lexmea.de, 22.10.2026).
+# Nicht aufgenommen (von Dr. Weber nicht genannt): Partnerschaftsgesellschaft und eGbR – bitte sagen, ob sie dazugehören.
+schema_version: 1
+id: gesellschaft.geschaeftsbriefe_pflichtangaben
+version: 1
+katalog_nr: B.23
+titel:
+  de: Pflichtangaben auf Geschäftsbriefen
+kurz:
+  de: Auf deinen Geschäftsbriefen und Bestellscheinen nennst du die Pflichtangaben deines Unternehmens, etwa Firma, Sitz, Registergericht und Registernummer.
+erklaerung:
+  de: 'Auf allen Geschäftsbriefen an einen bestimmten Empfänger, gleich in welcher Form, stehen Pflichtangaben. Als eingetragener Kaufmann sind das deine Firma mit der Bezeichnung „eingetragener Kaufmann“ oder „eingetragene Kauffrau“ oder einer Abkürzung wie „e. K.“, der Ort deiner Handelsniederlassung, das Registergericht und die Registernummer (§ 37a Abs. 1, § 19 Abs. 1 Nr. 1 HGB). Bei OHG und KG sind es Firma und Sitz der Gesellschaft, das Registergericht und die Registernummer (§ 125 Abs. 1 Satz 1 HGB, für die KG § 177a Satz 1 HGB). Ist keine natürliche Person persönlich haftender Gesellschafter, wie bei der GmbH & Co. KG, kommen die Firma der persönlich haftenden Gesellschafterin und deren Angaben nach § 35a GmbHG dazu (§ 125 Abs. 1 Satz 2 HGB, § 177a Satz 2 HGB). Bei GmbH und UG sind es Rechtsform und Sitz, Registergericht und Registernummer sowie alle Geschäftsführer mit dem Familiennamen und mindestens einem ausgeschriebenen Vornamen, und, wenn es einen Aufsichtsrat mit Vorsitz gibt, dessen Vorsitzender; machst du Angaben zum Kapital, nennst du das Stammkapital und, wenn nicht alle Geldeinlagen eingezahlt sind, den Gesamtbetrag der ausstehenden Einlagen (§ 35a Abs. 1 GmbHG). Bestellscheine gelten als Geschäftsbriefe. Mitteilungen in einer bestehenden Geschäftsverbindung, für die üblicherweise Vordrucke verwendet werden, brauchen die Angaben nicht (§ 37a Abs. 2, 3 HGB, § 125 Abs. 2 HGB, § 35a Abs. 2, 3 GmbHG).'
+rechtsgrundlage:
+- § 37a HGB
+- § 125 HGB
+- § 177a HGB
+- § 35a GmbHG
+- § 14 HGB
+- § 79 Abs. 1 GmbHG
+kategorie: gesellschaft
+# Weber 23.10.2026: für alle eingetragenen Unternehmen – der e. K. ist per Rechtsform eingetragen; Gesellschaften erst ab Eintragung
+# (Registergericht und Registernummer gibt es erst dann; wie gesellschaft.transparenzregister)
+ausloeser:
+  any:
+  - feld: profil.rechtsform
+    op: ==
+    wert: ek
+    label:
+      de: Du bist als Kauffrau oder Kaufmann im Handelsregister eingetragen.
+  - all:
+    - feld: profil.rechtsform
+      op: in
+      wert:
+      - ohg
+      - kg
+      - gmbh_co_kg
+      - ug
+      - gmbh
+      label:
+        de: Dein Unternehmen ist eine OHG, KG, GmbH & Co. KG, UG oder GmbH.
+    - feld: profil.gesellschaft.handelsregister
+      op: ==
+      wert: eingetragen
+      label:
+        de: Deine Gesellschaft ist im Handelsregister eingetragen.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Durchsetzung durch das Registergericht
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: 'Das Registergericht kann die Angaben mit Zwangsgeld bis 5.000 € durchsetzen: beim eingetragenen Kaufmann nach § 37a Abs. 4 HGB, bei OHG und KG gegen die vertretungsberechtigten Gesellschafter oder deren organschaftliche Vertreter nach § 125 Abs. 2 in Verbindung mit § 37a Abs. 4 HGB (§ 14 HGB), bei GmbH und UG gegen die Geschäftsführer (§ 79 Abs. 1 GmbHG).'
+  schwere: niedrig
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: § 37a HGB, Wortlaut (buzer.de)
+  url: https://www.buzer.de/37a_HGB.htm
+  abgerufen: '2026-10-23'
+  fundstelle: § 37a Abs. 1 bis 4 HGB
+- titel: § 19 HGB, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/hgb/19
+  abgerufen: '2026-10-23'
+  fundstelle: § 19 Abs. 1 Nr. 1 HGB
+- titel: § 125 HGB Angaben auf Geschäftsbriefen, Wortlaut (lexmea.de)
+  url: https://lexmea.de/de/gesetz/hgb/125
+  abgerufen: '2026-10-23'
+  fundstelle: § 125 Abs. 1, 2 HGB
+- titel: § 177a HGB, Wortlaut (lexmea.de)
+  url: https://lexmea.de/de/gesetz/hgb/177a
+  abgerufen: '2026-10-23'
+- titel: HGB-Änderungen zum 1.1.2024 durch das MoPeG (buzer.de, § 125a aufgehoben)
+  url: https://www.buzer.de/gesetz/3486/v276633-2024-01-01.htm
+  abgerufen: '2026-10-23'
+- titel: § 35a GmbHG, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/gmbhg/35a
+  abgerufen: '2026-10-23'
+  fundstelle: § 35a Abs. 1 bis 3 GmbHG
+- titel: § 79 GmbHG, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/gmbhg/79
+  abgerufen: '2026-10-23'
+  fundstelle: § 79 Abs. 1 GmbHG
+- titel: § 14 HGB, Wortlaut (lexmea.de)
+  url: https://lexmea.de/de/gesetz/hgb/14
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu nach RA Dr. Weber (Nachprüfung 23.10.2026, B.15 Frage 1) – bitte ganz prüfen. Abweichungen von seiner Anmerkung: § 125 HGB statt § 125a HGB (aufgehoben seit 1.1.2024, MoPeG); Partnerschaftsgesellschaft und eGbR nicht aufgenommen; Schwere „niedrig“ (nur Zwangsgeld) von uns eingestuft. Gesellschaften erst ab Eintragung (Registerangaben), der e. K. per Rechtsform.'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null
