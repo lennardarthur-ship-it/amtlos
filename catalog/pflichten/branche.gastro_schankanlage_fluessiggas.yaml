@@ -1,16 +1,16 @@
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Getränkeschankanlagen / Flüssiggas prüfen“, Fragen 1)
 schema_version: 1
 id: branche.gastro_schankanlage_fluessiggas
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
   de: Getränkeschankanlage und Flüssiggasanlage prüfen lassen
 kurz:
-  de: Betreibst du eine Schankanlage mit CO2-Flasche oder eine Flüssiggasanlage, lässt du sie vor der Inbetriebnahme und danach regelmäßig von einer befähigten Person prüfen.
+  de: Betreibst du eine Schankanlage mit CO2-Flasche oder eine Flüssiggasanlage, lässt du sie vor der Inbetriebnahme und danach regelmäßig von einer befähigten Person (bei Flüssiggas Sachkundiger nach DGUV Vorschrift 79) prüfen – Art, Umfang und Fristen der Prüfungen legst du in der Gefährdungsbeurteilung fest.
 erklaerung:
-  de: 'Getränkeschankanlagen arbeiten mit Kohlendioxid unter Druck; Gasflasche, Druckminderer und Leitungen sind Arbeitsmittel nach der Betriebssicherheitsverordnung. Art und Abstände der Prüfungen legst du in der Gefährdungsbeurteilung fest und lässt sie von einer befähigten Person durchführen (§§ 3, 14 BetrSichV); die DGUV Regel 110-007 beschreibt Bau, Betrieb und Prüfung. Ausströmendes CO2 kann in Kellern und engen Räumen zu Erstickung führen – dort gehören eine Gaswarnanlage und gesicherte Flaschen dazu. Für Flüssiggas, etwa am Gasgrill, Wok-Herd oder im Foodtruck, gilt die DGUV Vorschrift 79: Prüfung vor der ersten Inbetriebnahme und wiederkehrend durch eine befähigte Person, mit Prüfbescheinigung.'
+  de: 'Getränkeschankanlagen arbeiten mit Kohlendioxid unter Druck; Gasflasche, Druckminderer und Leitungen sind Arbeitsmittel nach der Betriebssicherheitsverordnung. Art und Umfang der Prüfungen und die Fristen der wiederkehrenden Prüfungen legst du in der Gefährdungsbeurteilung fest (§ 3 Abs. 6 BetrSichV) und lässt die Prüfungen von einer befähigten Person durchführen (§ 14 BetrSichV); Anhaltspunkte für die Fristen geben die DGUV Regel 110-007 (Getränkeschankanlagen) und die DGUV Vorschrift 79 (Flüssiggas). Ausströmendes CO2 kann in Kellern und engen Räumen zu Erstickung führen: In Räumen, in denen CO2-Flaschen stehen, siehst du nach der Gefährdungsbeurteilung eine CO2-Warneinrichtung vor und lässt auch sie regelmäßig prüfen; die Flaschen sicherst du gegen Umfallen. Für Flüssiggas, etwa am Gasgrill, Wok-Herd oder im Foodtruck, gilt die DGUV Vorschrift 79: Prüfung vor der ersten Inbetriebnahme und wiederkehrend durch einen Sachkundigen, mit Prüfbescheinigung. Die DGUV empfiehlt inzwischen, die DGUV Vorschrift 79 zurückzuziehen, und verweist auf die DGUV Regel 110-010 „Flüssiggas“ – ob die Vorschrift bei deiner Berufsgenossenschaft noch gilt, erfährst du dort.'
 rechtsgrundlage:
-- §§ 3, 14 BetrSichV
+- § 3 Abs. 6, § 14 BetrSichV
 - DGUV Regel 110-007
 - DGUV Vorschrift 79
 kategorie: branche
@@ -55,7 +55,15 @@ quellen:
 - titel: DGUV Regel 110-007 Verwendung von Getränkeschankanlagen
   url: https://publikationen.dguv.de/regelwerk/dguv-regeln/
   abgerufen: null
+- titel: § 3 BetrSichV (Gefährdungsbeurteilung)
+  url: https://www.gesetze-im-internet.de/betrsichv_2015/__3.html
+  abgerufen: '2026-10-23'
+  fundstelle: § 3 Abs. 6 Satz 1 BetrSichV
+- titel: DGUV Vorschrift 79 Verwendung von Flüssiggas (Publikationsseite der DGUV)
+  url: https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1135/verwendung-von-fluessiggas
+  abgerufen: '2026-10-23'
 fachlich_zu_pruefen:
+- 'Sifa Runde 2 (23.10.2026) umgesetzt: Fristen über die Gefährdungsbeurteilung (§ 3 Abs. 6 BetrSichV, Wortlaut gesetze-im-internet.de 23.10.2026) mit DGUV Regel 110-007 und DGUV Vorschrift 79 als Anhaltspunkt (im Text, Frist bleibt „dauerhaft“ – es gibt kein Ereignis zur Inbetriebnahme der Anlage); Kurztext „befähigte Person (bei Flüssiggas Sachkundiger nach DGUV Vorschrift 79)“; Hinweis CO2-Warneinrichtung. „oder“ im Kurztext bleibt (Sifa: Pflicht gilt schon für eine der beiden Anlagen). Rückfrage an die Sifa: Die Publikationsseite der DGUV (abgerufen 23.10.2026) meldet, dass die DGUV die Zurückziehung der DGUV Vorschrift 79 empfohlen hat und die DGUV Regel 110-010 „Flüssiggas“ erschienen ist; Geltung beim Unfallversicherungsträger erfragen – im Text als Hinweis, bitte bestätigen oder Verweis auf DGUV Regel 110-010 umstellen'
 - 'Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis über die Branche (Amtlos fragt Schankanlage und Flüssiggas nicht ab); Prüffristen (Schankanlage, DGUV V79 Flüssiggas) und Fundstellen nicht abgerufen; Gefährdungsbausteine CO2 und Gas sind Sache der Vorlage'
 pruefung:
   status: entwurf

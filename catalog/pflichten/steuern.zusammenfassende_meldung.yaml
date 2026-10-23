@@ -1,18 +1,20 @@
 # Katalog C.25 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.zusammenfassende_meldung
-version: 6
+version: 7
 katalog_nr: C.25
 titel:
   de: Zusammenfassende Meldung abgeben
 kurz:
-  de: Wenn du Lieferungen oder Leistungen an Unternehmen in anderen EU-Ländern erbringst, meldest du sie bis zum 25. nach Ablauf des Meldezeitraums in der Zusammenfassenden Meldung.
+  de: 'Lieferst oder leistest du an Unternehmen in anderen EU-Ländern, gibst du die Zusammenfassende Meldung bis zum 25. nach Ablauf des Meldezeitraums ab: monatlich als Regel, vierteljährlich auf Wunsch, wenn deine EU-Lieferungen weder im laufenden noch in einem der vier vorangegangenen Quartale jeweils 50.000 € übersteigen (§ 18a Abs. 1 Satz 2 UStG), und immer vierteljährlich, wenn du nur sonstige Leistungen erbringst – Amtlos fragt dich nach deinem Meldezeitraum.'
 erklaerung:
   de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben. Du übermittelst sie
     bis zum 25. Tag nach Ablauf des Meldezeitraums an das Bundeszentralamt für Steuern. Bei Warenlieferungen ist der Kalendermonat
     die Regel; vierteljährlich darfst du melden, wenn deine innergemeinschaftlichen Lieferungen weder im laufenden noch in einem
     der vier vorangegangenen Quartale jeweils 50.000 € übersteigen (§ 18a Abs. 1 Satz 2 UStG). Erbringst du nur sonstige Leistungen
-    (keine Warenlieferungen), meldest du vierteljährlich. Amtlos fragt deshalb nach deinem Meldezeitraum. Fällt der 25. auf ein
+    (keine Warenlieferungen), meldest du vierteljährlich (§ 18a Abs. 2 UStG). Amtlos fragt deshalb nach deinem Meldezeitraum und
+    berechnet danach die Termine – bei „monatlich“ für jeden Monat, bei „vierteljährlich“ oder nur sonstigen Leistungen für jedes
+    Quartal; „weiß ich nicht“ behandelt Amtlos bei Warenlieferungen wie monatlich, weil das die Regel ist. Fällt der 25. auf ein
     Wochenende oder einen Feiertag, nennt Amtlos trotzdem den 25. – ob sich die Frist verschiebt, ist nicht abschließend geklärt.
     Kleinunternehmer geben keine Zusammenfassende Meldung ab (§ 18a Abs. 4 UStG). Ändert sich die Bemessungsgrundlage später
     (z. B. Skonto oder Rücksendung), berichtigst du die Meldung für den ursprünglichen Zeitraum innerhalb eines Monats (§ 18a
@@ -42,6 +44,7 @@ frist:
   typ: wiederkehrend
   # StB Busch 22.10.2026: Meldezeitraum abfragen – monatlich als Regel, vierteljährlich wählbar bis 50.000 € je Quartal
   # (§ 18a Abs. 1 Satz 2 UStG), nur sonstige Leistungen vierteljährlich. Mit Warenlieferungen ohne Angabe fragt Amtlos nach.
+  # StB Busch Runde 3 (23.10.2026): Abfrage in der Prüfmappe nicht erkennbar (Mappe zeigt nur Kurztext und Fristtyp) – jetzt im Kurztext.
   rhythmus:
     waehle:
     - wenn:
@@ -99,15 +102,15 @@ sanktion:
   schwere: mittel
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
-  de: 'Amtlos fragt jetzt nach deinem Meldezeitraum (monatlich oder vierteljährlich) und nennt immer den 25. als Termin, ohne Verschiebung auf den nächsten Werktag.'
+  de: 'Der Kurztext nennt jetzt den Meldezeitraum: monatlich als Regel, vierteljährlich auf Wunsch bis 50.000 € je Quartal oder bei nur sonstigen Leistungen. Amtlos fragt danach und nennt weiter den 25. als Termin, ohne Verschiebung auf den nächsten Werktag.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
 - titel: Umsatzsteuergesetz § 18a
   url: https://www.gesetze-im-internet.de/ustg_1980/__18a.html
-  abgerufen: '2026-10-22'
-  fundstelle: § 18a Abs. 1 Satz 1 bis 4 UStG
+  abgerufen: '2026-10-23'
+  fundstelle: § 18a Abs. 1 Satz 1 bis 4, Abs. 2 UStG
 - titel: UStG § 26a (Bußgeldvorschriften)
   url: https://www.gesetze-im-internet.de/ustg_1980/__26a.html
   abgerufen: '2026-10-22'
