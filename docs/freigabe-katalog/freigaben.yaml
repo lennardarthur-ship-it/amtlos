@@ -1934,9 +1934,9 @@
       stand: '2026-10-23'
 - pruefer: RA Dr. Ulrich Weber
   umfang: alles
-  unterschrieben: false
+  unterschrieben: true
   felder_fehlen: []
-  hinweis: Nachprüfung 23.10.2026 freigegeben (Mail); Nachtragsblatt laut Mail unterschrieben, Scan steht aus
+  hinweis: Nachprüfung 23.10.2026 freigegeben (Mail); unterschriebenes Blatt liegt beim Gründer vor (Scan, 23.10.2026)
   eintraege:
     arbeitsschutz.arbeitsmedizinische_vorsorge:
       version: 6
@@ -1956,9 +1956,9 @@
       stand: '2026-10-23'
 - pruefer: RA Dr. Ulrich Weber
   umfang: sanktion
-  unterschrieben: false
+  unterschrieben: true
   felder_fehlen: []
-  hinweis: Nachprüfung 23.10.2026 (nur Folgen); Scan steht aus
+  hinweis: Nachprüfung 23.10.2026 (nur Folgen); unterschriebenes Blatt liegt beim Gründer vor (Scan, 23.10.2026)
   eintraege:
     branche.gastro_ifsg_bescheinigung_selbst:
       version: 3
@@ -1984,9 +1984,9 @@
       stand: '2026-10-23'
 - pruefer: Thomas Koch (Fachkraft für Arbeitssicherheit)
   umfang: alles
-  unterschrieben: false
+  unterschrieben: true
   felder_fehlen: []
-  hinweis: Nachprüfung 23.10.2026; Nachtragsblatt laut Mail unterschrieben, Scan nicht mitgeschickt
+  hinweis: Nachprüfung 23.10.2026; unterschriebenes Blatt liegt beim Gründer vor (Scan, 23.10.2026)
   eintraege:
     arbeitsschutz.dguv_v3:
       version: 5
