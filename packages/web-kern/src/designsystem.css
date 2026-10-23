@@ -39,25 +39,6 @@
   --text-blatt--line-height: 1;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-papier: #0f0e1c;
-    --color-blatt: #1a1930;
-    --color-tinte: #ecebf5;
-    --color-tinte-leise: #b3b1cc;
-    --color-linie: #33314d;
-    --color-amt: #a79dff;
-    --color-amt-tief: #cdc7ff;
-    --color-amt-hauch: #2a2566;
-    --color-erfolg: #7cf5c8;
-    --color-erfolg-hauch: #143c37;
-    --color-frist: #ff8a7a;
-    --color-frist-hauch: #3d1d1a;
-    --color-bald: #f5b453;
-    --color-bald-hauch: #3a2a12;
-    --color-fokus: #8fb2ff;
-  }
-}
 
 html {
   background: var(--color-papier);

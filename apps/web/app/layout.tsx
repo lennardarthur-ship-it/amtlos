@@ -18,10 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f3f3f8" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f0e1c" },
-  ],
+  themeColor: "#f3f3f8",
 };
 
 export default async function Wurzel({ children }: { children: ReactNode }) {

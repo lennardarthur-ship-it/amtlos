@@ -105,3 +105,8 @@ Ohne eigene Hausfarbe drucken die Dokumente in **Indigo `#3b30c4`** (8,7:1 zu We
 ### Store-Bilder
 
 Grund Navy `#120e3a`, Überschrift Weiß (18,3), Unterzeile Minze `#7cf5c8` (13,7); das Vorschaubild der Website trägt das Bildzeichen vor dem Namen.
+
+
+## Kein Dunkelmodus (E-172, 23.10.2026)
+
+App, Website und Web-App sind immer hell. Die Werte für „dunkel“ in den Abschnitten oben gelten nicht mehr; die Navy-Bühne bleibt als Fläche in der hellen Darstellung.

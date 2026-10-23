@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AccessibilityInfo, LayoutAnimation, Platform, StyleSheet, useColorScheme } from "react-native";
+import { AccessibilityInfo, LayoutAnimation, Platform, StyleSheet } from "react-native";
 
 /**
  * Designsystem der App (docs/06-design.md, E-142 „Bühne und Papier“, Farbwelt des Logos): Jede Tab-Seite beginnt auf
@@ -65,49 +65,6 @@ const HELL = {
   leiste: "rgba(255,255,255,0.8)",
   schatten: 0.08,
 };
-const DUNKEL: typeof HELL = {
-  papier: "#0b0a16",
-  blatt: "#18172b",
-  flaeche: "#25243d",
-  tinte: "#f3f3f8",
-  tinteLeise: "#aaa9c2",
-  linie: "#2e2d47",
-  linieLeise: "#222137",
-  rahmen: "#7c7a98",
-  zeiger: "#54526f",
-  amt: "#a79dff",
-  amtTief: "#cdc7ff",
-  amtHauch: "#272263",
-  amtText: "#120e3a",
-  minze: "#7cf5c8",
-  erfolg: "#7cf5c8",
-  erfolgTief: "#b5fadf",
-  erfolgHauch: "#123a35",
-  haupt: "#7cf5c8",
-  hauptText: "#120e3a",
-  frist: "#ff7a70",
-  fristHauch: "#3a1715",
-  bald: "#ffb340",
-  baldHauch: "#2e2414",
-  baldScheibe: "rgba(255,179,64,0.14)",
-  baldKreis: "rgba(255,179,64,0.14)",
-  lila: "#d7a6f5",
-  lilaHauch: "#2f2140",
-  gold: "#ffb340",
-  goldHauch: "#3a2a10",
-  blau: "#6eb4ff",
-  blauHauch: "#132a46",
-  buehne: "#17124a",
-  buehneText: "#ffffff",
-  buehneLeise: "rgba(255,255,255,0.72)",
-  buehneFlaeche: "#2c2669",
-  buehneKnopf: "#7cf5c8",
-  buehneKnopfText: "#120e3a",
-  kapsel: "#2a2750",
-  kapselRand: "rgba(255,255,255,0.08)",
-  leiste: "rgba(24,23,43,0.9)",
-  schatten: 0,
-};
 export type Farben = typeof HELL;
 /** Minze ist hell und dunkel gleich – Zeichenfarbe der Leisten auf der Bühne (daran erkennen Kopfknöpfe die Bühne). */
 export const MINZE = HELL.minze;
@@ -136,7 +93,8 @@ export const BLATT_OBEN = 24;
 export const HAARLINIE = StyleSheet.hairlineWidth;
 
 export function useFarben(): Farben {
-  return useColorScheme() === "dark" ? DUNKEL : HELL;
+  // E-172: kein Dunkelmodus – die App ist immer hell
+  return HELL;
 }
 
 /** Weicher Schatten für Karten (nur hell). */

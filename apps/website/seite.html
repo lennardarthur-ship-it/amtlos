@@ -1,7 +1,6 @@
 <title>{{MARKE}} – Pflichten, Rechnungen & E-Rechnung für kleine Betriebe</title>
 <meta name="description" content="Welche Pflichten kommen für deinen Betrieb in Frage? {{MARKE}} zeigt sie nach deinen Angaben mit Termin und Rechtsgrundlage und erstellt Rechnungen, E-Rechnungen und Vorlagen. iPhone, ohne Konto.">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0c0b19" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="schriften/onest-400Regular.woff2" as="font" type="font/woff2" crossorigin>
@@ -41,18 +40,6 @@ __KOPF_EXTRA__
   --serif: "Onest", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
   --sans: "Onest", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
   --rand: 7.5rem;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --papier: #0c0b19; --blatt: #17162b; --tinte: #f1f0f8; --tinte-2: #aaa9c2; --tinte-3: #9897b3; --chip-rand: #6d6b8a;
-    --linie: #2a2942; --linie-leise: #1f1e33; --amt: #a79dff; --amt-tief: #cdc7ff; --amt-hauch: #272263; --amt-text: #120e3a;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --papier: #0c0b19; --blatt: #17162b; --tinte: #f1f0f8; --tinte-2: #aaa9c2; --tinte-3: #9897b3; --chip-rand: #6d6b8a;
-  --linie: #2a2942; --linie-leise: #1f1e33; --amt: #a79dff; --amt-tief: #cdc7ff; --amt-hauch: #272263; --amt-text: #120e3a;
-  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { background: var(--papier); color: var(--tinte); font: 400 1.0625rem/1.55 var(--sans); padding-inline: 1.25rem; }

@@ -3,7 +3,7 @@ import * as Haptics from "expo-haptics";
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
 import { NavigationContext } from "@react-navigation/native";
 import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { AccessibilityInfo, ActivityIndicator, Animated, Pressable, Text as RNText, ScrollView, Switch, TextInput, View, useColorScheme, useWindowDimensions, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { AccessibilityInfo, ActivityIndicator, Animated, Pressable, Text as RNText, ScrollView, Switch, TextInput, View, useWindowDimensions, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { datumLesen, isoAus, nurJahr, uhrzeitLesen } from "./datum";
@@ -269,10 +269,9 @@ const tippen = () => {
  */
 export function Knopf({ text, onPress, leise, ton, gefahr, buehne, glas, deaktiviert, laedt, symbol, stil }: { text: string; onPress: () => void; leise?: boolean; ton?: boolean; gefahr?: boolean; buehne?: boolean; glas?: boolean; deaktiviert?: boolean; laedt?: boolean; symbol?: string; stil?: StyleProp<ViewStyle> }) {
   const f = useFarben();
-  const dunkel = useColorScheme() === "dark";
   const haupt = gefahr ? f.frist : f.haupt;
   const grund = buehne ? f.buehneKnopf : glas ? f.buehneFlaeche : ton ? f.flaeche : leise ? "transparent" : haupt;
-  const schrift = buehne ? f.buehneKnopfText : glas ? f.buehneText : ton ? (gefahr ? f.frist : f.tinte) : leise ? haupt : gefahr ? (dunkel ? f.papier : "#ffffff") : f.hauptText;
+  const schrift = buehne ? f.buehneKnopfText : glas ? f.buehneText : ton ? (gefahr ? f.frist : f.tinte) : leise ? haupt : gefahr ? "#ffffff" : f.hauptText;
   return (
     <Pressable
       accessibilityRole="button"

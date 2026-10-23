@@ -1,6 +1,6 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
-import { Modal, Pressable, View, useColorScheme } from "react-native";
+import { Modal, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { Knopf, Symbol, T } from "./bausteine";
@@ -15,7 +15,6 @@ const datumAusIso = (iso: string | null) => (iso && /^\d{4}-\d{2}-\d{2}$/.test(i
  */
 export function DatumWahl({ label, wert, aendern }: { label: string; wert: string | null; aendern: (iso: string) => void }) {
   const f = useFarben();
-  const dunkel = useColorScheme() === "dark";
   const inset = useSafeAreaInsets();
   const [offen, setOffen] = useState(false);
   const [datum, setDatum] = useState<Date>(() => datumAusIso(wert));
@@ -41,7 +40,7 @@ export function DatumWahl({ label, wert, aendern }: { label: string; wert: strin
               <Symbol name="xmark" groesse={18} farbe={f.tinte} />
             </Pressable>
           </View>
-          <DateTimePicker value={datum} mode="date" display="inline" locale="de-DE" themeVariant={dunkel ? "dark" : "light"} accentColor={f.amt} onChange={(_, d) => d && setDatum(d)} />
+          <DateTimePicker value={datum} mode="date" display="inline" locale="de-DE" themeVariant="light" accentColor={f.amt} onChange={(_, d) => d && setDatum(d)} />
           <View style={{ flexDirection: "row", gap: 10 }}>
             <Knopf ton text={TEXT.heute} onPress={() => { aendern(isoAusDatum(new Date())); setOffen(false); }} stil={{ flex: 1 }} />
             <Knopf text={TEXT.datum_uebernehmen} onPress={uebernehmen} stil={{ flex: 2 }} />

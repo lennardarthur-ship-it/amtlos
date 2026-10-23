@@ -515,7 +515,7 @@ async function marke() {
   const url = new URL(B);
   if (url.hostname !== "localhost") return;
   url.hostname = "127.0.0.1";
-  for (const farbschema of ["light", "dark"]) {
+  for (const farbschema of ["light"]) { // E-172: kein Dunkelmodus
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: farbschema, locale: "de-DE" });
     const p = await ctx.newPage();
     await p.goto(`${url.origin}/anmelden`);
@@ -523,7 +523,7 @@ async function marke() {
       pruefe(await p.getByText(`mit ${MARKE.name}`).count(), `${farbschema}-marke: Zusatz „mit ${MARKE.name}“ fehlt`);
       pruefe((await p.title()).endsWith("· Kanzlei Beispiel"), `${farbschema}-marke: Seitentitel ohne Marke (${await p.title()})`);
       const farbe = await p.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--color-amt").trim());
-      pruefe(farbe === (farbschema === "light" ? "#1f4e8c" : "#8fb8ff"), `${farbschema}-marke: Markenfarbe nicht gesetzt (${farbe})`);
+      pruefe(farbe === "#1f4e8c", `${farbschema}-marke: Markenfarbe nicht gesetzt (${farbe})`);
       await barrierefrei(p, `${farbschema}-marke-anmelden`);
     } else console.log("Hinweis: keine Marke für 127.0.0.1 (Studio-Rundgang vorher ausführen) – Markenprüfung übersprungen");
     await ctx.close();
@@ -532,7 +532,7 @@ async function marke() {
 
 try {
   await rundgang("light", 1280);
-  await rundgang("dark", 390);
+  await rundgang("light", 390);
   await marke();
 } finally {
   await browser.close();

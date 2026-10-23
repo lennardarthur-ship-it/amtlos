@@ -1,10 +1,10 @@
 import { createBottomTabNavigator, type BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { DarkTheme, DefaultTheme, NavigationContainer, createNavigationContainerRef, type NavigationProp, type ParamListBase } from "@react-navigation/native";
+import { DefaultTheme, NavigationContainer, createNavigationContainerRef, type NavigationProp, type ParamListBase } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, AppState, InputAccessoryView, Keyboard, Pressable, View, useColorScheme, useWindowDimensions } from "react-native";
+import { ActivityIndicator, AppState, InputAccessoryView, Keyboard, Pressable, View, useWindowDimensions } from "react-native";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Betrieb } from "./seiten/Betrieb";
 import { ErinnerungsPlaner, PflichtenTab } from "./seiten/Pflichten";
@@ -156,12 +156,11 @@ function BlattSeite() {
 /** Navigation der App: oben die Tabs (bzw. die Ladefehler-Seite), darüber Blätter für Abläufe und „Neu erstellen“. */
 function Navigation({ erste }: { erste: () => React.JSX.Element }) {
   const f = useFarben();
-  const dunkel = useColorScheme() === "dark";
   const { tab, tabWechseln } = useAmtlos();
   const thema = useMemo(() => {
-    const basis = dunkel ? DarkTheme : DefaultTheme;
+    const basis = DefaultTheme; // E-172: kein Dunkelmodus
     return { ...basis, colors: { ...basis.colors, primary: f.amt, background: f.papier, card: f.papier, text: f.tinte, border: f.linie } };
-  }, [dunkel, f]);
+  }, [f]);
   // Tab im Zustand und Tab in der Navigation abgleichen – über den zuletzt abgeglichenen Tab, nicht über den Vergleich
   // beider Seiten: Ändern sich beide im selben Durchgang (Blatt schließt, Tab wechselt), liefen sie sonst gegeneinander
   // („heute“ ↔ „pflichten“ ohne Ende, React-Fehler #185). Jede Seite meldet nur, was sich bei ihr geändert hat.
@@ -310,7 +309,6 @@ function useDatenGespeichert() {
 }
 
 export default function App() {
-  const dunkel = useColorScheme() === "dark";
   // Onest (E-142) – bis sie geladen ist, bleibt der Startbildschirm stehen
   const schrift = useSchrift();
   if (!schrift) return null;
@@ -321,7 +319,7 @@ export default function App() {
         <AmtlosAnbieter>
           <Fehlergrenze useGespeichert={useDatenGespeichert}>
             <KontoAnbieter>
-              <StatusBar style={dunkel ? "light" : "dark"} />
+              <StatusBar style="dark" />
               <ErinnerungsPlaner />
               <AutoSicherung />
               <Sperre>

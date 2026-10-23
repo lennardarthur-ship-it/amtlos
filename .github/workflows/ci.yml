@@ -70,13 +70,12 @@ jobs:
           CI=1 npx expo export --platform web --output-dir /tmp/web
           CI=1 EXPO_PUBLIC_API_URL=http://localhost:3001 npx expo export --platform web --clear --output-dir /tmp/web-sync
           grep -q "localhost:3001" /tmp/web-sync/_expo/static/js/web/*.js
-      - name: Rundgang hell, dunkel, Dokumente, Synchronisation
+      - name: Rundgang, Dokumente, Synchronisation
         run: |
           set -o pipefail
           cd apps/mobile
           export CHROMIUM_PFAD=$(node -e "const r=require('module').createRequire(require('path').resolve('../web/package.json'));console.log(r('playwright-core').chromium.executablePath())")
           node e2e/rundgang.mjs /tmp/web /tmp/bilder 2>&1 | tee ../../e2e-app.txt
-          DUNKEL=1 node e2e/rundgang.mjs /tmp/web /tmp/bilder 2>&1 | tee -a ../../e2e-app.txt
           node werkzeuge/dokumente-pruefen.mjs /tmp/dokumente 2>&1 | tee -a ../../e2e-app.txt
           nohup node e2e/sync-server.mjs > ../../sync-server.log 2>&1 &
           for i in $(seq 1 60); do curl -s -o /dev/null -X POST localhost:3001/v1/dev/token -H 'content-type: application/json' -d '{"kennung":"ci"}' && break; sleep 1; done

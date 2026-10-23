@@ -5,7 +5,7 @@
     "scheme": "amtlos",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "splash": {
       "backgroundColor": "#120E3A",
       "image": "./assets/splash.png",
@@ -83,10 +83,7 @@
           "image": "./assets/splash.png",
           "imageWidth": 160,
           "resizeMode": "contain",
-          "backgroundColor": "#120E3A",
-          "dark": {
-            "backgroundColor": "#120E3A"
-          }
+          "backgroundColor": "#120E3A"
         }
       ],
       "expo-notifications",
