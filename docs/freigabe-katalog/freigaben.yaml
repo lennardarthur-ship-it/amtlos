@@ -487,6 +487,154 @@
       version: 3
       quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
       stand: '2026-10-23'
+  gesehen:
+    branche.bau_soka: 2
+    branche.beauty_hygieneplan: 1
+    branche.beauty_kosmetikverordnung: 5
+    branche.gastro_mehrweg: 5
+    branche.gastro_ppwr_radar: 3
+    branche.gastro_preisverzeichnis: 2
+    branche.gesundheit_erlaubnisse: 2
+    branche.handwerk_gewaehrleistung: 3
+    branche.immo_gwg: 3
+    branche.immo_weiterbildung: 3
+    branche.it_haftung: 2
+    branche.it_scheinselbststaendigkeit: 3
+    branche.jugendschutz_abgabe: 2
+    branche.jugendschutz_aushang: 1
+    branche.mobiler_verkauf_standplatz: 1
+    branche.oeffentliche_wiedergabe: 1
+    branche.personenbefoerderung_genehmigung: 2
+    branche.preisverzeichnis_dienstleistung: 2
+    branche.transport_erlaubnis: 6
+    branche.transport_lenkzeiten: 4
+    branche.transport_lenkzeiten_national: 4
+    branche.widerruf_ausserhalb_geschaeftsraeume: 2
+    branche.widerruf_fernabsatz: 2
+    datenschutz.avv: 3
+    datenschutz.beschaeftigtendaten: 3
+    datenschutz.betroffenenanfrage: 2
+    datenschutz.datenpanne_benachrichtigung: 1
+    datenschutz.datenpanne_meldung: 4
+    datenschutz.dsb: 2
+    datenschutz.dsb_streichung: 3
+    datenschutz.dsfa: 4
+    datenschutz.informationspflichten: 2
+    datenschutz.loeschkonzept: 2
+    datenschutz.ortung: 2
+    datenschutz.tom: 2
+    datenschutz.videoueberwachung: 3
+    datenschutz.vvt: 2
+    gesellschaft.awv_meldung: 5
+    gesellschaft.egbr_hinweis: 3
+    gesellschaft.foerderprogramme: 3
+    gesellschaft.gesellschafterliste_aktualisieren: 2
+    gesellschaft.gesellschaftsvertrag_notar: 3
+    gesellschaft.gf_pflichten_haftung: 5
+    gesellschaft.gf_sozialversicherungsstatus: 1
+    gesellschaft.handelsregister_anmeldung: 4
+    gesellschaft.insolvenzantragspflicht: 4
+    gesellschaft.investitionspruefung_hinweis: 2
+    gesellschaft.istkaufmann_pruefen: 1
+    gesellschaft.jahresabschluss: 5
+    gesellschaft.mitarbeiterbeteiligung: 2
+    gesellschaft.offenlegung: 3
+    gesellschaft.offenlegung_abweichendes_gj: 4
+    gesellschaft.partg_mbb_haftpflicht: 1
+    gesellschaft.stammkapital_einzahlen: 4
+    gesellschaft.transparenzregister: 4
+    gesellschaft.ug_ruecklage: 2
+    gruendung.berufsgenossenschaft: 3
+    gruendung.elster_konto: 1
+    gruendung.erlaubnis_pruefen: 5
+    gruendung.gewerbeanzeige: 3
+    gruendung.gewo38_zuverlaessigkeit: 1
+    gruendung.gruendungsbeschleunigung_radar: 3
+    gruendung.gruendungszuschuss: 2
+    gruendung.handwerk_verzeichnis: 3
+    gruendung.handwerksrolle: 3
+    gruendung.ihk_hwk_mitgliedschaft: 2
+    gruendung.krankenversicherung: 1
+    gruendung.reisegewerbekarte: 4
+    gruendung.rentenversicherungspflicht: 3
+    gruendung.rundfunkbeitrag: 3
+    gruendung.statusfeststellung: 2
+    gruendung.taetigkeit_einordnen: 3
+    gruendung.vermittlerregister: 3
+    it_sicherheit.nis2_meldepflichten: 3
+    it_sicherheit.nis2_pruefen: 3
+    it_sicherheit.nis2_registrierung: 3
+    ki.hochrisiko: 5
+    ki.kompetenz: 5
+    ki.transparenz: 5
+    online.barrierefreiheit: 4
+    online.button_loesung: 3
+    online.cookie_einwilligung: 3
+    online.dac7: 3
+    online.datenschutzerklaerung: 4
+    online.impressum: 4
+    online.kuendigungsbutton: 3
+    online.marktplatz_angaben: 3
+    online.os_link: 4
+    online.preisangaben: 3
+    online.vsbg_hinweis: 4
+    online.vsbg_streitfall: 2
+    online.widerrufsbelehrung: 5
+    online.widerrufsbutton: 4
+    personal.anmeldezeitraum_angeben: 1
+    personal.arbeitszeit_aufzeichnung: 5
+    personal.arbeitszeit_milog: 3
+    personal.arbeitszeit_neuregelung: 3
+    personal.aufenthaltstitel: 3
+    personal.aufenthaltstitel_laufend: 2
+    personal.ausbildungsverguetung: 2
+    personal.aushangpflichtige_gesetze: 4
+    personal.ausweis_hinweis: 3
+    personal.azubi_ausbildungsnachweis: 2
+    personal.azubi_eintragung: 2
+    personal.beitragsnachweis: 3
+    personal.betriebsnummer: 3
+    personal.bewacherregister: 4
+    personal.entgelttransparenz_bericht: 3
+    personal.fuehrerscheinkontrolle: 2
+    personal.hinweisgeber_meldestelle: 3
+    personal.jugend_erstuntersuchung: 1
+    personal.jugend_nachuntersuchung: 2
+    personal.jugendarbeitsschutz: 5
+    personal.lohnabrechnung: 1
+    personal.lohnnachweis_bg: 3
+    personal.lohnsteuer_anmeldung: 5
+    personal.mindestlohn: 4
+    personal.minijob_grenze: 3
+    personal.mutterschutz_gefaehrdungsbeurteilung: 3
+    personal.nachtarbeit: 3
+    personal.nachunternehmerhaftung: 1
+    personal.nachweisgesetz: 3
+    personal.schwangerschaft_mitteilung: 3
+    personal.schwerbehinderte_anzeige: 3
+    personal.sofortmeldung: 3
+    personal.statusfeststellung_auftraggeber: 1
+    personal.sv_abmeldung: 3
+    personal.sv_anmeldung: 2
+    personal.sv_beitraege: 2
+    personal.sv_jahresmeldung: 3
+    personal.umlagen_eau: 1
+    produkte.bargeldobergrenze_radar: 1
+    produkte.barrierefreiheit: 5
+    produkte.batterien: 5
+    produkte.elektrogeraete: 5
+    produkte.geldwaesche_gueterhaendler: 4
+    produkte.geraetebatterien_ruecknahme: 1
+    produkte.gpsr: 8
+    produkte.gpsr_fernabsatz: 1
+    produkte.gpsr_hersteller: 1
+    produkte.starterbatterien_ruecknahme: 2
+    produkte.verpackung: 6
+    umwelt.altoel_ruecknahme: 2
+    umwelt.gefaehrliche_abfaelle: 3
+    umwelt.gewerbeabfall: 2
+    umwelt.klima_sachkunde: 3
+    umwelt.oelabscheider: 1
 - pruefer: RA Dr. Ulrich Weber
   umfang: sanktion
   unterschrieben: false
@@ -524,6 +672,21 @@
       version: 4
       quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
       stand: '2026-10-23'
+  gesehen:
+    branche.gastro_acrylamid: 3
+    branche.gastro_allergene: 4
+    branche.gastro_haccp: 6
+    branche.gastro_hygieneschulung: 4
+    branche.gastro_ifsg_belehrung: 4
+    branche.gastro_ifsg_bescheinigung: 3
+    branche.gastro_ifsg_bescheinigung_selbst: 2
+    branche.gastro_ifsg_folgebelehrung: 3
+    branche.gastro_kennzeichnung_vorverpackt: 3
+    branche.gastro_kontaktmaterialien: 2
+    branche.gastro_lebensmittelregistrierung: 6
+    branche.gastro_rueckverfolgbarkeit: 3
+    branche.gastro_trinkwasser_mobil: 4
+    branche.gastro_zusatzstoffe: 3
 - pruefer: Thomas Koch (Fachkraft für Arbeitssicherheit)
   umfang: alles
   unterschrieben: false
@@ -613,6 +776,35 @@
       version: 4
       quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
       stand: '2026-10-22'
+  gesehen:
+    arbeitsschutz.arbeitsmedizinische_vorsorge: 5
+    arbeitsschutz.arbeitsmittel_pruefen: 4
+    arbeitsschutz.betriebsanweisung_arbeitsmittel: 1
+    arbeitsschutz.biostoffe: 1
+    arbeitsschutz.brandschutzhelfer: 2
+    arbeitsschutz.dguv_v3: 4
+    arbeitsschutz.erste_hilfe: 2
+    arbeitsschutz.erste_hilfe_organisation: 1
+    arbeitsschutz.erstunterweisung: 5
+    arbeitsschutz.expositionsverzeichnis: 1
+    arbeitsschutz.fahrer_unterweisung: 2
+    arbeitsschutz.fahrzeuge_pruefen: 3
+    arbeitsschutz.fasi_betriebsarzt: 3
+    arbeitsschutz.feuerloescher: 2
+    arbeitsschutz.flucht_rettungsplan: 2
+    arbeitsschutz.fremdfirmen_abstimmung: 2
+    arbeitsschutz.gefaehrdungsbeurteilung: 8
+    arbeitsschutz.gefahrstoffe: 3
+    arbeitsschutz.laerm: 1
+    arbeitsschutz.sicherheitsbeauftragte: 3
+    arbeitsschutz.unfallanzeige: 3
+    arbeitsschutz.unterweisung_jugendliche: 3
+    arbeitsschutz.unterweisung_wiederholen: 5
+    arbeitsschutz.verbandbuch: 1
+    branche.bau_baustellenverordnung: 3
+    branche.beauty_hautschutzplan: 2
+    branche.gastro_schankanlage_fluessiggas: 1
+    branche.handwerk_gefaehrdung_gewerk: 4
 - pruefer: StB Lutz Busch
   umfang: alles
   unterschrieben: true
@@ -694,6 +886,40 @@
       version: 6
       quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
       stand: '2026-10-22'
+  gesehen:
+    gruendung.fragebogen_steuerliche_erfassung: 5
+    gruendung.ust_idnr: 2
+    steuern.aufbewahrung: 4
+    steuern.bauabzugsteuer_freistellung: 4
+    steuern.buchfuehrungspflicht: 5
+    steuern.e_bilanz: 4
+    steuern.e_rechnung_empfang: 3
+    steuern.e_rechnung_versand_2027: 2
+    steuern.e_rechnung_versand_2028: 2
+    steuern.est_erklaerung: 4
+    steuern.euer: 5
+    steuern.feststellungserklaerung: 3
+    steuern.gewst_erklaerung: 4
+    steuern.gobd_verfahrensdokumentation: 2
+    steuern.kasse_tse_belegausgabe: 4
+    steuern.kassenmeldung: 5
+    steuern.kassenmeldung_ausserbetriebnahme: 4
+    steuern.kleinunternehmer_grenze_offene_rechnungen: 1
+    steuern.kleinunternehmer_grenze_ueberschritten: 7
+    steuern.kleinunternehmer_naechstes_jahr: 6
+    steuern.kleinunternehmer_warnung_80: 5
+    steuern.kleinunternehmer_warnung_95: 5
+    steuern.kleinunternehmerregelung: 2
+    steuern.kst_erklaerung: 4
+    steuern.oss_erklaerung: 2
+    steuern.rechnungen_pflichtangaben: 4
+    steuern.ust_jahreserklaerung: 3
+    steuern.ust_sondervorauszahlung: 4
+    steuern.ust_va_neugruender_radar: 2
+    steuern.ust_voranmeldung: 6
+    steuern.vorauszahlung_est_kst: 2
+    steuern.vorauszahlung_gewst: 2
+    steuern.zusammenfassende_meldung: 6
 - pruefer: Tim Baum (Lebensmittelfachbeauftragter)
   umfang: ohne_sanktion
   unterschrieben: true
@@ -751,3 +977,19 @@
       version: 3
       quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
       stand: '2026-10-23'
+  gesehen:
+    branche.gastro_acrylamid: 1
+    branche.gastro_allergene: 3
+    branche.gastro_haccp: 5
+    branche.gastro_hygieneschulung: 3
+    branche.gastro_ifsg_belehrung: 4
+    branche.gastro_ifsg_bescheinigung: 2
+    branche.gastro_ifsg_bescheinigung_selbst: 1
+    branche.gastro_ifsg_folgebelehrung: 3
+    branche.gastro_kennzeichnung_vorverpackt: 3
+    branche.gastro_kontaktmaterialien: 1
+    branche.gastro_lebensmittelregistrierung: 5
+    branche.gastro_rueckverfolgbarkeit: 3
+    branche.gastro_schankanlage_fluessiggas: 1
+    branche.gastro_trinkwasser_mobil: 3
+    branche.gastro_zusatzstoffe: 2
