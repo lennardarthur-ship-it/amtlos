@@ -107,9 +107,9 @@ for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
     eintraege.append(d)
 eintraege.sort(key=lambda d: [int(x) if x.isdigit() else x for x in str(d.get("katalog_nr", "")).replace(".", " ").split()])
 
-KOPF = ["Nr", "ID", "Version", "Titel", "Kurztext", "Wann es gilt (Auslöser)", "Frist", "Rechtsgrundlage", "Folgen bei Verstoß", "Schwere",
+KOPF = ["Nr", "ID", "Version", "Titel", "Kurztext", "Erklärung", "Zuständige Stelle", "Wann es gilt (Auslöser)", "Frist", "Rechtsgrundlage", "Folgen bei Verstoß", "Schwere",
         "Rechtsstand", "Quellen", "Offene Fachfragen (unser Vermerk)", "Entscheidung", "Änderung / Anmerkung"]
-BREITE = [7, 30, 8, 34, 50, 40, 26, 34, 50, 9, 12, 40, 55, 16, 50]
+BREITE = [7, 30, 8, 34, 50, 70, 24, 40, 26, 34, 50, 9, 12, 40, 55, 16, 50]
 if RUECKFRAGEN:
     KOPF.insert(13, "Unsere Rückfrage / was wir umgesetzt haben")
     BREITE.insert(13, 60)
@@ -131,7 +131,7 @@ for schluessel, (name, person) in PRUEFER.items():
         s = d.get("sanktion") or {}
         quellen = " ".join(q.get("url", "") for q in (d.get("quellen") or []))
         fzp = "\n".join(f"• {t}" for t in (d.get("fachlich_zu_pruefen") or []))
-        ws.append([d.get("katalog_nr"), d["id"], d.get("version"), de(d.get("titel")), de(d.get("kurz")), ausloeser(d.get("ausloeser")),
+        ws.append([d.get("katalog_nr"), d["id"], d.get("version"), de(d.get("titel")), de(d.get("kurz")), de(d.get("erklaerung")), de(d.get("stelle")), ausloeser(d.get("ausloeser")),
                    frist(d.get("frist")), "; ".join(d.get("rechtsgrundlage") or []), de(s.get("text")), s.get("schwere", ""),
                    d.get("status_recht", ""), quellen, fzp] + ([RUECKFRAGEN.get(d["id"], "")] if RUECKFRAGEN else []) + ["", ""])
     for i, b in enumerate(BREITE, start=1):

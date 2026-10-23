@@ -51,8 +51,6 @@ quellen:
   url: https://www.gesetze-im-internet.de/hgb/__1.html
   abgerufen: null
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 1
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

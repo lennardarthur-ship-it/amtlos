@@ -22,7 +22,7 @@ sys.argv_ = sys.argv
 src = open(os.path.join(HIER, "anwenden.py"), encoding="utf-8").read().split("abweichung, uebersicht")[0]
 g = {"__file__": os.path.join(HIER, "anwenden.py")}
 exec(compile(src, "anwenden.py", "exec"), g)
-gebiet, BENOETIGT, frei, fassung, gueltig = g["gebiet"], g["BENOETIGT"], g["frei"], g["fassung"], g["gueltig"]
+gebiet, BENOETIGT, frei, fassung, gueltig, abgedeckt = g["gebiet"], g["BENOETIGT"], g["frei"], g["fassung"], g["gueltig"], g["abgedeckt"]
 WEBER, BUSCH, KOCH, BAUM = g["WEBER"], g["BUSCH"], g["KOCH"], g["BAUM"]
 
 ziel = os.path.abspath([a for a in sys.argv[1:] if not a.startswith("--")][0])
@@ -105,7 +105,12 @@ for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
         continue
     for p, u in BENOETIGT[gebiet(d)]:
         f = frei.get((p, u), {}).get(d["id"])
+        if abgedeckt(pfad, d, p, u):
+            continue
         if gueltig(pfad, d, f, u):
+            # alles andere ist freigegeben – nur Erklärung und Stelle standen nicht in der Freigabe-Datei
+            zeilen = [(lab, "(stand nicht in Ihrer Datei)", text(d.get(k), k)) for k, lab in FELDER if k in ("erklaerung", "stelle") and d.get(k)]
+            je[p].append((d, f, zeilen, u))
             continue
         gv = f["version"] if f else GESEHEN.get((p, u), {}).get(d["id"])
         alt = fassung(pfad, gv) if gv else None

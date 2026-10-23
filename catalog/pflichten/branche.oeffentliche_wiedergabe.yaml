@@ -49,8 +49,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: §§ 15, 19, 21, 22 UrhG und „in der Regel mit Zuschlag“ (100 % Kontrollzuschlag, von der Rechtsprechung gebilligt) bestätigt; Kurse per Video: Tarif VR-OD/Online-Kurse – Hinweis „GEMA fragen“ steht im Text'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 1
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

@@ -162,8 +162,6 @@ quellen:
 fachlich_zu_pruefen:
   - "StB Busch 22.10.2026: Neugründer ab 2027 im Gründungs- und Folgejahr monatlich (§ 18 Abs. 2 Satz 4 UStG) – nur als Hinweis im Text; der Rhythmus bei „weiß ich nicht“ bzw. ohne Angabe rechnet dann weiter vierteljährlich, weil die Regeln das Kalenderjahr des Stichtags nicht abfragen können"
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - StB Lutz Busch
-  geprueft_am: '2026-10-22'
-  geprueft_version: 6
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

@@ -54,8 +54,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: § 18 BattDG und Sanktion über § 4 Abs. 2 bestätigt. Pfand auf Starterbatterien unter dem BattDG prüfen (früher § 10 BattG, 7,50 €) – bis dahin nicht nennen (wird nicht genannt); Händlerpflichten für Gerätebatterien nicht abgebildet'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 2
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

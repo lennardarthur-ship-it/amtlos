@@ -45,8 +45,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Hinweis, §§ 276, 309 Nr. 7 BGB und „keine Frist“ bestätigt (Prüfvermerk RA Dr. Weber 22.10.2026)'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 2
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

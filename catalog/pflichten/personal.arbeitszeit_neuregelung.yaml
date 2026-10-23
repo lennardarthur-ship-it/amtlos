@@ -64,8 +64,6 @@ fachlich_zu_pruefen:
 - 'Übergangsfristen laut Handwerksblatt (unter 250: zwei Jahre, unter 50: fünf Jahre; 1.10.2026 zusätzlich „ab 250 mindestens ein Jahr“) – gegen den Entwurfstext prüfen; laut Freigabe Weber 22.10.2026 sind Angaben zu Fristen nicht bestätigbar, solange kein Kabinettsbeschluss vorliegt'
 - 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): als Radar ohne Fristangaben freigegeben; vor dem Launch und nach dem Kabinettsbeschluss erneut vorlegen'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 3
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

@@ -47,7 +47,13 @@ BENOETIGT = {"recht": [(WEBER, "alles")], "steuer": [(BUSCH, "alles")], "arbeits
              "lebensmittel": [(BAUM, "ohne_sanktion"), (WEBER, "sanktion")]}
 
 register = yaml.safe_load(open(os.path.join(ROOT, "docs/freigabe-katalog/freigaben.yaml"), encoding="utf-8"))
-frei = {(r["pruefer"], r["umfang"]): r["eintraege"] for r in register}
+# mehrere Blöcke je Prüfer/Umfang möglich (z. B. Nachtrag, der Erklärung und Stelle bestätigt)
+BLOECKE = [(r["pruefer"], r["umfang"], set(r.get("felder_fehlen") or []), r["eintraege"]) for r in register]
+frei = {}
+for _p, _u, _fehl, _e in BLOECKE:
+    for _i, _f in _e.items():
+        frei.setdefault((_p, _u), {})[_i] = _f  # jüngster Block gewinnt (für Anzeige/Abgleich)
+SONDERFELDER = {"erklaerung", "stelle"}
 
 _hist = {}
 
@@ -88,13 +94,23 @@ def gueltig(pfad, d, f, umfang):
     return all(alt.get(k) == d.get(k) for k in felder)
 
 
+def abgedeckt(pfad, d, p, u):
+    """Sind alle Felder im Umfang für die aktuelle Version freigegeben (inkl. Erklärung und Stelle)?"""
+    noetig = {"rest"} if u == "sanktion" else {"rest"} | SONDERFELDER
+    gedeckt = set()
+    for bp, bu, fehl, e in BLOECKE:
+        if (bp, bu) == (p, u) and gueltig(pfad, d, e.get(d["id"]), u):
+            gedeckt |= ({"rest"} | SONDERFELDER) - fehl
+    return noetig <= gedeckt
+
+
 abweichung, uebersicht = [], {"freigegeben": 0, "in_pruefung": 0, "entwurf": 0}
 for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
     text = open(pfad, encoding="utf-8").read()
     d = yaml.safe_load(text)
     noetig = BENOETIGT[gebiet(d)]
     passt = [(p, u, frei.get((p, u), {}).get(d["id"])) for p, u in noetig]
-    if all(gueltig(pfad, d, f, u) for _, u, f in passt):
+    if all(abgedeckt(pfad, d, p, u) for p, u, _ in passt):
         stand = max(f["stand"] for _, _, f in passt)
         block = "pruefung:\n  status: freigegeben\n  geprueft_von:\n" + "".join(f"    - {p}\n" for p, _, _ in passt) + f"  geprueft_am: '{stand}'\n  geprueft_version: {d['version']}\n"
         status = "freigegeben"

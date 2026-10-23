@@ -51,8 +51,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): Art. 34 Abs. 1 DSGVO („unverzüglich“) und Sanktion Art. 83 Abs. 4 Buchst. a bestätigt; die verlangten Ergänzungen – Ausnahmen nach Art. 34 Abs. 3 (Verschlüsselung, nachträgliche Maßnahmen, unverhältnismäßiger Aufwand mit öffentlicher Bekanntmachung) und Inhalt nach Art. 34 Abs. 2 i. V. m. Art. 33 Abs. 3 Buchst. b–d – stehen schon in der Erklärung. Auslöser über das Datenpanne-Formular in Ordnung, wenn die Risikobewertung dort steht: Das Formular (packages/fachlogik/src/dokumente/datenschutz.ts) erfasst die Bewertung (kein Risiko, Risiko, hohes Risiko) und die Benachrichtigung der Betroffenen; Frist „unverzüglich“ nur im Text, kein Termin'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 1
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

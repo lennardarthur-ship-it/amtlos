@@ -58,9 +58,6 @@ fachlich_zu_pruefen:
 - 'Liste der 14 Allergene (Anhang II LMIV) im Werkzeug prüfen'
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, freigegeben): Auslöser, Frist laufend und Kurztext fachlich richtig; Form bei loser Ware in der Allergenliste-Vorlage umgesetzt (Art. 44 LMIV, § 4 LMIDV); Folgen aus dem Wortlaut nachvollziehbar, Bußgeldhöhe laut T. Baum von RA Dr. Weber bestätigt; Schwere wieder „hoch“ (umgesetzt)'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - Tim Baum (Lebensmittelfachbeauftragter)
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

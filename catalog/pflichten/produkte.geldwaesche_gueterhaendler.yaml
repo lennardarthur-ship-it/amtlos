@@ -67,8 +67,6 @@ fachlich_zu_pruefen:
 - Immobilien- und Finanzbranche als Branchenmodul (H)
 - 'Schwellen § 10 Abs. 6a GwG (2.000 € bei hochwertigen Gütern einschließlich Edelmetallen, § 1 Abs. 10 Satz 2 Nr. 1 GwG) und Sanktion § 56 GwG bestätigt (Prüfvermerk RA Dr. Weber 22.10.2026)'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

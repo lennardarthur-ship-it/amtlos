@@ -70,8 +70,6 @@ fachlich_zu_pruefen:
 - 'Auslöser wie produkte.geldwaesche_gueterhaendler (Warenverkauf mit hohen Barzahlungen) – Art. 80 erfasst auch Dienstleistungen und das Leisten von Barzahlungen; das Profil fragt hohe Barzahlungen nur für Waren ab. Laut Prüfer auf Dienstleistungen erweitern, sobald das Profil das hergibt – braucht eine neue Angabe (die Frage profil.handel.hohe_bargeschaefte fragt nur nach Waren), noch nicht umgesetzt'
 - 'Sanktion: Art. 80 Abs. 5 verlangt Sanktionen der Mitgliedstaaten; deutsche Bußgeldnorm am 22.10.2026 nicht gesucht – ergänzen, sobald geregelt. Amtsblatt-Text (EUR-Lex) nicht abgerufen, Wortlaut aus Haufe-Normtext und Springlex'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 1
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

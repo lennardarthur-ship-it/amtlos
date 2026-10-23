@@ -635,6 +635,11 @@
     umwelt.gewerbeabfall: 2
     umwelt.klima_sachkunde: 3
     umwelt.oelabscheider: 1
+  felder_fehlen:
+  - erklaerung
+  - stelle
+  felder_hinweis: Die Freigabe-Dateien (erzeugen.py) und der Katalogauszug der Prüfmappe zeigten Erklärung und zuständige Stelle nicht; diese
+    Felder sind noch zu bestätigen.
 - pruefer: RA Dr. Ulrich Weber
   umfang: sanktion
   unterschrieben: false
@@ -687,6 +692,11 @@
     branche.gastro_rueckverfolgbarkeit: 3
     branche.gastro_trinkwasser_mobil: 4
     branche.gastro_zusatzstoffe: 3
+  felder_fehlen:
+  - erklaerung
+  - stelle
+  felder_hinweis: Die Freigabe-Dateien (erzeugen.py) und der Katalogauszug der Prüfmappe zeigten Erklärung und zuständige Stelle nicht; diese
+    Felder sind noch zu bestätigen.
 - pruefer: Thomas Koch (Fachkraft für Arbeitssicherheit)
   umfang: alles
   unterschrieben: false
@@ -805,6 +815,11 @@
     branche.beauty_hautschutzplan: 2
     branche.gastro_schankanlage_fluessiggas: 1
     branche.handwerk_gefaehrdung_gewerk: 4
+  felder_fehlen:
+  - erklaerung
+  - stelle
+  felder_hinweis: Die Freigabe-Dateien (erzeugen.py) und der Katalogauszug der Prüfmappe zeigten Erklärung und zuständige Stelle nicht; diese
+    Felder sind noch zu bestätigen.
 - pruefer: StB Lutz Busch
   umfang: alles
   unterschrieben: true
@@ -920,6 +935,11 @@
     steuern.vorauszahlung_est_kst: 2
     steuern.vorauszahlung_gewst: 2
     steuern.zusammenfassende_meldung: 6
+  felder_fehlen:
+  - erklaerung
+  - stelle
+  felder_hinweis: Die Freigabe-Dateien (erzeugen.py) und der Katalogauszug der Prüfmappe zeigten Erklärung und zuständige Stelle nicht; diese
+    Felder sind noch zu bestätigen.
 - pruefer: Tim Baum (Lebensmittelfachbeauftragter)
   umfang: ohne_sanktion
   unterschrieben: true
@@ -993,3 +1013,8 @@
     branche.gastro_schankanlage_fluessiggas: 1
     branche.gastro_trinkwasser_mobil: 3
     branche.gastro_zusatzstoffe: 2
+  felder_fehlen:
+  - erklaerung
+  - stelle
+  felder_hinweis: Die Freigabe-Dateien (erzeugen.py) und der Katalogauszug der Prüfmappe zeigten Erklärung und zuständige Stelle nicht; diese
+    Felder sind noch zu bestätigen.

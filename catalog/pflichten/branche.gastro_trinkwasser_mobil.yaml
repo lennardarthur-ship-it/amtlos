@@ -100,9 +100,6 @@ fachlich_zu_pruefen:
 - 'Gültig ab: Inkrafttreten der TrinkwV 2023 (24.6.2023) laut Verordnung gegenlesen'
 - 'Folgen bei Mängeln der Wasserqualität nicht ergänzt'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - Tim Baum (Lebensmittelfachbeauftragter)
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

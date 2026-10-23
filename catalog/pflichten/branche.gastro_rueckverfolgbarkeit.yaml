@@ -84,9 +84,6 @@ fachlich_zu_pruefen:
 - 'Lebensmittel ohne Branche Gastronomie oder Onlinehandel (z. B. Kiosk mit „Sonstige“) lösen den Eintrag weiter nicht aus – laut T. Baum hinnehmbar; besser wäre ein Auslöser „Was verkaufst du? Lebensmittel“ unabhängig von der Branche (die Frage wird nicht im Kern-Check gestellt, als alleiniger Auslöser stünde der Eintrag bei allen Betrieben ohne diese Angabe offen – nicht umgesetzt)'
 - 'DVO (EU) Nr. 931/2011 zusätzlich nach § 9 LMRStV bußgeldbewehrt (Tatbestände nicht gelesen)'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - Tim Baum (Lebensmittelfachbeauftragter)
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 3
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null
