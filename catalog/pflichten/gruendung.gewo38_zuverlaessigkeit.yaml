@@ -48,6 +48,8 @@ quellen:
   url: https://gesetze.legal/bund/gewo/146
   abgerufen: '2026-10-22'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 2

@@ -131,6 +131,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'StB Busch 22.10.2026, Runde 2 – umgesetzt (v6): Umsatzbegriff vereinnahmte Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.). Auslöser über finanzen.umsatz.bezahlt_laufendes_jahr und …_vorjahr: nur tatsächliche Zahlungseingänge auf Rechnungen, Kasse und Sachentnahmen (§ 3 Abs. 1b UStG, bestätigt); offene Rechnungen zählen nicht (§ 14c Abs. 2 UStG) – liegt die Grenze nur mit ihnen darüber, zeigt Amtlos steuern.kleinunternehmer_grenze_offene_rechnungen. Steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App heraus; Anlagenverkäufe kann sie nicht erkennen (Hinweis im Text). Zu prüfen: Wortlaut der Erklärung und Abgrenzung „steuerfrei“ nur mit Hinweis auf die Steuerbefreiung; der Server kennt keine Zahlungseingänge – dort gelten nur die Zweige aus den Profilangaben'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - StB Lutz Busch
+  geprueft_am: '2026-10-23'
+  geprueft_version: 7

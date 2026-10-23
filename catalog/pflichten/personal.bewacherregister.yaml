@@ -68,6 +68,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'Freigabe RA Dr. Weber 22.10.2026: Schwere „hoch“ umgesetzt. Freigabe RA Dr. Weber Runde 2 (23.10.2026): Abmeldung nach § 11b Abs. 6 GewO (sechs Wochen nach Beendigung über das Bewacherregister) bestätigt; die Fundstelle der ersten Rückmeldung (§ 11b Abs. 3 GewO, § 16 Abs. 3 BewachV) war unzutreffend. Text und Schwere „hoch“ in Ordnung'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

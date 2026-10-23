@@ -69,6 +69,8 @@ fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: Pflichten (Art. 4, 8, 10, 11, 13, 19, 23), Abgrenzung zum Weiterverkauf (Art. 6), Auslöser und Sanktion § 9 KosmetikV i. V. m. § 60 LFGB (50.000 €) bestätigt; Schwere wieder „hoch“'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 6

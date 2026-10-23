@@ -1,7 +1,8 @@
+# StB Busch Abgleich 23.10.2026: OHG und KG im Auslöser (gleich wie steuern.buchfuehrungspflicht)
 # Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.e_bilanz
-version: 4
+version: 5
 katalog_nr: B.18
 titel:
   de: E-Bilanz ans Finanzamt übermitteln
@@ -30,6 +31,13 @@ ausloeser:
     wert: gmbh_co_kg
     label:
       de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
+  # StB Busch 23.10.2026: OHG und KG sind als Handelsgesellschaften stets buchführungspflichtig (§§ 6, 238 HGB). Die App bietet
+  # sie nicht als eigene Rechtsform an – sie wählen „Andere“; dort erscheint die Pflicht als „kommt in Frage“.
+  - feld: profil.rechtsform
+    op: ==
+    wert: sonstige
+    label:
+      de: Du hast „Andere“ als Rechtsform gewählt – OHG und KG sind als Handelsgesellschaften immer buchführungspflichtig.
   # e.K.: nach HGB buchführungspflichtig, außer die Grenzen des § 241a HGB werden eingehalten (zwei aufeinanderfolgende Jahre;
   # vereinfacht über das Vorjahr, im Gründungsjahr über die Schätzung für das erste Jahr)
   - all:

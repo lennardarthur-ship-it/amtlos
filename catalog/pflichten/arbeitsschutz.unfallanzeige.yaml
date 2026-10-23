@@ -57,6 +57,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'Amtlos kennt die AU-Tage beim Melden nicht (Ereignis ohne Payload auswertbar), deshalb Aufgabe bei jedem Unfall mit „trifft nicht zu“ (laut Freigabe Sifa 22.10.2026 als Übergang vertretbar, solange der Kurztext die Schwelle nennt); Bedingung auf au_tage > 3 oder tödlich umstellen, sobald das Meldeformular die Angaben erfasst und die Engine Payload auswertet (Technik)'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Thomas Koch (Fachkraft für Arbeitssicherheit)
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

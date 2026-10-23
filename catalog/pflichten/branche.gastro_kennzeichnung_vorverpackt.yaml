@@ -104,6 +104,9 @@ fachlich_zu_pruefen:
 - 'Rückmeldung T. Baum Runde 2 (23.10.2026, ändern, danach freigegeben): „am selben Tag“ durch „zum unmittelbaren Verkauf“ ersetzt (Wortlaut Art. 44 Abs. 1 LMIV) und sein Beispiel zu Brot/Brötchen im SB-Regal und Dauerbackwaren wörtlich ergänzt'
 - 'RA Dr. Weber Runde 3 (23.10.2026), Folgen freigegeben: Bußgeld § 6 Abs. 4 Nr. 2 LMIDV i. V. m. § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB (50.000 €) bestätigt; Straftat § 6 Abs. 1 LMIDV i. V. m. § 59 Abs. 1 Nr. 21 Buchst. a LFGB (Freiheitsstrafe bis zu einem Jahr oder Geldstrafe) betrifft nach seiner Einordnung irreführende bzw. täuschende Angaben – auf Verlangen als „einzelne Verstöße (Täuschung) sind Straftaten“ präzisiert. Am 23.10.2026 gelesen: § 59 Abs. 1 LFGB (Strafrahmen, gesetze-im-internet.de), § 6 Abs. 1 LMIDV (verweist auf § 5 Abs. 1 Nr. 1 Buchst. b – Bezeichnung nach Art. 9 Abs. 1 Buchst. a i. V. m. Anhang VI Teil A Nr. 2 LMIV –, Nr. 14 Buchst. b Doppelbuchst. aa und Nr. 18 LMIDV; lexmea, gesetze-im-internet.de)'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Tim Baum (Lebensmittelfachbeauftragter)
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

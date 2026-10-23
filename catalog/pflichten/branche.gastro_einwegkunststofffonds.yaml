@@ -67,6 +67,8 @@ fachlich_zu_pruefen:
 - '§ 7 Abs. 1 Satz 1 am Wortlaut gelesen („Hersteller haben sich vor der Aufnahme ihrer Tätigkeit … beim Umweltbundesamt registrieren zu lassen“, gesetze.legal); § 11 (jährlich bis 15. Mai, Plattform DIVID) und § 12 nicht selbst am Wortlaut gelesen – § 11 nur über IHK Wiesbaden („jährlich bis zum 15. Mai“), § 12 nur über die Inhaltsübersicht („Abgabepflicht“); gesetze-im-internet.de war für §§ 11, 27 am 23.10.2026 nicht erreichbar'
 - 'Jährliche Meldung bis 15. Mai nicht als Termin abgebildet (Hinweis-Eintrag nach Vorgabe, Frist dauerhaft); Auslöser wie branche.gastro_mehrweg (Frage „Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen?“ – unterscheidet nicht nach Kunststoff)'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 1

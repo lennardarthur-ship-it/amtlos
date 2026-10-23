@@ -1,16 +1,17 @@
+# StB Busch Abgleich 23.10.2026: OHG und KG in Erklärung und Auslöser (über Rechtsform „Andere“)
 # Katalog C.28 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.buchfuehrungspflicht
-version: 5
+version: 6
 katalog_nr: C.28
 titel:
   de: Doppelte Buchführung
 kurz:
   de: Nach deinen Angaben kommt die doppelte Buchführung mit Jahresabschluss in Frage – für Kapitalgesellschaften immer, für andere je nach Rechtsform und Größe.
 erklaerung:
-  de: 'Bücher nach den Regeln der doppelten Buchführung führen Kapitalgesellschaften und die GmbH & Co. KG immer. Eingetragene
+  de: 'Bücher nach den Regeln der doppelten Buchführung führen Kapitalgesellschaften, die GmbH & Co. KG sowie OHG und KG immer – sie sind als Handelsgesellschaften Kaufleute (§§ 6, 238 HGB). Eingetragene
     Kaufleute (e. K.) sind befreit, wenn sie an zwei aufeinanderfolgenden Abschlussstichtagen höchstens 800.000 € Umsatz und
-    80.000 € Jahresüberschuss haben (§ 241a HGB). Steuerlich wirst du nach § 141 AO erst buchführungspflichtig, wenn das Finanzamt
+    80.000 € Jahresüberschuss haben (§ 241a HGB); diese Befreiung gilt nur für Einzelkaufleute. Steuerlich wirst du nach § 141 AO erst buchführungspflichtig, wenn das Finanzamt
     es dir mitteilt – das kann es, wenn dein Umsatz über 800.000 € oder dein Gewinn über 80.000 € liegt. Bis dahin ermittelst du
     den Gewinn mit der Einnahmen-Überschuss-Rechnung. Die Buchführung ist eine laufende Pflicht; den Jahresabschluss macht in der
     Regel deine Steuerberatung.'
@@ -30,6 +31,13 @@ ausloeser:
     wert: gmbh_co_kg
     label:
       de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
+  # StB Busch 23.10.2026: OHG und KG sind als Handelsgesellschaften stets buchführungspflichtig (§§ 6, 238 HGB). Die App bietet
+  # sie nicht als eigene Rechtsform an – sie wählen „Andere“; dort erscheint die Pflicht als „kommt in Frage“.
+  - feld: profil.rechtsform
+    op: ==
+    wert: sonstige
+    label:
+      de: Du hast „Andere“ als Rechtsform gewählt – OHG und KG sind als Handelsgesellschaften immer buchführungspflichtig.
   # e.K.: nach HGB buchführungspflichtig, außer die Grenzen des § 241a HGB werden eingehalten (zwei aufeinanderfolgende Jahre;
   # vereinfacht über das Vorjahr, im Gründungsjahr über die Schätzung für das erste Jahr)
   - all:

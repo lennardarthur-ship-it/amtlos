@@ -78,6 +78,8 @@ fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: § 36 Abs. 1, 3 VSBG und Zählweise nach Köpfen bestätigt, Folge UWG-Abmahnung (§ 3a UWG) eingetragen, Auslöser Website (oder Onlineshop/App) statt AGB. Offen: Stichtag 31.12. des Vorjahres ist im Auslöser nicht abgebildet'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 5

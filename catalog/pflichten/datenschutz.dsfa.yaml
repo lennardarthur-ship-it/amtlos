@@ -55,6 +55,8 @@ fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - 'Muss-Liste der DSK als Verweis im Text (Prüfvermerk RA Dr. Weber 22.10.2026); Ortung nicht als Auslöser ergänzt (vom Prüfvermerk nicht verlangt; die DSFA-Pflicht bei Ortung steht in datenschutz.ortung) – als Auslöser vorschlagen; Link zur Muss-Liste nicht geprüft'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 5

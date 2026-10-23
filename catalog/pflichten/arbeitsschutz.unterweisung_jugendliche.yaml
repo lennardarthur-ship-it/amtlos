@@ -63,6 +63,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'Frist je Jugendlichem ab dessen letzter Unterweisung führen (laut Freigabe Sifa 22.10.2026 fachlich gewünscht, Technik) – Amtlos rechnet ab der letzten erfassten Unterweisung im Betrieb, ohne Personen zu unterscheiden; bis dahin Hinweis im Text'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Thomas Koch (Fachkraft für Arbeitssicherheit)
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

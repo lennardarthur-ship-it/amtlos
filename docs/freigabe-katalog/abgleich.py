@@ -132,6 +132,13 @@ for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
             art = f"Geändert seit Ihrer Fassung v{gv} (meist Ihre Anmerkungen). Geänderte Felder unten."
         je[p].append((d, f or ({"version": gv} if gv else None), zeilen, u, art))
 
+import re as _re
+MARKE = json.load(open(os.path.join(ROOT, "packages/marke/marke.json"), encoding="utf-8"))
+def marke(t):
+    """wie im App-Bündel: Katalogtexte sagen „Amtlos“, angezeigt wird der Markenname"""
+    return _re.sub(r"\bAmtlos\b", MARKE["name"], _re.sub(r"\bAmtlos Pro\b", MARKE["proName"], t)) if isinstance(t, str) else t
+
+
 GELB = PatternFill("solid", fgColor="FFF4CC")
 GRAU = PatternFill("solid", fgColor="EDEDED")
 for p, liste in je.items():
@@ -148,7 +155,7 @@ for p, liste in je.items():
         erste = True
         for label, a, n in zeilen or [("–", "", "")]:
             ws.append([d.get("katalog_nr") if erste else "", d["id"] if erste else "", (f"v{f['version']}" if f else "–") if erste else "",
-                       f"v{d['version']}" if erste else "", (art + (" " + notizen[d["id"]] if d["id"] in notizen else "")) if erste else "", label, a, n, "" , ""])
+                       f"v{d['version']}" if erste else "", (art + (" " + notizen[d["id"]] if d["id"] in notizen else "")) if erste else "", label, marke(a), marke(n), "" , ""])
             r = ws.max_row
             if erste:
                 ws.cell(r, 9).fill = GELB; ws.cell(r, 10).fill = GELB

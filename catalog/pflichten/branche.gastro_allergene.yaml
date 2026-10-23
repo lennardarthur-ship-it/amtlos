@@ -1,15 +1,21 @@
+# T. Baum Abgleich 23.10.2026: Erklärung und Stelle nach seinem Vorschlag (letzter Satz mit Produktname wie in allen Katalogtexten)
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gastro_allergene
-version: 4
+version: 5
 katalog_nr: H.1
 titel:
   de: Allergene kennzeichnen
 kurz:
   de: Du informierst deine Gäste über die 14 Hauptallergene in deinen Speisen und Getränken – auch bei loser Ware.
 erklaerung:
-  de: Die Lebensmittelinformationsverordnung verlangt Angaben zu Allergenen. Amtlos führt eine Allergenliste je Gericht und
-    erstellt daraus eine Übersicht zum Aushängen.
+  de: 'Für jedes Lebensmittel, das du lose abgibst – an der Theke, im Restaurant, am Buffet –, informierst du über die 14 Hauptallergene
+    (Art. 44 LMIV, § 4 LMIDV). Schriftlich steht das Wort „Enthält“ davor; bei glutenhaltigem Getreide und Schalenfrüchten nennst
+    du die Art, z. B. Weizen oder Haselnüsse. Die Information muss vor dem Kauf zugänglich sein: auf der Speisekarte, auf einem
+    Schild an der Ware oder in einem Aushang. Mündliche Auskunft genügt nur, wenn eine schriftliche Aufstellung vorliegt, auf die
+    du deutlich hinweist und die Gäste und Lebensmittelüberwachung auf Nachfrage einsehen können. Bei vorverpackter Ware stehen
+    die Allergene hervorgehoben im Zutatenverzeichnis. Amtlos führt eine Allergenliste je Gericht und erstellt daraus eine Übersicht
+    zum Aushängen.'
 rechtsgrundlage:
 - Art. 9 und 44 Verordnung (EU) Nr. 1169/2011
 - LMIDV
@@ -27,7 +33,7 @@ frist:
 wiederholung:
   art: einmalig
 stelle:
-  de: Du selbst
+  de: Du selbst; Kontrolle durch die Lebensmittelüberwachung
 kanal: intern_dokumentieren
 kosten: null
 sanktion:

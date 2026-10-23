@@ -65,6 +65,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - StB Lutz Busch
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

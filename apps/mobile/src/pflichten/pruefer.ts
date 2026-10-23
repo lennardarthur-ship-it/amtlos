@@ -24,7 +24,8 @@ interface Pruefer {
 export const PRUEFER: Record<string, Pruefer> = {
   "RA Dr. Ulrich Weber": {
     wortlaut: "Inhalt geprüft von Rechtsanwalt Dr. Ulrich Weber (Weber & Merz, Reutlingen), Stand {stand}. Die Prüfung betrifft die allgemeinen Inhalte, nicht deinen Einzelfall.",
-    // Prüfvermerk vom 22.10.2026 noch ohne Unterschrift; Pflege und Widerruf „in einer gesonderten Vereinbarung“ (offen, T-160)
+    // Bestätigungsblatt unterschrieben 23.10.2026 (ohne Namensnennung); Name erst mit der gesonderten Vereinbarung zu Pflege
+    // und Widerruf (offen, T-160)
     nennung: false,
   },
   "Thomas Koch (Fachkraft für Arbeitssicherheit)": {
@@ -39,8 +40,9 @@ export const PRUEFER: Record<string, Pruefer> = {
   },
   "StB Lutz Busch": {
     wortlaut: "Fachlich durchgesehen von StB Lutz Busch, Kanzlei Heckler und Busch (Stand {stand}) – ohne Gewähr für den Einzelfall.",
-    // Bestätigung (Teil A, 19 Einträge in der genannten Fassung) unterschrieben Stuttgart 23.10.2026 – Name nur bei diesen,
-    // weil nur sie `freigegeben` mit passender Version sind (docs/freigabe-katalog/freigaben.yaml, E-173)
+    // Bestätigung vom 23.10.2026 (30 Einträge, alle Felder; ersetzt Teil A vom 22.10.) unterschrieben – Name nur bei Einträgen,
+    // die `freigegeben` mit passender Version sind (docs/freigabe-katalog/freigaben.yaml, E-173). Das Blatt verweist auf die
+    // Auftragsvereinbarung – unterschrieben an StB Busch senden (T-161)
     nennung: true,
   },
 };

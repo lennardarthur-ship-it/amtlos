@@ -69,6 +69,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): § 98 Abs. 2a Nr. 2, Abs. 5 AufenthG (30.000 €) nur für die unterlassene Mitteilung bestätigt; für die fehlende Kopie besteht kein eigener Bußgeldtatbestand, Nr. 1 betrifft die Beauftragung nach § 4a Abs. 5 S. 1. Folgentext in dieser Fassung in Ordnung'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 3

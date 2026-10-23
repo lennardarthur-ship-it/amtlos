@@ -76,6 +76,8 @@ fachlich_zu_pruefen:
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: Geltungsbereich (ab 3,5 t, grenzüberschreitend ab 2,5 t seit 1.7.2026), Ausnahmen (Werkverkehr, Art. 3 Buchst. aa), Auslese- und Aufbewahrungsfristen (§ 2a FPersV), Sanktion § 8a FPersG und Hinweis § 8 FPersG/FPersV übernommen; Ausnahmen nicht im Auslöser'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 5

@@ -44,6 +44,8 @@ fachlich_zu_pruefen:
 - Partner noch nicht gewählt (Abschnitt 5, Integration offen)
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: als Hinweis in Ordnung (§§ 95 ff. SGB IV). „Amtlos durch Markennamen ersetzen“: erledigt das Katalog-Bündel (werkzeuge/katalog-buendel.mjs ersetzt „Amtlos“ durch MARKE.name, docs/14-marke.md) – im Katalogtext bleibt „Amtlos“'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 2

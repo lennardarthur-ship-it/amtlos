@@ -62,6 +62,8 @@ fachlich_zu_pruefen:
 - 'Freigabe RA Dr. Weber 22.10.2026: Meldegrenze und Auslöser umgesetzt. Freigabe RA Dr. Weber Runde 2 (23.10.2026): Frist „bis zum siebten Werktag des folgenden Monats“ (§ 71 Abs. 6 AWV) bestätigt, „7. Kalendertag, Abs. 8“ verworfen – in Erklärung und Rechtsgrundlage eingetragen. „Wiederkehrend je Monat mit Zahlung“ NICHT als Termin abgebildet: Es gibt kein Ereignis für eine meldepflichtige Auslandszahlung und keine Fälligkeit „n-ter Werktag des Folgemonats“ (Fristtypen: Tag nach Periodenende, feste Termine, n-letzter Bankarbeitstag); die Frist bleibt „dauerhaft“, der Termin steht nur im Text'
 - 'RA Dr. Weber Runde 3 (23.10.2026), freigegeben: Frist nur im Text genügt (Meldepflicht ereignisbezogen, ohne Erfassung der Zahlung nicht terminierbar); seine Formulierung „bis zum 7. Werktag des Monats, der auf die Zahlung folgt (§ 71 Abs. 6 AWV)“ in die Erklärung übernommen'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 6

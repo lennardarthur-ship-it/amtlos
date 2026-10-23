@@ -1,7 +1,8 @@
+# Sifa Abgleich 23.10.2026: Zuständig ist der Unternehmer, die Elektrofachkraft führt die Prüfung durch
 # Katalog E.54 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.dguv_v3
-version: 4
+version: 5
 katalog_nr: E.54
 titel:
   de: Elektrische Geräte prüfen lassen
@@ -33,7 +34,7 @@ frist:
 wiederholung:
   art: einmalig
 stelle:
-  de: Elektrofachkraft
+  de: Du selbst (Prüfung durch eine Elektrofachkraft oder elektrotechnisch unterwiesene Person unter deren Leitung)
 kanal: partner
 kosten: null
 sanktion:

@@ -57,6 +57,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'Prüfabstand „spätestens alle zwei Jahre“ laut Prüfergebnis Sifa 22.10.2026 bestätigt – die Erledigung gilt in Amtlos weiter nur für das Kalenderjahr (laufend je Jahr); Abstand aus einem Prüfnachweis übernehmen (laut Freigabe Sifa 22.10.2026 fachlich richtig), sobald es eine Vorlage gibt (Technik)'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Thomas Koch (Fachkraft für Arbeitssicherheit)
+  geprueft_am: '2026-10-23'
+  geprueft_version: 3

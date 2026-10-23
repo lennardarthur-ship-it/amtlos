@@ -1,8 +1,9 @@
+# StB Busch Abgleich 23.10.2026: EU-Kleinunternehmerregelung (§ 19a UStG) wörtlich nach seinem Vorschlag
 # StB-Prüfung Heckler und Busch (21.10.2026, Abschnitt 5.2, C-9, Frage 14): OSS-Erklärung als Pflicht mit Frist
 # StB-Durchsicht Busch 22.10.2026 umgesetzt: OSS ist ein Wahlrecht; Kleinunternehmer nicht ausgeschlossen
 schema_version: 1
 id: steuern.oss_erklaerung
-version: 2
+version: 3
 katalog_nr: C.36
 titel:
   de: OSS-Erklärung beim Bundeszentralamt für Steuern abgeben
@@ -18,7 +19,7 @@ erklaerung:
     Teilnahme zeigst du vorher über das BZStOnline-Portal an. Erklärung und Zahlung sind bis zum letzten Tag des Monats
     nach Ablauf des Quartals fällig (§ 18j Abs. 4 UStG); die Frist verschiebt sich nicht auf den nächsten Werktag.
     OSS-Umsätze gehören nicht in die deutsche Umsatzsteuer-Voranmeldung. Auch als Kleinunternehmer: § 19 UStG gilt nur
-    für Umsätze im Inland – Fernverkäufe über 10.000 € sind im Bestimmungsland steuerpflichtig. Ob du über der Schwelle
+    für Umsätze im Inland – Fernverkäufe über 10.000 € sind im Bestimmungsland steuerpflichtig, es sei denn, du nimmst dort die EU-Kleinunternehmerregelung in Anspruch (Unionsumsatz höchstens 100.000 €, Grenze des jeweiligen Landes, Meldeverfahren beim BZSt nach § 19a UStG). Ob du über der Schwelle
     liegst, ergibt sich aus deinen Umsätzen – Amtlos fragt die Höhe nicht ab. Amtlos stellt die Umsätze aus Rechnungen
     mit „OSS“ je Land und Steuersatz zusammen; du übermittelst selbst.
 rechtsgrundlage:

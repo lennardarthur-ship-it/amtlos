@@ -20,7 +20,7 @@
     "url": "https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.biostoffe",
@@ -42,7 +42,7 @@
     "url": "https://www.gesetze-im-internet.de/biostoffv_2013/__14.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.dguv_v3",
@@ -93,7 +93,7 @@
     "url": "https://www.gesetze-im-internet.de/betrsichv_2015/BJNR004910015.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.expositionsverzeichnis",
@@ -121,7 +121,7 @@
     "url": "https://www.haufe.de/id/beitrag/novellierung-der-gefahrstoffverordnung-fokus-krebserz-11-10a-expositionsverzeichnis-auch-fuer-reproduktionstoxische-stoffe-kat-1a-oder-1b-HI16494225.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.gefaehrdungsbeurteilung",
@@ -153,7 +153,7 @@
     "url": "https://www.gesetze-im-internet.de/chemg/__26.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.gefahrstoffe",
@@ -181,7 +181,7 @@
     "url": "https://www.gesetze-im-internet.de/chemg/__26.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.unterweisung_jugendliche",
@@ -204,7 +204,7 @@
     "url": "https://lxgesetze.de/jarbschg/59"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.unterweisung_wiederholen",
@@ -228,7 +228,7 @@
     "url": "https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "branche.beauty_hautschutzplan",
@@ -252,7 +252,7 @@
     "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/BJNR164400010.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "branche.beauty_hygieneplan",
@@ -273,7 +273,7 @@
     "url": "https://www.gesetze-im-internet.de/ifsg/__73.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "branche.gastro_allergene",
@@ -348,7 +348,7 @@
     "url": "https://gesetze.legal/eu/vo_eu_2017_625/138"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "branche.gastro_hygieneschulung",
@@ -380,7 +380,7 @@
     "url": "https://www.dinmedia.de/de/norm/din-10514/381020683"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "branche.gastro_ifsg_belehrung",
@@ -399,7 +399,7 @@
     "url": "https://www.gesetze-im-internet.de/ifsg/__73.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "branche.handwerk_gefaehrdung_gewerk",
@@ -422,7 +422,7 @@
     "url": "https://lxgesetze.de/arbschg/22"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.avv",
@@ -441,7 +441,7 @@
     "url": "https://gesetze.legal/eu/vo_eu_2016_679/83"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.datenpanne_meldung",
@@ -460,7 +460,7 @@
     "url": "https://gesetze.legal/eu/vo_eu_2016_679/33"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.informationspflichten",
@@ -476,7 +476,7 @@
     "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.tom",
@@ -491,7 +491,7 @@
     "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.videoueberwachung",
@@ -516,7 +516,7 @@
     "url": "https://gesetze.legal/eu/vo_eu_2016_679/83"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.vvt",
@@ -531,7 +531,7 @@
     "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "gesellschaft.handelsregister_anmeldung",
@@ -573,7 +573,7 @@
     "url": "https://www.gesetze-im-internet.de/partgg/__5.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "gesellschaft.transparenzregister",
@@ -601,7 +601,7 @@
     "url": "https://gesetze.legal/bund/gwg/56"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "gruendung.gewerbeanzeige",
@@ -617,7 +617,7 @@
     "url": "https://www.gesetze-im-internet.de/gewo/__14.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "ki.kompetenz",
@@ -648,7 +648,7 @@
     "url": "https://www.ihk.de/ihklw/produkte/beratung-und-service/ecommerce-und-internet/digital-omnibus-verordnung-zur-ki-tritt-in-kraft-7142858"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "online.datenschutzerklaerung",
@@ -668,7 +668,7 @@
     "url": "https://gdpr-text.com/es/read/article-83"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "online.impressum",
@@ -683,7 +683,7 @@
     "url": "https://www.gesetze-im-internet.de/ddg/__5.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.arbeitszeit_aufzeichnung",
@@ -707,7 +707,7 @@
     "url": "https://www.gesetze-im-internet.de/arbschg/__25.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.arbeitszeit_milog",
@@ -735,7 +735,7 @@
     "url": "https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.ausweis_hinweis",
@@ -763,7 +763,7 @@
     "url": "https://www.gesetze-im-internet.de/schwarzarbg_2004/__8.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.lohnsteuer_anmeldung",
@@ -782,7 +782,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.mutterschutz_gefaehrdungsbeurteilung",
@@ -801,7 +801,7 @@
     "url": "https://www.gesetze-im-internet.de/muschg_2018/__32.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.nachweisgesetz",
@@ -824,7 +824,7 @@
     "url": "https://www.buzer.de/gesetz/5010/al0-210457.htm"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.sofortmeldung",
@@ -851,7 +851,7 @@
     "url": "https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "personal.sv_anmeldung",
@@ -867,7 +867,7 @@
     "url": "https://www.gesetze-im-internet.de/sgb_4/__28a.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.aufbewahrung",
@@ -908,7 +908,7 @@
     "url": "https://www.gesetze-im-internet.de/stgb/__283.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.buchfuehrungspflicht",
@@ -1020,7 +1020,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.euer",
@@ -1056,7 +1056,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.feststellungserklaerung",
@@ -1093,7 +1093,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.gewst_erklaerung",
@@ -1133,7 +1133,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.gobd_verfahrensdokumentation",
@@ -1166,7 +1166,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__379.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.kassenmeldung",
@@ -1193,7 +1193,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.kassenmeldung_ausserbetriebnahme",
@@ -1220,7 +1220,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.kst_erklaerung",
@@ -1264,7 +1264,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.oss_erklaerung",
@@ -1334,7 +1334,7 @@
     "url": "https://www.gesetze-im-internet.de/ustdv_1980/__34a.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.ust_jahreserklaerung",
@@ -1378,7 +1378,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.ust_voranmeldung",
@@ -1413,7 +1413,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__370.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.zusammenfassende_meldung",
@@ -1432,6 +1432,6 @@
     "url": "https://www.gesetze-im-internet.de/ustg_1980/__26a.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  }
 ]

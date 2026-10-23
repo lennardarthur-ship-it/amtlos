@@ -77,6 +77,9 @@ fachlich_zu_pruefen:
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, freigegeben): Frist „spätestens am ersten Arbeitstag“ fachlich bestätigt (Praxis der Gesundheitsämter); Sanktion § 73 Abs. 1a Nr. 16b, Abs. 2 IfSG'
 - 'RA Dr. Weber Runde 3 (23.10.2026): Höhe 25.000 € (§ 73 Abs. 2 IfSG) bestätigt; Nummer am amtlichen Wortlaut geprüft (gesetze-im-internet.de, 23.10.2026): § 73 Abs. 1a Nr. 16b lautet „entgegen § 34 Absatz 5a Satz 1 oder § 43 Absatz 4 Satz 1 eine Belehrung nicht, nicht richtig, nicht vollständig …“ – „Nr. 16b“ ist richtig und steht bereits im Eintrag, Text unverändert'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Tim Baum (Lebensmittelfachbeauftragter)
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

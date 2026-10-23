@@ -1,7 +1,8 @@
+# RA Dr. Weber Abgleich 23.10.2026: § 26 Nr. 2 ArbSchG und Aufsichtsbehörde ergänzt (beharrliche Wiederholung nach § 26 Nr. 1 betrifft nur § 25 Abs. 1 Nr. 2 Buchst. a – nicht übernommen)
 # Katalog E.56 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.56, Frage 15, bestätigt) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.arbeitsmedizinische_vorsorge
-version: 5
+version: 6
 katalog_nr: E.56
 titel:
   de: Arbeitsmedizinische Vorsorge anbieten
@@ -25,12 +26,12 @@ frist:
 wiederholung:
   art: einmalig
 stelle:
-  de: Betriebsarzt
+  de: 'Betriebsarzt; Aufsicht: Arbeitsschutzbehörde des Landes'
 kanal: partner
 kosten: null
 sanktion:
   text:
-    de: 'Bußgeld bis 5.000 €, wenn du eine Pflichtvorsorge nicht oder nicht rechtzeitig veranlasst, eine Tätigkeit ohne die vorgeschriebene Pflichtvorsorge ausüben lässt, die Vorsorgekartei nicht, nicht richtig oder nicht vollständig führst oder eine Angebotsvorsorge nicht oder nicht rechtzeitig anbietest (§ 10 Abs. 1 ArbMedVV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).'
+    de: 'Bußgeld bis 5.000 €, wenn du eine Pflichtvorsorge nicht oder nicht rechtzeitig veranlasst, eine Tätigkeit ohne die vorgeschriebene Pflichtvorsorge ausüben lässt, die Vorsorgekartei nicht, nicht richtig oder nicht vollständig führst oder eine Angebotsvorsorge nicht oder nicht rechtzeitig anbietest (§ 10 Abs. 1 ArbMedVV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG). Gefährdest du dadurch vorsätzlich Leben oder Gesundheit eines Beschäftigten, ist das eine Straftat (§ 26 Nr. 2 ArbSchG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -54,6 +55,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Fristen je Vorsorgeart nach AMR 2.1 und Bewertung Kosmetik mit Blutkontakt durch einen Betriebsarzt bestätigen lassen (laut Freigabe Sifa 22.10.2026 weiterhin offen; Auslöser für alle Betriebe mit Beschäftigten bestätigt)'
 pruefung:
-  status: entwurf
+  status: in_pruefung
   geprueft_von: null
   geprueft_am: null

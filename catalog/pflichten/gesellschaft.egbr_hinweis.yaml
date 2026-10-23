@@ -59,6 +59,8 @@ fachlich_zu_pruefen:
 - 'Freigabe RA Dr. Weber 22.10.2026: „Rechtsform ‚eGbR‘ im Fragebogen ergänzen“ – umgesetzt als Unterart der GbR, nicht als neue Rechtsform: die Registerfrage (profil.gesellschaft.handelsregister) wird auch der GbR gestellt (Gesellschaftsregister), „eingetragen“ = eGbR. abgeleitet.ist_eingetragene_gesellschaft gilt dann auch für die eGbR (Transparenzregister nur für die eingetragene GbR, § 20 Abs. 1 GwG); die GbR-Auslöser (Istkaufmann, Feststellungserklärung) gelten für GbR und eGbR unverändert; dieser Hinweis entfällt für die eingetragene GbR. Kein Auslöser eines freigegebenen Eintrags geändert'
 - 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): Umsetzung als Registerfrage für die GbR sachgerecht; Rechtsfolgen (Transparenzregister nur eGbR, keine Handelsregisteranmeldung) bestätigt'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 3

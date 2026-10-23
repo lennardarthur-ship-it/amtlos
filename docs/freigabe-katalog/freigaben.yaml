@@ -1022,3 +1022,913 @@
   - stelle
   felder_hinweis: Die Freigabe-Dateien (erzeugen.py) und der Katalogauszug der Prüfmappe zeigten Erklärung und zuständige Stelle nicht; diese
     Felder sind noch zu bestätigen.
+- pruefer: RA Dr. Ulrich Weber
+  umfang: alles
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (2026-10-23-bestaetigung-weber-unterschrieben.jpg)
+  eintraege:
+    arbeitsschutz.arbeitsmedizinische_vorsorge:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.bau_soka:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.beauty_hygieneplan:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.beauty_kosmetikverordnung:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.gastro_einwegkunststofffonds:
+      version: 1
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.gastro_mehrweg:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.gastro_ppwr_radar:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.gastro_preisverzeichnis:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.gesundheit_erlaubnisse:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.handwerk_gewaehrleistung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.immo_gwg:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.immo_weiterbildung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.it_haftung:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.it_scheinselbststaendigkeit:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.jugendschutz_abgabe:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.jugendschutz_aushang:
+      version: 1
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.mobiler_verkauf_standplatz:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.oeffentliche_wiedergabe:
+      version: 1
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.personenbefoerderung_genehmigung:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.preisverzeichnis_dienstleistung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.transport_erlaubnis:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.transport_lenkzeiten:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.transport_lenkzeiten_national:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.widerruf_ausserhalb_geschaeftsraeume:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.widerruf_fernabsatz:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.avv:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.beschaeftigtendaten:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.betroffenenanfrage:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.datenpanne_benachrichtigung:
+      version: 1
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.datenpanne_meldung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.dsb:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.dsb_streichung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.dsfa:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.informationspflichten:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.loeschkonzept:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.ortung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.tom:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.videoueberwachung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    datenschutz.vvt:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.awv_meldung:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.egbr_hinweis:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.foerderprogramme:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.gesellschafterliste_aktualisieren:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.gf_pflichten_haftung:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.gf_sozialversicherungsstatus:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.handelsregister_anmeldung:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.insolvenzantragspflicht:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.investitionspruefung_hinweis:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.istkaufmann_pruefen:
+      version: 1
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.jahresabschluss:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.mitarbeiterbeteiligung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.offenlegung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.offenlegung_abweichendes_gj:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.partg_mbb_haftpflicht:
+      version: 1
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.stammkapital_einzahlen:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.transparenzregister:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.ug_ruecklage:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.berufsgenossenschaft:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.elster_konto:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.erlaubnis_pruefen:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.gewerbeanzeige:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.gewo38_zuverlaessigkeit:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.gruendungsbeschleunigung_radar:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.gruendungszuschuss:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.handwerk_verzeichnis:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.handwerksrolle:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.ihk_hwk_mitgliedschaft:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.krankenversicherung:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.reisegewerbekarte:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.rentenversicherungspflicht:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.rundfunkbeitrag:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.statusfeststellung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.taetigkeit_einordnen:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    gruendung.vermittlerregister:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    it_sicherheit.nis2_meldepflichten:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    it_sicherheit.nis2_pruefen:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    it_sicherheit.nis2_registrierung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    ki.hochrisiko:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    ki.kompetenz:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    ki.transparenz:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.barrierefreiheit:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.button_loesung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.cookie_einwilligung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.dac7:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.datenschutzerklaerung:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.impressum:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.kuendigungsbutton:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.marktplatz_angaben:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.os_link:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.preisangaben:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.vsbg_hinweis:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.vsbg_streitfall:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.widerrufsbelehrung:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    online.widerrufsbutton:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.anmeldezeitraum_angeben:
+      version: 1
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.arbeitszeit_aufzeichnung:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.arbeitszeit_milog:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.arbeitszeit_neuregelung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.aufenthaltstitel:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.aufenthaltstitel_laufend:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.ausbildungsverguetung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.aushangpflichtige_gesetze:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.ausweis_hinweis:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.azubi_ausbildungsnachweis:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.azubi_eintragung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.beitragsnachweis:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.betriebsnummer:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.bewacherregister:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.entgelttransparenz_bericht:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.fuehrerscheinkontrolle:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.hinweisgeber_meldestelle:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.jugend_erstuntersuchung:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.jugend_nachuntersuchung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.jugendarbeitsschutz:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.lohnabrechnung:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.lohnnachweis_bg:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.lohnsteuer_anmeldung:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.mindestlohn:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.minijob_grenze:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.mutterschutz_gefaehrdungsbeurteilung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.nachtarbeit:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.nachunternehmerhaftung:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.nachweisgesetz:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.schwangerschaft_mitteilung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.schwerbehinderte_anzeige:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.sofortmeldung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.statusfeststellung_auftraggeber:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.sv_abmeldung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.sv_anmeldung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.sv_beitraege:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.sv_jahresmeldung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    personal.umlagen_eau:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.bargeldobergrenze_radar:
+      version: 1
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.barrierefreiheit:
+      version: 5
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.batterien:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.elektrogeraete:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.geldwaesche_gueterhaendler:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.geraetebatterien_ruecknahme:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.gpsr:
+      version: 8
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.gpsr_fernabsatz:
+      version: 1
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.gpsr_hersteller:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.starterbatterien_ruecknahme:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    produkte.verpackung:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    umwelt.altoel_ruecknahme:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    umwelt.gefaehrliche_abfaelle:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    umwelt.gewerbeabfall:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    umwelt.klima_sachkunde:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    umwelt.oelabscheider:
+      version: 2
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+- pruefer: RA Dr. Ulrich Weber
+  umfang: sanktion
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (2026-10-23-bestaetigung-weber-unterschrieben.jpg)
+  eintraege:
+    branche.gastro_haccp:
+      version: 7
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.gastro_ifsg_belehrung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.gastro_ifsg_bescheinigung:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.gastro_ifsg_folgebelehrung:
+      version: 3
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.gastro_kennzeichnung_vorverpackt:
+      version: 4
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+    branche.gastro_lebensmittelregistrierung:
+      version: 6
+      quelle: 2026-10-23-abgleich-weber.xlsx
+      stand: '2026-10-23'
+- pruefer: StB Lutz Busch
+  umfang: alles
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (2026-10-23-bestaetigung-busch-unterschrieben.jpg)
+  eintraege:
+    gruendung.fragebogen_steuerliche_erfassung:
+      version: 5
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    gruendung.ust_idnr:
+      version: 2
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.aufbewahrung:
+      version: 4
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.bauabzugsteuer_freistellung:
+      version: 4
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.e_rechnung_empfang:
+      version: 4
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.e_rechnung_versand_2027:
+      version: 3
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.e_rechnung_versand_2028:
+      version: 3
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.est_erklaerung:
+      version: 4
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.euer:
+      version: 5
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.feststellungserklaerung:
+      version: 3
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.gewst_erklaerung:
+      version: 4
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.gobd_verfahrensdokumentation:
+      version: 2
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.kasse_tse_belegausgabe:
+      version: 4
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.kassenmeldung:
+      version: 6
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.kassenmeldung_ausserbetriebnahme:
+      version: 5
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.kleinunternehmer_grenze_offene_rechnungen:
+      version: 1
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.kleinunternehmer_grenze_ueberschritten:
+      version: 7
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.kleinunternehmer_naechstes_jahr:
+      version: 6
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.kleinunternehmer_warnung_80:
+      version: 6
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.kleinunternehmer_warnung_95:
+      version: 6
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.kleinunternehmerregelung:
+      version: 3
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.kst_erklaerung:
+      version: 4
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.rechnungen_pflichtangaben:
+      version: 5
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.ust_jahreserklaerung:
+      version: 3
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.ust_sondervorauszahlung:
+      version: 5
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.ust_va_neugruender_radar:
+      version: 3
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.ust_voranmeldung:
+      version: 6
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.vorauszahlung_est_kst:
+      version: 3
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.vorauszahlung_gewst:
+      version: 3
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+    steuern.zusammenfassende_meldung:
+      version: 7
+      quelle: 2026-10-23-abgleich-busch.xlsx
+      stand: '2026-10-23'
+- pruefer: Thomas Koch (Fachkraft für Arbeitssicherheit)
+  umfang: alles
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (2026-10-23-bestaetigung-koch-unterschrieben.jpg)
+  eintraege:
+    arbeitsschutz.arbeitsmittel_pruefen:
+      version: 5
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.betriebsanweisung_arbeitsmittel:
+      version: 1
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.biostoffe:
+      version: 2
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.brandschutzhelfer:
+      version: 3
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.erste_hilfe:
+      version: 3
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.erste_hilfe_organisation:
+      version: 1
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.erstunterweisung:
+      version: 5
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.expositionsverzeichnis:
+      version: 2
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.fahrer_unterweisung:
+      version: 3
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.fahrzeuge_pruefen:
+      version: 4
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.fasi_betriebsarzt:
+      version: 4
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.feuerloescher:
+      version: 3
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.fremdfirmen_abstimmung:
+      version: 2
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.gefaehrdungsbeurteilung:
+      version: 8
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.gefahrstoffe:
+      version: 3
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.laerm:
+      version: 2
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.sicherheitsbeauftragte:
+      version: 4
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.unfallanzeige:
+      version: 4
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.unterweisung_jugendliche:
+      version: 4
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.unterweisung_wiederholen:
+      version: 5
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.verbandbuch:
+      version: 2
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    branche.bau_baustellenverordnung:
+      version: 3
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    branche.beauty_hautschutzplan:
+      version: 3
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+    branche.handwerk_gefaehrdung_gewerk:
+      version: 5
+      quelle: 2026-10-23-abgleich-koch.xlsx
+      stand: '2026-10-23'
+- pruefer: Tim Baum (Lebensmittelfachbeauftragter)
+  umfang: ohne_sanktion
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (2026-10-23-bestaetigung-baum-unterschrieben.jpg)
+  eintraege:
+    branche.gastro_acrylamid:
+      version: 3
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_haccp:
+      version: 7
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_hygieneschulung:
+      version: 4
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_ifsg_belehrung:
+      version: 4
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_ifsg_bescheinigung:
+      version: 4
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_ifsg_bescheinigung_selbst:
+      version: 2
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_ifsg_folgebelehrung:
+      version: 3
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_kennzeichnung_vorverpackt:
+      version: 4
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_lebensmittelregistrierung:
+      version: 6
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_rueckverfolgbarkeit:
+      version: 3
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_trinkwasser_mobil:
+      version: 4
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_zusatzstoffe:
+      version: 4
+      quelle: 2026-10-23-abgleich-baum.xlsx
+      stand: '2026-10-23'

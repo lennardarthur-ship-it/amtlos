@@ -1,7 +1,8 @@
+# RA Dr. Weber Abgleich 23.10.2026: Folgen wörtlich nach seinem Vorschlag, Schwere hoch bleibt
 # R11 (Nutzertest Gründerin Foodtruck, K-062): Bescheinigung nach § 43 Abs. 1 IfSG auch für die Inhaberin bzw. den Inhaber – als Gründungsschritt vor dem Start
 schema_version: 1
 id: branche.gastro_ifsg_bescheinigung_selbst
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Eigene Bescheinigung des Gesundheitsamts vor dem Start (§ 43 IfSG)
@@ -51,7 +52,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Bußgeld bis 25.000 € (§ 73 IfSG).
+    de: 'Kein eigenes Bußgeld. Das Gesundheitsamt kann die Tätigkeit untersagen und Maßnahmen anordnen (§ 16 Abs. 1, § 31 IfSG); beschäftigst du Personen ohne Bescheinigung, gilt § 73 Abs. 1a Nr. 20 IfSG (bis 25.000 €).'
   schwere: hoch
 automatisierung: hinweis
 erledigung:

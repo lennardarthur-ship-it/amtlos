@@ -1,14 +1,15 @@
+# RA Dr. Weber Abgleich 23.10.2026: Einzahlung nach § 7 Abs. 2 GmbHG wörtlich nach seinem Vorschlag
 # Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gesellschaftsvertrag_notar
-version: 4
+version: 5
 katalog_nr: B.14
 titel:
   de: Gesellschaftsvertrag beim Notar beurkunden
 kurz:
   de: Für eine UG oder GmbH lässt du den Gesellschaftsvertrag notariell beurkunden – auch online möglich.
 erklaerung:
-  de: 'Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet (§ 2 GmbHG). Die Beurkundung ist auch online per Videokommunikation beim Notar möglich, auch mit dem Musterprotokoll (§ 2 Abs. 3 GmbHG). Für die GmbH beträgt das Stammkapital mindestens 25.000 €, davon ist mindestens die Hälfte einzuzahlen. Eine UG kann ab 1 € gegründet werden.'
+  de: 'Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet (§ 2 GmbHG). Die Beurkundung ist auch online per Videokommunikation beim Notar möglich, auch mit dem Musterprotokoll (§ 2 Abs. 3 GmbHG). Für die GmbH beträgt das Stammkapital mindestens 25.000 €; vor der Anmeldung ist auf jeden Geschäftsanteil ein Viertel einzuzahlen, insgesamt mindestens 12.500 € (§ 7 Abs. 2 GmbHG). Eine UG kann ab 1 € gegründet werden.'
 begriffe:
 - begriff:
     de: Stammkapital

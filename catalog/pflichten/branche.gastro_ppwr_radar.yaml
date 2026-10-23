@@ -75,6 +75,8 @@ fachlich_zu_pruefen:
 - 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 66 Abs. 2 Nr. 29 (Art. 32 Abs. 1), Nr. 30 (Art. 32 Abs. 2 UAbs. 1, Art. 33 Abs. 3), Nr. 31 (Art. 32 Abs. 2 UAbs. 2, Art. 33 Abs. 2), Nr. 32 (Art. 33 Abs. 1) und Abs. 3 VerpackDG gelesen; ab wann Abs. 2 gilt, steht nicht im Paragraphen (laut IHK Karlsruhe ab 12.2.2027); EWKFondsG (Gastronom als Hersteller?) offen – fachlich zu bestätigen'
 - 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): als Radar freigegeben, Termine nach Art. 32/33 VO (EU) 2025/40 über Sekundärquelle belegt. Auflage: Vor der Aktivierung des Termins 12.2.2027 das Amtsblatt (ABl. L 2025/40, deutsche PDF-Fassung) gegenlesen; bis dahin Sanktionstext ohne Beträge – Beträge (bis 200.000 € bzw. 10.000 €, § 66 Abs. 3 VerpackDG) entfernt'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

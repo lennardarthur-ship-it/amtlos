@@ -63,6 +63,8 @@ fachlich_zu_pruefen:
 - 'Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen'
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: Produktliste § 1 Abs. 2 BFSG als Auswahlfrage profil.produkte.bfsg_produkte (Nr. 1 bis 5) umgesetzt; Auslöser Elektrogeräte und mindestens ein Produkt der Liste, ohne Angabe „unklar“; Sanktion bestätigt. Freigabe RA Dr. Weber Runde 2 (23.10.2026): Auswahlfrage und Beispiele bestätigt (Notebook, Tablet, Smartphone: Nr. 1 Hardwaresysteme; Router: Nr. 3; Smart-TV: Nr. 4; E-Book-Reader: Nr. 5) – Antworttexte der Frage entsprechend geordnet (Smartphones bei Nr. 1)'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 5

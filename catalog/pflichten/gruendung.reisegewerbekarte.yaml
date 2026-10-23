@@ -60,6 +60,8 @@ quellen:
   url: https://lxgesetze.de/gewo/145
   abgerufen: '2026-10-22'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

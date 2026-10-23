@@ -1,0 +1,14 @@
+{
+  "arbeitsschutz.arbeitsmedizinische_vorsorge": "Ihre beiden Ergänzungen sind eingetragen. Eine Abweichung: Die beharrliche Wiederholung (§ 26 Nr. 1 ArbSchG) erfasst nur Verstöße nach § 25 Abs. 1 Nr. 2 Buchst. a (vollziehbare Anordnung), nicht die ArbMedVV-Verstöße nach Nr. 1. Wir haben deshalb nur die vorsätzliche Gefährdung (§ 26 Nr. 2) aufgenommen.",
+  "gesellschaft.gesellschaftsvertrag_notar": "Ihr Satz zu § 7 Abs. 2 GmbHG ist wörtlich übernommen.",
+  "branche.gastro_ifsg_bescheinigung_selbst": "Folgen wörtlich nach Ihrem Vorschlag, Schwere „hoch“.",
+  "branche.gastro_zusatzstoffe": "FRAGE (noch nicht geändert): Am Wortlaut finden wir es anders als in Ihrer Anmerkung. Chinin: § 7 Abs. 2 AromenDV erfasst nur § 5 Abs. 6. Wer entgegen § 5 Abs. 1 Satz 1 ohne „chininhaltig“ abgibt, macht sich nach § 6 Abs. 2 AromenDV i. V. m. § 59 Abs. 1 Nr. 21 Buchst. a LFGB strafbar (keine Ordnungswidrigkeit). Koffein: § 8 Abs. 3 FrSaftErfrischGetrV (Verweis auf § 6 Abs. 1, § 60 Abs. 2 Nr. 26 Buchst. a LFGB) wurde nach buzer.de durch die Zweite Verordnung zur Änderung der Honigverordnung u. a. vom 25.11.2025 (BGBl. 2025 I Nr. 289) mit Wirkung vom 14.06.2026 gestrichen. Bitte sagen Sie uns, was wir eintragen sollen. Bis dahin bleibt der Text ohne Angabe zu Koffein und Chinin.",
+  "steuern.buchfuehrungspflicht": "Erklärung ergänzt. Zum Auslöser: Die App bietet OHG und KG nicht als eigene Rechtsform an; sie wählen „Andere“. Für „Andere“ erscheint die Pflicht jetzt als „kommt in Frage“ mit dem Hinweis auf OHG und KG.",
+  "steuern.e_bilanz": "Auslöser wie bei der Buchführungspflicht (Rechtsform „Andere“).",
+  "steuern.oss_erklaerung": "Ihr Satz zur EU-Kleinunternehmerregelung ist wörtlich übernommen.",
+  "arbeitsschutz.dguv_v3": "Zuständige Stelle wörtlich nach Ihrem Vorschlag.",
+  "arbeitsschutz.flucht_rettungsplan": "Satz wörtlich nach Ihrem Vorschlag.",
+  "branche.gastro_schankanlage_fluessiggas": "Auf BetrSichV und DGUV Regel 110-010 umgestellt, „Sachkundiger nach DGUV Vorschrift 79“ gestrichen; der Hinweis zur BG bleibt.",
+  "branche.gastro_allergene": "Erklärung und Zuständige Stelle nach Ihrem Vorschlag.",
+  "branche.gastro_kontaktmaterialien": "Satz wörtlich nach Ihrem Vorschlag."
+}

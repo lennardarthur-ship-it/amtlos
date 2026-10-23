@@ -72,6 +72,8 @@ fachlich_zu_pruefen:
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: Frist mit Ereignis „erstes Inverkehrbringen“ – umgesetzt als relative Frist (vor Beginn) zur neuen Angabe profil.produkte.verpackung_ab („Ab wann bringst du zum ersten Mal verpackte Waren in Verkehr?“, nur bei verpackter Ware, ausdrücklich nur für Betriebe, die noch nicht begonnen haben); ohne Datum kein Termin – Bestandsbetriebe bekommen keine überfällige Frist; Sanktionen plausibel'
 - 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): VerpackDG belegt, Frist mit Ereignis umgesetzt – freigegeben; Schwere „hoch“ bleibt'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 6

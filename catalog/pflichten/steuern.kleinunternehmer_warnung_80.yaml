@@ -97,6 +97,8 @@ fachlich_zu_pruefen:
 - 'StB Busch 22.10.2026, Runde 2 (freigegeben, v5): vorsichtige Zählung für eine Warnung vertretbar – offene Rechnungen ab Rechnungsdatum (Ersatzregel) und Sachentnahmen (§ 3 Abs. 1b UStG) bestätigt. Umgesetzt (v6) nach seiner Empfehlung: Text zu steuerfreien Umsätzen und Anlagenverkäufen; steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App jetzt heraus. Zu prüfen: nur der neue Textteil (Versionssprung hebt die Freigabe in der App auf). Server: kennt keine Zahlungseingänge und zählt alle Rechnungen nach Rechnungsdatum (wie die Ersatzregel)'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - StB Lutz Busch
+  geprueft_am: '2026-10-23'
+  geprueft_version: 6

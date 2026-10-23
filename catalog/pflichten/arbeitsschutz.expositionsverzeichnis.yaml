@@ -69,6 +69,8 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen: []
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Thomas Koch (Fachkraft für Arbeitssicherheit)
+  geprueft_am: '2026-10-23'
+  geprueft_version: 2

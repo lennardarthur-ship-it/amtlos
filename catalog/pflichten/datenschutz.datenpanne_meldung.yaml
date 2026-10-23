@@ -59,6 +59,8 @@ fachlich_zu_pruefen:
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: Benachrichtigung der Betroffenen bei hohem Risiko (Art. 34 DSGVO) als eigene Pflicht – neuer Eintrag datenschutz.datenpanne_benachrichtigung'
 - 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): P2D als konservative Abbildung der 72 Stunden vertretbar; Text nach Art. 33 Abs. 1 richtig'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

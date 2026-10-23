@@ -1,7 +1,8 @@
+# T. Baum Abgleich 23.10.2026: Konformitätserklärung nur bei EU-Einzelvorschriften, wörtlich nach seinem Vorschlag
 # Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (b), Frage 15): Materialien mit Lebensmittelkontakt – Konformitätserklärungen
 schema_version: 1
 id: branche.gastro_kontaktmaterialien
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Konformitätserklärungen für Verpackungen und Behälter ablegen
@@ -11,8 +12,9 @@ erklaerung:
   de: >-
     Materialien und Gegenstände, die mit Lebensmitteln in Berührung kommen – zum Beispiel Verpackungen, To-go-Becher,
     Frischhaltedosen oder Kunststoffbehälter –, müssen dafür geeignet sein (Verordnung (EG) Nr. 1935/2004). Für Kunststoff
-    gelten zusätzlich die Vorgaben der Verordnung (EU) Nr. 10/2011. Dein Lieferant gibt dir dazu eine schriftliche
-    Konformitätserklärung (Art. 16 VO (EG) Nr. 1935/2004, Art. 15 VO (EU) Nr. 10/2011). Fordere sie vom Lieferanten an
+    gelten zusätzlich die Vorgaben der Verordnung (EU) Nr. 10/2011. Für Kunststoff und andere Materialien, für die es
+    EU-Einzelvorschriften gibt, gibt dir dein Lieferant eine schriftliche Konformitätserklärung (Art. 16 VO (EG) Nr. 1935/2004,
+    Art. 15 VO (EU) Nr. 10/2011). Für Papier und Karton ist sie nicht vorgeschrieben, viele Lieferanten stellen sie aber aus. Fordere sie vom Lieferanten an
     und lege sie ab – die Lebensmittelüberwachung fragt bei Kontrollen danach.
 rechtsgrundlage:
 - Verordnung (EG) Nr. 1935/2004
