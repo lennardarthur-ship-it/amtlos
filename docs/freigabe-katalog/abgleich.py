@@ -110,7 +110,7 @@ for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
         if gueltig(pfad, d, f, u):
             # alles andere ist freigegeben – nur Erklärung und Stelle standen nicht in der Freigabe-Datei
             zeilen = [(lab, "(stand nicht in Ihrer Datei)", text(d.get(k), k)) for k, lab in FELDER if k in ("erklaerung", "stelle") and d.get(k)]
-            je[p].append((d, f, zeilen, u))
+            je[p].append((d, f, zeilen, u, f"Inhalt von Ihnen freigegeben (v{f['version']}). Bitte nur Erklärung und Zuständige Stelle bestätigen."))
             continue
         gv = f["version"] if f else GESEHEN.get((p, u), {}).get(d["id"])
         alt = fassung(pfad, gv) if gv else None
@@ -124,7 +124,13 @@ for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
             alt_t = text(alt.get(k), k) if alt else None
             if alt is None or alt_t != neu_t:
                 zeilen.append((label, alt_t if alt is not None else "(neu für Sie)", neu_t))
-        je[p].append((d, f or ({"version": gv} if gv else None), zeilen, u))
+        if not gv:
+            art = "Neu für Sie – bitte ganz prüfen."
+        elif gv == d["version"]:
+            art = "Gesehen, aber noch nicht freigegeben – bitte entscheiden."
+        else:
+            art = f"Geändert seit Ihrer Fassung v{gv} (meist Ihre Anmerkungen). Geänderte Felder unten."
+        je[p].append((d, f or ({"version": gv} if gv else None), zeilen, u, art))
 
 GELB = PatternFill("solid", fgColor="FFF4CC")
 GRAU = PatternFill("solid", fgColor="EDEDED")
@@ -138,11 +144,11 @@ for p, liste in je.items():
     ws.append(kopf)
     for c in ws[1]:
         c.font = Font(bold=True); c.fill = GRAU; c.alignment = Alignment(wrap_text=True, vertical="top")
-    for d, f, zeilen, u in liste:
+    for d, f, zeilen, u, art in liste:
         erste = True
         for label, a, n in zeilen or [("–", "", "")]:
             ws.append([d.get("katalog_nr") if erste else "", d["id"] if erste else "", (f"v{f['version']}" if f else "–") if erste else "",
-                       f"v{d['version']}" if erste else "", notizen.get(d["id"], "") if erste else "", label, a, n, "" , ""])
+                       f"v{d['version']}" if erste else "", (art + (" " + notizen[d["id"]] if d["id"] in notizen else "")) if erste else "", label, a, n, "" , ""])
             r = ws.max_row
             if erste:
                 ws.cell(r, 9).fill = GELB; ws.cell(r, 10).fill = GELB

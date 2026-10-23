@@ -4,6 +4,10 @@ Nennung, Unterschriftszeile. Die Einträge kommen aus dem Katalog (`pruefung.gep
 
     python3 docs/freigabe-katalog/bestaetigung.py <ziel.pdf> "<Prüfer im Katalog>" "<Name, Funktion>" "<Stand TT.MM.JJJJ>" \
         "<Nennung: Text>" [--zusatz "<weiterer Satz>"] [--auch id1,id2]   # --auch: Einträge, die nach Durchsicht dazukommen
+        [--bereich] [--ids id1,id2] [--text "<Bestätigungstext, {n} = Anzahl>"] [--titel "<Überschrift>"] [--ohne-unterschrift]
+
+--bereich: alle Einträge des Prüfbereichs (wie anwenden.py) in der aktuellen Version, ohne E.56 – für die Bestätigung
+zusammen mit der Abgleich-Datei („ausgenommen die dort mit ‚ändern‘ markierten“). --ids: genau diese Einträge.
 
 Erzeugt eine HTML-Seite und druckt sie mit Chromium (Playwright) als PDF auf eine A4-Seite.
 """
@@ -19,23 +23,49 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 args = [a for a in sys.argv[1:]]
 zusatz = ""
 auch = []
+opt = {}
+for k in ("--ids", "--text", "--titel"):
+    if k in args:
+        i = args.index(k); opt[k] = args[i + 1]; del args[i:i + 2]
+bereich = "--bereich" in args
+ohne_sig = "--ohne-unterschrift" in args
+args = [a for a in args if a not in ("--bereich", "--ohne-unterschrift")]
 if "--zusatz" in args:
     i = args.index("--zusatz"); zusatz = args[i + 1]; del args[i:i + 2]
 if "--auch" in args:
     i = args.index("--auch"); auch = [x for x in args[i + 1].split(",") if x]; del args[i:i + 2]
 ziel, pruefer, name, stand, nennung = args[:5]
 
+HIER = os.path.dirname(os.path.abspath(__file__))
+_src = open(os.path.join(HIER, "anwenden.py"), encoding="utf-8").read().split("abweichung, uebersicht")[0]
+_g = {"__file__": os.path.join(HIER, "anwenden.py")}
+exec(compile(_src, "anwenden.py", "exec"), _g)
+ids = set(opt["--ids"].split(",")) if "--ids" in opt else None
 zeilen = []
 for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
     d = yaml.safe_load(open(pfad, encoding="utf-8"))
     pr = d.get("pruefung") or {}
-    if (pr.get("status") == "freigegeben" and pruefer in (pr.get("geprueft_von") or [])) or d["id"] in auch:
+    if ids is not None:
+        treffer = d["id"] in ids
+    elif bereich:
+        treffer = pruefer in [p for p, _ in _g["BENOETIGT"][_g["gebiet"](d)]] and d["id"] != "arbeitsschutz.arbeitsmedizinische_vorsorge"
+    else:
+        treffer = (pr.get("status") == "freigegeben" and pruefer in (pr.get("geprueft_von") or [])) or d["id"] in auch
+    if treffer:
         zeilen.append((str(d.get("katalog_nr", "")), d["id"], d["version"], d["titel"]["de"]))
 zeilen.sort(key=lambda z: [int(x) if x.isdigit() else x for x in z[0].replace(".", " ").split()])
 
 n = len(zeilen)
 groesse = "6.4pt" if n > 110 else "7.2pt" if n > 60 else "8.5pt"
 spalten = 3 if n > 40 else 2
+STANDARD = ("Ich habe die unten aufgeführten {n} Einträge des Pflichtenkatalogs in der jeweils genannten Fassung (Version) fachlich geprüft. "
+            "Sie sind nach meiner Prüfung zum genannten Stand in Rechtsgrundlage, Auslöser, Frist und Folgen zutreffend; meine Anmerkungen "
+            "aus den Freigabe-Dateien sind umgesetzt. Die Prüfung betrifft die allgemeinen Katalogtexte, nicht ihre Anwendung auf einen "
+            "Einzelfall; spätere Rechtsänderungen sind nicht erfasst. Wird ein Eintrag inhaltlich geändert (neue Version), gilt diese "
+            "Bestätigung für ihn nicht mehr, bis er erneut geprüft ist.")
+haupttext = html.escape(opt.get("--text", STANDARD).replace("{n}", str(n)))
+titel = html.escape(opt.get("--titel", "Bestätigung der fachlichen Prüfung – Pflichtenkatalog Betriebsklar"))
+sig = "" if ohne_sig else f'<div class="sig"><div>Ort, Datum</div><div>Unterschrift – {html.escape(name)}</div></div>'
 eintraege = "".join(f"<li><b>{html.escape(nr)}</b> {html.escape(i)} <i>v{v}</i></li>" for nr, i, v, _ in zeilen)
 seite = f"""<!doctype html><html lang="de"><head><meta charset="utf-8"><style>
 @page {{ size: A4; margin: 14mm 14mm 12mm; }}
@@ -46,17 +76,13 @@ li {{ break-inside: avoid; }} i {{ color: #555; }}
 .box {{ border: 0.4pt solid #888; padding: 2.5mm 3mm; margin-top: 3mm; }}
 .sig {{ display: flex; gap: 10mm; margin-top: 9mm; }} .sig div {{ flex: 1; border-top: 0.6pt solid #111; padding-top: 1mm; font-size: 8.5pt; }}
 </style></head><body>
-<h1>Bestätigung der fachlichen Prüfung – Pflichtenkatalog Betriebsklar</h1>
+<h1>{titel}</h1>
 <p>Anbieter: Lang Ventures UG (haftungsbeschränkt) i. G., Gomaringer Str. 33, 72770 Reutlingen · App „Betriebsklar“</p>
 <p><b>{html.escape(name)}</b> – Stand der Prüfung: {html.escape(stand)}</p>
-<p>Ich habe die unten aufgeführten {n} Einträge des Pflichtenkatalogs in der jeweils genannten Fassung (Version) fachlich geprüft.
-Sie sind nach meiner Prüfung zum genannten Stand in Rechtsgrundlage, Auslöser, Frist und Folgen zutreffend; meine Anmerkungen
-aus den Freigabe-Dateien sind umgesetzt. Die Prüfung betrifft die allgemeinen Katalogtexte, nicht ihre Anwendung auf einen
-Einzelfall; spätere Rechtsänderungen sind nicht erfasst. Wird ein Eintrag inhaltlich geändert (neue Version), gilt diese
-Bestätigung für ihn nicht mehr, bis er erneut geprüft ist. {html.escape(zusatz)}</p>
+<p>{haupttext} {html.escape(zusatz)}</p>
 <ul>{eintraege}</ul>
 <div class="box"><b>Anzeige in der App:</b> {html.escape(nennung)}</div>
-<div class="sig"><div>Ort, Datum</div><div>Unterschrift – {html.escape(name)}</div></div>
+{sig}
 </body></html>"""
 tmp = ziel.replace(".pdf", ".html")
 open(tmp, "w", encoding="utf-8").write(seite)
