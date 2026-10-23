@@ -8,6 +8,8 @@
 
 1.1 Diese Bedingungen gelten für die Nutzung der App „Betriebsklar“ (im Folgenden „App“) von Lang Ventures UG (haftungsbeschränkt) i. G., Gomaringer Str. 33, 72770 Reutlingen, vertreten durch Lennard Lang (Geschäftsführer), Registergericht und Registernummer: [nach Eintragung], USt-IdNr.: [nach Eintragung], E-Mail: hallo@betriebsklar.de (im Folgenden „wir“).
 
+> RA Dr. Weber (Vorlagen-Freigabe 23.10.2026, Nr. 18, ändern): Die Platzhalter für Registergericht/Registernummer und USt-IdNr. bleiben bis zur Eintragung; solange die UG „i. G.“ ist, steht das hier in 1.1 (ist der Fall). Nach der Eintragung: `ANBIETER` in `rechtliches.ts` und diese Ziffer füllen, „i. G.“ streichen, neues Datum „Fassung vom …“ und `NUTZUNGSBEDINGUNGEN.fassung` setzen. Freigabe zur Veröffentlichung erst, wenn Fassungsdatum und Platzhalter erledigt sind.
+
 1.2 Die Bedingungen gelten für Unternehmer (§ 14 BGB) und Verbraucher (§ 13 BGB). Wo Regeln nur für eine Gruppe gelten, ist das gesagt.
 
 1.3 Die Bedingungen schließen wir mit dir ab, nicht Apple. Apple ist für die App und ihren Inhalt nicht verantwortlich.
@@ -122,4 +124,6 @@
 
 12.2 Legst du Sicherungen in iCloud Drive ab, gelten dafür die Bedingungen von Apple für iCloud.
 
-Fassung vom 21.10.2026
+> Fassungsdatum (RA Dr. Weber 23.10.2026): Das bisherige Fassungsdatum (21.10.2026) passte nicht mehr zum geänderten Text (u. a. 6.3, Erstattung über Apple) – gesetzt auf den 23.10.2026, die Fassung, die so veröffentlicht werden soll. Ändert sich der Text vor der Veröffentlichung noch einmal, Datum hier und in `NUTZUNGSBEDINGUNGEN.fassung` erneut anpassen.
+
+Fassung vom 23.10.2026

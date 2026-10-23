@@ -1,8 +1,9 @@
+# RA Dr. Weber Nachprüfung 23.10.2026 (B.16): Mitteilungspflicht entsteht mit der Eintragung, nicht mit dem Antrag (§ 20 Abs. 1 S. 1 GwG) – Eintrag wie bei der GbR erst ab „eingetragen“, für alle Gesellschaften (auch GmbH/UG, OHG, KG, GmbH & Co. KG, PartG)
 # E-176 (23.10.2026): OHG und KG als eigene Rechtsformen – lösen den Eintrag über abgeleitet.ist_eingetragene_gesellschaft aus; im Text genannt
 # Katalog B.16 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.transparenzregister
-version: 6
+version: 7
 katalog_nr: B.16
 titel:
   de: Wirtschaftlich Berechtigte ans Transparenzregister melden
@@ -19,12 +20,19 @@ rechtsgrundlage:
 - § 19 GwG
 - § 20 GwG
 kategorie: gesellschaft
+# Weber 23.10.2026: erst ab Eintragung (bei der GbR steckt das schon im abgeleiteten Fakt); ohne Registerangabe „Angabe fehlt“
 ausloeser:
-  feld: abgeleitet.ist_eingetragene_gesellschaft
-  op: ==
-  wert: true
-  label:
-    de: Deine Gesellschaft wird im Handels- oder Partnerschaftsregister eingetragen.
+  all:
+  - feld: abgeleitet.ist_eingetragene_gesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Deine Gesellschaft wird im Handels- oder Partnerschaftsregister eingetragen.
+  - feld: profil.gesellschaft.handelsregister
+    op: ==
+    wert: eingetragen
+    label:
+      de: Deine Gesellschaft ist im Register eingetragen.
 # R11 (Nutzertest Tischlerei #4): keine Gründungs-Phase – Altgesellschaften (vor 1.8.2021) hatten Nachmeldepflichten (§ 59 Abs. 8 GwG), laut Freigabe Weber 22.10.2026 bis 31.12.2022 abgelaufen (nur historisch); Änderungen laufend
 # Frist „unverzüglich“ (§ 20 Abs. 1 GwG) nur im Text – das Datum der Eintragung bzw. Änderung kennt die App nicht; Rechtsform eGbR im Fragebogen siehe gesellschaft.egbr_hinweis
 frist:
@@ -47,7 +55,7 @@ aktion:
   ziel: portal.transparenzregister
   nachweis_erforderlich: true
 aenderungsnotiz:
-  de: Jetzt auch für OHG und KG, die du im Check als eigene Rechtsform wählen kannst.
+  de: Erscheint jetzt erst, wenn deine Gesellschaft im Register eingetragen ist – vorher besteht die Mitteilungspflicht noch nicht.
 erledigung:
   art: bestaetigen
   bestaetigung:
@@ -72,8 +80,6 @@ quellen:
   url: https://www.ihk.de/bayreuth/hauptnavigation/service/recht/geldwaesche/mitteilungspflicht-transparenzregister-4819528
   abgerufen: '2026-10-23'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 6
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

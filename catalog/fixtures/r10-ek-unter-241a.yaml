@@ -15,6 +15,8 @@ fakten:
   profil.bundesland: BW
 erwartet:
   steuern.buchfuehrungspflicht: gilt_nicht
+  gesellschaft.jahresabschluss_personenhandel: gilt_nicht
+  gesellschaft.geschaeftsbriefe_pflichtangaben: gilt
   steuern.e_bilanz: gilt_nicht
   steuern.euer: gilt
   steuern.est_erklaerung: gilt

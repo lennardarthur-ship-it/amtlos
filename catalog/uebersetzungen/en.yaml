@@ -1841,8 +1841,6 @@ eintraege:
   en: You report payments of more than €50,000 that you receive from or make to non-residents – for example investor money from abroad – to the Bundesbank.
 - de: Zentrale Stelle Verpackungsregister (LUCID)
   en: Central Agency Packaging Register (Zentrale Stelle Verpackungsregister, LUCID)
-- de: Zur Prüfung befähigte Person, z. B. Schankanlagen- oder Gasfachbetrieb
-  en: Person qualified to carry out inspections, e.g. a beverage dispensing system or gas specialist company
 - de: Zusammenfassende Meldung abgeben
   en: Submit the EC sales list
 - de: Zuständige Berufsgenossenschaft (nach Branche)
@@ -2854,14 +2852,6 @@ eintraege:
     während der Arbeitszeit anwesend ist (ASR A2.2 Nr. 7.3).
   en: You appoint enough employees as fire safety assistants and have them trained in using fire extinguishers – usually 5 per cent of employees, in small businesses at least one person who is present during
     working hours (ASR A2.2 No. 7.3).
-- de: Einen Flucht- und Rettungsplan brauchst du, wenn Lage, Ausdehnung und Art der Benutzung der Arbeitsstätte es erfordern (§ 4 Abs. 4 ArbStättV) – etwa bei unübersichtlichen Fluchtwegen, mehreren Geschossen,
-    vielen Kundinnen und Kunden oder erhöhter Brandgefährdung. Ob das so ist, hältst du in der Gefährdungsbeurteilung fest. Der Plan wird an geeigneten Stellen ausgehängt oder ausgelegt; gestaltet wird
-    er nach ASR A2.3 (Grundriss, Fluchtwege, Sammelstelle, Verhalten im Brandfall und bei Unfällen). Nach dem Plan übst du in angemessenen Zeitabständen, wie die Arbeitsstätte geräumt wird – empfohlen ist
-    jährlich (ASR A2.3). Für ein kleines Ladenlokal mit direktem Ausgang ins Freie ist oft kein Plan nötig.
-  en: You need an escape and rescue plan if the location, size and type of use of the workplace require it (§ 4(4) ArbStättV) – for example with confusing escape routes, several floors, many customers or
-    increased fire risk. You record whether this is the case in the risk assessment. The plan is posted or displayed in suitable places; it is designed according to ASR A2.3 (floor plan, escape routes,
-    assembly point, what to do in case of fire and accidents). Following the plan, you practise evacuating the workplace at appropriate intervals – annually is recommended (ASR A2.3). A small shop with
-    a direct exit to the outside often needs no plan.
 - de: Ergibt die Gefährdungsbeurteilung eine Gefährdung durch Tätigkeiten mit krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A oder 1B, führst du ein Verzeichnis
     der betroffenen Beschäftigten mit Art, Dauer, Häufigkeit und Höhe der Exposition (§ 10a Abs. 1 GefStoffV). Typisch sind Hartholzstaub (Eiche, Buche) in der Tischlerei, Dieselmotoremissionen in der Kfz-Werkstatt
     und Quarzstaub oder Asbest auf Baustellen – dort gilt die Pflicht typischerweise; ob sie in deinem Betrieb im Einzelfall entfällt, klärst du in einer Beratung, etwa mit deiner Fachkraft für Arbeitssicherheit.
@@ -2943,10 +2933,6 @@ eintraege:
     35 DGUV Regulation 70). Recording the assignment in writing is not required but recommended as evidence. Instruct them on departure checks, what to do in case of a breakdown and load securing. The load
     must be stowed and secured so that it does not slip, fall over, roll back and forth or fall off even during emergency braking or a sudden evasive manoeuvre (§ 22(1) StVO). The accident prevention regulation
     “Vehicles” of your BG is decisive.
-- de: 'Nach dem berichtigten Prüfbericht Lebensmittelhygiene (22.10.2026): Warnhinweis bei Azofarbstoffen ergänzt, „chininhaltig“ nach der Aromen-Durchführungsverordnung, Koffeinhinweis nur für Erfrischungsgetränke
-    über 150 mg/l mit Gehalt; die Zusatzstoffe gibst du in der Allergenliste mit an.'
-  en: 'After the corrected food hygiene review report (22.10.2026): warning for azo dyes added, “chininhaltig” under the Flavourings Implementing Ordinance (AromenDV), caffeine statement only for soft drinks
-    above 150 mg/l with content; you enter the additives in the allergen list as well.'
 - de: Sobald du mindestens eine Person beschäftigst, sind die Gefährdungen an jedem Arbeitsplatz zu beurteilen, Schutzmaßnahmen festzulegen und das zu dokumentieren. Amtlos erstellt dir dafür eine Vorlage
     passend zu deiner Branche. Überprüfe die Beurteilung bei Änderungen der Arbeitsstätte oder der Tätigkeiten, bei neuen Arbeitsmitteln oder Arbeitsstoffen, nach Unfällen und Beinaheunfällen, bei Berufskrankheiten
     oder Gesundheitsbeschwerden, nach Ergebnissen der arbeitsmedizinischen Vorsorge, bei neuen Vorschriften oder Erkenntnissen und wenn du Jugendliche beschäftigst oder eine Beschäftigte dir ihre Schwangerschaft
@@ -3995,8 +3981,6 @@ eintraege:
   en: No specific fine provision (the offence is not listed in the LMRStV, which for Regulation (EC) No 852/2004 only covers Art. 4 with Annexes I/II). Food control can order the necessary measures (§ 39
     LFGB; Art. 138 Regulation (EU) 2017/625). Hygiene deficiencies under Annex II (e.g. storage, cleaning, waste), on the other hand, are subject to fines – fine of up to €50,000 (§ 2 LMRStV in conjunction
     with § 60(4) No. 2(a), (5) LFGB).
-- de: Bußgeld bis 50.000 € (§ 7 Abs. 2 Nr. 1 LMZDV i. V. m. § 60 Abs. 2 Nr. 26 lit. a, Abs. 5 LFGB).
-  en: Fine of up to €50,000 (§ 7(2) no. 1 LMZDV in conjunction with § 60(2) no. 26 letter a, (5) LFGB).
 - de: Bußgeld bis 25.000 €, wenn du eine Person ohne diese Bescheinigung beschäftigst (§ 73 Abs. 1a Nr. 20, Abs. 2 IfSG).
   en: Fine of up to €25,000 if you employ a person without this certificate (§ 73(1a) no. 20, (2) IfSG).
 - de: 'Wer Speisen in Einwegkunststoffverpackungen oder Getränke in Einwegbechern erst beim Verkauf befüllt, muss sie auch in einer Mehrwegverpackung anbieten – nicht teurer und gut sichtbar mit einem Hinweis
@@ -4037,8 +4021,6 @@ eintraege:
   en: Fine of up to €5,000 if you do not arrange a mandatory check-up (Pflichtvorsorge) or arrange it late, allow an activity without the required mandatory check-up, do not keep the check-up record (Vorsorgekartei) or keep it incorrectly or incompletely, or do not offer an offered check-up (Angebotsvorsorge) or offer it late (§ 10(1) ArbMedVV in conjunction with § 25(1) no. 1, (2) ArbSchG). If you thereby intentionally endanger the life or health of an employee, this is a criminal offence (§ 26 no. 2 ArbSchG).
 - de: Du selbst (Prüfung durch eine Elektrofachkraft oder elektrotechnisch unterwiesene Person unter deren Leitung)
   en: You yourself (inspection by a qualified electrician or an electrotechnically instructed person under their supervision)
-- de: Einen Flucht- und Rettungsplan brauchst du, wenn Lage, Ausdehnung und Art der Benutzung der Arbeitsstätte es erfordern (§ 4 Abs. 4 ArbStättV) – etwa bei unübersichtlichen Fluchtwegen, mehreren Geschossen, vielen Kundinnen und Kunden oder erhöhter Brandgefährdung. Ob das so ist, hältst du in der Gefährdungsbeurteilung fest. Der Plan wird an geeigneten Stellen ausgehängt oder ausgelegt; gestaltet wird er nach ASR A2.3 (Grundriss, Fluchtwege, Sammelstelle, Verhalten im Brandfall und bei Unfällen). Nach dem Plan übst du in angemessenen Zeitabständen, wie die Arbeitsstätte geräumt wird – in regelmäßigen Abständen (ASR A2.3 Nr. 11 Abs. 2); einen festen Rhythmus schreibt die ASR nicht vor, üblich ist etwa einmal im Jahr. Für ein kleines Ladenlokal mit direktem Ausgang ins Freie ist oft kein Plan nötig.
-  en: You need an escape and rescue plan if the location, size and type of use of the workplace require it (§ 4(4) ArbStättV) – for example with confusing escape routes, several floors, many customers or increased fire risk. You record whether this is the case in the risk assessment. The plan is posted or displayed in suitable places; it is designed according to ASR A2.3 (floor plan, escape routes, assembly point, what to do in case of fire and accidents). Following the plan, you practise evacuating the workplace at appropriate intervals – at regular intervals (ASR A2.3 no. 11(2)); the ASR does not prescribe a fixed rhythm, about once a year is common. A small shop with a direct exit to the outside often needs no plan.
 - de: 'Für jedes Lebensmittel, das du lose abgibst – an der Theke, im Restaurant, am Buffet –, informierst du über die 14 Hauptallergene (Art. 44 LMIV, § 4 LMIDV). Schriftlich steht das Wort „Enthält“ davor; bei glutenhaltigem Getreide und Schalenfrüchten nennst du die Art, z. B. Weizen oder Haselnüsse. Die Information muss vor dem Kauf zugänglich sein: auf der Speisekarte, auf einem Schild an der Ware oder in einem Aushang. Mündliche Auskunft genügt nur, wenn eine schriftliche Aufstellung vorliegt, auf die du deutlich hinweist und die Gäste und Lebensmittelüberwachung auf Nachfrage einsehen können. Bei vorverpackter Ware stehen die Allergene hervorgehoben im Zutatenverzeichnis. Amtlos führt eine Allergenliste je Gericht und erstellt daraus eine Übersicht zum Aushängen.'
   en: 'For every food you supply unpackaged – at the counter, in the restaurant, at the buffet – you provide information on the 14 main allergens (Art. 44 LMIV, § 4 LMIDV). In writing, the word “Contains” (“Enthält”) comes first; for cereals containing gluten and nuts you name the type, e.g. wheat or hazelnuts. The information must be accessible before purchase: on the menu, on a sign at the product or in a notice. Oral information is only sufficient if there is a written list that you clearly point out and that guests and food control can see on request. For prepacked food, the allergens are highlighted in the list of ingredients. Amtlos keeps an allergen list per dish and creates an overview to display from it.'
 - de: Kein eigenes Bußgeld. Das Gesundheitsamt kann die Tätigkeit untersagen und Maßnahmen anordnen (§ 16 Abs. 1, § 31 IfSG); beschäftigst du Personen ohne Bescheinigung, gilt § 73 Abs. 1a Nr. 20 IfSG (bis 25.000 €).
@@ -4067,3 +4049,88 @@ eintraege:
   en: You can now choose the OHG and KG as a legal form of their own – they always prepare balance sheets and do not file an Anlage EÜR.
 - de: OHG und KG kannst du jetzt als eigene Rechtsform wählen – sie übermitteln die E-Bilanz immer. Die Rechtsform „Andere“ löst die Pflicht nicht mehr aus.
   en: You can now choose the OHG and KG as a legal form of their own – they always submit the e-balance sheet (E-Bilanz). The legal form “Other” no longer triggers the obligation.
+- de: Auf allen Geschäftsbriefen an einen bestimmten Empfänger, gleich in welcher Form, stehen Pflichtangaben. Als eingetragener Kaufmann sind das deine Firma mit der Bezeichnung „eingetragener Kaufmann“
+    oder „eingetragene Kauffrau“ oder einer Abkürzung wie „e. K.“, der Ort deiner Handelsniederlassung, das Registergericht und die Registernummer (§ 37a Abs. 1, § 19 Abs. 1 Nr. 1 HGB). Bei OHG und KG sind
+    es Firma und Sitz der Gesellschaft, das Registergericht und die Registernummer (§ 125 Abs. 1 Satz 1 HGB, für die KG § 177a Satz 1 HGB). Ist keine natürliche Person persönlich haftender Gesellschafter,
+    wie bei der GmbH & Co. KG, kommen die Firma der persönlich haftenden Gesellschafterin und deren Angaben nach § 35a GmbHG dazu (§ 125 Abs. 1 Satz 2 HGB, § 177a Satz 2 HGB). Bei GmbH und UG sind es Rechtsform
+    und Sitz, Registergericht und Registernummer sowie alle Geschäftsführer mit dem Familiennamen und mindestens einem ausgeschriebenen Vornamen, und, wenn es einen Aufsichtsrat mit Vorsitz gibt, dessen
+    Vorsitzender; machst du Angaben zum Kapital, nennst du das Stammkapital und, wenn nicht alle Geldeinlagen eingezahlt sind, den Gesamtbetrag der ausstehenden Einlagen (§ 35a Abs. 1 GmbHG). Bestellscheine
+    gelten als Geschäftsbriefe. Mitteilungen in einer bestehenden Geschäftsverbindung, für die üblicherweise Vordrucke verwendet werden, brauchen die Angaben nicht (§ 37a Abs. 2, 3 HGB, § 125 Abs. 2 HGB,
+    § 35a Abs. 2, 3 GmbHG).
+  en: All business letters addressed to a specific recipient, in whatever form, must contain mandatory details. As a registered merchant (eingetragener Kaufmann), these are your company name (Firma) with
+    the designation “eingetragener Kaufmann” or “eingetragene Kauffrau” or an abbreviation such as “e. K.”, the location of your commercial establishment, the register court and the register number (§ 37a(1),
+    § 19(1) no. 1 HGB). For an OHG and KG, they are the company name and registered office of the partnership, the register court and the register number (§ 125(1) sentence 1 HGB, for the KG § 177a sentence
+    1 HGB). If no natural person is a personally liable partner, as with a GmbH & Co. KG, the company name of the personally liable partner and its details under § 35a GmbHG are added (§ 125(1) sentence
+    2 HGB, § 177a sentence 2 HGB). For a GmbH and UG, they are the legal form and registered office, register court and register number as well as all managing directors with their surname and at least
+    one first name written out in full and, if there is a supervisory board with a chair, its chair; if you give details of the capital, you state the share capital (Stammkapital) and, if not all cash contributions
+    have been paid in, the total amount of outstanding contributions (§ 35a(1) GmbHG). Order forms count as business letters. Communications within an existing business relationship for which pre-printed
+    forms are usually used do not need these details (§ 37a(2), (3) HGB, § 125(2) HGB, § 35a(2), (3) GmbHG).
+- de: Auf deinen Geschäftsbriefen und Bestellscheinen nennst du die Pflichtangaben deines Unternehmens, etwa Firma, Sitz, Registergericht und Registernummer.
+  en: On your business letters and order forms, you state your business's mandatory details, such as company name, registered office, register court and register number.
+- de: 'Bußgeld bis 50.000 € bei fehlender Kenntlichmachung von Zusatzstoffen (§ 7 Abs. 2 Nr. 1 LMZDV i. V. m. § 60 Abs. 2 Nr. 26 lit. a, Abs. 5 LFGB). Wer chininhaltige Lebensmittel ohne den Hinweis „chininhaltig“
+    abgibt, macht sich strafbar (§ 6 Abs. 2 AromenDV i. V. m. § 59 Abs. 1 Nr. 21 lit. a LFGB: Freiheitsstrafe bis zu einem Jahr oder Geldstrafe).'
+  en: 'Fine of up to €50,000 if additives are not labelled (§ 7(2) no. 1 LMZDV in conjunction with § 60(2) no. 26 letter a, (5) LFGB). Anyone who supplies food containing quinine without the notice “chininhaltig”
+    (contains quinine) commits a criminal offence (§ 6(2) AromenDV in conjunction with § 59(1) no. 21 letter a LFGB: imprisonment of up to one year or a fine).'
+- de: 'Das Registergericht kann die Angaben mit Zwangsgeld bis 5.000 € durchsetzen: beim eingetragenen Kaufmann nach § 37a Abs. 4 HGB, bei OHG und KG gegen die vertretungsberechtigten Gesellschafter oder
+    deren organschaftliche Vertreter nach § 125 Abs. 2 in Verbindung mit § 37a Abs. 4 HGB (§ 14 HGB), bei GmbH und UG gegen die Geschäftsführer (§ 79 Abs. 1 GmbHG).'
+  en: 'The register court can enforce the details with a coercive fine (Zwangsgeld) of up to €5,000: for a registered merchant under § 37a(4) HGB, for an OHG and KG against the partners authorised to represent
+    it or their statutory representatives under § 125(2) in conjunction with § 37a(4) HGB (§ 14 HGB), for a GmbH and UG against the managing directors (§ 79(1) GmbHG).'
+- de: Dein Unternehmen ist eine OHG oder KG.
+  en: Your business is an OHG or KG.
+- de: Dein Unternehmen ist eine OHG, KG, GmbH & Co. KG, UG oder GmbH.
+  en: Your business is an OHG, KG, GmbH & Co. KG, UG or GmbH.
+- de: Deine Gesellschaft ist im Handelsregister eingetragen.
+  en: Your company is entered in the commercial register (Handelsregister).
+- de: Deine Gesellschaft ist im Register eingetragen.
+  en: Your company is entered in the register.
+- de: Den Gesellschaftsvertrag einer OHG oder KG schließt ihr ohne Notar – am besten schriftlich.
+  en: You conclude the partnership agreement of an OHG or KG without a notary – preferably in writing.
+- de: Der Gesellschaftsvertrag der OHG und der KG ist formfrei, du brauchst dafür keinen Notar. Er sollte aber schriftlich geschlossen werden. Ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161
+    ff. HGB).
+  en: The partnership agreement of an OHG and a KG is not subject to any formal requirements; you do not need a notary for it. It should, however, be concluded in writing. Without an agreement, the statutory
+    rules apply (§§ 105 et seq., 161 et seq. HGB).
+- de: Du selbst (Prüfung durch eine zur Prüfung befähigte Person, z. B. Schankanlagen- oder Gasfachbetrieb)
+  en: You yourself (inspection by a person qualified to carry out inspections, e.g. a beverage dispensing system or gas specialist company)
+- de: Du selbst bzw. alle persönlich haftenden Gesellschafter, in der Regel mit deiner Steuerberatung
+  en: You yourself or all personally liable partners, usually with your tax adviser
+- de: Du selbst; Durchsetzung durch das Registergericht
+  en: You yourself; enforcement by the register court
+- de: Du und deine Mitgesellschafter
+  en: You and your fellow partners
+- de: 'Ein eigenes Bußgeld für die verspätete Aufstellung nennt das Gesetz nicht. Wer die Bilanz nicht in der vorgeschriebenen Zeit aufstellt, macht sich strafbar, wenn später die Zahlungen eingestellt
+    werden oder ein Insolvenzverfahren eröffnet oder mangels Masse abgelehnt wird: Freiheitsstrafe bis zu zwei Jahren oder Geldstrafe, bei Fahrlässigkeit bis zu einem Jahr (§ 283b Abs. 1 Nr. 3 Buchst. b,
+    Abs. 2, 3 StGB in Verbindung mit § 283 Abs. 6 StGB).'
+  en: 'The law provides no separate fine for late preparation. Anyone who does not prepare the balance sheet within the prescribed time commits a criminal offence if payments are later stopped or insolvency
+    proceedings are opened or rejected for lack of assets: imprisonment of up to two years or a fine, in case of negligence up to one year (§ 283b(1) no. 3 letter b, (2), (3) StGB in conjunction with §
+    283(6) StGB).'
+- de: Einen Flucht- und Rettungsplan brauchst du, wenn Lage, Ausdehnung und Art der Benutzung der Arbeitsstätte es erfordern (§ 4 Abs. 4 ArbStättV) – etwa bei unübersichtlichen Fluchtwegen, mehreren Geschossen,
+    vielen Kundinnen und Kunden oder erhöhter Brandgefährdung. Ob das so ist, hältst du in der Gefährdungsbeurteilung fest. Der Plan wird an geeigneten Stellen ausgehängt oder ausgelegt; gestaltet wird
+    er nach ASR A2.3 (Grundriss, Fluchtwege, Sammelstelle, Verhalten im Brandfall und bei Unfällen). Nach dem Plan übst du in regelmäßigen Abständen, wie die Arbeitsstätte geräumt wird (ASR A2.3 Nr. 11
+    Abs. 2); einen festen Rhythmus schreibt die ASR nicht vor, üblich ist etwa einmal im Jahr. Für ein kleines Ladenlokal mit direktem Ausgang ins Freie ist oft kein Plan nötig.
+  en: You need an escape and rescue plan if the location, size and type of use of the workplace require it (§ 4(4) ArbStättV) – for example with confusing escape routes, several floors, many customers or
+    increased fire risk. You record whether this is the case in the risk assessment. The plan is posted or displayed in suitable places; it is designed according to ASR A2.3 (floor plan, escape routes,
+    assembly point, what to do in case of fire and accidents). Following the plan, you practise evacuating the workplace at regular intervals (ASR A2.3 no. 11(2)); the ASR does not prescribe a fixed rhythm,
+    about once a year is common. A small shop with a direct exit to the outside often needs no plan.
+- de: 'Einen Jahresabschluss aus Bilanz und Gewinn- und Verlustrechnung stellen alle Kaufleute auf (§ 242 HGB), also auch OHG und KG und der eingetragene Kaufmann (e. K.), soweit er nicht nach § 241a HGB
+    befreit ist. Eine feste Frist gibt es für OHG, KG und e. K. nicht: Der Jahresabschluss ist „innerhalb der einem ordnungsmäßigen Geschäftsgang entsprechenden Zeit“ aufzustellen (§ 243 Abs. 3 HGB). Die
+    Dreimonatsfrist (bei kleinen Gesellschaften bis sechs Monate) gilt nur für Kapitalgesellschaften und die GmbH & Co. KG (§§ 264, 264a HGB). Unterschreiben muss ihn unter Angabe des Datums beim e. K.
+    der Kaufmann, bei OHG und KG alle persönlich haftenden Gesellschafter (§ 245 HGB). Die Offenlegung entfällt für OHG, KG und e. K. außerhalb des Publizitätsgesetzes.'
+  en: 'All merchants (Kaufleute) prepare annual financial statements consisting of a balance sheet and a profit and loss account (§ 242 HGB) – including the OHG and KG and the registered merchant (e. K.),
+    unless exempt under § 241a HGB. There is no fixed deadline for the OHG, KG and e. K.: the annual financial statements must be prepared “within the time corresponding to the proper course of business”
+    (§ 243(3) HGB). The three-month deadline (up to six months for small companies) applies only to corporations and the GmbH & Co. KG (§§ 264, 264a HGB). They must be signed, stating the date, by the merchant
+    in the case of an e. K., and by all personally liable partners in the case of an OHG and KG (§ 245 HGB). Publication (Offenlegung) does not apply to the OHG, KG and e. K. outside the Disclosure Act
+    (Publizitätsgesetz).'
+- de: Erscheint jetzt erst, wenn deine Gesellschaft im Register eingetragen ist – vorher besteht die Mitteilungspflicht noch nicht.
+  en: Now only appears once your company is entered in the register – before that, the reporting obligation does not yet exist.
+- de: 'Folgen bei Verstoß ergänzt: Wer chininhaltige Lebensmittel ohne den Hinweis „chininhaltig“ abgibt, macht sich strafbar.'
+  en: 'Consequences of non-compliance added: anyone who supplies food containing quinine without the notice “chininhaltig” (contains quinine) commits a criminal offence.'
+- de: Gesellschaftsvertrag der OHG oder KG schließen
+  en: Conclude the partnership agreement of the OHG or KG
+- de: Jahresabschluss aufstellen (OHG, KG, e. K.)
+  en: Prepare annual financial statements (OHG, KG, e. K.)
+- de: Kein Bußgeld. Ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161 ff. HGB).
+  en: No fine. Without an agreement, the statutory rules apply (§§ 105 et seq., 161 et seq. HGB).
+- de: Nach jedem Geschäftsjahr stellst du Bilanz und Gewinn- und Verlustrechnung auf – ohne feste Frist, aber in der Zeit, die ein ordnungsmäßiger Geschäftsgang erfordert.
+  en: After each financial year, you prepare a balance sheet and a profit and loss account – without a fixed deadline, but within the time that a proper course of business requires.
+- de: Pflichtangaben auf Geschäftsbriefen
+  en: Mandatory details on business letters

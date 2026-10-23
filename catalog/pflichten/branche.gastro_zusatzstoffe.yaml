@@ -1,7 +1,9 @@
+# RA Dr. Weber Nachprüfung 23.10.2026 (H.1, ändern): Folgen bei Verstoß nach seinem Wortlaut – LMZDV-Bußgeld und „chininhaltig“ als Straftat (§ 6 Abs. 2 AromenDV i. V. m. § 59 Abs. 1 Nr. 21 lit. a LFGB); § 8 Abs. 3 FrSaftErfrischGetrV nicht mehr genannt.
+# Sein Satz zu Koffein („über § 6 LMIDV … die Nummer am Wortlaut eintragen“) ist NICHT übernommen: § 6 LMIDV (freirecht.de/g/LMIDV:6, lexmea.de/de/gesetz/lmidv/6, gelesen 23.10.2026) hat vier Absätze; Anhang III Nr. 4 LMIV erfasst nur Abs. 4 Nr. 2 über § 5 Abs. 1 Nr. 14 Buchst. a LMIDV – und § 5 Abs. 1 LMIDV gilt nur für vorverpackte Lebensmittel (freirecht.de/g/LMIDV:5); für nicht vorverpackte erfasst Abs. 4 Nr. 3 (§ 5 Abs. 3 LMIDV) nur die Angaben nach § 4 Abs. 2 LMIDV (Allergene). Rückfrage an Dr. Weber.
 # R12 (Rechtsprüfung Befund 12): Zusatzstoffe bei loser Ware kenntlich machen
 schema_version: 1
 id: branche.gastro_zusatzstoffe
-version: 4
+version: 5
 katalog_nr: H.1
 titel:
   de: Zusatzstoffe bei loser Ware kenntlich machen
@@ -33,13 +35,13 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Bußgeld bis 50.000 € (§ 7 Abs. 2 Nr. 1 LMZDV i. V. m. § 60 Abs. 2 Nr. 26 lit. a, Abs. 5 LFGB).
+    de: 'Bußgeld bis 50.000 € bei fehlender Kenntlichmachung von Zusatzstoffen (§ 7 Abs. 2 Nr. 1 LMZDV i. V. m. § 60 Abs. 2 Nr. 26 lit. a, Abs. 5 LFGB). Wer chininhaltige Lebensmittel ohne den Hinweis „chininhaltig“ abgibt, macht sich strafbar (§ 6 Abs. 2 AromenDV i. V. m. § 59 Abs. 1 Nr. 21 lit. a LFGB: Freiheitsstrafe bis zu einem Jahr oder Geldstrafe).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
   art: abhaken
 aenderungsnotiz:
-  de: 'Nach dem berichtigten Prüfbericht Lebensmittelhygiene (22.10.2026): Warnhinweis bei Azofarbstoffen ergänzt, „chininhaltig“ nach der Aromen-Durchführungsverordnung, Koffeinhinweis nur für Erfrischungsgetränke über 150 mg/l mit Gehalt; die Zusatzstoffe gibst du in der Allergenliste mit an.'
+  de: 'Folgen bei Verstoß ergänzt: Wer chininhaltige Lebensmittel ohne den Hinweis „chininhaltig“ abgibt, macht sich strafbar.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -64,6 +66,7 @@ fachlich_zu_pruefen:
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern, zu v2): Korrekturen der Fundstellen („chininhaltig“ nach § 5 Abs. 1 AromenDV, Koffeinhinweis nach § 6 FrSaftErfrischGetrV i. V. m. Anhang III Nr. 4.1 LMIV ohne „§ 2 LMIDV“, Azofarbstoff-Warnhinweis nach Art. 24 i. V. m. Anhang V VO (EG) Nr. 1333/2008 im Text) sind in v3 bereits umgesetzt (berichtigter Prüfbericht); § 5 LMZDV und § 7 Abs. 2 Nr. 1 LMZDV bestätigt; Anhang III Nr. 4.1 LMIV nur über Sekundärquelle gelesen'
 - 'RA Dr. Weber Runde 3 (23.10.2026), ändern: § 7 Abs. 2 Nr. 1 LMZDV bestätigt, Höhe bis 50.000 € (§ 60 Abs. 2 Nr. 26 lit. a, Abs. 5 LFGB) in seinem Wortlaut übernommen; § 7 Abs. 2 LMZDV (Einleitung „Ordnungswidrig im Sinne des § 60 Absatz 2 Nummer 26 Buchstabe a …“, lxgesetze) und § 60 Abs. 5 LFGB (gesetze-im-internet.de) am 23.10.2026 gelesen'
 - 'Hinweis T. Baum (Nachkontrolle der Vorlagen, 23.10.2026, Hinweis 6) – zur Prüfung durch RA Dr. Weber: Die Sanktion nennt nur § 7 LMZDV; für Koffein und Chinin gelten die Straf- und Bußgeldvorschriften der FrSaftErfrischGetrV bzw. der AromenDV – Fundstelle und Höhe nicht geprüft, Text unverändert'
+- 'RA Dr. Weber Nachprüfung 23.10.2026 (ändern): Folgen nach seinem Wortlaut (LMZDV, Chinin als Straftat nach § 6 Abs. 2 AromenDV i. V. m. § 59 Abs. 1 Nr. 21 lit. a LFGB) umgesetzt. RÜCKFRAGE Koffein: Er bat, die Nummer in § 6 LMIDV am Wortlaut einzutragen. § 6 LMIDV (freirecht.de, lexmea.de, gelesen 23.10.2026) hat vier Absätze; Anhang III Nr. 4 LMIV ist nur über § 6 Abs. 4 Nr. 2 i. V. m. § 5 Abs. 1 Nr. 14 Buchst. a LMIDV erfasst, und § 5 Abs. 1 LMIDV betrifft nur vorverpackte Lebensmittel; § 6 Abs. 4 Nr. 3 (§ 5 Abs. 3 LMIDV) erfasst bei nicht vorverpackten Lebensmitteln nur die Angaben nach § 4 Abs. 2 LMIDV. Der Koffein-Satz ist deshalb nicht eingetragen – bitte sagen, ob „§ 6 Abs. 4 Nr. 2 LMIDV“ für lose Getränke passt oder eine andere Vorschrift gemeint ist. Quellen nur hier und im Kopfkommentar (Quellenliste unverändert, damit die Freigabe von T. Baum für den Inhalt ohne Folgen nicht entfällt)'
 pruefung:
   status: in_pruefung
   geprueft_von: null

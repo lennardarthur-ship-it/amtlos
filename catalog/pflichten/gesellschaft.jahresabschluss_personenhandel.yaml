@@ -1,0 +1,120 @@
+# Neu nach StB Busch, Mail zur Nachprüfung 23.10.2026 (Frage Jahresabschluss): Jahresabschluss (Bilanz und GuV, § 242 HGB) für alle Kaufleute – OHG, KG und e. K. (außer § 241a HGB);
+# keine feste Frist (§ 243 Abs. 3 HGB), Unterschrift nach § 245 HGB, keine Offenlegung außerhalb des PublG. Eigener Eintrag statt Zweig in gesellschaft.jahresabschluss
+# (dort steht die Dreimonatsfrist der Kapitalgesellschaften im Text; der freigegebene Eintrag bleibt unverändert). Prüfung durch StB Busch (docs/freigabe-katalog/anwenden.py).
+# Wortlaut gelesen 23.10.2026: § 242 HGB (lxgesetze.de/hgb/242), § 243 Abs. 3 HGB (lexmea.de/de/gesetz/hgb/243), § 245 HGB (lexmea.de/en/gesetz/hgb/245).
+# Auslöser e. K. wie steuern.buchfuehrungspflicht (§ 241a HGB über Vorjahr bzw. Schätzung im Gründungsjahr, § 242 Abs. 4 Satz 2 HGB).
+schema_version: 1
+id: gesellschaft.jahresabschluss_personenhandel
+version: 1
+katalog_nr: B.18
+titel:
+  de: Jahresabschluss aufstellen (OHG, KG, e. K.)
+kurz:
+  de: Nach jedem Geschäftsjahr stellst du Bilanz und Gewinn- und Verlustrechnung auf – ohne feste Frist, aber in der Zeit, die ein ordnungsmäßiger Geschäftsgang erfordert.
+erklaerung:
+  de: 'Einen Jahresabschluss aus Bilanz und Gewinn- und Verlustrechnung stellen alle Kaufleute auf (§ 242 HGB), also auch OHG und KG und der eingetragene Kaufmann (e. K.), soweit er nicht nach § 241a HGB befreit ist. Eine feste Frist gibt es für OHG, KG und e. K. nicht: Der Jahresabschluss ist „innerhalb der einem ordnungsmäßigen Geschäftsgang entsprechenden Zeit“ aufzustellen (§ 243 Abs. 3 HGB). Die Dreimonatsfrist (bei kleinen Gesellschaften bis sechs Monate) gilt nur für Kapitalgesellschaften und die GmbH & Co. KG (§§ 264, 264a HGB). Unterschreiben muss ihn unter Angabe des Datums beim e. K. der Kaufmann, bei OHG und KG alle persönlich haftenden Gesellschafter (§ 245 HGB). Die Offenlegung entfällt für OHG, KG und e. K. außerhalb des Publizitätsgesetzes.'
+rechtsgrundlage:
+- § 242 HGB
+- § 243 Abs. 3 HGB
+- § 245 HGB
+- § 241a HGB
+kategorie: gesellschaft
+ausloeser:
+  any:
+  # StB Busch 23.10.2026: OHG und KG sind Kaufleute (§ 6 HGB) – § 241a HGB gilt nur für Einzelkaufleute
+  - feld: profil.rechtsform
+    op: in
+    wert:
+    - ohg
+    - kg
+    label:
+      de: Dein Unternehmen ist eine OHG oder KG.
+  # e. K.: wie steuern.buchfuehrungspflicht – außer die Grenzen des § 241a HGB werden eingehalten
+  - all:
+    - feld: profil.rechtsform
+      op: ==
+      wert: ek
+      label:
+        de: Du bist als Kauffrau oder Kaufmann im Handelsregister eingetragen.
+    - any:
+      - all:
+        - feld: abgeleitet.ist_gruendungsjahr
+          op: ==
+          wert: false
+        - feld: abgeleitet.noch_nicht_gestartet
+          op: ==
+          wert: false
+        - any:
+          - feld: profil.umsatz.vorjahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_umsatz
+            label:
+              de: Dein Umsatz im Vorjahr lag über 800.000 € – die Befreiung nach § 241a HGB greift nicht.
+          - feld: profil.gewinn.vorjahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_gewinn
+            label:
+              de: Dein Gewinn im Vorjahr lag über 80.000 € – die Befreiung nach § 241a HGB greift nicht.
+      - all:
+        - feld: abgeleitet.ist_gruendungsjahr
+          op: ==
+          wert: true
+        - any:
+          - feld: profil.umsatz.prognose_laufendes_jahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_umsatz
+            label:
+              de: Dein erwarteter Umsatz im ersten Jahr liegt über 800.000 € – die Befreiung nach § 241a HGB greift nicht.
+          - feld: profil.gewinn.prognose_laufendes_jahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_gewinn
+            label:
+              de: Dein erwarteter Gewinn im ersten Jahr liegt über 80.000 € – die Befreiung nach § 241a HGB greift nicht.
+# keine feste Frist (§ 243 Abs. 3 HGB) – deshalb kein Termin, nur der Text
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst bzw. alle persönlich haftenden Gesellschafter, in der Regel mit deiner Steuerberatung
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: 'Ein eigenes Bußgeld für die verspätete Aufstellung nennt das Gesetz nicht. Wer die Bilanz nicht in der vorgeschriebenen Zeit aufstellt, macht sich strafbar, wenn später die Zahlungen eingestellt werden oder ein Insolvenzverfahren eröffnet oder mangels Masse abgelehnt wird: Freiheitsstrafe bis zu zwei Jahren oder Geldstrafe, bei Fahrlässigkeit bis zu einem Jahr (§ 283b Abs. 1 Nr. 3 Buchst. b, Abs. 2, 3 StGB in Verbindung mit § 283 Abs. 6 StGB).'
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: § 242 HGB, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/hgb/242
+  abgerufen: '2026-10-23'
+  fundstelle: § 242 Abs. 1 bis 4 HGB
+- titel: § 243 HGB, Wortlaut (lexmea.de)
+  url: https://lexmea.de/de/gesetz/hgb/243
+  abgerufen: '2026-10-23'
+  fundstelle: § 243 Abs. 3 HGB
+- titel: § 245 HGB, Wortlaut (lexmea.de)
+  url: https://lexmea.de/en/gesetz/hgb/245
+  abgerufen: '2026-10-23'
+- titel: Handelsgesetzbuch § 241a
+  url: https://www.gesetze-im-internet.de/hgb/__241a.html
+  abgerufen: null
+- titel: Strafgesetzbuch § 283b
+  url: https://www.gesetze-im-internet.de/stgb/__283b.html
+  abgerufen: '2026-10-22'
+- titel: Strafgesetzbuch § 283 (Abs. 6)
+  url: https://www.gesetze-im-internet.de/stgb/__283.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu nach StB Busch (Mail 23.10.2026) – bitte ganz prüfen. Erklärung nach seinen drei Punkten (Aufstellung § 243 Abs. 3, Unterschrift § 245, Offenlegung) und § 242 HGB; Folgen bei Verstoß aus gesellschaft.jahresabschluss (freigegeben von RA Dr. Weber, v5) übernommen und auf alle Kaufleute verallgemeinert („wenn später die Zahlungen eingestellt werden“ wie in steuern.buchfuehrungspflicht) – § 283b StGB rechtlich ggf. durch RA Dr. Weber gegenlesen. Stelle „in der Regel mit deiner Steuerberatung“ nach steuern.buchfuehrungspflicht.'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -31,7 +31,9 @@ erwartet:
   gesellschaft.stammkapital_einzahlen: gilt
   gesellschaft.handelsregister_anmeldung: gilt
   gesellschaft.ug_ruecklage: gilt
-  gesellschaft.transparenzregister: gilt
+  # Weber 23.10.2026 (B.16): Transparenzregister erst ab Eintragung (§ 20 Abs. 1 S. 1 GwG)
+  gesellschaft.transparenzregister: gilt_nicht
+  gesellschaft.geschaeftsbriefe_pflichtangaben: gilt_nicht
   gesellschaft.gesellschafterliste_aktualisieren: gilt_nicht
   gesellschaft.mitarbeiterbeteiligung: gilt_nicht
   gesellschaft.awv_meldung: gilt_nicht

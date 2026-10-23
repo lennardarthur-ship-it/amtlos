@@ -1,5 +1,5 @@
 persona: gesellschaft
-beschreibung: "E-176 (23.10.2026): OHG in Gründung, Registereintrag beantragt – Handelsregisteranmeldung durch alle Gesellschafter (§ 106 HGB), Transparenzregister (§ 20 Abs. 1 GwG), doppelte Buchführung ohne § 241a HGB (§§ 6, 238 HGB), E-Bilanz, Feststellungserklärung (§ 180 AO); keine Beurkundung des Gesellschaftsvertrags, kein Stammkapital, keine Insolvenzantragspflicht und keine Offenlegung (kein § 264a HGB)"
+beschreibung: "E-176 (23.10.2026): OHG in Gründung, Registereintrag beantragt – Handelsregisteranmeldung durch alle Gesellschafter (§ 106 HGB), Gesellschaftsvertrag ohne Notar (Weber 23.10.2026), Jahresabschluss ohne feste Frist (§§ 242, 243 Abs. 3 HGB, Busch 23.10.2026), doppelte Buchführung ohne § 241a HGB (§§ 6, 238 HGB), E-Bilanz, Feststellungserklärung (§ 180 AO); keine Beurkundung des Gesellschaftsvertrags, kein Stammkapital, keine Insolvenzantragspflicht und keine Offenlegung (kein § 264a HGB); Transparenzregister und Geschäftsbriefangaben erst ab Eintragung (Weber 23.10.2026)"
 stichtag: "2026-10-23"
 fakten:
   profil.rechtsform: ohg
@@ -15,7 +15,12 @@ fakten:
   profil.bundesland: BY
 erwartet:
   gesellschaft.handelsregister_anmeldung: gilt
-  gesellschaft.transparenzregister: gilt
+  # Weber 23.10.2026 (B.16): Transparenzregister erst ab Eintragung (§ 20 Abs. 1 S. 1 GwG)
+  gesellschaft.transparenzregister: gilt_nicht
+  gesellschaft.gesellschaftsvertrag_ohg_kg: gilt
+  gesellschaft.geschaeftsbriefe_pflichtangaben: gilt_nicht
+  gesellschaft.jahresabschluss_personenhandel: gilt
+  gesellschaft.jahresabschluss: gilt_nicht
   steuern.buchfuehrungspflicht: gilt
   steuern.e_bilanz: gilt
   steuern.euer: gilt_nicht

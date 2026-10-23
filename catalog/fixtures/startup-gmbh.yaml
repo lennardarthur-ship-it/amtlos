@@ -50,6 +50,8 @@ erwartet:
   gesellschaft.handelsregister_anmeldung: gilt_nicht
   gesellschaft.gesellschafterliste_aktualisieren: gilt_nicht
   gesellschaft.transparenzregister: gilt
+  gesellschaft.geschaeftsbriefe_pflichtangaben: gilt
+  gesellschaft.jahresabschluss_personenhandel: gilt_nicht
   gesellschaft.gf_sozialversicherungsstatus: gilt
   gesellschaft.gf_pflichten_haftung: gilt
   gesellschaft.insolvenzantragspflicht: gilt

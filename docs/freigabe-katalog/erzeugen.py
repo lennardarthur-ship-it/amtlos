@@ -33,7 +33,7 @@ if "--rueckfragen" in sys.argv:
     RUECKFRAGEN = json.load(open(sys.argv[sys.argv.index("--rueckfragen") + 1], encoding="utf-8"))
 os.makedirs(ZIEL, exist_ok=True)
 
-STEUER_GRUENDUNG = {"gruendung.fragebogen_steuerliche_erfassung", "gruendung.ust_idnr"}
+STEUER_GRUENDUNG = {"gruendung.fragebogen_steuerliche_erfassung", "gruendung.ust_idnr", "gesellschaft.jahresabschluss_personenhandel"}
 ARBEITSSCHUTZ_BRANCHE = {"branche.handwerk_gefaehrdung_gewerk", "branche.bau_baustellenverordnung", "branche.beauty_hautschutzplan"}
 LEBENSMITTEL_RECHT = {"branche.gastro_preisverzeichnis", "branche.gastro_mehrweg", "branche.gastro_ppwr_radar"}
 
