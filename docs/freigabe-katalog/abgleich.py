@@ -45,20 +45,19 @@ def de(x):
 def ausloeser(a):
     if not a:
         return ""
-    if "label" in a:
-        return de(a["label"])
+    lab = f" „{de(a['label'])}“" if "label" in a else ""
     if a.get("immer"):
         return "gilt für alle Betriebe"
     for art, wort in (("all", " UND "), ("any", " ODER ")):
         if art in a:
-            return "(" + wort.join(ausloeser(t) for t in a[art]) + ")"
+            return "(" + wort.join(ausloeser(t) for t in a[art]) + ")" + lab
     if "not" in a:
-        return "NICHT " + ausloeser(a["not"])
+        return "NICHT " + ausloeser(a["not"]) + lab
     if "feld" in a:
         w = a.get("wert")
         if isinstance(w, dict) and "regelwert" in w:
             w = "Regelwert " + w["regelwert"]
-        return f"[{a['feld']} {a.get('op', '')} {'' if w is None else w}]".replace("  ", " ")
+        return f"[{a['feld']} {a.get('op', '')} {'' if w is None else w}]".replace("  ", " ") + lab
     return str(a)
 
 
