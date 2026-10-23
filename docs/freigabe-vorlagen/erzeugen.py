@@ -14,6 +14,10 @@ from openpyxl.worksheet.datavalidation import DataValidation
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../.."))
 MAPPEN, ZIEL = sys.argv[1], sys.argv[2]
+# --nur '{"1 RA Dr. Weber": ["handelsregister", "Nutzungsbedingungen (Entwurf)"], ...}': nur diese Vorlagen/Texte (Nachprüfung)
+NUR = json.loads(sys.argv[sys.argv.index("--nur") + 1]) if "--nur" in sys.argv else None
+RUNDE = " (Nachprüfung)" if NUR else ""
+NOTIZ = json.load(open(sys.argv[sys.argv.index("--notizen") + 1], encoding="utf-8")) if "--notizen" in sys.argv else {}
 STAND = "23.10.2026"
 
 ZUORDNUNG = {
@@ -74,6 +78,12 @@ def html_zu_pdf(pfad, ziel):
     subprocess.run(["node", "-e", s], check=True, cwd=os.path.join(ROOT, "apps/web"))
     os.remove(tmp)
 
+if NUR:
+    for o in list(ZUORDNUNG):
+        if o not in NUR:
+            del ZUORDNUNG[o]; continue
+        ZUORDNUNG[o]["vorlagen"] = [v for v in ZUORDNUNG[o]["vorlagen"] if v in NUR[o]]
+        ZUORDNUNG[o]["texte"] = [t for t in ZUORDNUNG[o].get("texte", []) if t[0] in NUR[o]]
 GELB = PatternFill("solid", fgColor="FFF4CC"); GRAU = PatternFill("solid", fgColor="EDEDED")
 for ordner, z in ZUORDNUNG.items():
     o = os.path.join(ZIEL, ordner); os.makedirs(os.path.join(o, "Vorlagen-PDF"), exist_ok=True)
@@ -88,11 +98,11 @@ for ordner, z in ZUORDNUNG.items():
     for c in ws[1]: c.font = Font(bold=True); c.fill = GRAU
     for i, vid in enumerate(z["vorlagen"], 1):
         pdfs = ", ".join(sorted(f for f in os.listdir(os.path.join(o, "Vorlagen-PDF")) if f.startswith(vid + "-")))
-        ws.append([i, vid, V[vid]["titel"], pdfs, V[vid]["summe"][:12], z.get("hinweis", {}).get(vid, ""), "", ""])
+        ws.append([i, vid, V[vid]["titel"], pdfs, V[vid]["summe"][:12], NOTIZ.get(vid) or z.get("hinweis", {}).get(vid, ""), "", ""])
         ws.cell(ws.max_row, 7).fill = GELB; ws.cell(ws.max_row, 8).fill = GELB
     texte = [(t, q, f, hashlib.sha256(open(os.path.join(MAPPEN, q), "rb").read()).hexdigest()) for t, q, f in z.get("texte", [])]
     for t, q, f, h in texte:
-        ws.append([ws.max_row, "(Text)", t, "App- und Website-Texte/" + f, h[:12], "Fassung aus dem Code vom 23.10.2026" + ("; Abschnitt Hosting folgt nach Wahl des Hosters" if "website-datenschutz" in q else ""), "", ""])
+        ws.append([ws.max_row, "(Text)", t, "App- und Website-Texte/" + f, h[:12], (NOTIZ.get(t) or "Fassung aus dem Code vom 23.10.2026") + ("; Abschnitt Hosting folgt nach Wahl des Hosters" if "website-datenschutz" in q else ""), "", ""])
         ws.cell(ws.max_row, 7).fill = GELB; ws.cell(ws.max_row, 8).fill = GELB
     for i, b in enumerate([5, 28, 34, 44, 15, 40, 18, 50], 1): ws.column_dimensions[ws.cell(1, i).column_letter].width = b
     for r in ws.iter_rows():
@@ -120,7 +130,7 @@ for ordner, z in ZUORDNUNG.items():
     zeilen += "".join(f"<tr><td>{html.escape(t)}</td><td>Text</td><td><code>{h[:12]}</code></td></tr>" for t, q, f, h in texte)
     anzahl = len(z["vorlagen"]) + len(texte)
     blatt = f"""<!doctype html><meta charset=utf-8><style>@page{{size:A4;margin:14mm}}{CSS}</style>
-<h1>Bestätigung der fachlichen Durchsicht – Vorlagen der App Betriebsklar</h1>
+<h1>Bestätigung der fachlichen Durchsicht – Vorlagen der App Betriebsklar{RUNDE}</h1>
 <p>Anbieter: Lang Ventures UG (haftungsbeschränkt) i. G., Gomaringer Str. 33, 72770 Reutlingen</p>
 <p><b>{html.escape(z['name'])}</b> – Stand der Durchsicht: ____________</p>
 <p>Ich habe die unten aufgeführten {anzahl} Vorlagen{" und Texte" if texte else ""} in der Fassung der mir übergebenen PDFs (leer, Auswahl, voll) und der Freigabe-Datei vom {STAND} {html.escape(z['umfang'])} durchgesehen. Die Fassung ist durch die angegebene Prüfsumme bestimmt. Ausgenommen sind Vorlagen, die ich in der Freigabe-Datei mit „ändern“ oder „nicht mein Bereich“ markiert habe. Die Durchsicht betrifft die Vorlagen als allgemeine Muster, nicht ihre Verwendung im Einzelfall; spätere Rechtsänderungen sind nicht erfasst. Ändert sich eine Vorlage (andere Prüfsumme), gilt diese Bestätigung für sie nicht mehr, bis ich sie erneut durchgesehen habe.</p>
@@ -131,10 +141,9 @@ for ordner, z in ZUORDNUNG.items():
     print(ordner, len(z["vorlagen"]), "Vorlagen,", len(os.listdir(os.path.join(o, "Vorlagen-PDF"))), "PDFs")
 
 # Weber zusätzlich: Datenschutzhinweis der App, Nutzungsbedingungen, Website-Texte
-w = os.path.join(ZIEL, "1 RA Dr. Weber", "App- und Website-Texte"); os.makedirs(w, exist_ok=True)
 A = os.path.join(MAPPEN, "anwalt")
-md_zu_pdf(os.path.join(A, "datenschutzhinweis-app.md"), os.path.join(w, "Datenschutzhinweis-App.pdf"), "Datenschutzhinweis der App")
-md_zu_pdf(os.path.join(A, "nutzungsbedingungen-entwurf.md"), os.path.join(w, "Nutzungsbedingungen-Entwurf.pdf"), "Nutzungsbedingungen")
-for f, n in [("website-datenschutz.html", "Website-Datenschutzerklaerung.pdf"), ("website-impressum.html", "Website-Impressum.pdf")]:
-    html_zu_pdf(os.path.join(A, f), os.path.join(w, n))
-print("Weber: App- und Website-Texte", os.listdir(w))
+if "1 RA Dr. Weber" in ZUORDNUNG and ZUORDNUNG["1 RA Dr. Weber"].get("texte"):
+    w = os.path.join(ZIEL, "1 RA Dr. Weber", "App- und Website-Texte"); os.makedirs(w, exist_ok=True)
+    for t, q, f in ZUORDNUNG["1 RA Dr. Weber"]["texte"]:
+        (md_zu_pdf(os.path.join(MAPPEN, q), os.path.join(w, f), t) if q.endswith(".md") else html_zu_pdf(os.path.join(MAPPEN, q), os.path.join(w, f)))
+    print("Weber: App- und Website-Texte", os.listdir(w))

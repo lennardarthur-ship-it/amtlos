@@ -1,0 +1,17 @@
+{
+  "handelsregister": "Ihre Änderung: Bei OHG und KG zeigt die Vorlage die Gesellschafter mit Stellung (persönlich haftend oder Kommanditist/in) und Hafteinlage (§ 162 Abs. 1 HGB), die Vertretungsregelung (§ 106 Abs. 2 Nr. 4 HGB) und den Hinweis, dass alle Gesellschafter anmelden (§ 106 Abs. 7 HGB). GmbH und UG wie bisher. Bitte die Fassung „Auswahl“ ansehen.",
+  "Nutzungsbedingungen (Entwurf)": "Ihre Änderung: Fassungsdatum 23.10.2026; Arbeitsnotiz, was nach der Eintragung nachzutragen ist (Register, USt-IdNr., „i. G.“ streichen, neues Datum). Bitte freigeben, soweit inhaltlich – vor Inkraftsetzung nach der Eintragung legen wir die Fassung nur mit den Registerangaben erneut vor.",
+  "bilanz_guv": "Ihre Änderung: Anhang-Hinweis nur bei Kapitalgesellschaften und GmbH & Co. KG (mit Zusatz Kleinstkapitalgesellschaften), bei OHG/KG/e. K. „stellen keinen Anhang auf“; Unterschrift nach Rechtsform (§ 245 HGB). FRAGE: Bei der GmbH & Co. KG steht noch „persönlich haftende Gesellschafter“ – sollen es die Geschäftsführer der Komplementär-GmbH sein?",
+  "ust_voranmeldung": "Ihre Änderung: Eingabefelder für innergemeinschaftliche Erwerbe (Kz 89 und 93, Steuer aus vollen Euro) und Vorsteuer Kz 61; ohne Eintrag sagt das Dokument ausdrücklich, dass sie nicht enthalten sind.",
+  "oss_meldung": "Ihre Änderung: Lieferschwelle in Ihrem Wortlaut; Hinweis zu Korrekturen früherer Quartale (Berichtigungsteil einer späteren Erklärung).",
+  "zm_meldung": "Ihre Änderung: Meldezeitraum nach § 18a Abs. 1 Satz 2 UStG (laufendes und vier vorangegangene Quartale, monatlich ab dem Monat der Überschreitung).",
+  "steuererklaerung": "Ihre Änderung: Jede Vorauszahlung hat eine Steuerart (ESt, KSt, SolZ, GewSt, USt, Andere); summiert wird nur je Steuerart.",
+  "kassenbuch": "Ihre Änderung: Bestand nie negativ, Korrektur als Gegenbuchung mit Beleg, täglich (§ 146 Abs. 1 Satz 2 AO), mit elektronischer Kasse nur ergänzend; die App warnt bei negativen Beträgen und negativem Bestand.",
+  "aufbewahrung": "Ihre Änderung: „aufgestellt“ statt „festgestellt“ (§ 147 Abs. 4 AO).",
+  "sv_meldedaten": "Ihre Änderung: Geschlecht, fünfstellige Tätigkeit nach KldB 2010 (Prüfung auf fünf Ziffern), Kennzeichen Arbeitnehmerüberlassung, beim Minijob Rentenversicherung (Befreiung nach § 6 Abs. 1b SGB VI oder pflichtig). FRAGE: Geschlecht wird als W/M/D/X erfasst – sind das die richtigen Werte für die Meldung?",
+  "betriebsanweisung": "Ihre Änderung: Piktogramme nur noch als Text („GHS02 Flamme“), ohne Raute; B-240 und B-241 in Ihrem Wortlaut.",
+  "betriebsanweisung_biostoffe": "Ihre Änderung: Abschnitte „Arbeitsmedizinische Vorsorge und Impfungen“ und „Beschäftigungsbeschränkungen“ immer vorhanden; Schutzstufe Pflicht ohne Vorbelegung mit Verweis auf TRBA 250, Hinweis bei Blutkontakt und Schutzstufe 1. B-283 in Ihrem Wortlaut, B-284 entfernt.",
+  "expositionsverzeichnis": "Ihre Änderung: Geburtsdatum, Pflicht-Stoffkennung (CAS/EG bzw. Tätigkeit nach TRGS 906), Hinweise zu Ermittlungsmethode und Beurteilungsmaßstab, Fußtext mit 5-Jahres-Frist und ZED.",
+  "hautschutzplan": "Ihre Änderung: TRGS 530 nur beim Bereich Friseur; B-286 ergänzt.",
+  "gefaehrdungsbeurteilung": "Erneut, weil Ihre Baustein-Anmerkungen diese Vorlage betreffen: B-054, B-200, B-233 (DGUV Regel 110-010 statt Vorschrift 79), B-218 (TRBA 220 entfernt), B-226 (Tabelle 1B), B-231, B-236, B-238 („mindestens jährlich“). Sonst unverändert."
+}
