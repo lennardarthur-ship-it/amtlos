@@ -8,13 +8,24 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { LEERER_BETRIEB, PRUEFHINWEIS, VERIFIZIERUNG, VORLAGEN, dokumentHtml, leereDaten,VORLAGEN_GEPRUEFT, geprueftVermerk, pruefHinweisFuer, sha256, vorlageFuer, vorlageGeprueft, vorlagenPruefsumme, type Daten, type Vorlage } from "../src/index.js";
 
 const FUENF = ["haccp", "hygieneplan", "allergene", "ifsg_belehrung", "hygieneschulung"];
+// Durchsicht 23.10.2026: StB Busch, T. Koch, RA Dr. Weber (E-177)
+const WEITERE = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung", "lohnkonto", "gefaehrdungsbeurteilung", "unterweisung", "gefahrstoffverzeichnis",
+  "betriebsanweisung_maschine", "pruefprotokoll_elektro", "datenschutz_dokumentation", "datenschutzerklaerung_website", "avv", "datenschutzinformation", "datenpanne",
+  "video_hinweisschild", "anamnese_einwilligung", "arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ki_kompetenz", "ausweis_hinweis", "schluesselquittung",
+  "impressum", "gewerbeanmeldung", "transparenzregister"];
+const ALLE = [...FUENF, ...WEITERE];
 const VERMERK = "Vorlagen fachlich durchgesehen (Stand 23.10.2026)";
 
 describe("Vorlagen fachlich durchgesehen (Nachkontrolle T. Baum 23.10.2026)", () => {
   afterEach(() => vi.useRealTimers());
 
   it("zentrale Liste: genau die fünf Vorlagen, Stand 23.10.2026, ohne Namen im Vermerk", () => {
-    expect(Object.keys(VORLAGEN_GEPRUEFT).sort()).toEqual([...FUENF].sort());
+    expect(Object.keys(VORLAGEN_GEPRUEFT).sort()).toEqual([...ALLE].sort());
+    for (const id of WEITERE) {
+      expect(vorlageFuer(id), id).toBeDefined();
+      expect(VORLAGEN_GEPRUEFT[id]!.stand).toBe("2026-10-23");
+      expect(vorlagenPruefsumme(vorlageFuer(id)!), id).toBe(VORLAGEN_GEPRUEFT[id]!.pruefsumme);
+    }
     for (const id of FUENF) {
       expect(vorlageFuer(id), id).toBeDefined();
       expect(VORLAGEN_GEPRUEFT[id]!.stand).toBe("2026-10-23");
@@ -34,7 +45,7 @@ describe("Vorlagen fachlich durchgesehen (Nachkontrolle T. Baum 23.10.2026)", ()
   it("Vermerk bei den fünf Vorlagen, bei allen anderen der bisherige Hinweis", () => {
     for (const v of VORLAGEN) {
       const d: Daten = v.id === "hygieneplan" ? { art: "lebensmittel" } : {};
-      expect(pruefHinweisFuer(v, d), v.id).toBe(FUENF.includes(v.id) ? VERMERK : PRUEFHINWEIS);
+      expect(pruefHinweisFuer(v, d), v.id).toBe(ALLE.includes(v.id) ? VERMERK : PRUEFHINWEIS);
     }
   });
 

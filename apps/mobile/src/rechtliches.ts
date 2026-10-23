@@ -67,7 +67,9 @@ const DRITTLAND_REVENUECAT = `Übermittlung in die USA auf Grundlage der ${SCC_F
  * meldet sie. Fachlich zu prüfen (T-77): bis zur Freigabe `freigegeben: false`.
  */
 export const DATENSCHUTZ = {
-  freigegeben: false,
+  // Freigegeben von RA Dr. Weber 23.10.2026 für den Build ohne Sync (docs/pruefberichte/2026-10-23-vorlagen-weber.xlsx, Prüfsumme
+  // 892aa8818e0e der Fassung aus docs/pruefmappe-anwalt). Bei Textänderung erneut vorlegen; der Sync-Zusatz ist nicht freigegeben.
+  freigegeben: true,
   abschnitte: [
     { titel: "Kurz gesagt", text: `${MARKE.name} speichert deine Angaben nur auf deinem iPhone – verschlüsselt, ohne Konto und ohne Server von ${MARKE.name}. Wir sehen deine Unterlagen, Kunden und Mitarbeiter nicht. ${MARKE.name} macht keine eigenen Analysen und zeigt keine Werbung; nur für ${MARKE.proName} wertet unser Dienstleister RevenueCat die Käufe für die Abo-Verwaltung aus.` },
     { titel: "Was auf dem iPhone liegt", text: `Betrieb, Unterlagen, Rechnungen, Belege mit Fotos und Dateien, Mitarbeiter- und Kundendaten sowie deine Antworten im Pflichten-Check. Die Daten sind mit AES-256 verschlüsselt; der Schlüssel liegt im Schlüsselbund dieses iPhones. Diese Daten verarbeitest du selbst – ${MARKE.name} erhält sie nicht. Wenn du die App löschst, sind die Daten weg – außer in einer Sicherung, die du selbst erstellt hast.` },

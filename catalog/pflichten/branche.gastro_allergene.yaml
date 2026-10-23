@@ -65,6 +65,9 @@ fachlich_zu_pruefen:
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, freigegeben): Auslöser, Frist laufend und Kurztext fachlich richtig; Form bei loser Ware in der Allergenliste-Vorlage umgesetzt (Art. 44 LMIV, § 4 LMIDV); Folgen aus dem Wortlaut nachvollziehbar; Schwere wieder „hoch“ (umgesetzt)'
 - 'RA Dr. Weber Runde 3 (23.10.2026), Folgen freigegeben: § 6 Abs. 4 Nr. 1, 2 LMIDV i. V. m. § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB, bis 50.000 € – Fundstelle und Höhe bestätigt'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Tim Baum (Lebensmittelfachbeauftragter)
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 5

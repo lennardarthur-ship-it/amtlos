@@ -61,7 +61,7 @@
     "url": "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.erstunterweisung",
@@ -301,7 +301,7 @@
     "url": "https://www.gesetze-im-internet.de/lfgb/__60.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "branche.gastro_haccp",
@@ -587,7 +587,7 @@
     "url": "https://lxgesetze.de/hgb/176"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "gesellschaft.transparenzregister",
@@ -619,7 +619,7 @@
     "url": "https://www.ihk.de/bayreuth/hauptnavigation/service/recht/geldwaesche/mitteilungspflicht-transparenzregister-4819528"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "gruendung.gewerbeanzeige",
@@ -962,7 +962,7 @@
     "url": "https://www.gesetze-im-internet.de/stgb/__283.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.e_bilanz",
@@ -994,7 +994,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.est_erklaerung",
@@ -1311,7 +1311,7 @@
     "url": "https://www.bzst.de/DE/Unternehmen/Umsatzsteuer/One-Stop-Shop_EU/one_stop_shop_eu_node.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "steuern.rechnungen_pflichtangaben",

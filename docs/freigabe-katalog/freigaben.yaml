@@ -1932,3 +1932,81 @@
       version: 4
       quelle: 2026-10-23-abgleich-baum.xlsx
       stand: '2026-10-23'
+- pruefer: RA Dr. Ulrich Weber
+  umfang: alles
+  unterschrieben: false
+  felder_fehlen: []
+  hinweis: Nachprüfung 23.10.2026 freigegeben (Mail); Nachtragsblatt laut Mail unterschrieben, Scan steht aus
+  eintraege:
+    arbeitsschutz.arbeitsmedizinische_vorsorge:
+      version: 6
+      quelle: 2026-10-23-nachpruefung-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.gesellschaftsvertrag_notar:
+      version: 5
+      quelle: 2026-10-23-nachpruefung-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.handelsregister_anmeldung:
+      version: 6
+      quelle: 2026-10-23-nachpruefung-weber.xlsx
+      stand: '2026-10-23'
+    gesellschaft.transparenzregister:
+      version: 6
+      quelle: 2026-10-23-nachpruefung-weber.xlsx
+      stand: '2026-10-23'
+- pruefer: RA Dr. Ulrich Weber
+  umfang: sanktion
+  unterschrieben: false
+  felder_fehlen: []
+  hinweis: Nachprüfung 23.10.2026 (nur Folgen); Scan steht aus
+  eintraege:
+    branche.gastro_ifsg_bescheinigung_selbst:
+      version: 3
+      quelle: 2026-10-23-nachpruefung-weber.xlsx
+      stand: '2026-10-23'
+- pruefer: StB Lutz Busch
+  umfang: alles
+  unterschrieben: false
+  felder_fehlen: []
+  hinweis: Freigabe per Mail 23.10.2026; Ergänzung der Bestätigung folgt mit EÜR und Feststellung
+  eintraege:
+    steuern.buchfuehrungspflicht:
+      version: 7
+      quelle: 2026-10-23-nachpruefung-vorlagen-busch-mail.txt
+      stand: '2026-10-23'
+    steuern.e_bilanz:
+      version: 6
+      quelle: 2026-10-23-nachpruefung-vorlagen-busch-mail.txt
+      stand: '2026-10-23'
+    steuern.oss_erklaerung:
+      version: 3
+      quelle: 2026-10-23-nachpruefung-vorlagen-busch-mail.txt
+      stand: '2026-10-23'
+- pruefer: Thomas Koch (Fachkraft für Arbeitssicherheit)
+  umfang: alles
+  unterschrieben: false
+  felder_fehlen: []
+  hinweis: Nachprüfung 23.10.2026; Nachtragsblatt laut Mail unterschrieben, Scan nicht mitgeschickt
+  eintraege:
+    arbeitsschutz.dguv_v3:
+      version: 5
+      quelle: 2026-10-23-nachpruefung-koch.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.flucht_rettungsplan:
+      version: 4
+      quelle: 2026-10-23-nachpruefung-koch.xlsx
+      stand: '2026-10-23'
+- pruefer: Tim Baum (Lebensmittelfachbeauftragter)
+  umfang: ohne_sanktion
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Nachtrag unterschrieben 23.10.2026 (2026-10-23-nachtrag-baum-unterschrieben.jpg)
+  eintraege:
+    branche.gastro_allergene:
+      version: 5
+      quelle: 2026-10-23-nachpruefung-baum.xlsx
+      stand: '2026-10-23'
+    branche.gastro_kontaktmaterialien:
+      version: 3
+      quelle: 2026-10-23-nachpruefung-baum.xlsx
+      stand: '2026-10-23'

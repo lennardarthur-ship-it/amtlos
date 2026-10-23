@@ -64,6 +64,9 @@ fachlich_zu_pruefen:
 - 'Als Hinweis über die Branche – Amtlos fragt nicht ab, welche Verpackungen und Behälter der Betrieb nutzt'
 - 'RA Dr. Weber Runde 3 (23.10.2026), Folgen freigegeben: Konformitätserklärung ist Pflicht des Inverkehrbringers (Art. 16 VO (EG) Nr. 1935/2004); für den Gastronomiebetrieb keine Bußgeldnorm, Anordnung nach § 39 LFGB; Schwere „niedrig“ passt'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Tim Baum (Lebensmittelfachbeauftragter)
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 3

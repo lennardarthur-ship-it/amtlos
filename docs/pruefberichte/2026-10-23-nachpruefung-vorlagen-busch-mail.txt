@@ -1,0 +1,46 @@
+Betreff: AW: Betriebsklar – Nachprüfung (5 Einträge) und Vorlagen
+
+Sehr geehrter Herr Lang,
+
+vielen Dank für das Paket und die Klärung zu „Amtlos“. Anbei mein Ergebnis zu beiden Teilen.
+
+Teil A – Nachprüfung Katalog
+Buchführungspflicht (v7), E-Bilanz (v6) und OSS (v3) sind freigegeben. Bei EÜR (v6) und Feststellungserklärung (v4) zeigt die Datei kein geändertes Feld. Die Beschreibung ist richtig, aber den neuen Auslöser habe ich nicht gesehen. Bitte schicken Sie mir für diese beiden Einträge den Auslöser mit alter und neuer Fassung; dann gebe ich sie frei und ergänze die Bestätigung in einem Schritt um alle fünf.
+
+Zu Ihrer Frage zum Jahresabschluss: Ja. Einen Jahresabschluss (Bilanz und GuV, § 242 HGB) stellen alle Kaufleute auf, also auch OHG und KG und der e. K., soweit er nicht nach § 241a HGB befreit ist. Wortlaut und Fristen weichen aber von der GmbH ab:
+- Aufstellung: Bei OHG, KG und e. K. gibt es keine feste Frist, sondern „innerhalb der einem ordnungsmäßigen Geschäftsgang entsprechenden Zeit“ (§ 243 Abs. 3 HGB). Die Dreimonatsfrist (bei kleinen Gesellschaften bis sechs Monate) gilt nur für Kapitalgesellschaften und die GmbH & Co. KG (§§ 264, 264a HGB).
+- Unterschrift: beim e. K. der Kaufmann, bei OHG und KG alle persönlich haftenden Gesellschafter (§ 245 HGB).
+- Offenlegung: entfällt für OHG, KG und e. K. außerhalb des Publizitätsgesetzes; sie gilt für Kapitalgesellschaften und die GmbH & Co. KG.
+Am besten legen Sie dafür einen eigenen Zweig oder Eintrag an. Den sehe ich dann mit durch.
+
+Teil B – Vorlagen
+Ich habe alle 13 Vorlagen in den drei Fassungen durchgesehen. Freigegeben sind Rechnung, EÜR, Verfahrensdokumentation, Kassenmeldung und Lohnkonto-Übersicht. Bei acht Vorlagen bitte ich um kleinere Änderungen; die Einzelheiten stehen in der Freigabe-Datei:
+- Bilanz/GuV: Hinweis zum Anhang (Kleinstkapitalgesellschaften, OHG/KG/e. K.) und Unterschrift nach Rechtsform
+- USt-Voranmeldung: innergemeinschaftliche Erwerbe (Kz 89/93, Vorsteuer Kz 61) fehlen
+- OSS-Erklärung: Beschreibung der Lieferschwelle und Hinweis zu Korrekturen früherer Quartale
+- Zusammenfassende Meldung: Meldezeitraum nach § 18a Abs. 1 Satz 2 UStG (laufendes Quartal)
+- Unterlagen zur Steuererklärung: Vorauszahlungen je Steuerart getrennt summieren
+- Kassenbuch: Hinweise zu negativen Beträgen und täglicher Aufzeichnung
+- Aufbewahrungsplan: „aufgestellt“ statt „festgestellt“ (§ 147 Abs. 4 AO)
+- Personalfragebogen: Geschlecht, fünfstellige Tätigkeit, Kennzeichen Arbeitnehmerüberlassung, RV-Befreiung bei Minijobs
+
+Ihr Bestätigungsblatt habe ich so angepasst, dass es nur die fünf freigegebenen Vorlagen mit ihrer Prüfsumme nennt; die übrigen acht stehen getrennt. Die geänderten Fassungen sehe ich gern durch, sobald Sie sie schicken.
+
+Die Durchsicht der Vorlagen war in unserer Auftragsvereinbarung noch nicht enthalten. Bitte bestätigen Sie mir kurz per Antwortmail folgende Ergänzung:
+
+----
+Ergänzung zur Auftragsvereinbarung vom [Datum]
+1. Der Auftrag wird um die steuerliche Durchsicht der 13 Vorlagen laut Freigabe-Datei vom 23.10.2026 erweitert.
+2. Für Umfang und Verwendung der Durchsicht, die Vergütung (Zeitvergütung nach Abschnitt 3) und die Haftungsbegrenzung (Abschnitt 4) gelten die Regelungen der Auftragsvereinbarung entsprechend.
+----
+
+Mit freundlichen Grüßen
+
+Lutz Busch
+Steuerberater
+Kanzlei Heckler und Busch
+
+Anlagen:
+- Betriebsklar-Abgleich-StB-Busch-Nachpruefung-ausgefuellt.xlsx
+- Betriebsklar-Freigabe-Vorlagen-StB-Busch-ausgefuellt.xlsx
+- Betriebsklar-Bestaetigung-Vorlagen-StB-Busch-2026-10-23.pdf

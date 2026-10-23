@@ -28,6 +28,9 @@ export interface VorlagenFreigabe {
 }
 
 const BAUM = "Nachkontrolle T. Baum 23.10.2026";
+const BUSCH = "Durchsicht StB Busch 23.10.2026 (Bestätigung unterschrieben, docs/pruefberichte/2026-10-23-vorlagen-busch.xlsx)";
+const KOCH = "Durchsicht T. Koch 23.10.2026 (docs/pruefberichte/2026-10-23-vorlagen-koch.xlsx)";
+const WEBER = "Durchsicht RA Dr. Weber 23.10.2026 (docs/pruefberichte/2026-10-23-vorlagen-weber.xlsx)";
 
 /** Zentrale Liste der fachlich durchgesehenen Vorlagen. */
 export const VORLAGEN_GEPRUEFT: Readonly<Record<string, VorlagenFreigabe>> = {
@@ -35,6 +38,31 @@ export const VORLAGEN_GEPRUEFT: Readonly<Record<string, VorlagenFreigabe>> = {
   hygieneplan: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "941cde2f8ec04fc0ad7eb4ddcb08dc047d36416cadefbff5788f667da7133dd8", fassung: { feld: "art", wert: "lebensmittel" }, gruppen: ["Gastronomie / Café", "Bäckerei", "Foodtruck / mobiler Verkauf"] },
   allergene: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "8d6b015f6491872e3ca492ee2c1b9245890e84428cacecfe914beb90ea85144c" },
   ifsg_belehrung: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "2e35d889d03764df32a310aeacc999e2b6151e83afd38520da0c6c36d541ebec" },
+  rechnung: { stand: "2026-10-23", bezug: BUSCH, pruefsumme: "8c2e773d415398dea57ab58922035136df2317e273cb2e82db72f0f86a6cda9e" },
+  euer: { stand: "2026-10-23", bezug: BUSCH, pruefsumme: "d669212fbf4abf8bfcff24ad65388185ca46f47d513de53cf93e5286010130d2" },
+  verfahrensdokumentation: { stand: "2026-10-23", bezug: BUSCH, pruefsumme: "9d23a5d3f01831910bcec4e93e563d8503a3736b68a73deaaf09d14435fec48b" },
+  kassenmeldung: { stand: "2026-10-23", bezug: BUSCH, pruefsumme: "d9ac127520bab87ef105e7da71c3c9cebbc7549993ffcb8740ef243dcaa0ee65" },
+  lohnkonto: { stand: "2026-10-23", bezug: BUSCH, pruefsumme: "7210085d37a2e3866d4d15108172b76d61339ee16cce5d3169bd8702393f9428" },
+  gefaehrdungsbeurteilung: { stand: "2026-10-23", bezug: KOCH, pruefsumme: "ea0f369af38e33e88d501eb12f85d34536d1a6c74ae83a686a26d03fa7581531" },
+  unterweisung: { stand: "2026-10-23", bezug: KOCH, pruefsumme: "73c536207bb588fba5cf502a2f83323e56c2fdd6c8b5c2a8b7ada82c4a91e8df" },
+  gefahrstoffverzeichnis: { stand: "2026-10-23", bezug: KOCH, pruefsumme: "e1f81534e968125c84bbece65d414b87460da5c4748a820f243fb09d27e420a6" },
+  betriebsanweisung_maschine: { stand: "2026-10-23", bezug: KOCH, pruefsumme: "f041a0b042843e6b29e05171e90e4669fefafde1ce37aeb4445f2dd58af1268e" },
+  pruefprotokoll_elektro: { stand: "2026-10-23", bezug: KOCH, pruefsumme: "599f83aa64055153e81be987c85ffabc90b5aa02f16e293412b66782161c27c3" },
+  datenschutz_dokumentation: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "524dfef7fee994656e460147adcac2fa4a2928dff076141e881ae90912499d28" },
+  datenschutzerklaerung_website: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "1b191e90779472b36e0ff8582d5dbb4a73bc40d394d9663d62291aa387db5768" },
+  avv: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "d4a5c48088053795e457ead7dea54f83e15d58a24134484a0c3938c029182811" },
+  datenschutzinformation: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "5f243298c3669fefcf8e3f435e4b813f416a3ab04e1cba91deb88d75eef665c8" },
+  datenpanne: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "e907682096eabf02baa57c257de08ffde433d31c3ccaba58640119663ddec962" },
+  video_hinweisschild: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "9d1a06fbb30f998d3d4561780c495a56403a9bc96fca8c1242c584ce6fd48c75" },
+  anamnese_einwilligung: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "16515a705e3114af069241bdcc4d604055373688dfa43d056c33efd62247bcac" },
+  arbeitszeitnachweis: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "62df8ed29e691294c9e9cb06471cef68b385714e7c79360c0b3cb7ccf1a31a39" },
+  nachweis_arbeitsbedingungen: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "c37a8792a9983556a308cf82a8f62e7af408d939f39a9bff617d8df72ae8b40b" },
+  ki_kompetenz: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "2353e20c509afdfa922e841ecb2042d6bff6d9b40fa8317e86087bb1502218a4" },
+  ausweis_hinweis: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "235a5366934919f9c449f9223d23317360e3f502a9fb4ec8cbbb3d76b9028c27" },
+  schluesselquittung: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "2399c8cf81e2fee1fc294ea8de923f6d9c5c4ae05c633a95c3ca78215cffac8f" },
+  impressum: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "9e79f203766117dd6c5e67a7d2aa51c100bb828689625dbfa15cf077cee9328f" },
+  gewerbeanmeldung: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "8324d37f947181f884e29330c41f50c757b5486398ca864c3b2d11ccb610e110" },
+  transparenzregister: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "01473dc8aef549c590384275e82fbf08740a1da053f021709174242d73d84116" },
   hygieneschulung: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "1f3bb870b0decd354c4cee8a7ab39bc1465e926e11549c8028c222418549f50e" },
 };
 
