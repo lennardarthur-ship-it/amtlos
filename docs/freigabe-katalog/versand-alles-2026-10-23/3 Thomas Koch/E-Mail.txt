@@ -1,0 +1,19 @@
+Betreff: Betriebsklar – Nachprüfung (3 Einträge) und Vorlagen
+
+Hallo Herr Koch,
+
+danke für den Abgleich und das unterschriebene Blatt. Ihre Freigabe ist für 24 Einträge eingetragen. Alles Restliche kommt in diesem einen Paket (ZIP im Anhang).
+
+Teil A – Nachprüfung Katalog, 3 Einträge, jeweils in Ihrem Wortlaut umgesetzt:
+- DGUV V3: Zuständig ist der Unternehmer selbst, die Prüfung führt eine Elektrofachkraft durch.
+- Flucht- und Rettungsplan: Räumungsübung „in regelmäßigen Abständen (ASR A2.3 Nr. 11 Abs. 2)“, ohne festen Rhythmus.
+- Schankanlage und Flüssiggas: auf BetrSichV und DGUV Regel 110-010 umgestellt, „Sachkundiger nach DGUV Vorschrift 79“ gestrichen; der Hinweis zur BG bleibt.
+Bitte die Datei ausfüllen und das Nachtragsblatt unterschreiben.
+
+Teil B – Vorlagen: Im Ordner „B Vorlagen“ liegt jede Vorlage als PDF in drei Fassungen (leer, mit allen Auswahlmöglichkeiten, voll ausgefüllt mit erfundenen Beispieldaten). Bitte in der Freigabe-Datei je Vorlage „freigegeben“, „ändern“ oder „nicht mein Bereich“ wählen und das Bestätigungsblatt unterschreiben. Jede Vorlage hat eine Prüfsumme: Ändert sich danach ein Text, verschwindet der Vermerk in der App, bis Sie erneut durchgesehen haben. In der App erscheint nur „Vorlagen fachlich durchgesehen (Stand …)“, ohne Namen.
+Ihr Teil umfasst 10 Vorlagen: Gefährdungsbeurteilung, Unterweisung, Gefahrstoffverzeichnis, drei Betriebsanweisungen, Expositionsverzeichnis, Prüfprotokoll elektrische Geräte, Hautschutzplan und den Hygieneplan für Friseur und Kosmetik. Beim Hygieneplan geht es um Infektionshygiene nach Landes-Hygieneverordnung – wenn das nicht Ihr Fachgebiet ist, wählen Sie bitte „nicht mein Bereich“. Die Bausteine zum Antippen stehen zum Kommentieren in einem eigenen Blatt der Freigabe-Datei.
+
+Zum Namen: „Amtlos“ ist der Arbeitsname, unter dem die Katalogtexte intern geschrieben sind. Die App ersetzt ihn automatisch durch „Betriebsklar“; in den Dateien steht jetzt auch „Betriebsklar“.
+
+Viele Grüße
+Lennard Lang
