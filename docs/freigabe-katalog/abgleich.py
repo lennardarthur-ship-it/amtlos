@@ -28,7 +28,7 @@ WEBER, BUSCH, KOCH, BAUM = g["WEBER"], g["BUSCH"], g["KOCH"], g["BAUM"]
 ziel = os.path.abspath([a for a in sys.argv[1:] if not a.startswith("--")][0])
 os.makedirs(ziel, exist_ok=True)
 notizen = json.load(open(sys.argv[sys.argv.index("--notizen") + 1], encoding="utf-8")) if "--notizen" in sys.argv else {}
-AUSGENOMMEN = {"arbeitsschutz.arbeitsmedizinische_vorsorge"}  # E.56 offen bis zur Rückmeldung eines Betriebsarztes
+AUSGENOMMEN = set()  # E.56 seit E-174 bei RA Dr. Weber
 
 FELDER = [("titel", "Titel"), ("kurz", "Kurztext"), ("erklaerung", "Erklärung"), ("ausloeser", "Auslöser"), ("frist", "Frist"),
           ("wiederholung", "Wiederholung"), ("rechtsgrundlage", "Rechtsgrundlage"), ("sanktion", "Folgen bei Verstoß"),

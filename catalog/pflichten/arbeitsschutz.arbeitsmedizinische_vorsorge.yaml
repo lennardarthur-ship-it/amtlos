@@ -54,6 +54,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Fristen je Vorsorgeart nach AMR 2.1 und Bewertung Kosmetik mit Blutkontakt durch einen Betriebsarzt bestätigen lassen (laut Freigabe Sifa 22.10.2026 weiterhin offen; Auslöser für alle Betriebe mit Beschäftigten bestätigt)'
 pruefung:
-  status: in_pruefung
+  status: entwurf
   geprueft_von: null
   geprueft_am: null

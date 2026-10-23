@@ -48,7 +48,7 @@ for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
     if ids is not None:
         treffer = d["id"] in ids
     elif bereich:
-        treffer = pruefer in [p for p, _ in _g["BENOETIGT"][_g["gebiet"](d)]] and d["id"] != "arbeitsschutz.arbeitsmedizinische_vorsorge"
+        treffer = pruefer in [p for p, _ in _g["BENOETIGT"][_g["gebiet"](d)]]
     else:
         treffer = (pr.get("status") == "freigegeben" and pruefer in (pr.get("geprueft_von") or [])) or d["id"] in auch
     if treffer:
@@ -56,7 +56,7 @@ for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
 zeilen.sort(key=lambda z: [int(x) if x.isdigit() else x for x in z[0].replace(".", " ").split()])
 
 n = len(zeilen)
-groesse = "6.4pt" if n > 110 else "7.2pt" if n > 60 else "8.5pt"
+groesse = "6pt" if n > 150 else "6.4pt" if n > 110 else "7.2pt" if n > 60 else "8.5pt"
 spalten = 3 if n > 40 else 2
 STANDARD = ("Ich habe die unten aufgeführten {n} Einträge des Pflichtenkatalogs in der jeweils genannten Fassung (Version) fachlich geprüft. "
             "Sie sind nach meiner Prüfung zum genannten Stand in Rechtsgrundlage, Auslöser, Frist und Folgen zutreffend; meine Anmerkungen "

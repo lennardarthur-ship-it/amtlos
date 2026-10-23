@@ -32,8 +32,14 @@ WEBER, BUSCH, KOCH, BAUM = "RA Dr. Ulrich Weber", "StB Lutz Busch", "Thomas Koch
 NICHT_VERGLICHEN = {"version", "pruefung", "fachlich_zu_pruefen", "aenderungsnotiz"}
 
 
+# E-174: arbeitsmedizinische Vorsorge (ArbMedVV) prüft RA Dr. Weber rechtlich – die Sifa hat sie als ärztliches Fachgebiet abgegeben
+RECHT_STATT_ARBEITSSCHUTZ = {"arbeitsschutz.arbeitsmedizinische_vorsorge"}
+
+
 def gebiet(d):
     i, k = d["id"], d["kategorie"]
+    if i in RECHT_STATT_ARBEITSSCHUTZ:
+        return "recht"
     if i in ARBEITSSCHUTZ_BRANCHE or k == "arbeitsschutz":
         return "arbeitsschutz"
     if k == "steuern" or i in STEUER_GRUENDUNG:
