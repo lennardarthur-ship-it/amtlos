@@ -455,6 +455,28 @@ const ARTEN = [
   { wert: "werkstudent", text: "Werkstudent/in" },
 ];
 
+/**
+ * StB Busch (Durchsicht 23.10.2026): Geschlecht für die Anmeldung ohne Sozialversicherungsnummer (mit Geburtsname,
+ * Geburtsort und Staatsangehörigkeit für die Vergabe), fünfstellige Tätigkeit (KldB 2010) und Kennzeichen
+ * Arbeitnehmerüberlassung im Tätigkeitsschlüssel, bei Minijobs die Befreiung von der Rentenversicherungspflicht.
+ */
+const GESCHLECHT = [
+  { wert: "W", text: "weiblich" },
+  { wert: "M", text: "männlich" },
+  { wert: "D", text: "divers" },
+  { wert: "X", text: "unbestimmt" },
+];
+/** Tätigkeitsschlüssel Stelle 8 */
+const AN_UEBERLASSUNG = [
+  { wert: "1", text: "nein" },
+  { wert: "2", text: "ja" },
+];
+const RV_BEFREIUNG = [
+  { wert: "befreit", text: "Befreiung von der Rentenversicherungspflicht beantragt (§ 6 Abs. 1b SGB VI)" },
+  { wert: "pflichtig", text: "keine Befreiung – rentenversicherungspflichtig" },
+];
+export const SV_GESCHLECHT_HILFE = "Nötig, wenn noch keine Sozialversicherungsnummer vorliegt: Mit Geburtsname, Geburtsort und Staatsangehörigkeit wird damit die Nummer vergeben.";
+
 export const svMeldedaten: Vorlage = {
   id: "sv_meldedaten",
   gestalt: "formular",
@@ -473,6 +495,7 @@ export const svMeldedaten: Vorlage = {
         { id: "name", art: "text", label: "Vor- und Nachname", pflicht: true },
         { id: "geburtsname", selten: true, art: "text", label: "Geburtsname", hilfe: "falls abweichend" },
         { id: "geburtsdatum", art: "datum", label: "Geburtsdatum", pflicht: true },
+        { id: "geschlecht", art: "wahl", label: "Geschlecht", optionen: GESCHLECHT, hilfe: SV_GESCHLECHT_HILFE },
         { id: "geburtsort", art: "text", label: "Geburtsort", pflicht: true },
         { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit", pflicht: true },
         { id: "anschrift", art: "mehrzeilig", label: "Anschrift", pflicht: true },
@@ -492,8 +515,11 @@ export const svMeldedaten: Vorlage = {
         { id: "stunden", art: "zahl", label: "Wochenstunden", pflicht: true },
         { id: "entgelt", art: "betrag", label: "Monatliches Entgelt (€)", pflicht: true },
         { id: "taetigkeit", art: "text", label: "Tätigkeit", pflicht: true },
+        { id: "kldb", art: "text", label: "Ausgeübte Tätigkeit nach KldB 2010 (fünfstellig)", hilfe: "Stellen 1 bis 5 des Tätigkeitsschlüssels – Schlüsselverzeichnis der Bundesagentur für Arbeit; trägt sonst der Arbeitgeber bzw. das Lohnbüro ein" },
+        { id: "ueberlassung", art: "wahl", label: "Arbeitnehmerüberlassung", optionen: AN_UEBERLASSUNG, vorbelegung: "1", hilfe: "Stelle 8 des Tätigkeitsschlüssels" },
         { id: "schulabschluss", art: "wahl", label: "Höchster Schulabschluss", optionen: SV.schulabschluss },
         { id: "ausbildung", art: "wahl", label: "Höchster Berufsabschluss", optionen: SV.ausbildung },
+        { id: "rv_befreiung", art: "wahl", label: "Rentenversicherung im Minijob", optionen: RV_BEFREIUNG, wenn: { feld: "art", ist: "minijob" }, pflicht: true, hilfe: "Minijobs sind rentenversicherungspflichtig; die beschäftigte Person kann die Befreiung schriftlich beim Arbeitgeber beantragen (§ 6 Abs. 1b SGB VI)" },
         { id: "weitere", art: "schalter", label: "Hat weitere Beschäftigungen" },
         { id: "weitere_welche", art: "text", label: "Welche (Arbeitgeber, Umfang)", wenn: { feld: "weitere" }, pflicht: true },
       ],
@@ -509,6 +535,7 @@ export const svMeldedaten: Vorlage = {
     const pgText = SV.personengruppen.find((o) => o.wert === pg)?.text ?? pg;
     const f: string[] = [];
     if ((art === "minijob" || pg === "109") && grenze && e !== null && e > grenze.cent) f.push(`Entgelt über der Minijob-Grenze von ${euro(grenze.cent)} im Monat`);
+    if (text(d, "kldb").trim() && !/^\d{5}$/.test(text(d, "kldb").trim())) f.push("Tätigkeit nach KldB 2010: fünf Ziffern, z. B. aus dem Schlüsselverzeichnis der Bundesagentur für Arbeit");
     // Widersprüche zwischen den Auswahlen – Hinweise, kein Hindernis
     if (vf && ((art === "teilzeit" && /^Vollzeit/.test(vf.text)) || (art === "vollzeit" && /^Teilzeit/.test(vf.text)))) f.push(`Art „${artText}“ passt nicht zur Vertragsform „${vf.text}“ – bitte prüfen.`);
     if (art === "minijob" && pg && !["109", "110"].includes(pg)) f.push(`Art „Minijob“ mit Personengruppe „${pgText}“ – üblich ist 109 (bzw. 110 bei kurzfristiger Beschäftigung), bitte prüfen.`);
@@ -534,16 +561,33 @@ export const svMeldedaten: Vorlage = {
       ["Wochenstunden", text(d, "stunden")],
       ["Monatliches Entgelt", text(d, "entgelt") ? euro(cent(text(d, "entgelt")) ?? 0) : ""],
       ["Tätigkeit", text(d, "taetigkeit")],
+      [leer ? "Tätigkeit nach KldB 2010, fünfstellig (trägt der Arbeitgeber ein)" : "Tätigkeit nach KldB 2010", text(d, "kldb")],
+      [leer ? "Arbeitnehmerüberlassung (trägt der Arbeitgeber ein)" : "Arbeitnehmerüberlassung", mitSchluessel(AN_UEBERLASSUNG.find((o) => o.wert === wahl("ueberlassung", "1")))],
       // Schlüssel des Meldeverfahrens: auf dem leeren Blatt trägt sie der Arbeitgeber ein
       [leer ? "Personengruppe (trägt der Arbeitgeber ein)" : "Personengruppe", SV.personengruppen.find((o) => o.wert === wahl("personengruppe", "101"))?.text ?? ""],
       [leer ? "Vertragsform (trägt der Arbeitgeber ein)" : "Vertragsform", mitSchluessel(SV.vertragsform.find((o) => o.wert === wahl("vertragsform", "1")))],
       ["Schulabschluss", kreuze(SV.schulabschluss, text(d, "schulabschluss"), true)],
       ["Berufsabschluss", kreuze(SV.ausbildung, text(d, "ausbildung"), true)],
+      // Minijob: Befreiung von der Rentenversicherungspflicht – leer zum Ankreuzen
+      ...(leer || text(d, "art") === "minijob" ? ([["Nur bei Minijob: Rentenversicherung", kreuze(RV_BEFREIUNG, text(d, "rv_befreiung"), false)]] as [string, string | Roh][]) : []),
       ["Weitere Beschäftigungen", ja(d, "weitere") ? text(d, "weitere_welche") || "ja" : leer ? "" : "keine"],
     ];
     // Geburtsname: ausgefüllt oder auf dem leeren Blatt als Zeile; Feldnummern laufen durch
     const geburtsname = text(d, "geburtsname") || (leer ? "" : null);
-    const start = 11 - (geburtsname === null ? 1 : 0);
+    const person: [string, string | Roh | null][] = [
+      ["Name", text(d, "name")],
+      ["Geburtsname (falls abweichend)", geburtsname],
+      ["Geburtsdatum", datumDe(text(d, "geburtsdatum"))],
+      ["Geschlecht", kreuze(GESCHLECHT, text(d, "geschlecht"), false)],
+      ["Geburtsort", text(d, "geburtsort")],
+      ["Staatsangehörigkeit", text(d, "staatsangehoerigkeit")],
+      ["Anschrift", text(d, "anschrift")],
+      ["SV-Nummer", svNummerText(text(d, "sv_nummer"))],
+      ["Steuer-ID", text(d, "steuer_id")],
+      ["Krankenkasse", text(d, "krankenkasse")],
+      ["IBAN", ibanText(text(d, "iban"))],
+    ];
+    const start = person.filter((x) => x[1] !== null).length + 1;
     // das letzte Feld bleibt mit Erklärung und Unterschrift zusammen (nicht allein auf einer neuen Seite) – mehr
     // Felder schöben den Block samt Feldern auf die Folgeseite und ließen auf Seite 1 eine Lücke
     const teil = beschaeftigung.length - 1;
@@ -553,21 +597,10 @@ export const svMeldedaten: Vorlage = {
       unter: text(d, "name") ? `${text(d, "name")}, Angaben für die Anmeldung zur Sozialversicherung` : "Angaben für die Anmeldung zur Sozialversicherung",
       meta: `Beginn: ${datumDe(text(d, "beginn"))}`,
       inhalt:
-        `<p class="klein">Mit diesen Angaben meldet der Arbeitgeber bzw. das Lohnbüro die Beschäftigung bei der Krankenkasse an (DEÜV). Die Schlüssel für Personengruppe, Vertragsform und Abschlüsse sind die des Meldeverfahrens.</p>` +
+        `<p class="klein">Mit diesen Angaben meldet der Arbeitgeber bzw. das Lohnbüro die Beschäftigung bei der Krankenkasse an (DEÜV). Die Schlüssel für Personengruppe, Tätigkeit, Arbeitnehmerüberlassung, Vertragsform und Abschlüsse sind die des Meldeverfahrens. Liegt noch keine Sozialversicherungsnummer vor, werden Geschlecht, Geburtsname, Geburtsort und Staatsangehörigkeit für die Vergabe gebraucht.</p>` +
         abschnitt(
           "Person",
-          felder([
-            ["Name", text(d, "name")],
-            ["Geburtsname (falls abweichend)", geburtsname],
-            ["Geburtsdatum", datumDe(text(d, "geburtsdatum"))],
-            ["Geburtsort", text(d, "geburtsort")],
-            ["Staatsangehörigkeit", text(d, "staatsangehoerigkeit")],
-            ["Anschrift", text(d, "anschrift")],
-            ["SV-Nummer", svNummerText(text(d, "sv_nummer"))],
-            ["Steuer-ID", text(d, "steuer_id")],
-            ["Krankenkasse", text(d, "krankenkasse")],
-            ["IBAN", ibanText(text(d, "iban"))],
-          ]),
+          felder(person),
         ) +
         abschnitt(
           "Beschäftigung",

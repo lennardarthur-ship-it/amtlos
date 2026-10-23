@@ -4,7 +4,7 @@
  * (Muster DGUV Information 211-010), mit eigener Farbe und eigener Gliederung. Die Vorschläge zum Antippen sind allgemeine
  * Regeln je Maschine bzw. Tätigkeit; sie sind fachlich noch zu prüfen (PRUEFLISTE T-153).
  */
-import { BEREICHE_VORSCHLAG, BESCHRAENKUNG_VORSCHLAEGE, baAushang, baFelder, type BaTeil } from "./arbeitsschutz.js";
+import { BEREICHE_VORSCHLAG, baAushang, baFelder, type BaTeil } from "./arbeitsschutz.js";
 import { text } from "./html.js";
 import { optionen } from "./konstanten.js";
 import type { Daten, Vorlage } from "./typen.js";
@@ -179,9 +179,16 @@ const BIO_TEILE: BaTeil[] = [
     ]),
   },
 ];
-const BIO_VORSORGE: BaTeil = { id: "vorsorge", label: "Arbeitsmedizinische Vorsorge und Impfungen", hilfe: "z. B. Vorsorge nach ArbMedVV Anhang Teil 2, Impfangebot", vorschlaege: ["Arbeitsmedizinische Vorsorge nach ArbMedVV Anhang Teil 2 beim Betriebsarzt; Impfung gegen Hepatitis B wird angeboten."], wennGefuellt: true, pflicht: false };
-const BIO_BESCHRAENKUNG: BaTeil = { id: "beschraenkung", label: "Beschäftigungsbeschränkungen", hilfe: "z. B. Mutterschutz", vorschlaege: [...BESCHRAENKUNG_VORSCHLAEGE.slice(1), "Schwangere: Immunstatus klären; bei unverantwortbarer Gefährdung keine Tätigkeit mit diesen Biostoffen (§ 11 Abs. 2 MuSchG)."], wennGefuellt: true, pflicht: false };
+/**
+ * Durchsicht T. Koch 23.10.2026: Vorsorge und Beschäftigungsbeschränkungen stehen immer auf dem Aushang (leer mit Linien
+ * zum Ausfüllen). B-283: Impfungen nur, soweit tätigkeitsbedingt erforderlich (§ 6 Abs. 2 ArbMedVV); B-284 (pauschales
+ * Verbot „mit diesem Stoff“) gestrichen – B-285 deckt den Mutterschutz bei Biostoffen ab.
+ */
+const BIO_VORSORGE: BaTeil = { id: "vorsorge", label: "Arbeitsmedizinische Vorsorge und Impfungen", hilfe: "z. B. Vorsorge nach ArbMedVV Anhang Teil 2, Impfangebot", vorschlaege: ["Arbeitsmedizinische Vorsorge nach ArbMedVV Anhang Teil 2 beim Betriebsarzt; Impfungen (z. B. Hepatitis B) werden angeboten, soweit tätigkeitsbedingt erforderlich."], linien: 2, pflicht: false };
+const BIO_BESCHRAENKUNG: BaTeil = { id: "beschraenkung", label: "Beschäftigungsbeschränkungen", hilfe: "z. B. Mutterschutz", vorschlaege: ["Schwangere: Immunstatus klären; bei unverantwortbarer Gefährdung keine Tätigkeit mit diesen Biostoffen (§ 11 Abs. 2 MuSchG)."], linien: 2, pflicht: false };
 const SCHUTZSTUFE: Record<string, string> = { "1": "Schutzstufe 1", "2": "Schutzstufe 2", "3": "Schutzstufe 3", "4": "Schutzstufe 4" };
+/** Durchsicht T. Koch 23.10.2026: Tätigkeiten mit Kontakt zu Blut und Körperflüssigkeiten sind nach TRBA 250 mindestens Schutzstufe 2. */
+export const BIO_SCHUTZSTUFE_BLUT = "Tätigkeiten mit Kontakt zu Blut und Körperflüssigkeiten sind nach TRBA 250 mindestens Schutzstufe 2 – bitte die Schutzstufe prüfen.";
 
 export const betriebsanweisungBiostoffe: Vorlage = {
   id: "betriebsanweisung_biostoffe",
@@ -197,17 +204,22 @@ export const betriebsanweisungBiostoffe: Vorlage = {
       felder: [
         { id: "taetigkeit", art: "text", label: "Arbeitsbereich und Tätigkeit", hilfe: "z. B. Blutentnahme und Injektionen, Fußpflege, Kosmetikbehandlung", pflicht: true, vorschlaege: ["Untersuchung und Behandlung in der Praxis", "Blutentnahme und Injektionen", "Fußpflege", "Kosmetikbehandlung mit möglichem Blutkontakt"], vorschlagGruppen: { "Untersuchung und Behandlung in der Praxis": PRAXIS, "Blutentnahme und Injektionen": PRAXIS, Fußpflege: ["kosmetik"], "Kosmetikbehandlung mit möglichem Blutkontakt": ["kosmetik"] } },
         { id: "biostoffe", art: "text", label: "Biostoffe", hilfe: "Welche Biostoffe vorkommen können, mit Risikogruppe – aus der Gefährdungsbeurteilung (TRBA 250)", pflicht: true, vorschlaege: ["Krankheitserreger in Blut und Körperflüssigkeiten (z. B. Hepatitis-B-, Hepatitis-C-Virus, HIV)", "Erreger von Haut- und Nagelpilz"] },
-        { id: "schutzstufe", art: "wahl", label: "Schutzstufe der Tätigkeit", optionen: optionen(SCHUTZSTUFE), hilfe: "Aus der Gefährdungsbeurteilung (TRBA 250); in Praxen meist Schutzstufe 2" },
+        // Durchsicht T. Koch 23.10.2026: ohne Vorbelegung, der Nutzer muss wählen; Hilfetext mit Verweis auf TRBA 250
+        { id: "schutzstufe", art: "wahl", label: "Schutzstufe der Tätigkeit", optionen: optionen(SCHUTZSTUFE), pflicht: true, hilfe: "Aus der Gefährdungsbeurteilung nach TRBA 250 – Tätigkeiten mit Kontakt zu Blut und Körperflüssigkeiten sind mindestens Schutzstufe 2" },
         { id: "nummer", selten: true, art: "text", label: "Nummer der Betriebsanweisung", hilfe: "z. B. BA-B-01" },
       ],
     },
     {
       titel: "Inhalt nach § 14 BioStoffV",
       hilfe: "Grundlage sind deine Gefährdungsbeurteilung und dein Hygieneplan; die Vorschläge sind allgemeine Regeln.",
-      felder: [...baFelder(BIO_TEILE), ...baFelder([BIO_VORSORGE, BIO_BESCHRAENKUNG]).map((f) => ({ ...f, selten: true }))],
+      felder: baFelder([...BIO_TEILE, BIO_VORSORGE, BIO_BESCHRAENKUNG]),
     },
     NOTRUF_FREIGABE,
   ],
+  hinweise(d: Daten) {
+    const blut = /blut|körperflüssigkeit|injektion|kanüle/i.test(`${text(d, "taetigkeit")} ${text(d, "biostoffe")}`);
+    return text(d, "schutzstufe") === "1" && blut ? [BIO_SCHUTZSTUFE_BLUT] : [];
+  },
   html(d: Daten, b) {
     // Grün (Rettungszeichen), weiße Schrift mit mehr als 4,5 : 1
     return baAushang({

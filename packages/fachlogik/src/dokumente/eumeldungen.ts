@@ -9,8 +9,8 @@
  *   (EU-einheitlich). Die Umsätze gehören nicht in die deutsche Voranmeldung.
  * - Zusammenfassende Meldung (§ 18a UStG): innergemeinschaftliche Lieferungen (L), sonstige Leistungen an Unternehmen
  *   im EU-Ausland, für die der Empfänger die Steuer schuldet (S), und Dreiecksgeschäfte (D) je USt-IdNr. des Erwerbers;
- *   bis zum 25. Tag nach Ablauf des Meldezeitraums (Monat; Quartal bei Lieferungen bis 50.000 € je Quartal bzw. nur
- *   sonstigen Leistungen). Beträge in vollen Euro.
+ *   bis zum 25. Tag nach Ablauf des Meldezeitraums (Monat; Quartal bei Lieferungen bis 50.000 € im laufenden und den
+ *   vier vorangegangenen Quartalen bzw. nur sonstigen Leistungen, § 18a Abs. 1 Satz 2 UStG). Beträge in vollen Euro.
  *
  * Die Werte trägt die App aus den geteilten Rechnungen ein („Aus Rechnungen übernehmen“, apps/mobile
  * src/unterlagen/euMeldungen.ts) – sie übermittelt nichts. Fachlich zu prüfen: Kennzeichnung der Länder und Sätze.
@@ -33,6 +33,12 @@ export const landName = (t: string) => EU_LAENDER_NAMEN[t.trim().toUpperCase() =
 export const OSS_FRIST = "bis zum letzten Tag des Monats nach Ablauf des Quartals über das BZStOnline-Portal zu übermitteln und zu zahlen (§ 18j Abs. 4 UStG) – die Frist verschiebt sich nicht, wenn sie auf ein Wochenende oder einen Feiertag fällt";
 export const OSS_NICHT_VA = "OSS-Umsätze gehören nicht in die deutsche Umsatzsteuer-Voranmeldung; die Steuer zahlst du an das BZSt, das sie an die Bestimmungsländer weiterleitet.";
 export const ZM_FRIST = "bis zum 25. Tag nach Ablauf des Meldezeitraums elektronisch an das BZSt zu übermitteln (§ 18a Abs. 1 UStG)";
+/** StB Busch (Durchsicht 23.10.2026): Lieferschwelle nach § 3c Abs. 4 UStG (Wortlaut des Prüfers). */
+export const OSS_LIEFERSCHWELLE = "Die Lieferschwelle von 10.000 € gilt EU-weit für Fernverkäufe von Waren sowie Telekommunikations-, Rundfunk- und elektronische Dienstleistungen an Privatpersonen; sie ist überschritten, wenn diese Umsätze im Vorjahr oder im laufenden Jahr insgesamt mehr als 10.000 € betragen (§ 3c Abs. 4 UStG).";
+/** StB Busch (Durchsicht 23.10.2026): Korrekturen früherer Quartale. */
+export const OSS_KORREKTUR = "Korrekturen früherer Quartale gehören nicht als negative Beträge in das laufende Quartal, sondern in den Berichtigungsteil einer späteren Erklärung.";
+/** StB Busch (Durchsicht 23.10.2026): Meldezeitraum nach § 18a Abs. 1 Satz 2 UStG. */
+export const ZM_ZEITRAUM = "Meldezeitraum ist der Kalendermonat; vierteljährlich ist wählbar, wenn die innergemeinschaftlichen Lieferungen weder im laufenden noch in einem der vier vorangegangenen Quartale jeweils 50.000 € übersteigen (§ 18a Abs. 1 Satz 2 UStG), und bei nur sonstigen Leistungen. Wird die Grenze im laufenden Quartal überschritten, ist ab dem Monat der Überschreitung monatlich zu melden.";
 export const ZM_SKONTO = "Ändert sich die Bemessungsgrundlage später (z. B. Skonto, Rabatt, Rücksendung), ist die Meldung für den ursprünglichen Meldezeitraum innerhalb eines Monats zu berichtigen (§ 18a Abs. 10 UStG).";
 
 /** Steuersatz in Prozent aus dem Feld („20“, „5,5“) – null, wenn nicht lesbar */
@@ -80,12 +86,16 @@ export const oss: Vorlage = {
             { id: "netto", art: "betrag", label: "Bemessungsgrundlage netto (€)", pflicht: true },
           ],
         },
-        { id: "notiz", selten: true, art: "mehrzeilig", label: "Notiz", hilfe: "z. B. Korrekturen früherer Quartale (werden in der Erklärung des laufenden Quartals gesondert angegeben)" },
+        { id: "notiz", selten: true, art: "mehrzeilig", label: "Notiz", hilfe: `z. B. Besonderheiten in diesem Quartal. ${OSS_KORREKTUR}` },
       ],
     },
   ],
   pruefen(d) {
     return ossZeilen(d).some((z) => z.satz === null && text(z.e, "satz").trim()) ? ["Steuersatz je Zeile als Zahl, z. B. 20 oder 5,5"] : [];
+  },
+  // StB Busch (Durchsicht 23.10.2026): negative Beträge sind meist Korrekturen früherer Quartale
+  hinweise(d) {
+    return ossZeilen(d).some((z) => z.netto < 0) ? [OSS_KORREKTUR] : [];
   },
   ergebnis(d) {
     const z = ossZeilen(d);
@@ -115,7 +125,7 @@ export const oss: Vorlage = {
         (jeLand.length > 1 ? abschnitt("Steuer je Land", tabelle(["Bestimmungsland", "Steuer"], jeLand.map(([l, c]) => [zelle(l), euro(c)]), { breiten: ["70%", "30%"], zahlen: [1] })) : "") +
         (text(d, "notiz") ? abschnitt("Notiz", absatz(text(d, "notiz"))) : "") +
         nachsatz(`Erklärung und Zahlung ${OSS_FRIST}. ${OSS_NICHT_VA}`) +
-        nachsatz("Die Lieferschwelle von 10.000 € gilt EU-weit für Fernverkäufe und Leistungen an Privatpersonen im Vorjahr und im laufenden Jahr zusammen (§ 3c Abs. 4 UStG). Steuersätze und Ware je Land vor dem Übertragen prüfen.") +
+        nachsatz(`${OSS_LIEFERSCHWELLE} ${OSS_KORREKTUR} Steuersätze und Ware je Land vor dem Übertragen prüfen.`) +
         steuerHinweis("erklaerung", MARKE.name) +
         uebertragung(["Übermittelt am (BZStOnline-Portal)", "Gezahlt am"]),
     });
@@ -193,7 +203,7 @@ export const zusammenfassendeMeldung: Vorlage = {
         ) +
         abschnitt("Summe", kennzahlen([{ text: "Summe aller Meldungen", hinweis: "in vollen Euro", betrag: leer ? "&nbsp;" : voll(z.reduce((a, x) => a + x.betrag, 0)), fett: true }])) +
         (text(d, "notiz") ? abschnitt("Notiz", absatz(text(d, "notiz"))) : "") +
-        nachsatz(`Die Meldung ist ${ZM_FRIST}. Meldezeitraum ist der Kalendermonat; vierteljährlich, wenn die innergemeinschaftlichen Lieferungen in keinem der vier vorangegangenen Quartale 50.000 € überstiegen haben, und bei nur sonstigen Leistungen. Lieferungen zählen im Zeitraum der Rechnung, spätestens im Monat nach der Lieferung; sonstige Leistungen im Zeitraum der Ausführung. Kleinunternehmer geben keine Zusammenfassende Meldung ab.`) +
+        nachsatz(`Die Meldung ist ${ZM_FRIST}. ${ZM_ZEITRAUM} Lieferungen zählen im Zeitraum der Rechnung, spätestens im Monat nach der Lieferung; sonstige Leistungen im Zeitraum der Ausführung. Kleinunternehmer geben keine Zusammenfassende Meldung ab.`) +
         nachsatz(ZM_SKONTO) +
         steuerHinweis("erklaerung", MARKE.name) +
         uebertragung(["Übermittelt am", "Transferticket (ELSTER)"]),

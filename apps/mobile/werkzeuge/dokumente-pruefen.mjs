@@ -168,9 +168,9 @@ function arbeitsschutzVoll(v, d) {
     };
   if (v.id === "pruefprotokoll_elektro") return { ...d, einsatz: feld("einsatz").optionen[3].wert, qualifikation: "efk", geraete: (d.geraete ?? []).map((e) => ({ ...e, naechste: null })) };
   if (v.id === "betriebsanweisung_maschine") return { ...d, maschine: "Aufschnittmaschine", arbeitsbereich: "Küche", nummer: "BA-M-01", gefahren: vorschlaegeVon("gefahren").split("\n").slice(0, 2).join("\n"), schutz: vorschlaegeVon("schutz").split("\n").slice(0, 4).join("\n"), stoerung: vorschlaegeVon("stoerung"), unfall: vorschlaegeVon("unfall"), instandhaltung: vorschlaegeVon("instandhaltung"), beschraenkung: "", notruf: "Notruf 112 · Ersthelferin: Mara Lindner, Tel. 0151 2345678" };
-  if (v.id === "betriebsanweisung_biostoffe") return { ...d, taetigkeit: "Blutentnahme und Injektionen", biostoffe: "Krankheitserreger in Blut und Körperflüssigkeiten (z. B. Hepatitis-B-, Hepatitis-C-Virus, HIV)", schutzstufe: "2", nummer: "BA-B-01", gefahren: vorschlaegeVon("gefahren").split("\n").slice(0, 2).join("\n"), schutz: vorschlaegeVon("schutz"), unfall: vorschlaegeVon("unfall").split("\n").slice(0, 3).join("\n"), entsorgung: vorschlaegeVon("entsorgung"), vorsorge: "", beschraenkung: "", notruf: "Notruf 112 · Ersthelfer: Dr. Jonas Weber, Tel. 0151 9876543" };
+  if (v.id === "betriebsanweisung_biostoffe") return { ...d, taetigkeit: "Blutentnahme und Injektionen", biostoffe: "Krankheitserreger in Blut und Körperflüssigkeiten (z. B. Hepatitis-B-, Hepatitis-C-Virus, HIV)", schutzstufe: "2", nummer: "BA-B-01", gefahren: vorschlaegeVon("gefahren").split("\n").slice(0, 2).join("\n"), schutz: vorschlaegeVon("schutz"), unfall: vorschlaegeVon("unfall").split("\n").slice(0, 3).join("\n"), entsorgung: vorschlaegeVon("entsorgung"), vorsorge: vorschlaegeVon("vorsorge"), beschraenkung: vorschlaegeVon("beschraenkung"), notruf: "Notruf 112 · Ersthelfer: Dr. Jonas Weber, Tel. 0151 9876543" };
   if (v.id === "expositionsverzeichnis")
-    return { ...d, eintraege: [["Ole Holm", "Schleifen und Fräsen von Eiche und Buche", "Hartholzstaub (z. B. Eiche, Buche)", "unter 2 mg/m³ (Messung vom 12.03.2026)", "2019-08-01", "etwa 6 Stunden je Woche"], ["Finn Berger", "Zuschnitt an der Formatkreissäge", "Hartholzstaub (z. B. Eiche, Buche)", "unter 1 mg/m³ (Abschätzung nach TRGS 553)", "2024-09-01", "etwa 3 Stunden je Woche"], ["Kai Demir", "Motorlauf bei der Fehlersuche in der Halle", "Dieselmotoremissionen", "Absaugung am Auspuff; Abschätzung nach TRGS 554", "2025-01-15", "etwa 1 Stunde je Woche"]].map(([name, taetigkeit, stoff, hoehe, von, dauer]) => ({ name, taetigkeit, stoff, kategorie: "k", hoehe, von, bis: null, dauer })) };
+    return { ...d, eintraege: [["Ole Holm", "Schleifen und Fräsen von Eiche und Buche", "Hartholzstaub (z. B. Eiche, Buche)", "unter 2 mg/m³ (Messung vom 12.03.2026)", "2019-08-01", "etwa 6 Stunden je Woche"], ["Finn Berger", "Zuschnitt an der Formatkreissäge", "Hartholzstaub (z. B. Eiche, Buche)", "unter 1 mg/m³ (Abschätzung nach TRGS 553)", "2024-09-01", "etwa 3 Stunden je Woche"], ["Kai Demir", "Motorlauf bei der Fehlersuche in der Halle", "Dieselmotoremissionen", "Absaugung am Auspuff; Abschätzung nach TRGS 554", "2025-01-15", "etwa 1 Stunde je Woche"]].map(([name, taetigkeit, stoff, hoehe, von, dauer], i) => ({ name, geburtsdatum: ["1984-04-12", "1996-11-03", "1991-06-27"][i], taetigkeit, stoff, kennung: "Tätigkeit nach TRGS 906", kategorie: "k", hoehe, von, bis: null, dauer })) };
   return d;
 }
 
@@ -228,7 +228,11 @@ function auswahl(v) {
   const d = voll(v);
   for (const a of v.abschnitte)
     for (const f of a.felder) {
-      if (f.art === "wahl" && f.optionen.length) d[f.id] = (f.optionen.find((o) => o.wert !== d[f.id]) ?? f.optionen[0]).wert;
+      // Durchsicht T. Koch 23.10.2026: Biostoffe mit Blutkontakt sind mindestens Schutzstufe 2 – die Auswahl bleibt dabei
+      if (v.id === "betriebsanweisung_biostoffe" && f.id === "schutzstufe") continue;
+      // leere Textfelder mit Vorschlägen (z. B. Beschäftigungsbeschränkungen, B-266): mit den Vorschlägen, damit der Abschnitt erscheint
+      if (f.art === "mehrzeilig" && !String(d[f.id] ?? "").trim() && f.vorschlaege?.length) d[f.id] = f.vorschlaege.join("\n");
+      else if (f.art === "wahl" && f.optionen.length) d[f.id] = (f.optionen.find((o) => o.wert !== d[f.id]) ?? f.optionen[0]).wert;
       else if (f.art === "schalter") d[f.id] = d[f.id] !== true;
       else if ((f.art === "mehrfach" || f.art === "bausteine") && f.optionen.length) d[f.id] = f.optionen.map((o) => o.wert);
       else if (f.art === "datum" && !d[f.id]) d[f.id] = HEUTE;

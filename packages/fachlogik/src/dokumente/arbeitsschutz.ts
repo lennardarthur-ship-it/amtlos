@@ -197,7 +197,7 @@ const GASTRO = "Gastronomie / Café";
 const sonst = (unterpunkt: string): Eintrag => ({ unterpunkt });
 const GEFAEHRDUNGEN_SIFA: Vorschlag[] = [
   g(GASTRO, "CO2 aus Getränkeschankanlagen und Druckgasflaschen im Keller: Erstickung.", "einwirkungen", "CO2-Warnanlage in Räumen mit Gasflaschen bzw. Schankanlage.\nGasflaschen gegen Umfallen sichern.\nSchankanlage nach BetrSichV prüfen lassen.\nBeschäftigte unterweisen.", "DGUV Regel 110-007; BetrSichV; TRGS 510", "hoch"),
-  g(GASTRO, "Gasgeräte und Flüssiggas: Brand, Explosion, Kohlenmonoxid.", "sonstiges", "Gasgeräte mit der Lüftung verriegeln.\nFlüssiggasanlagen prüfen lassen; Gasmangelsicherung.\nVerhalten bei Gasgeruch unterweisen.", "DGUV Vorschrift 79; DGUV Regel 110-003; BetrSichV", "hoch", sonst("brand")),
+  g(GASTRO, "Gasgeräte und Flüssiggas: Brand, Explosion, Kohlenmonoxid.", "sonstiges", "Gasgeräte mit der Lüftung verriegeln.\nFlüssiggasanlagen prüfen lassen; Gasmangelsicherung.\nVerhalten bei Gasgeruch unterweisen.", "DGUV Regel 110-010; DGUV Regel 110-003; BetrSichV", "hoch", sonst("brand")),
   g(GASTRO, "Brandschutz allgemein: Feuerlöscher, Flucht- und Rettungswege, Brandschutzhelfer.", "sonstiges", "Grundausstattung mit Feuerlöschern nach ASR A2.2.\nFlucht- und Rettungswege freihalten (ASR A2.3).\nBrandschutzhelferinnen und -helfer benennen und ausbilden (in der Regel 5 % der Beschäftigten).", "ASR A2.2; ASR A2.3", "mittel", sonst("brand")),
   g(GASTRO, "Alleinarbeit, Spät- und Nachtschicht, Gästeaggression beim Kassenabschluss.", "psychisch", "Erreichbarkeit und Notruf regeln.\nKassenabschluss ohne Publikum.\nBargeldbestand in der Kasse gering halten.", "BGN; DGUV Regel 112-139", "mittel"),
   g("Friseur", "Schnitt- und Stichverletzungen an Scheren und Rasiermessern (mit Blutkontakt).", "arbeitsmittel", "Rasiermesser mit Wechselklinge verwenden.\nKlingen in durchstichsichere Behälter entsorgen.\nVerletzungen im Verbandbuch eintragen; Hygieneplan anwenden.", "BGW; Hygieneverordnung des Landes", "mittel"),
@@ -215,7 +215,7 @@ const GEFAEHRDUNGEN_SIFA: Vorschlag[] = [
   g("Gebäudereinigung", "Ätzende Sanitär- und Grundreiniger: Verätzung von Haut und Augen.", "einwirkungen", "Durch mildere Reiniger ersetzen, wo möglich.\nDosiersysteme verwenden.\nSchutzbrille tragen; Betriebsanweisung für die Reiniger.", "DGUV Regel 101-019; TRGS 555", "mittel"),
   g("Gebäudereinigung", "Ausrutschen auf frisch gewischten Böden.", "arbeitsstaette", "Nasse Bereiche absperren bzw. kennzeichnen.\nRutschhemmende Schuhe tragen.\nIn Nass- und Trockenzonen arbeiten.", "ASR A1.5; BG BAU", "mittel"),
   g("Gebäudereinigung", "Absturz bei Glas- und Fensterreinigung, von Leitern und Tritten.", "arbeitsmittel", "Teleskopstangen statt Leitern verwenden.\nGeeignete Tritte einsetzen.\nVorhandene Anschlageinrichtungen nutzen.", "DGUV Information 208-016; BG BAU", "hoch"),
-  g("Gebäudereinigung", "Biostoffe in Sanitärbereichen.", "einwirkungen", "Schutzhandschuhe tragen.\nReinigungstücher nach Farben trennen (Farbkodierung).\nHändehygiene; Impfangebot mit dem Betriebsarzt prüfen.", `BioStoffV; TRBA 220 und TRBA 250 sinngemäß – ${PRUEFEN}`, "mittel"),
+  g("Gebäudereinigung", "Biostoffe in Sanitärbereichen.", "einwirkungen", "Schutzhandschuhe tragen.\nReinigungstücher nach Farben trennen (Farbkodierung).\nHändehygiene; Impfangebot mit dem Betriebsarzt prüfen.", `BioStoffV; TRBA 250 sinngemäß – ${PRUEFEN}`, "mittel"),
   g("Gebäudereinigung", "Heben und Tragen, Zwangshaltungen, Reinigungsmaschinen (Lärm, Elektrik).", "ablaeufe_arbeitszeit", "Leichte Geräte und Fahrwagen einsetzen.\nReinigungsmaschinen nach DGUV Vorschrift 3 prüfen lassen.\nKabel so führen, dass niemand stolpert.", "LasthandhabV; DGUV Vorschrift 3", "mittel"),
   g("Büro / Laden", "Flurförderzeuge (Handhubwagen) und Warenannahme.", "arbeitsmittel", "Beschäftigte unterweisen.\nSicherheitsschuhe tragen.\nVerkehrswege für Personen und Fahrzeuge trennen.", "BGHW; DGUV Vorschrift 68 (nur bei Gabelstaplern)", "mittel"),
   g("Büro / Laden", "Kälte an Kühltheken und in Kühlräumen.", "einwirkungen", "Kälteschutzkleidung bereitstellen.\nAufwärmzeiten einplanen.", "BGHW; ASR A3.5", "gering"),
@@ -234,31 +234,38 @@ const MUSCH_STICHWORTE = /krebserzeugend|hartholz|holzstaub|lärm|gefahrstoff|l�
 const SCHUTZBEDUERFTIG: Record<string, string> = { jugendliche: "Jugendliche", schwangere: "Schwangere und stillende Frauen", leiharbeit: "Leiharbeitnehmerinnen und Leiharbeitnehmer", fremdfirmen: "Beschäftigte von Fremdfirmen", behinderung: "Menschen mit Behinderung" };
 /**
  * E-167 (Blatt „B Vorlagen“, § 3 Abs. 6 BetrSichV): Art, Umfang und Fristen der Prüfungen von Arbeitsmitteln. Vorschläge
- * mit Frist aus der genannten Quelle; wo die Frist erst die Gefährdungsbeurteilung ergibt, steht das so da.
+ * mit Frist aus der genannten Quelle; wo die Frist erst die Gefährdungsbeurteilung ergibt, steht das so da. Durchsicht
+ * T. Koch 23.10.2026: Fristen „mindestens jährlich“, Tabelle 1B vollständig (B-226), DGUV Regel 110-010 statt DGUV
+ * Vorschrift 79 (B-200, B-233), TRBA 220 gestrichen (B-218).
  */
 const pruef = (gruppe: string | undefined, arbeitsmittel: string, pruefart: string, frist: string, befaehigt: string, quelle: string): Vorschlag => ({ ...(gruppe ? { gruppe } : {}), titel: arbeitsmittel, werte: { arbeitsmittel, pruefart, frist, befaehigt }, quelle });
 const ALLE_BRANCHEN = undefined;
 export const PRUEF_VORSCHLAEGE: Vorschlag[] = [
-  pruef(ALLE_BRANCHEN, "Ortsveränderliche elektrische Geräte und Verlängerungsleitungen", "Prüfung nach DIN EN 50699 (VDE 0702)", "Richtwert 6 Monate, in Büros höchstens 2 Jahre bei Fehlerquote unter 2 %", "Elektrofachkraft bzw. elektrotechnisch unterwiesene Person unter Leitung einer Elektrofachkraft", "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1B"),
+  pruef(ALLE_BRANCHEN, "Ortsveränderliche elektrische Geräte und Verlängerungsleitungen", "Prüfung nach DIN EN 50699 (VDE 0702)", "Richtwert 6 Monate, in Büros höchstens 2 Jahre bei Fehlerquote unter 2 %; Werkstätten und ähnliche Bedingungen höchstens 1 Jahr; Baustellen Richtwert 3 Monate, höchstens 1 Jahr", "Elektrofachkraft bzw. elektrotechnisch unterwiesene Person unter Leitung einer Elektrofachkraft", "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1B"),
   pruef(ALLE_BRANCHEN, "Elektrische Anlagen und ortsfeste Betriebsmittel", "Wiederholungsprüfung", "Richtwert 4 Jahre", "Elektrofachkraft", "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A"),
   pruef(ALLE_BRANCHEN, "Fehlerstrom-Schutzschalter (stationäre Anlagen)", "Prüftaste betätigen", "Richtwert 6 Monate", "unterwiesene Benutzerin bzw. unterwiesener Benutzer", "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A"),
   pruef(ALLE_BRANCHEN, "Feuerlöscher", "Instandhaltung und Prüfung", "spätestens alle 2 Jahre", "Sachkundige Person", "ASR A2.2"),
   pruef(ALLE_BRANCHEN, "Leitern und Tritte", "Sichtprüfung vor Benutzung; Prüfung durch befähigte Person", "Frist nach Gefährdungsbeurteilung (in der Regel 12 Monate)", "befähigte Person", "DGUV Information 208-016; §§ 3 Abs. 6, 14 BetrSichV"),
-  pruef(ALLE_BRANCHEN, "Regale und Lagereinrichtungen", "Regalinspektion", "mindestens 12 Monate", "befähigte Person", "DIN EN 15635; § 14 BetrSichV"),
+  pruef(ALLE_BRANCHEN, "Regale und Lagereinrichtungen", "Regalinspektion", "mindestens jährlich", "befähigte Person", "DIN EN 15635; § 14 BetrSichV"),
   pruef("Gastronomie / Café", "Getränkeschankanlage mit CO2-Druckgasflaschen", "Prüfung nach BetrSichV", "Frist nach Gefährdungsbeurteilung", "befähigte Person", "DGUV Regel 110-007; BetrSichV – fachlich zu prüfen"),
-  pruef("Gastronomie / Café", "Flüssiggasanlage und Gasgeräte", "Prüfung auf Dichtheit und sicheren Betrieb", "Frist nach Gefährdungsbeurteilung", "befähigte Person bzw. Sachkundige", "DGUV Vorschrift 79; BetrSichV – fachlich zu prüfen"),
+  pruef("Gastronomie / Café", "Flüssiggasanlage und Gasgeräte", "Prüfung auf Dichtheit und sicheren Betrieb", "Frist nach Gefährdungsbeurteilung", "befähigte Person", "DGUV Regel 110-010; BetrSichV – fachlich zu prüfen"),
   pruef("Gastronomie / Café", "Aufschnittmaschine", "Prüfung der Schutzeinrichtungen", "Frist nach Gefährdungsbeurteilung", "befähigte Person", "§§ 3 Abs. 6, 14 BetrSichV"),
   pruef("Bäckerei", "Knet-, Teig- und Ausrollmaschinen", "Prüfung der Schutzeinrichtungen und Verriegelungen", "Frist nach Gefährdungsbeurteilung", "befähigte Person", "§§ 3 Abs. 6, 14 BetrSichV"),
-  pruef("Kfz-Werkstatt", "Hebebühne", "Wiederkehrende Prüfung", "mindestens 12 Monate", "befähigte Person", "§ 14 BetrSichV; DGUV Grundsatz 308-002"),
+  pruef("Kfz-Werkstatt", "Hebebühne", "Wiederkehrende Prüfung", "mindestens jährlich", "befähigte Person", "§ 14 BetrSichV; DGUV Grundsatz 308-002"),
   pruef("Kfz-Werkstatt", "Kompressor und Druckluftbehälter", "Prüfung nach BetrSichV Anhang 2 Abschnitt 4", "Frist nach Prüffristenermittlung", "befähigte Person bzw. zugelassene Überwachungsstelle", "BetrSichV Anhang 2 Abschnitt 4"),
-  pruef(undefined, "Firmenfahrzeuge", "Prüfung auf betriebssicheren Zustand", "mindestens 12 Monate", "Sachkundige Person", "§ 57 DGUV Vorschrift 70"),
+  pruef(undefined, "Firmenfahrzeuge", "Prüfung auf betriebssicheren Zustand", "mindestens jährlich", "Sachkundige Person", "§ 57 DGUV Vorschrift 70"),
   pruef("Holz / Tischlerei", "Holzbearbeitungsmaschinen (z. B. Kreissäge)", "Prüfung der Schutzeinrichtungen", "Frist nach Gefährdungsbeurteilung", "befähigte Person", "§§ 3 Abs. 6, 14 BetrSichV; DGUV Regel 109-606"),
 ];
-/** Nächster Prüftermin als Vorschlag: letzte Prüfung plus erste Monats- bzw. Jahreszahl der Frist („12 Monate“, „2 Jahre“). */
+/**
+ * Nächster Prüftermin als Vorschlag: letzte Prüfung plus erste Monats- bzw. Jahreszahl der Frist („12 Monate“, „2 Jahre“);
+ * „mindestens jährlich“ (Durchsicht T. Koch 23.10.2026, B-231/B-236/B-238) zählt als 12 Monate.
+ */
 export function naechstePruefung(letzte: string, frist: string): string {
   const m = /(\d+)\s*(Monat|Monate|Jahr|Jahre)\b/.exec(frist);
-  if (!letzte || !m || /Gefährdungsbeurteilung|Prüffristenermittlung/.test(frist.slice(0, m.index))) return "";
-  return plusMonate(letzte, Number(m[1]) * (m[2]!.startsWith("Jahr") ? 12 : 1));
+  const j = /\bjährlich\b/.exec(frist);
+  const stelle = m && (!j || m.index < j.index) ? m.index : j?.index;
+  if (!letzte || stelle === undefined || /Gefährdungsbeurteilung|Prüffristenermittlung/.test(frist.slice(0, stelle))) return "";
+  return plusMonate(letzte, m && stelle === m.index ? Number(m[1]) * (m[2]!.startsWith("Jahr") ? 12 : 1) : 12);
 }
 const PRUEF_KOPF = ["Arbeitsmittel", "Prüfart", "Frist", "Befähigte Person", "Letzte Prüfung", "Nächste Prüfung"];
 const PRUEF_BREITEN = ["21%", "19%", "18%", "18%", "12%", "12%"];
@@ -799,10 +806,12 @@ export const gefahrstoffverzeichnis: Vorlage = {
  * E-167 (Sifa-Durchsicht, Blatt „B Vorlagen“, B-079, B-085): Verzeichnis der Beschäftigten mit Tätigkeiten mit
  * krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A oder 1B, mit Höhe und
  * Dauer der Exposition (§ 10a GefStoffV in der Fassung vom 2.12.2024) – z. B. Hartholzstaub in der Tischlerei,
- * Dieselmotoremissionen in der Werkstatt. Aufbewahrungsfrist und Auszug für die Beschäftigten fachlich zu prüfen (T-153).
+ * Dieselmotoremissionen in der Werkstatt. Durchsicht T. Koch 23.10.2026 (TRGS 410 Nr. 5): Geburtsdatum, eindeutige
+ * Stoffkennung bzw. Tätigkeit nach TRGS 906, Ermittlungsmethode und Beurteilungsmaßstab als Feldhinweis, Datum der
+ * Aktualisierung; Fußtext mit 5-Jahres-Frist für ausschließlich reproduktionstoxische Stoffe und der ZED.
  */
 const EXPO_STOFFE = ["Hartholzstaub (z. B. Eiche, Buche)", "Dieselmotoremissionen"];
-export const EXPO_HINWEIS = "Verzeichnis nach § 10a GefStoffV: Beschäftigte mit Tätigkeiten mit krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A oder 1B, mit Höhe und Dauer der Exposition. Das Verzeichnis wird aktuell gehalten und 40 Jahre nach Ende der Exposition aufbewahrt; Beschäftigte erhalten beim Ausscheiden einen Auszug ihrer Angaben.";
+export const EXPO_HINWEIS = "Verzeichnis nach § 10a GefStoffV (TRGS 410): Beschäftigte mit Tätigkeiten mit krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A oder 1B, mit Höhe und Dauer der Exposition. Das Verzeichnis wird aktuell gehalten; bei Änderungen wird das Datum der Aktualisierung festgehalten (TRGS 410 Nr. 5 Abs. 2). Aufbewahrung: 40 Jahre, bei ausschließlich reproduktionstoxischen Stoffen 5 Jahre nach Ende der Exposition; Abgabe an die ZED möglich (§ 10a Abs. 2, 3 GefStoffV). Beschäftigte erhalten beim Ausscheiden einen Auszug ihrer Angaben.";
 export const expositionsverzeichnis: Vorlage = {
   id: "expositionsverzeichnis",
   titel: "Expositionsverzeichnis",
@@ -812,7 +821,7 @@ export const expositionsverzeichnis: Vorlage = {
   grundlage: "§ 10a GefStoffV",
   querformat: true,
   abschnitte: [
-    { titel: "Stand", felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute", pflicht: true }, { id: "verantwortlich", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" }] },
+    { titel: "Stand", felder: [{ id: "stand", art: "datum", label: "Stand", hilfe: "Bei jeder Änderung das Datum der Aktualisierung eintragen (TRGS 410 Nr. 5 Abs. 2)", vorbelegung: "heute", pflicht: true }, { id: "verantwortlich", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" }] },
     {
       titel: "Beschäftigte und Exposition",
       hilfe: "Je Person und Stoff eine Zeile. Die Höhe der Exposition kommt aus Messungen oder einer begründeten Abschätzung in der Gefährdungsbeurteilung. Alternativ bietet die DGUV die Zentrale Expositionsdatenbank (ZED) an.",
@@ -827,10 +836,12 @@ export const expositionsverzeichnis: Vorlage = {
           pflicht: true,
           felder: [
             { id: "name", art: "text", label: "Name", pflicht: true },
+            { id: "geburtsdatum", art: "datum", label: "Geburtsdatum", pflicht: true },
             { id: "taetigkeit", art: "text", label: "Tätigkeit", pflicht: true, hilfe: "z. B. Schleifen von Eichenholz, Motorlauf in der Halle" },
             { id: "stoff", art: "text", label: "Stoff", pflicht: true, vorschlaege: EXPO_STOFFE },
+            { id: "kennung", art: "text", label: "Stoffkennung bzw. Tätigkeit nach TRGS 906", pflicht: true, hilfe: "Eindeutige Stoffkennung (z. B. CAS- oder EG-Nummer) oder die Tätigkeit nach TRGS 906 (TRGS 410 Nr. 5 Abs. 1 Nr. 3)" },
             { id: "kategorie", art: "wahl", label: "Einstufung", optionen: CMR.filter((o) => o.wert !== "nein"), vorbelegung: "k" },
-            { id: "hoehe", art: "text", label: "Höhe der Exposition", pflicht: true, hilfe: "Messwert oder Abschätzung, z. B. „unter 2 mg/m³ (Messung vom …)“" },
+            { id: "hoehe", art: "text", label: "Höhe der Exposition", pflicht: true, hilfe: "Messwert oder Abschätzung mit Ermittlungsmethode und Beurteilungsmaßstab (TRGS 410 Nr. 5 Abs. 1 Nr. 5), z. B. „unter 2 mg/m³ (Messung vom …)“" },
             { id: "von", art: "datum", label: "Exposition seit", pflicht: true },
             { id: "bis", art: "datum", label: "Exposition bis", hilfe: "leer: dauert an" },
             { id: "dauer", art: "text", label: "Dauer", hilfe: "z. B. „etwa 4 Stunden je Woche“", pflicht: true },
@@ -849,8 +860,15 @@ export const expositionsverzeichnis: Vorlage = {
       meta: `Stand: ${datumDe(text(d, "stand"))}\nVerantwortlich: ${text(d, "verantwortlich")}${l.length ? `\nAnzahl Einträge: ${l.length}` : ""}`,
       inhalt:
         tabelle(
-          ["Name", "Tätigkeit", "Stoff / Einstufung", "Höhe der Exposition", "Zeitraum", "Dauer"],
-          l.map((x) => [`<strong>${zelle(text(x, "name"))}</strong>`, zelle(text(x, "taetigkeit")), `${zelle(text(x, "stoff"))}${CMR_TEXT[text(x, "kategorie")] ? `<br><span class="klein">${esc(CMR_TEXT[text(x, "kategorie")]!)}</span>` : ""}`, zelle(text(x, "hoehe")), zeit(x), zelle(text(x, "dauer"))]),
+          ["Name / Geburtsdatum", "Tätigkeit", "Stoff / Kennung / Einstufung", "Höhe der Exposition (Methode, Beurteilungsmaßstab)", "Zeitraum", "Dauer"],
+          l.map((x) => [
+            `<strong>${zelle(text(x, "name"))}</strong>${text(x, "geburtsdatum") ? `<br><span class="klein">geb. ${datumDe(text(x, "geburtsdatum"))}</span>` : ""}`,
+            zelle(text(x, "taetigkeit")),
+            `${zelle(text(x, "stoff"))}${text(x, "kennung") ? `<br><span class="klein">${esc(text(x, "kennung"))}</span>` : ""}${CMR_TEXT[text(x, "kategorie")] ? `<br><span class="klein">${esc(CMR_TEXT[text(x, "kategorie")]!)}</span>` : ""}`,
+            zelle(text(x, "hoehe")),
+            zeit(x),
+            zelle(text(x, "dauer")),
+          ]),
           { breiten: ["17%", "20%", "18%", "17%", "15%", "13%"], ...(l.length ? {} : { mindestens: 10, hoch: true }) },
         ) +
         nachsatz(EXPO_HINWEIS) +
@@ -881,8 +899,11 @@ const BA_TEILE: BaTeil[] = [
   { id: "erste_hilfe", label: "Erste Hilfe", hilfe: "Nach Augen-, Hautkontakt, Einatmen, Verschlucken – laut Sicherheitsdatenblatt (Abschnitt 4); auch, was zu unterlassen ist", bausteine: "erste_hilfe" },
   { id: "entsorgung", label: "Sachgerechte Entsorgung", hilfe: "Laut Sicherheitsdatenblatt (Abschnitt 13); Entsorgungswege im Zweifel mit der örtlichen Gewerbeabfallberatung klären", bausteine: "entsorgung" },
 ];
-/** E-167 (Blatt „B Vorlagen“, TRGS 555 Nr. 3.1, 3.2): Beschäftigungsbeschränkungen als eigener Kasten, nur wenn ausgefüllt. */
-export const BESCHRAENKUNG_VORSCHLAEGE = ["Jugendliche dürfen nur unter Aufsicht einer fachkundigen Person mit diesem Stoff arbeiten (§ 22 JArbSchG).", "Schwangere und stillende Frauen dürfen nicht mit diesem Stoff arbeiten (§§ 11, 12 MuSchG)."];
+/**
+ * E-167 (Blatt „B Vorlagen“, TRGS 555 Nr. 3.1, 3.2): Beschäftigungsbeschränkungen als eigener Kasten, nur wenn ausgefüllt.
+ * Wortlaut nach der Durchsicht T. Koch 23.10.2026 (B-240: § 22 Abs. 2 JArbSchG wie B-266; B-241: kein pauschales Verbot).
+ */
+export const BESCHRAENKUNG_VORSCHLAEGE = ["Jugendliche dürfen mit diesem Stoff nur arbeiten, soweit dies zur Erreichung des Ausbildungsziels erforderlich ist, und unter Aufsicht einer fachkundigen Person (§ 22 Abs. 2 JArbSchG).", "Schwangere und stillende Frauen dürfen mit diesem Stoff nicht arbeiten, soweit die Gefährdungsbeurteilung eine unverantwortbare Gefährdung ergibt (§ 11 MuSchG für Schwangere, § 12 MuSchG für Stillende)."];
 const BA_BESCHRAENKUNG: BaTeil = { id: "beschraenkung", label: "Beschäftigungsbeschränkungen", hilfe: "z. B. für Jugendliche, Schwangere und stillende Frauen", vorschlaege: BESCHRAENKUNG_VORSCHLAEGE, wennGefuellt: true, pflicht: false };
 /** Gefahrenpiktogramme nach CLP (Anhang V VO (EG) Nr. 1272/2008). */
 export const GHS: Record<string, string> = { GHS01: "Explodierende Bombe", GHS02: "Flamme", GHS03: "Flamme über einem Kreis", GHS04: "Gasflasche", GHS05: "Ätzwirkung", GHS06: "Totenkopf mit Knochen", GHS07: "Ausrufezeichen", GHS08: "Gesundheitsgefahr", GHS09: "Umwelt" };
@@ -922,12 +943,16 @@ export function baAushang(o: { d: Daten; b: Betrieb; band: string; untertitel: s
   });
 }
 
-/** Signalwort und Piktogramme (E-167, TRGS 555 Nr. 3.2.4 Abs. 3): Zeile im Kopfkasten; leer zum Ankreuzen bzw. Eintragen. */
+/**
+ * Signalwort und Piktogramme (E-167, TRGS 555 Nr. 3.2.4 Abs. 3): Zeile im Kopfkasten; leer zum Ankreuzen bzw. Eintragen.
+ * Durchsicht T. Koch 23.10.2026: Piktogramme nur als Text („GHS02 Flamme“) ohne Raute – eine nummerierte Raute ohne Symbol
+ * ist kein Piktogramm nach CLP und kann verwechselt werden.
+ */
 function ghsZeile(d: Daten): string {
   const w = SIGNALWORT[text(d, "signalwort")];
   const p = auswahl(d, "piktogramme").filter((x) => GHS[x]);
   const signal = w ? `<b>${esc(w)}</b>` : "☐ Gefahr &nbsp; ☐ Achtung";
-  const bilder = p.length ? p.map((x) => `<span class="ghs-eintrag"><span class="ghs"><span>${esc(x.replace("GHS", ""))}</span></span>${esc(x)} ${esc(GHS[x]!)}</span>`).join("") : LINIE;
+  const bilder = p.length ? p.map((x) => `<span class="ghs-eintrag">${esc(x)} ${esc(GHS[x]!)}</span>`).join("") : LINIE;
   return `<div class="inhalt ghs-zeile"><div><dt>Signalwort</dt><dd>${signal}</dd></div><div class="breit"><dt>Gefahrenpiktogramme</dt><dd>${bilder}</dd></div></div>`;
 }
 

@@ -234,6 +234,9 @@ const ERSETZE = [
   ["HYGIENE", "nach Behandlung bei Bedarf und am Arbeitstagsende", "nach der Behandlung bei Bedarf und bei Arbeitsende"],
   ["HYGIENE", "\"Arbeitsbeginn, nach Pausen/Essen, nach Toilettenbesuch", "\"vor Arbeitsbeginn, nach Pausen und dem Essen, nach dem Toilettenbesuch"],
   ["HYGIENE", "nicht zurückstecken", "Schutzkappe nicht wieder aufsetzen"],
+  // Durchsicht T. Koch 23.10.2026 (Hygieneplan Beauty, Hinweise aus Sicht des Arbeitsschutzes): nach einem Arbeitsunfall der
+  // Durchgangsarzt, nicht der Hausarzt; HIV-Postexpositionsprophylaxe möglichst innerhalb von 2 Stunden
+  ["HYGIENE", "unverzüglich Hausarzt bzw. Durchgangsarzt (ggf. Postexpositionsprophylaxe)", "sofort Durchgangsarzt (HIV-Postexpositionsprophylaxe möglichst innerhalb von 2 Stunden)"],
   ["HAUTSCHUTZ_FRISEUR", "; gut abtrocknen; eincremen", "; gut abtrocknen"],
   ["HAUTSCHUTZ_FRISEUR", "Hände mit Hautpflegepräparat eincremen", "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"],
   ["HAUTSCHUTZ_FRISEUR", "\"Einmalhandschuhe, langstulpig\"", "\"Einmalhandschuhe mit langen Stulpen\""],
@@ -393,7 +396,7 @@ const SIFA = [
   ["B-051", "GEFAEHRDUNGEN", "Stromschlag durch beschädigte Leitungen und elektrische Betriebsmittel.", { quelle: "DGUV Information 203-006; DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A; BG BAU Bausteine B 171, B 172, A 002" }],
   ["B-052", "GEFAEHRDUNGEN", "Unfälle mit Kraftfahrzeugen durch technische Mängel oder ungesicherte Ladung.", { quelle: "§ 57 DGUV Vorschrift 70", "werte.massnahme": zeile("Regelmäßige Prüfung durch Fachbetrieb;", "Fahrzeuge mindestens jährlich durch eine sachkundige Person prüfen lassen (§ 57 DGUV Vorschrift 70);") }],
   ["B-053", "GEFAEHRDUNGEN", "Schwere körperliche Belastung durch Heben, Tragen, Zwangshaltungen und Knien.", { quelle: "LasthandhabV; BG BAU Baustein D 506" }],
-  ["B-054", "GEFAEHRDUNGEN", "Brand- und Explosionsgefahr durch Druckgasflaschen (z. B. Flüssiggas).", { quelle: "TRGS 510; DGUV Vorschrift 79; BG BAU Bausteine A 063, A 064, A 065", "werte.unterpunkt": "brand" }],
+  ["B-054", "GEFAEHRDUNGEN", "Brand- und Explosionsgefahr durch Druckgasflaschen (z. B. Flüssiggas).", { quelle: "TRGS 510; DGUV Regel 110-010; BG BAU Bausteine A 063, A 064, A 065", "werte.unterpunkt": "brand" }], // Durchsicht T. Koch 23.10.2026: DGUV Regel 110-010 statt DGUV Vorschrift 79
   ["B-055", "GEFAEHRDUNGEN", "Fehlende oder defekte persönliche Schutzausrüstung bzw. fehlende Kenntnis über deren Benutzung.", { quelle: "PSA-BV; BG ETEM" }],
   ["B-056", "GEFAEHRDUNGEN", "Arbeitsbedingte psychische Belastungen (z. B. Über-/Unterforderung, Stress, soziale Konflikte).", { quelle: "§ 5 Abs. 3 Nr. 6 ArbSchG; GDA; BG ETEM" }],
   ["B-057", "GEFAEHRDUNGEN", "Stolpern, Ausrutschen und Stürzen auf Böden und Verkehrswegen.", { quelle: "ASR A1.5; BGHW" }],
