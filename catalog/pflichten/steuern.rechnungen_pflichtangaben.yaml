@@ -1,17 +1,20 @@
 # Katalog C.29 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.rechnungen_pflichtangaben
-version: 4
+version: 5
 katalog_nr: C.29
 titel:
   de: Rechnungen mit allen Pflichtangaben schreiben
 kurz:
-  de: Deine Rechnungen müssen bestimmte Angaben enthalten. Als Kleinunternehmer brauchst du den Hinweis, dass die Steuerbefreiung für Kleinunternehmer gilt (§ 34a UStDV).
+  de: Deine Rechnungen müssen bestimmte Angaben enthalten; bist du zur Rechnung verpflichtet – etwa bei Leistungen an andere Unternehmen –, stellst du sie innerhalb von sechs Monaten nach Ausführung der Leistung aus (§ 14 Abs. 2 Satz 2 UStG). Als Kleinunternehmer brauchst du den Hinweis, dass die Steuerbefreiung für Kleinunternehmer gilt (§ 34a UStDV).
 erklaerung:
   de: Welche Angaben eine Rechnung braucht, regelt § 14 UStG. Für Kleinbetragsrechnungen bis 250 € brutto gelten Erleichterungen
-    (§ 33 UStDV). Kleinunternehmer weisen darauf hin, dass die Steuerbefreiung für Kleinunternehmer gilt (§ 34a UStDV). Bist du
-    zur Rechnung verpflichtet, stellst du sie innerhalb von sechs Monaten nach Ausführung der Leistung aus (§ 14 Abs. 2 Satz 1
-    Nr. 1 und 2 UStG).
+    (§ 33 UStDV). Kleinunternehmer weisen darauf hin, dass die Steuerbefreiung für Kleinunternehmer gilt (§ 34a UStDV). Zur
+    Rechnung verpflichtet bist du bei Leistungen an andere Unternehmer für deren Unternehmen, an juristische Personen, die keine
+    Unternehmer sind, und bei steuerpflichtigen Werklieferungen oder sonstigen Leistungen im Zusammenhang mit einem Grundstück –
+    dann auch gegenüber Privatkunden; nicht bei Umsätzen, die nach § 4 Nr. 8 bis 29 UStG steuerfrei sind. In diesen Fällen
+    stellst du die Rechnung innerhalb von sechs Monaten nach Ausführung der Leistung aus (§ 14 Abs. 2 Satz 2 Nr. 1 bis 3 UStG).
+    Amtlos nennt dafür keinen eigenen Termin, weil es den Tag der Leistung nicht kennt.
 rechtsgrundlage:
 - § 14 UStG
 - § 19 UStG
@@ -45,6 +48,10 @@ quellen:
 - titel: Umsatzsteuergesetz § 14
   url: https://www.gesetze-im-internet.de/ustg_1980/__14.html
   abgerufen: null
+- titel: § 14 UStG, Wortlaut (lexmea.de)
+  url: https://lexmea.de/de/gesetz/ustg/14
+  abgerufen: '2026-10-23'
+  fundstelle: § 14 Abs. 2 Satz 2 Nr. 1 bis 3 UStG
 - titel: UStG § 26a (Bußgeldvorschriften)
   url: https://www.gesetze-im-internet.de/ustg_1980/__26a.html
   abgerufen: '2026-10-22'
@@ -62,6 +69,7 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Liste der Pflichtangaben (§ 14 Abs. 4 UStG) als Inhalt ergänzen
+- 'StB Busch Runde 3 (23.10.2026) nennt für die Sechsmonatsfrist § 14 Abs. 2 Satz 1 Nr. 1 und 2 UStG. Laut Wortlaut der geltenden Fassung (lexmea.de, lxgesetze.de, 23.10.2026) steht die Frist in § 14 Abs. 2 Satz 2 (Nr. 1 andere Unternehmer, Nr. 2 juristische Personen, Nr. 3 Grundstücksleistungen auch an Privatkunden; nicht bei Umsätzen nach § 4 Nr. 8 bis 29 UStG) – so übernommen, vom Prüfer zu bestätigen. Als Text, nicht als Frist: es gibt kein Ereignis „Leistung ausgeführt“ (packages/rules-schema/ereignisse.json)'
 pruefung:
   status: entwurf
   geprueft_von: null
