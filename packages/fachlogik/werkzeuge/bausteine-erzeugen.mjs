@@ -480,7 +480,7 @@ for (const [nr, liste, schluessel, aenderungen] of SIFA) {
 const LAVES = "LAVES Niedersachsen, Merkblatt Lagertemperaturen 08/2022 (DIN 10508:2019)";
 const LM_BAUM = [
   ["L-057", "Kühllagerung allgemein – Temperaturkontrolle Kühleinrichtungen", { "werte.grenzwert": "Kühlschrank höchstens +7 °C", quelle: `BgVV 1999; ${LAVES}; Lebensmittelüberwachung Mainz` }],
-  ["L-060", "Kühlung Hackfleisch", { "werte.grenzwert": "zugekauft bzw. vorverpackt: max. +2 °C", quelle: "Tier-LMHV Anlage 5 Kap. II Nr. 3.1.3, 3.3.1; LAVES Niedersachsen; Lebensmittelüberwachung Mainz" }],
+  ["L-060", "Kühlung Hackfleisch", { "werte.grenzwert": "zugekauft bzw. vorverpackt: max. +2 °C", quelle: "Tier-LMHV Anlage 5 Kap. II Nr. 3.3.1; LAVES Niedersachsen; Lebensmittelüberwachung Mainz" }],
   ["L-062", "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)", { "werte.grenzwert": "max. +4 °C", quelle: "VO (EG) Nr. 853/2004 Anhang III Abschn. II Kap. V Nr. 3; LAVES Niedersachsen; Lebensmittelüberwachung Mainz" }],
   ["L-067", "Kühlung Eiprodukte / roheihaltige Lebensmittel", { "werte.grenzwert": "max. +4 °C; roheihaltige Speisen innerhalb von 24 Stunden verbrauchen", quelle: `${LAVES}; Verbrauch binnen 24 Stunden: BgVV 1999` }],
   ["L-069", "Tiefkühlung (Tiefkühltruhe/-raum, tiefgefrorene Lebensmittel)", { "werte.grenzwert": "−18 °C oder kälter; kurzfristiger Anstieg um höchstens 3 K beim Transport oder Abtauen", quelle: "VO (EG) Nr. 37/2005; TLMV; LAVES Niedersachsen; Lebensmittelüberwachung Mainz" }],
@@ -511,11 +511,15 @@ for (const [nr, schluessel, aenderungen] of LM_BAUM) {
     if (ziel[feld] === alt) throw new Error(`Lebensmittel ${nr} greift nicht: HACCP „${schluessel}“ ${pfad}`);
   }
 }
+/**
+ * Nachkontrolle T. Baum (23.10.2026, Hinweis 1): Fundstellen getrennt – zugekauft (+2 °C) Tier-LMHV Anlage 5 Kap. II
+ * Nr. 3.3.1, eigene Herstellung (+7 °C) Nr. 3.1.3 (Prüfmappe v3: L-061, L-062).
+ */
 /** L-060: ein Wert je Zeile – der Wert für selbst hergestelltes Hackfleisch als eigene Zeile direkt dahinter. */
 {
   const i = daten.HACCP.findIndex((x) => x.titel === "Kühlung Hackfleisch");
   const titel = "Kühlung Hackfleisch – nur bei eigener Herstellung";
-  daten.HACCP.splice(i + 1, 0, { titel, werte: { ...daten.HACCP[i].werte, punkt: titel, grenzwert: "selbst hergestellt, lose abgegeben: max. +7 °C Umgebung; Abgabe am Tag der Herstellung" }, quelle: "Tier-LMHV Anlage 5 Kap. II Nr. 3.1.3, 3.3.1; LAVES Niedersachsen" });
+  daten.HACCP.splice(i + 1, 0, { titel, werte: { ...daten.HACCP[i].werte, punkt: titel, grenzwert: "selbst hergestellt, lose abgegeben: max. +7 °C Umgebung; Abgabe am Tag der Herstellung" }, quelle: "Tier-LMHV Anlage 5 Kap. II Nr. 3.1.3; LAVES Niedersachsen" });
 }
 /**
  * E-167, B-036 (Prüfstand „bestätigt“): Fettbrand nach Fettmenge getrennt (BGN ASI 2.15 Nr. 4) – bis 50 l, 50 bis 100 l,

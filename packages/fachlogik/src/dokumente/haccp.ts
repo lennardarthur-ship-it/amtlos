@@ -178,7 +178,7 @@ export const VERIFIZIERUNG: Option[] = [
   { wert: "abweichungen", text: "Abweichungen und Korrekturmaßnahmen auswerten: Wiederholt sich eine Abweichung, Ursache beheben und das Verfahren anpassen", quelle: "Art. 5 Abs. 2 Buchst. e, f VO (EG) Nr. 852/2004" },
   { wert: "aenderungen", text: "Gefahrenanalyse und CCP überprüfen, sobald sich Produkte, Abläufe, Geräte oder Lieferanten ändern", quelle: "Art. 5 Abs. 2 Unterabs. 2 VO (EG) Nr. 852/2004" },
   { wert: "regelmaessig", text: "Das ganze Verfahren zusätzlich jährlich überprüfen", quelle: LEITLINIE_KOM },
-  { wert: "kontrollen", text: "Ergebnisse amtlicher Kontrollen, Beschwerden und Laborbefunde (z. B. Abklatschproben von Flächen) auswerten", quelle: "Bekanntmachung 2022/C 355/01 (Oberflächenuntersuchung als Beispiel der Verifizierung) – " + PRUEFEN_HACCP },
+  { wert: "kontrollen", text: "Ergebnisse amtlicher Kontrollen, Beschwerden und Laborbefunde (z. B. Abklatschproben von Flächen) auswerten", quelle: "Bekanntmachung 2022/C 355/01 (Oberflächenuntersuchung als Beispiel der Verifizierung)" },
 ];
 
 /** Dokumentation (Grundsatz g): welche Aufzeichnungen der Betrieb führt. */

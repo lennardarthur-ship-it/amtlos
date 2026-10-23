@@ -1,7 +1,7 @@
 # Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (a)): Kennzeichnung vorverpackter Lebensmittel nach Art. 9 LMIV
 schema_version: 1
 id: branche.gastro_kennzeichnung_vorverpackt
-version: 3
+version: 4
 katalog_nr: H.1
 titel:
   de: Selbst abgepackte Lebensmittel kennzeichnen
@@ -14,12 +14,14 @@ erklaerung:
     die Nettofüllmenge, das Mindesthaltbarkeits- oder Verbrauchsdatum, Name und Anschrift deines Betriebs und die
     Nährwertdeklaration. Handwerklich hergestellte Lebensmittel, die du in kleinen Mengen direkt an Endverbraucher oder an
     Geschäfte vor Ort abgibst, brauchen keine Nährwertdeklaration (Anhang V Nr. 19 LMIV). Die übrigen Angaben brauchen
-    sie trotzdem. Wichtig ist die Abgrenzung: Ware, die du im eigenen Laden für den Verkauf am selben Tag abpackst (z. B.
+    sie trotzdem. Wichtig ist die Abgrenzung: Ware, die du im eigenen Laden zum unmittelbaren Verkauf abpackst (z. B.
     Brot in Tüten, Kekse in Beuteln an der Theke) oder die du auf Wunsch der Kundschaft verpackst, gilt als lose Ware
     (Art. 44 Abs. 1 LMIV). Dafür reicht die Allergen- und Zusatzstoffinformation wie bei loser Ware. Legst du solche Ware
     allerdings zur Selbstbedienung aus, brauchst du die Pflichtangaben bis auf Nettofüllmenge und Nährwertdeklaration
     (§ 4 Abs. 1 LMIDV) – außer bei Dauerbackwaren und Süßwaren, die du im Laden abpackst, wenn du die Kundschaft auf
-    andere Weise informierst. Die volle Kennzeichnung nach Art. 9 LMIV braucht Ware mit längerer Haltbarkeit (Marmelade,
+    andere Weise informierst. Brot und Brötchen in Tüten im SB-Regal sind keine Dauerbackwaren – sie brauchen die
+    Angaben. Kekse oder Lebkuchen, die du im Laden abpackst, sind Dauerbackwaren – dafür reicht eine Information auf
+    andere Weise, z. B. ein Schild. Die volle Kennzeichnung nach Art. 9 LMIV braucht Ware mit längerer Haltbarkeit (Marmelade,
     Granola, Kekse im Regal über Tage), Ware für andere Händler und Ware für den Onlineversand.
 rechtsgrundlage:
 - Art. 9 Verordnung (EU) Nr. 1169/2011 (LMIV)
@@ -65,7 +67,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: 'Bußgeld bis 50.000 €, wenn vorverpackte Lebensmittel ohne die vorgeschriebenen Pflichtangaben in den Verkehr gebracht werden (§ 6 Abs. 4 Nr. 2 in Verbindung mit § 5 Abs. 1 LMIDV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB); einzelne Verstöße sind Straftaten (§ 6 Abs. 1 LMIDV, § 59 Abs. 1 Nr. 21 Buchst. a LFGB).'
+    de: 'Bußgeld bis 50.000 €, wenn vorverpackte Lebensmittel ohne die vorgeschriebenen Pflichtangaben in den Verkehr gebracht werden (§ 6 Abs. 4 Nr. 2 in Verbindung mit § 5 Abs. 1 LMIDV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB); einzelne Verstöße (Täuschung) sind Straftaten (§ 6 Abs. 1 LMIDV, § 59 Abs. 1 Nr. 21 Buchst. a LFGB).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -96,9 +98,11 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Abgrenzung zu loser Ware (Art. 44 Abs. 1 LMIV) wie vorgegeben erklärt, Hinweis Nährwerttabelle (Anhang V Nr. 19 LMIV) war schon im Text; Onlinehändler mit eigenen Lebensmitteln sehen den Eintrag jetzt (Branche Onlinehandel und „Was verkaufst du?“ Lebensmittel, dazu die Frage „Verkaufst du selbst abgepackte Lebensmittel?“); Fundstellen der Folgen plausibel, Straftatbestand und Höhe prüft RA Dr. Weber'
-- 'ZUSATZ OHNE PRÜFERVORGABE (bitte von T. Baum bestätigen lassen): Satz zur Selbstbedienung – am 22.10.2026 am Wortlaut gelesen: Art. 44 Abs. 1 LMIV (gesetze.legal) nennt „im Hinblick auf ihren unmittelbaren Verkauf vorverpackt“, § 4 Abs. 1 LMIDV verlangt für solche Ware „zur Selbstbedienung“ die Angaben nach Art. 9 Abs. 1 Buchst. a bis d und f bis k und Art. 10 Abs. 1 LMIV, außer für Dauerbackwaren und Süßwaren, die in der Verkaufsstätte vorverpackt werden, sofern die Unterrichtung auf andere Weise gewährleistet ist (Satz 3 Nr. 1); nur § 4 Abs. 2 LMIDV (nicht zur Selbstbedienung) beschränkt die Pflicht auf das Zutatenverzeichnis. „Am selben Tag“ steht so nicht im Wortlaut (Art. 44: „unmittelbarer Verkauf“) – Formulierung von T. Baum'
-- 'Anhang V Nr. 19 LMIV nicht am Wortlaut gelesen'
+- 'Zusatz ohne Prüfervorgabe, von T. Baum in Runde 2 (23.10.2026) bestätigt: Satz zur Selbstbedienung – am 22.10.2026 am Wortlaut gelesen: Art. 44 Abs. 1 LMIV (gesetze.legal) nennt „im Hinblick auf ihren unmittelbaren Verkauf vorverpackt“, § 4 Abs. 1 LMIDV verlangt für solche Ware „zur Selbstbedienung“ die Angaben nach Art. 9 Abs. 1 Buchst. a bis d und f bis k und Art. 10 Abs. 1 LMIV, außer für Dauerbackwaren und Süßwaren, die in der Verkaufsstätte vorverpackt werden, sofern die Unterrichtung auf andere Weise gewährleistet ist (Satz 3 Nr. 1); nur § 4 Abs. 2 LMIDV (nicht zur Selbstbedienung) beschränkt die Pflicht auf das Zutatenverzeichnis. „Am selben Tag“ steht so nicht im Wortlaut (Art. 44: „unmittelbarer Verkauf“) – Formulierung von T. Baum'
+- 'Anhang V Nr. 19 LMIV nicht am Wortlaut gelesen – inhaltlich von T. Baum (Runde 2, 23.10.2026) als richtig wiedergegeben bestätigt'
 - 'Vorprüfung 22.10.2026: die Nettofüllmenge (Art. 9 Abs. 1 Buchst. e LMIV) ist in § 5 Abs. 1 LMIDV nicht genannt; Höhe der Strafe nach § 59 LFGB nicht gelesen – Straftatbestand und Höhe prüft RA Dr. Weber'
+- 'Rückmeldung T. Baum Runde 2 (23.10.2026, ändern, danach freigegeben): „am selben Tag“ durch „zum unmittelbaren Verkauf“ ersetzt (Wortlaut Art. 44 Abs. 1 LMIV) und sein Beispiel zu Brot/Brötchen im SB-Regal und Dauerbackwaren wörtlich ergänzt'
+- 'RA Dr. Weber Runde 3 (23.10.2026), Folgen freigegeben: Bußgeld § 6 Abs. 4 Nr. 2 LMIDV i. V. m. § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB (50.000 €) bestätigt; Straftat § 6 Abs. 1 LMIDV i. V. m. § 59 Abs. 1 Nr. 21 Buchst. a LFGB (Freiheitsstrafe bis zu einem Jahr oder Geldstrafe) betrifft nach seiner Einordnung irreführende bzw. täuschende Angaben – auf Verlangen als „einzelne Verstöße (Täuschung) sind Straftaten“ präzisiert. Am 23.10.2026 gelesen: § 59 Abs. 1 LFGB (Strafrahmen, gesetze-im-internet.de), § 6 Abs. 1 LMIDV (verweist auf § 5 Abs. 1 Nr. 1 Buchst. b – Bezeichnung nach Art. 9 Abs. 1 Buchst. a i. V. m. Anhang VI Teil A Nr. 2 LMIV –, Nr. 14 Buchst. b Doppelbuchst. aa und Nr. 18 LMIDV; lexmea, gesetze-im-internet.de)'
 pruefung:
   status: in_pruefung
   geprueft_von: null

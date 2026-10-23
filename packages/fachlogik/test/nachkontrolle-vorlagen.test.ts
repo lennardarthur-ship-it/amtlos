@@ -111,9 +111,12 @@ describe("Hygieneplan für Lebensmittelbetriebe", () => {
     expect(HYGIENE_THEMEN_LEBENSMITTEL).toEqual(["Reinigung und Desinfektion", "Personalhygiene", "Schädlingsbekämpfung", "Temperaturkontrollen", "Wareneingang", "Lagerung", "Trennung rein/unrein", "Allergenmanagement", "Abfall", "Trinkwasser", "Schulungen"]);
     const alles = JSON.stringify(lm);
     for (const s of ["Händewaschen", "Arbeitskleidung und Schmuck", "Ringe, Uhren", "§ 42 IfSG", "Schädlingsmonitoring", "Wareneingang", "rohe und verzehrfertige", "Abfall", "Trinkwasser", "§ 4 LMHV"]) expect(alles, s).toContain(s);
-    // Prüfbericht Lebensmittelhygiene: bestätigte bzw. geänderte Zeilen ohne „fachlich zu prüfen“, die übrigen und neue mit
-    const geprueft = ["Arbeitsflächen und Schneidbretter", "Geschirr, Besteck, Gläser", "Reinigungstücher und Reinigungsgeräte", "Händewaschen", "Schädlingsmonitoring", "Kühlgeräte", "Tiefkühlgeräte", "Schulung Lebensmittelhygiene"];
-    for (const x of lm) expect(x.quelle, x.titel).toMatch(geprueft.includes(x.titel) ? /^(?!.*zu prüfen)/ : /fachlich zu prüfen$/);
+    // Nachkontrolle T. Baum (23.10.2026, Antwort 6): alle Zeilen geprüft – keine trägt mehr „fachlich zu prüfen“
+    for (const x of lm) expect(x.quelle, x.titel).not.toMatch(/zu prüfen/);
+    const zeile = (t: string) => lm.find((x) => x.titel === t)!.werte;
+    expect(zeile("Milchschäumer und Milchlanzen").wie).toContain("Milch nicht länger als nötig ungekühlt, Restmilch im Kännchen verwerfen");
+    expect(zeile("Getränkeschankanlage").wann).toBe("Reinigungsintervall nach DIN 6650-6 bzw. Herstellerangabe");
+    expect(zeile("Getränkeschankanlage").wie).toContain("Nachweis führen");
     for (const s of ["DVG-gelistetes Produkt eintragen", "80–85 °C nach DIN 10510/10511, die Herstellerangabe geht vor", "mindestens 60 °C oder desinfizierendes Waschverfahren (Richtwert)", "20–30 Sekunden", "Monitoringstellen monatlich", "jährlich wiederholen", "Schulungsnachweis Lebensmittelhygiene", "Milchschäumer und Milchlanzen", "Eiswürfelbereiter", "Getränkeschankanlage", "First in – first out", "keine Auskunft ins Blaue"]) expect(alles, s).toContain(s);
   });
   it("Temperaturzeilen: Grenzwert nur in den Eigenkontrollen (HACCP), Richtwerte nur als Richtwert", () => {

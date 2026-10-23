@@ -977,6 +977,10 @@
       version: 3
       quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
       stand: '2026-10-23'
+    branche.gastro_kennzeichnung_vorverpackt:
+      version: 4
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026 („sobald die Änderungen aus Runde 2 umgesetzt sind“; umgesetzt in v4 wörtlich)
+      stand: '2026-10-23'
     branche.gastro_kontaktmaterialien:
       version: 2
       quelle: Bestätigung unterschrieben Nürnberg 23.10.2026

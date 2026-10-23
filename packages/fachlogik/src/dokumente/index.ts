@@ -14,6 +14,10 @@ import { oss, zusammenfassendeMeldung } from "./eumeldungen.js";
 import { pdfDateiname } from "../dateinamen.js";
 import { GESTALT_MARKE, GRUNDLAGE_MARKE, RAENDER, RAENDER_MARKE, SEITE_MARKE, cent, esc, festeLeerzeichen, kennungFassen, seiteCss, zahl } from "./html.js";
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Option, Vorlage, Vorschlag } from "./typen.js";
+import { KURZ } from "./ablauf.js";
+import { PRUEFHINWEIS } from "./html.js";
+import { VORLAGEN_GEPRUEFT, fassungPasst, geprueftVermerk, kanonisch, sha256, sichtbarerText, type VorlagenFreigabe } from "./geprueft.js";
+import { LEERER_BETRIEB } from "./typen.js";
 
 export * from "./typen.js";
 export { ALLERGENE, GETREIDEARTEN, NUSSARTEN, WARNFARBSTOFFE, WEIZENARTEN_FUSSNOTE, ZUSATZSTOFFE, ZUSATZSTOFFE_QUELLE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, HANDLUNGSBEDARF, RISIKO_MATRIX, RISIKO_STUFEN, SCHUTZZIELE, SCHWERE, SONSTIGE_UNTERPUNKTE, WAHRSCHEINLICHKEIT, risikoAus } from "./konstanten.js";
@@ -43,6 +47,7 @@ export { RECHTSFORMEN } from "./bausteine.js";
 export { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN, arbeitsminuten, arbeitszeitPruefung, monatAus, monatSchluessel, stunden } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent, fassungText, zahl } from "./html.js";
+export { VORLAGEN_GEPRUEFT, geprueftVermerk, sha256, type VorlagenFreigabe } from "./geprueft.js";
 // StB-Prüfung Heckler und Busch (21.10.2026): Rechnungen, Voranmeldung, OSS und ZM
 export { GUTSCHRIFT_PRAEFIX, KUNDEN_ARTEN, NULLSATZ_HINWEIS as NULLSATZ_TEXT, RECHNUNG_EINHEIT_CODE, RECHNUNG_GUTSCHRIFT_NUMMER, RECHNUNG_LEITWEG_FEHLT, RECHNUNG_LEITWEG_FORMAT, RECHNUNG_NULLSATZ_GEMISCHT, RECHNUNG_OSS_LAND, RECHNUNG_OSS_SATZ, RECHNUNG_OSS_VORSCHLAG, RECHNUNG_SCHLUSS_HOCH, RECHNUNG_SCHLUSS_LEER, RECHNUNG_SCHLUSS_SATZ, SATZ_NULLSATZ, abschlaegeAus, euPrivatLand, istGutschriftNummer, leitwegFormatOk, mitGrundstueckHinweis, ossSatz, satzZahl, vollEuro } from "./buchhaltung.js";
 export { EU_LAENDER_NAMEN, OSS_FRIST, OSS_NICHT_VA, ZM_ARTEN, ZM_FRIST, ZM_SKONTO, landName } from "./eumeldungen.js";
@@ -385,4 +390,58 @@ export function dokumentHtml(v: Vorlage, d: Daten, b: Betrieb): string {
   const art = fuerAndere || v.gestalt === "aushang" ? "" : (BEREICHE.find((x) => x.id === v.bereich)?.titel ?? "");
   return kennungFassen(v.html(ohneVerdeckte(v, d), b).replace(GRUNDLAGE_MARKE, grundlage)).replace('<div class="art"></div>', `<div class="art">${esc(art)}</div>`).split(GESTALT_MARKE).join(v.gestalt ?? "nachweis").replace(SEITE_MARKE, seiteCss(v.gestalt ?? "nachweis", v.querformat))
     .replace(RAENDER_MARKE, RAENDER[v.gestalt ?? "nachweis"].join(","));
+}
+
+/** Fester Stichtag und leerer Betrieb für die Prüfsumme – das Ergebnis hängt nicht vom heutigen Datum ab. */
+const PRUEFSUMME_TAG = "2026-01-01";
+const pruefsummen = new WeakMap<Vorlage, string>();
+
+/**
+ * Prüfsumme der Bausteine und Texte einer Vorlage (Nachkontrolle T. Baum, 23.10.2026): SHA-256 über
+ *   1. die Formularbeschreibung als JSON mit sortierten Schlüsseln (Titel, Beschreibung, Rechtsgrundlage, alle Abschnitte
+ *      mit Hilfetexten, Feldern, Auswahllisten, Textbausteinen und Vorschlägen; Funktionen entfallen),
+ *   2. den Kurztext der Vorlage in der App (KURZ),
+ *   3. den sichtbaren Text des Dokuments mit den Startwerten und
+ *   4. den sichtbaren Text des Dokuments mit allen Vorschlägen und allen Textbausteinen ausgewählt
+ * (3 und 4 ohne Gestaltung: ohne <style>, Tags und Attribute; leerer Betrieb, Stichtag 1.1.2026). Bei einer Freigabe nur
+ * für eine Fassung (`fassung`) wird mit dieser Fassung gerechnet, bei `gruppen` zählen nur Vorschläge dieser Gruppen.
+ */
+export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, "fassung" | "gruppen"> | undefined = VORLAGEN_GEPRUEFT[v.id]): string {
+  const gemerkt = freigabe === VORLAGEN_GEPRUEFT[v.id] ? pruefsummen.get(v) : undefined;
+  if (gemerkt) return gemerkt;
+  const passt = (x: Vorschlag) => !freigabe?.gruppen || freigabe.gruppen.includes(x.gruppe ?? "");
+  const abschnitte = v.abschnitte.map((a) => ({ ...a, felder: a.felder.map((f) => (f.art === "liste" && f.vorschlaege ? { ...f, vorschlaege: f.vorschlaege.filter(passt) } : f)) }));
+  const fassung: Daten = freigabe?.fassung ? { [freigabe.fassung.feld]: freigabe.fassung.wert } : {};
+  const start: Daten = { ...leereDaten(v, LEERER_BETRIEB, PRUEFSUMME_TAG), ...fassung };
+  const voll: Daten = { ...start };
+  for (const a of abschnitte)
+    for (const f of a.felder) {
+      if (f.art === "liste" && f.vorschlaege?.length) voll[f.id] = f.vorschlaege.map((x) => eintragAusVorschlag(f, x, LEERER_BETRIEB, PRUEFSUMME_TAG));
+      else if (f.art === "bausteine") voll[f.id] = f.optionen.map((o) => o.wert);
+    }
+  const teile = [
+    `vorlage:${kanonisch({ id: v.id, titel: v.titel, beschreibung: v.beschreibung, grundlage: v.grundlage, abschnitte })}`,
+    `kurz:${KURZ[v.id] ?? ""}`,
+    `start:${sichtbarerText(dokumentHtml(v, start, LEERER_BETRIEB))}`,
+    `voll:${sichtbarerText(dokumentHtml(v, voll, LEERER_BETRIEB))}`,
+  ];
+  const summe = sha256(teile.join("\n"));
+  if (freigabe === VORLAGEN_GEPRUEFT[v.id]) pruefsummen.set(v, summe);
+  return summe;
+}
+
+/**
+ * Freigabe einer Vorlage, solange ihr Inhalt dem freigegebenen Stand entspricht (Prüfsumme) und – bei einer Freigabe
+ * nur für eine Fassung – die Unterlage diese Fassung hat. Sonst `undefined`.
+ */
+export function vorlageGeprueft(v: Vorlage, d?: Daten): VorlagenFreigabe | undefined {
+  const f = VORLAGEN_GEPRUEFT[v.id];
+  if (!f || !f.pruefsumme || !fassungPasst(f, d)) return undefined;
+  return vorlagenPruefsumme(v) === f.pruefsumme ? f : undefined;
+}
+
+/** Hinweis in der App unter einer Vorlage: „Vorlagen fachlich durchgesehen (Stand …)“ oder der allgemeine Prüfhinweis. */
+export function pruefHinweisFuer(v: Vorlage, d?: Daten): string {
+  const f = vorlageGeprueft(v, d);
+  return f ? geprueftVermerk(f.stand) : PRUEFHINWEIS;
 }

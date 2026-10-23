@@ -26,6 +26,8 @@ erwartet:
   gruendung.erlaubnis_pruefen: gilt_nicht
   branche.gastro_lebensmittelregistrierung: gilt
   branche.gastro_mehrweg: gilt
+  # RA Dr. Weber Runde 3 (23.10.2026): Einwegkunststofffonds wie Mehrweg über „To-go“
+  branche.gastro_einwegkunststofffonds: gilt
   branche.gastro_hygieneschulung: gilt
   branche.gastro_preisverzeichnis: gilt
   branche.gastro_ifsg_bescheinigung: gilt_nicht

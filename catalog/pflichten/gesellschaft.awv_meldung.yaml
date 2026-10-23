@@ -1,14 +1,14 @@
 # Katalog B.21 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.awv_meldung
-version: 5
+version: 6
 katalog_nr: B.21
 titel:
   de: Auslandszahlungen nach AWV melden
 kurz:
   de: 'Zahlungen über 50.000 €, die du von Gebietsfremden erhältst oder an Gebietsfremde leistest – zum Beispiel Investorengeld aus dem Ausland –, meldest du der Bundesbank.'
 erklaerung:
-  de: 'Die Außenwirtschaftsverordnung verlangt Meldungen für Zahlungen, die du von Gebietsfremden erhältst oder an Gebietsfremde leistest (§ 67 AWV). Meldepflichtig sind seit dem 1.1.2025 Zahlungen über 50.000 € (§ 67 Abs. 2 Nr. 1 AWV) – das gilt für alle solchen Zahlungen, nicht nur für Geld von Investoren. Ausgenommen sind Zahlungen für die Einfuhr, Ausfuhr oder Verbringung von Waren. Die Meldung geht elektronisch an die Deutsche Bundesbank, und zwar bis zum siebten Werktag des Monats, der auf die Zahlung folgt (§ 71 Abs. 6 AWV) – für jeden Monat, in dem du eine meldepflichtige Zahlung erhältst oder leistest.'
+  de: 'Die Außenwirtschaftsverordnung verlangt Meldungen für Zahlungen, die du von Gebietsfremden erhältst oder an Gebietsfremde leistest (§ 67 AWV). Meldepflichtig sind seit dem 1.1.2025 Zahlungen über 50.000 € (§ 67 Abs. 2 Nr. 1 AWV) – das gilt für alle solchen Zahlungen, nicht nur für Geld von Investoren. Ausgenommen sind Zahlungen für die Einfuhr, Ausfuhr oder Verbringung von Waren. Die Meldung geht elektronisch an die Deutsche Bundesbank, und zwar bis zum 7. Werktag des Monats, der auf die Zahlung folgt (§ 71 Abs. 6 AWV) – für jeden Monat, in dem du eine meldepflichtige Zahlung erhältst oder leistest.'
 rechtsgrundlage:
 - § 67 AWV
 - § 71 Abs. 6 AWV
@@ -60,6 +60,7 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Freigabe RA Dr. Weber 22.10.2026: Meldegrenze und Auslöser umgesetzt. Freigabe RA Dr. Weber Runde 2 (23.10.2026): Frist „bis zum siebten Werktag des folgenden Monats“ (§ 71 Abs. 6 AWV) bestätigt, „7. Kalendertag, Abs. 8“ verworfen – in Erklärung und Rechtsgrundlage eingetragen. „Wiederkehrend je Monat mit Zahlung“ NICHT als Termin abgebildet: Es gibt kein Ereignis für eine meldepflichtige Auslandszahlung und keine Fälligkeit „n-ter Werktag des Folgemonats“ (Fristtypen: Tag nach Periodenende, feste Termine, n-letzter Bankarbeitstag); die Frist bleibt „dauerhaft“, der Termin steht nur im Text'
+- 'RA Dr. Weber Runde 3 (23.10.2026), freigegeben: Frist nur im Text genügt (Meldepflicht ereignisbezogen, ohne Erfassung der Zahlung nicht terminierbar); seine Formulierung „bis zum 7. Werktag des Monats, der auf die Zahlung folgt (§ 71 Abs. 6 AWV)“ in die Erklärung übernommen'
 pruefung:
   status: in_pruefung
   geprueft_von: null
