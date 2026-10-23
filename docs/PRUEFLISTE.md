@@ -10,3 +10,6 @@
 - **T-168** Dr. Weber: Koffein bei loser Ware – welche Bußgeldnorm (§ 6 Abs. 4 Nr. 2 LMIDV gilt über § 5 Abs. 1 nur für vorverpackte Lebensmittel)? § 125 statt § 125a HGB bestätigen; PartG/eGbR bei Geschäftsbriefangaben? „Kein Bußgeld“ beim Gesellschaftsvertrag OHG/KG bestätigen.
 - **T-169** T. Baum: Zusatzstoffe – Erklärung nennt § 6 FrSaftErfrischGetrV; prüfen, ob die Vorschrift nach der Änderung vom 25.11.2025 (m. W. v. 14.06.2026) unverändert gilt.
 - **T-170** Nutzungsbedingungen: nach der Eintragung Register und USt-IdNr. eintragen, „i. G.“ streichen, neues Fassungsdatum, dann Freigabe.
+- **T-171** Betriebsarzt: Bausteine B-276, B-283 (PEP-Zeitfenster, Impfangebot) und Satz im Hygieneplan Beauty; Elektrofachkraft: Grenzwerte im Prüfprotokoll.
+- **T-172** Dr. Weber: Darf der Hygieneplan Beauty den Infektionsstatus der Kundschaft erfragen (Datenschutz)? Empfehlungen avv/gewerbeanmeldung/schluesselquittung/ausweis_hinweis für eine spätere Runde.
+- **T-173** GmbH & Co. KG: Unterzeichner der Bilanz und Angaben zur Komplementär-GmbH in der Handelsregister-Vorlage (kein Prüfer hat es verlangt).
