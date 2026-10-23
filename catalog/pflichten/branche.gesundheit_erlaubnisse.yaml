@@ -47,8 +47,6 @@ fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: Folgen, Liste der Berufe und Schwere „hoch“ übernommen; zuständige Stellen je Beruf nicht ergänzt'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 3
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -59,8 +59,6 @@ quellen:
   url: https://lxgesetze.de/gewo/144
   abgerufen: '2026-10-22'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

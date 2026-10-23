@@ -54,8 +54,6 @@ quellen:
 fachlich_zu_pruefen:
 - Vorlage Datenschutzerklärung (6.4) erst nach Prüfung
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 3
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

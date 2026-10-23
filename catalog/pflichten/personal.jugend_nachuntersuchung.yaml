@@ -62,8 +62,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Freigabe RA Dr. Weber Runde 2 (23.10.2026) (zu personal.jugend_erstuntersuchung): Bußgeld § 58 Abs. 1 Nr. 23 JArbSchG („entgegen § 33 Abs. 3 einen Jugendlichen ohne ärztliche Bescheinigung über die erste Nachuntersuchung weiterbeschäftigt“), Abs. 4 bis 30.000 € eingetragen – Wortlaut am 22.10.2026 gelesen (gesetze-im-internet.de)'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

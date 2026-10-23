@@ -78,8 +78,6 @@ fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: größenunabhängige Sektoren (§ 28 Abs. 3 BSIG) als Liste im Text, Umsatzschwelle 10 Mio. € im Auslöser (Vorjahresumsatz; Bilanzsumme nicht im Profil, ohne Umsatzangabe als klein gewertet); vollständige Sektorenliste nicht hinterlegt; § 28 Abs. 3 BSIG nicht im Wortlaut gelesen'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

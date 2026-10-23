@@ -65,8 +65,6 @@ fachlich_zu_pruefen:
 - Verträge außerhalb von Geschäftsräumen als eigene Pflicht (branche.widerruf_ausserhalb_geschaeftsraeume)
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: § 312d, Art. 246a EGBGB, § 355, § 356 Abs. 3–5 n. F., § 357a Abs. 2 bestätigt; Muster nach Anlage 1 EGBGB mit Gestaltungshinweis (Stand 19.6.2026) und Ausnahmen § 312g Abs. 2 als Hinweis im Text'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 6
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

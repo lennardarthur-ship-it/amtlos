@@ -63,6 +63,6 @@ quellen:
 fachlich_zu_pruefen:
 - Liste der Pflichtangaben (§ 14 Abs. 4 UStG) als Inhalt ergänzen
 pruefung:
-  status: in_pruefung
+  status: entwurf
   geprueft_von: null
   geprueft_am: null

@@ -52,8 +52,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: Rechtsgrundlage auf § 13 PAngV korrigiert, Inhalt und Sanktion § 20 Nr. 1, 4 PAngV i. V. m. WiStrG (25.000 €) bestätigt. Zusatz „künftig bis 100.000 € nach PAngG (G. v. 19.10.2026, BGBl. 2026 I Nr. 314)“ nach Prüfvermerk RA Dr. Weber 22.10.2026 gestrichen, bis die Fundstelle mit Inkrafttretensdatum vorliegt und geprüft ist (am 22.10.2026 nicht geprüft); Quellen BT-Drs. 21/5873 und BR-Drs. 499/26 dafür entfernt'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 3
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

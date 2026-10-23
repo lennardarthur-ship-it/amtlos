@@ -100,6 +100,6 @@ fachlich_zu_pruefen:
 - 'Anhang V Nr. 19 LMIV nicht am Wortlaut gelesen'
 - 'Vorprüfung 22.10.2026: die Nettofüllmenge (Art. 9 Abs. 1 Buchst. e LMIV) ist in § 5 Abs. 1 LMIDV nicht genannt; Höhe der Strafe nach § 59 LFGB nicht gelesen – Straftatbestand und Höhe prüft RA Dr. Weber'
 pruefung:
-  status: entwurf
+  status: in_pruefung
   geprueft_von: null
   geprueft_am: null

@@ -43,8 +43,6 @@ quellen:
   url: https://www.gesetze-im-internet.de/awg_2013/
   abgerufen: null
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 3
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

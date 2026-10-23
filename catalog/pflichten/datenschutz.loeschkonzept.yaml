@@ -60,8 +60,6 @@ quellen:
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 3
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

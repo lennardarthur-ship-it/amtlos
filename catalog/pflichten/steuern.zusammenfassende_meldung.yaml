@@ -113,6 +113,6 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen: []
 pruefung:
-  status: in_pruefung
+  status: entwurf
   geprueft_von: null
   geprueft_am: null

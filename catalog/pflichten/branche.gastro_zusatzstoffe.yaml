@@ -64,6 +64,6 @@ fachlich_zu_pruefen:
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern, zu v2): Korrekturen der Fundstellen („chininhaltig“ nach § 5 Abs. 1 AromenDV, Koffeinhinweis nach § 6 FrSaftErfrischGetrV i. V. m. Anhang III Nr. 4.1 LMIV ohne „§ 2 LMIDV“, Azofarbstoff-Warnhinweis nach Art. 24 i. V. m. Anhang V VO (EG) Nr. 1333/2008 im Text) sind in v3 bereits umgesetzt (berichtigter Prüfbericht); § 5 LMZDV und § 7 Abs. 2 Nr. 1 LMZDV bestätigt; Anhang III Nr. 4.1 LMIV nur über Sekundärquelle gelesen'
 - 'Höhe des Bußgelds prüft RA Dr. Weber (laut Rückmeldung T. Baum)'
 pruefung:
-  status: entwurf
+  status: in_pruefung
   geprueft_von: null
   geprueft_am: null

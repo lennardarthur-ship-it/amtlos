@@ -69,6 +69,6 @@ fachlich_zu_pruefen:
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, freigegeben): bestätigt, dass § 43 Abs. 1 IfSG für jede Person gilt, die erstmals gewerbsmäßig mit Lebensmitteln nach § 42 Abs. 2 arbeitet, auch für Inhaberinnen und Inhaber; Zusatz „nicht älter als drei Monate“ im Kurztext ergänzt'
 - 'Sanktion § 73 Abs. 1a IfSG, bis 25.000 € laut Rechtsprüfung R11 (Befund 20) „wahrscheinlich“ – Nummer und Höhe bestätigen (Bußgeldhöhen laut Prüfvermerk T. Baum durch RA Dr. Weber)'
 pruefung:
-  status: entwurf
+  status: in_pruefung
   geprueft_von: null
   geprueft_am: null

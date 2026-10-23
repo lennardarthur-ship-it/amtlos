@@ -101,8 +101,6 @@ quellen:
   url: https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen
   abgerufen: '2026-10-20'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 4
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -39,8 +39,9 @@ export const PRUEFER: Record<string, Pruefer> = {
   },
   "StB Lutz Busch": {
     wortlaut: "Fachlich durchgesehen von StB Lutz Busch, Kanzlei Heckler und Busch (Stand {stand}) – ohne Gewähr für den Einzelfall.",
-    // Prüfvermerk vom 22.10.2026 noch ohne Unterschrift (T-160)
-    nennung: false,
+    // Bestätigung (Teil A, 19 Einträge in der genannten Fassung) unterschrieben Stuttgart 23.10.2026 – Name nur bei diesen,
+    // weil nur sie `freigegeben` mit passender Version sind (docs/freigabe-katalog/freigaben.yaml, E-173)
+    nennung: true,
   },
 };
 

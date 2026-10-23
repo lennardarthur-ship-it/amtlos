@@ -68,6 +68,6 @@ fachlich_zu_pruefen:
 - 'Nur erstmalige Tätigkeit (§ 43 Abs. 1 IfSG, Rechtsprüfung R11 Befund 7) – Auslöser über die Frage „Arbeiten Beschäftigte mit Lebensmitteln?“ (erstmals / schon mit Bescheinigung / niemand); je Person nicht abbildbar'
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Kurztext um „nicht älter als drei Monate“ ergänzt (§ 43 Abs. 1 Satz 1 IfSG: „eine nicht mehr als drei Monate alte Bescheinigung“, am 22.10.2026 gelesen); Auslöser und Folgen fachlich in Ordnung, Höhe laut T. Baum von RA Dr. Weber bestätigt'
 pruefung:
-  status: entwurf
+  status: in_pruefung
   geprueft_von: null
   geprueft_am: null

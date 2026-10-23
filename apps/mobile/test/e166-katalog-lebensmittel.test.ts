@@ -75,7 +75,7 @@ describe("Prüfbericht Lebensmittelhygiene: neue und geänderte Katalogeinträge
       expect(finde(a, id)!.einordnung).toBe("hinweis");
     }
     expect(ids(auswertung(feinkost, "2026-10-22").gilt)).not.toEqual(expect.arrayContaining(["branche.gastro_kontaktmaterialien"]));
-    for (const id of ["branche.gastro_kennzeichnung_vorverpackt", "branche.gastro_kontaktmaterialien", "branche.gastro_acrylamid", "branche.gastro_hygieneschulung", "branche.gastro_trinkwasser_mobil"]) expect(pflicht(id).pruefung.status).toBe("entwurf");
+    for (const id of ["branche.gastro_kennzeichnung_vorverpackt", "branche.gastro_kontaktmaterialien", "branche.gastro_acrylamid", "branche.gastro_hygieneschulung", "branche.gastro_trinkwasser_mobil"]) expect(["entwurf", "in_pruefung", "freigegeben"]).toContain(pflicht(id).pruefung.status); // E-173: Status kommt aus dem Freigabe-Register
   });
   it("Hygieneschulung: Nachweis, jährliche Wiederholung, Abgrenzung zur IfSG-Belehrung, Ausnahme Berufsausbildung", () => {
     const t = text(pflicht("branche.gastro_hygieneschulung").erklaerung);

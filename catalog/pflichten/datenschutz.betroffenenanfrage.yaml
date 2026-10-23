@@ -57,8 +57,6 @@ fachlich_zu_pruefen:
 - Mehrere Anfragen am selben Tag ergeben eine Instanz (T-15)
 - 'Verlängerung um zwei Monate (Art. 12 Abs. 3 Satz 2) nur als Hinweis im Text (Prüfvermerk RA Dr. Weber 22.10.2026); die Frist rechnet immer mit einem Monat'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 3
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

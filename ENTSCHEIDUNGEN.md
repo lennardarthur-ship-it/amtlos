@@ -1146,6 +1146,10 @@ Rückläufer der Freigabe-Mappen (E-170): Dr. Weber (141 Einträge: 110 freigege
 
 App, Website und Web-App erscheinen immer hell, unabhängig von der Systemeinstellung. App: `userInterfaceStyle: light`, `useFarben()` liefert nur noch die helle Palette, dunkle Palette und Startbild-Variante entfernt, Datumswahl immer hell. Website und Web-App: keine `prefers-color-scheme: dark`-Regeln mehr (auch nicht für White-Label-Marken; `farbe_dunkel` bleibt in der Datenbank, wird aber nicht mehr ausgegeben). Rundgänge prüfen nur noch hell. Die dunkle Bühne (Navy) bleibt als Gestaltungselement.
 
+### E-173 · Freigabe gilt nur für die gesehene Fassung; Freigabe-Register (2026-10-23)
+
+StB Busch, T. Koch und Dr. Weber haben zu Recht beanstandet, dass Einträge als freigegeben galten, deren umgesetzte Fassung sie nicht gesehen hatten, und dass Bestätigungsseiten die Umsetzung bescheinigen sollten. Neu: Jede Freigabe steht mit Prüfer, Umfang, Version, Quelle und Stand im Register `docs/freigabe-katalog/freigaben.yaml`; `docs/freigabe-katalog/anwenden.py` schreibt daraus die `pruefung`-Blöcke. Freigegeben ist ein Eintrag nur, wenn alle nötigen Freigaben zur aktuellen Version passen (Lebensmittel: T. Baum für den Inhalt ohne Folgen, Dr. Weber nur für die Folgen – Änderungen außerhalb des jeweiligen Umfangs heben die Freigabe nicht auf). Nach dieser Regel waren am 23.10.2026 80 von 222 Einträgen freigegeben (statt 187); die übrigen gehen in einen Abgleich mit Gegenüberstellung alt/neu. Bestätigungsseiten nennen nur noch die Fassung, die dem Prüfer vorlag, und bescheinigen nicht die technische Umsetzung. Unterschrieben: StB Busch (Teil A, 19 Einträge, 23.10.2026 – Nennung mit seinem Wortlaut an), T. Baum (14 Lebensmittel-Einträge, 23.10.2026, ohne Namen). Arbeitsmedizinische Vorsorge (E.56) bleibt bis zur Rückmeldung eines Betriebsarztes offen und steht auf keiner Bestätigung.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

@@ -64,6 +64,6 @@ fachlich_zu_pruefen:
 - 'Schwere „mittel“ belassen – keine eigene Bußgeldvorschrift; T. Baum hat zur Schwere nichts angegeben'
 - 'Zulassung nach Art. 4 VO (EG) Nr. 853/2004 nur als Hinweis (Eigenherstellung tierischer Erzeugnisse)'
 pruefung:
-  status: entwurf
+  status: in_pruefung
   geprueft_von: null
   geprueft_am: null

@@ -76,6 +76,6 @@ fachlich_zu_pruefen:
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, freigegeben): „Alle zwei Jahre ab der letzten Belehrung“ fachlich richtig umgesetzt'
 - 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 73 Abs. 1a Nr. 16b (§ 43 Abs. 4 Satz 1: „im Weiteren alle zwei Jahre“) und Abs. 2 IfSG gelesen – Bußgeldhöhe laut Prüfvermerk T. Baum durch RA Dr. Weber zu bestätigen'
 pruefung:
-  status: entwurf
+  status: in_pruefung
   geprueft_von: null
   geprueft_am: null

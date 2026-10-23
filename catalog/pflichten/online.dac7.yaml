@@ -47,8 +47,6 @@ fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - 'Hinweis und Meldeschwelle (§ 4 Abs. 5 Nr. 4 PStTG) nach Prüfvermerk RA Dr. Weber 22.10.2026'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

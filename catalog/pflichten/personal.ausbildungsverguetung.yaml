@@ -48,8 +48,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Freigabe RA Dr. Weber Runde 2 (23.10.2026) (ändern): Beträge je Jahr des Ausbildungsbeginns (§ 17 Abs. 2 BBiG) in den Text übernommen – Beginn 2026: 724/854/977/1.014 €, Beginn 2027: 764/902/1.031/1.070 € (BGBl. 2026 I Nr. 287); Hinweis „gelten für die gesamte Ausbildung nach dem Beginnjahr, tarifliche Vergütung geht vor (§ 17 Abs. 3, 4 BBiG)“ im Text. Beträge nur im Text, kein Regelwert – für einen Ausbildungsbeginn 2028 nach der nächsten Bekanntmachung ergänzen'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 3
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

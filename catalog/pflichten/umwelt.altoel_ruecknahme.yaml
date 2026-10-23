@@ -51,8 +51,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: § 8 Abs. 1, 2 AltölV (Annahmestelle, Hinweis, Menge bis zur verkauften Menge) und Sanktion bestätigt'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 3
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

@@ -69,8 +69,6 @@ fachlich_zu_pruefen:
 - 'Auslöser über die Frage „Schließt du Verträge mit Privatkunden bei ihnen zu Hause oder unterwegs ab?“'
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: Ausnahmen (§ 312g Abs. 2 Nr. 11, § 312 Abs. 2 Nr. 12), Form (Art. 246a § 4 Abs. 2 EGBGB) und Höchstfrist § 356 Abs. 4 Satz 1 n. F. bestätigt'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 3
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

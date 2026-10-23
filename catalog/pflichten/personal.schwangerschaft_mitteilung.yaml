@@ -53,8 +53,6 @@ quellen:
   url: https://gesetze.legal/bund/muschg/32
   abgerufen: '2026-10-21'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

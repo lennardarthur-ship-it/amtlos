@@ -74,6 +74,9 @@ fachlich_zu_pruefen:
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): DIN 10514 aus der Rechtsgrundlage genommen und als Quelle geführt; jährliche Wiederholung als Empfehlung, keine gesetzliche Frist; Folgen bestätigt (Bußgeld knüpft an das Arbeiten ohne Fachkenntnisse an, § 10 Nr. 3 LMHV, nicht an den fehlenden Nachweis); Ausnahme § 4 Abs. 2 LMHV und Abgrenzung zur IfSG-Belehrung bestätigt'
 - 'Erledigung bleibt laufend je Kalenderjahr (erledigung laufend/jahr) – bildet die empfohlene jährliche Wiederholung ab, keine gesetzliche Frist; T. Baum hat dazu nichts angegeben'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Tim Baum (Lebensmittelfachbeauftragter)
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

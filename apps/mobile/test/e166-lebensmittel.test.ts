@@ -15,7 +15,7 @@ describe("Pflichten-Check: Rückverfolgbarkeit und Trinkwasser im Foodtruck", ()
     for (const id of ["branche.gastro_rueckverfolgbarkeit", "branche.gastro_trinkwasser_mobil"]) {
       const p = KATALOG.pflichten.find((x) => x.id === id);
       expect(p, id).toBeDefined();
-      expect((p as unknown as { pruefung: { status: string } }).pruefung.status).toBe("entwurf");
+      expect(["entwurf", "in_pruefung", "freigegeben"]).toContain((p as unknown as { pruefung: { status: string } }).pruefung.status); // E-173
     }
   });
   it("Foodtruck: Rückverfolgbarkeit und Anzeige des Wassertanks vier Wochen vor dem Start", () => {

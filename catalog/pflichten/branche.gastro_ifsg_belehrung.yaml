@@ -76,6 +76,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, freigegeben): Frist „spätestens am ersten Arbeitstag“ fachlich bestätigt (Praxis der Gesundheitsämter); Sanktion § 73 Abs. 1a Nr. 16b, Abs. 2 IfSG – Höhe laut T. Baum von RA Dr. Weber bestätigt'
 pruefung:
-  status: entwurf
+  status: in_pruefung
   geprueft_von: null
   geprueft_am: null

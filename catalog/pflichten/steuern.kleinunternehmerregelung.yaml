@@ -54,8 +54,6 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen: []
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - StB Lutz Busch
-  geprueft_am: '2026-10-22'
-  geprueft_version: 3
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

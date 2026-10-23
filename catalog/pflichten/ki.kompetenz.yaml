@@ -74,8 +74,6 @@ fachlich_zu_pruefen:
 - Inhalt und Umfang einer ausreichenden Schulung fachlich festlegen
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: Titel, Kurztext, Schwere niedrig bestätigt, Folgen übernommen; Einordnung als Hinweis „vertretbar“ – nicht umgestellt (bleibt Pflicht). Neuer Art. 4 am 22.10.2026 im Amtsblatt (VO (EU) 2026/1744) gelesen: Anbieter und Betreiber „ergreifen Maßnahmen, um die Entwicklung der KI-Kompetenz ihres Personals“ zu fördern, ein bestimmtes Niveau ist nicht garantiert'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-22'
-  geprueft_version: 6
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

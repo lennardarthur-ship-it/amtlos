@@ -1,0 +1,753 @@
+- pruefer: RA Dr. Ulrich Weber
+  umfang: alles
+  unterschrieben: false
+  hinweis: Freigabe-Dateien 22./23.10.2026; Bestätigungsseite mit geänderter Formulierung (a)/(b) steht aus
+  eintraege:
+    branche.beauty_kosmetikverordnung:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.gastro_ppwr_radar:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    branche.handwerk_gewaehrleistung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.immo_gwg:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.it_haftung:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.jugendschutz_abgabe:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.jugendschutz_aushang:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.mobiler_verkauf_standplatz:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.oeffentliche_wiedergabe:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.personenbefoerderung_genehmigung:
+      version: 2
+      quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
+      stand: '2026-10-23'
+    branche.preisverzeichnis_dienstleistung:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.transport_erlaubnis:
+      version: 6
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    branche.transport_lenkzeiten:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.transport_lenkzeiten_national:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.widerruf_ausserhalb_geschaeftsraeume:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    branche.widerruf_fernabsatz:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    datenschutz.avv:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    datenschutz.beschaeftigtendaten:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    datenschutz.betroffenenanfrage:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    datenschutz.datenpanne_benachrichtigung:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    datenschutz.datenpanne_meldung:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    datenschutz.dsb:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    datenschutz.dsb_streichung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    datenschutz.dsfa:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    datenschutz.loeschkonzept:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    datenschutz.ortung:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    datenschutz.videoueberwachung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.awv_meldung:
+      version: 5
+      quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
+      stand: '2026-10-23'
+    gesellschaft.egbr_hinweis:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    gesellschaft.foerderprogramme:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.gesellschafterliste_aktualisieren:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.gesellschaftsvertrag_notar:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.gf_pflichten_haftung:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.handelsregister_anmeldung:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.insolvenzantragspflicht:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.investitionspruefung_hinweis:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.istkaufmann_pruefen:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.jahresabschluss:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.mitarbeiterbeteiligung:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.offenlegung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.offenlegung_abweichendes_gj:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.partg_mbb_haftpflicht:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.stammkapital_einzahlen:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.transparenzregister:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gesellschaft.ug_ruecklage:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.berufsgenossenschaft:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.elster_konto:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.gewerbeanzeige:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.gruendungsbeschleunigung_radar:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.gruendungszuschuss:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.handwerk_verzeichnis:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.handwerksrolle:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.ihk_hwk_mitgliedschaft:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.reisegewerbekarte:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.rentenversicherungspflicht:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.rundfunkbeitrag:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.statusfeststellung:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.taetigkeit_einordnen:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    gruendung.vermittlerregister:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    it_sicherheit.nis2_meldepflichten:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    it_sicherheit.nis2_pruefen:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    ki.hochrisiko:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    ki.kompetenz:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    ki.transparenz:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.barrierefreiheit:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.button_loesung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.cookie_einwilligung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.dac7:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.datenschutzerklaerung:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.impressum:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.kuendigungsbutton:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.marktplatz_angaben:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.os_link:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.vsbg_hinweis:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.vsbg_streitfall:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    online.widerrufsbelehrung:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.anmeldezeitraum_angeben:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.arbeitszeit_aufzeichnung:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.arbeitszeit_milog:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.arbeitszeit_neuregelung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    personal.aufenthaltstitel:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    personal.aufenthaltstitel_laufend:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    personal.aushangpflichtige_gesetze:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    personal.azubi_eintragung:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.beitragsnachweis:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.betriebsnummer:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.bewacherregister:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    personal.entgelttransparenz_bericht:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.fuehrerscheinkontrolle:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.hinweisgeber_meldestelle:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.jugend_erstuntersuchung:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    personal.jugend_nachuntersuchung:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.jugendarbeitsschutz:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.lohnabrechnung:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.lohnsteuer_anmeldung:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.mindestlohn:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.minijob_grenze:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.mutterschutz_gefaehrdungsbeurteilung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.nachtarbeit:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.nachunternehmerhaftung:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.schwangerschaft_mitteilung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.schwerbehinderte_anzeige:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.statusfeststellung_auftraggeber:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.sv_abmeldung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.sv_anmeldung:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.sv_beitraege:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    personal.sv_jahresmeldung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    produkte.bargeldobergrenze_radar:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    produkte.barrierefreiheit:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    produkte.batterien:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    produkte.elektrogeraete:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    produkte.geldwaesche_gueterhaendler:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    produkte.geraetebatterien_ruecknahme:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    produkte.gpsr:
+      version: 8
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    produkte.gpsr_fernabsatz:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    produkte.starterbatterien_ruecknahme:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    produkte.verpackung:
+      version: 6
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+    umwelt.altoel_ruecknahme:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    umwelt.gefaehrliche_abfaelle:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    umwelt.gewerbeabfall:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-recht-weber.xlsx
+      stand: '2026-10-22'
+    umwelt.klima_sachkunde:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-recht-weber-runde2.xlsx
+      stand: '2026-10-23'
+- pruefer: RA Dr. Ulrich Weber
+  umfang: sanktion
+  unterschrieben: false
+  hinweis: Freigabe-Dateien 22./23.10.2026; Bestätigungsseite mit geänderter Formulierung (a)/(b) steht aus
+  eintraege:
+    branche.gastro_acrylamid:
+      version: 3
+      quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
+      stand: '2026-10-23'
+    branche.gastro_allergene:
+      version: 4
+      quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
+      stand: '2026-10-23'
+    branche.gastro_haccp:
+      version: 6
+      quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
+      stand: '2026-10-23'
+    branche.gastro_hygieneschulung:
+      version: 4
+      quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
+      stand: '2026-10-23'
+    branche.gastro_kennzeichnung_vorverpackt:
+      version: 3
+      quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
+      stand: '2026-10-23'
+    branche.gastro_kontaktmaterialien:
+      version: 2
+      quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
+      stand: '2026-10-23'
+    branche.gastro_rueckverfolgbarkeit:
+      version: 3
+      quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
+      stand: '2026-10-23'
+    branche.gastro_trinkwasser_mobil:
+      version: 4
+      quelle: 2026-10-23-freigabe-recht-weber-runde3.xlsx
+      stand: '2026-10-23'
+- pruefer: Thomas Koch (Fachkraft für Arbeitssicherheit)
+  umfang: alles
+  unterschrieben: false
+  hinweis: Freigabe-Dateien 22./23.10.2026; Bestätigungsblatt nach Abgleich
+  eintraege:
+    arbeitsschutz.arbeitsmedizinische_vorsorge:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.arbeitsmittel_pruefen:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.betriebsanweisung_arbeitsmittel:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.biostoffe:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.dguv_v3:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.erste_hilfe:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.erste_hilfe_organisation:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.erstunterweisung:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.expositionsverzeichnis:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.fahrzeuge_pruefen:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.flucht_rettungsplan:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.fremdfirmen_abstimmung:
+      version: 2
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.gefaehrdungsbeurteilung:
+      version: 8
+      quelle: 2026-10-23-freigabe-arbeitsschutz-koch-runde2.xlsx
+      stand: '2026-10-23'
+    arbeitsschutz.gefahrstoffe:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.laerm:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.unfallanzeige:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.unterweisung_jugendliche:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.unterweisung_wiederholen:
+      version: 5
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    arbeitsschutz.verbandbuch:
+      version: 1
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    branche.bau_baustellenverordnung:
+      version: 3
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+    branche.handwerk_gefaehrdung_gewerk:
+      version: 4
+      quelle: 2026-10-22-freigabe-katalog-arbeitsschutz-sifa.xlsx
+      stand: '2026-10-22'
+- pruefer: StB Lutz Busch
+  umfang: alles
+  unterschrieben: true
+  hinweis: Bestätigung Teil A unterschrieben 23.10.2026; Teil B (14) offen
+  eintraege:
+    gruendung.fragebogen_steuerliche_erfassung:
+      version: 5
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    gruendung.ust_idnr:
+      version: 2
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.aufbewahrung:
+      version: 4
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.bauabzugsteuer_freistellung:
+      version: 4
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.buchfuehrungspflicht:
+      version: 5
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.e_bilanz:
+      version: 4
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.est_erklaerung:
+      version: 4
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.euer:
+      version: 5
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.feststellungserklaerung:
+      version: 3
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.gewst_erklaerung:
+      version: 4
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.gobd_verfahrensdokumentation:
+      version: 2
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.kasse_tse_belegausgabe:
+      version: 4
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.kleinunternehmer_grenze_offene_rechnungen:
+      version: 1
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.kleinunternehmer_grenze_ueberschritten:
+      version: 7
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.kleinunternehmer_naechstes_jahr:
+      version: 6
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.kst_erklaerung:
+      version: 4
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.oss_erklaerung:
+      version: 2
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.ust_jahreserklaerung:
+      version: 3
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+    steuern.ust_voranmeldung:
+      version: 6
+      quelle: Bestätigung unterschrieben Stuttgart 23.10.2026 (Teil A)
+      stand: '2026-10-22'
+- pruefer: Tim Baum (Lebensmittelfachbeauftragter)
+  umfang: ohne_sanktion
+  unterschrieben: true
+  hinweis: Bestätigung unterschrieben 23.10.2026; Kennzeichnung vorverpackt nach Umsetzung Runde 2
+  eintraege:
+    branche.gastro_acrylamid:
+      version: 3
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_allergene:
+      version: 4
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_haccp:
+      version: 6
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_hygieneschulung:
+      version: 4
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_ifsg_belehrung:
+      version: 4
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_ifsg_bescheinigung:
+      version: 3
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_ifsg_bescheinigung_selbst:
+      version: 2
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_ifsg_folgebelehrung:
+      version: 3
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_kontaktmaterialien:
+      version: 2
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_lebensmittelregistrierung:
+      version: 6
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_rueckverfolgbarkeit:
+      version: 3
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_trinkwasser_mobil:
+      version: 4
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'
+    branche.gastro_zusatzstoffe:
+      version: 3
+      quelle: Bestätigung unterschrieben Nürnberg 23.10.2026
+      stand: '2026-10-23'

@@ -67,8 +67,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Freigabe RA Dr. Weber Runde 2 (23.10.2026) (ändern): beide Normen genannt – § 111 Abs. 1 Nr. 5, Abs. 4 SGB IV (bis 25.000 €) ist die Bußgeldnorm mit dem höheren Rahmen und bei Tateinheit maßgeblich (§ 19 Abs. 1, 2 OWiG), § 209 Abs. 1 Nr. 5 Buchst. a, Abs. 3 SGB VII (bis 2.500 €) daneben; Sanktionstext in seiner Formulierung, Schwere „mittel“'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 4
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null
