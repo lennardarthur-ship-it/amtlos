@@ -43,7 +43,8 @@ export const VORLAGEN_GEPRUEFT: Readonly<Record<string, VorlagenFreigabe>> = {
   verfahrensdokumentation: { stand: "2026-10-23", bezug: BUSCH, pruefsumme: "9d23a5d3f01831910bcec4e93e563d8503a3736b68a73deaaf09d14435fec48b" },
   kassenmeldung: { stand: "2026-10-23", bezug: BUSCH, pruefsumme: "d9ac127520bab87ef105e7da71c3c9cebbc7549993ffcb8740ef243dcaa0ee65" },
   lohnkonto: { stand: "2026-10-23", bezug: BUSCH, pruefsumme: "7210085d37a2e3866d4d15108172b76d61339ee16cce5d3169bd8702393f9428" },
-  gefaehrdungsbeurteilung: { stand: "2026-10-23", bezug: KOCH, pruefsumme: "ea0f369af38e33e88d501eb12f85d34536d1a6c74ae83a686a26d03fa7581531" },
+  // gefaehrdungsbeurteilung (Prüfsumme ea0f369a…, Durchsicht T. Koch 23.10.2026): Vermerk entfallen – Koch hat in derselben
+  // Durchsicht Bausteine der Vorlage korrigiert (B-054, B-200, B-218, B-226, B-231, B-233, B-236, B-238); erneut vorlegen
   unterweisung: { stand: "2026-10-23", bezug: KOCH, pruefsumme: "73c536207bb588fba5cf502a2f83323e56c2fdd6c8b5c2a8b7ada82c4a91e8df" },
   gefahrstoffverzeichnis: { stand: "2026-10-23", bezug: KOCH, pruefsumme: "e1f81534e968125c84bbece65d414b87460da5c4748a820f243fb09d27e420a6" },
   betriebsanweisung_maschine: { stand: "2026-10-23", bezug: KOCH, pruefsumme: "f041a0b042843e6b29e05171e90e4669fefafde1ce37aeb4445f2dd58af1268e" },

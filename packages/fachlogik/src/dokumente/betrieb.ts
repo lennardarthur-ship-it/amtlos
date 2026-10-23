@@ -3,9 +3,9 @@
  * Angemeldet wird beim Gewerbeamt, über den Notar bzw. im Transparenzregister; die App übermittelt nichts.
  * Gliederungen fachlich zu prüfen (T-60).
  */
-import { abschnitt, absatz, anschrift, cent, datumDe, dokument, euro, felder, liste, tabelle, text, uebertragung, unterschriften, zelle } from "./html.js";
+import { abschnitt, absatz, anschrift, cent, datumDe, dokument, esc, euro, felder, liste, nachsatz, tabelle, text, uebertragung, unterschriften, zelle } from "./html.js";
 import { INTERESSE, RECHTSFORMEN } from "./bausteine.js";
-import type { Betrieb, Vorlage } from "./typen.js";
+import type { Betrieb, Daten, Eintrag, Vorlage } from "./typen.js";
 import { MARKE } from "@amtlos/marke";
 
 const formNorm = (t: string) => t.toLocaleLowerCase("de").replace(/[\s.]/g, "");
@@ -165,12 +165,26 @@ export const HR_KAPITAL_UG = "Stammkapital: bei einer UG mindestens 1 € (§ 5a
 export const HR_KAPITAL_EURO = "Stammkapital und Geschäftsanteile in vollen Euro (§ 5 Abs. 2 GmbHG)";
 
 const HR_FORMEN = ["GmbH", "UG (haftungsbeschränkt)", "e. K.", "OHG", "KG", "GmbH & Co. KG"].map((r) => ({ wert: r, text: r }));
+/**
+ * Nachprüfung RA Dr. Weber (23.10.2026): für OHG und KG Rechtsform-abhängige Abschnitte – Kommanditisten mit Hafteinlage
+ * (§ 162 Abs. 1 HGB), Vertretungsregelung der Gesellschafter (§ 106 Abs. 2 Nr. 4 HGB) und der Hinweis, dass alle
+ * Gesellschafter anmelden (§ 106 Abs. 7 HGB).
+ */
+const HR_PERSONENGESELLSCHAFT = ["OHG", "KG", "GmbH & Co. KG"];
+const HR_KG = ["KG", "GmbH & Co. KG"];
+const HR_STELLUNG = [
+  { wert: "phg", text: "persönlich haftend" },
+  { wert: "kommandit", text: "Kommanditist/in" },
+];
+export const HR_ALLE_MELDEN = "Bei OHG und KG melden alle Gesellschafter die Gesellschaft zur Eintragung an (§ 106 Abs. 7 HGB).";
+export const HR_HAFTEINLAGE = "Bei einer KG je Kommanditistin bzw. Kommanditist den Betrag der Hafteinlage angeben (§ 162 Abs. 1 HGB).";
+const hrRechtsform = (d: Daten, b?: Betrieb) => rechtsformAus(text(d, "rechtsform") || b?.rechtsform, HR_FORMEN.map((o) => o.wert));
 
 export const handelsregister: Vorlage = {
   id: "handelsregister",
   gestalt: "formular",
   titel: "Handelsregister (Vorbereitung)",
-  beschreibung: "Die Angaben für die Anmeldung zum Handelsregister – Firma, Sitz, Gegenstand, Kapital, Gesellschafter, Geschäftsführung – zum Termin beim Notar.",
+  beschreibung: "Die Angaben für die Anmeldung zum Handelsregister – Firma, Sitz, Gegenstand, Kapital, Gesellschafter, Geschäftsführung und Vertretung, bei OHG und KG mit Kommanditisten und Hafteinlage – zum Termin beim Notar.",
   bereich: "betrieb",
   pflichten: ["gesellschaft.handelsregister_anmeldung"],
   namensFeld: "firma",
@@ -188,15 +202,36 @@ export const handelsregister: Vorlage = {
         { id: "kapital", art: "betrag", label: "Stammkapital (€)", hilfe: "nur bei GmbH und UG" },
       ],
     },
-    { titel: "Gesellschafter", felder: [{ id: "gesellschafter", art: "liste", label: "Gesellschafter", eintrag: "Gesellschafter/in", titelFeld: "name", felder: [...PERSON, { id: "anteil", art: "text", label: "Anteil", hilfe: "z. B. 12.500 € bzw. 50 %" }] }] },
-    { titel: "Geschäftsführung bzw. Inhaber/in", felder: [{ id: "fuehrung", art: "liste", label: "Geschäftsführung", eintrag: "Person", titelFeld: "name", pflicht: true, felder: PERSON }, { id: "vertretung", art: "mehrzeilig", label: "Vertretungsregelung", hilfe: "z. B. vertritt allein; bei mehreren: gemeinsam oder einzeln" }] },
+    {
+      titel: "Gesellschafter",
+      hilfe: `Bei OHG und KG alle Gesellschafter. ${HR_ALLE_MELDEN}`,
+      felder: [
+        {
+          id: "gesellschafter",
+          art: "liste",
+          label: "Gesellschafter",
+          eintrag: "Gesellschafter/in",
+          titelFeld: "name",
+          felder: [
+            ...PERSON,
+            { id: "anteil", art: "text", label: "Anteil", hilfe: "z. B. 12.500 € bzw. 50 %" },
+            { id: "stellung", art: "wahl", label: "Stellung in der OHG bzw. KG", optionen: HR_STELLUNG, hilfe: "nur bei OHG und KG" },
+            { id: "hafteinlage", art: "betrag", label: "Hafteinlage (€)", hilfe: "Betrag der Einlage der Kommanditistin bzw. des Kommanditisten (§ 162 Abs. 1 HGB)", wenn: { feld: "stellung", ist: "kommandit" } },
+          ],
+        },
+      ],
+    },
+    { titel: "Geschäftsführung bzw. Inhaber/in", felder: [{ id: "fuehrung", art: "liste", label: "Geschäftsführung", eintrag: "Person", titelFeld: "name", pflicht: true, felder: PERSON }, { id: "vertretung", art: "mehrzeilig", label: "Vertretungsregelung", hilfe: "z. B. vertritt allein; bei mehreren: gemeinsam oder einzeln. Bei OHG und KG: wie die Gesellschafter die Gesellschaft vertreten (§ 106 Abs. 2 Nr. 4 HGB)" }] },
   ],
   // R12 (Recht #16): Stammkapital der GmbH mindestens 25.000 €, in vollen Euro (§ 5 Abs. 1, 2 GmbHG); UG ab 1 € (§ 5a Abs. 1 GmbHG)
+  // OHG und KG: vertreten durch die Gesellschafter – eine eigene Geschäftsführung ist keine Pflichtangabe
+  nichtPflicht: (d) => (HR_PERSONENGESELLSCHAFT.includes(hrRechtsform(d)) ? ["fuehrung"] : []),
   pruefen(d, b) {
-    const rechtsform = rechtsformAus(text(d, "rechtsform") || b.rechtsform, HR_FORMEN.map((o) => o.wert));
-    const c = cent(text(d, "kapital"));
-    if (c === null || !text(d, "kapital").trim()) return [];
+    const rechtsform = hrRechtsform(d, b);
     const f: string[] = [];
+    if (HR_KG.includes(rechtsform) && liste(d, "gesellschafter").some((x) => text(x, "name") && text(x, "stellung") === "kommandit" && !text(x, "hafteinlage").trim())) f.push(HR_HAFTEINLAGE);
+    const c = cent(text(d, "kapital"));
+    if (c === null || !text(d, "kapital").trim()) return f;
     if (rechtsform === "GmbH" && c < 2_500_000) f.push(HR_KAPITAL_GMBH);
     if (rechtsform === "UG (haftungsbeschränkt)" && c < 100) f.push(HR_KAPITAL_UG);
     if ((rechtsform === "GmbH" || rechtsform === "UG (haftungsbeschränkt)") && c % 100 !== 0) f.push(HR_KAPITAL_EURO);
@@ -207,9 +242,19 @@ export const handelsregister: Vorlage = {
     const ges = liste(d, "gesellschafter").filter((x) => text(x, "name"));
     const gf = liste(d, "fuehrung").filter((x) => text(x, "name"));
     const firma = text(d, "firma") || b.name.trim();
-    const rechtsform = rechtsformAus(text(d, "rechtsform") || b.rechtsform, HR_FORMEN.map((o) => o.wert));
+    const rechtsform = hrRechtsform(d, b);
     // Kapitalgesellschaft: Gesellschafter und Stammkapital gehören immer dazu (leer als Zeilen zum Ausfüllen)
     const kapitalgesellschaft = rechtsform === "GmbH" || rechtsform === "UG (haftungsbeschränkt)";
+    // Dr. Weber (23.10.2026): OHG und KG – Gesellschafter mit Stellung und Hafteinlage, Vertretungsregelung, alle melden an
+    const personengesellschaft = HR_PERSONENGESELLSCHAFT.includes(rechtsform);
+    const kg = HR_KG.includes(rechtsform);
+    const stellung = (x: Eintrag) => {
+      const st = HR_STELLUNG.find((o) => o.wert === text(x, "stellung"))?.text ?? "";
+      const he = text(x, "stellung") === "kommandit" && text(x, "hafteinlage") ? `Hafteinlage ${euro(cent(text(x, "hafteinlage")) ?? 0)}` : "";
+      return [st, he].filter(Boolean).join(", ");
+    };
+    const gesellschafterTabelle = () =>
+      tabelle(["Name", "Geburtsdatum", "Wohnort", ...(kg ? ["Stellung, Hafteinlage"] : [])], ges.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), ...(kg ? [zelle(stellung(x))] : [])]), { breiten: kg ? ["32%", "18%", "22%", "28%"] : ["32%", "18%", "50%"], ...(ges.length ? {} : { mindestens: 3, hoch: true }) });
     // Name und Geburtsdatum in beiden Tabellen gleich breit, damit die Spalten untereinander stehen
     const person = (l: typeof ges, extra = false, mindestens = 0) =>
       tabelle(["Name", "Geburtsdatum", "Wohnort", ...(extra ? ["Anteil"] : [])], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), ...(extra ? [zelle(text(x, "anteil"))] : [])]), { breiten: extra ? ["32%", "18%", "28%", "22%"] : ["32%", "18%", "50%"], ...(l.length ? {} : { mindestens, hoch: true }) });
@@ -218,7 +263,7 @@ export const handelsregister: Vorlage = {
       betrieb: b,
       unter: firma || undefined,
       inhalt:
-        `<p class="klein">Für den Termin beim Notar: Die Anmeldung zum Handelsregister reicht der Notar elektronisch ein; dieses Blatt hält die nötigen Angaben bereit.</p>` +
+        `<p class="klein">Für den Termin beim Notar: Die Anmeldung zum Handelsregister reicht der Notar elektronisch ein; dieses Blatt hält die nötigen Angaben bereit.${personengesellschaft ? ` ${esc(HR_ALLE_MELDEN)}` : ""}</p>` +
         abschnitt(
           "Gesellschaft",
           felder([
@@ -230,10 +275,15 @@ export const handelsregister: Vorlage = {
             ["Stammkapital", text(d, "kapital") ? euro(cent(text(d, "kapital")) ?? 0) : kapitalgesellschaft ? "" : null],
           ]),
         ) +
-        (ges.length || kapitalgesellschaft ? abschnitt("Gesellschafter", person(ges, true, 3)) : "") +
-        abschnitt(kapitalgesellschaft ? "Geschäftsführung" : "Geschäftsführung bzw. Inhaber/in", person(gf, false, 2)) +
-        // GmbH/UG: Vertretungsregelung gehört dazu – leer als Linien zum Ausfüllen
-        (text(d, "vertretung") || kapitalgesellschaft ? abschnitt("Vertretungsregelung", absatz(text(d, "vertretung"))) : "") +
+        (personengesellschaft
+          ? abschnitt(kg ? "Gesellschafter (persönlich haftende und Kommanditisten)" : "Gesellschafter", gesellschafterTabelle() + (kg ? nachsatz(HR_HAFTEINLAGE) : ""))
+          : ges.length || kapitalgesellschaft
+            ? abschnitt("Gesellschafter", person(ges, true, 3))
+            : "") +
+        // OHG und KG: Geschäftsführung nur, wenn eingetragen (die Gesellschafter vertreten)
+        (personengesellschaft && !gf.length ? "" : abschnitt(kapitalgesellschaft ? "Geschäftsführung" : "Geschäftsführung bzw. Inhaber/in", person(gf, false, 2))) +
+        // GmbH/UG und OHG/KG: Vertretungsregelung gehört dazu – leer als Linien zum Ausfüllen
+        (text(d, "vertretung") || kapitalgesellschaft || personengesellschaft ? abschnitt(personengesellschaft ? "Vertretungsregelung der Gesellschafter" : "Vertretungsregelung", absatz(text(d, "vertretung")), personengesellschaft ? { rand: "§ 106 Abs. 2 Nr. 4 HGB" } : "") : "") +
         uebertragung(["Notartermin am", "Notar/in", "Eingetragen am, Registernummer"]),
     });
   },

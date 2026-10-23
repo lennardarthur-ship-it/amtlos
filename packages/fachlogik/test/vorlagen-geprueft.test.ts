@@ -9,7 +9,9 @@ import { LEERER_BETRIEB, PRUEFHINWEIS, VERIFIZIERUNG, VORLAGEN, dokumentHtml, le
 
 const FUENF = ["haccp", "hygieneplan", "allergene", "ifsg_belehrung", "hygieneschulung"];
 // Durchsicht 23.10.2026: StB Busch, T. Koch, RA Dr. Weber (E-177)
-const WEITERE = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung", "lohnkonto", "gefaehrdungsbeurteilung", "unterweisung", "gefahrstoffverzeichnis",
+// Gefährdungsbeurteilung: Vermerk entfallen mit den Baustein-Korrekturen aus derselben Durchsicht (T. Koch, B-054, B-200,
+// B-218, B-226, B-231, B-233, B-236, B-238) – erneut vorlegen
+const WEITERE = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung", "lohnkonto", "unterweisung", "gefahrstoffverzeichnis",
   "betriebsanweisung_maschine", "pruefprotokoll_elektro", "datenschutz_dokumentation", "datenschutzerklaerung_website", "avv", "datenschutzinformation", "datenpanne",
   "video_hinweisschild", "anamnese_einwilligung", "arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ki_kompetenz", "ausweis_hinweis", "schluesselquittung",
   "impressum", "gewerbeanmeldung", "transparenzregister"];

@@ -650,7 +650,8 @@ const haut = (gruppe: string, anlass: string, handschuhe: string, norm: string, 
 });
 const DESINF_BEHANDLUNG = "vor und nach jeder Behandlung und nach dem Ausziehen der Handschuhe";
 export const HAUTSCHUTZ_WEITERE: Vorschlag[] = [
-  haut("Kosmetik", "Nagelmodellage: Kleber, Acrylate, Gele und Aktivatoren", "Nitril-Einmalhandschuhe, nach jeder Kundin bzw. jedem Kunden wechseln", "Nitril, DIN EN ISO 374", { desinfektion: DESINF_BEHANDLUNG }),
+  // Durchsicht T. Koch 23.10.2026 (B-286): bei Acrylaten nach direktem Kontakt sofort wechseln – „nach jeder Kundin“ allein reicht nicht
+  haut("Kosmetik", "Nagelmodellage: Kleber, Acrylate, Gele und Aktivatoren", "Nitril-Einmalhandschuhe, nach direktem Kontakt mit Acrylaten sofort und nach jeder Kundin bzw. jedem Kunden wechseln – dünne Nitril-Einmalhandschuhe bieten nur kurzzeitigen Schutz", "Nitril, DIN EN ISO 374", { desinfektion: DESINF_BEHANDLUNG }),
   haut("Kosmetik", "Kosmetische Behandlung und Fußpflege mit möglichem Blutkontakt", "Flüssigkeitsdichte Einmalhandschuhe", "Nitril, DIN EN ISO 374 bzw. DIN EN 455", { desinfektion: DESINF_BEHANDLUNG }),
   haut("Gastronomie / Café", "Spülen und Arbeiten in der Spülküche (Feuchtarbeit)", "Flüssigkeitsdichte Handschuhe mit Stulpe, darunter Baumwoll-Unterziehhandschuhe", "DIN EN ISO 374", { reinigung: "Hände mit pH-hautneutralem Flüssigsyndet waschen; gut abtrocknen" }),
   haut("Gastronomie / Café", "Reinigung mit Grill- und Backofenreinigern", "Chemikalienschutzhandschuhe mit langer Stulpe, dazu Schutzbrille", "nach Sicherheitsdatenblatt, DIN EN ISO 374"),
@@ -677,6 +678,13 @@ const HAUT_PRODUKTE: [string, string][] = [
   ["desinfektion", "produkt_desinfektion"],
 ];
 
+/**
+ * Durchsicht T. Koch 23.10.2026: Die TRGS 530 gilt nur für das Friseurhandwerk – als Rechtsgrundlage nur beim Bereich
+ * Friseur (Bereich nennt „Friseur“ oder der Plan enthält eine Zeile aus dem Friseur-Muster), sonst nur TRGS 401.
+ */
+const FRISEUR_ZEILEN = new Set(HAUTSCHUTZ_FRISEUR.map((x) => x.titel));
+export const hautschutzFriseur = (d: Daten) => /friseur/i.test(text(d, "bereich")) || liste(d, "eintraege").some((x) => FRISEUR_ZEILEN.has(text(x, "anlass")));
+
 export const hautschutzplan: Vorlage = {
   id: "hautschutzplan",
   gestalt: "aushang",
@@ -684,11 +692,12 @@ export const hautschutzplan: Vorlage = {
   beschreibung: "Aushang auf einem Blatt: wann welcher Hautschutz, welche Handschuhe, welche Reinigung und Pflege – mit den Zeilen aus dem Muster-Hautschutzplan der TRGS 530 und der BGW, Musterzeilen für weitere Branchen und deinen Produkten.",
   bereich: "beauty",
   pflichten: ["branche.beauty_hautschutzplan"],
-  grundlage: "TRGS 401; TRGS 530",
+  grundlage: "TRGS 401",
+  grundlageFuer: (d) => (hautschutzFriseur(d) ? "TRGS 401; TRGS 530" : ""),
   querformat: true,
   namensFeld: "bereich",
   abschnitte: [
-    { titel: "Bereich", felder: [{ id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Salon", "Kosmetikkabine", "Nagelstudio", "Küche und Spülküche", "Reinigungsobjekte", "Behandlungsräume der Praxis", "Werkstatt", "Backstube", "Baustelle"] }] },
+    { titel: "Bereich", felder: [{ id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Friseursalon", "Kosmetikkabine", "Nagelstudio", "Küche und Spülküche", "Reinigungsobjekte", "Behandlungsräume der Praxis", "Werkstatt", "Backstube", "Baustelle"] }] },
     {
       titel: "Tätigkeiten",
       hilfe: "Wähle die Tätigkeiten aus dem Muster. Die Produkte, die bei dir stehen, trägst du im nächsten Schritt ein.",

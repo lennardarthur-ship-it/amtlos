@@ -31,22 +31,24 @@ describe("neue Vorlagen", () => {
     expect(h).toContain("<dd>Aufschnittmaschine</dd>");
     expect(h).toContain("<h2>Beschäftigungsbeschränkungen</h2>");
   });
-  it("Betriebsanweisung Biostoffe (§ 14 BioStoffV): Gliederung nach § 14 Abs. 1, Schutzstufe, optionale Kästen nur ausgefüllt", () => {
+  it("Betriebsanweisung Biostoffe (§ 14 BioStoffV): Gliederung nach § 14 Abs. 1, Schutzstufe, Vorsorge und Beschäftigungsbeschränkungen immer", () => {
     const l = leer("betriebsanweisung_biostoffe");
     expect(l).toContain("für Tätigkeiten mit Biostoffen gemäß § 14 BioStoffV");
     for (const k of ["Gefahren für die Beschäftigten", "Schutzmaßnahmen und Verhaltensregeln", "Verhalten bei Verletzungen, Unfällen und Betriebsstörungen – Erste Hilfe", "Sachgerechte Inaktivierung und Entsorgung"]) expect(l).toContain(`<h2>${k}</h2>`);
-    expect(l).not.toContain("Arbeitsmedizinische Vorsorge und Impfungen");
+    // Durchsicht T. Koch 23.10.2026: beide Abschnitte auch auf dem leeren Blatt
+    expect(l).toContain("<h2>Arbeitsmedizinische Vorsorge und Impfungen</h2>");
+    expect(l).toContain("<h2>Beschäftigungsbeschränkungen</h2>");
     const h = html("betriebsanweisung_biostoffe", { taetigkeit: "Blutentnahme", biostoffe: "HBV, HCV, HIV", schutzstufe: "2", vorsorge: "Impfangebot Hepatitis B." });
     expect(h).toContain("<dd>HBV, HCV, HIV · Schutzstufe 2</dd>");
     expect(h).toContain("<h2>Arbeitsmedizinische Vorsorge und Impfungen</h2>");
   });
   it("Expositionsverzeichnis (§ 10a GefStoffV): Hartholzstaub und Dieselmotoremissionen, Höhe und Dauer", () => {
     const h = html("expositionsverzeichnis", { stand: "2026-10-22", eintraege: [{ name: "Ole Holm", taetigkeit: "Schleifen Eiche", stoff: "Hartholzstaub (z. B. Eiche, Buche)", kategorie: "k", hoehe: "unter 2 mg/m³", von: "2024-03-01", bis: null, dauer: "4 Stunden je Woche" }] });
-    expect(h).toContain("<th>Höhe der Exposition</th>");
+    expect(h).toContain("<th>Höhe der Exposition (Methode, Beurteilungsmaßstab)</th>");
     expect(h).toContain("krebserzeugend 1A/1B");
     expect(h).toContain("01.03.2024 – andauernd");
     expect(h).toMatch(/Verzeichnis nach § 10a GefStoffV/);
-    expect(leer("expositionsverzeichnis")).toContain("<th>Name</th><th>Tätigkeit</th>");
+    expect(leer("expositionsverzeichnis")).toContain("<th>Name / Geburtsdatum</th><th>Tätigkeit</th>");
   });
   it("Betriebsanweisung Gefahrstoffe: Signalwort, Piktogramme, Beschäftigungsbeschränkungen", () => {
     expect(leer("betriebsanweisung")).toContain("☐ Gefahr");

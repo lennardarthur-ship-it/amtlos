@@ -1148,6 +1148,17 @@ export function bilanzUnterzeichner(b: Betrieb): string[] {
   return [b.verantwortlich.trim() ? `${b.verantwortlich.trim()} (Kaufmann/Kauffrau)` : "Kaufmann/Kauffrau"];
 }
 
+/** Kapitalgesellschaft oder GmbH & Co. KG (§§ 264, 264a HGB): Anhang bzw. Angaben unter der Bilanz, §§ 264, 266, 275 HGB. */
+const bilanzKapital = (b: Betrieb) => istKapitalgesellschaft(b.rechtsform, b.name) || (formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name)) === "GmbH & Co. KG";
+/**
+ * StB Busch (Durchsicht 23.10.2026): Anhang nur bei Kapitalgesellschaften und GmbH & Co. KG – Kleinstkapitalgesellschaften
+ * brauchen keinen, wenn die Angaben unter der Bilanz stehen; OHG, KG und e. K. stellen keinen Anhang auf.
+ */
+export const BILANZ_ANHANG = "Zum Jahresabschluss gehört ein Anhang (§§ 264, 284 ff. HGB) – er kommt aus der Buchführung der Kanzlei. Kleinstkapitalgesellschaften brauchen keinen Anhang, wenn die Angaben nach § 264 Abs. 1 Satz 5 HGB unter der Bilanz stehen.";
+export const BILANZ_OHNE_ANHANG = "OHG, KG und e. K. stellen keinen Anhang auf.";
+/** StB Busch (Durchsicht 23.10.2026, § 245 HGB): wer unterschreibt, je Rechtsform. */
+export const BILANZ_UNTERSCHRIFT = "Den Jahresabschluss unterschreiben mit Datum: bei GmbH und UG alle Geschäftsführer, bei OHG und KG alle persönlich haftenden Gesellschafter, beim e. K. der Kaufmann bzw. die Kauffrau (§ 245 HGB).";
+
 export const bilanzGuv: Vorlage = {
   id: "bilanz_guv",
   gestalt: "formular",
@@ -1155,14 +1166,16 @@ export const bilanzGuv: Vorlage = {
   beschreibung: "Vorlage – Werte aus der Buchführung der Kanzlei: Erträge, Aufwendungen und Ertragsteuern, Vermögen und Kapital, Angaben unter der Bilanz und Unterschriften – mit Prüfung, ob Aktiva und Passiva aufgehen.",
   bereich: "steuern",
   pflichten: ["steuern.buchfuehrungspflicht", "steuern.e_bilanz"],
-  grundlage: "§§ 238, 242, 245, 264, 266, 275 HGB; § 5b EStG",
+  // StB Busch (Durchsicht 23.10.2026): §§ 264, 266, 275 HGB nur bei Kapitalgesellschaften und GmbH & Co. KG
+  grundlage: "§§ 238, 242, 245 HGB; § 5b EStG",
+  grundlageFuer: (_d, b) => (bilanzKapital(b) ? "§§ 238, 242, 245, 264, 266, 275 HGB; § 5b EStG" : ""),
   namensFeld: "stichtag",
   abschnitte: [
     { titel: "Stichtag",
       hilfe: `Vorlage – Werte aus der Buchführung der Kanzlei. ${BILANZ_STATT_EUER} Die E-Bilanz ans Finanzamt (§ 5b EStG) erstellt die Kanzlei bzw. das Buchhaltungsprogramm.`,
       felder: [
         { id: "stichtag", art: "datum", label: "Bilanzstichtag", pflicht: true },
-        { id: "aufgestellt", art: "datum", label: "Tag der Aufstellung", hilfe: "Den Jahresabschluss unterschreiben alle Geschäftsführer bzw. alle persönlich haftenden Gesellschafter mit Datum (§ 245 HGB)." },
+        { id: "aufgestellt", art: "datum", label: "Tag der Aufstellung", hilfe: BILANZ_UNTERSCHRIFT },
       ],
     },
     {
@@ -1177,7 +1190,7 @@ export const bilanzGuv: Vorlage = {
     { titel: "Bilanz", felder: [posten("aktiva", "Aktiva", "Aktivposten", "z. B. Betriebs- und Geschäftsausstattung, Bank"), posten("passiva", "Passiva", "Passivposten", "z. B. Eigenkapital, Verbindlichkeiten")] },
     {
       titel: "Angaben unter der Bilanz",
-      hilfe: "Nur für GmbH, UG und AG. Eine Kleinstkapitalgesellschaft (höchstens eine der Grenzen überschritten: 450.000 € Bilanzsumme, 900.000 € Umsatzerlöse, 10 Beschäftigte im Jahresdurchschnitt; § 267a HGB) braucht keinen Anhang, wenn diese Angaben unter der Bilanz stehen (§ 264 Abs. 1 Satz 5 HGB).",
+      hilfe: "Nur für GmbH, UG, AG und GmbH & Co. KG – OHG, KG und e. K. stellen keinen Anhang auf. Eine Kleinstkapitalgesellschaft (höchstens eine der Grenzen überschritten: 450.000 € Bilanzsumme, 900.000 € Umsatzerlöse, 10 Beschäftigte im Jahresdurchschnitt; § 267a HGB) braucht keinen Anhang, wenn diese Angaben unter der Bilanz stehen (§ 264 Abs. 1 Satz 5 HGB).",
       felder: [
         { id: "kleinst", art: "schalter", label: "Kleinstkapitalgesellschaft – Angaben unter der Bilanz statt Anhang", vorbelegung: true },
         { id: "haftung", art: "mehrzeilig", label: "Haftungsverhältnisse (§ 251, § 268 Abs. 7 HGB)", hilfe: "z. B. Bürgschaften, Gewährleistungsverträge, Sicherheiten für fremde Verbindlichkeiten – sonst „Keine“", vorbelegung: { text: "Keine" }, wenn: { feld: "kleinst" } },
@@ -1187,7 +1200,10 @@ export const bilanzGuv: Vorlage = {
   ],
   pruefen(_d, b) {
     // Hinweis bleibt im Formular: Personenunternehmen ohne Buchführungspflicht ermitteln den Gewinn per EÜR
-    return istKapitalgesellschaft(b.rechtsform, b.name) && !b.vertretung?.trim() ? ["Geschäftsführung in „Mein Betrieb“ eintragen – alle Geschäftsführer unterschreiben den Jahresabschluss (§ 245 HGB)."] : [];
+    if (b.vertretung?.trim()) return [];
+    if (istKapitalgesellschaft(b.rechtsform, b.name)) return ["Geschäftsführung in „Mein Betrieb“ eintragen – alle Geschäftsführer unterschreiben den Jahresabschluss (§ 245 HGB)."];
+    // StB Busch (Durchsicht 23.10.2026): bei OHG und KG alle persönlich haftenden Gesellschafter
+    return istPersonengesellschaft(b.rechtsform, b.name) ? ["Persönlich haftende Gesellschafter in „Mein Betrieb“ eintragen – sie unterschreiben alle den Jahresabschluss (§ 245 HGB)."] : [];
   },
   ergebnis(d) {
     const st = cent(text(d, "ertragsteuern")) ?? 0;
@@ -1230,7 +1246,9 @@ export const bilanzGuv: Vorlage = {
     const mitSteuern = kapital || guvLeer || Boolean(text(d, "ertragsteuern"));
     const akt = summe(l("aktiva"), "betrag");
     const pas = summe(l("passiva"), "betrag");
-    const kleinst = kapital && ja(d, "kleinst");
+    // Anhang bzw. Angaben unter der Bilanz: Kapitalgesellschaften und GmbH & Co. KG (StB Busch 23.10.2026)
+    const mitAnhang = bilanzKapital(b);
+    const kleinst = mitAnhang && ja(d, "kleinst");
     // Blatt zum Ausfüllen (keine Zahlen): Linien statt des Startwerts „Keine“
     const blattLeer = guvLeer && !l("aktiva").length && !l("passiva").length;
     const angabe = (k: string) => (blattLeer ? "" : text(d, k) || "Keine");
@@ -1256,7 +1274,7 @@ export const bilanzGuv: Vorlage = {
           ])}`,
         ) +
         // Hinweis und Satz zu § 245 HGB im letzten Abschnitt: so bleibt er mit den Unterschriften zusammen (Schlussblock)
-        abschnitt("Bilanz", `${bilanz()}${akt !== pas ? `<p class="nachsatz"><strong>Aktiva und Passiva weichen um ${euro(akt - pas)} ab – bitte prüfen.</strong></p>` : ""}${kleinst ? "" : (kapital ? nachsatz("Zum Jahresabschluss gehört ein Anhang (§§ 264, 284 ff. HGB) – er kommt aus der Buchführung der Kanzlei.") : "") + schluss}`) +
+        abschnitt("Bilanz", `${bilanz()}${akt !== pas ? `<p class="nachsatz"><strong>Aktiva und Passiva weichen um ${euro(akt - pas)} ab – bitte prüfen.</strong></p>` : ""}${kleinst ? "" : (mitAnhang ? nachsatz(BILANZ_ANHANG) : ["OHG", "KG", "e. K."].includes(formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name) ?? "") ? nachsatz(BILANZ_OHNE_ANHANG) : "") + schluss}`) +
         (kleinst ? abschnitt("Angaben unter der Bilanz", `<p>${esc(BILANZ_KLEINST)}</p>${angaben([["Haftungsverhältnisse (§ 251, § 268 Abs. 7 HGB)", angabe("haftung")], ["Vorschüsse und Kredite an Mitglieder der Geschäftsführung bzw. des Aufsichtsrats (§ 285 Nr. 9 Buchst. c HGB)", angabe("organkredite")]])}${schluss}`, { rand: "§ 264 Abs. 1 Satz 5 HGB" }) : "") +
         unterschriften(bilanzUnterzeichner(b), { ortDatum: true }),
     });
@@ -1276,14 +1294,23 @@ function ust(d: Daten) {
   const s85 = cent(text(d, "rc_bau_steuer")) ?? 0;
   const v67 = cent(text(d, "vorsteuer_13b")) ?? 0;
   const svz = cent(text(d, "sondervorauszahlung")) ?? 0;
-  const steuer = s19 + s7 + s47 + s85;
+  // StB Busch (Durchsicht 23.10.2026): innergemeinschaftliche Erwerbe Kz 89 (19 %) und Kz 93 (7 %) mit Steuer, Vorsteuer Kz 61
+  const g19 = cent(text(d, "ige_19")) ?? 0;
+  const g7 = cent(text(d, "ige_7")) ?? 0;
+  const v61 = cent(text(d, "vorsteuer_ige")) ?? 0;
+  const steuer = s19 + s7 + s47 + s85 + rundeCent((g19 * 19) / 100) + rundeCent((g7 * 7) / 100);
   // StB-Prüfung (5.2): Bemessungsgrundlagen im Vordruck in vollen Euro (Cent bleiben weg), die Steuer daraus – so rechnet ELSTER
   const e19 = vollEuro(u19);
   const e7 = vollEuro(u7);
   const es19 = rundeCent((e19 * 19) / 100);
   const es7 = rundeCent((e7 * 7) / 100);
-  const elsterSteuer = es19 + es7 + s47 + s85;
-  return { u19, u7, s19, s7, vst, s47, s85, v67, svz, steuer, zahllast: steuer - vst - v67 - svz, e19, e7, es19, es7, elsterSteuer, elsterZahllast: elsterSteuer - vst - v67 - svz };
+  const eg19 = vollEuro(g19);
+  const eg7 = vollEuro(g7);
+  const es89 = rundeCent((eg19 * 19) / 100);
+  const es93 = rundeCent((eg7 * 7) / 100);
+  const elsterSteuer = es19 + es7 + s47 + s85 + es89 + es93;
+  const abzug = vst + v67 + v61 + svz;
+  return { u19, u7, s19, s7, vst, s47, s85, v67, v61, svz, steuer, zahllast: steuer - abzug, e19, e7, es19, es7, g19, g7, eg19, eg7, es89, es93, elsterSteuer, elsterZahllast: elsterSteuer - abzug };
 }
 
 /** Betrag in Cent ohne die Cent (volle Euro, zur Null hin abgeschnitten) – wie im Vordruck der Voranmeldung. */
@@ -1307,6 +1334,8 @@ const UST_OHNE_STEUER: { id: string; kz?: string; text: string; hinweis?: string
   { id: "umsatz_frei", text: "Weitere steuerfreie oder nicht steuerbare Umsätze", hinweis: `${KZ_FREI_HINWEIS[0]!.toUpperCase()}${KZ_FREI_HINWEIS.slice(1)}` },
 ];
 
+/** StB Busch (Durchsicht 23.10.2026): ausdrücklicher Hinweis, wenn keine innergemeinschaftlichen Erwerbe eingetragen sind. */
+export const UST_OHNE_IGE = "Innergemeinschaftliche Erwerbe (Kz 89 bzw. 93 mit Steuer, Vorsteuer Kz 61) sind nicht enthalten – die App übernimmt sie nicht aus den Belegen. Wer Waren aus anderen EU-Ländern bezieht, trägt sie im Formular ein.";
 /** Hinweis bei steuerfreien Umsätzen ohne Vorsteuerabzug (Voranmeldung, Steuerberater-Paket). */
 export const VORSTEUER_AUFTEILEN = "Steuerfreie Umsätze ohne Vorsteuerabzug und Vorsteuer im selben Zeitraum: Vorsteuer aus Eingangsleistungen, die diesen Umsätzen dienen, ist nicht abziehbar (§ 15 Abs. 2 UStG); dienen sie beiden Arten von Umsätzen, ist sie aufzuteilen (§ 15 Abs. 4 UStG). Bitte die Vorsteuer prüfen.";
 
@@ -1367,6 +1396,17 @@ export const ustVoranmeldung: Vorlage = {
       ],
     },
     {
+      // StB Busch (Durchsicht 23.10.2026): betrifft jeden Betrieb, der Waren aus anderen EU-Ländern bezieht – die App kann
+      // die Erwerbe nicht aus den Rechnungen ableiten, deshalb zum Eintragen
+      titel: "Innergemeinschaftliche Erwerbe",
+      hilfe: "Wenn du Waren von Unternehmen aus anderen EU-Ländern bezogen hast: Bemessungsgrundlage nach Steuersatz, darauf schuldest du die Umsatzsteuer; die Vorsteuer daraus steht in Kz 61. Die App übernimmt die Erwerbe nicht aus deinen Belegen – bitte von Hand eintragen.",
+      felder: [
+        { id: "ige_19", selten: true, art: "betrag", label: "Innergemeinschaftliche Erwerbe zum Steuersatz 19 % (Kz 89) (€)", hilfe: "Bemessungsgrundlage ohne Umsatzsteuer" },
+        { id: "ige_7", selten: true, art: "betrag", label: "Innergemeinschaftliche Erwerbe zum Steuersatz 7 % (Kz 93) (€)", hilfe: "Bemessungsgrundlage ohne Umsatzsteuer" },
+        { id: "vorsteuer_ige", selten: true, art: "betrag", label: "Vorsteuer aus innergemeinschaftlichen Erwerben (Kz 61) (€)", hilfe: "die Steuer aus Kz 89/93 – nur mit Vorsteuerabzug, also nicht als Kleinunternehmer (§ 15 Abs. 1 Satz 1 Nr. 3 UStG)" },
+      ],
+    },
+    {
       titel: "Vorsteuer",
       felder: [
         { id: "vorsteuer", art: "betrag", label: "Vorsteuer aus Eingangsrechnungen (€)", pflicht: true },
@@ -1383,14 +1423,14 @@ export const ustVoranmeldung: Vorlage = {
     const x = ust(d);
     // 5.2: weicht die Zahllast aus vollen Euro ab, steht sie als letzte Zeile da – sie ist der Betrag, den ELSTER errechnet
     const elster: [string, string][] = x.elsterZahllast !== x.zahllast ? [[`${x.elsterZahllast >= 0 ? "Zahllast" : "Erstattung"} laut ELSTER (volle Euro)`, euro(Math.abs(x.elsterZahllast))]] : [];
-    return [["Umsatzsteuer", euro(x.steuer)], ["Vorsteuer", euro(x.vst + x.v67)], ...(x.svz ? ([["Sondervorauszahlung", euro(x.svz)]] as [string, string][]) : []), [x.zahllast >= 0 ? "Zahllast" : "Erstattung", euro(Math.abs(x.zahllast))], ...elster];
+    return [["Umsatzsteuer", euro(x.steuer)], ["Vorsteuer", euro(x.vst + x.v67 + x.v61)], ...(x.svz ? ([["Sondervorauszahlung", euro(x.svz)]] as [string, string][]) : []), [x.zahllast >= 0 ? "Zahllast" : "Erstattung", euro(Math.abs(x.zahllast))], ...elster];
   },
   html(d, b) {
     const x = ust(d);
     const ohneSteuer = UST_OHNE_STEUER.map((f) => ({ ...f, cent: cent(text(d, f.id)) ?? 0 })).filter((f) => f.cent);
     const ist = text(d, "versteuerung") === "ist";
     // Vorlage zum Ausfüllen (keine Beträge eingegeben): Beträge leer statt „0,00 €“
-    const leer = !["umsatz_19", "umsatz_7", "vorsteuer", "rc_eu_netto", "rc_bau_netto", "vorsteuer_13b", "sondervorauszahlung", ...UST_OHNE_STEUER.map((f) => f.id)].some((k) => text(d, k));
+    const leer = !["umsatz_19", "umsatz_7", "vorsteuer", "rc_eu_netto", "rc_bau_netto", "vorsteuer_13b", "sondervorauszahlung", "ige_19", "ige_7", "vorsteuer_ige", ...UST_OHNE_STEUER.map((f) => f.id)].some((k) => text(d, k));
     const dfv = ja(d, "dauerfrist");
     const rc = [
       { kz: "46", text: "Sonstige Leistungen von Unternehmen aus dem übrigen Gemeinschaftsgebiet (§ 13b Abs. 1 UStG)", hinweis: "Bemessungsgrundlage", c: cent(text(d, "rc_eu_netto")) ?? 0 },
@@ -1399,6 +1439,7 @@ export const ustVoranmeldung: Vorlage = {
       { kz: "85", text: "darauf Umsatzsteuer", c: x.s85 },
     ];
     const mitRc = rc.some((z) => z.c);
+    const mitIge = Boolean(x.g19 || x.g7);
     const betrag = (c: number) => (leer ? "&nbsp;" : euro(c));
     // 5.2: Bemessungsgrundlagen in vollen Euro
     const voll = (c: number) => (leer ? "&nbsp;" : euroVoll(c));
@@ -1425,11 +1466,24 @@ export const ustVoranmeldung: Vorlage = {
           : "") +
         // Kz 46/84 sind Bemessungsgrundlagen (volle Euro), Kz 47/85 Steuerbeträge (mit Cent)
         (mitRc ? abschnitt("Steuerschuldnerschaft als Leistungsempfänger", kennzahlen(rc.map((z) => ({ kz: z.kz, text: z.text, ...(z.hinweis ? { hinweis: z.hinweis } : {}), betrag: z.hinweis ? euroVoll(z.c) : euro(z.c) })))) : "") +
+        // StB Busch (Durchsicht 23.10.2026): innergemeinschaftliche Erwerbe – Bemessungsgrundlage in vollen Euro, Steuer daraus
+        (mitIge
+          ? abschnitt(
+              "Innergemeinschaftliche Erwerbe",
+              kennzahlen([
+                { kz: "89", text: "Steuerpflichtige innergemeinschaftliche Erwerbe zum Steuersatz 19 %", hinweis: "Bemessungsgrundlage ohne Umsatzsteuer in vollen Euro", betrag: euroVoll(x.g19) },
+                { text: "darauf Umsatzsteuer 19 % (rechnet ELSTER aus vollen Euro)", betrag: euro(x.es89) },
+                { kz: "93", text: "Steuerpflichtige innergemeinschaftliche Erwerbe zum Steuersatz 7 %", hinweis: "Bemessungsgrundlage ohne Umsatzsteuer in vollen Euro", betrag: euroVoll(x.g7) },
+                { text: "darauf Umsatzsteuer 7 % (rechnet ELSTER aus vollen Euro)", betrag: euro(x.es93) },
+              ]),
+            )
+          : "") +
         abschnitt(
           "Vorsteuer und Zahllast",
           kennzahlen([
             { text: "Umsatzsteuer gesamt (aus vollen Euro)", betrag: betrag(x.elsterSteuer) },
             { kz: "66", text: "Vorsteuerbeträge aus Rechnungen anderer Unternehmer", hinweis: "§ 15 Abs. 1 Satz 1 Nr. 1 UStG", betrag: betrag(x.vst) },
+            ...(x.v61 ? [{ kz: "61", text: "Vorsteuerbeträge aus dem innergemeinschaftlichen Erwerb von Gegenständen", hinweis: "§ 15 Abs. 1 Satz 1 Nr. 3 UStG", betrag: euro(x.v61) }] : []),
             ...(x.v67 ? [{ kz: "67", text: "Vorsteuerbeträge aus Leistungen im Sinne des § 13b UStG", hinweis: "§ 15 Abs. 1 Satz 1 Nr. 4 UStG", betrag: euro(x.v67) }] : []),
             ...(x.svz ? [{ kz: "39", text: "Abzug der festgesetzten Sondervorauszahlung für Dauerfristverlängerung", hinweis: "nur Monatszahler, in der Voranmeldung für Dezember (§§ 46–48 UStDV)", betrag: euro(x.svz) }] : []),
             {
@@ -1455,6 +1509,7 @@ export const ustVoranmeldung: Vorlage = {
         ((cent(text(d, "umsatz_48")) ?? 0) && x.vst > 0 ? nachsatz(VORSTEUER_AUFTEILEN) : "") +
         (text(d, "notiz") ? abschnitt("Notiz", absatz(text(d, "notiz"))) : "") +
         nachsatz("Kennzahlen nach dem Vordruckmuster USt 1 A für 2026. Bemessungsgrundlagen in vollen Euro (Cent bleiben weg), Steuer- und Vorsteuerbeträge mit Cent. Vor dem Übertragen gegen das aktuelle ELSTER-Formular prüfen; das Formular rechnet die Steuerbeträge selbst – maßgeblich ist der Betrag, den ELSTER errechnet. OSS-Umsätze (Fernverkäufe mit der Steuer des Bestimmungslands) gehören nicht in diese Voranmeldung, sondern in die OSS-Erklärung beim BZSt.") +
+        (mitIge || x.v61 ? "" : nachsatz(UST_OHNE_IGE)) +
         steuerHinweis("va", MARKE.name) +
         uebertragung(["Übermittelt am", "Transferticket (ELSTER)", ueberschuss ? "Erstattung erhalten am" : "Gezahlt am"]),
     });
@@ -1470,6 +1525,16 @@ const ERKLAERUNGEN = [
   { wert: "kst", text: "Körperschaftsteuer" },
   // R10: Personengesellschaften (GbR, OHG, KG, GmbH & Co. KG, PartG) – Gewinnfeststellung statt Einkommensteuer der Gesellschaft
   { wert: "feststellung", text: "Feststellungserklärung (Personengesellschaft)" },
+];
+
+/** Steuerart einer Vorauszahlung (StB Busch 23.10.2026: Summe je Steuerart getrennt). */
+const VORAUSZAHLUNG_ARTEN: Option[] = [
+  { wert: "est", text: "Einkommensteuer" },
+  { wert: "kst", text: "Körperschaftsteuer" },
+  { wert: "soli", text: "Solidaritätszuschlag" },
+  { wert: "gewst", text: "Gewerbesteuer" },
+  { wert: "ust", text: "Umsatzsteuer" },
+  { wert: "andere", text: "Andere Steuer" },
 ];
 
 /** Personengesellschaft nach der Rechtsform aus „Mein Betrieb“ bzw. dem Zusatz im Namen (GbR, OHG, KG, GmbH & Co. KG, PartG). */
@@ -1524,7 +1589,8 @@ export const steuererklaerung: Vorlage = {
     },
     {
       titel: "Vorauszahlungen",
-      felder: [{ id: "vorauszahlungen", art: "liste", label: "Vorauszahlungen", eintrag: "Vorauszahlung", titelFeld: "art", felder: [{ id: "art", art: "text", label: "Steuer", hilfe: "z. B. Einkommensteuer Q1", pflicht: true }, { id: "betrag", art: "betrag", label: "Betrag (€)", pflicht: true }] }],
+      // StB Busch (Durchsicht 23.10.2026): Summe je Steuerart getrennt – deshalb die Steuerart zur Auswahl
+      felder: [{ id: "vorauszahlungen", art: "liste", label: "Vorauszahlungen", eintrag: "Vorauszahlung", titelFeld: "art", felder: [{ id: "steuerart", art: "wahl", label: "Steuerart", optionen: VORAUSZAHLUNG_ARTEN, pflicht: true }, { id: "art", art: "text", label: "Zeitraum bzw. Bezeichnung", hilfe: "z. B. Q1 oder 10.03.", pflicht: true }, { id: "betrag", art: "betrag", label: "Betrag (€)", pflicht: true }] }],
     },
     {
       titel: "Weitere Angaben und Belege",
@@ -1537,13 +1603,17 @@ export const steuererklaerung: Vorlage = {
   ],
   html(d, b) {
     const arten = auswahl(d, "arten").map((a) => ERKLAERUNGEN.find((x) => x.wert === a)?.text ?? a);
-    const vz = liste(d, "vorauszahlungen").filter((x) => text(x, "art"));
+    const vz = liste(d, "vorauszahlungen").filter((x) => text(x, "art") || text(x, "steuerart"));
     const we = liste(d, "weiteres").filter((x) => text(x, "was"));
     // Blatt zum Ausfüllen (keine Zahlen eingegeben): Erklärungen zum Ankreuzen, alle Zeilen und Tabellen zum Eintragen
     const leer = !["gewinn", "umsatz", "ust_jahr", "vorsteuer_jahr"].some((k) => text(d, k)) && !vz.length && !we.length;
-    // Steuerart einer Vorauszahlung: das erste Wort („Einkommensteuer Q1“ → „einkommensteuer“)
-    const steuerart = (t: string) => t.trim().split(/\s+/)[0]!.toLocaleLowerCase("de");
-    const verschiedene = new Set(vz.map((x) => steuerart(text(x, "art")))).size > 1;
+    // StB Busch (Durchsicht 23.10.2026): je Steuerart getrennt summieren, nie über verschiedene Steuerarten. Steuerart aus
+    // der Auswahl; ältere Einträge ohne Auswahl: das erste Wort der Bezeichnung („Einkommensteuer Q1“ → „einkommensteuer“)
+    const artText = (x: Eintrag) => VORAUSZAHLUNG_ARTEN.find((o) => o.wert === text(x, "steuerart"))?.text ?? "";
+    const steuerart = (x: Eintrag) => text(x, "steuerart") || (text(x, "art").trim().split(/\s+/)[0] ?? "").toLocaleLowerCase("de");
+    const gruppenName = (x: Eintrag) => artText(x) || text(x, "art").trim().split(/\s+/)[0] || "Ohne Steuerart";
+    const bezeichnung = (x: Eintrag) => [artText(x), text(x, "art")].filter(Boolean).join(" ");
+    const arten_ = [...new Set(vz.map(steuerart))];
     return dokument({
       titel: "Unterlagen zur Steuererklärung",
       betrieb: b,
@@ -1564,17 +1634,17 @@ export const steuererklaerung: Vorlage = {
         (vz.length
           ? abschnitt(
               "Geleistete Vorauszahlungen",
-              // verschiedene Steuern: keine Gesamtsumme (Einkommen- und Umsatzsteuer zusammenzuzählen, sagt nichts), sondern je Steuer
-              verschiedene
-                ? tabelle(["Steuer", "Betrag"], vz.map((x) => [zelle(text(x, "art")), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["70%", "30%"], zahlen: [1] }) +
-                    kennzahlen([...new Set(vz.map((x) => steuerart(text(x, "art"))))].map((art) => {
-                      const je = vz.filter((x) => steuerart(text(x, "art")) === art);
-                      return { text: `Summe ${text(je[0]!, "art").trim().split(/\s+/)[0]}`, betrag: euro(summe(je, "betrag")), fett: true };
-                    }))
-                : tabelle(["Steuer", "Betrag"], vz.map((x) => [zelle(text(x, "art")), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["70%", "30%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(summe(vz, "betrag"))}</strong>`] }),
+              // keine Gesamtsumme über verschiedene Steuern (Einkommen- und Umsatzsteuer zusammenzuzählen, sagt nichts), sondern je Steuerart
+              tabelle(["Steuer", "Betrag"], vz.map((x) => [zelle(bezeichnung(x)), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["70%", "30%"], zahlen: [1] }) +
+                kennzahlen(
+                  arten_.map((art) => {
+                    const je = vz.filter((x) => steuerart(x) === art);
+                    return { text: `Summe ${gruppenName(je[0]!)}`, betrag: euro(summe(je, "betrag")), fett: true };
+                  }),
+                ),
             )
           : leer
-            ? abschnitt("Geleistete Vorauszahlungen", tabelle(["Steuer", "Betrag"], [], { breiten: ["70%", "30%"], zahlen: [1], mindestens: 4, hoch: true }))
+            ? abschnitt("Geleistete Vorauszahlungen", tabelle(["Steuerart und Zeitraum", "Betrag"], [], { breiten: ["70%", "30%"], zahlen: [1], mindestens: 4, hoch: true }) + nachsatz("Je Steuerart getrennt summieren – nicht über verschiedene Steuerarten."))
             : "") +
         (we.length
           ? abschnitt("Weitere Angaben und Belege", tabelle(["Was", "Betrag", "Beleg"], we.map((x) => [zelle(text(x, "was")), text(x, "betrag") ? euro(cent(text(x, "betrag")) ?? 0) : "", ja(x, "beleg") ? "liegt vor" : "<strong>fehlt</strong>"]), { breiten: ["55%", "25%", "20%"], zahlen: [1] }))
@@ -1589,6 +1659,12 @@ export const steuererklaerung: Vorlage = {
 };
 
 // ---------------------------------------------------------------- Kassenbuch
+
+/** StB Busch (Durchsicht 23.10.2026): Regeln für das Kassenbuch (§ 146 Abs. 1 Satz 2 AO). */
+export const KASSENBUCH_REGELN = "Der Kassenbestand darf nie negativ werden. Korrekturen nicht als negative Einnahme oder Ausgabe, sondern als Gegenbuchung mit Beleg. Einträge täglich (§ 146 Abs. 1 Satz 2 AO).";
+export const KASSENBUCH_ELEKTRONISCH = "Für Betriebe mit elektronischer Kasse ist das Kassenbuch nur ergänzend; die Einzelaufzeichnung bleibt beim Kassensystem.";
+export const KASSENBUCH_NEGATIV = "Negativer Betrag: Korrekturen nicht als negative Einnahme oder Ausgabe eintragen, sondern als Gegenbuchung mit Beleg.";
+export const KASSENBUCH_BESTAND_NEGATIV = "Der Kassenbestand wird negativ – das darf nicht sein. Bitte Einträge und Anfangsbestand prüfen.";
 
 function kasse(d: Daten) {
   let bestand = cent(text(d, "anfang")) ?? 0;
@@ -1624,7 +1700,7 @@ export const kassenbuch: Vorlage = {
     },
     {
       titel: "Einträge",
-      hilfe: "Jeder Vorgang einzeln, in zeitlicher Reihenfolge, mit Beleg.",
+      hilfe: `Jeder Vorgang einzeln, in zeitlicher Reihenfolge, mit Beleg. ${KASSENBUCH_REGELN}`,
       felder: [
         {
           id: "eintraege",
@@ -1644,6 +1720,11 @@ export const kassenbuch: Vorlage = {
       ],
     },
   ],
+  // StB Busch (Durchsicht 23.10.2026): negative Beträge und negativer Bestand nicht ohne Hinweis annehmen
+  hinweise(d) {
+    const k = kasse(d);
+    return [...(k.zeilen.some((z) => z.ein < 0 || z.aus < 0) ? [KASSENBUCH_NEGATIV] : []), ...(k.negativ ? [KASSENBUCH_BESTAND_NEGATIV] : [])];
+  },
   ergebnis(d) {
     const k = kasse(d);
     return [["Endbestand", euro(k.ende)], ...(k.negativ ? ([["Achtung", "Bestand zwischendurch negativ – bitte prüfen"]] as [string, string][]) : [])];
@@ -1674,6 +1755,7 @@ export const kassenbuch: Vorlage = {
         ) +
         (k.negativ ? `<p><strong>Der Bestand war zwischendurch negativ – bitte prüfen.</strong></p>` : "") +
         (ausKasse ? nachsatz(kassenbuchEinzel(text(d, "kb_einzel"))) : "") +
+        nachsatz(`${KASSENBUCH_REGELN} ${KASSENBUCH_ELEKTRONISCH}`) +
         unterschriften(["Geprüft am", "Unterschrift"]),
     });
   },
@@ -1878,7 +1960,8 @@ export const aufbewahrung: Vorlage = {
       betrieb: b,
       inhalt:
         tabelle(["Unterlagen", "Frist", "Jahr der letzten Eintragung bzw. des Belegs", "Aufbewahren mindestens bis", "Wo"], l.map((x) => [zelle(text(x, "art")), text(x, "jahre") ? `${esc(text(x, "jahre"))} ${zahl(text(x, "jahre")) === 1 ? "Jahr" : "Jahre"}` : ZELLE_LINIE, text(x, "letzte") ? zelle(text(x, "letzte")) : ZELLE_LINIE, aufbewahrenBis(text(x, "letzte"), text(x, "jahre")) ?? ZELLE_LINIE, text(x, "ort") ? zelle(text(x, "ort")) : ZELLE_LINIE]), { breiten: ["42%", "10%", "17%", "14%", "17%"], leerzeilen: leer ? 3 : 0 }) +
-        nachsatz("Die Frist beginnt mit dem Schluss des Kalenderjahres, in dem die letzte Eintragung gemacht, das Inventar aufgestellt, der Jahresabschluss festgestellt, der Brief empfangen oder abgesandt oder der Buchungsbeleg entstanden ist (§ 147 Abs. 4 AO). Sie läuft nicht ab, solange die Unterlagen für Steuern von Bedeutung sind, deren Festsetzungsfrist noch nicht abgelaufen ist (§ 147 Abs. 3 AO)."),
+        // StB Busch (Durchsicht 23.10.2026): „aufgestellt“ wie in § 147 Abs. 4 AO (nicht „festgestellt“)
+        nachsatz("Die Frist beginnt mit dem Schluss des Kalenderjahres, in dem die letzte Eintragung gemacht, das Inventar bzw. der Jahresabschluss aufgestellt, der Brief empfangen oder abgesandt oder der Buchungsbeleg entstanden ist (§ 147 Abs. 4 AO). Sie läuft nicht ab, solange die Unterlagen für Steuern von Bedeutung sind, deren Festsetzungsfrist noch nicht abgelaufen ist (§ 147 Abs. 3 AO)."),
     });
   },
 };

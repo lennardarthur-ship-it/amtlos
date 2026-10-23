@@ -51,6 +51,13 @@ export { VORLAGEN_GEPRUEFT, geprueftVermerk, sha256, type VorlagenFreigabe } fro
 // StB-Prüfung Heckler und Busch (21.10.2026): Rechnungen, Voranmeldung, OSS und ZM
 export { GUTSCHRIFT_PRAEFIX, KUNDEN_ARTEN, NULLSATZ_HINWEIS as NULLSATZ_TEXT, RECHNUNG_EINHEIT_CODE, RECHNUNG_GUTSCHRIFT_NUMMER, RECHNUNG_LEITWEG_FEHLT, RECHNUNG_LEITWEG_FORMAT, RECHNUNG_NULLSATZ_GEMISCHT, RECHNUNG_OSS_LAND, RECHNUNG_OSS_SATZ, RECHNUNG_OSS_VORSCHLAG, RECHNUNG_SCHLUSS_HOCH, RECHNUNG_SCHLUSS_LEER, RECHNUNG_SCHLUSS_SATZ, SATZ_NULLSATZ, abschlaegeAus, euPrivatLand, istGutschriftNummer, leitwegFormatOk, mitGrundstueckHinweis, ossSatz, satzZahl, vollEuro } from "./buchhaltung.js";
 export { EU_LAENDER_NAMEN, OSS_FRIST, OSS_NICHT_VA, ZM_ARTEN, ZM_FRIST, ZM_SKONTO, landName } from "./eumeldungen.js";
+// Nachprüfung der Vorlagen 23.10.2026 (StB Busch, T. Koch, RA Dr. Weber)
+export { OSS_KORREKTUR, OSS_LIEFERSCHWELLE, ZM_ZEITRAUM } from "./eumeldungen.js";
+export { BILANZ_ANHANG, BILANZ_OHNE_ANHANG, BILANZ_UNTERSCHRIFT, KASSENBUCH_BESTAND_NEGATIV, KASSENBUCH_ELEKTRONISCH, KASSENBUCH_NEGATIV, KASSENBUCH_REGELN, UST_OHNE_IGE } from "./buchhaltung.js";
+export { SV_GESCHLECHT_HILFE } from "./lohn.js";
+export { BIO_SCHUTZSTUFE_BLUT } from "./betriebsanweisungen.js";
+export { hautschutzFriseur } from "./branchen.js";
+export { HR_ALLE_MELDEN, HR_HAFTEINLAGE } from "./betrieb.js";
 
 export const BEREICHE: { id: Bereich; titel: string }[] = [
   { id: "steuern", titel: "Steuern und Buchhaltung" },
@@ -306,7 +313,7 @@ export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
         const eintraege = (Array.isArray(d[f.id]) ? d[f.id] : []) as Eintrag[];
         const genutzt = eintraege.filter((e) => benutzt(f, e));
         // R11 (UX #15): ohne zweiten Doppelpunkt hinter „Fehlt:“
-        if (f.pflicht && !genutzt.length) fehlt.push(`mindestens ein Eintrag „${f.eintrag}“`);
+        if (f.pflicht && !frei.has(f.id) && !genutzt.length) fehlt.push(`mindestens ein Eintrag „${f.eintrag}“`);
         genutzt.forEach((e, i) => {
           const vor = `${f.eintrag}${genutzt.length > 1 ? ` ${i + 1}` : ""}: `;
           for (const x of f.felder) {

@@ -24,8 +24,9 @@ describe("Vermerk je Vorlage in der App", () => {
     for (const id of ["haccp", "allergene", "ifsg_belehrung", "hygieneschulung"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(VERMERK);
     expect(pruefHinweisFuer(vorlageFuer("hygieneplan")!, { art: "lebensmittel" })).toBe(VERMERK);
     expect(pruefHinweisFuer(vorlageFuer("hygieneplan")!, { art: "beauty" })).toBe(PRUEFHINWEIS);
-    for (const id of ["rechnung", "gefaehrdungsbeurteilung", "impressum"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(VERMERK);
-    for (const id of ["hautschutzplan", "handelsregister", "bilanz_guv"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(PRUEFHINWEIS);
+    for (const id of ["rechnung", "unterweisung", "impressum"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(VERMERK);
+    // Gefährdungsbeurteilung: Vermerk mit den Baustein-Korrekturen der Durchsicht vom 23.10.2026 entfallen
+    for (const id of ["hautschutzplan", "handelsregister", "bilanz_guv", "gefaehrdungsbeurteilung"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(PRUEFHINWEIS);
   });
 
   it("nie im PDF", () => {

@@ -565,7 +565,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "massnahme": "Flaschen gegen Umfallen sichern, Ventile schützen; Lagerung in Kellern, Fluren und Treppenräumen unzulässig.\nNur mit geschlossenen Ventilen und Schutzkappen transportieren, auf Fahrzeugen verzurren; Feuerlöscher mitführen.",
    "unterpunkt": "brand"
   },
-  "quelle": "TRGS 510; DGUV Vorschrift 79; BG BAU Bausteine A 063, A 064, A 065"
+  "quelle": "TRGS 510; DGUV Regel 110-010; BG BAU Bausteine A 063, A 064, A 065"
  },
  {
   "gruppe": "Handwerk",
@@ -3049,7 +3049,7 @@ export const HYGIENE: Vorschlag[] = [
    "was": "Umgang mit Blut – Stich-/Schnittverletzung der beschäftigten Person",
    "wann": "sofort nach Verletzung",
    "womit": "Hautantiseptikum (VAH-gelistet), Verbandmaterial, Verbandbuch",
-   "wie": "Blutfluss fördern, Wunde mind. 1 Minute desinfizieren, abdecken; Infektionsstatus von Kundin/Kunde erfragen (Hepatitis, HIV); unverzüglich Hausarzt bzw. Durchgangsarzt (ggf. Postexpositionsprophylaxe); Unfall im Verbandbuch dokumentieren",
+   "wie": "Blutfluss fördern, Wunde mind. 1 Minute desinfizieren, abdecken; Infektionsstatus von Kundin/Kunde erfragen (Hepatitis, HIV); sofort Durchgangsarzt (HIV-Postexpositionsprophylaxe möglichst innerhalb von 2 Stunden); Unfall im Verbandbuch dokumentieren",
    "wer": "betroffene Person / Arbeitgeber"
   },
   "quelle": "Rahmenhygieneplan"
