@@ -1966,9 +1966,9 @@
       stand: '2026-10-23'
 - pruefer: StB Lutz Busch
   umfang: alles
-  unterschrieben: false
+  unterschrieben: true
   felder_fehlen: []
-  hinweis: Freigabe per Mail 23.10.2026; Ergänzung der Bestätigung folgt mit EÜR und Feststellung
+  hinweis: Freigabe per Mail 23.10.2026; in der Ergänzung der Bestätigung (Runde 3) unterschrieben
   eintraege:
     steuern.buchfuehrungspflicht:
       version: 7
@@ -2009,4 +2009,42 @@
     branche.gastro_kontaktmaterialien:
       version: 3
       quelle: 2026-10-23-nachpruefung-baum.xlsx
+      stand: '2026-10-23'
+- pruefer: StB Lutz Busch
+  umfang: alles
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Runde 3; Ergänzung der Bestätigung (A1, 5 Einträge inkl. Buchführung, E-Bilanz, OSS) unterschrieben
+  eintraege:
+    steuern.euer:
+      version: 6
+      quelle: 2026-10-24-runde3-katalog-busch.xlsx
+      stand: '2026-10-23'
+    steuern.feststellungserklaerung:
+      version: 4
+      quelle: 2026-10-24-runde3-katalog-busch.xlsx
+      stand: '2026-10-23'
+- pruefer: RA Dr. Ulrich Weber
+  umfang: alles
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Runde 3; Bestätigungsblatt Runde 3 unterschrieben (Mail 24.10.2026)
+  eintraege:
+    gesellschaft.transparenzregister:
+      version: 7
+      quelle: 2026-10-24-runde3-weber-mail.txt
+      stand: '2026-10-23'
+    gesellschaft.geschaeftsbriefe_pflichtangaben:
+      version: 1
+      quelle: 2026-10-24-runde3-weber-mail.txt
+      stand: '2026-10-23'
+- pruefer: RA Dr. Ulrich Weber
+  umfang: sanktion
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Runde 3, ohne Koffein-Satz bestätigt
+  eintraege:
+    branche.gastro_zusatzstoffe:
+      version: 5
+      quelle: 2026-10-24-runde3-weber-mail.txt
       stand: '2026-10-23'

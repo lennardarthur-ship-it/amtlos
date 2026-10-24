@@ -14,7 +14,8 @@ const FUENF = ["haccp", "hygieneplan", "allergene", "ifsg_belehrung", "hygienesc
 const WEITERE = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung", "lohnkonto", "unterweisung", "gefahrstoffverzeichnis",
   "betriebsanweisung_maschine", "pruefprotokoll_elektro", "datenschutz_dokumentation", "datenschutzerklaerung_website", "avv", "datenschutzinformation", "datenpanne",
   "video_hinweisschild", "anamnese_einwilligung", "arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ki_kompetenz", "ausweis_hinweis", "schluesselquittung",
-  "impressum", "gewerbeanmeldung", "transparenzregister"];
+  "impressum", "gewerbeanmeldung", "transparenzregister",
+  "ust_voranmeldung", "oss_meldung", "zm_meldung", "steuererklaerung", "kassenbuch", "aufbewahrung", "sv_meldedaten"];
 const ALLE = [...FUENF, ...WEITERE];
 const VERMERK = "Vorlagen fachlich durchgesehen (Stand 23.10.2026)";
 

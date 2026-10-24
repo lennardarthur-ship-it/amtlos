@@ -29,6 +29,7 @@ export interface VorlagenFreigabe {
 
 const BAUM = "Nachkontrolle T. Baum 23.10.2026";
 const BUSCH = "Durchsicht StB Busch 23.10.2026 (Bestätigung unterschrieben, docs/pruefberichte/2026-10-23-vorlagen-busch.xlsx)";
+const BUSCH2 = "Durchsicht StB Busch Runde 3 (Ergänzung der Bestätigung, docs/pruefberichte/2026-10-24-ergaenzung-bestaetigung-busch.pdf)";
 const KOCH = "Durchsicht T. Koch 23.10.2026 (docs/pruefberichte/2026-10-23-vorlagen-koch.xlsx)";
 const WEBER = "Durchsicht RA Dr. Weber 23.10.2026 (docs/pruefberichte/2026-10-23-vorlagen-weber.xlsx)";
 
@@ -64,6 +65,13 @@ export const VORLAGEN_GEPRUEFT: Readonly<Record<string, VorlagenFreigabe>> = {
   impressum: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "9e79f203766117dd6c5e67a7d2aa51c100bb828689625dbfa15cf077cee9328f" },
   gewerbeanmeldung: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "8324d37f947181f884e29330c41f50c757b5486398ca864c3b2d11ccb610e110" },
   transparenzregister: { stand: "2026-10-23", bezug: WEBER, pruefsumme: "01473dc8aef549c590384275e82fbf08740a1da053f021709174242d73d84116" },
+  ust_voranmeldung: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "fa59f364368d123e367c2ba3c36eb00e0a68389d050ff36954d2ece6b50d66e4" },
+  oss_meldung: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "f136b58ddfcc5b60337fc499c573ec5b6de28ec0df50092e4b6338c452d1b7b3" },
+  zm_meldung: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "f7a989efdb3e0291b49ac247e3f199d63950bb8f73f3c6e18f67b8df829a5f71" },
+  steuererklaerung: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "77c6acbdf298c1eb68a3f2caeb8642bbe6c2c05240ac9803bc313b09144d4dce" },
+  kassenbuch: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "cda4e6656204d5352af7a559b5fe94f8f7a91b3e67a057dc4fc1321bc85d5f64" },
+  aufbewahrung: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "0582763257c6d3cf28329e42a2cd8bd03f0ed1b16a0a38c64e4244bffb9a6316" },
+  sv_meldedaten: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "71ff4c2ff8209e9d1a6b23654ec65cd96df10370d78a54bad6f7e9660b040ba0" },
   hygieneschulung: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "1f3bb870b0decd354c4cee8a7ab39bc1465e926e11549c8028c222418549f50e" },
 };
 
