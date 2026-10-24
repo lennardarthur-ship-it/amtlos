@@ -144,9 +144,9 @@ describe("T. Koch: Vorlagen", () => {
     const nagel = vorschlaege("hautschutzplan", "eintraege").find((x) => x.titel.startsWith("Nagelmodellage"))!;
     expect(nagel.werte!.handschuhe).toMatch(/nach direktem Kontakt mit Acrylaten sofort/);
   });
-  it("Hygieneplan (Beauty): Durchgangsarzt statt Hausarzt, HIV-PEP möglichst innerhalb von 2 Stunden", () => {
+  it("Hygieneplan (Beauty): Durchgangsarzt statt Hausarzt, HIV-PEP möglichst innerhalb von 2 Stunden (seit Weber Runde 3 mit Obergrenze)", () => {
     const z = HYGIENE.find((x) => x.titel === "Umgang mit Blut – Stich-/Schnittverletzung der beschäftigten Person")!;
-    expect(z.werte!.wie).toContain("sofort Durchgangsarzt (HIV-Postexpositionsprophylaxe möglichst innerhalb von 2 Stunden)");
+    expect(z.werte!.wie).toContain("sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen – eine HIV-Postexpositionsprophylaxe sollte möglichst innerhalb von 2 Stunden beginnen");
     expect(z.werte!.wie).not.toContain("Hausarzt");
   });
 });

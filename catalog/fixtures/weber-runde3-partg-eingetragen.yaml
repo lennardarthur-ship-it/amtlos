@@ -1,0 +1,17 @@
+persona: freiberufler
+beschreibung: "RA Dr. Weber 24.10.2026 (Geschäftsbriefe): PartG mbB im Partnerschaftsregister eingetragen – Pflichtangaben auf Geschäftsbriefen nach § 7 Abs. 3 PartGG (Verweis auf § 125 Abs. 1 Satz 1, Abs. 2 HGB, mit Namenszusatz); kein Jahresabschluss nach HGB"
+stichtag: "2026-10-24"
+fakten:
+  profil.rechtsform: partg_mbb
+  profil.gruendungsdatum: "2024-03-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.taetigkeit.branchen: [it_agentur_freelancer]
+  profil.gesellschaft.handelsregister: eingetragen
+  profil.beschaeftigte.gesamt: 2
+  profil.bundesland: BE
+erwartet:
+  gesellschaft.geschaeftsbriefe_pflichtangaben: gilt
+  gesellschaft.transparenzregister: gilt
+  gesellschaft.handelsregister_anmeldung: gilt_nicht
+  gesellschaft.jahresabschluss: gilt_nicht
+  gesellschaft.jahresabschluss_personenhandel: gilt_nicht

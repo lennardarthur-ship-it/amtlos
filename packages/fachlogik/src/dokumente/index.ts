@@ -16,7 +16,7 @@ import { GESTALT_MARKE, GRUNDLAGE_MARKE, RAENDER, RAENDER_MARKE, SEITE_MARKE, ce
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Option, Vorlage, Vorschlag } from "./typen.js";
 import { KURZ } from "./ablauf.js";
 import { PRUEFHINWEIS } from "./html.js";
-import { VORLAGEN_GEPRUEFT, fassungPasst, geprueftVermerk, kanonisch, sha256, sichtbarerText, type VorlagenFreigabe } from "./geprueft.js";
+import { VORLAGEN_GEPRUEFT, fassungPasst, freigabenFuer, geprueftVermerk, kanonisch, sha256, sichtbarerText, type VorlagenFreigabe } from "./geprueft.js";
 import { LEERER_BETRIEB } from "./typen.js";
 
 export * from "./typen.js";
@@ -47,13 +47,13 @@ export { RECHTSFORMEN } from "./bausteine.js";
 export { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN, arbeitsminuten, arbeitszeitPruefung, monatAus, monatSchluessel, stunden } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent, fassungText, zahl } from "./html.js";
-export { VORLAGEN_GEPRUEFT, geprueftVermerk, sha256, type VorlagenFreigabe } from "./geprueft.js";
+export { VORLAGEN_GEPRUEFT, freigabenFuer, geprueftVermerk, sha256, type VorlagenFreigabe } from "./geprueft.js";
 // StB-Prüfung Heckler und Busch (21.10.2026): Rechnungen, Voranmeldung, OSS und ZM
 export { GUTSCHRIFT_PRAEFIX, KUNDEN_ARTEN, NULLSATZ_HINWEIS as NULLSATZ_TEXT, RECHNUNG_EINHEIT_CODE, RECHNUNG_GUTSCHRIFT_NUMMER, RECHNUNG_LEITWEG_FEHLT, RECHNUNG_LEITWEG_FORMAT, RECHNUNG_NULLSATZ_GEMISCHT, RECHNUNG_OSS_LAND, RECHNUNG_OSS_SATZ, RECHNUNG_OSS_VORSCHLAG, RECHNUNG_SCHLUSS_HOCH, RECHNUNG_SCHLUSS_LEER, RECHNUNG_SCHLUSS_SATZ, SATZ_NULLSATZ, abschlaegeAus, euPrivatLand, istGutschriftNummer, leitwegFormatOk, mitGrundstueckHinweis, ossSatz, satzZahl, vollEuro } from "./buchhaltung.js";
 export { EU_LAENDER_NAMEN, OSS_FRIST, OSS_NICHT_VA, ZM_ARTEN, ZM_FRIST, ZM_SKONTO, landName } from "./eumeldungen.js";
 // Nachprüfung der Vorlagen 23.10.2026 (StB Busch, T. Koch, RA Dr. Weber)
 export { OSS_KORREKTUR, OSS_LIEFERSCHWELLE, ZM_ZEITRAUM } from "./eumeldungen.js";
-export { BILANZ_ANHANG, BILANZ_OHNE_ANHANG, BILANZ_UNTERSCHRIFT, KASSENBUCH_BESTAND_NEGATIV, KASSENBUCH_ELEKTRONISCH, KASSENBUCH_NEGATIV, KASSENBUCH_REGELN, UST_OHNE_IGE } from "./buchhaltung.js";
+export { BILANZ_ANHANG, BILANZ_FORM, BILANZ_OHNE_ANHANG, BILANZ_UNTERSCHRIFT, BILANZ_UNTERSCHRIFT_GMBH_CO_KG, KASSENBUCH_BESTAND_NEGATIV, KASSENBUCH_ELEKTRONISCH, KASSENBUCH_NEGATIV, KASSENBUCH_REGELN, UST_OHNE_IGE } from "./buchhaltung.js";
 export { SV_GESCHLECHT_HILFE } from "./lohn.js";
 export { BIO_SCHUTZSTUFE_BLUT } from "./betriebsanweisungen.js";
 export { hautschutzFriseur } from "./branchen.js";
@@ -401,7 +401,8 @@ export function dokumentHtml(v: Vorlage, d: Daten, b: Betrieb): string {
 
 /** Fester Stichtag und leerer Betrieb für die Prüfsumme – das Ergebnis hängt nicht vom heutigen Datum ab. */
 const PRUEFSUMME_TAG = "2026-01-01";
-const pruefsummen = new WeakMap<Vorlage, string>();
+/** Merkliste je Vorlage und Freigabe (Objekt aus VORLAGEN_GEPRUEFT) – eigene Freigaben (Tests, Werkzeuge) rechnen neu */
+const pruefsummen = new WeakMap<Vorlage, Map<object, string>>();
 
 /**
  * Prüfsumme der Bausteine und Texte einer Vorlage (Nachkontrolle T. Baum, 23.10.2026): SHA-256 über
@@ -412,9 +413,11 @@ const pruefsummen = new WeakMap<Vorlage, string>();
  *   4. den sichtbaren Text des Dokuments mit allen Vorschlägen und allen Textbausteinen ausgewählt
  * (3 und 4 ohne Gestaltung: ohne <style>, Tags und Attribute; leerer Betrieb, Stichtag 1.1.2026). Bei einer Freigabe nur
  * für eine Fassung (`fassung`) wird mit dieser Fassung gerechnet, bei `gruppen` zählen nur Vorschläge dieser Gruppen.
+ * Ohne Angabe: die erste Freigabe der Vorlage (bei mehreren Freigaben die übrigen mit `vorlagenPruefsumme(v, f)`).
  */
 export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, "fassung" | "gruppen"> | undefined = VORLAGEN_GEPRUEFT[v.id]): string {
-  const gemerkt = freigabe === VORLAGEN_GEPRUEFT[v.id] ? pruefsummen.get(v) : undefined;
+  const merken = freigabe !== undefined && freigabenFuer(v.id).includes(freigabe as VorlagenFreigabe);
+  const gemerkt = merken ? pruefsummen.get(v)?.get(freigabe) : undefined;
   if (gemerkt) return gemerkt;
   const passt = (x: Vorschlag) => !freigabe?.gruppen || freigabe.gruppen.includes(x.gruppe ?? "");
   const abschnitte = v.abschnitte.map((a) => ({ ...a, felder: a.felder.map((f) => (f.art === "liste" && f.vorschlaege ? { ...f, vorschlaege: f.vorschlaege.filter(passt) } : f)) }));
@@ -433,18 +436,20 @@ export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, 
     `voll:${sichtbarerText(dokumentHtml(v, voll, LEERER_BETRIEB))}`,
   ];
   const summe = sha256(teile.join("\n"));
-  if (freigabe === VORLAGEN_GEPRUEFT[v.id]) pruefsummen.set(v, summe);
+  if (merken) {
+    if (!pruefsummen.has(v)) pruefsummen.set(v, new Map());
+    pruefsummen.get(v)!.set(freigabe, summe);
+  }
   return summe;
 }
 
 /**
  * Freigabe einer Vorlage, solange ihr Inhalt dem freigegebenen Stand entspricht (Prüfsumme) und – bei einer Freigabe
- * nur für eine Fassung – die Unterlage diese Fassung hat. Sonst `undefined`.
+ * nur für eine Fassung – die Unterlage diese Fassung hat. Bei mehreren Freigaben (`weitere`) die erste, deren Fassung
+ * zu den Daten passt und deren Prüfsumme stimmt. Sonst `undefined`.
  */
-export function vorlageGeprueft(v: Vorlage, d?: Daten): VorlagenFreigabe | undefined {
-  const f = VORLAGEN_GEPRUEFT[v.id];
-  if (!f || !f.pruefsumme || !fassungPasst(f, d)) return undefined;
-  return vorlagenPruefsumme(v) === f.pruefsumme ? f : undefined;
+export function vorlageGeprueft(v: Vorlage, d?: Daten, liste: Readonly<Record<string, VorlagenFreigabe>> = VORLAGEN_GEPRUEFT): Omit<VorlagenFreigabe, "weitere"> | undefined {
+  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && fassungPasst(f, d) && vorlagenPruefsumme(v, f) === f.pruefsumme);
 }
 
 /** Hinweis in der App unter einer Vorlage: „Vorlagen fachlich durchgesehen (Stand …)“ oder der allgemeine Prüfhinweis. */

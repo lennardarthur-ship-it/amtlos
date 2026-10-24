@@ -1137,19 +1137,38 @@ export const BILANZ_KLEINST = "Die Gesellschaft ist eine Kleinstkapitalgesellsch
 /** StB GoBD (E-4/E-5): Kapitalgesellschaften bilanzieren – diese Vorlage statt der EÜR. */
 export const BILANZ_STATT_EUER = "GmbH, UG und andere Kaufleute mit Buchführungspflicht (§ 238 HGB, § 140 AO) stellen eine Bilanz mit Gewinn- und Verlustrechnung auf – keine EÜR. Die Werte kommen aus der Buchführung der Kanzlei bzw. dem Buchhaltungsprogramm.";
 
-/** StB GoBD (E-5, § 245 HGB): wer den Jahresabschluss unterschreibt – alle Geschäftsführer bzw. alle persönlich haftenden Gesellschafter. */
+/** GmbH & Co. KG nach der Rechtsform aus „Mein Betrieb“ bzw. dem Zusatz im Namen. */
+const istGmbhCoKg = (b: Betrieb) => (formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name)) === "GmbH & Co. KG";
+
+/**
+ * StB GoBD (E-5, § 245 HGB): wer den Jahresabschluss unterschreibt – alle Geschäftsführer bzw. alle persönlich haftenden
+ * Gesellschafter. StB Busch (24.10.2026): bei der GmbH & Co. KG die Geschäftsführer der Komplementär-GmbH.
+ */
 export function bilanzUnterzeichner(b: Betrieb): string[] {
   const namen = (b.vertretung ?? "")
     .split(/\s*(?:,|;|\n|\bund\b|\bsowie\b)\s*/)
     .map((x) => x.trim())
     .filter(Boolean);
   if (istKapitalgesellschaft(b.rechtsform, b.name)) return namen.length ? namen.map((n) => `${n} (Geschäftsführung)`) : ["Geschäftsführer/in", "Geschäftsführer/in"];
+  if (istGmbhCoKg(b)) return namen.length ? namen.map((n) => `${n} (Geschäftsführung der Komplementär-GmbH)`) : ["Geschäftsführer/in der Komplementär-GmbH", "Geschäftsführer/in der Komplementär-GmbH"];
   if (istPersonengesellschaft(b.rechtsform, b.name)) return namen.length ? namen.map((n) => `${n} (persönlich haftende/r Gesellschafter/in)`) : ["Persönlich haftende/r Gesellschafter/in", "Persönlich haftende/r Gesellschafter/in"];
   return [b.verantwortlich.trim() ? `${b.verantwortlich.trim()} (Kaufmann/Kauffrau)` : "Kaufmann/Kauffrau"];
 }
 
 /** Kapitalgesellschaft oder GmbH & Co. KG (§§ 264, 264a HGB): Anhang bzw. Angaben unter der Bilanz, §§ 264, 266, 275 HGB. */
-const bilanzKapital = (b: Betrieb) => istKapitalgesellschaft(b.rechtsform, b.name) || (formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name)) === "GmbH & Co. KG";
+const bilanzKapital = (b: Betrieb) => istKapitalgesellschaft(b.rechtsform, b.name) || istGmbhCoKg(b);
+/** OHG, KG und e. K. nach der Rechtsform aus „Mein Betrieb“ bzw. dem Zusatz im Namen – sie stellen keinen Anhang auf. */
+const bilanzOhneAnhang = (b: Betrieb) => ["OHG", "KG", "e. K."].includes(formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name) ?? "");
+/**
+ * StB Busch (24.10.2026): Die Angaben unter der Bilanz (§ 264 Abs. 1 Satz 5 HGB) erscheinen im Formular nur bei
+ * Kapitalgesellschaften und der GmbH & Co. KG. Startwert aus „Mein Betrieb“ (profilStart); ohne Angabe (ältere Unterlagen)
+ * entscheidet die Rechtsform in „Mein Betrieb“ wie bisher.
+ */
+export const BILANZ_FORM: Option[] = [
+  { wert: "kapital", text: "GmbH, UG oder GmbH & Co. KG – Anhang bzw. Angaben unter der Bilanz" },
+  { wert: "personen", text: "OHG, KG oder e. K. – kein Anhang" },
+];
+const bilanzFormAus = (b: Betrieb): string | null => (bilanzKapital(b) ? "kapital" : bilanzOhneAnhang(b) ? "personen" : null);
 /**
  * StB Busch (Durchsicht 23.10.2026): Anhang nur bei Kapitalgesellschaften und GmbH & Co. KG – Kleinstkapitalgesellschaften
  * brauchen keinen, wenn die Angaben unter der Bilanz stehen; OHG, KG und e. K. stellen keinen Anhang auf.
@@ -1157,7 +1176,9 @@ const bilanzKapital = (b: Betrieb) => istKapitalgesellschaft(b.rechtsform, b.nam
 export const BILANZ_ANHANG = "Zum Jahresabschluss gehört ein Anhang (§§ 264, 284 ff. HGB) – er kommt aus der Buchführung der Kanzlei. Kleinstkapitalgesellschaften brauchen keinen Anhang, wenn die Angaben nach § 264 Abs. 1 Satz 5 HGB unter der Bilanz stehen.";
 export const BILANZ_OHNE_ANHANG = "OHG, KG und e. K. stellen keinen Anhang auf.";
 /** StB Busch (Durchsicht 23.10.2026, § 245 HGB): wer unterschreibt, je Rechtsform. */
-export const BILANZ_UNTERSCHRIFT = "Den Jahresabschluss unterschreiben mit Datum: bei GmbH und UG alle Geschäftsführer, bei OHG und KG alle persönlich haftenden Gesellschafter, beim e. K. der Kaufmann bzw. die Kauffrau (§ 245 HGB).";
+export const BILANZ_UNTERSCHRIFT = "Den Jahresabschluss unterschreiben mit Datum: bei GmbH und UG alle Geschäftsführer, bei der GmbH & Co. KG alle Geschäftsführer der Komplementär-GmbH, bei OHG und KG alle persönlich haftenden Gesellschafter, beim e. K. der Kaufmann bzw. die Kauffrau (§ 245 HGB).";
+/** StB Busch (24.10.2026, § 245 HGB): Unterschrift bei der GmbH & Co. KG – sein Wortlaut, ergänzt um das Datum wie bei den anderen Rechtsformen. */
+export const BILANZ_UNTERSCHRIFT_GMBH_CO_KG = "Zu unterschreiben von allen Geschäftsführern der Komplementär-GmbH, mit dem Datum der Aufstellung (§ 245 HGB).";
 
 export const bilanzGuv: Vorlage = {
   id: "bilanz_guv",
@@ -1192,16 +1213,25 @@ export const bilanzGuv: Vorlage = {
       titel: "Angaben unter der Bilanz",
       hilfe: "Nur für GmbH, UG, AG und GmbH & Co. KG – OHG, KG und e. K. stellen keinen Anhang auf. Eine Kleinstkapitalgesellschaft (höchstens eine der Grenzen überschritten: 450.000 € Bilanzsumme, 900.000 € Umsatzerlöse, 10 Beschäftigte im Jahresdurchschnitt; § 267a HGB) braucht keinen Anhang, wenn diese Angaben unter der Bilanz stehen (§ 264 Abs. 1 Satz 5 HGB).",
       felder: [
-        { id: "kleinst", art: "schalter", label: "Kleinstkapitalgesellschaft – Angaben unter der Bilanz statt Anhang", vorbelegung: true },
-        { id: "haftung", art: "mehrzeilig", label: "Haftungsverhältnisse (§ 251, § 268 Abs. 7 HGB)", hilfe: "z. B. Bürgschaften, Gewährleistungsverträge, Sicherheiten für fremde Verbindlichkeiten – sonst „Keine“", vorbelegung: { text: "Keine" }, wenn: { feld: "kleinst" } },
-        { id: "organkredite", art: "mehrzeilig", label: "Vorschüsse und Kredite an Geschäftsführung bzw. Aufsichtsrat (§ 285 Nr. 9 Buchst. c HGB)", hilfe: "Betrag, Zinssatz, wesentliche Bedingungen und Rückzahlungen – sonst „Keine“", vorbelegung: { text: "Keine" }, wenn: { feld: "kleinst" } },
+        // StB Busch (24.10.2026): nur bei Kapitalgesellschaften und GmbH & Co. KG – Startwert aus „Mein Betrieb“
+        { id: "anhang_form", art: "wahl", label: "Rechtsform (Anhang)", optionen: BILANZ_FORM, hilfe: "Aus „Mein Betrieb“. Nur Kapitalgesellschaften und die GmbH & Co. KG stellen einen Anhang auf bzw. machen die Angaben unter der Bilanz." },
+        { id: "kleinst", art: "schalter", label: "Kleinstkapitalgesellschaft – Angaben unter der Bilanz statt Anhang", vorbelegung: true, wenn: { feld: "anhang_form", ist: "personen", nicht: true } },
+        // § 264 Abs. 1 Satz 5 Nr. 1 und 2 HGB: von diesen Angaben hängt die Befreiung vom Anhang ab
+        { id: "haftung", art: "mehrzeilig", label: "Haftungsverhältnisse (§ 251, § 268 Abs. 7 HGB)", hilfe: "Angabe unter der Bilanz nach § 264 Abs. 1 Satz 5 Nr. 1 HGB – ohne sie entfällt der Anhang nicht. z. B. Bürgschaften, Gewährleistungsverträge, Sicherheiten für fremde Verbindlichkeiten – sonst „Keine“", vorbelegung: { text: "Keine" }, wenn: { feld: "kleinst" } },
+        { id: "organkredite", art: "mehrzeilig", label: "Vorschüsse und Kredite an Geschäftsführung bzw. Aufsichtsrat (§ 285 Nr. 9 Buchst. c HGB)", hilfe: "Angabe unter der Bilanz nach § 264 Abs. 1 Satz 5 Nr. 2 HGB – ohne sie entfällt der Anhang nicht. Betrag, Zinssatz, wesentliche Bedingungen und Rückzahlungen – sonst „Keine“", vorbelegung: { text: "Keine" }, wenn: { feld: "kleinst" } },
       ],
     },
   ],
+  // StB Busch (24.10.2026): Rechtsform für Anhang und Angaben unter der Bilanz aus „Mein Betrieb“
+  profilStart(_profil, b): Daten {
+    const form = b ? bilanzFormAus(b) : null;
+    return form ? { anhang_form: form } : {};
+  },
   pruefen(_d, b) {
     // Hinweis bleibt im Formular: Personenunternehmen ohne Buchführungspflicht ermitteln den Gewinn per EÜR
     if (b.vertretung?.trim()) return [];
     if (istKapitalgesellschaft(b.rechtsform, b.name)) return ["Geschäftsführung in „Mein Betrieb“ eintragen – alle Geschäftsführer unterschreiben den Jahresabschluss (§ 245 HGB)."];
+    if (istGmbhCoKg(b)) return ["Geschäftsführer der Komplementär-GmbH in „Mein Betrieb“ eintragen – sie unterschreiben alle den Jahresabschluss (§ 245 HGB)."];
     // StB Busch (Durchsicht 23.10.2026): bei OHG und KG alle persönlich haftenden Gesellschafter
     return istPersonengesellschaft(b.rechtsform, b.name) ? ["Persönlich haftende Gesellschafter in „Mein Betrieb“ eintragen – sie unterschreiben alle den Jahresabschluss (§ 245 HGB)."] : [];
   },
@@ -1247,13 +1277,19 @@ export const bilanzGuv: Vorlage = {
     const akt = summe(l("aktiva"), "betrag");
     const pas = summe(l("passiva"), "betrag");
     // Anhang bzw. Angaben unter der Bilanz: Kapitalgesellschaften und GmbH & Co. KG (StB Busch 23.10.2026)
-    const mitAnhang = bilanzKapital(b);
+    // StB Busch (24.10.2026): die Angabe in der Unterlage geht vor, ohne sie die Rechtsform aus „Mein Betrieb“
+    const form = text(d, "anhang_form") || bilanzFormAus(b);
+    const mitAnhang = form === "kapital";
     const kleinst = mitAnhang && ja(d, "kleinst");
     // Blatt zum Ausfüllen (keine Zahlen): Linien statt des Startwerts „Keine“
     const blattLeer = guvLeer && !l("aktiva").length && !l("passiva").length;
     const angabe = (k: string) => (blattLeer ? "" : text(d, k) || "Keine");
     const aufgestellt = datumDe(text(d, "aufgestellt"));
-    const schluss = nachsatz(`Zu unterschreiben mit dem Datum der Aufstellung von ${kapital ? "allen Geschäftsführern" : istPersonengesellschaft(b.rechtsform, b.name) ? "allen persönlich haftenden Gesellschaftern" : "der Kauffrau bzw. dem Kaufmann"} (§ 245 HGB).`);
+    const schluss = nachsatz(
+      !kapital && istGmbhCoKg(b)
+        ? BILANZ_UNTERSCHRIFT_GMBH_CO_KG
+        : `Zu unterschreiben mit dem Datum der Aufstellung von ${kapital ? "allen Geschäftsführern" : istPersonengesellschaft(b.rechtsform, b.name) ? "allen persönlich haftenden Gesellschaftern" : "der Kauffrau bzw. dem Kaufmann"} (§ 245 HGB).`,
+    );
     return dokument({
       titel: "Jahresabschluss",
       betrieb: b,
@@ -1274,7 +1310,7 @@ export const bilanzGuv: Vorlage = {
           ])}`,
         ) +
         // Hinweis und Satz zu § 245 HGB im letzten Abschnitt: so bleibt er mit den Unterschriften zusammen (Schlussblock)
-        abschnitt("Bilanz", `${bilanz()}${akt !== pas ? `<p class="nachsatz"><strong>Aktiva und Passiva weichen um ${euro(akt - pas)} ab – bitte prüfen.</strong></p>` : ""}${kleinst ? "" : (mitAnhang ? nachsatz(BILANZ_ANHANG) : ["OHG", "KG", "e. K."].includes(formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name) ?? "") ? nachsatz(BILANZ_OHNE_ANHANG) : "") + schluss}`) +
+        abschnitt("Bilanz", `${bilanz()}${akt !== pas ? `<p class="nachsatz"><strong>Aktiva und Passiva weichen um ${euro(akt - pas)} ab – bitte prüfen.</strong></p>` : ""}${kleinst ? "" : (mitAnhang ? nachsatz(BILANZ_ANHANG) : form === "personen" ? nachsatz(BILANZ_OHNE_ANHANG) : "") + schluss}`) +
         (kleinst ? abschnitt("Angaben unter der Bilanz", `<p>${esc(BILANZ_KLEINST)}</p>${angaben([["Haftungsverhältnisse (§ 251, § 268 Abs. 7 HGB)", angabe("haftung")], ["Vorschüsse und Kredite an Mitglieder der Geschäftsführung bzw. des Aufsichtsrats (§ 285 Nr. 9 Buchst. c HGB)", angabe("organkredite")]])}${schluss}`, { rand: "§ 264 Abs. 1 Satz 5 HGB" }) : "") +
         unterschriften(bilanzUnterzeichner(b), { ortDatum: true }),
     });

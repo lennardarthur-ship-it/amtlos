@@ -3049,10 +3049,10 @@ export const HYGIENE: Vorschlag[] = [
    "was": "Umgang mit Blut – Stich-/Schnittverletzung der beschäftigten Person",
    "wann": "sofort nach Verletzung",
    "womit": "Hautantiseptikum (VAH-gelistet), Verbandmaterial, Verbandbuch",
-   "wie": "Blutfluss fördern, Wunde mind. 1 Minute desinfizieren, abdecken; Infektionsstatus von Kundin/Kunde erfragen (Hepatitis, HIV); sofort Durchgangsarzt (HIV-Postexpositionsprophylaxe möglichst innerhalb von 2 Stunden); Unfall im Verbandbuch dokumentieren",
+   "wie": "Blutfluss fördern, Wunde mind. 1 Minute desinfizieren, abdecken und sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen – eine HIV-Postexpositionsprophylaxe sollte möglichst innerhalb von 2 Stunden beginnen, nach einer Stich- oder Schnittverletzung spätestens bis 24 Stunden; auch später noch ärztlich abklären lassen. Kundin/Kunde fragen, ob sie freiwillig Auskunft über bekannte Infektionen (Hepatitis B/C, HIV) geben möchten – die Antwort ist freiwillig; nur an den Durchgangsarzt weitergeben, nicht im Verbandbuch notieren. Unfall im Verbandbuch dokumentieren.",
    "wer": "betroffene Person / Arbeitgeber"
   },
-  "quelle": "Rahmenhygieneplan"
+  "quelle": "Rahmenhygieneplan; S2k-Leitlinie AWMF 055-004; Art. 9 Abs. 2 lit. a DSGVO"
  },
  {
   "gruppe": "Alle Beauty-Betriebe",

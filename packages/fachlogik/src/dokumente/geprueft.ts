@@ -11,6 +11,12 @@
  */
 import type { Daten } from "./typen.js";
 
+/**
+ * Mehrere Freigaben je Vorlage (24.10.2026): Eine Vorlage mit Fassungen (Hygieneplan: Lebensmittelbetrieb, Beauty) kann je
+ * Fassung eine eigene Freigabe haben – jede mit eigener Fassung, eigenen Gruppen und eigener Prüfsumme. Die erste Freigabe
+ * steht wie bisher direkt am Eintrag, weitere unter `weitere`. `vorlageGeprueft` wählt die Freigabe, deren Fassung zu den
+ * Daten der Unterlage passt und deren Prüfsumme zum aktuellen Stand passt.
+ */
 export interface VorlagenFreigabe {
   /** Stand der Durchsicht (ISO-Datum) – erscheint im Vermerk */
   stand: string;
@@ -25,6 +31,8 @@ export interface VorlagenFreigabe {
   fassung?: { feld: string; wert: string };
   /** Nur Vorschläge dieser Gruppen gehören zur Freigabe (und zur Prüfsumme) – die übrigen hat der Prüfer nicht gesehen */
   gruppen?: string[];
+  /** Freigaben weiterer Fassungen derselben Vorlage (je eigene Fassung, Gruppen und Prüfsumme) */
+  weitere?: readonly Omit<VorlagenFreigabe, "weitere">[];
 }
 
 const BAUM = "Nachkontrolle T. Baum 23.10.2026";
@@ -75,11 +83,17 @@ export const VORLAGEN_GEPRUEFT: Readonly<Record<string, VorlagenFreigabe>> = {
   hygieneschulung: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "1f3bb870b0decd354c4cee8a7ab39bc1465e926e11549c8028c222418549f50e" },
 };
 
+/** Alle Freigaben einer Vorlage: die erste (am Eintrag) und die weiteren Fassungen; ohne Freigabe eine leere Liste. */
+export function freigabenFuer(id: string, liste: Readonly<Record<string, VorlagenFreigabe>> = VORLAGEN_GEPRUEFT): Omit<VorlagenFreigabe, "weitere">[] {
+  const f = liste[id];
+  return f ? [f, ...(f.weitere ?? [])] : [];
+}
+
 /** Vermerk in der App (ohne Namen, Wortlaut des Prüfers). */
 export const geprueftVermerk = (stand: string) => `Vorlagen fachlich durchgesehen (Stand ${stand.slice(0, 10).split("-").reverse().join(".")})`;
 
 /** Fassung passt (ohne Angabe: immer). Ohne Daten (Info-Seite einer Vorlage mit Fassungen) gilt die Freigabe nicht. */
-export function fassungPasst(f: VorlagenFreigabe, d?: Daten): boolean {
+export function fassungPasst(f: Pick<VorlagenFreigabe, "fassung">, d?: Daten): boolean {
   if (!f.fassung) return true;
   return d !== undefined && d[f.fassung.feld] === f.fassung.wert;
 }

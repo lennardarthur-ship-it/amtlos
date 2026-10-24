@@ -15,3 +15,5 @@ erwartet:
   gesellschaft.egbr_hinweis: gilt_nicht
   gesellschaft.istkaufmann_pruefen: gilt
   steuern.feststellungserklaerung: gilt
+  # Weber 24.10.2026 (Geschäftsbriefe): § 707b BGB verweist nicht auf § 125 HGB – die eGbR ist nicht aufgenommen
+  gesellschaft.geschaeftsbriefe_pflichtangaben: gilt_nicht

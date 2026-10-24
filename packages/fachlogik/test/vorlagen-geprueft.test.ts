@@ -5,7 +5,7 @@
  */
 import { createHash } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LEERER_BETRIEB, PRUEFHINWEIS, VERIFIZIERUNG, VORLAGEN, dokumentHtml, leereDaten,VORLAGEN_GEPRUEFT, geprueftVermerk, pruefHinweisFuer, sha256, vorlageFuer, vorlageGeprueft, vorlagenPruefsumme, type Daten, type Vorlage } from "../src/index.js";
+import { LEERER_BETRIEB, PRUEFHINWEIS, VERIFIZIERUNG, VORLAGEN, dokumentHtml, freigabenFuer, leereDaten,VORLAGEN_GEPRUEFT, geprueftVermerk, pruefHinweisFuer, sha256, vorlageFuer, vorlageGeprueft, vorlagenPruefsumme, type Daten, type Vorlage, type VorlagenFreigabe } from "../src/index.js";
 
 const FUENF = ["haccp", "hygieneplan", "allergene", "ifsg_belehrung", "hygieneschulung"];
 // Durchsicht 23.10.2026: StB Busch, T. Koch, RA Dr. Weber (E-177)
@@ -106,6 +106,56 @@ describe("Vorlagen fachlich durchgesehen (Nachkontrolle T. Baum 23.10.2026)", ()
 
   it("SHA-256 ohne Node-APIs stimmt mit node:crypto überein", () => {
     for (const t of ["", "abc", "Allergene und Zusatzstoffe – °C ≤ 𝄞", "x".repeat(10_000)]) expect(sha256(t)).toBe(createHash("sha256").update(t, "utf8").digest("hex"));
+  });
+});
+
+describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026)", () => {
+  const h = vorlageFuer("hygieneplan")!;
+  const lm = VORLAGEN_GEPRUEFT.hygieneplan!;
+  const BEAUTY = { fassung: { feld: "art", wert: "beauty" } };
+  // eine erfundene zweite Freigabe für die Beauty-Fassung – nur im Test, nicht in geprueft.ts
+  const beautyFreigabe = { stand: "2026-11-02", bezug: "Test", pruefsumme: vorlagenPruefsumme(h, BEAUTY), ...BEAUTY };
+  const mitBeauty: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, hygieneplan: { ...lm, weitere: [beautyFreigabe] } };
+
+  it("die bisherige Lebensmittel-Freigabe bleibt die einzige des Hygieneplans; noch keine Beauty-Freigabe", () => {
+    expect(freigabenFuer("hygieneplan")).toEqual([lm]);
+    expect(lm.weitere).toBeUndefined();
+    expect(freigabenFuer("bilanz_guv")).toEqual([]);
+    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
+  });
+
+  it("je Fassung eine eigene Prüfsumme: Beauty unterscheidet sich von der freigegebenen Lebensmittel-Fassung", () => {
+    expect(vorlagenPruefsumme(h)).toBe(lm.pruefsumme);
+    expect(vorlagenPruefsumme(h, lm)).toBe(lm.pruefsumme);
+    expect(beautyFreigabe.pruefsumme).toMatch(/^[0-9a-f]{64}$/);
+    expect(beautyFreigabe.pruefsumme).not.toBe(lm.pruefsumme);
+  });
+
+  it("vorlageGeprueft wählt die Freigabe, deren Fassung zu den Daten passt", () => {
+    expect(vorlageGeprueft(h, { art: "lebensmittel" }, mitBeauty)).toBe(mitBeauty.hygieneplan);
+    expect(vorlageGeprueft(h, { art: "beauty" }, mitBeauty)).toBe(beautyFreigabe);
+    expect(vorlageGeprueft(h, {}, mitBeauty)).toBeUndefined();
+    expect(vorlageGeprueft(h, undefined, mitBeauty)).toBeUndefined();
+    // ohne die zusätzliche Freigabe (geprueft.ts): Beauty weiter ohne Vermerk
+    expect(vorlageGeprueft(h, { art: "beauty" })).toBeUndefined();
+    expect(vorlageGeprueft(h, { art: "lebensmittel" })).toBe(lm);
+  });
+
+  it("passt die Prüfsumme einer Fassung nicht mehr, entfällt nur deren Vermerk", () => {
+    const veraltet: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, hygieneplan: { ...lm, weitere: [{ ...beautyFreigabe, pruefsumme: "0".repeat(64) }] } };
+    expect(vorlageGeprueft(h, { art: "beauty" }, veraltet)).toBeUndefined();
+    expect(vorlageGeprueft(h, { art: "lebensmittel" }, veraltet)).toBe(veraltet.hygieneplan);
+    // geänderter Beauty-Text: die Beauty-Freigabe passt nicht mehr, die Lebensmittel-Freigabe bleibt
+    const geaendert: Vorlage = { ...h, grundlageFuer: (d, b) => `${h.grundlageFuer!(d, b)}${d.art === "beauty" ? " (geändert)" : ""}` };
+    expect(vorlageGeprueft(geaendert, { art: "beauty" }, mitBeauty)).toBeUndefined();
+    expect(vorlageGeprueft(geaendert, { art: "lebensmittel" }, mitBeauty)).toBe(mitBeauty.hygieneplan);
+  });
+
+  it("Vermerk in der App: Stand der passenden Freigabe", () => {
+    expect(pruefHinweisFuer(h, { art: "lebensmittel" })).toBe(VERMERK);
+    expect(pruefHinweisFuer(h, { art: "beauty" })).toBe(PRUEFHINWEIS);
+    const f = vorlageGeprueft(h, { art: "beauty" }, mitBeauty)!;
+    expect(geprueftVermerk(f.stand)).toBe("Vorlagen fachlich durchgesehen (Stand 02.11.2026)");
   });
 });
 

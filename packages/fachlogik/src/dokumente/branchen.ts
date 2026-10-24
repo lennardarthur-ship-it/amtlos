@@ -919,6 +919,12 @@ function lebensmittelPlan(d: Daten, b: Betrieb): string {
 }
 
 export const HYGIENE_GRUNDLAGE_LEBENSMITTEL = "Art. 4 Abs. 2, Art. 5, Anhang II VO (EG) Nr. 852/2004; §§ 3, 4 LMHV";
+/**
+ * RA Dr. Weber, Fachfragen Runde 3 (24.10.2026, Nr. 4): Die Hygieneverordnungen der Länder beruhen auf § 17 Abs. 4 IfSG
+ * (nicht auf § 36 IfSG) – im Dokument der Beauty-Fassung präziser als „auf Grundlage des IfSG“. Nur über `grundlageFuer`:
+ * `grundlage` gehört zur Prüfsumme der freigegebenen Lebensmittel-Fassung und bleibt unverändert.
+ */
+export const HYGIENE_GRUNDLAGE_BEAUTY = "Hygieneverordnung des Landes (§ 17 Abs. 4 IfSG)";
 export const hygieneplan: Vorlage = {
   id: "hygieneplan",
   gestalt: "aushang",
@@ -928,7 +934,7 @@ export const hygieneplan: Vorlage = {
   pflichten: ["branche.beauty_hygieneplan"],
   grundlage: "Hygieneverordnung des Landes (auf Grundlage des IfSG)",
   // Vorprüfung 21.10.2026 (T-104): Lebensmittelbetriebe nach EU-Lebensmittelhygienerecht, nicht nach der Landes-Hygieneverordnung
-  grundlageFuer: (d) => (text(d, "art") === "lebensmittel" ? HYGIENE_GRUNDLAGE_LEBENSMITTEL : ""),
+  grundlageFuer: (d) => (text(d, "art") === "lebensmittel" ? HYGIENE_GRUNDLAGE_LEBENSMITTEL : HYGIENE_GRUNDLAGE_BEAUTY),
   querformat: true,
   namensFeld: "bereich",
   abschnitte: [

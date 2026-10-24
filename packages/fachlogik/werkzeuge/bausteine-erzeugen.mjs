@@ -341,6 +341,31 @@ for (const [liste, alt, neu] of ERSETZE) {
   daten[liste] = JSON.parse(vorher.split(alt).join(neu));
 }
 /**
+ * RA Dr. Weber, Fachfragen Runde 3 (24.10.2026, docs/pruefberichte/2026-10-24-runde3-fachfragen-weber.xlsx, Nr. 1 und 4),
+ * Hygieneplan Beauty, Zeile „Umgang mit Blut – Stich-/Schnittverletzung“ – beide Sätze im Wortlaut des Prüfers:
+ *   - HIV-PEP mit der Obergrenze, die die S2k-Leitlinie AWMF 055-004 nach Stich- oder Schnittverletzungen nennt (wie B-276);
+ *   - keine routinemäßige Abfrage des Infektionsstatus: nur die freiwillige Auskunft der Kundin oder des Kunden
+ *     (Art. 9 Abs. 2 lit. a DSGVO), nur an den Durchgangsarzt, nicht ins Verbandbuch.
+ */
+const PEP_WEBER = "sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen – eine HIV-Postexpositionsprophylaxe sollte möglichst innerhalb von 2 Stunden beginnen, nach einer Stich- oder Schnittverletzung spätestens bis 24 Stunden; auch später noch ärztlich abklären lassen.";
+const AUSKUNFT_WEBER = "Kundin/Kunde fragen, ob sie freiwillig Auskunft über bekannte Infektionen (Hepatitis B/C, HIV) geben möchten – die Antwort ist freiwillig; nur an den Durchgangsarzt weitergeben, nicht im Verbandbuch notieren.";
+const WEBER_RUNDE3 = [
+  ["HYGIENE", "Umgang mit Blut – Stich-/Schnittverletzung der beschäftigten Person", "werte.wie", (t) =>
+    t.replace("abdecken; Infektionsstatus von Kundin/Kunde erfragen (Hepatitis, HIV); sofort Durchgangsarzt (HIV-Postexpositionsprophylaxe möglichst innerhalb von 2 Stunden); Unfall im Verbandbuch dokumentieren",
+      `abdecken und ${PEP_WEBER} ${AUSKUNFT_WEBER} Unfall im Verbandbuch dokumentieren.`)],
+  ["HYGIENE", "Umgang mit Blut – Stich-/Schnittverletzung der beschäftigten Person", "quelle", (t) => `${t}; S2k-Leitlinie AWMF 055-004; Art. 9 Abs. 2 lit. a DSGVO`],
+];
+for (const [liste, schluessel, pfad, neu] of WEBER_RUNDE3) {
+  const eintrag = daten[liste].find((x) => x.titel === schluessel);
+  if (!eintrag) throw new Error(`Korrektur Weber Runde 3: ${liste} „${schluessel}“ nicht gefunden`);
+  const teile = pfad.split(".");
+  const ziel = teile.slice(0, -1).reduce((o, k) => o[k], eintrag);
+  const feld = teile.at(-1);
+  const alt = ziel[feld];
+  ziel[feld] = neu(alt);
+  if (ziel[feld] === alt) throw new Error(`Korrektur Weber Runde 3 greift nicht mehr: ${liste} „${schluessel}“ ${pfad}`);
+}
+/**
  * E-167: fachliche Durchsicht durch eine Fachkraft für Arbeitssicherheit (Ergebnis vom 22.10.2026,
  * docs/pruefberichte/2026-10-22-arbeitsschutz-pruefergebnis.xlsx, Blatt „A Bausteine“). Je Eintrag die Nummer der
  * Prüfmappe (B-…), damit jede Änderung zuzuordnen ist; die Zuordnung Nummer → Baustein steht in

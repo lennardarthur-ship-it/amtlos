@@ -1,21 +1,29 @@
+# v2 nach RA Dr. Weber, Rückmeldung 24.10.2026 (Abgleich Runde 3, Geschäftsbriefe): Partnerschaftsgesellschaft (partg, partg_mbb) ergänzt – „über § 7 Abs. 5 PartGG“.
+# Abweichung von seinem Wortlaut: Die Regel steht seit 1.1.2024 (MoPeG) in § 7 Abs. 3 PartGG – „Für die Angabe auf Geschäftsbriefen der Partnerschaft ist § 125 Absatz 1 Satz 1 und Absatz 2
+# des Handelsgesetzbuchs mit der Maßgabe entsprechend anzuwenden, dass bei einer Partnerschaft mit beschränkter Berufshaftung auch der von dieser gewählte Namenszusatz im Sinne des § 8 Absatz 4 Satz 3
+# anzugeben ist.“ (gesetze.legal/bund/partgg/7, Synopse buzer.de/gesetz/3018/v276650-2024-01-01.htm, gelesen 24.10.2026); die geltende Fassung hat kein Abs. 5. Bitte bestätigen.
+# § 8 Abs. 4 Satz 3 PartGG („mit beschränkter Berufshaftung“, „mbB“; gesetze.legal/bund/partgg/8, gelesen 24.10.2026).
+# eGbR nicht aufgenommen: § 707b BGB (gesetze.legal/bund/bgb/707b und lexmea.de/de/gesetz/bgb/707b, gelesen 24.10.2026) verweist für eingetragene Gesellschaften nur auf §§ 18, 21 bis 24, 30, 37
+# (Name), §§ 8, 8a Abs. 1, 9 Abs. 1 Satz 1 und Abs. 3 bis 6, 10 bis 12, 13h, 14, 16, 32 (Register) und §§ 13, 13d HGB (Zweigniederlassung) – nicht auf § 125 oder § 37a HGB.
 # Neu nach RA Dr. Weber, Nachprüfung 23.10.2026 (zu B.15, Frage 1): eigener Eintrag „Pflichtangaben auf Geschäftsbriefen“ für alle eingetragenen Unternehmen – § 37a HGB (e. K.), OHG/KG, § 35a GmbHG (GmbH/UG, bei der GmbH & Co. KG zusätzlich § 177a S. 2 HGB); Zwangsgeld § 14 HGB bzw. § 79 Abs. 1 GmbHG bis 5.000 €.
 # Abweichung von seinem Wortlaut: Er nennt § 125a HGB – die Vorschrift ist seit 1.1.2024 aufgehoben (MoPeG, Synopse buzer.de/gesetz/3486/v276633-2024-01-01.htm); die Angaben stehen jetzt in § 125 HGB „Angaben auf Geschäftsbriefen“, § 177a S. 1 HGB verweist auf § 125. Bitte bestätigen.
 # Wortlaut gelesen 23.10.2026: § 37a HGB (buzer.de/37a_HGB.htm), § 19 Abs. 1 Nr. 1 HGB (lxgesetze.de/hgb/19), § 125 HGB (lexmea.de/de/gesetz/hgb/125, gesetze.legal/bund/hgb/125), § 177a HGB (lexmea.de/de/gesetz/hgb/177a), § 35a GmbHG (gesetze.legal/bund/gmbhg/35a), § 79 Abs. 1 GmbHG (lxgesetze.de/gmbhg/79); § 14 HGB wie in gesellschaft.handelsregister_anmeldung (lexmea.de, 22.10.2026).
-# Nicht aufgenommen (von Dr. Weber nicht genannt): Partnerschaftsgesellschaft und eGbR – bitte sagen, ob sie dazugehören.
+# v1: Partnerschaftsgesellschaft und eGbR nicht aufgenommen (von Dr. Weber nicht genannt).
 schema_version: 1
 id: gesellschaft.geschaeftsbriefe_pflichtangaben
-version: 1
+version: 2
 katalog_nr: B.23
 titel:
   de: Pflichtangaben auf Geschäftsbriefen
 kurz:
   de: Auf deinen Geschäftsbriefen und Bestellscheinen nennst du die Pflichtangaben deines Unternehmens, etwa Firma, Sitz, Registergericht und Registernummer.
 erklaerung:
-  de: 'Auf allen Geschäftsbriefen an einen bestimmten Empfänger, gleich in welcher Form, stehen Pflichtangaben. Als eingetragener Kaufmann sind das deine Firma mit der Bezeichnung „eingetragener Kaufmann“ oder „eingetragene Kauffrau“ oder einer Abkürzung wie „e. K.“, der Ort deiner Handelsniederlassung, das Registergericht und die Registernummer (§ 37a Abs. 1, § 19 Abs. 1 Nr. 1 HGB). Bei OHG und KG sind es Firma und Sitz der Gesellschaft, das Registergericht und die Registernummer (§ 125 Abs. 1 Satz 1 HGB, für die KG § 177a Satz 1 HGB). Ist keine natürliche Person persönlich haftender Gesellschafter, wie bei der GmbH & Co. KG, kommen die Firma der persönlich haftenden Gesellschafterin und deren Angaben nach § 35a GmbHG dazu (§ 125 Abs. 1 Satz 2 HGB, § 177a Satz 2 HGB). Bei GmbH und UG sind es Rechtsform und Sitz, Registergericht und Registernummer sowie alle Geschäftsführer mit dem Familiennamen und mindestens einem ausgeschriebenen Vornamen, und, wenn es einen Aufsichtsrat mit Vorsitz gibt, dessen Vorsitzender; machst du Angaben zum Kapital, nennst du das Stammkapital und, wenn nicht alle Geldeinlagen eingezahlt sind, den Gesamtbetrag der ausstehenden Einlagen (§ 35a Abs. 1 GmbHG). Bestellscheine gelten als Geschäftsbriefe. Mitteilungen in einer bestehenden Geschäftsverbindung, für die üblicherweise Vordrucke verwendet werden, brauchen die Angaben nicht (§ 37a Abs. 2, 3 HGB, § 125 Abs. 2 HGB, § 35a Abs. 2, 3 GmbHG).'
+  de: 'Auf allen Geschäftsbriefen an einen bestimmten Empfänger, gleich in welcher Form, stehen Pflichtangaben. Als eingetragener Kaufmann sind das deine Firma mit der Bezeichnung „eingetragener Kaufmann“ oder „eingetragene Kauffrau“ oder einer Abkürzung wie „e. K.“, der Ort deiner Handelsniederlassung, das Registergericht und die Registernummer (§ 37a Abs. 1, § 19 Abs. 1 Nr. 1 HGB). Bei OHG und KG sind es Firma und Sitz der Gesellschaft, das Registergericht und die Registernummer (§ 125 Abs. 1 Satz 1 HGB, für die KG § 177a Satz 1 HGB). Für die Partnerschaftsgesellschaft gilt das entsprechend: Name und Sitz der Partnerschaft, das Registergericht und die Registernummer; bei der Partnerschaft mit beschränkter Berufshaftung kommt der gewählte Namenszusatz dazu, etwa „mbB“ (§ 7 Abs. 3 PartGG, § 8 Abs. 4 Satz 3 PartGG). Ist keine natürliche Person persönlich haftender Gesellschafter, wie bei der GmbH & Co. KG, kommen die Firma der persönlich haftenden Gesellschafterin und deren Angaben nach § 35a GmbHG dazu (§ 125 Abs. 1 Satz 2 HGB, § 177a Satz 2 HGB). Bei GmbH und UG sind es Rechtsform und Sitz, Registergericht und Registernummer sowie alle Geschäftsführer mit dem Familiennamen und mindestens einem ausgeschriebenen Vornamen, und, wenn es einen Aufsichtsrat mit Vorsitz gibt, dessen Vorsitzender; machst du Angaben zum Kapital, nennst du das Stammkapital und, wenn nicht alle Geldeinlagen eingezahlt sind, den Gesamtbetrag der ausstehenden Einlagen (§ 35a Abs. 1 GmbHG). Bestellscheine gelten als Geschäftsbriefe. Mitteilungen in einer bestehenden Geschäftsverbindung, für die üblicherweise Vordrucke verwendet werden, brauchen die Angaben nicht (§ 37a Abs. 2, 3 HGB, § 125 Abs. 2 HGB, § 7 Abs. 3 PartGG, § 35a Abs. 2, 3 GmbHG).'
 rechtsgrundlage:
 - § 37a HGB
 - § 125 HGB
 - § 177a HGB
+- § 7 Abs. 3 PartGG
 - § 35a GmbHG
 - § 14 HGB
 - § 79 Abs. 1 GmbHG
@@ -38,13 +46,16 @@ ausloeser:
       - gmbh_co_kg
       - ug
       - gmbh
+      # Weber 24.10.2026: Partnerschaftsgesellschaft über § 7 Abs. 3 PartGG (Partnerschaftsregister)
+      - partg
+      - partg_mbb
       label:
-        de: Dein Unternehmen ist eine OHG, KG, GmbH & Co. KG, UG oder GmbH.
+        de: Dein Unternehmen ist eine OHG, KG, GmbH & Co. KG, UG, GmbH oder Partnerschaftsgesellschaft.
     - feld: profil.gesellschaft.handelsregister
       op: ==
       wert: eingetragen
       label:
-        de: Deine Gesellschaft ist im Handelsregister eingetragen.
+        de: Deine Gesellschaft ist im Handels- oder Partnerschaftsregister eingetragen.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -55,7 +66,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: 'Das Registergericht kann die Angaben mit Zwangsgeld bis 5.000 € durchsetzen: beim eingetragenen Kaufmann nach § 37a Abs. 4 HGB, bei OHG und KG gegen die vertretungsberechtigten Gesellschafter oder deren organschaftliche Vertreter nach § 125 Abs. 2 in Verbindung mit § 37a Abs. 4 HGB (§ 14 HGB), bei GmbH und UG gegen die Geschäftsführer (§ 79 Abs. 1 GmbHG).'
+    de: 'Das Registergericht kann die Angaben mit Zwangsgeld bis 5.000 € durchsetzen: beim eingetragenen Kaufmann nach § 37a Abs. 4 HGB, bei OHG und KG gegen die vertretungsberechtigten Gesellschafter oder deren organschaftliche Vertreter nach § 125 Abs. 2 in Verbindung mit § 37a Abs. 4 HGB (§ 14 HGB), bei der Partnerschaftsgesellschaft entsprechend gegen die vertretungsberechtigten Partner (§ 7 Abs. 3 PartGG), bei GmbH und UG gegen die Geschäftsführer (§ 79 Abs. 1 GmbHG).'
   schwere: niedrig
 automatisierung: hinweis
 aktion:
@@ -79,6 +90,17 @@ quellen:
 - titel: § 177a HGB, Wortlaut (lexmea.de)
   url: https://lexmea.de/de/gesetz/hgb/177a
   abgerufen: '2026-10-23'
+- titel: § 7 PartGG, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/partgg/7
+  abgerufen: '2026-10-24'
+  fundstelle: § 7 Abs. 3 PartGG
+- titel: § 8 PartGG, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/partgg/8
+  abgerufen: '2026-10-24'
+  fundstelle: § 8 Abs. 4 Satz 3 PartGG
+- titel: PartGG-Änderungen zum 1.1.2024 durch das MoPeG (buzer.de, Verweis auf § 125 HGB statt § 125a HGB)
+  url: https://www.buzer.de/gesetz/3018/v276650-2024-01-01.htm
+  abgerufen: '2026-10-24'
 - titel: HGB-Änderungen zum 1.1.2024 durch das MoPeG (buzer.de, § 125a aufgehoben)
   url: https://www.buzer.de/gesetz/3486/v276633-2024-01-01.htm
   abgerufen: '2026-10-23'
@@ -94,10 +116,9 @@ quellen:
   url: https://lexmea.de/de/gesetz/hgb/14
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
+- 'v2 (RA Dr. Weber, 24.10.2026): Partnerschaftsgesellschaft ergänzt (Auslöser partg und partg_mbb ab Eintragung, Erklärung, Folgen, Rechtsgrundlage). Abweichung: § 7 Abs. 3 PartGG statt „§ 7 Abs. 5 PartGG“ – seit dem MoPeG (1.1.2024) steht die Verweisung auf § 125 Abs. 1 Satz 1 und Abs. 2 HGB in Abs. 3; „Name“ statt „Firma“ (die Partnerschaft führt einen Namen, § 2 Abs. 1 PartGG) und der Namenszusatz der PartG mbB nach dem Wortlaut von § 7 Abs. 3 PartGG. Folgen „entsprechend gegen die vertretungsberechtigten Partner“ über die Verweisung auf § 125 Abs. 2 HGB – bitte bestätigen. eGbR nicht aufgenommen: § 707b BGB verweist nicht auf § 125 oder § 37a HGB.'
 - 'Neu nach RA Dr. Weber (Nachprüfung 23.10.2026, B.15 Frage 1) – bitte ganz prüfen. Abweichungen von seiner Anmerkung: § 125 HGB statt § 125a HGB (aufgehoben seit 1.1.2024, MoPeG); Partnerschaftsgesellschaft und eGbR nicht aufgenommen; Schwere „niedrig“ (nur Zwangsgeld) von uns eingestuft. Gesellschaften erst ab Eintragung (Registerangaben), der e. K. per Rechtsform.'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 1
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

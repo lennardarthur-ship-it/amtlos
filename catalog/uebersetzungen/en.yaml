@@ -4049,22 +4049,25 @@ eintraege:
   en: You can now choose the OHG and KG as a legal form of their own – they always prepare balance sheets and do not file an Anlage EÜR.
 - de: OHG und KG kannst du jetzt als eigene Rechtsform wählen – sie übermitteln die E-Bilanz immer. Die Rechtsform „Andere“ löst die Pflicht nicht mehr aus.
   en: You can now choose the OHG and KG as a legal form of their own – they always submit the e-balance sheet (E-Bilanz). The legal form “Other” no longer triggers the obligation.
-- de: Auf allen Geschäftsbriefen an einen bestimmten Empfänger, gleich in welcher Form, stehen Pflichtangaben. Als eingetragener Kaufmann sind das deine Firma mit der Bezeichnung „eingetragener Kaufmann“
+- de: 'Auf allen Geschäftsbriefen an einen bestimmten Empfänger, gleich in welcher Form, stehen Pflichtangaben. Als eingetragener Kaufmann sind das deine Firma mit der Bezeichnung „eingetragener Kaufmann“
     oder „eingetragene Kauffrau“ oder einer Abkürzung wie „e. K.“, der Ort deiner Handelsniederlassung, das Registergericht und die Registernummer (§ 37a Abs. 1, § 19 Abs. 1 Nr. 1 HGB). Bei OHG und KG sind
-    es Firma und Sitz der Gesellschaft, das Registergericht und die Registernummer (§ 125 Abs. 1 Satz 1 HGB, für die KG § 177a Satz 1 HGB). Ist keine natürliche Person persönlich haftender Gesellschafter,
-    wie bei der GmbH & Co. KG, kommen die Firma der persönlich haftenden Gesellschafterin und deren Angaben nach § 35a GmbHG dazu (§ 125 Abs. 1 Satz 2 HGB, § 177a Satz 2 HGB). Bei GmbH und UG sind es Rechtsform
-    und Sitz, Registergericht und Registernummer sowie alle Geschäftsführer mit dem Familiennamen und mindestens einem ausgeschriebenen Vornamen, und, wenn es einen Aufsichtsrat mit Vorsitz gibt, dessen
-    Vorsitzender; machst du Angaben zum Kapital, nennst du das Stammkapital und, wenn nicht alle Geldeinlagen eingezahlt sind, den Gesamtbetrag der ausstehenden Einlagen (§ 35a Abs. 1 GmbHG). Bestellscheine
-    gelten als Geschäftsbriefe. Mitteilungen in einer bestehenden Geschäftsverbindung, für die üblicherweise Vordrucke verwendet werden, brauchen die Angaben nicht (§ 37a Abs. 2, 3 HGB, § 125 Abs. 2 HGB,
-    § 35a Abs. 2, 3 GmbHG).
-  en: All business letters addressed to a specific recipient, in whatever form, must contain mandatory details. As a registered merchant (eingetragener Kaufmann), these are your company name (Firma) with
+    es Firma und Sitz der Gesellschaft, das Registergericht und die Registernummer (§ 125 Abs. 1 Satz 1 HGB, für die KG § 177a Satz 1 HGB). Für die Partnerschaftsgesellschaft gilt das entsprechend: Name
+    und Sitz der Partnerschaft, das Registergericht und die Registernummer; bei der Partnerschaft mit beschränkter Berufshaftung kommt der gewählte Namenszusatz dazu, etwa „mbB“ (§ 7 Abs. 3 PartGG, § 8
+    Abs. 4 Satz 3 PartGG). Ist keine natürliche Person persönlich haftender Gesellschafter, wie bei der GmbH & Co. KG, kommen die Firma der persönlich haftenden Gesellschafterin und deren Angaben nach §
+    35a GmbHG dazu (§ 125 Abs. 1 Satz 2 HGB, § 177a Satz 2 HGB). Bei GmbH und UG sind es Rechtsform und Sitz, Registergericht und Registernummer sowie alle Geschäftsführer mit dem Familiennamen und mindestens
+    einem ausgeschriebenen Vornamen, und, wenn es einen Aufsichtsrat mit Vorsitz gibt, dessen Vorsitzender; machst du Angaben zum Kapital, nennst du das Stammkapital und, wenn nicht alle Geldeinlagen eingezahlt
+    sind, den Gesamtbetrag der ausstehenden Einlagen (§ 35a Abs. 1 GmbHG). Bestellscheine gelten als Geschäftsbriefe. Mitteilungen in einer bestehenden Geschäftsverbindung, für die üblicherweise Vordrucke
+    verwendet werden, brauchen die Angaben nicht (§ 37a Abs. 2, 3 HGB, § 125 Abs. 2 HGB, § 7 Abs. 3 PartGG, § 35a Abs. 2, 3 GmbHG).'
+  en: 'All business letters addressed to a specific recipient, in whatever form, must contain mandatory details. As a registered merchant (eingetragener Kaufmann), these are your company name (Firma) with
     the designation “eingetragener Kaufmann” or “eingetragene Kauffrau” or an abbreviation such as “e. K.”, the location of your commercial establishment, the register court and the register number (§ 37a(1),
     § 19(1) no. 1 HGB). For an OHG and KG, they are the company name and registered office of the partnership, the register court and the register number (§ 125(1) sentence 1 HGB, for the KG § 177a sentence
-    1 HGB). If no natural person is a personally liable partner, as with a GmbH & Co. KG, the company name of the personally liable partner and its details under § 35a GmbHG are added (§ 125(1) sentence
-    2 HGB, § 177a sentence 2 HGB). For a GmbH and UG, they are the legal form and registered office, register court and register number as well as all managing directors with their surname and at least
-    one first name written out in full and, if there is a supervisory board with a chair, its chair; if you give details of the capital, you state the share capital (Stammkapital) and, if not all cash contributions
-    have been paid in, the total amount of outstanding contributions (§ 35a(1) GmbHG). Order forms count as business letters. Communications within an existing business relationship for which pre-printed
-    forms are usually used do not need these details (§ 37a(2), (3) HGB, § 125(2) HGB, § 35a(2), (3) GmbHG).
+    1 HGB). The same applies accordingly to a partnership company (Partnerschaftsgesellschaft): the name and registered office of the partnership, the register court and the register number; for a partnership
+    with limited professional liability (Partnerschaft mit beschränkter Berufshaftung), the chosen name suffix is added, such as “mbB” (§ 7(3) PartGG, § 8(4) sentence 3 PartGG). If no natural person is
+    a personally liable partner, as with a GmbH & Co. KG, the company name of the personally liable partner and its details under § 35a GmbHG are added (§ 125(1) sentence 2 HGB, § 177a sentence 2 HGB).
+    For a GmbH and UG, they are the legal form and registered office, register court and register number as well as all managing directors with their surname and at least one first name written out in full
+    and, if there is a supervisory board with a chair, its chair; if you give details of the capital, you state the share capital (Stammkapital) and, if not all cash contributions have been paid in, the
+    total amount of outstanding contributions (§ 35a(1) GmbHG). Order forms count as business letters. Communications within an existing business relationship for which pre-printed forms are usually used
+    do not need these details (§ 37a(2), (3) HGB, § 125(2) HGB, § 7(3) PartGG, § 35a(2), (3) GmbHG).'
 - de: Auf deinen Geschäftsbriefen und Bestellscheinen nennst du die Pflichtangaben deines Unternehmens, etwa Firma, Sitz, Registergericht und Registernummer.
   en: On your business letters and order forms, you state your business's mandatory details, such as company name, registered office, register court and register number.
 - de: 'Bußgeld bis 50.000 € bei fehlender Kenntlichmachung von Zusatzstoffen (§ 7 Abs. 2 Nr. 1 LMZDV i. V. m. § 60 Abs. 2 Nr. 26 lit. a, Abs. 5 LFGB). Wer chininhaltige Lebensmittel ohne den Hinweis „chininhaltig“
@@ -4072,15 +4075,17 @@ eintraege:
   en: 'Fine of up to €50,000 if additives are not labelled (§ 7(2) no. 1 LMZDV in conjunction with § 60(2) no. 26 letter a, (5) LFGB). Anyone who supplies food containing quinine without the notice “chininhaltig”
     (contains quinine) commits a criminal offence (§ 6(2) AromenDV in conjunction with § 59(1) no. 21 letter a LFGB: imprisonment of up to one year or a fine).'
 - de: 'Das Registergericht kann die Angaben mit Zwangsgeld bis 5.000 € durchsetzen: beim eingetragenen Kaufmann nach § 37a Abs. 4 HGB, bei OHG und KG gegen die vertretungsberechtigten Gesellschafter oder
-    deren organschaftliche Vertreter nach § 125 Abs. 2 in Verbindung mit § 37a Abs. 4 HGB (§ 14 HGB), bei GmbH und UG gegen die Geschäftsführer (§ 79 Abs. 1 GmbHG).'
+    deren organschaftliche Vertreter nach § 125 Abs. 2 in Verbindung mit § 37a Abs. 4 HGB (§ 14 HGB), bei der Partnerschaftsgesellschaft entsprechend gegen die vertretungsberechtigten Partner (§ 7 Abs.
+    3 PartGG), bei GmbH und UG gegen die Geschäftsführer (§ 79 Abs. 1 GmbHG).'
   en: 'The register court can enforce the details with a coercive fine (Zwangsgeld) of up to €5,000: for a registered merchant under § 37a(4) HGB, for an OHG and KG against the partners authorised to represent
-    it or their statutory representatives under § 125(2) in conjunction with § 37a(4) HGB (§ 14 HGB), for a GmbH and UG against the managing directors (§ 79(1) GmbHG).'
+    it or their statutory representatives under § 125(2) in conjunction with § 37a(4) HGB (§ 14 HGB), for a partnership company (Partnerschaftsgesellschaft) accordingly against the partners authorised to
+    represent it (§ 7(3) PartGG), for a GmbH and UG against the managing directors (§ 79(1) GmbHG).'
 - de: Dein Unternehmen ist eine OHG oder KG.
   en: Your business is an OHG or KG.
-- de: Dein Unternehmen ist eine OHG, KG, GmbH & Co. KG, UG oder GmbH.
-  en: Your business is an OHG, KG, GmbH & Co. KG, UG or GmbH.
-- de: Deine Gesellschaft ist im Handelsregister eingetragen.
-  en: Your company is entered in the commercial register (Handelsregister).
+- de: Dein Unternehmen ist eine OHG, KG, GmbH & Co. KG, UG, GmbH oder Partnerschaftsgesellschaft.
+  en: Your business is an OHG, KG, GmbH & Co. KG, UG, GmbH or partnership company (Partnerschaftsgesellschaft).
+- de: Deine Gesellschaft ist im Handels- oder Partnerschaftsregister eingetragen.
+  en: Your company is entered in the commercial register (Handelsregister) or the partnership register (Partnerschaftsregister).
 - de: Deine Gesellschaft ist im Register eingetragen.
   en: Your company is entered in the register.
 - de: Den Gesellschaftsvertrag einer OHG oder KG schließt ihr ohne Notar – am besten schriftlich.

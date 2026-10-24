@@ -160,9 +160,11 @@ const BIO_TEILE: BaTeil[] = [
   {
     id: "unfall",
     label: "Verhalten bei Verletzungen, Unfällen und Betriebsstörungen – Erste Hilfe",
-    hilfe: "Sofortmaßnahmen, Meldung im Betrieb, Erste Hilfe",
+    hilfe: "Sofortmaßnahmen, Meldung im Betrieb, Erste Hilfe – Zeitfenster der HIV-Postexpositionsprophylaxe nach S2k-Leitlinie AWMF 055-004",
     ...mitGruppen([
-      ["Nach einer Stich- oder Schnittverletzung: Wunde desinfizieren und sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen – eine HIV-Postexpositionsprophylaxe sollte möglichst innerhalb von 2 Stunden beginnen.", BEAUTY],
+      // B-276, RA Dr. Weber (Fachfragen Runde 3, 24.10.2026, Abgleich mit der S2k-Leitlinie AWMF 055-004): Obergrenze nach
+      // Stich- oder Schnittverletzungen ergänzt, damit nach Ablauf von 2 Stunden niemand auf den Arztbesuch verzichtet – sein Wortlaut
+      ["Nach einer Stich- oder Schnittverletzung: Wunde desinfizieren und sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen – eine HIV-Postexpositionsprophylaxe sollte möglichst innerhalb von 2 Stunden beginnen, nach einer Stich- oder Schnittverletzung spätestens bis 24 Stunden; auch später noch ärztlich abklären lassen.", BEAUTY],
       ["Bei Spritzern in Auge oder Mund sofort mit Wasser bzw. Augenspüllösung spülen und ärztlich vorstellen."],
       ["Jede Verletzung der verantwortlichen Person melden und im Verbandbuch eintragen."],
       ["Verschüttetes infektiöses Material mit Schutzhandschuhen aufnehmen und die Fläche desinfizieren."],

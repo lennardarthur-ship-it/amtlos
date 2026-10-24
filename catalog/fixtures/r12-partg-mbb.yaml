@@ -19,3 +19,5 @@ erwartet:
   gesellschaft.insolvenzantragspflicht: gilt_nicht
   gesellschaft.stammkapital_einzahlen: gilt_nicht
   gesellschaft.istkaufmann_pruefen: gilt_nicht
+  # Weber 24.10.2026: Geschäftsbriefe der Partnerschaft (§ 7 Abs. 3 PartGG) – Registerangaben erst ab Eintragung
+  gesellschaft.geschaeftsbriefe_pflichtangaben: gilt_nicht
