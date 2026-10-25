@@ -59,62 +59,93 @@ fs.writeFileSync(`${p}/tsconfig.json`, JSON.stringify({
 }, null, 2) + "\n");
 JS
 cat > "$P/LIESMICH.txt" <<'TXT'
-{{MARKE}} – Unterlagen für deinen Betrieb (Testversion fürs iPhone)
+{{MARKE}} – Testversion fürs iPhone (Expo Go)
 
-Dies ist nur ein Testpaket zum Ausprobieren in Expo Go – nicht der Quellcode. Quellcode, Tests, CI und
-Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). Stand: Commit STAND_COMMIT.
+Stand: Commit STAND_COMMIT · Expo SDK 58 · Quellcode, Tests und Entscheidungen im Git-Repository
+(GitHub: lennardarthur-ship-it/amtlos). Dieser Ordner ist nur ein Testpaket zum Ausprobieren, nicht der Quellcode.
 
-1. Auf dem iPhone: „Expo Go“ aus dem App Store laden.
-2. Auf dem Mac: Node.js installieren (https://nodejs.org, Knopf „LTS“, Installer öffnen, durchklicken).
-3. Auf dem Mac das Programm „Terminal“ öffnen und eintippen (Ordnerpfad anpassen, falls woanders):
+
+EINRICHTEN
+
+1. iPhone: „Expo Go“ aus dem App Store laden bzw. aktualisieren. Das Testpaket braucht die Expo-Go-Version für
+   SDK 58. Meldet Expo Go „Project is incompatible with this version of Expo Go“, ist entweder Expo Go oder das
+   Testpaket nicht aktuell.
+2. Mac: Node.js installieren (https://nodejs.org, Knopf „LTS“, Installer öffnen, durchklicken).
+3. Mac: Programm „Terminal“ öffnen und eintippen (Ordnerpfad anpassen, falls woanders):
 
      cd ~/Desktop/amtlos-app
      npm install
      npx expo start -c
 
-   Wichtig: „npm install“ erst ganz durchlaufen lassen (bis „added … packages“ erscheint), dann „npx expo start -c“.
-
-4. Es erscheint ein QR-Code. Mit der normalen Kamera-App des iPhones scannen → „In Expo Go öffnen“.
+   „npm install“ erst ganz durchlaufen lassen (bis „added … packages“ erscheint). Nach einem neuen Testpaket mit
+   anderen Bibliotheken (z. B. neues Expo SDK) „npm install“ wieder ausführen; sonst reicht „npx expo start -c“.
+4. Es erscheint ein QR-Code. Mit der Kamera-App des iPhones scannen → „In Expo Go öffnen“.
    iPhone und Mac müssen im selben WLAN sein. Fragt der Mac, ob „node“ Verbindungen annehmen darf: Erlauben.
-5. In der App:
-   - Vier Tabs: Heute · Pflichten · Unterlagen · Mein Betrieb – dazu rechts der Knopf „+“ für alles Neue
-     (Rechnung, Beleg, jede Vorlage).
-   - „Pflichten-Check starten“ – ein paar Fragen, dann zeigt die App, welche Pflichten für deinen Betrieb gelten.
-   - „Mein Betrieb“: oben den Betrieb eintragen (Name, Adresse, verantwortliche Person), darunter Steuer und Bank,
-     Briefkopf, Mitarbeiter und Kunden – jede Gruppe auf einer eigenen Seite.
-   - „+“: „Rechnung“ oder unter „Wofür brauchst du eine Unterlage?“ den Anlass wählen (z. B. „Ich stelle jemanden ein“).
-   - Schritt für Schritt ausfüllen, unten „Weiter“. Am Ende siehst du das Dokument und tippst „PDF teilen“.
-     Bei Datumsfeldern öffnet der Kalender-Knopf den iPhone-Kalender; über Zahlentastaturen gibt es „Fertig“.
-   - „Unterlagen“: alles, was du angelegt hast – mit Summe der offenen Rechnungen, Filtern und Suche.
-     Alles bleibt nur auf dem iPhone. „Daten sichern“ (Mein Betrieb) erstellt eine mit deinem Passwort verschlüsselte
-     Datei, „Sicherung wiederherstellen“ spielt sie zurück.
-   - „Heute“ zeigt, was als Nächstes dran ist und was Kunden noch offen haben. Im Tab „Pflichten“ „Erinnerungen“ einschalten
-     (Mitteilungen erlauben): Die App erinnert 3 Tage vor jedem Termin – ganz ohne Server.
-   - „Mein Betrieb → Briefkopf“: Logo und Hausfarbe wählen – sie erscheinen auf Rechnung und Unterlagen.
-   - Rechnung mit Bankverbindung: im Zahlungsblock steht ein GiroCode – mit der Banking-App scannen, Überweisung ist vorausgefüllt.
-   - Jede Unterlage hat ihren eigenen Aufbau (Brief, Vertrag, Aushang, Nachweis, Vordruck, Handbuch): Abschnittsnummern und Gesetze am Rand, Vordrucke mit Feldnummern zum Übertragen.
-   - Rechnung an eine Firma: im Abschluss „Als E-Rechnung teilen (XRechnung)“, auch mit Leistungszeitraum.
-     Nach dem Teilen „Zahlung eingegangen“ vermerken. „Mein Betrieb → Kontrollmappe“ bündelt Nachweise für Kontrollen.
-   - „Umsatzsteuer-Voranmeldung“: übernimmt die Umsätze aus deinen Rechnungen – nach Leistungsdatum (Soll)
-     oder nach Zahlungseingang (Ist).
-   - „Mein Betrieb → Deine Daten“: alles liegt verschlüsselt auf dem iPhone, optional mit Face ID gesperrt.
-   - „+ → Beleg“ bzw. „Beleg“ auf „Heute“: Foto, Datei oder E-Rechnung (XRechnung/ZUGFeRD-PDF
-     aus der Dateien-App) – E-Rechnungen füllen sich selbst aus. Die Vorsteuer landet in der Voranmeldung, Einnahmen
-     und Ausgaben in der EÜR („Aus Rechnungen und Belegen übernehmen“).
-   - „Mein Betrieb → Paket für die Steuerberatung“: ZIP mit DATEV-Buchungsstapel, Listen und Belegen.
-   - „{{MARKE_PRO}}“ (oben unter „Mein Betrieb“): In dieser Testversion gibt es keinen Kauf – „Pro testweise einschalten“
-     zeigt alle Funktionen (im späteren Store-Build gibt es diesen Knopf nicht). Ohne Pro: Rechnungen ohne Limit, 1 Vorlage im Monat als PDF, Pflichten im Überblick (Details, Erinnerungen und Kontrollmappe mit Pro), kein Logo/keine Hausfarbe, keine E-Rechnung.
-   - „Über {{MARKE}}“: Impressum (Anbieter, Anschrift, Vertretung, E-Mail; Handelsregister und USt-IdNr. folgen nach
-     der Eintragung der UG), Datenschutzhinweis (vom Anwalt freigegeben) und Nutzungsbedingungen (inhaltlich
-     freigegeben, in Kraft erst nach der Eintragung – bis dahin als Entwurf gekennzeichnet), „{{MARKE}} weiterempfehlen“.
-   - Fachlich geprüft: Alle Pflichten des Katalogs und alle Vorlagen sind von Fachleuten freigegeben (Rechtsanwalt,
-     Steuerberater, Fachkraft für Arbeitssicherheit, Lebensmittelfachbeauftragter). Die App zeigt das je Pflicht bzw.
-     Vorlage mit „Inhalt fachlich geprüft“ bzw. „Vorlagen fachlich durchgesehen (Stand …)“ – nur solange der Inhalt
-     der geprüften Fassung entspricht. Rechtsberatung im Einzelfall ist die App weiterhin nicht.
-   - Synchronisation zwischen Geräten (Konto, Ende-zu-Ende-verschlüsselt) ist eingebaut, in diesem Testpaket aber
-     aus: Sie braucht einen laufenden {{MARKE}}-Server und einen Anmeldedienst. Ohne Server bleibt alles auf dem iPhone.
+5. Beenden: im Terminal Ctrl + C.
 
-Beenden: im Terminal Ctrl + C. Nächstes Mal reichen die Befehle „cd …“ und „npx expo start“.
+Hakt etwas: Expo Go auf dem iPhone ganz schließen, im Terminal Ctrl + C, dann „npx expo start -c“ und den QR-Code
+neu scannen. Hilft das nicht: Ordner „node_modules“ löschen und „npm install“ wiederholen.
+
+
+RUNDGANG DURCH DIE APP
+
+Unten vier Tabs – Heute · Pflichten · Unterlagen · Mein Betrieb – und rechts der Knopf „+“ für alles Neue.
+
+- Pflichten-Check (Tab „Pflichten“): ein paar Fragen zum Betrieb – Rechtsform (auch OHG und KG), Branche,
+  Beschäftigte, Kasse, Website … –, dann zeigt die App, welche Pflichten nach deinen Angaben in Frage kommen,
+  mit Termin, Kurztext und Abhaken. „Erinnerungen“ einschalten (Mitteilungen erlauben): Die App erinnert 3 Tage vor
+  jedem Termin, ganz ohne Server.
+- Heute: was als Nächstes dran ist, offene Rechnungen, die Kasse des Tages, Belege.
+- „+“: „Rechnung“, „Beleg“ oder unter „Wofür brauchst du eine Unterlage?“ den Anlass wählen (z. B. „Ich stelle
+  jemanden ein“). Schritt für Schritt ausfüllen, unten „Weiter“; am Ende das Dokument ansehen und „PDF teilen“.
+  Jede Unterlage hat ihren eigenen Aufbau (Brief, Vertrag, Aushang, Nachweis, Vordruck, Handbuch).
+- Rechnungen: Pflichtangaben, Storno, Gutschrift, Abschlag, GiroCode zum Scannen mit der Banking-App; an Firmen
+  auch als E-Rechnung (XRechnung). Nach dem Teilen „Zahlung eingegangen“ vermerken.
+- Belege: Foto, Datei oder E-Rechnung (XRechnung/ZUGFeRD aus der Dateien-App) – E-Rechnungen füllen sich selbst aus.
+- Kasse: Tagesabschluss aus dem Z-Bon, Kassenbuch, Kassensturz mit Zählprotokoll.
+- Steuern: Umsatzsteuer-Voranmeldung und EÜR übernehmen die Werte aus Rechnungen, Belegen und Kasse („Aus Rechnungen
+  und Belegen übernehmen“); „Mein Betrieb → Paket für die Steuerberatung“ erzeugt ein ZIP mit DATEV-Buchungsstapel,
+  Listen und Belegen. Die Werte trägst du selbst in ELSTER ein.
+- Unterlagen: alles, was du angelegt hast – mit Summe der offenen Rechnungen, Filtern und Suche.
+- Mein Betrieb: Betrieb (Name, Adresse, Rechtsform, verantwortliche Person), Steuer und Bank, Briefkopf (Logo und
+  Hausfarbe), Mitarbeiter, Kunden, Betriebsstätten; „Kontrollmappe“ bündelt die Nachweise für eine Kontrolle.
+- Deine Daten (Mein Betrieb): alles liegt verschlüsselt nur auf dem iPhone, auf Wunsch mit Face ID gesperrt.
+  „Daten sichern“ erstellt eine mit deinem Passwort verschlüsselte Datei, „Sicherung wiederherstellen“ spielt sie zurück.
+
+
+KOSTENLOS UND PRO
+
+Kostenlos: Rechnungen (ohne Limit), Belege, Kasse und Kassenbuch, Pflichten-Check im Überblick, Fristen in der App,
+alle Vorlagen ausfüllen und ansehen, Sicherung. Je Kalendermonat geht eine Vorlage kostenlos als PDF hinaus.
+{{MARKE_PRO}}: alle Vorlagen als PDF, Erinnerungen per Mitteilung, Kontrollmappe, Erklärung jeder Pflicht (Folgen,
+Rechtsgrundlage, Quellen), Paket für die Steuerberatung, E-Rechnung erstellen, Briefkopf, iCloud-Sicherung,
+Synchronisation. Pro sperrt nie den Zugriff auf eigene Daten.
+In dieser Testversion gibt es keinen Kauf: „{{MARKE_PRO}}“ (Mein Betrieb) → „Pro testweise einschalten“ zeigt alles.
+Im Store-Build gibt es diesen Knopf nicht.
+
+
+FACHLICHE PRÜFUNG
+
+Alle 226 Pflichten des Katalogs und alle 43 Vorlagen sind von Fachleuten freigegeben (Rechtsanwalt, Steuerberater,
+Fachkraft für Arbeitssicherheit, Lebensmittelfachbeauftragter; Stand 25.10.2026). Die App zeigt das je Pflicht
+(„Inhalt fachlich geprüft, Stand …“) und je Vorlage („Vorlagen fachlich durchgesehen (Stand …)“) – nur solange der
+Inhalt der geprüften Fassung entspricht; jede Änderung hebt den Vermerk auf, bis erneut geprüft ist. Die
+Handelsregister-Vorlage ist für GmbH, OHG und KG geprüft. Rechtsberatung im Einzelfall ist die App nicht.
+
+
+RECHTLICHES IN DER APP („Über {{MARKE}}“)
+
+- Impressum: Anbieter, Anschrift, Vertretung, E-Mail; Handelsregister und USt-IdNr. folgen nach der Eintragung der UG.
+- Datenschutzhinweis: vom Rechtsanwalt freigegeben (Fassung ohne Synchronisation).
+- Nutzungsbedingungen: inhaltlich freigegeben, in Kraft erst nach der Eintragung der UG – bis dahin als Entwurf
+  gekennzeichnet; es gilt Apples Standard-Lizenzvertrag.
+
+
+WAS IN DER TESTVERSION FEHLT
+
+- Kein Kauf (siehe oben), keine iCloud-Sicherung und keine Synchronisation: Die Synchronisation braucht einen
+  laufenden {{MARKE}}-Server und einen Anmeldedienst; ohne Server bleibt alles auf dem iPhone.
+- Expo Go ist eine Test-Umgebung: Aussehen und Tempo können leicht von der späteren App aus dem App Store abweichen.
 TXT
 STAND="$(git -C "$APP" rev-parse --short HEAD 2>/dev/null || echo unbekannt)"
 sed -i.bak "s/STAND_COMMIT/$STAND/" "$P/LIESMICH.txt" && rm -f "$P/LIESMICH.txt.bak"
