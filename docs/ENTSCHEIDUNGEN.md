@@ -28,3 +28,6 @@ Dr. Weber bestätigt die Handelsregister-Vorlage (Prüfsumme e2cd7a14a6c1) für 
 
 ## E-183 – Katalog vollständig freigegeben (25.10.2026)
 Alle 226 Katalogeinträge freigegeben (T. Koch: Schankanlage v4, Fluchtplan v5). Vorlagen: T. Koch Betriebsanweisung, Expositionsverzeichnis, Hautschutzplan (ohne arbeitsmedizinische Angaben); B-022 und B-105 (Gefährdungsbeurteilung) nach Abgleich Dr. Weber (AWMF 055-004, § 11 Abs. 5 BioStoffV), B-105 wörtlich nach seinem Satz. Gefährdungsbeurteilung und Betriebsanweisung Biostoffe: T. Koch gleicht die aktuellen PDFs ab (er unterschreibt keine Fassung, die er nicht gesehen hat). T. Koch hält einen Betriebsarzt für die PEP-Angaben für richtig; Entscheidung des Gründers: Abgleich durch Dr. Weber.
+
+## E-184 – Kochs Teil abgeschlossen (25.10.2026)
+Gefährdungsbeurteilung (1063d59082d4) und Betriebsanweisung Biostoffe (70fe591f5a3e) nach Abgleich der aktuellen PDFs durch T. Koch freigegeben, arbeitsmedizinische Stellen ausgenommen (Abgleich Dr. Weber). Vorlagen: 42 von 43 freigegeben; offen nur Bilanz/GuV (Unterschrift StB Busch).

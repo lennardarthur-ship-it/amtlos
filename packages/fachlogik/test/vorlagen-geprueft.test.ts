@@ -16,7 +16,7 @@ const WEITERE = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung",
   "video_hinweisschild", "anamnese_einwilligung", "arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ki_kompetenz", "ausweis_hinweis", "schluesselquittung",
   "impressum", "gewerbeanmeldung", "transparenzregister",
   "ust_voranmeldung", "oss_meldung", "zm_meldung", "steuererklaerung", "kassenbuch", "aufbewahrung", "sv_meldedaten",
-  "betriebsanweisung", "expositionsverzeichnis", "hautschutzplan"];
+  "betriebsanweisung", "expositionsverzeichnis", "hautschutzplan", "gefaehrdungsbeurteilung", "betriebsanweisung_biostoffe"];
 // RA Dr. Weber 25.10.2026: nur für GmbH, OHG und KG (Vermerk abhängig von der Rechtsform)
 const NUR_RECHTSFORM = ["handelsregister"];
 const ALLE = [...FUENF, ...WEITERE];
@@ -31,7 +31,7 @@ describe("Vorlagen fachlich durchgesehen (Nachkontrolle T. Baum 23.10.2026)", ()
     expect(vorlagenPruefsumme(vorlageFuer("handelsregister")!)).toBe(VORLAGEN_GEPRUEFT.handelsregister!.pruefsumme);
     for (const id of WEITERE) {
       expect(vorlageFuer(id), id).toBeDefined();
-      expect(VORLAGEN_GEPRUEFT[id]!.stand).toBe("2026-10-23");
+      expect(["2026-10-23", "2026-10-25"]).toContain(VORLAGEN_GEPRUEFT[id]!.stand);
       expect(vorlagenPruefsumme(vorlageFuer(id)!), id).toBe(VORLAGEN_GEPRUEFT[id]!.pruefsumme);
     }
     for (const id of FUENF) {
@@ -53,7 +53,7 @@ describe("Vorlagen fachlich durchgesehen (Nachkontrolle T. Baum 23.10.2026)", ()
   it("Vermerk bei den fünf Vorlagen, bei allen anderen der bisherige Hinweis", () => {
     for (const v of VORLAGEN) {
       const d: Daten = v.id === "hygieneplan" ? { art: "lebensmittel" } : {};
-      expect(pruefHinweisFuer(v, d), v.id).toBe(ALLE.includes(v.id) ? VERMERK : PRUEFHINWEIS);
+      expect(pruefHinweisFuer(v, d), v.id).toBe(ALLE.includes(v.id) ? geprueftVermerk(VORLAGEN_GEPRUEFT[v.id]!.stand) : PRUEFHINWEIS);
     }
   });
 
