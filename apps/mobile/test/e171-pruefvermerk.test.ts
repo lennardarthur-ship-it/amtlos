@@ -44,3 +44,10 @@ describe("Nennung höchstens zwölf Monate nach dem Prüfdatum (Vereinbarung Dr.
     expect(nennungGilt("2026-10-25", undefined, new Date(2030, 0, 1))).toBe(true);
   });
 });
+
+describe("Geteilte Prüfung: nie ein Name (Vereinbarung Dr. Weber § 3 Abs. 2)", () => {
+  it("zwei Prüfer → neutraler Vermerk", () => {
+    const geteilt = { status: "freigegeben", geprueft_von: ["StB Lutz Busch", "RA Dr. Ulrich Weber"], geprueft_am: "2026-10-25", geprueft_version: 2 };
+    expect(pruefVermerk(2, geteilt, new Date(2026, 10, 1))).toBe(VERMERK_NEUTRAL.replace("{stand}", "25.10.2026"));
+  });
+});

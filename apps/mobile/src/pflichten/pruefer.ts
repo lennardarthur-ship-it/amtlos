@@ -71,7 +71,10 @@ export function istGeprueft(version: number, pruefung: PruefungRoh | undefined |
 export function pruefVermerk(version: number, pruefung: PruefungRoh | undefined | null, heute: Date = new Date()): string | null {
   if (!istGeprueft(version, pruefung)) return null;
   const stand = datumDe(pruefung!.geprueft_am!);
-  const p = PRUEFER[pruefung!.geprueft_von?.[0] ?? ""];
+  // Geteilte Prüfung (Lebensmittel: Inhalt T. Baum, Folgen RA Dr. Weber): nie ein Name, nur der neutrale Vermerk – sonst
+  // entstünde der Eindruck, eine Person habe alle Felder geprüft (Vereinbarung Dr. Weber § 3 Abs. 2)
+  const von = pruefung!.geprueft_von ?? [];
+  const p = von.length === 1 ? PRUEFER[von[0]!] : undefined;
   return (p?.nennung && nennungGilt(pruefung!.geprueft_am!, p.nennungMonate, heute) ? p.wortlaut : VERMERK_NEUTRAL).replace("{stand}", stand);
 }
 
