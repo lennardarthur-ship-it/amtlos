@@ -3,6 +3,8 @@
  * Prüft die Wege eines neuen Nutzers: Betrieb eintragen, Pflichten-Check mit Ergebnis und Abhaken, Rechnung im geführten Ablauf (Nummer zählt hoch, Kunde wird
  * gemerkt), Abschluss mit Vorschau und PDF, Anlass „Sicherheit“ mit Vorschlägen, Mitarbeiter übernehmen, Neustart,
  * Kopie, Löschen, verschlüsselte Sicherung und Wiederherstellen. Bildschirmfotos zur Sichtprüfung. Bricht beim ersten Befund ab.
+ * E-188: der erste Pflichten-Check ohne Pro (Bezahlschirm einmal danach, „Später“, nur die ersten 3 Pflichten), am Ende
+ * der Teil ohne Pro (Neues gesperrt; erneut teilen, Storno, Kasse und Kassenbuch frei).
  *
  *   cd apps/mobile && CI=1 npx expo export --platform web --output-dir /tmp/expo-web
  *   node e2e/rundgang.mjs /tmp/expo-web /tmp/bilder        # DUNKEL=1 für Dunkelmodus, BREITE=375 für 375 pt, CHROMIUM_PFAD optional
@@ -115,6 +117,30 @@ try {
   await knopf("Schließen").click();
   await warte(900);
 
+  // E-188: den ersten Pflichten-Check macht ein neuer Nutzer ohne Pro – Pro (testweise) bis nach dem Ergebnis aus;
+  // Logo und Hausfarbe bleiben gespeichert und stehen wieder auf der Rechnung, sobald Pro an ist
+  const proSchalten = async (an) => {
+    await p.getByRole("tab", { name: "Mein Betrieb" }).click();
+    await warte(800);
+    await tippe(p.getByRole("button", { name: new RegExp(`^(Pro ist aktiv|${MARKE.proName})`) }).locator("visible=true").first());
+    await warte(900);
+    // nach „Alles löschen“ ist auch der Testschalter aus – nur schalten, was nicht schon so ist
+    if (an && (await knopf("Pro testweise einschalten").count()) > 0) {
+      await knopf("Pro testweise einschalten").click();
+      await warte(900);
+      pruefe(await sichtbar("Pro ist testweise an."), "keine Bestätigung nach dem Einschalten von Pro");
+      return;
+    }
+    if (!an && (await sichtbar("Pro testweise ausschalten"))) {
+      await tippe(knopf("Pro testweise ausschalten"));
+      await warte(600);
+    }
+    await zurueck();
+    await warte(800);
+  };
+  await proSchalten(false);
+  pruefe(await sichtbar("Pflichten-Check kostenlos – alles Weitere mit Pro"), "ohne Pro fehlt unter „Mein Betrieb“ der Hinweis, was kostenlos ist");
+
   // Pflichten-Check (E-126): Fragen beantworten, Ergebnis, Pflichten, Unterlage zur Pflicht
   await p.getByRole("tab", { name: "Pflichten" }).click();
   await warte(800);
@@ -169,29 +195,44 @@ try {
   await warte(600);
   pruefe(await sichtbar("Genauer machen · Frage 1 von"), "Zusatzfragen ohne eigenen Fortschritt");
   pruefe((await knopf("Überspringen").count()) > 0, "ohne Antwort kein „Überspringen“");
-  // R12 (UX #1/#2): ein Betrieb, der seit 2024 läuft, sieht „Was hast du schon?“ vor der Hauptzahl – nach Bereichen,
-  // ohne „Alle auswählen“; danach das Ergebnis mit der endgültigen Zahl
+  // E-188: ohne Pro kein „Was hast du schon?“ (der Schritt nennt viele Pflichten beim Namen) – gleich das Ergebnis
   const ergebnis = async () => (await sichtbar(/sind jetzt dran|ist jetzt dran|nichts dringend/)) && (await p.getByRole("button", { name: "Deine Pflichten ansehen", exact: true }).locator("visible=true").count()) > 0;
   for (let k = 0; k < 10 && !(await sichtbar("Was hast du schon?")) && !(await ergebnis()); k++) {
     await knopf("Überspringen").click();
     await warte(500);
   }
-  pruefe(await sichtbar("Was hast du schon?"), "Schritt „Was hast du schon?“ fehlt vor dem Ergebnis");
-  pruefe(!(await sichtbar("Alle auswählen")), "„Alle auswählen“ verleitet zum Durchwinken (R12 UX #19)");
-  pruefe(await sichtbar(/^(Gründung|Gesellschaft|Steuern|Personal|Arbeitsschutz|Datenschutz|IT-Sicherheit|Produkte|Deine Branche|Website und Online-Handel) \(\d+\)$/), "„Was hast du schon?“ nicht nach Bereichen gegliedert");
-  await p.getByRole("checkbox").locator("visible=true").first().click();
-  await warte(300);
-  await foto("check-schon");
-  await knopf("1 als erledigt übernehmen").click();
-  await warte(1200);
+  pruefe(!(await sichtbar("Was hast du schon?")), "„Was hast du schon?“ ohne Pro (nennt gesperrte Pflichten beim Namen)");
+  // E-188: nach dem ersten Check kurz das Ergebnis, dann einmal von selbst der Bezahlschirm darüber – „Später“
+  // schließt ihn, das kostenlose Ergebnis bleibt
+  await warte(2000);
+  pruefe((await sichtbar("Damit du keine Frist verpasst")) && (await sichtbar("Immer kostenlos")) && (await sichtbar("verlängert sich automatisch")) && (await knopf("Später").count()) > 0, "Bezahlschirm nach dem ersten Pflichten-Check (mit „Später“) fehlt");
+  await foto("pro-nach-check");
+  await knopf("Später").click();
+  await warte(1800);
+  pruefe(!(await sichtbar("Damit du keine Frist verpasst")), "Bezahlschirm nach „Später“ nicht geschlossen oder kommt wieder");
   pruefe((await ergebnis()) && (await sichtbar(/^Insgesamt \d+ Pflichten/)), "Ergebnis des Checks fehlt (eine Hauptzahl groß, Gesamtzahl klein)");
   // R11 (Berater d): was Lohnbüro bzw. Steuerberatung macht, steht nicht unter „Mit diesen 3 fängst du an“
   pruefe(!(await sichtbar("Macht dein Lohnbüro")), "Aufgabe des Lohnbüros im Einstieg des Ergebnisses");
+  // E-188: ohne Pro die ersten 3 Pflichten, die übrigen nur als Zahl
+  pruefe((await sichtbar("Mit diesen 3 fängst du an")) && (await sichtbar(/^… und \d+ weitere Pflichten$/)) && (await knopf("Alle Pflichten mit Pro").count()) > 0, "Ergebnis ohne Pro: die ersten 3 Pflichten oder „… und N weitere“ fehlen");
   await foto("check-ergebnis");
   await knopf("Deine Pflichten ansehen").click();
   await warte(1200);
   pruefe(befunde.length === 0, `Fehler nach dem Check (vom Check auf „Heute“): ${befunde.join(" | ")}`);
   pruefe((await p.getByRole("tab", { name: "Pflichten", selected: true }).count()) === 1, "nach dem Check nicht im Tab „Pflichten“ gelandet");
+  pruefe(!(await sichtbar("Damit du keine Frist verpasst")), "Bezahlschirm nach dem Check kam ein zweites Mal");
+  // E-188: „Deine Pflichten“ ohne Pro – 3 Pflichten, der Rest als Zahl, kein Jahresraster; eine gesperrte öffnet den Bezahlschirm
+  pruefe((await sichtbar("Deine ersten 3 Pflichten")) && (await sichtbar(/^… und \d+ weitere Pflichten$/)) && (await sichtbar("Dein Jahr mit allen Terminen – mit Pro")) && !(await sichtbar("Alle ansehen:")), "Pflichten-Tab ohne Pro zeigt mehr als die ersten 3 oder keinen Hinweis auf die übrigen");
+  await foto("pflichten-frei");
+  await tippe(knopf("Alle Pflichten mit Pro"));
+  await warte(900);
+  pruefe((await sichtbar("Alle Pflichten – mit Pro")) && (await sichtbar("verlängert sich automatisch")), "Bezahlschirm „Alle Pflichten“ fehlt");
+  await zurueck();
+  await warte(800);
+  // der Rest des ersten Rundgangs mit Pro (testweise) – ohne Pro geht es weiter unten
+  await proSchalten(true);
+  await p.getByRole("tab", { name: "Pflichten" }).click();
+  await warte(900);
   // Bühne (E-142): das Jahr mit den Terminen je Monat
   pruefe((await sichtbar("Dein Jahr")) && (await p.getByLabel(/: \d+ Termine?$/).count()) > 0, "Jahresblick fehlt im Pflichten-Tab");
   await foto("pflichten-jahr");
@@ -202,8 +243,7 @@ try {
   await warte(500);
   pruefe((await sichtbar("Hautschutzplan aushängen")) && (await sichtbar("Elektronische Kasse beim Finanzamt melden")) && !(await sichtbar("Impressum auf der Website")), "Pflichten passen nicht zum Profil (Beauty, Kasse, keine Website)");
   pruefe(await sichtbar("Aus der Gründung"), "Gründungsschritte des bestehenden Betriebs nicht abgetrennt");
-  // eine Pflicht ist schon aus „Was hast du schon?“ abgehakt (R11)
-  pruefe(await sichtbar(/^1 von \d+/), "Fortschritt fehlt (oder „Was hast du schon?“ hat nicht abgehakt)");
+  pruefe(await sichtbar(/^0 von \d+/), "Fortschritt fehlt");
   await foto("pflichten");
   await tippe(p.getByRole("button", { name: /^Hautschutzplan aushängen/ }).locator("visible=true").last());
   await warte(900);
@@ -221,7 +261,7 @@ try {
   await warte(500);
   await zurueck();
   await warte(800);
-  pruefe(await sichtbar(/^2 von \d+/), "Abhaken zählt nicht im Fortschritt");
+  pruefe(await sichtbar(/^1 von \d+/), "Abhaken zählt nicht im Fortschritt");
   await foto("start-mit-pflichten");
 
   // R12: Kassenabschluss – Betrieb mit Kasse sieht „Kasse“ auf „Heute“; Tagesabschluss in wenigen Feldern
@@ -650,36 +690,37 @@ try {
   await warte(800);
   pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("2026-002 · ")) && (await sichtbar("Friseurbedarf Müller GmbH")), "Unterlagen oder Belege nicht wiederhergestellt");
 
-  // E-156: ohne Pro – Rechnungen, Überblick und erneutes Teilen frei; Vorlage 2 im Monat, Pflicht-Details, Erinnerungen,
-  // Kontrollmappe, Steuerpaket und E-Rechnung öffnen den Bezahlschirm mit Anlass
-  await p.getByRole("tab", { name: "Mein Betrieb" }).click();
+  // E-188 (Modell Check-Teaser): ohne Pro nur die ersten 3 Pflichten; Neues (Rechnung, Beleg, Vorlage, Kopie, Kassentag)
+  // öffnet den Bezahlschirm mit Anlass; eigene Daten bleiben: erneut teilen, stornieren, Kasse und Kassenbuch ansehen
+  // und teilen. Vorher noch mit Pro die Allergenliste teilen – danach endet Pro.
+  await proSchalten(true);
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
-  await tippe(p.getByRole("button", { name: new RegExp(`^(Pro ist aktiv|${MARKE.proName})`) }).locator("visible=true").first());
+  await tippe(p.getByRole("button", { name: /^Allergenliste/ }).locator("visible=true").first());
+  await warte(1200);
+  const [mitProPdf] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
+  await mitProPdf.waitForLoadState();
+  pruefe((await mitProPdf.content()).includes("Apfelkuchen"), "PDF der Allergenliste (mit Pro) unvollständig");
+  await mitProPdf.close();
+  await warte(600);
+  await knopf("Schließen").click();
   await warte(900);
-  if (await sichtbar("Pro testweise ausschalten")) {
-    await tippe(knopf("Pro testweise ausschalten"));
-    await warte(600);
-  }
-  await zurueck();
-  await warte(800);
-  pruefe(await sichtbar("Diesen Monat ist 1 Vorlage als PDF kostenlos"), "ohne Pro fehlt der Hinweis auf die kostenlose Vorlage unter „Mein Betrieb“");
+  await proSchalten(false);
+  pruefe(await sichtbar("Pflichten-Check kostenlos – alles Weitere mit Pro"), "ohne Pro fehlt unter „Mein Betrieb“ der Hinweis, was kostenlos ist");
   const bezahlschirm = async (titel, name) => {
     await warte(900);
     pruefe((await sichtbar(titel)) && (await sichtbar("Immer kostenlos")) && (await sichtbar("verlängert sich automatisch")), `Bezahlschirm „${titel}“ fehlt`);
     await foto(name);
   };
 
-  // Pflicht ohne Pro: Überblick, Termin bzw. Stand und Abhaken – Details als Hinweis, Rechtshinweis bleibt
+  // Pflicht ohne Pro: eine der ersten 3 – Überblick, Termin bzw. Stand und Abhaken; Details als Hinweis, Rechtshinweis bleibt
   await p.getByRole("tab", { name: "Pflichten" }).click();
   await warte(900);
-  if ((await p.getByRole("button", { name: /^Alle ansehen: \d+ Pflichten/ }).locator("visible=true").count()) > 0) {
-    await tippe(p.getByRole("button", { name: /^Alle ansehen: \d+ Pflichten/ }).locator("visible=true").last());
-    await warte(500);
-  }
-  await tippe(p.getByRole("button", { name: /^Hautschutzplan aushängen/ }).locator("visible=true").last());
+  pruefe((await sichtbar("Deine ersten 3 Pflichten")) && (await sichtbar(/^… und \d+ weitere Pflichten$/)), "Pflichten ohne Pro (nach dem Ende von Pro): erste 3 oder „… und N weitere“ fehlen");
+  await tippe(p.getByText("Deine ersten 3 Pflichten", { exact: true }).locator("visible=true").last().locator("xpath=following::*[@role='button'][1]"));
   await warte(900);
-  pruefe((await sichtbar("Mit Pro: Erklärung, Folgen, Schritte")) && !(await sichtbar("TRGS 401")) && (await sichtbar("keine Rechts- oder Steuerberatung")), "Pflicht ohne Pro: Hinweis auf die Details fehlt, Details sichtbar oder Rechtshinweis fehlt");
-  pruefe((await sichtbar("Haken entfernen")) || (await sichtbar("Erledigt")), "Pflicht ohne Pro lässt sich nicht abhaken");
+  pruefe((await sichtbar("Mit Pro: Erklärung, Folgen, Schritte")) && (await sichtbar("keine Rechts- oder Steuerberatung")), "freie Pflicht ohne Pro: Hinweis auf die Details oder Rechtshinweis fehlt");
+  pruefe((await sichtbar("Haken entfernen")) || (await sichtbar("Erledigt")) || (await sichtbar(/^Als erledigt/)), "freie Pflicht ohne Pro lässt sich nicht abhaken");
   await foto("pflicht-frei");
   await tippe(knopf("Mit Pro ansehen"));
   await bezahlschirm("Jede Pflicht erklärt – mit Pro", "pro-pflicht");
@@ -688,82 +729,119 @@ try {
   await zurueck();
   await warte(800);
 
-  // Erinnerungen: die Fristen stehen in der App, der Schalter für Mitteilungen öffnet den Bezahlschirm
+  // Erinnerungen: der Schalter für Mitteilungen öffnet den Bezahlschirm
   const erinnern = p.getByRole("switch", { name: /An Fristen erinnern/ }).locator("visible=true").last();
   await erinnern.evaluate((el) => el.scrollIntoView({ block: "center" }));
   await warte(300);
-  pruefe(await sichtbar("Alle Fristen siehst du immer hier in der App"), "Erinnerungen ohne Pro: Hinweis auf die Fristen in der App fehlt");
   await foto("erinnerung-frei");
   await erinnern.click();
   await bezahlschirm("Erinnerung vor jeder Frist – mit Pro", "pro-erinnerungen");
   await zurueck();
   await warte(800);
 
-  // Vorlagen: die erste im Monat geht frei hinaus, die zweite öffnet den Bezahlschirm mit dem Ausweg „Als Entwurf behalten“
+  // Neues anlegen nur mit Pro: Rechnung und Beleg von „Heute“ aus, eine Vorlage aus dem Katalog – kein leerer Entwurf
+  await p.getByRole("tab", { name: "Heute" }).click();
+  await warte(800);
+  await knopf("Rechnung").click();
+  await bezahlschirm("Rechnungen schreiben – mit Pro", "pro-rechnung");
+  await zurueck();
+  await warte(800);
+  await knopf("Beleg").click();
+  await bezahlschirm("Belege erfassen – mit Pro", "pro-beleg");
+  await zurueck();
+  await warte(800);
+  pruefe(!(await sichtbar("Rechnungsnummer")), "ohne Pro wurde trotzdem eine Rechnung angelegt");
+
+  // Vorlagen: eine schon geteilte teilt man immer wieder; ein vorhandener Entwurf bleibt, sein PDF gehört zu Pro
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
   await tippe(p.getByRole("button", { name: /^Allergenliste/ }).locator("visible=true").first());
   await warte(1200);
-  pruefe((await sichtbar("Diesen Monat ist 1 Vorlage als PDF kostenlos")) && (await knopf("PDF teilen").count()) > 0, "Vorlage ohne Pro: Hinweis auf die kostenlose Vorlage oder freier Knopf fehlt");
-  await foto("vorlage-frei");
+  pruefe((await knopf("PDF teilen").count()) > 0 && !(await sichtbar("PDF teilen · Pro")), "geteilte Vorlage lässt sich ohne Pro nicht erneut teilen");
+  await foto("vorlage-erneut");
   const [vorlagePdf] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
   await vorlagePdf.waitForLoadState();
-  pruefe((await vorlagePdf.content()).includes("Apfelkuchen"), "PDF der kostenlosen Vorlage unvollständig");
+  pruefe((await vorlagePdf.content()).includes("Apfelkuchen"), "erneut geteiltes PDF der Vorlage unvollständig");
   await vorlagePdf.close();
   await warte(600);
-  // erneut teilen bleibt frei
-  pruefe((await knopf("PDF teilen").count()) > 0 && !(await sichtbar("PDF teilen · Pro")), "geteilte Vorlage lässt sich ohne Pro nicht erneut teilen");
   await knopf("Schließen").click();
   await warte(900);
   await tippe(p.getByRole("button", { name: /^Gefährdungsbeurteilung · Salon/ }).locator("visible=true").first());
   await warte(1200);
-  pruefe((await sichtbar("Die kostenlose Vorlage dieses Monats ist geteilt")) && (await knopf("PDF teilen · Pro").count()) > 0, "zweite Vorlage im Monat: Hinweis oder „PDF teilen · Pro“ fehlt");
-  await foto("vorlage-verbraucht");
+  pruefe((await sichtbar("Als PDF teilen und drucken gehört zu Pro")) && (await knopf("PDF teilen · Pro").count()) > 0 && (await sichtbar("Zum Bearbeiten antippen")), "vorhandener Entwurf ohne Pro: Hinweis, „PDF teilen · Pro“ oder Bearbeiten fehlt");
+  await foto("vorlage-pro");
   await knopf("PDF teilen · Pro").click();
-  await bezahlschirm("Vorlage 2 diesen Monat – mit Pro ohne Limit", "pro-vorlage");
-  const ausweg = p.getByRole("button", { name: /^Als Entwurf behalten – am 1\. \S+ wieder 1 Vorlage frei$/ }).locator("visible=true").last();
-  pruefe((await ausweg.count()) > 0, "Ausweg „Als Entwurf behalten“ fehlt auf dem Bezahlschirm");
-  await ausweg.click();
+  await bezahlschirm("Alle Vorlagen – mit Pro", "pro-vorlage");
+  const auswegVorlage = p.getByRole("button", { name: "Als Entwurf behalten", exact: true }).locator("visible=true").last();
+  pruefe((await auswegVorlage.count()) > 0, "Ausweg „Als Entwurf behalten“ fehlt auf dem Bezahlschirm des Entwurfs");
+  await auswegVorlage.click();
   await warte(900);
   pruefe((await sichtbar("Zum Bearbeiten antippen")) && (await knopf("PDF teilen · Pro").count()) > 0, "nach „Als Entwurf behalten“ nicht zurück beim Entwurf");
   await knopf("Schließen").click();
   await warte(900);
 
-  // Rechnungen bleiben frei: neue Rechnung teilen; E-Rechnung erstellen öffnet den Bezahlschirm
-  await p.getByRole("tab", { name: "Heute" }).click();
-  await warte(800);
-  await knopf("Rechnung").click();
-  await warte(900);
-  await knopf("Weiter").click();
-  await warte();
-  await tippe(p.getByRole("radio", { name: "Kim Beispiel" }).locator("visible=true").last());
-  await knopf("Weiter").click();
-  await warte();
-  await tippe(p.getByRole("button", { name: /^Position 1/ }).locator("visible=true").last());
-  await warte(800);
-  await feld("Leistung oder Ware").fill("Färben");
-  await feld("Einzelpreis brutto (€)").fill("65,00");
-  await knopf("Fertig").click();
-  await warte(800);
-  await knopf("Weiter").click();
-  await warte();
-  await knopf("Zur Unterlage").click();
-  await warte(1500);
-  pruefe((await knopf("PDF teilen").count()) > 0 && !(await sichtbar("Vorlage als PDF kostenlos")), "Rechnung ohne Pro nicht frei teilbar oder mit Kontingent-Hinweis");
-  await foto("rechnung-frei");
+  // Rechnung 2026-001 (mit Pro geteilt): erneut teilen frei (ohne Hausfarbe), E-Rechnung und Kopie mit Pro, Storno immer
+  await tippe(p.getByRole("button", { name: /2026-001 · / }).locator("visible=true").first());
+  await warte(1200);
+  pruefe((await knopf("PDF teilen").count()) > 0 && !(await sichtbar("PDF teilen · Pro")), "geteilte Rechnung lässt sich ohne Pro nicht erneut teilen");
   const [rechnungPdf] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
   await rechnungPdf.waitForLoadState();
   const rechnungHtml = await rechnungPdf.content();
-  pruefe(rechnungHtml.includes("Färben") && !rechnungHtml.includes("--akzent:#702434"), "Rechnung ohne Pro nicht geteilt oder mit Hausfarbe (Briefkopf gehört zu Pro)");
+  pruefe(rechnungHtml.includes("Haarschnitt") && !rechnungHtml.includes("--akzent:#702434"), "Rechnung ohne Pro nicht erneut geteilt oder mit Hausfarbe (Briefkopf gehört zu Pro)");
   await rechnungPdf.close();
   await warte(600);
-  pruefe(await sichtbar("Geteilt am"), "Rechnung ohne Pro nach dem Teilen nicht festgeschrieben");
+  await foto("rechnung-erneut");
   await knopf("Als E-Rechnung teilen (XRechnung) · Pro").click();
   await bezahlschirm("E-Rechnung für Firmenkunden – mit Pro", "pro-e-rechnung");
   await zurueck();
   await warte(700);
-  await knopf("Schließen").click();
+  await tippe(knopf("Kopie anlegen · Pro"));
+  await bezahlschirm("Rechnungen schreiben – mit Pro", "pro-kopie");
+  await zurueck();
+  await warte(700);
+  await tippe(knopf("Stornieren"));
+  await warte(1500);
+  pruefe((await knopf("PDF teilen").count()) > 0 && !(await sichtbar("PDF teilen · Pro")), "Storno ohne Pro nicht frei teilbar (GoBD)");
+  const [stornoPdf] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
+  await stornoPdf.waitForLoadState();
+  pruefe((await stornoPdf.content()).includes("Haarschnitt"), "Storno-PDF ohne Pro unvollständig");
+  await stornoPdf.close();
+  await warte(800);
+  await foto("storno-frei");
+  for (let k = 0; k < 5 && (await p.getByRole("tab", { name: "Unterlagen" }).locator("visible=true").count()) === 0; k++) {
+    await knopf("Schließen").click();
+    await warte(900);
+  }
+
+  // Kasse (E-188): erfasste Tage und ihr Kassenbuch bleiben ohne Pro sichtbar und teilbar, neue Tage mit Pro
+  await p.getByRole("tab", { name: "Heute" }).click();
+  await warte(800);
+  await tippe(p.getByRole("button", { name: /^Kasse: Tagesabschlüsse/ }).locator("visible=true").last());
   await warte(900);
+  pruefe((await sichtbar("1 Tagesabschluss")) && (await sichtbar("Neue Tagesabschlüsse erfasst du mit Pro")) && (await knopf("Tagesabschluss erfassen · Pro").count()) > 0, "Kasse ohne Pro: erfasster Tag, Hinweis oder „Tagesabschluss erfassen · Pro“ fehlt");
+  await foto("kasse-frei");
+  await tippe(p.getByRole("button", { name: /^(Mo|Di|Mi|Do|Fr|Sa|So), \d{2}\.\d{2}\.\d{4}/ }).locator("visible=true").last());
+  await warte(900);
+  pruefe((await sichtbar("Korrigieren")) && (await sichtbar("Umsatz 19 % (brutto)")), "erfasster Kassentag ohne Pro nicht zu öffnen oder nicht korrigierbar");
+  await zurueck();
+  await warte(800);
+  await tippe(p.getByRole("button", { name: /^Kassenbuch .* ansehen$/ }).locator("visible=true").last());
+  await warte(1200);
+  const [kassenbuch] = await Promise.all([ctx.waitForEvent("page"), knopf("Kassenbuch teilen").click()]);
+  await kassenbuch.waitForLoadState();
+  const kassenbuchHtml = await kassenbuch.content();
+  fs.writeFileSync(`${OUT}/kassenbuch-ohne-pro.html`, kassenbuchHtml);
+  pruefe(kassenbuchHtml.includes("Kassenbuch") && kassenbuchHtml.includes("Tageseinnahmen bar") && kassenbuchHtml.includes("200,00"), "Kassenbuch ohne Pro nicht teilbar oder unvollständig");
+  await kassenbuch.close();
+  await warte(800);
+  await zurueck();
+  await warte(800);
+  await tippe(knopf("Tagesabschluss erfassen · Pro"));
+  await bezahlschirm("Kasse und Kassenbuch – mit Pro", "pro-kasse");
+  await zurueck();
+  await warte(700);
+  await zurueck();
+  await warte(800);
 
   // Kontrollmappe: die Mappe gehört zu Pro, jede Unterlage öffnet einzeln (Auge)
   await p.getByRole("tab", { name: "Unterlagen" }).click();

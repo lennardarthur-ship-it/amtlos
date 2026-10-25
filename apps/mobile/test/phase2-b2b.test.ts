@@ -109,7 +109,7 @@ describe("Ein Partner-Code schaltet nie etwas frei", () => {
     s = { ...s1, unterlagen: s1.unterlagen.map((x) => (x.id === "h" ? { ...x, ausgegeben: "2026-10-02T09:00:00.000Z" } : x)) };
     const [s2, zweite] = anlegen(s, "unterweisung", new Date("2026-10-03T09:00:00Z"), "w");
     expect(u.id).toBe("h");
-    expect(ausgabeErlaubt(s2.unterlagen, zweite, false, new Date("2026-10-03T09:00:00Z"))).toBe(false);
+    expect(ausgabeErlaubt(zweite, false)).toBe(false);
     expect(kontrollmappeErlaubt(false)).toBe(false);
     expect(pflichtAnsicht({ grund: "x", erklaerung: "y" }, false).grund).toBe("");
     expect(s2.proTest).toBe(false);

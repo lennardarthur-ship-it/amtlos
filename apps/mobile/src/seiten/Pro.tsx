@@ -9,8 +9,8 @@ import { useNav } from "../ui/navigation";
 import { BuehnenBlatt } from "./gemeinsam";
 import { HAARLINIE, RADIUS, useFarben } from "../ui/thema";
 import { angebote, kaufAktiv, kaufen, paywallVerfuegbar, testmodus, wiederherstellen, type Angebot } from "../pro/kauf";
-import { ersparnis, knopfText, naechsterMonat, preisZeile } from "../pro/bezahltext";
-import { PRO_VORTEILE, VORLAGEN_FREI_JE_MONAT, uebrig, type ProFunktion } from "../pro/regeln";
+import { ersparnis, knopfText, preisZeile } from "../pro/bezahltext";
+import { PRO_VORTEILE, PFLICHTEN_FREI, type ProFunktion } from "../pro/regeln";
 import { useAmtlos } from "../zustand";
 import { syncAngeboten } from "../konto/konfig";
 import { DatenschutzSeite } from "./Recht";
@@ -18,19 +18,19 @@ import { CodeEinloesenKnopf, PartnerHinweis, usePartner } from "./Partner";
 
 /** „Synchronisation“ nur zeigen, wenn dieser Build einen Server hat (E-134). */
 const VORTEILE = PRO_VORTEILE.filter((v) => v !== "sync" || syncAngeboten);
-/** Reihenfolge nach Nutzen (E-156): „Pflichten erfüllen, Kontrollen bestehen“ – Vorlagen als PDF, Erinnerungen, Kontrollmappe zuerst. */
+/** Reihenfolge nach Nutzen (E-188): der wiederkehrende Nutzen zuerst – Rechnungen und E-Rechnung, Belege und Kasse, alle Pflichten. */
 const NACH_NUTZEN: ProFunktion[] = PRO_VORTEILE;
-const VORTEIL_SYMBOL: Record<ProFunktion, string> = { pdf: "square.and.arrow.up", erinnerungen: "bell", kontrollmappe: "folder", pflicht_details: "checklist", e_rechnung: "doc.text", ust_uebernahme: "percent", steuerberater: "briefcase", sync: "arrow.triangle.2.circlepath", icloud: "icloud", briefkopf: "paintpalette" };
+const VORTEIL_SYMBOL: Record<ProFunktion, string> = { rechnungen: "eurosign.circle", belege: "doc.viewfinder", kasse: "banknote", pflichten: "calendar", pdf: "square.and.arrow.up", erinnerungen: "bell", kontrollmappe: "folder", pflicht_details: "checklist", e_rechnung: "doc.text", ust_uebernahme: "percent", steuerberater: "briefcase", sync: "arrow.triangle.2.circlepath", icloud: "icloud", briefkopf: "paintpalette" };
 
 /** Vorteil als Kachel im 2×2-Raster: Symbol, kurzer Titel, ein Satz. */
 function VorteilKachel({ v }: { v: ProFunktion }) {
   const f = useFarben();
   const gross = useGrosseSchrift();
   return (
-    <View accessible accessibilityRole="text" accessibilityLabel={`${TEXT.pro_vorteil[v].titel}. ${TEXT.pro_vorteil[v].text(VORLAGEN_FREI_JE_MONAT)}`} style={{ flexBasis: gross ? "100%" : "46%", flexGrow: 1, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 8 }}>
+    <View accessible accessibilityRole="text" accessibilityLabel={`${TEXT.pro_vorteil[v].titel}. ${TEXT.pro_vorteil[v].text(PFLICHTEN_FREI)}`} style={{ flexBasis: gross ? "100%" : "46%", flexGrow: 1, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 8 }}>
       <Kachel symbol={VORTEIL_SYMBOL[v]} groesse={36} />
       <T fett stil={{ marginTop: 2 }}>{trennen(TEXT.pro_kachel[v])}</T>
-      <T v="caption" leise>{trennen(TEXT.pro_vorteil[v].text(VORLAGEN_FREI_JE_MONAT))}</T>
+      <T v="caption" leise>{trennen(TEXT.pro_vorteil[v].text(PFLICHTEN_FREI))}</T>
     </View>
   );
 }
@@ -41,8 +41,11 @@ function VorteilKachel({ v }: { v: ProFunktion }) {
  * Testmodus (Entwicklung, Testpaket, `EXPO_PUBLIC_PRO_TESTMODUS=1`) testweise einschalten; ein Store-Build ohne Kauf
  * zeigt keinen Kaufknopf (App-Review B2). Der Preis nach dem Testzeitraum steht gleich groß direkt über dem Knopf (R3).
  * Pflichtangaben für Abos (Verlängerung, Kündigung, Nutzungsbedingungen, Datenschutz) stehen unter dem Knopf.
+ *
+ * E-188: `anlass="check"` – einmal von selbst nach dem ersten Pflichten-Check („Damit du keine Frist verpasst“), mit
+ * deutlich sichtbarem „Später“ unter dem Kaufknopf; das Ergebnis des Checks liegt darunter und bleibt kostenlos.
  */
-export function ProSeite({ grund, danach }: { grund?: ProFunktion; /** nach erfolgreichem Kauf bzw. Einschalten (z. B. Erinnerungen einschalten) */ danach?: () => void }) {
+export function ProSeite({ grund, anlass, entwurf, danach }: { grund?: ProFunktion; /** E-188: Bezahlschirm nach dem ersten Pflichten-Check */ anlass?: "check"; /** aus einem vorhandenen Entwurf heraus (Ausweg „Als Entwurf behalten“) */ entwurf?: boolean; /** nach erfolgreichem Kauf bzw. Einschalten (z. B. Erinnerungen einschalten) */ danach?: () => void }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
@@ -113,14 +116,17 @@ export function ProSeite({ grund, danach }: { grund?: ProFunktion; /** nach erfo
   const gewaehlt = liste?.find((a) => a.id === wahl);
   const knopf = knopfText({ kaufAktiv, testmodus, gewaehlt });
   const reihe = NACH_NUTZEN.filter((x) => VORTEILE.includes(x));
-  const sortiert = grund ? [grund, ...reihe.filter((x) => x !== grund)] : reihe;
+  // E-188: nach dem ersten Pflichten-Check stehen die Erinnerungen vorn („Damit du keine Frist verpasst“)
+  const vorn = grund ?? (anlass === "check" ? "erinnerungen" : undefined);
+  const sortiert = vorn ? [vorn, ...reihe.filter((x) => x !== vorn)] : reihe;
   const haupt = sortiert.slice(0, 4);
   const weitere = sortiert.slice(4);
-  const rest = uebrig(z.stand.unterlagen, new Date());
   // R12 (UX #12): „Immer kostenlos“ zugeklappt – der Pro-Nutzen steht vorn; der Ausweg ist ein eigener Knopf
   const [freiOffen, setFreiOffen] = useState(false);
   const spart = liste ? ersparnis(liste) : null;
-  const ausweg = grund === "pdf" && !z.pro ? TEXT.r12_pro_entwurf(naechsterMonat(new Date()), VORLAGEN_FREI_JE_MONAT) : null;
+  // E-188: der Ausweg aus einem vorhandenen Entwurf heraus – der Entwurf bleibt
+  const ausweg = !z.pro && entwurf ? TEXT.r12_pro_entwurf : null;
+  const spaeter = anlass === "check" && !z.pro;
   // Phase 2.3: Zugang über einen Partner (Kammer, Verband …) läuft über Apples Angebotscode – nie über einen eigenen Schlüssel
   const partner = usePartner();
   const nachCode = () => {
@@ -145,19 +151,21 @@ export function ProSeite({ grund, danach }: { grund?: ProFunktion; /** nach erfo
           ) : knopf ? (
             <View style={{ flex: 1, gap: 4 }}>
               <Knopf text={knopf} laedt={laedt} deaktiviert={kaufAktiv ? !wahl : !testmodus} onPress={() => void los()} />
-              {/* R12 (UX #12), E-156: der Ausweg als zweiter Knopf – die Vorlage bleibt als Entwurf, am Monatsersten ist wieder eine frei */}
+              {/* R12 (UX #12), E-188: der Ausweg als zweiter Knopf – die Unterlage bleibt als Entwurf */}
               {ausweg ? <TextKnopf text={ausweg} onPress={nav.zurueck} stil={{ alignSelf: "center" }} /> : null}
+              {/* E-188 (App Review): nach dem Pflichten-Check deutlich „Später“ – schließt, das Ergebnis bleibt */}
+              {spaeter ? <Knopf ton text={TEXT.pro_spaeter} onPress={nav.zurueck} /> : null}
             </View>
           ) : (
             <Knopf ton text={TEXT.schliessen} onPress={nav.zurueck} stil={{ flex: 1 }} />
           )}
         </Fuss>
       }
-      // zuerst der Nutzen (E-156): Pflichten erfüllen, Kontrollen bestehen – nicht Logo und Hausfarbe
+      // zuerst der Nutzen (E-188): der Betriebsalltag – nicht Logo und Hausfarbe
       ueber={TEXT.pro_marke}
-      // R12 (UX #12): Überschrift aus dem Anlass („Vorlage 2 diesen Monat – mit Pro ohne Limit“)
-      titel={grund ? TEXT.r12_pro_anlass[grund](VORLAGEN_FREI_JE_MONAT) : TEXT.pro_wert_titel}
-      unter={grund ? TEXT.pro_grund[grund](VORLAGEN_FREI_JE_MONAT) : TEXT.pro_wert_text}
+      // R12 (UX #12): Überschrift aus dem Anlass („Rechnung 4 diesen Monat – mit Pro ohne Limit“)
+      titel={grund ? TEXT.r12_pro_anlass[grund](PFLICHTEN_FREI) : anlass === "check" ? TEXT.pro_check_titel : TEXT.pro_wert_titel}
+      unter={grund ? TEXT.pro_grund[grund](PFLICHTEN_FREI) : anlass === "check" ? TEXT.pro_check_text : TEXT.pro_wert_text}
     >
       {partner ? (
         <View style={{ marginBottom: 12 }}>
@@ -186,7 +194,6 @@ export function ProSeite({ grund, danach }: { grund?: ProFunktion; /** nach erfo
         {freiOffen ? <Hinweis art="erfolg" text={TEXT.pro_frei_bleibt} /> : null}
         <TextKnopf symbol={freiOffen ? "chevron.up" : "chevron.down"} erweitert={freiOffen} text={TEXT.r12_pro_frei_knopf} onPress={() => setFreiOffen(!freiOffen)} />
       </View>
-      {!z.pro ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, VORLAGEN_FREI_JE_MONAT)}</T> : null}
 
       {kaufAktiv ? (
         liste === null ? (
@@ -242,9 +249,9 @@ export function ProSeite({ grund, danach }: { grund?: ProFunktion; /** nach erfo
 export function useProSperre() {
   const z = useAmtlos();
   const nav = useNav();
-  return (f: ProFunktion, danach?: () => void): boolean => {
+  return (f: ProFunktion, danach?: () => void, o?: { entwurf?: boolean }): boolean => {
     if (z.pro) return true;
-    nav.oeffnen("pro", () => <ProSeite grund={f} danach={danach} />, true);
+    nav.oeffnen("pro", () => <ProSeite grund={f} entwurf={o?.entwurf} danach={danach} />, true);
     return false;
   };
 }
@@ -257,7 +264,6 @@ export function ProZeile() {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
-  const rest = uebrig(z.stand.unterlagen, new Date());
   if (!paywallVerfuegbar && !z.pro) return null;
   return (
     <Pressable accessibilityRole="button" onPress={() => nav.oeffnen("pro", () => <ProSeite />, true)} style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}>
@@ -266,7 +272,7 @@ export function ProZeile() {
         <Kachel symbol={z.pro ? "checkmark.seal.fill" : "sparkles"} ton="amt" />
         <View style={{ flex: 1 }}>
           <T fett>{z.pro ? TEXT.pro_aktiv : TEXT.pro_titel}</T>
-          <T v="klein" leise>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_rest(rest, VORLAGEN_FREI_JE_MONAT)}</T>
+          <T v="klein" leise>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_zeile_frei}</T>
         </View>
         <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" />
       </View>

@@ -22,7 +22,7 @@ import { BetriebTeilSeite } from "./Absender";
 import { handwerkLaut, ohneZahlungsweg } from "./rechnungHinweise";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { useProSperre } from "./Pro";
-import { VORLAGEN_FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, eRechnungErlaubt, uebrig, zaehltFuerKontingent } from "../pro/regeln";
+import { ausgabeErlaubt, ausgabeGrund, betriebFuerDokument, eRechnungErlaubt, erstellenErlaubt } from "../pro/regeln";
 import { Ansage, useAnsage } from "./felder";
 import { GEWERBE_VORLAGE } from "../gewerbe/felder";
 import { GewerbeOnlineSeite } from "./GewerbeOnline";
@@ -85,8 +85,8 @@ export function useTeilen(id: string) {
     if (!u || !v) return;
     setFehler(null);
     if (v.kundendokument && fehltFuer(z.stand, u).length) return setFehler(TEXT.erst_vollstaendig);
-    // E-156: Rechnungen immer, Vorlagen mit Pro oder als kostenlose Vorlage des Monats; erneutes Teilen und Stornos gehen immer
-    if (!ausgabeErlaubt(z.stand.unterlagen, u, z.pro, new Date()) && !sperre("pdf")) return;
+    // E-188: eine noch nie ausgegebene Rechnung bzw. Vorlage nur mit Pro; erneutes Teilen, Stornos und Kassenbuch gehen immer
+    if (!ausgabeErlaubt(u, z.pro) && !sperre(ausgabeGrund(u), undefined, { entwurf: true })) return;
     setLaedt(art === "teilen");
     // der Inhalt, aus dem das PDF entsteht (H1): Ändert er sich, während das Teilen-Menü offen ist (z. B. durch die
     // Synchronisation), wird nicht festgeschrieben
@@ -114,7 +114,7 @@ export function useTeilen(id: string) {
     const v = u ? vorlageFuer(u.vorlage) : undefined;
     if (!u || !v?.eRechnung) return;
     setFehler(null);
-    // E-156: Erstellen gehört zu Pro – eine schon einmal geteilte E-Rechnung geht immer wieder hinaus
+    // E-156/E-188: Erstellen gehört zu Pro – eine schon einmal geteilte E-Rechnung geht immer wieder hinaus
     if (!eRechnungErlaubt(u, z.pro) && !sperre("e_rechnung")) return;
     const absender = absenderFuer(z.stand, u);
     const { daten, fehlt } = eRechnungAus(u.daten, absender);
@@ -129,13 +129,11 @@ export function useTeilen(id: string) {
       setFehler(TEXT.e_rechnung_fehler);
     }
   };
-  // ohne Pro und ohne freie Vorlage: „PDF teilen · Pro“ – man soll nicht erst beim Tippen gegen den Bezahlschirm laufen
+  // ohne Pro bei einer noch nie ausgegebenen Unterlage: „PDF teilen · Pro“ – man soll nicht erst beim Tippen gegen den Bezahlschirm laufen
   const u = z.stand.unterlagen.find((x) => x.id === id);
-  const frei = !u || ausgabeErlaubt(z.stand.unterlagen, u, z.pro, new Date());
-  // E-156: ohne Pro bei einer noch nie ausgegebenen Vorlage – wie viele Vorlagen diesen Monat noch frei sind (über dem Knopf)
-  const zaehlt = Boolean(u && !z.pro && !u.ausgegeben && zaehltFuerKontingent(u) && !(typeof u.daten.storno_zu === "string" && u.daten.storno_zu));
-  const rest = zaehlt ? uebrig(z.stand.unterlagen, new Date()) : 0;
-  const kontingent = zaehlt ? { text: TEXT.pro_rest(rest, VORLAGEN_FREI_JE_MONAT), leer: rest === 0 } : null;
+  const frei = !u || ausgabeErlaubt(u, z.pro);
+  // E-188: darüber, dass das PDF zu Pro gehört und der Entwurf bleibt
+  const kontingent = !frei ? { text: TEXT.pro_vorlage_pdf, leer: true } : null;
   return { laedt, fehler, eFehlt, frei, kontingent, los: () => ausgabe("teilen"), drucken: () => ausgabe("drucken"), eRechnung };
 }
 
@@ -176,6 +174,7 @@ function VorschauSeite({ id }: { id: string }) {
  */
 export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung, eFehlt = [] }: { id: string; springen: (schritt: number) => void; fehler: string | null; drucken: () => Promise<void>; eRechnung?: () => Promise<void>; eFehlt?: string[] }) {
   const z = useAmtlos();
+  const sperre = useProSperre();
   const nav = useNav();
   const f = useFarben();
   const melden = useMeldung();
@@ -337,12 +336,14 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         <Karte>
           {[
             ...(v.eRechnung && eRechnung ? [{ symbol: "doc.text", titel: TEXT.mitPro(TEXT.e_rechnung, eRechnungErlaubt(u, z.pro)), los: () => void eRechnung() }] : []),
-            { symbol: "printer", titel: TEXT.mitPro(TEXT.drucken, ausgabeErlaubt(z.stand.unterlagen, u, z.pro, new Date())), los: () => void druckenLos() },
+            { symbol: "printer", titel: TEXT.mitPro(TEXT.drucken, ausgabeErlaubt(u, z.pro)), los: () => void druckenLos() },
             ...(v.alsText ? [{ symbol: "doc.on.doc", titel: TEXT.als_text, los: () => void Share.share({ message: v.alsText!(d, z.stand.betrieb) }).catch(() => undefined) }] : []),
             {
               symbol: "plus.circle",
-              titel: TEXT.kopie,
+              // E-188: eine Kopie ist eine neue Unterlage – mit Pro
+              titel: TEXT.mitPro(TEXT.kopie, erstellenErlaubt(z.pro)),
               los: () => {
+                if (!erstellenErlaubt(z.pro) && !sperre(ausgabeGrund(u))) return;
                 const k = z.kopieren(id);
                 if (k) {
                   melden(TEXT.kopie_angelegt);

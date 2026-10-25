@@ -20,12 +20,29 @@ import { HAUPT_STAETTE, alleStaetten, heute, kassenbuchFest, offenerBetrag, vaAb
 import { istKleinunternehmer } from "../unterlagen/steuerpaket";
 import { offeneRechnungen } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
+import { kasseErfassenErlaubt } from "../pro/regeln";
 import { BuehnenBlatt, GrosserBetrag, Gruppe, Leer } from "./gemeinsam";
+import { useProSperre } from "./Pro";
+
+/**
+ * E-188: neue Kassendaten erfassen nur mit Pro – sonst der Bezahlschirm (Grund „Kasse“); `los` läuft gleich bzw. nach
+ * dem Kauf. Erfasstes ansehen, korrigieren und das Kassenbuch teilen prüft das nie.
+ */
+function useKasseErfassen() {
+  const z = useAmtlos();
+  const sperre = useProSperre();
+  return (los: () => void) => {
+    if (kasseErfassenErlaubt(z.pro) || sperre("kasse", los)) los();
+  };
+}
 
 /**
  * Kasse (R12): Tagesabschlüsse laut Z-Bon bzw. Kassenbericht, Monatsübersicht mit Bargeldbestand und Warnungen
- * (negativer Bestand, fehlende Tage, Lücken in der Z-Bon-Folge, Kassendifferenzen), Kassenbuch als PDF. Erfassen ist
- * immer kostenlos (Pflicht-Nachweis).
+ * (negativer Bestand, fehlende Tage, Lücken in der Z-Bon-Folge, Kassendifferenzen), Kassenbuch als PDF.
+ *
+ * E-188: Neue Kassendaten erfassen (Tagesabschluss, Kassensturz, Sachentnahme) gehört zu Pro. Ohne Pro bleibt alles
+ * Erfasste sichtbar (Monatsübersicht, Tage, Kassenstürze, Sachentnahmen), ein Tag lässt sich mit Grund korrigieren, und
+ * das Kassenbuch erfasster Tage lässt sich ansehen, teilen und drucken (GoBD-Aufbewahrung, § 147 AO).
  *
  * R12 GoBD: Kassenbuch nur lesbar und beim ersten Teilen festgeschrieben; kein Tag in der Zukunft; Nacherfassung mit
  * Grund; Trinkgeld, App, „auf Rechnung“, Gutscheine und bar kassierte Rechnungen aus Amtlos getrennt; Eigenbeleg-Nummer
@@ -56,6 +73,8 @@ export function KasseZeile({ letzte = true }: { letzte?: boolean }) {
   const tag = heute();
   const heuteDa = z.stand.kasse.some((k) => k.datum === tag);
   const letzter = z.stand.kasse.reduce<string | null>((m, k) => (!m || k.datum > m ? k.datum : m), null);
+  // E-188: ohne Pro kein „Heute noch kein Tagesabschluss“ – erfassen gehört zu Pro; Erfasstes bleibt zu öffnen
+  if (!kasseErfassenErlaubt(z.pro)) return <Zeile symbol="banknote" titel={TEXT.r12_kasse_zeile} text={z.stand.kasse.length ? TEXT.r12_kasse_zeile_text(letzter ? datumDe(letzter) : null) : TEXT.mitPro(TEXT.r12_kasse_zeile_text(null), false)} onPress={oeffnen} letzte={letzte} />;
   return <Zeile symbol="banknote" titel={TEXT.r12_kasse_zeile} text={z.stand.kasse.length ? (heuteDa ? TEXT.r12_heute_erfasst : `${TEXT.r12_heute_offen} · ${TEXT.r12_kasse_zeile_text(letzter ? datumDe(letzter) : null)}`) : TEXT.r12_kasse_zeile_text(null)} onPress={oeffnen} letzte={letzte} />;
 }
 
@@ -67,7 +86,9 @@ export function KasseSeite() {
   const monate = useMemo(() => kassenMonate(z.stand), [z.stand]);
   const [monat, setMonat] = useState(monate[0]!);
   const m = useMemo(() => kassenMonat(z.stand, monat), [z.stand, monat]);
-  const neu = () => nav.oeffnen("kasse-neu", () => <KassenTagSeite />, true);
+  const erfassen = useKasseErfassen();
+  // E-188: einen neuen Tag erfassen gehört zu Pro; einen erfassten Tag öffnen (ansehen, korrigieren) geht immer
+  const neu = () => erfassen(() => nav.oeffnen("kasse-neu", () => <KassenTagSeite />, true));
   const oeffnen = (id: string) => nav.oeffnen(`kasse-${id}`, () => <KassenTagSeite id={id} />, true);
   const ruhe = ruhetage(z.stand.profil);
   // R12 GoBD: Kassenbuch nur lesbar – je Standort ein Kassenbuch; hier der Hauptbetrieb bzw. der erste Standort des Monats
@@ -101,7 +122,7 @@ export function KasseSeite() {
             <GrosserBetrag cent={m.brutto} groesse={grosseSchrift ? 40 : 52} />
             <T v="klein" farbe={f.buehneLeise}>{TEXT.r12_tage(m.abschluesse.length)}</T>
           </View>
-          <Knopf buehne symbol="plus" text={TEXT.r12_erfassen} onPress={neu} />
+          <Knopf buehne symbol="plus" text={TEXT.mitPro(TEXT.r12_erfassen, kasseErfassenErlaubt(z.pro))} onPress={neu} />
         </View>
       }
     >
@@ -110,6 +131,8 @@ export function KasseSeite() {
       {m.fehlend.length ? <Hinweis art="warnung" symbol="calendar" text={TEXT.r12_fehlend(m.fehlendText)} /> : null}
       {m.zbonLuecken.length ? <Hinweis art="info" text={TEXT.r12_zbon_luecken(m.zbonLuecken.slice(0, 8).join(", "))} /> : null}
       {m.differenzen.length ? <Hinweis art="info" text={TEXT.r12g_differenzen(m.differenzen.length, euro(m.differenzen.reduce((a, d) => a + d.cent, 0)))} /> : null}
+      {/* E-188: Pro endete bzw. fehlt – Erfasstes bleibt, neue Tage nur mit Pro */}
+      {!kasseErfassenErlaubt(z.pro) && z.stand.kasse.length ? <Hinweis art="info" symbol="info.circle" text={TEXT.r12_kasse_pro} /> : null}
       {!z.stand.kasse.length ? (
         <Leer symbol="banknote" text={TEXT.r12_leer} unter={TEXT.r12_leer_text} />
       ) : (
@@ -149,6 +172,7 @@ export function KasseSeite() {
         </View>
       )}
       <View style={{ marginTop: 14 }}>
+        {/* E-188: die Seite zeigt auch die bisherigen Kassenstürze – sie öffnet immer, nur das Speichern gehört zu Pro */}
         <Knopf ton symbol="eurosign.circle" text={TEXT.r12g_kassensturz} onPress={() => nav.oeffnen("kassensturz", () => <KassensturzSeite />, true)} />
         <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.r12g_kassensturz_text}</T>
       </View>
@@ -160,7 +184,8 @@ export function KasseSeite() {
         </Gruppe>
       ) : null}
       <MehrfachWahl label={TEXT.r12_ruhetage} hilfe={TEXT.r12_ruhetage_hilfe} werte={ruhe.map(String)} aendern={(w) => z.profilSetzen({ "kasse.ruhetage": w })} optionen={[1, 2, 3, 4, 5, 6, 0].map((d) => ({ wert: String(d), text: TEXT.r12_wochentage_lang[d]! }))} />
-      <T v="caption" leise stil={{ marginTop: 16 }}>{TEXT.r12_kostenlos}</T>
+      {/* E-188: ohne Pro – was zu Pro gehört und was immer bleibt */}
+      {!kasseErfassenErlaubt(z.pro) ? <T v="caption" leise stil={{ marginTop: 16 }}>{TEXT.r12_kostenlos}</T> : null}
     </BuehnenBlatt>
   );
 }
@@ -280,6 +305,7 @@ export function KassenTagSeite({ id }: { id?: string }) {
   const f = useFarben();
   const nav = useNav();
   const melden = useMeldung();
+  const erfassen = useKasseErfassen();
   const alt = id ? z.stand.kasse.find((k) => k.id === id) : undefined;
   const offen = offeneLadenkasse(z.stand.profil);
   const [korrektur, setKorrektur] = useState(false);
@@ -356,6 +382,8 @@ export function KassenTagSeite({ id }: { id?: string }) {
 
   const speichern = async () => {
     setFehler(null);
+    // E-188: einen neuen Tag speichern gehört zu Pro (falls Pro endete, während die Seite offen war); Korrekturen gehen immer
+    if (!alt && !kasseErfassenErlaubt(z.pro)) return erfassen(() => undefined);
     if (betragFalsch) return setFehler(TEXT.betrag_falsch);
     if (fehlerListe.includes("zukunft")) return setFehler(TEXT.r12g_zukunft);
     if (fehlerListe.includes("trinkgeld_zu_hoch")) return setFehler(TEXT.r12g_trinkgeld_zu_hoch);
@@ -581,8 +609,11 @@ function KassensturzSeite() {
   const stueckelung = Object.fromEntries(Object.entries(anzahl).map(([w, n]) => [w, Number(n.trim())]).filter(([, n]) => Number.isInteger(n) && (n as number) > 0)) as Record<string, number>;
   const gezaehlt = stueck ? stueckelungSumme(stueckelung) : (summe.trim() ? cent(summe) : null);
   const wertText = (w: number) => (w >= 100 ? `${w / 100} €` : `${w} ct`);
+  const erfassen = useKasseErfassen();
   const speichern = () => {
     if (gezaehlt === null || gezaehlt < 0) return setFehler(TEXT.betrag_falsch);
+    // E-188: einen neuen Kassensturz speichern gehört zu Pro – die Eingaben bleiben stehen, bis Pro aktiv ist
+    if (!kasseErfassenErlaubt(z.pro)) return erfassen(() => undefined);
     z.kassensturzSpeichern({ gezaehlt_cent: gezaehlt, ...(stueck ? { stueckelung } : {}), ...(letzter ? { vortag_cent: letzter.ende } : {}), ...(anwesend.trim() ? { anwesend: anwesend.trim() } : {}), ...(notiz.trim() ? { notiz: notiz.trim() } : {}) });
     melden(TEXT.r12g_kassensturz_gespeichert(euro(gezaehlt)));
     nav.zurueck();
@@ -593,7 +624,7 @@ function KassensturzSeite() {
       unter={TEXT.r12g_kassensturz_unter}
       fuss={
         <Fuss ueber={fehler ? <T v="klein">{fehler}</T> : undefined}>
-          <Knopf symbol="checkmark" text={TEXT.r12g_kassensturz_speichern} onPress={speichern} stil={{ flex: 1 }} />
+          <Knopf symbol="checkmark" text={TEXT.mitPro(TEXT.r12g_kassensturz_speichern, kasseErfassenErlaubt(z.pro))} onPress={speichern} stil={{ flex: 1 }} />
         </Fuss>
       }
     >
@@ -636,10 +667,13 @@ function SachentnahmenSeite() {
   const [n19, setN19] = useState("");
   const [text, setText] = useState("");
   const [fehler, setFehler] = useState<string | null>(null);
+  const erfassen = useKasseErfassen();
   const speichern = () => {
     setFehler(null);
     if (falsch(n7) || falsch(n19)) return setFehler(TEXT.betrag_falsch);
     if (!c(n7) && !c(n19)) return setFehler(TEXT.r12g_se_leer);
+    // E-188: eine neue Sachentnahme speichern gehört zu Pro – die bisherigen bleiben sichtbar
+    if (!kasseErfassenErlaubt(z.pro)) return erfassen(() => undefined);
     z.sachentnahmeSpeichern({ datum, netto7_cent: c(n7) ?? 0, netto19_cent: c(n19) ?? 0, ...(text.trim() ? { text: text.trim() } : {}) });
     setN7("");
     setN19("");
@@ -652,7 +686,7 @@ function SachentnahmenSeite() {
       unter={TEXT.r12g_sachentnahme_unter}
       fuss={
         <Fuss ueber={fehler ? <T v="klein">{fehler}</T> : undefined}>
-          <Knopf symbol="checkmark" text={TEXT.r12g_se_speichern} onPress={speichern} stil={{ flex: 1 }} />
+          <Knopf symbol="checkmark" text={TEXT.mitPro(TEXT.r12g_se_speichern, kasseErfassenErlaubt(z.pro))} onPress={speichern} stil={{ flex: 1 }} />
         </Fuss>
       }
     >

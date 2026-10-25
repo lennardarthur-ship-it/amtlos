@@ -1,66 +1,87 @@
 /**
- * Amtlos Pro (E-132, E-156) – reine Regeln, ohne Gerät testbar.
+ * Amtlos Pro (E-132, E-188) – reine Regeln, ohne Gerät testbar.
  *
- * Seit E-156 (ersetzt E-154): Kostenlos ist, was jeder Betrieb täglich braucht – Rechnungen (auch Gutschriften und
- * Stornos, als PDF, ohne Limit), Belege und E-Rechnungen empfangen, Kasse und Kassenbuch, der Pflichten-Check im
- * Überblick (was in Frage kommt, Kurztext, Termin, Abhaken), Fristen in der App, alle Vorlagen ausfüllen und ansehen,
- * Sicherung, Wiederherstellen und das offene Archiv. Je Kalendermonat geht außerdem eine Vorlage (alles außer Rechnung
- * und Kassenbuch) kostenlos zum ersten Mal als PDF hinaus.
+ * Seit E-188 („Modell Check-Teaser“, ersetzt E-156): Kostenlos ist nur das Ausprobieren des Pflichten-Checks – alle
+ * Fragen beantworten, im Ergebnis die Zahl der Pflichten, die nach den Angaben in Frage kommen, und die ersten 3
+ * Pflichten (nach Dringlichkeit wie im Überblick) mit Titel, Kurztext und Termin, die sich auch abhaken lassen. Alle
+ * weiteren Pflichten stehen nur als Zahl da („… und 38 weitere“, mit Pro).
  *
- * Pro: alle Vorlagen als PDF, Erinnerungen per Mitteilung, Kontrollmappe, Pflicht-Details (Erklärung, Folgen,
- * Rechtsgrundlage, Quellen, Vorlage), Paket für die Steuerberatung und Werte per Tipp, E-Rechnung erstellen, Briefkopf,
- * iCloud-Sicherung, Synchronisation.
+ * Pro ist alles Weitere: Rechnungen und E-Rechnung, Belege (auch E-Rechnungen empfangen) und Kasse, alle Pflichten mit
+ * Erinnerungen, Paket für die Steuerberatung und Werte per Tipp, Vorlagen ausfüllen und als PDF, Kontrollmappe,
+ * Pflicht-Details, Briefkopf, iCloud-Sicherung, Synchronisation. Im Katalog lassen sich die Vorlagen ohne Pro ansehen
+ * (Titel, Beschreibung); eine neue Unterlage anlegen gehört zu Pro.
  *
- * Grundsatz (GoBD, Datenschutz, App Review 3.1): Pro sperrt nie den Zugriff auf eigene Daten – eine schon einmal
- * ausgegebene Unterlage lässt sich immer wieder teilen und drucken, Entwürfe immer ausfüllen, ansehen und speichern,
- * Storno, Sicherung, Wiederherstellen und Datenexport sind frei, und ein Ende von Pro löscht oder versteckt nichts.
+ * Grundsatz (GoBD, Datenschutz, App Review 3.1): Pro sperrt nie den Zugriff auf eigene Daten – was schon da ist,
+ * bleibt sichtbar; eine schon ausgegebene Unterlage lässt sich immer wieder teilen und drucken, eine ausgegebene
+ * Rechnung immer stornieren (das Storno teilen eingeschlossen), vorhandene Entwürfe bleiben ansehbar und bearbeitbar,
+ * vorhandene Belege lassen sich ansehen, bearbeiten und exportieren, erfasste Kassentage ansehen und mit Grund
+ * korrigieren und ihr Kassenbuch ansehen, teilen und drucken (Aufbewahrung, § 147 AO); Sicherung, Wiederherstellen,
+ * Datenexport und Löschen gehen immer, und ein Ende von Pro löscht oder versteckt nichts.
  */
 import type { Betrieb } from "@amtlos/fachlogik";
+import { dringlichkeit, type Auswertung } from "../pflichten/check";
 import type { Unterlage } from "../unterlagen/speicher";
 
-/** Vorlagen (ohne Rechnung und Kassenbuch), die kostenlos je Kalendermonat zum ersten Mal als PDF hinausgehen (E-156). */
-export const VORLAGEN_FREI_JE_MONAT = 1;
+/** Pflichten, die ohne Pro mit Titel, Kurztext und Termin erscheinen (E-188). */
+export const PFLICHTEN_FREI = 3;
 
-export type ProFunktion = "pdf" | "erinnerungen" | "kontrollmappe" | "pflicht_details" | "steuerberater" | "ust_uebernahme" | "e_rechnung" | "briefkopf" | "icloud" | "sync";
+export type ProFunktion = "rechnungen" | "e_rechnung" | "belege" | "kasse" | "pflichten" | "erinnerungen" | "steuerberater" | "ust_uebernahme" | "pdf" | "kontrollmappe" | "pflicht_details" | "briefkopf" | "icloud" | "sync";
 
 /**
- * Reihenfolge der Vorteile auf dem Bezahlschirm (E-156): „Pflichten erfüllen, Kontrollen bestehen“ zuerst, Komfort
- * zuletzt. Die Werte per Tipp (`ust_uebernahme`) stehen beim Paket für die Steuerberatung mit dabei.
+ * Reihenfolge der Vorteile auf dem Bezahlschirm (E-188): der wiederkehrende Nutzen zuerst – Rechnungen und E-Rechnung,
+ * Belege und Kasse, alle Pflichten mit Erinnerungen, Paket für die Steuerberatung –, dann Vorlagen, Kontrollmappe,
+ * Pflicht-Details, Komfort zuletzt. Die Werte per Tipp (`ust_uebernahme`) stehen beim Paket für die Steuerberatung mit dabei.
  */
-export const PRO_VORTEILE: ProFunktion[] = ["pdf", "erinnerungen", "kontrollmappe", "pflicht_details", "steuerberater", "e_rechnung", "briefkopf", "icloud", "sync"];
+export const PRO_VORTEILE: ProFunktion[] = ["rechnungen", "e_rechnung", "belege", "kasse", "pflichten", "erinnerungen", "steuerberater", "pdf", "kontrollmappe", "pflicht_details", "briefkopf", "icloud", "sync"];
 
-/** Vorlagen, deren PDF immer kostenlos ist: Rechnungen (mit Gutschrift und Storno) und das Kassenbuch (Kasse). */
-const IMMER_FREI = new Set(["rechnung", "kassenbuch"]);
-
-/** Kalendermonat in Deutschland (Europe/Berlin) – nicht UTC, sonst wechselt das Kontingent nachts um 1 bzw. 2 Uhr. */
-const BERLIN = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" });
-const monat = (iso: string | Date) => BERLIN.format(typeof iso === "string" ? new Date(iso) : iso).slice(0, 7);
+/** Vorlagen, deren PDF ohne Pro immer geht: das Kassenbuch – es entsteht nur lesbar aus schon erfassten Tagen (GoBD). */
+const IMMER_FREI = new Set(["kassenbuch"]);
 const istStorno = (u: Pick<Unterlage, "daten">) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";
 
-/** Zählt diese Unterlage aufs Freikontingent? Jede Vorlage außer Rechnung (auch Gutschrift, Storno) und Kassenbuch (E-156). */
-export const zaehltFuerKontingent = (u: Pick<Unterlage, "vorlage">) => !IMMER_FREI.has(u.vorlage);
+/**
+ * Neue Daten anlegen – eine Unterlage (Rechnung, Vorlage, Kopie, Ersatzrechnung), einen Beleg (auch aus einer
+ * empfangenen E-Rechnung), einen Kassentag, Kassensturz oder eine Sachentnahme – gehört zu Pro (E-188). Ein Storno
+ * einer ausgegebenen Rechnung ist keine neue Unterlage in diesem Sinn: es geht immer (GoBD).
+ */
+export const erstellenErlaubt = (pro: boolean) => pro;
+/** Kasse: neue Kassendaten erfassen nur mit Pro (Ansehen, Korrigieren, Kassenbuch teilen gehen immer). */
+export const kasseErfassenErlaubt = erstellenErlaubt;
 
 /**
- * Im Monat von `jetzt` erstmals ausgegebene Vorlagen – ohne Stornos (Korrekturen zählen nie) und ohne Konfliktkopien
- * (K1: dieselbe Unterlage, auf einem zweiten Gerät geteilt).
+ * Darf diese Unterlage jetzt geteilt oder gedruckt werden? Mit Pro immer. Ohne Pro: was schon einmal ausgegeben wurde
+ * (erneut teilen, drucken, korrigierte Fassung), jedes Storno und das Kassenbuch erfasster Tage; eine noch nie
+ * ausgegebene Rechnung oder Vorlage nicht.
  */
-export function verbraucht(unterlagen: Unterlage[], jetzt: Date): number {
-  const m = monat(jetzt);
-  return unterlagen.filter((u) => zaehltFuerKontingent(u) && u.ausgegeben && monat(u.ausgegeben) === m && !istStorno(u) && !u.konfliktKopieVon).length;
+export function ausgabeErlaubt(u: Unterlage, pro: boolean): boolean {
+  return pro || Boolean(u.ausgegeben) || istStorno(u) || IMMER_FREI.has(u.vorlage);
 }
 
-/** Wie viele kostenlose erste Ausgaben einer Vorlage in diesem Monat noch übrig sind. */
-export const uebrig = (unterlagen: Unterlage[], jetzt: Date) => Math.max(0, VORLAGEN_FREI_JE_MONAT - verbraucht(unterlagen, jetzt));
+/** Welche Pro-Funktion fehlt, wenn `ausgabeErlaubt` bzw. `erstellenErlaubt` nein sagt: Rechnungen bzw. Vorlagen. */
+export const ausgabeGrund = (u: Pick<Unterlage, "vorlage">): ProFunktion => (u.vorlage === "rechnung" ? "rechnungen" : "pdf");
 
 /**
- * Darf diese Unterlage jetzt geteilt oder gedruckt werden? Mit Pro immer; sonst, wenn sie eine Rechnung bzw. ein
- * Kassenbuch ist, schon einmal ausgegeben wurde (erneut teilen, drucken, korrigierte Fassung), ein Storno ist oder
- * die kostenlose Vorlage des Monats noch frei ist.
+ * Die Pflichten, die ohne Pro sichtbar sind (E-188): die ersten 3 nach Dringlichkeit wie im Überblick – „Jetzt dran“,
+ * dann „In den nächsten Wochen“, dann die übrigen Pflichten. Gerechnet ohne Haken und ohne Unterlagen: Abhaken
+ * verschiebt die Auswahl nicht (sonst rückte mit jedem Haken eine weitere Pflicht nach); sie hängt nur von den
+ * Antworten im Check und vom Tag ab.
  */
-export function ausgabeErlaubt(unterlagen: Unterlage[], u: Unterlage, pro: boolean, jetzt: Date): boolean {
-  if (pro || u.ausgegeben || istStorno(u) || !zaehltFuerKontingent(u)) return true;
-  return uebrig(unterlagen, jetzt) > 0;
+export function freiePflichten(a: Auswertung, betrieb: Betrieb, tag: string): Set<string> {
+  const d = dringlichkeit(a, { erledigt: {}, unterlagen: [], betrieb }, tag);
+  const reihe = [...d.jetzt, ...d.naechsteWochen, ...d.imBlick.filter((p) => p.einordnung === "pflicht")];
+  const ids: string[] = [];
+  for (const p of reihe) if (!ids.includes(p.id) && ids.length < PFLICHTEN_FREI) ids.push(p.id);
+  return new Set(ids);
 }
+
+/** Pflicht sichtbar? Mit Pro jede, ohne Pro nur die freien (`frei` aus `freiePflichten`). */
+export const pflichtSichtbar = (id: string, pro: boolean, frei: ReadonlySet<string>) => pro || frei.has(id);
+
+/**
+ * Bezahlschirm nach dem ersten Pflichten-Check (E-188): genau einmal von selbst – ohne Pro, wenn feststeht, dass Pro
+ * fehlt (`proBekannt`), der Bezahlschirm in diesem Build angeboten wird und er noch nie so gezeigt wurde (`gezeigt`).
+ * Danach nur noch über die üblichen Anlässe.
+ */
+export const bezahlschirmNachCheck = (o: { pro: boolean; proBekannt: boolean; verfuegbar: boolean; gezeigt?: string }) => !o.pro && o.proBekannt && o.verfuegbar && !o.gezeigt;
 
 /**
  * Darf die E-Rechnung (XRechnung) dieser Rechnung geteilt werden? Erstellen gehört zu Pro; eine schon einmal als
@@ -88,7 +109,7 @@ export async function erinnerungenAbgleichen<P>(an: boolean, pro: boolean, plan:
 }
 
 /**
- * Pflicht-Details (E-156): Ohne Pro zeigt die Pflicht den Überblick – Titel, Kurztext, Termin bzw. Stand und Abhaken
+ * Pflicht-Details (E-156, in E-188 unverändert): Ohne Pro zeigt die Pflicht den Überblick – Titel, Kurztext, Termin bzw. Stand und Abhaken
  * (dazu Hinweise zum eigenen Stand und den Rechtshinweis). Warum sie gilt, zuständige Stelle, Erklärung, Folgen,
  * Rechtsgrundlage, Quellen und die verknüpften Vorlagen gehören zu Pro.
  */

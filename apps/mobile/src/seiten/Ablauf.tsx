@@ -410,7 +410,7 @@ export function Ablauf({ id, neu, amEnde, start }: { id: string; neu?: boolean; 
               // direkt über dem Knopf – oben im Inhalt sähe man den Hinweis nach dem Scrollen nicht
               <Ansage text={teilen.fehler} farbe={f.frist} />
             ) : amAbschluss && teilen.kontingent?.leer ? (
-              // E-156: die kostenlose Vorlage des Monats ist verbraucht – darum „PDF teilen · Pro“
+              // E-188: ein noch nie geteilter Entwurf ohne Pro – darum „PDF teilen · Pro“
               <T v="caption" leise>{teilen.kontingent.text}</T>
             ) : amAbschluss && !absenderFehlt && festschreibenHinweis(vorlage, fest) ? (
               // vor dem ersten Teilen: was das Teilen bewirkt – direkt über dem Knopf, ohne Rückfrage

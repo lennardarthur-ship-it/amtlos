@@ -23,6 +23,7 @@ import { kasseSichtbar } from "../unterlagen/kasse";
 import { useOeffnen, useStarten } from "./starten";
 import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { PartnerHinweis } from "./Partner";
+import { freiePflichten } from "../pro/regeln";
 
 // Formatter einmal anlegen (R9 Performance)
 const WOCHENTAG = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long" });
@@ -59,8 +60,10 @@ export function Heute() {
     const d = dringlichkeit(a, e, tag);
     // R11 (Berater d): „Kontrollbereit: x von y Nachweisen“ – offene Pflichten mit Vorlage, die in die Mappe gehört
     const bereit = kontrollbereit({ unterlagen, betrieb }, a.gilt.filter((p) => !istErledigt(p, e)), tag);
-    return { naechste: [...d.jetzt, ...d.naechsteWochen].slice(0, 3), fs: fortschritt(a, e), bereit };
-  }, [a, erledigt, unterlagen, betrieb, tag]);
+    // E-188: ohne Pro nur die freien Pflichten (die ersten 3 aus dem Check)
+    const frei = z.pro ? null : freiePflichten(a, betrieb, tag);
+    return { naechste: [...d.jetzt, ...d.naechsteWochen].filter((p) => !frei || frei.has(p.id)).slice(0, 3), fs: fortschritt(a, e), bereit };
+  }, [a, erledigt, unterlagen, betrieb, tag, z.pro]);
   const mappe = useKontrollmappeOeffnen();
   const gruenden = ANLAESSE.find((x) => x.id === "gruenden");
   const offen = useMemo(() => offeneSumme(unterlagen, betrieb, tag), [unterlagen, betrieb, tag]);

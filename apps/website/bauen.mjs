@@ -197,7 +197,7 @@ schreibe(
       A.email
         ? `<p>Fragen zu {{MARKE}}? Schreib uns an <a href="mailto:${esc(A.email)}">${esc(A.email)}</a>.</p>${A.name ? `\n<p class="leise">${esc([A.name, A.anschrift].filter(Boolean).join(", "))}</p>` : ""}`
         : `<p class="hinweis">Die Kontaktadresse folgt vor der Veröffentlichung.</p>`
-    }\n<h2>Häufige Fragen</h2>\n<div>${fragen.trim()}</div>\n<h2>Abo verwalten</h2>\n<p>{{MARKE_PRO}} kündigst oder änderst du in den Einstellungen deines Apple-Accounts unter Abonnements. Einen Kauf auf einem neuen iPhone holst du in der App unter „Mein Betrieb“ → „{{MARKE_PRO}}“ → „Käufe wiederherstellen“ zurück.</p>`,
+    }\n<h2>Häufige Fragen</h2>\n<div>${fragen.trim()}</div>\n<h2>Abo verwalten</h2>\n<p>{{MARKE_PRO}} kündigst oder änderst du in den Einstellungen deines Apple-Accounts unter Abonnements. Einen Kauf auf einem neuen iPhone holst du in der App unter „Mein Betrieb“ → „{{MARKE_PRO}}“ → „Käufe wiederherstellen“ zurück.</p>\n<p>Endet {{MARKE_PRO}}, bleibt alles erhalten: Geteilte Rechnungen und Unterlagen teilst und druckst du weiter, Stornos gehen immer, Entwürfe bleiben, und deine erfassten Kassentage samt Kassenbuch kannst du weiter ansehen, teilen und drucken. Den Pflichten-Check (die Zahl deiner Pflichten und die ersten drei) kannst du ohne Abo weiter nutzen; neue Rechnungen, Belege, Kassentage und Unterlagen gibt es mit {{MARKE_PRO}}.</p>`,
     { index: true, pfad: "hilfe.html" },
   ),
 );

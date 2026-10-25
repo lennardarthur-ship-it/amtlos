@@ -15,6 +15,8 @@ import { belegEndgueltigLoeschbar, leererBeleg, neueId } from "../unterlagen/spe
 import { istKleinunternehmer } from "../unterlagen/steuerpaket";
 import { gemischteUmsaetze, nurSteuerfreieUmsaetze, vorsteuerquoteAus } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
+import { erstellenErlaubt } from "../pro/regeln";
+import { ProSeite } from "./Pro";
 import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, GrosserBetrag, datumKurz } from "./gemeinsam";
 import { useAnsage } from "./felder";
@@ -440,8 +442,14 @@ export function UngueltigeBelege() {
   );
 }
 
-/** Seite „Beleg erfassen“ – von „Vorlagen“ aus. */
+/**
+ * Seite „Beleg erfassen“ – von „Heute“, „Neu erstellen“ und „Unterlagen“ aus. E-188: einen neuen Beleg erfassen (auch
+ * aus einer empfangenen E-Rechnung) gehört zu Pro – ohne Pro steht hier der Bezahlschirm mit Anlass. Vorhandene Belege
+ * bleiben in „Unterlagen“ ansehbar, bearbeitbar und exportierbar.
+ */
 export function BelegErfassenSeite() {
+  const z = useAmtlos();
+  if (!erstellenErlaubt(z.pro)) return <ProSeite grund="belege" />;
   return (
     <BuehnenBlatt titel={TEXT.beleg_erfassen} unter={TEXT.beleg_erfassen_text}>
       <BelegErfassen />

@@ -113,11 +113,11 @@ describe("Rechnungsabschluss (UX #4, Kfz #11, Bäckerei #14)", () => {
 
 describe("Bezahlschirm (UX #12)", () => {
   it("Überschrift aus dem Anlass, Ausweg mit Monat, Ersparnis nur aus Store-Preisen", () => {
-    // E-156: der Anlass ist die zweite Vorlage im Monat
-    expect(TEXT.r12_pro_anlass.pdf(1)).toBe("Vorlage 2 diesen Monat – mit Pro ohne Limit");
+    // E-188: der Anlass steht in der Überschrift
+    expect(TEXT.r12_pro_anlass.rechnungen(0)).toBe("Rechnungen schreiben – mit Pro");
     expect(naechsterMonat(new Date("2026-10-21T10:00:00Z"))).toBe("November");
     expect(naechsterMonat(new Date("2026-12-31T10:00:00Z"))).toBe("Januar");
-    expect(TEXT.r12_pro_entwurf("November", 1)).toBe("Als Entwurf behalten – am 1. November wieder 1 Vorlage frei");
+    expect(TEXT.r12_pro_entwurf).toBe("Als Entwurf behalten");
     expect(ersparnis([{ zeitraum: "jährlich", betrag: 59.99 }, { zeitraum: "monatlich", betrag: 7.99 }])).toBe(37);
     expect(ersparnis([{ zeitraum: "jährlich" }, { zeitraum: "monatlich", betrag: 7.99 }])).toBeNull();
   });

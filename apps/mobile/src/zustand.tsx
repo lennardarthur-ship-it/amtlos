@@ -140,6 +140,8 @@ interface Zustand {
   /** Abo-Status beim Store neu abfragen (nach Kauf/Wiederherstellen und beim Start) */
   proAktualisieren(aktiv?: boolean): void;
   proTestSetzen(an: boolean): void;
+  /** E-188: der Bezahlschirm nach dem ersten Pflichten-Check kam von selbst – vermerken, damit er so nur einmal kommt */
+  bezahlschirmNachCheckVermerken(): void;
   /** Phase 2.3: Partner für „Empfohlen von …“ setzen bzw. entfernen (null) – nur Anzeige, schaltet nie etwas frei */
   partnerSetzen(id: string | null): void;
   /** Vorprüfung Recht (§ 305 Abs. 2 BGB): Zustimmung zu dieser Fassung der Nutzungsbedingungen mit Zeitpunkt speichern */
@@ -612,6 +614,11 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       cloudSicherungSetzen: (an) => setzen({ ...aktuell.current, cloudSicherung: an }),
       proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
       proTestSetzen: (an) => setzen({ ...aktuell.current, proTest: an }),
+      bezahlschirmNachCheckVermerken: () => {
+        if (aktuell.current.bezahlschirmNachCheck) return;
+        setzen({ ...aktuell.current, bezahlschirmNachCheck: new Date().toISOString() });
+        schreiben();
+      },
       partnerSetzen: (id) => {
         const { partnerId: _alt, ...rest } = aktuell.current;
         setzen(id ? { ...rest, partnerId: id } : rest);

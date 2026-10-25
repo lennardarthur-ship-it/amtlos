@@ -8,11 +8,14 @@ import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, checkFragenAnzahl, beantwortet, checkFragen, dringlichkeit, folgeAntworten, offeneFragenNachWirkung, selten, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { umsatzFakten } from "../unterlagen/kuUmsatz";
-import { PflichtZeile } from "./Pflichten";
+import { GesperrtePflichten, PflichtZeile } from "./Pflichten";
 import { langBestehend, schonDaKandidaten } from "./schonDa";
 import { WasHastDuSchon } from "./WasHastDu";
 import { useAmtlos } from "../zustand";
 import { checkHinweis, rechtsHinweis } from "../rechtshinweis";
+import { bezahlschirmNachCheck, freiePflichten } from "../pro/regeln";
+import { paywallVerfuegbar } from "../pro/kauf";
+import { ProSeite } from "./Pro";
 
 /**
  * R11 (UX #3/#5): Branchen aus Schritt 1, die auch Sofortmelde-Branchen sind – vorbelegt, damit niemand „Gastronomie“
@@ -214,10 +217,26 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   // Steuerberatung erledigt, zählt nicht mit und steht nie unter „Mit diesen 3 fängst du an“; die Liste kommt aus
   // derselben Rechnung wie die Zahl.
   const jetztDran = d?.jetzt ?? [];
-  const anfangen = (jetztDran.length ? jetztDran : a ? a.gilt.filter((p) => p.einordnung === "pflicht" && !p.lohnbuero) : []).slice(0, 3);
+  // E-188: ohne Pro genau die freien Pflichten (die ersten 3 nach Dringlichkeit) – die übrigen nur als Zahl
+  const frei = useMemo(() => (a && !z.pro ? freiePflichten(a, z.stand.betrieb, heute()) : null), [a, z.pro, z.stand.betrieb]);
+  const anfangen = frei && a ? [...frei].map((id) => a.gilt.find((p) => p.id === id)).filter((p): p is NonNullable<typeof p> => Boolean(p)) : (jetztDran.length ? jetztDran : a ? a.gilt.filter((p) => p.einordnung === "pflicht" && !p.lohnbuero) : []).slice(0, 3);
   const genauer = useMemo(() => (a ? offeneFragenNachWirkung(a, z.stand.profil).length : 0), [a, z.stand.profil]);
   const schonListe = useMemo(() => (a && langBestehend(z.stand.profil, heute()) ? schonDaKandidaten(a, { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb }, heute()) : []), [a, z.stand.profil, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb]);
-  const schon = Boolean(a) && !schonFertig && schonListe.length > 0;
+  // E-188: „Was hast du schon?“ nennt viele Pflichten beim Namen – ohne Pro entfällt der Schritt
+  const schon = Boolean(a) && z.pro && !schonFertig && schonListe.length > 0;
+  // E-188: nach dem ersten ganzen Pflichten-Check einmal von selbst der Bezahlschirm („Damit du keine Frist verpasst“) –
+  // als Blatt über dem Ergebnis, das darunter stehen bleibt; „Später“ schließt. Danach nur über die üblichen Anlässe.
+  const ergebnisDa = voll && Boolean(a) && !schon;
+  const nachCheck = bezahlschirmNachCheck({ pro: z.pro, proBekannt: z.proBekannt, verfuegbar: paywallVerfuegbar, gezeigt: z.stand.bezahlschirmNachCheck });
+  useEffect(() => {
+    if (!ergebnisDa || !nachCheck) return;
+    // kurz warten, damit man das Ergebnis zuerst sieht
+    const t = setTimeout(() => {
+      z.bezahlschirmNachCheckVermerken();
+      nav.oeffnen("pro", () => <ProSeite anlass="check" />, true);
+    }, 900);
+    return () => clearTimeout(t);
+  }, [ergebnisDa, nachCheck]);
   const schliessen = () => {
     // „Pflichten“ ist der erste Tab (E-129): Check schließen und dorthin wechseln
     z.erfolg();
@@ -288,6 +307,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
                   </Karte>
                 </View>
               ) : null}
+              {frei && a ? <GesperrtePflichten anzahl={a.gilt.length - anfangen.length} /> : null}
               <Karte stil={{ marginTop: 16 }}>
                 {[
                   { symbol: "doc.text", ton: "amt" as const, text: TEXT.ergebnis_vorlagen(a.gilt.filter((p) => p.vorlage).length) },

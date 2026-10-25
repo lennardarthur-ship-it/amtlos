@@ -154,6 +154,11 @@ export interface Stand {
   /** Bitte um eine Bewertung (E-132): Erfolgsmomente gezählt, zuletzt gefragt am (ISO) */
   bewertung: { erfolge: number; gefragt?: string };
   /**
+   * E-188: wann der Bezahlschirm nach dem ersten Pflichten-Check von selbst kam (ISO) – er kommt so nur einmal, danach
+   * nur über die üblichen Anlässe. Gerätegebunden (nicht synchronisiert), bleibt in der Datensicherung.
+   */
+  bezahlschirmNachCheck?: string;
+  /**
    * Als ungültig markierte Belege (H2): innerhalb der Aufbewahrungsfrist nicht gelöscht, sondern hier mit Grund
    * aufbewahrt – samt Datei. Sie erscheinen in keiner Liste und zählen nirgends mit.
    */
@@ -460,6 +465,7 @@ export function standAus(json: string | null): Stand {
     ...(nachweiseAus(r.sicherungsNachweis).length ? { sicherungsNachweis: nachweiseAus(r.sicherungsNachweis) } : {}),
     ...(partnerId ? { partnerId } : {}),
     ...(nutzungsbedingungen ? { nutzungsbedingungen } : {}),
+    ...(iso(r.bezahlschirmNachCheck) ? { bezahlschirmNachCheck: iso(r.bezahlschirmNachCheck) } : {}),
   });
 }
 

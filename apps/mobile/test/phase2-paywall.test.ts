@@ -1,17 +1,19 @@
 /**
- * E-156 (ersetzt E-154): umgekehrte Bezahlschranke. Kostenlos: Rechnungen ohne Limit, Storno, Pflichten-Überblick,
- * Fristen in der App, alle Vorlagen ausfüllen und ansehen, eine Vorlage je Monat als PDF, erneutes Teilen. Pro:
- * Vorlagen als PDF, Erinnerungen per Mitteilung, Kontrollmappe, Pflicht-Details, Steuerpaket, E-Rechnung erstellen.
+ * E-188 (Modell Check-Teaser, ersetzt E-156): kostenlos nur das Ausprobieren des Pflichten-Checks – Zahl der Pflichten
+ * und die ersten 3 mit Termin und Abhaken. Alles Weitere mit Pro: Rechnungen, E-Rechnung, Belege, Kasse, alle
+ * Pflichten mit Erinnerungen, Steuerpaket, Vorlagen, Kontrollmappe, Pflicht-Details, Briefkopf, iCloud, Sync. Ein Ende
+ * von Pro sperrt nie eigene Daten: erneut teilen, Storno, vorhandene Entwürfe, Belege, Kassenbuch, Sicherung, Export.
  */
 import { describe, expect, it, vi } from "vitest";
 import { T as TEXT } from "../src/texte";
-import { auswertung, type Profil } from "../src/pflichten/check";
-import { PFLICHT_PRO_TEILE, PRO_VORTEILE, VORLAGEN_FREI_JE_MONAT, ausgabeErlaubt, eRechnungErlaubt, erinnerungenAbgleichen, erinnerungenAktiv, kontrollmappeErlaubt, pflichtAnsicht, uebrig, verbraucht, type ProFunktion } from "../src/pro/regeln";
-import { LEERER_STAND, anlegen, ausgeben, felderSetzen, korrigieren, standAus, stornieren, unterlageVereinen, type Stand } from "../src/unterlagen/speicher";
+import { auswertung, dringlichkeit, type Profil } from "../src/pflichten/check";
+import { PFLICHTEN_FREI, PFLICHT_PRO_TEILE, PRO_VORTEILE, ausgabeErlaubt, eRechnungErlaubt, erinnerungenAbgleichen, erinnerungenAktiv, erstellenErlaubt, freiePflichten, kontrollmappeErlaubt, pflichtAnsicht, pflichtSichtbar, type ProFunktion } from "../src/pro/regeln";
+import { LEERER_STAND, anlegen, ausgeben, erledigtSetzen, felderSetzen, korrigieren, standAus, stornieren, unterlageVereinen, type Stand } from "../src/unterlagen/speicher";
 
 const t = (d: string) => new Date(`${d}T09:00:00Z`);
 const RECHNUNG = { kunde_name: "Kim Beispiel", kunde_anschrift: "Gartenweg 3\n80333 München", positionen: [{ bezeichnung: "Haarschnitt", menge: "1", einheit: "", preis: "30", satz: "19" }] };
 const B = { ...LEERER_STAND.betrieb, name: "Salon Sonne", strasse: "Hauptstraße 1", plz: "80331", ort: "München", inhaber: "Alex Muster", steuernummer: "143/123/45678" };
+const CAFE: Profil = { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "SN", "beschaeftigte.gesamt": 2, "kasse.elektronisch": true, "ust.kleinunternehmer": false, gruendungsdatum: "2022-03-01", "ifsg.beschaeftigte": "erstmals" };
 
 function rechnung(s: Stand, id: string, tag: string): Stand {
   const [s1] = anlegen(s, "rechnung", t(tag), id);
@@ -23,79 +25,76 @@ function vorlage(s: Stand, id: string, tag: string, art = "hygieneplan", teilen 
 }
 const u = (s: Stand, id: string) => s.unterlagen.find((x) => x.id === id)!;
 
-describe("Rechnungen sind kostenlos ohne Limit (E-156)", () => {
-  it("auch die 30. Rechnung im Monat geht ohne Pro hinaus und verbraucht keine freie Vorlage", () => {
-    let s: Stand = { ...LEERER_STAND, betrieb: B };
-    for (let i = 0; i < 29; i++) s = rechnung(s, `r${i}`, "2026-10-05");
-    const [s1, neu] = anlegen(s, "rechnung", t("2026-10-20"), "r29");
-    expect(ausgabeErlaubt(s1.unterlagen, neu, false, t("2026-10-20"))).toBe(true);
-    expect(verbraucht(s1.unterlagen, t("2026-10-20"))).toBe(0);
-    expect(uebrig(s1.unterlagen, t("2026-10-20"))).toBe(VORLAGEN_FREI_JE_MONAT);
+describe("Pflichten-Check ohne Pro: Zahl und die ersten 3 Pflichten (E-188)", () => {
+  const a = auswertung(CAFE, "2026-10-13");
+  const frei = freiePflichten(a, B, "2026-10-13");
+
+  it("genau 3 freie Pflichten – die dringendsten wie im Überblick, der Rest nur als Zahl", () => {
+    expect(PFLICHTEN_FREI).toBe(3);
+    expect(a.gilt.length).toBeGreaterThan(10);
+    expect(frei.size).toBe(3);
+    const d = dringlichkeit(a, { erledigt: {}, unterlagen: [], betrieb: B }, "2026-10-13");
+    expect([...frei]).toEqual([...d.jetzt, ...d.naechsteWochen, ...d.imBlick.filter((p) => p.einordnung === "pflicht")].slice(0, 3).map((p) => p.id));
+    for (const p of a.gilt) expect(pflichtSichtbar(p.id, false, frei)).toBe(frei.has(p.id));
+    for (const p of a.gilt) expect(pflichtSichtbar(p.id, true, frei)).toBe(true);
   });
 
-  it("Storno ist frei – auch wenn die freie Vorlage verbraucht ist", () => {
-    let s: Stand = { ...LEERER_STAND, betrieb: B };
-    s = rechnung(s, "r", "2026-10-02");
-    s = vorlage(s, "h", "2026-10-03");
-    const [s2, st] = stornieren(s, "r", t("2026-10-04"), "st");
-    expect(st).not.toBeNull();
-    expect(ausgabeErlaubt(s2.unterlagen, st!, false, t("2026-10-04"))).toBe(true);
-    // ein Storno einer Vorlage (falls je) zählte ebenfalls nie
-    expect(verbraucht(ausgeben(s2, "st", t("2026-10-04")).unterlagen, t("2026-10-20"))).toBe(1);
-  });
-});
-
-describe("Eine Vorlage je Kalendermonat als PDF (E-156)", () => {
-  it("die erste Vorlage ist frei, die zweite braucht Pro, im nächsten Monat ist wieder eine frei", () => {
-    let s: Stand = { ...LEERER_STAND, betrieb: B };
-    const [s1, erste] = anlegen(s, "unterweisung", t("2026-10-02"), "a");
-    expect(ausgabeErlaubt(s1.unterlagen, erste, false, t("2026-10-02"))).toBe(true);
-    s = ausgeben(s1, "a", t("2026-10-02"));
-    const [s2, zweite] = anlegen(s, "gefaehrdungsbeurteilung", t("2026-10-10"), "b");
-    expect(ausgabeErlaubt(s2.unterlagen, zweite, false, t("2026-10-10"))).toBe(false);
-    expect(ausgabeErlaubt(s2.unterlagen, zweite, true, t("2026-10-10"))).toBe(true);
-    // der Entwurf bleibt – im November ist er frei
-    expect(ausgabeErlaubt(s2.unterlagen, zweite, false, t("2026-11-01"))).toBe(true);
-    expect(TEXT.r12_pro_entwurf("November", VORLAGEN_FREI_JE_MONAT)).toBe("Als Entwurf behalten – am 1. November wieder 1 Vorlage frei");
+  it("Abhaken verschiebt die Auswahl nicht – es rückt keine vierte Pflicht nach", () => {
+    let s: Stand = { ...LEERER_STAND, betrieb: B, profil: CAFE };
+    for (const id of frei) s = erledigtSetzen(s, id, "2026-10-13");
+    expect([...freiePflichten(a, s.betrieb, "2026-10-13")]).toEqual([...frei]);
   });
 
-  it("Monatsgrenze nach deutscher Zeit: 1.11. 00:30 Uhr in Berlin zählt für November", () => {
-    // 31.10.2026 23:30 UTC = 1.11. 00:30 Uhr MEZ; 31.10. 22:30 UTC = 31.10. 23:30 Uhr MEZ
-    const nov = ausgeben(anlegen(LEERER_STAND, "hygieneplan", new Date("2026-10-31T23:30:00Z"), "n")[0], "n", new Date("2026-10-31T23:30:00Z"));
-    expect(verbraucht(nov.unterlagen, new Date("2026-11-15T10:00:00Z"))).toBe(1);
-    expect(verbraucht(nov.unterlagen, new Date("2026-10-31T12:00:00Z"))).toBe(0);
-    expect(uebrig(nov.unterlagen, new Date("2026-10-31T22:59:00Z"))).toBe(1);
-    expect(uebrig(nov.unterlagen, new Date("2026-10-31T23:00:00Z"))).toBe(0);
-    const okt = ausgeben(anlegen(LEERER_STAND, "hygieneplan", new Date("2026-10-31T22:30:00Z"), "o")[0], "o", new Date("2026-10-31T22:30:00Z"));
-    expect(verbraucht(okt.unterlagen, new Date("2026-10-31T22:45:00Z"))).toBe(1);
-    expect(verbraucht(okt.unterlagen, new Date("2026-11-01T08:00:00Z"))).toBe(0);
+  it("die Texte sind ehrlich: nur die Zahl der übrigen Pflichten, kein Titel", () => {
+    expect(TEXT.pflichten_gesperrt(38)).toBe("… und 38 weitere Pflichten");
+    expect(TEXT.pflichten_gesperrt(1)).toBe("… und 1 weitere Pflicht");
+    expect(TEXT.pro_grund.pflichten(0)).toMatch(/ersten 3 Pflichten/);
   });
 });
 
-describe("Pro sperrt nie eigene Daten (GoBD, App Review 3.1)", () => {
-  it("eine einmal ausgegebene Vorlage lässt sich immer wieder teilen – auch nach dem Ende von Pro und als Korrektur", () => {
-    let s: Stand = { ...LEERER_STAND, betrieb: B };
-    // mit Pro drei Vorlagen geteilt, dann endet Pro
-    for (const id of ["a", "b", "c"]) s = vorlage(s, id, "2026-10-03", "arbeitszeitnachweis");
-    for (const id of ["a", "b", "c"]) expect(ausgabeErlaubt(s.unterlagen, u(s, id), false, t("2026-10-20"))).toBe(true);
-    // Korrektur eines festgeschriebenen Nachweises bleibt frei teilbar (eigene Unterlage, keine neue Vorlage)
-    const k = korrigieren(s, "a", "Stunden nachgetragen", t("2026-10-21"));
-    expect(u(k, "a").fassungen?.length).toBe(1);
-    expect(ausgabeErlaubt(k.unterlagen, u(k, "a"), false, t("2026-10-21"))).toBe(true);
+describe("Neues nur mit Pro (E-188)", () => {
+  it("keine neue Rechnung, Vorlage, kein Beleg, keine Kasse ohne Pro – mit Pro alles", () => {
+    expect(erstellenErlaubt(false)).toBe(false);
+    expect(erstellenErlaubt(true)).toBe(true);
+    const [s1, neu] = anlegen({ ...LEERER_STAND, betrieb: B }, "rechnung", t("2026-10-05"), "r");
+    const [, vorl] = anlegen(s1, "unterweisung", t("2026-10-05"), "v");
+    expect(ausgabeErlaubt(neu, false)).toBe(false);
+    expect(ausgabeErlaubt(vorl, false)).toBe(false);
+    expect(ausgabeErlaubt(neu, true)).toBe(true);
   });
 
-  it("Entwürfe bleiben ausfüllbar und gespeichert – ohne Pro geht nichts verloren", () => {
+  it("vorhandene Entwürfe bleiben ausfüllbar und gespeichert – ohne Pro geht nichts verloren", () => {
     let s: Stand = { ...LEERER_STAND, betrieb: B };
     s = vorlage(s, "frei", "2026-10-02");
     const [s1] = anlegen(s, "allergene", t("2026-10-05"), "entwurf");
     const s2 = felderSetzen(s1, "entwurf", { betrieb: "Café" }, t("2026-10-05"));
     expect(u(s2, "entwurf").daten.betrieb).toBe("Café");
-    const zurueck = standAus(JSON.stringify(s2));
-    expect(zurueck.unterlagen.map((x) => x.id).sort()).toEqual(["entwurf", "frei"]);
+    expect(standAus(JSON.stringify(s2)).unterlagen.map((x) => x.id).sort()).toEqual(["entwurf", "frei"]);
   });
 });
 
-describe("Erinnerungen per Mitteilung nur mit Pro (E-156)", () => {
+describe("Pro sperrt nie eigene Daten (GoBD, App Review 3.1)", () => {
+  it("eine ausgegebene Rechnung lässt sich nach dem Ende von Pro erneut teilen und stornieren – das Storno teilen eingeschlossen", () => {
+    let s: Stand = { ...LEERER_STAND, betrieb: B };
+    s = rechnung(s, "r", "2026-10-02");
+    expect(ausgabeErlaubt(u(s, "r"), false)).toBe(true);
+    const [s2, st] = stornieren(s, "r", t("2026-10-04"), "st");
+    expect(st).not.toBeNull();
+    expect(ausgabeErlaubt(st!, false)).toBe(true);
+    expect(u(s2, "r").storniertDurch).toBe("st");
+  });
+
+  it("eine einmal ausgegebene Vorlage lässt sich immer wieder teilen – auch nach dem Ende von Pro und als Korrektur", () => {
+    let s: Stand = { ...LEERER_STAND, betrieb: B };
+    for (const id of ["a", "b", "c"]) s = vorlage(s, id, "2026-10-03", "arbeitszeitnachweis");
+    for (const id of ["a", "b", "c"]) expect(ausgabeErlaubt(u(s, id), false)).toBe(true);
+    const k = korrigieren(s, "a", "Stunden nachgetragen", t("2026-10-21"));
+    expect(u(k, "a").fassungen?.length).toBe(1);
+    expect(ausgabeErlaubt(u(k, "a"), false)).toBe(true);
+  });
+});
+
+describe("Erinnerungen per Mitteilung nur mit Pro", () => {
   const geraet = () => ({ planen: vi.fn(async (_p: string[]) => undefined), allesAbsagen: vi.fn(async () => undefined) });
 
   it("plant nur mit Pro und eingeschaltetem Schalter", async () => {
@@ -123,7 +122,7 @@ describe("Erinnerungen per Mitteilung nur mit Pro (E-156)", () => {
   });
 });
 
-describe("Pflicht-Details (E-156)", () => {
+describe("Pflicht-Details (E-156, in E-188 unverändert)", () => {
   const cafe: Profil = { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "SN", "beschaeftigte.gesamt": 2, "kasse.elektronisch": true, "ust.kleinunternehmer": false, gruendungsdatum: "2022-03-01", "ifsg.beschaeftigte": "erstmals" };
   const a = auswertung(cafe, "2026-10-13");
 
@@ -152,14 +151,14 @@ describe("Pflicht-Details (E-156)", () => {
   });
 });
 
-describe("Kontrollmappe und E-Rechnung (E-156)", () => {
-  it("die Mappe braucht Pro – jede Unterlage darin bleibt einzeln teilbar", () => {
+describe("Kontrollmappe und E-Rechnung", () => {
+  it("die Mappe braucht Pro – jede schon geteilte Unterlage darin bleibt einzeln teilbar", () => {
     expect(kontrollmappeErlaubt(false)).toBe(false);
     expect(kontrollmappeErlaubt(true)).toBe(true);
     let s: Stand = { ...LEERER_STAND, betrieb: B };
     s = vorlage(s, "hyg", "2026-09-02");
     s = vorlage(s, "unt", "2026-10-02", "unterweisung");
-    for (const id of ["hyg", "unt"]) expect(ausgabeErlaubt(s.unterlagen, u(s, id), false, t("2026-10-21"))).toBe(true);
+    for (const id of ["hyg", "unt"]) expect(ausgabeErlaubt(u(s, id), false)).toBe(true);
   });
 
   it("E-Rechnung erstellen braucht Pro; einmal geteilt bleibt sie ohne Pro teilbar – auch nach Sicherung und Zusammenführen", () => {
@@ -179,23 +178,22 @@ describe("Kontrollmappe und E-Rechnung (E-156)", () => {
   });
 });
 
-describe("Bezahlschirm (E-156)", () => {
-  it("„Pflichten erfüllen, Kontrollen bestehen“: Vorlagen als PDF, Erinnerungen und Kontrollmappe zuerst – Texte für jeden Anlass", () => {
-    expect(PRO_VORTEILE.slice(0, 4)).toEqual(["pdf", "erinnerungen", "kontrollmappe", "pflicht_details"]);
+describe("Bezahlschirm (E-188)", () => {
+  it("der wiederkehrende Nutzen zuerst: Rechnungen, E-Rechnung, Belege, Kasse, alle Pflichten – Texte für jeden Anlass", () => {
+    expect(PRO_VORTEILE).toEqual(["rechnungen", "e_rechnung", "belege", "kasse", "pflichten", "erinnerungen", "steuerberater", "pdf", "kontrollmappe", "pflicht_details", "briefkopf", "icloud", "sync"]);
     const alle: ProFunktion[] = [...PRO_VORTEILE, "ust_uebernahme"];
     for (const f of alle) {
-      expect(TEXT.pro_grund[f](1).length).toBeGreaterThan(20);
+      expect(TEXT.pro_grund[f](3).length).toBeGreaterThan(20);
       expect(TEXT.pro_vorteil[f].titel.length).toBeGreaterThan(3);
       expect(TEXT.pro_kachel[f].length).toBeGreaterThan(3);
-      expect(TEXT.r12_pro_anlass[f](1)).toMatch(/Pro/);
+      expect(TEXT.r12_pro_anlass[f](3)).toMatch(/Pro/);
     }
-    expect(TEXT.r12_pro_anlass.pdf(1)).toBe("Vorlage 2 diesen Monat – mit Pro ohne Limit");
-    expect(TEXT.pro_frei_bleibt).toMatch(/Rechnungen[\s\S]*Belege[\s\S]*Kasse[\s\S]*Pflichten-Check[\s\S]*Sicherung/);
+    expect(TEXT.pro_frei_bleibt).toMatch(/Pflichten-Check[\s\S]*ersten 3[\s\S]*erneut teilen[\s\S]*stornieren[\s\S]*Belege[\s\S]*Kassenbuch[\s\S]*Sicherung[\s\S]*Löschen/);
+    expect(TEXT.pro_frei_bleibt).not.toMatch(/ohne Limit|3 Rechnungen|Vorlage als PDF/);
     expect(TEXT.pro_pflicht_teaser_titel).toBe("Mit Pro: Erklärung, Folgen, Schritte");
     // keine Beträge im Code – Preise kommen aus dem Store
-    const texte = [...alle.map((f) => TEXT.pro_grund[f](1)), ...alle.map((f) => TEXT.pro_vorteil[f].text(1)), TEXT.pro_frei_bleibt, TEXT.pro_wert_text];
+    const texte = [...alle.map((f) => TEXT.pro_grund[f](3)), ...alle.map((f) => TEXT.pro_vorteil[f].text(3)), TEXT.pro_frei_bleibt, TEXT.pro_wert_text, TEXT.pro_check_text];
     expect(texte.join(" ")).not.toMatch(/\d+,\d\d\s*€/);
-    expect(TEXT.pro_rest(1, 1)).toMatch(/1 Vorlage/);
-    expect(TEXT.pro_rest(0, 1)).toMatch(/Entwürfe/);
+    expect(TEXT.pro_zeile_frei).toMatch(/Pflichten-Check kostenlos/);
   });
 });

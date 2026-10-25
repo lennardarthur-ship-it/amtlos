@@ -27,13 +27,22 @@ describe("Store-Texte (E-132) halten die Grenzen des App Store ein", () => {
     expect(s.beschreibung).toMatch(/Nutzungsbedingungen: https:\/\/www\.apple\.com\/legal\/internet-services\/itunes\/dev\/stdeula\//);
     expect(s.beschreibung).toMatch(/E-Rechnung \(XRechnung\)[^\n]*\(Pro\)/);
     expect(s.beschreibung).toMatch(/Steuerberatung[^\n]*\(Pro\)/);
-    // E-156: Rechnungen kostenlos; Erinnerungen, Kontrollmappe und Pflicht-Details gekennzeichnet; Prüfhinweise mit Testweg
-    expect(s.beschreibung).toMatch(/Rechnungen als PDF ohne Limit/);
-    expect(s.beschreibung).toMatch(/Erinnerung[^\n]*\(Pro\)/);
-    expect(s.beschreibung).toMatch(/Kontrollmappe[^\n]*\(Pro\)/);
-    expect(s.beschreibung).not.toMatch(/5 Rechnungen/);
-    expect(s.pruefhinweise).toMatch(/1 template per calendar month/);
+    // E-188 (Modell Check-Teaser): Pflichten-Check kostenlos ausprobieren, alles Weitere mit Pro und Testphase; kein
+    // „kostenlos ohne Limit“; Prüfhinweise sagen, dass die Prüfung ein Probeabo braucht und was ohne Abo sichtbar ist
+    expect(s.beschreibung).toMatch(/Pflichten-Check kostenlos/);
+    expect(s.beschreibung).toMatch(/ersten 3/);
+    expect(s.beschreibung).toMatch(/kostenlose[rn]? Testphase/);
+    for (const r of [/Rechnungen[^\n]*\(Pro\)/, /Belege[^\n]*\(Pro\)/, /Kasse und Kassenbuch[^\n]*\(Pro\)/, /Alle Pflichten[^\n]*\(Pro\)/, /Vorlagen[^\n]*\(Pro\)/, /Erinnerung[^\n]*\(Pro\)/, /Kontrollmappe[^\n]*\(Pro\)/]) expect(s.beschreibung).toMatch(r);
+    expect(JSON.stringify([s.untertitel, s.werbetext, s.beschreibung, s.neu, s.bilder])).not.toMatch(/ohne Limit|Rechnungen kostenlos|3 Rechnungen|1 Vorlage als PDF/);
+    expect(s.pruefhinweise).toMatch(/most features require the subscription/);
+    expect(s.pruefhinweise).toMatch(/free trial \/ a Sandbox purchase/);
+    expect(s.pruefhinweise).toMatch(/Visible without a subscription[\s\S]*first 3 obligations/);
+    expect(s.pruefhinweise).not.toMatch(/1 template per calendar month|3 invoices per calendar month/);
     expect(s.pruefhinweise).toMatch(/How to see the paywall/);
+    expect(s.pruefhinweise).toMatch(/first completed obligations check[^\n]*Später/);
+    for (const anlass of [/"Rechnung" \(new invoice\)/, /"Beleg" \(new receipt\)/, /any template/, /Tagesabschluss erfassen/, /weitere Pflichten/, /An Fristen erinnern/, /Kontrollmappe/, /Mit Pro ansehen/, /tax-advisor package/, /E-Rechnung/]) expect(s.pruefhinweise).toMatch(anlass);
+    expect(s.pruefhinweise).toMatch(/cancelling \(Storno\) an issued invoice/);
+    expect(s.pruefhinweise).toMatch(/sharing\/printing their cash book/);
     // XRechnung an Behörden braucht die Leitweg-ID – die App fragt sie nicht ab, also kein Versprechen
     expect(JSON.stringify(s)).not.toMatch(/Behörde/);
     expect((s.neu as string).length).toBeGreaterThan(0);

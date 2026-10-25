@@ -1,6 +1,6 @@
 /** Randfälle aus der Prüfung R9: Datumseingabe, Gruß nach Uhrzeit, Zeitzone, Trennstellen, Schreibrichtung, Kontingent. */
 import { describe, expect, it } from "vitest";
-import { verbraucht } from "../src/pro/regeln";
+import { ausgabeErlaubt } from "../src/pro/regeln";
 import { datumLesen, isoAus } from "../src/ui/datum";
 import { isoliert, trennen } from "../src/ui/trennen";
 import { stundeIn, zeitzoneAbweichend } from "../src/ui/zeit";
@@ -63,13 +63,13 @@ describe("Weiche Trennstellen (G1) und Schreibrichtung (G3)", () => {
   });
 });
 
-describe("Kontingent: Konfliktkopien zählen nicht (K1)", () => {
-  it("eine geteilte Konfliktkopie verbraucht keine freie Ausgabe", () => {
+describe("Konfliktkopien (K1) und Pro (E-188)", () => {
+  it("eine geteilte Konfliktkopie bleibt wie das Original ohne Pro erneut teilbar", () => {
     const t = new Date("2026-10-05T09:00:00Z");
-    // E-156: aufs Kontingent zählen Vorlagen wie der Hygieneplan
-    const [s1] = anlegen(LEERER_STAND, "hygieneplan", t, "u1");
+    const [s1] = anlegen(LEERER_STAND, "rechnung", t, "u1");
     const s2 = ausgeben(s1, "u1", t);
     const kopie: Unterlage = { ...s2.unterlagen[0]!, id: "u1-k", konfliktKopieVon: "u1" };
-    expect(verbraucht([...s2.unterlagen, kopie], t)).toBe(1);
+    expect(ausgabeErlaubt(kopie, false)).toBe(true);
+    expect(ausgabeErlaubt(s2.unterlagen[0]!, false)).toBe(true);
   });
 });

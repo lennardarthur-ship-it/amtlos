@@ -115,11 +115,16 @@ Unten vier Tabs – Heute · Pflichten · Unterlagen · Mein Betrieb – und rec
 
 KOSTENLOS UND PRO
 
-Kostenlos: Rechnungen (ohne Limit), Belege, Kasse und Kassenbuch, Pflichten-Check im Überblick, Fristen in der App,
-alle Vorlagen ausfüllen und ansehen, Sicherung. Je Kalendermonat geht eine Vorlage kostenlos als PDF hinaus.
-{{MARKE_PRO}}: alle Vorlagen als PDF, Erinnerungen per Mitteilung, Kontrollmappe, Erklärung jeder Pflicht (Folgen,
-Rechtsgrundlage, Quellen), Paket für die Steuerberatung, E-Rechnung erstellen, Briefkopf, iCloud-Sicherung,
-Synchronisation. Pro sperrt nie den Zugriff auf eigene Daten.
+Kostenlos ist nur das Ausprobieren des Pflichten-Checks: alle Fragen, die Zahl der Pflichten, die nach deinen Angaben
+in Frage kommen, und die ersten 3 mit Kurztext, Termin und Abhaken; die übrigen stehen nur als Zahl da. Im Katalog
+lassen sich die Vorlagen ansehen.
+{{MARKE_PRO}} (mit kostenloser Testphase): alles Weitere – Rechnungen und E-Rechnung, Belege (auch E-Rechnungen
+empfangen) und Kasse, alle Pflichten mit Erinnerungen, Paket für die Steuerberatung und Werte per Tipp, Vorlagen
+ausfüllen und als PDF, Kontrollmappe, Erklärung jeder Pflicht, Briefkopf, iCloud-Sicherung, Synchronisation.
+Pro sperrt nie den Zugriff auf eigene Daten: Vorhandenes bleibt sichtbar, Geteiltes lässt sich immer wieder teilen und
+drucken, Rechnungen lassen sich immer stornieren, vorhandene Entwürfe bearbeiten, Belege und das Kassenbuch erfasster
+Tage ansehen und exportieren; Sicherung, Wiederherstellen, Datenexport und Löschen gehen immer.
+Nach dem ersten Pflichten-Check öffnet sich der Bezahlschirm einmal von selbst über dem Ergebnis – „Später“ schließt ihn.
 In dieser Testversion gibt es keinen Kauf: „{{MARKE_PRO}}“ (Mein Betrieb) → „Pro testweise einschalten“ zeigt alles.
 Im Store-Build gibt es diesen Knopf nicht.
 

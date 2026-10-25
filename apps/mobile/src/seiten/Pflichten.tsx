@@ -21,7 +21,7 @@ import { Jahresraster } from "./Jahresraster";
 import { useProSperre } from "./Pro";
 import { kanzleienSichtbar } from "./Kanzleien";
 import { SteuerberatungSeite } from "./Steuerberatung";
-import { erinnerungenAbgleichen, erinnerungenAktiv, pflichtAnsicht } from "../pro/regeln";
+import { erinnerungenAbgleichen, erinnerungenAktiv, freiePflichten, pflichtAnsicht } from "../pro/regeln";
 import { GEWERBE_PFLICHT } from "../gewerbe/felder";
 import { GewerbeOnlineSeite } from "./GewerbeOnline";
 
@@ -53,6 +53,34 @@ export function useAuswertung() {
   return useMemo(() => auswertung(profil, tag, unterweisungen, mitarbeiter, finanzen), [profil, schluessel, personen, umsatz, tag]);
 }
 
+/**
+ * E-188: Pflichten, die ohne Pro sichtbar sind (die ersten 3 aus dem Check) – mit Pro `null` (alle sichtbar).
+ */
+export function useFreiePflichten(): ReadonlySet<string> | null {
+  const a = useAuswertung();
+  const pro = useAmtlos().pro;
+  const betrieb = useStandWahl((s) => s.betrieb);
+  const tag = heute();
+  return useMemo(() => (pro ? null : freiePflichten(a, betrieb, tag)), [pro, a, betrieb, tag]);
+}
+
+/** E-188: an Stelle der übrigen Pflichten ohne Pro – nur die Zahl, kein Titel, ein Knopf zum Bezahlschirm. */
+export function GesperrtePflichten({ anzahl }: { anzahl: number }) {
+  const f = useFarben();
+  const sperre = useProSperre();
+  if (anzahl <= 0) return null;
+  return (
+    <View style={{ marginTop: 10, padding: 16, borderRadius: 14, backgroundColor: f.amtHauch, gap: 4 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <Symbol name="lock" groesse={18} farbe={f.amtTief} />
+        <T fett farbe={f.amtTief} stil={{ flex: 1 }}>{TEXT.pflichten_gesperrt(anzahl)}</T>
+      </View>
+      <T v="klein">{TEXT.pflichten_gesperrt_text}</T>
+      <TextKnopf symbol="chevron.right" text={TEXT.pflichten_pro_knopf} onPress={() => void sperre("pflichten")} />
+    </View>
+  );
+}
+
 /** Hat jemand den Check schon gemacht? (die erste Frage ist beantwortet) */
 export const checkGemacht = (profil: Record<string, unknown>) => beantwortet(profil as never, "taetigkeit.branchen") || beantwortet(profil as never, "rechtsform");
 
@@ -74,7 +102,10 @@ export function PflichtDetail({ id }: { id: string }) {
   const nav = useNav();
   const a = useAuswertung();
   const roh = [...a.gilt, ...a.gruendung, ...a.beiEinstellung, ...a.unbekannt].find((x) => x.id === id);
+  const frei = useFreiePflichten();
   if (!roh) return <Unterseite titel="">{null}</Unterseite>;
+  // E-188: ohne Pro nur die ersten 3 Pflichten – eine andere (z. B. über einen Verweis geöffnet) bleibt gesperrt
+  if (frei && !frei.has(id)) return <Unterseite titel={TEXT.pflicht_titel}><Inhalt><Hinweis text={TEXT.pflicht_gesperrt} symbol="lock" /><GesperrtePflichten anzahl={Math.max(1, a.gilt.length - frei.size)} /></Inhalt></Unterseite>;
   // E-156: ohne Pro der Überblick (Titel, Kurztext, Termin, Abhaken) – die Details als kurzer Hinweis auf Pro
   const p = pflichtAnsicht(roh, z.pro);
   // schon angefangen? Dann die vorhandene Unterlage öffnen statt mit „Ausfüllen“ eine zweite anzulegen
@@ -303,6 +334,51 @@ export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtI
 /** Alle geltenden Pflichten nach Bereich, oben der Fortschritt; unklare Pflichten mit den Fragen, die sie klären. */
 /** Inhalt von „Deine Pflichten“ – als Tab (Start) und als Unterseite. */
 function PflichtenInhalt() {
+  const frei = useFreiePflichten();
+  return frei ? <PflichtenFrei frei={frei} /> : <PflichtenAlle />;
+}
+
+/**
+ * E-188: „Deine Pflichten“ ohne Pro – die ersten 3 Pflichten mit Termin und Abhaken, die übrigen nur als Zahl. Keine
+ * Titel weiterer Pflichten (auch nicht „Kommt demnächst“, Gründung, „Schon erledigt?“); Fragen, die den Check genauer
+ * machen, Erinnerungs-Schalter (öffnet den Bezahlschirm) und der Rechtshinweis bleiben.
+ */
+function PflichtenFrei({ frei }: { frei: ReadonlySet<string> }) {
+  const z = useAmtlos();
+  const nav = useNav();
+  const a = useAuswertung();
+  const { erledigt, unterlagen, betrieb, profil } = z.stand;
+  const liste = a.gilt.filter((p) => frei.has(p.id));
+  const reihe = [...frei].map((id) => liste.find((p) => p.id === id)).filter((p): p is PflichtInfo => Boolean(p));
+  const offen = useMemo(() => offeneFragenNachWirkung(a, profil), [a, profil]);
+  const kernOffen = offeneKernFragen(profil);
+  return (
+    <View>
+      {kernOffen.length ? (
+        <Gruppe erste titel={TEXT.r10_check_fortsetzen_titel} fuss={TEXT.r10_check_fortsetzen_text(kernOffen.length, frageZu(kernOffen[0]!)?.frage.de, offen.find((o) => o.feld === kernOffen[0])?.anzahl ?? 0)}>
+          <Knopf ton symbol="checklist" text={TEXT.r10_check_fortsetzen} onPress={() => nav.oeffnen("nachfragen", () => <CheckAblauf felder={kernOffen} />, true)} />
+        </Gruppe>
+      ) : null}
+      <Gruppe erste={!kernOffen.length} titel={TEXT.pflichten_frei_titel(reihe.length)}>
+        {reihe.length ? (
+          <Karte>
+            {reihe.map((p, i) => (
+              <PflichtZeile key={p.id} p={p} erledigt={istErledigt(p, { erledigt, unterlagen, betrieb })} letzte={i === reihe.length - 1} />
+            ))}
+          </Karte>
+        ) : null}
+        <GesperrtePflichten anzahl={a.gilt.length - reihe.length} />
+      </Gruppe>
+      <ErinnerungsSchalter />
+      <KurzKlaeren offen={offen} />
+      <TextKnopf symbol="pencil" text={TEXT.angaben_aendern} onPress={() => nav.oeffnen("check", () => <CheckAblauf einleitung={false} />, true)} stil={{ marginTop: 20 }} />
+      <RechtsHinweis art="pflichten" oben={8} />
+    </View>
+  );
+}
+
+/** „Deine Pflichten“ mit Pro – alles. */
+function PflichtenAlle() {
   const z = useAmtlos();
   const nav = useNav();
   const a = useAuswertung();
@@ -585,6 +661,7 @@ export function PflichtenTab() {
   }, [a, erledigt, unterlagen, betrieb, tag]);
   const zahl = zaehlung(a.gilt);
   const check = () => nav.oeffnen("check", () => <CheckAblauf einleitung={!gemacht} />, true);
+  const sperre = useProSperre();
   return (
     <BuehnenSeite
       ueber={gemacht ? TEXT.fortschritt_text(fs.fertig, fs.gesamt) : TEXT.tabs.pflichten}
@@ -598,7 +675,7 @@ export function PflichtenTab() {
             <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: -10 }}>{TEXT.r10_ergebnis_gesamt(zahl.pflichten, zahl.hinweise, zahl.optionen, selten(a.gilt))}</T>
             <T v="klein" fett accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 8 }}>{TEXT.jahr_titel}</T>
             {/* R12 (UX #22): sechs Spalten, Monate antippbar (seiten/Jahresraster.tsx) */}
-            <Jahresraster gilt={a.gilt} tag={tag} />
+            {z.pro ? <Jahresraster gilt={a.gilt} tag={tag} /> : <BuehnenKnopf text={TEXT.jahr_pro} onPress={() => void sperre("pflichten")} />}
           </View>
         ) : (
           <View style={{ gap: 18 }}>

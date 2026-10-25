@@ -45,8 +45,8 @@ describe("Hinweis „keine Rechts- oder Steuerberatung“ mit Rechtsstand", () =
     // Ergebnis des Checks: als Hinweis mit Symbol
     expect(quelle("src/seiten/Check.tsx")).toMatch(/<Hinweis text=\{rechtsHinweis\("pflichten"\)\.ganz\} \/>/);
     const pflichten = quelle("src/seiten/Pflichten.tsx");
-    // Pflicht (Detail), Liste im Tab und Start vor dem Check
-    expect(pflichten.match(/<RechtsHinweis art="pflichten"/g)?.length).toBe(3);
+    // Pflicht (Detail), Liste im Tab (mit Pro und – E-188 – ohne Pro) und Start vor dem Check
+    expect(pflichten.match(/<RechtsHinweis art="pflichten"/g)?.length).toBe(4);
     expect(pflichten).not.toContain("TEXT.pflichten_quelle");
     expect(quelle("src/seiten/Ablauf.tsx")).toMatch(/mitVorlagenHinweis\(vorlage\) \? <RechtsHinweis art="vorlage"/);
     expect(quelle("src/seiten/Abschluss.tsx")).toMatch(/mitVorlagenHinweis\(v\) \? <RechtsHinweis art="vorlage"/);
