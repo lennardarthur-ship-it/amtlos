@@ -204,7 +204,7 @@ def mail(rolle, z, datei, vorl=()):
         punkte.append(f"- {arten['Einschränkung']} Einträge, bei denen der Vermerk Ihre Einschränkung nennt (z. B. „ohne arbeitsmedizinische Angaben“).")
     if arten.get("Vorlage"):
         geaendert = [v for v in vorl if v.get("rolle") == rolle and v["geaendert"]]
-        satz = f"- {arten['Vorlage']} Vorlagen. Ihre Freigaben liegen uns schriftlich vor; der Vermerk gilt je Variante (Rechtsform, Land, Rechnungsart …) nur für die Fassung, die Sie gesehen haben."
+        satz = f"- {arten['Vorlage']} {'Vorlage' if arten['Vorlage'] == 1 else 'Vorlagen'}. Ihre Freigaben liegen uns schriftlich vor; der Vermerk gilt je Variante (Rechtsform, Land, Rechnungsart …) nur für die Fassung, die Sie gesehen haben."
         if geaendert:
             satz += " Seit Ihrer Freigabe geändert: " + "; ".join(f"{v['titel']} ({', '.join(x.replace('rf:', '').replace('storno_schluss', 'Storno einer Schlussrechnung mit Abschlägen').replace('basis', 'Hilfetext im Formular') for x in v['geaendert'])})" for v in geaendert) + " – nur dort fehlt der Vermerk; die PDFs dieser Varianten liegen bei."
         punkte.append(satz)

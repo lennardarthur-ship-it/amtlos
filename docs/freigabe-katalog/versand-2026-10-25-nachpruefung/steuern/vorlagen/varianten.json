@@ -1,41 +1,32 @@
 {
-  "hinweis": "E-196: nur die seit der Freigabe geänderten Varianten (Beispielbetriebe mit erfundenen Angaben). Alle übrigen Varianten sind unverändert.",
-  "pdfs": {
-    "rechnung-gmbh-co-kg.pdf": {
-      "vorlage": "rechnung",
-      "titel": "Rechnung",
-      "variante": "GmbH & Co. KG",
-      "teilsumme_freigegeben": "dd90f260a4cfa8565e644650",
-      "teilsumme_heute": "92a329e6b26646390439b711",
-      "unveraendert": 30,
-      "varianten": 33
-    },
-    "rechnung-ug-co-kg.pdf": {
-      "vorlage": "rechnung",
-      "titel": "Rechnung",
-      "variante": "UG (haftungsbeschränkt) & Co. KG",
-      "teilsumme_freigegeben": "9afcc95eae33eb45e6682ea9",
-      "teilsumme_heute": "2243cad17ef4670df1148aff",
-      "unveraendert": 30,
-      "varianten": 33
-    },
-    "rechnung-storno-schlussrechnung.pdf": {
-      "vorlage": "rechnung",
-      "titel": "Rechnung",
-      "variante": "Storno einer Schlussrechnung mit Abschlägen",
-      "teilsumme_freigegeben": "68fbbe36c5486052dcc21fec",
-      "teilsumme_heute": "d57ca49e94962a4248a4e1c8",
-      "unveraendert": 30,
-      "varianten": 33
-    },
-    "bilanz_guv-gemeinsamer-teil.pdf": {
-      "vorlage": "bilanz_guv",
-      "titel": "Bilanz und Gewinn- und Verlustrechnung",
-      "variante": "gemeinsamer Teil (alle Betriebe)",
-      "teilsumme_freigegeben": "bacf757b4ad49d68569f8d49",
-      "teilsumme_heute": "7729129b66b443d1ab859c1f",
-      "unveraendert": 29,
-      "varianten": 30
-    }
+ "hinweis": "E-196: nur die seit der Freigabe geänderten Varianten (Beispielbetriebe mit erfundenen Angaben). Alle übrigen Varianten sind unverändert.",
+ "pdfs": {
+  "rechnung-gmbh-co-kg.pdf": {
+   "vorlage": "rechnung",
+   "titel": "Rechnung",
+   "variante": "GmbH & Co. KG",
+   "teilsumme_freigegeben": "dd90f260a4cfa8565e644650",
+   "teilsumme_heute": "92a329e6b26646390439b711",
+   "unveraendert": 30,
+   "varianten": 33
+  },
+  "rechnung-ug-co-kg.pdf": {
+   "vorlage": "rechnung",
+   "titel": "Rechnung",
+   "variante": "UG (haftungsbeschränkt) & Co. KG",
+   "teilsumme_freigegeben": "9afcc95eae33eb45e6682ea9",
+   "teilsumme_heute": "2243cad17ef4670df1148aff",
+   "unveraendert": 30,
+   "varianten": 33
+  },
+  "rechnung-storno-schlussrechnung.pdf": {
+   "vorlage": "rechnung",
+   "titel": "Rechnung",
+   "variante": "Storno einer Schlussrechnung mit Abschlägen",
+   "teilsumme_freigegeben": "68fbbe36c5486052dcc21fec",
+   "teilsumme_heute": "d57ca49e94962a4248a4e1c8",
+   "unveraendert": 30,
+   "varianten": 33
   }
+ }
 }

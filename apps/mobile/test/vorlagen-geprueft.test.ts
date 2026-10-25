@@ -22,8 +22,8 @@ describe("Vermerk je Vorlage in der App", () => {
   });
 
   it("E-197: Vermerk bei allen schriftlich bestätigten Vorlagen – nicht in Varianten, die sich seit der Bestätigung geändert haben", () => {
-    // Bilanz: gemeinsamer Teil geändert (Hilfetext); Handelsregister nur für GmbH, OHG, KG; Rechnung nicht für GmbH & Co. KG
-    const OHNE = ["bilanz_guv", "handelsregister"];
+    // Handelsregister nur für GmbH, OHG, KG; Rechnung nicht für GmbH & Co. KG (Bilanz: nur Name → Rolle, E-197)
+    const OHNE = ["handelsregister"];
     const cafe = { ...LEERER_STAND.betrieb, name: "Café Sonne", bundesland: "Berlin" };
     const coKg = { ...cafe, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" };
     for (const v of VORLAGEN) {
@@ -35,7 +35,7 @@ describe("Vermerk je Vorlage in der App", () => {
     expect(pruefHinweisFuer(vorlageFuer("rechnung")!, {}, cafe)).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 23.10.2026)");
     expect(pruefHinweisFuer(vorlageFuer("rechnung")!, { storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, cafe)).toBe(PRUEFHINWEIS);
     expect(pruefHinweisFuer(vorlageFuer("handelsregister")!, { rechtsform: "GmbH" }, { ...cafe, rechtsform: "GmbH" })).toBe("Vorlage fachlich durchgesehen von einem Rechtsanwalt (Stand 25.10.2026)");
-    expect(pruefHinweisFuer(vorlageFuer("bilanz_guv")!, {}, { ...cafe, rechtsform: "GmbH" })).toBe(PRUEFHINWEIS);
+    expect(pruefHinweisFuer(vorlageFuer("bilanz_guv")!, {}, { ...cafe, rechtsform: "GmbH" })).toContain("von einem Steuerberater");
   });
 
   it("nie im PDF", () => {

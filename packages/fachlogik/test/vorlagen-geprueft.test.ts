@@ -24,11 +24,12 @@ const ALLE = [...FUENF, ...WEITERE];
 // E-197: jede Freigabe ist schriftlich bestätigt (Mail oder schriftliche Antwort des Prüfers; unterschriebene Blätter am
 // 25.10.2026 auf Wunsch des Gründers entfernt)
 const STEUERN_23 = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung", "lohnkonto"];
-// Vorlagen, die heute einen Vermerk zeigen (Café, Einzelunternehmen): alle bestätigten außer der Bilanz – dort hat sich
-// seit der Bestätigung der gemeinsame Teil geändert (Hilfetext, E-196 A) – und dem Handelsregister (nur GmbH, OHG, KG).
+// Vorlagen, die heute einen Vermerk zeigen (Café, Einzelunternehmen): alle bestätigten außer dem Handelsregister (nur GmbH,
+// OHG, KG). Die Bilanz zählt mit: dort wurde seit der Bestätigung nur der Name im Hilfetext durch die Rolle ersetzt (E-196 A),
+// der Abgleich rechnet die freigegebene Fassung ebenso anonymisiert (E-197).
 // Bei der Rechnung fehlt der Vermerk in den seit der Bestätigung geänderten Varianten (Fußzeile GmbH & Co. KG /
 // UG & Co. KG, Storno einer Schlussrechnung mit Abschlägen; E-193).
-const MIT_VERMERK: string[] = ALLE.filter((id) => id !== "bilanz_guv");
+const MIT_VERMERK: string[] = ALLE;
 const CAFE: Betrieb = { ...LEERER_BETRIEB, name: "Café Sonne", bundesland: "Berlin" };
 const CO_KG = ["rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"];
 const alleFreigaben = () => Object.keys(VORLAGEN_GEPRUEFT).flatMap((id) => freigabenFuer(id).map((f, i) => ({ id, f, schluessel: i ? `${id}#${i}` : id })));
@@ -113,8 +114,8 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
       geaendert[schluessel] = Object.keys(heute).filter((g) => heute[g] !== f.teilsummen![g]).sort();
     }
     for (const [k, g] of Object.entries(geaendert)) {
-      // Bilanz: nur der Hilfetext eines Felds (E-196 A: „Steuerberater“ statt des Namens) – gehört zum gemeinsamen Teil
-      const soll = k === "rechnung" ? [...CO_KG, "storno_schluss"] : k === "bilanz_guv" ? ["basis"] : [];
+      // Bilanz: nur der Name im Hilfetext durch die Rolle ersetzt (E-196 A) – zählt nicht als Änderung (E-197)
+      const soll = k === "rechnung" ? [...CO_KG, "storno_schluss"] : [];
       expect(g, k).toEqual([...soll].sort());
     }
   });

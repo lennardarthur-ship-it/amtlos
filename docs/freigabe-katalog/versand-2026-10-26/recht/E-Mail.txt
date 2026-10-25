@@ -1,0 +1,45 @@
+Betreff: Betriebsklar – offene Bestätigungen und Aufträge (Stand 26.10.2026)
+
+Sehr geehrter Herr [Name],
+
+vielen Dank für Ihre bisherigen Freigaben. Für den Start fehlen noch die folgenden Punkte. Alles ist in dieser einen Mail gebündelt; eine Antwort per E-Mail genügt, eine Unterschrift ist nicht nötig.
+
+A) Nachprüfliste (Datei „Betriebsklar-Nachpruefliste-Rechtsanwalt.xlsx“)
+Bitte bestätigen Sie die acht Positionen:
+  1. Offener Punkt E.56 – Arbeitsmedizinische Vorsorge anbieten (v6)
+  2. Einschränkung E.56 – Arbeitsmedizinische Vorsorge: Ihre Freigabe betrifft die rechtliche Seite; die App zeigt das im Vermerk an
+  3. Offener Punkt F.61 – Wegfall der Schwelle nach § 38 BDSG (geplant)
+  4. Offener Punkt D.42 – Elektronische Arbeitszeiterfassung (geplante Neuregelung)
+  5. Vorlage Hygieneplan (Fassung Beauty) – Länderzusatz nur für Bayern geprüft
+  6. Vorlage Datenschutzerklärung für die Website
+  7. Vorlage Hinweisschild Videoüberwachung
+  8. Die App nennt keine Personen mehr, nur noch die Rolle: „Inhalt fachlich geprüft von einem Rechtsanwalt, Stand …“
+
+B) Neuer Katalogeintrag „Künstlersozialabgabe“ (Datei „Betriebsklar-Freigabe-Katalog-Rechtsanwalt-neue-Eintraege.xlsx“)
+Bitte prüfen und freigeben (Spalte „Entscheidung“). Dazu drei Fragen:
+  1. Bis es eine eigene Frage im Check gibt, erscheint der Eintrag als Hinweis ohne Termin für alle Betriebe mit eigener Website oder Social-Media-Profil. Vertretbar?
+  2. Bitte die Zitate zu § 24 KSVG bestätigen (Eigenwerbung, Generalklausel und 1.000-€-Grenze in Abs. 2, Abs. 3 weggefallen).
+  3. Der Abgabesatz von 4,9 % gilt nur für 2026. Soll er im Text stehen (dann jährliche Anpassung und erneute Vorlage)?
+
+C) Angaben auf Geschäftsbriefen der GmbH & Co. KG / UG (haftungsbeschränkt) & Co. KG (Ordner „vorlagen“)
+Briefe und Rechnungen nennen jetzt in der Fußzeile die persönlich haftende Gesellschafterin mit Rechtsform, Sitz, Registergericht, Registernummer und ihren Geschäftsführern (§§ 125a, 177a HGB, § 35a GmbHG). Bitte prüfen Sie anhand der beiden Beispiel-PDFs, ob die Angaben vollständig und richtig dargestellt sind.
+
+D) Datenschutzhinweis der Android-App (Datei „Betriebsklar-Datenschutzhinweis-Android-Entwurf.pdf“)
+Wir bringen die App auch für Android heraus. Ihr freigegebener Datenschutzhinweis für das iPhone bleibt unverändert. Die Android-Fassung übernimmt ihn Abschnitt für Abschnitt und ändert nur, was Android technisch anders macht (Google Play statt App Store, Sicherung in einem selbst gewählten Ordner statt iCloud). Bitte prüfen und freigeben oder ändern; die sechs Fragen stehen am Ende der Datei.
+
+E) Nutzungsbedingungen für Google Play (Datei „Betriebsklar-Nutzungsbedingungen-Android-Punkte.pdf“)
+Bitte fassen Sie die Ziffern mit Apple-Bezug für den Vertrieb über Google Play neu (Liste und technische Fakten in der Datei). Zu klären sind dabei Vertragspartner und Widerrufsbelehrung bei Google Play, der Erstattungsweg nach § 327r BGB und ob Google Play bei Abos einen Link auf die Nutzungsbedingungen verlangt. Bitte nennen Sie mir kurz Ihren Zeitplan und den Aufwand.
+
+Für Ihre Antwort genügt zum Beispiel: „A 1–8 bestätigt, B freigegeben, C in Ordnung, D freigegeben bzw. mit folgenden Änderungen: …“. Die ausgefüllten Dateien schicken Sie gern mit zurück.
+
+Mit freundlichen Grüßen
+Lennard Lang
+Lang Ventures UG (haftungsbeschränkt) i. G.
+
+Anlagen:
+- Betriebsklar-Nachpruefliste-Rechtsanwalt.xlsx
+- Betriebsklar-Freigabe-Katalog-Rechtsanwalt-neue-Eintraege.xlsx
+- Betriebsklar-Datenschutzhinweis-Android-Entwurf.pdf
+- Betriebsklar-Nutzungsbedingungen-Android-Punkte.pdf
+- vorlagen/rechnung-gmbh-co-kg.pdf
+- vorlagen/rechnung-ug-co-kg.pdf

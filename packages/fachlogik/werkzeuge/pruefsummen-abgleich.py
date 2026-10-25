@@ -68,12 +68,32 @@ def erster_commit(summe):
     return r[0] if r else None
 
 
-def rechnen(commit, auftraege, arbeit):
-    ziel = os.path.join(arbeit, commit or "heute")
+# E-197: Namen der Prüfer wurden in E-196 durch Rollen ersetzt – keine inhaltliche Änderung. Für den Vergleich wird die
+# freigegebene Fassung genauso anonymisiert; stimmt eine Ausprägung danach mit heute überein, hat sich nur der Name geändert.
+# Ersetzt wird nur, was E-196 ersetzt hat; eine unvollständige Liste lässt eine Vorlage höchstens als „geändert“ stehen.
+NAMEN = [("StB-Prüfung Heckler und Busch", "StB-Prüfung Steuerberatungskanzlei"), ("Prüfbericht Heckler und Busch", "Prüfbericht Steuerberatungskanzlei"),
+         ("Kanzlei Heckler und Busch", "Steuerberatungskanzlei"), ("Heckler und Busch", "Steuerberatungskanzlei"),
+         ("StB Busch", "Steuerberater"), ("RA Dr. Weber", "Rechtsanwalt"), ("Dr. Weber", "Rechtsanwalt")]
+
+
+def anonymisieren(ordner):
+    for pfad in glob.glob(os.path.join(ordner, "packages/fachlogik/src/**/*.ts"), recursive=True):
+        t = open(pfad, encoding="utf-8").read()
+        u = t
+        for a, b in NAMEN:
+            u = u.replace(a, b)
+        if u != t:
+            open(pfad, "w", encoding="utf-8").write(u)
+
+
+def rechnen(commit, auftraege, arbeit, anonym=False):
+    ziel = os.path.join(arbeit, (commit or "heute") + ("-anonym" if anonym else ""))
     os.makedirs(ziel, exist_ok=True)
     if commit:
         tar = subprocess.run(["git", "archive", commit, "packages/fachlogik/src"], cwd=ROOT, capture_output=True, check=True).stdout
         subprocess.run(["tar", "-x", "-C", ziel], input=tar, check=True)
+        if anonym:
+            anonymisieren(ziel)
         neu = open(os.path.join(ROOT, "packages/fachlogik/src/dokumente/pruefvarianten.ts"), encoding="utf-8").read()
         open(os.path.join(ziel, "packages/fachlogik/src/dokumente/pruefvarianten-neu.ts"), "w", encoding="utf-8").write(neu)
         treiber = TREIBER
@@ -96,7 +116,12 @@ if __name__ == "__main__":
         heute = rechnen(None, alle, arbeit)
         ergebnis = []
         for commit, liste in je_commit.items():
-            alt = rechnen(commit, liste, arbeit) if commit else {}
+            roh = rechnen(commit, liste, arbeit) if commit else {}
+            alt = rechnen(commit, liste, arbeit, anonym=True) if commit else {}
+            # Bestätigung der alten Prüfsumme aus der unveränderten Fassung, Teilsummen aus der anonymisierten
+            for k, w in alt.items():
+                if w is not None and roh.get(k):
+                    w["alt"] = roh[k].get("alt")
             for f in liste:
                 a = alt.get(f["schluessel"]) or {}
                 h = heute[f["schluessel"]]
