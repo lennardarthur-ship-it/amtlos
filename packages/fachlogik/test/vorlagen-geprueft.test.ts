@@ -16,6 +16,8 @@ const WEITERE = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung",
   "video_hinweisschild", "anamnese_einwilligung", "arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ki_kompetenz", "ausweis_hinweis", "schluesselquittung",
   "impressum", "gewerbeanmeldung", "transparenzregister",
   "ust_voranmeldung", "oss_meldung", "zm_meldung", "steuererklaerung", "kassenbuch", "aufbewahrung", "sv_meldedaten"];
+// RA Dr. Weber 25.10.2026: nur für GmbH, OHG und KG (Vermerk abhängig von der Rechtsform)
+const NUR_RECHTSFORM = ["handelsregister"];
 const ALLE = [...FUENF, ...WEITERE];
 const VERMERK = "Vorlagen fachlich durchgesehen (Stand 23.10.2026)";
 
@@ -23,7 +25,9 @@ describe("Vorlagen fachlich durchgesehen (Nachkontrolle T. Baum 23.10.2026)", ()
   afterEach(() => vi.useRealTimers());
 
   it("zentrale Liste: genau die fünf Vorlagen, Stand 23.10.2026, ohne Namen im Vermerk", () => {
-    expect(Object.keys(VORLAGEN_GEPRUEFT).sort()).toEqual([...ALLE].sort());
+    expect(Object.keys(VORLAGEN_GEPRUEFT).sort()).toEqual([...ALLE, ...NUR_RECHTSFORM].sort());
+    expect(VORLAGEN_GEPRUEFT.handelsregister!.rechtsformen).toEqual(["GmbH", "OHG", "KG"]);
+    expect(vorlagenPruefsumme(vorlageFuer("handelsregister")!)).toBe(VORLAGEN_GEPRUEFT.handelsregister!.pruefsumme);
     for (const id of WEITERE) {
       expect(vorlageFuer(id), id).toBeDefined();
       expect(VORLAGEN_GEPRUEFT[id]!.stand).toBe("2026-10-23");

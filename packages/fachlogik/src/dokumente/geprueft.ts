@@ -88,6 +88,8 @@ export const VORLAGEN_GEPRUEFT: Readonly<Record<string, VorlagenFreigabe>> = {
   kassenbuch: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "cda4e6656204d5352af7a559b5fe94f8f7a91b3e67a057dc4fc1321bc85d5f64" },
   aufbewahrung: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "0582763257c6d3cf28329e42a2cd8bd03f0ed1b16a0a38c64e4244bffb9a6316" },
   sv_meldedaten: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "71ff4c2ff8209e9d1a6b23654ec65cd96df10370d78a54bad6f7e9660b040ba0" },
+  // RA Dr. Weber 25.10.2026 (Mail Runde 5): nur GmbH, OHG und KG; Fassung mit § 106 Abs. 2 Nr. 3 HGB
+  handelsregister: { stand: "2026-10-25", bezug: "Bestätigung RA Dr. Weber per Mail 25.10.2026 (docs/pruefberichte/2026-10-25-runde5-weber-mail.txt)", pruefsumme: "e2cd7a14a6c1574814a6725b12104ff0234d3e4d02a52025ec83e3d8f9917338", rechtsformen: ["GmbH", "OHG", "KG"] },
   hygieneschulung: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "1f3bb870b0decd354c4cee8a7ab39bc1465e926e11549c8028c222418549f50e" },
 };
 

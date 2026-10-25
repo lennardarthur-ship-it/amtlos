@@ -18,6 +18,11 @@ interface Pruefer {
   wortlaut: string;
   /** Name darf erscheinen (unterschriebener Prüfvermerk liegt vor, ggf. Vereinbarung) */
   nennung: boolean;
+  /**
+   * Nennung nur so viele Monate nach dem Prüfdatum, danach der neutrale Vermerk (Vereinbarung RA Dr. Weber § 4 Abs. 3).
+   * Die App vergleicht dafür das Prüfdatum mit dem Datum des Geräts – ohne Server.
+   */
+  nennungMonate?: number;
 }
 
 /** Schlüssel = Eintrag in `pruefung.geprueft_von`. */
@@ -27,6 +32,7 @@ export const PRUEFER: Record<string, Pruefer> = {
     // Bestätigungsblatt unterschrieben 23.10.2026 (ohne Namensnennung); Name erst mit der gesonderten Vereinbarung zu Pflege
     // und Widerruf (offen, T-160)
     nennung: false,
+    nennungMonate: 12,
   },
   "Thomas Koch (Fachkraft für Arbeitssicherheit)": {
     // 22.10.2026: ausdrücklich ohne Namen – nur „Inhalt fachlich geprüft, Stand …“ (neutraler Vermerk)
@@ -62,9 +68,17 @@ export function istGeprueft(version: number, pruefung: PruefungRoh | undefined |
 }
 
 /** Vermerk für die Pflicht-Details, oder null, wenn der Eintrag (in dieser Version) nicht geprüft ist. */
-export function pruefVermerk(version: number, pruefung: PruefungRoh | undefined | null): string | null {
+export function pruefVermerk(version: number, pruefung: PruefungRoh | undefined | null, heute: Date = new Date()): string | null {
   if (!istGeprueft(version, pruefung)) return null;
   const stand = datumDe(pruefung!.geprueft_am!);
   const p = PRUEFER[pruefung!.geprueft_von?.[0] ?? ""];
-  return (p?.nennung ? p.wortlaut : VERMERK_NEUTRAL).replace("{stand}", stand);
+  return (p?.nennung && nennungGilt(pruefung!.geprueft_am!, p.nennungMonate, heute) ? p.wortlaut : VERMERK_NEUTRAL).replace("{stand}", stand);
+}
+
+/** Liegt das Prüfdatum höchstens `monate` Monate zurück (ohne Angabe: unbegrenzt)? */
+export function nennungGilt(geprueftAm: string, monate: number | undefined, heute: Date = new Date()): boolean {
+  if (monate === undefined) return true;
+  const [j, m, t] = geprueftAm.slice(0, 10).split("-").map(Number);
+  const grenze = new Date(j!, m! - 1 + monate, t!);
+  return heute < grenze;
 }

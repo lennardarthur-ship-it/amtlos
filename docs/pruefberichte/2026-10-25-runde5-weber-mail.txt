@@ -1,0 +1,27 @@
+Betreff: AW: Betriebsklar – Handelsregister § 106 Abs. 2 Nr. 3, Anlage 1 und Ihre Frage zu § 5 Abs. 2
+
+Sehr geehrter Herr Lang,
+
+vielen Dank. Zu Ihren drei Punkten:
+
+1. Handelsregister
+Dass „§ 106 Abs. 2 Nr. 4 HGB“ auch in der Vorlage selbst stand, geht auf meine frühere Anmerkung zurück. In den Beispielen war der Verweis nicht abgedruckt, deshalb ist er mir bei der Prüfung nicht aufgefallen. Meine Bestätigung für die Prüfsumme f4f0d39422b6 ist damit überholt.
+
+Hiermit bestätige ich die Vorlage in der Fassung mit der Prüfsumme e2cd7a14a6c1 für die Rechtsformen GmbH, OHG und KG, im selben Umfang wie auf dem Blatt vom 25.10.2026. Die Bestätigung gilt unter der Voraussetzung, dass sich diese Fassung von f4f0d39422b6 nur darin unterscheidet, dass an den drei Stellen „Nr. 4“ durch „Nr. 3“ ersetzt ist. Für meine Akte schicken Sie mir bitte noch ein Beispiel-PDF (OHG genügt), auf dem der Verweis zu sehen ist.
+
+2. § 5 Abs. 2 der Vereinbarung
+Ich habe die Regelung im Entwurf angepasst. Der Widerruf wird jetzt allein über ein App-Update umgesetzt: Einreichung bei Apple innerhalb von fünf Werktagen, Entfernung aus der im App Store angebotenen Version spätestens nach 30 Tagen. Ältere Versionen, die Nutzer nicht aktualisieren, bleiben unberührt; Sie weisen in den Versionshinweisen auf das Update hin und bieten keine ältere Version mit Nennung erneut an. Die Zwölf-Monats-Regel in § 4 Abs. 3 setzt voraus, dass die App das Prüfdatum auf dem Gerät mit dem aktuellen Datum vergleicht. Bitte bestätigen Sie, dass das ohne Server geht.
+
+3. Anlage 1
+Ich habe die Liste vollständig mit meinen Freigabe-Dateien und den unterschriebenen Blättern abgeglichen. 163 der 165 Katalogeinträge, alle 16 Vorlagen und alle Texte stimmen überein. Zwei Einträge stimmen nicht:
+- branche.gastro_allergene: In der Liste steht v5, bestätigt habe ich v4 (Blatt vom 23.10.2026).
+- branche.gastro_kontaktmaterialien: In der Liste steht v3, bestätigt habe ich v2 (Blatt vom 23.10.2026).
+Die Fassungen v5 und v3 habe ich nicht gesehen. Da der Vermerk laut Ihrer Liste an die Version im Register gebunden ist, würde die App ihn derzeit bei zwei ungeprüften Fassungen zeigen. Bitte korrigieren Sie das Register umgehend oder legen Sie mir beide Fassungen vor; meine Prüfung beschränkt sich bei beiden auf die Folgen bei Verstoß.
+
+Außerdem fehlt bei B-283 und bei der Zeile Grenzwerte die Prüfsumme. Auf dem Blatt vom 24.10.2026 stehen eedd5b3ffeca (B-283, nur rechtliche Seite) und 88409edcac2d (Grenzwerte, Quellenabgleich). Die Handelsregister-Vorlage können Sie mit e2cd7a14a6c1 aufnehmen.
+
+Mit diesen Korrekturen übernehme ich die Liste gern als Anlage 1. Die Korrekturen stehen bereits im Entwurf der Vereinbarung. Bitte schicken Sie mir die bereinigte Liste, dann ist der Entwurf vollständig.
+
+Mit freundlichen Grüßen
+Dr. Ulrich Weber
+Weber & Merz Rechtsanwälte

@@ -35,3 +35,12 @@ describe("E-171 Prüfvermerk je Katalogeintrag", () => {
     expect(katalogGeprueft([g, radar])).toBe("alle");
   });
 });
+
+import { nennungGilt } from "../src/pflichten/pruefer";
+describe("Nennung höchstens zwölf Monate nach dem Prüfdatum (Vereinbarung Dr. Weber § 4 Abs. 3)", () => {
+  it("vergleicht das Prüfdatum mit dem Gerätedatum", () => {
+    expect(nennungGilt("2026-10-25", 12, new Date(2027, 9, 24))).toBe(true);
+    expect(nennungGilt("2026-10-25", 12, new Date(2027, 9, 25))).toBe(false);
+    expect(nennungGilt("2026-10-25", undefined, new Date(2030, 0, 1))).toBe(true);
+  });
+});
