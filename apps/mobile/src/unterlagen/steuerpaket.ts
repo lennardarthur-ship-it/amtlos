@@ -217,8 +217,9 @@ export function rechnungFuerBuchung(u: Unterlage, betrieb: Betrieb, o: { tage?: 
     leistungsdatum: istStorno(u) ? null : leistung,
     steuerperiode: o.tage?.get(u.id) ?? null,
     empfaenger_ku: o.betriebKu ?? false,
-    // Koordination Rechnungen: Schlussrechnung (abgesetzte Abschläge) und OSS (Steuer des Bestimmungslands)
-    ...(daten.abschlaege?.length && !istStorno(u) ? { abschlaege: daten.abschlaege } : {}),
+    // Koordination Rechnungen: Schlussrechnung (abgesetzte Abschläge) und OSS (Steuer des Bestimmungslands).
+    // E-193 (8b): auch beim Storno einer Schlussrechnung – es spiegelt die Buchung des Rests (vorher: ganzer Betrag)
+    ...(daten.abschlaege?.length ? { abschlaege: daten.abschlaege } : {}),
     ...(daten.oss ? { oss: daten.oss } : {}),
   };
 }
@@ -247,8 +248,8 @@ export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
     .filter((u) => u.bezahlt && !(u.zahlungen?.length && !istStorno(u)))
     .map((u) => {
       const { daten } = eRechnungAus(u.daten, absenderFuer(s, u));
-      // Schlussrechnung (C-4): Zufluss ist der Rest nach Abzug der schon gezahlten Abschläge
-      const rest = istStorno(u) ? summen(daten.positionen, daten.kleinunternehmer).gruppen : restGruppen(daten);
+      // Schlussrechnung (C-4): Zufluss ist der Rest nach Abzug der schon gezahlten Abschläge – beim Storno ebenso (E-193)
+      const rest = restGruppen(daten);
       const sm = { gruppen: rest, netto_cent: rest.reduce((a, g) => a + g.netto_cent, 0), ust_cent: rest.reduce((a, g) => a + g.ust_cent, 0) };
       const vz = istStorno(u) ? -1 : 1;
       // Nullsteuersatz (§ 12 Abs. 3 UStG) ist steuerpflichtig zu 0 % – Zeile „umsatzsteuerpflichtig“, nicht „steuerfrei“ (R10)
@@ -625,7 +626,7 @@ export function rechnungenCsv(s: Stand, z: Zeitraum, gutschriften = false, pdfs?
         summe.set(schluessel, w);
       }
       // Schlussrechnung: offen ist höchstens der Zahlbetrag (Rechnungsbetrag abzüglich Abschläge)
-      const offen = offenAm(s, u, z.bis, vz * (istStorno(u) ? sm.brutto_cent : zahlbetrag(daten)));
+      const offen = offenAm(s, u, z.bis, vz * zahlbetrag(daten));
       offenGesamt += offen;
       const saetze = sm.gruppen.map((g) => (g.satz === null ? "§ 19" : `${g.satz} %`)).join(", ");
       return [
@@ -915,7 +916,7 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
     .filter((u) => !istGutschrift(u) && String(u.daten.datum) <= z.bis)
     .map((u) => {
       const { daten } = eRechnungAus(u.daten, absenderFuer(s, u));
-      return { u, daten, offen: offenAm(s, u, z.bis, istStorno(u) ? summen(daten.positionen, daten.kleinunternehmer).brutto_cent : zahlbetrag(daten)) };
+      return { u, daten, offen: offenAm(s, u, z.bis, zahlbetrag(daten)) };
     })
     .filter((x) => x.offen)
     .sort((a, b) => a.daten.rechnungsdatum.localeCompare(b.daten.rechnungsdatum) || nachNummer(a.daten.nummer, b.daten.nummer));
@@ -1133,7 +1134,7 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
         .filter((u) => !gutscheine.has(u.id) && !istGutschrift(u) && !barKassiert.has(u.id))
         .flatMap((u) => {
           const r = mitPk(u, rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku }));
-          const zl = !istStorno(u) && u.zahlungen?.length ? u.zahlungen.filter((x) => imZeitraum(x.datum, z)).map((x) => ({ id: x.id, datum: x.datum, betrag_cent: x.betrag_cent })) : u.bezahlt && imZeitraum(u.bezahlt, z) ? [{ id: "bezahlt", datum: u.bezahlt, betrag_cent: istStorno(u) ? summen(r.positionen, r.kleinunternehmer).brutto_cent : zahlbetrag(r) }] : [];
+          const zl = !istStorno(u) && u.zahlungen?.length ? u.zahlungen.filter((x) => imZeitraum(x.datum, z)).map((x) => ({ id: x.id, datum: x.datum, betrag_cent: x.betrag_cent })) : u.bezahlt && imZeitraum(u.bezahlt, z) ? [{ id: "bezahlt", datum: u.bezahlt, betrag_cent: zahlbetrag(r) }] : [];
           return zahlungsBuchungenRechnung(r, zl, sb.kontenrahmen, bo);
         })
     : [];
@@ -1162,7 +1163,7 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   // A-4 (Nachtrag 22.10.2026): offene Forderungen zum Stichtag aus den Rechnungen des Zeitraums – wie die Rechnungsliste
   const offenZumEnde = rechnungen.reduce((a, u) => {
     const r = rechnungFuerBuchung(u, s.betrieb);
-    return a + offenAm(s, u, z.bis, istStorno(u) ? summen(r.positionen, r.kleinunternehmer).brutto_cent : zahlbetrag(r));
+    return a + offenAm(s, u, z.bis, zahlbetrag(r));
   }, 0);
   const nichtImStapel = belege.filter((b) => !belegImStapel(b, { kapitalgesellschaft: kapital }));
   const kuBis = /^\d{4}-\d{2}-\d{2}$/.test((s.betrieb.ku_bis ?? "").trim()) ? s.betrieb.ku_bis!.trim() : "";

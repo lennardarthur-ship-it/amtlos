@@ -42,7 +42,8 @@ export async function pdfErstellen(roh: string, dateiname: string, quer = false)
     const bytes = await fusszeileStempeln(base64 ?? new File(uri).base64Sync(), angaben);
     if (ziel.exists) ziel.delete();
     ziel.create();
-    ziel.write(bytes);
+    // E-193: File.write ist seit Expo SDK 58 asynchron – ohne await ginge das PDF leer oder abgeschnitten ins Teilen-Menü
+    await ziel.write(bytes);
     return ziel.uri;
   } catch {
     // Ohne gestempelte Fußzeile stehen die Geschäftsangaben (Steuer, Bank, Register) im Fluss am Dokumentende

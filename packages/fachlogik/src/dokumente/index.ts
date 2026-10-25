@@ -40,8 +40,8 @@ export { EUER_KAPITALGESELLSCHAFT, GUTSCHRIFT_AUSWAHL, RECHNUNG_NEGATIV, RECHNUN
 export { NULLSATZ_HINWEIS, RECHNUNG_13B_TEXT, RECHNUNG_EU_19, RECHNUNG_GUTSCHRIFT_STEUER, RECHNUNG_KU_DRITTLAND, RECHNUNG_KU_EU, RECHNUNG_KU_IGL, RECHNUNG_KU_PROFIL, RECHNUNG_KU_RC, RECHNUNG_LEITWEG, UST_FRIST, UST_FRIST_DFV, drittlandLand, euUnternehmenLand, istNullsatzText, istOeffentlicherEmpfaenger, kuFuer } from "./buchhaltung.js";
 export { RECHNUNG_SKONTO_FALSCH, RECHNUNG_SKONTO_FRIST, RECHNUNG_SKONTO_HOCH, skontoFuer } from "./buchhaltung.js";
 // R12 UX
-export { GMBH_ANGABEN, RECHNUNG_KU_GUTSCHEIN, RECHNUNG_MONAT_ZEITRAUM, gmbhAngabenFehlen, istPrivatperson, kleinbetrag, standardAnrede } from "./buchhaltung.js";
-export { vertretungLabel } from "./html.js";
+export { GMBH_ANGABEN, KG_ANGABEN, KG_REGISTERGERICHT, KG_REGISTERNUMMER, komplementaerAngabenFehlen, STORNO_ABSCHLAEGE, RECHNUNG_KU_GUTSCHEIN, RECHNUNG_MONAT_ZEITRAUM, gmbhAngabenFehlen, istPrivatperson, kleinbetrag, standardAnrede } from "./buchhaltung.js";
+export { istCoKg, komplementaerZeile, vertretungLabel } from "./html.js";
 export { REGISTER_FORMEN, istKapitalgesellschaft, mitVertretung, rechtsformAus, registerAus } from "./betrieb.js";
 export { RECHTSFORMEN } from "./bausteine.js";
 export { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN, arbeitsminuten, arbeitszeitPruefung, monatAus, monatSchluessel, stunden } from "./lohn.js";

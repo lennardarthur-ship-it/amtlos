@@ -17,7 +17,7 @@ import { syncZusammenfuehren } from "./konto/sync";
 import { dateienImStand, doppeltePerson, korrigieren, personenZusammenfuehren, staetteLoeschen, staetteSetzen, unterlageStaette, type Betriebsstaette } from "./unterlagen/speicher";
 import { personenkontenVergeben } from "./unterlagen/steuerpaket";
 import { belegeFestschreiben, kassenbuchFestschreiben, kassensturzSpeichern, sachentnahmeLoeschen, sachentnahmeSpeichern } from "./unterlagen/speicher";
-import { LEERER_STAND, StandFehler, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
+import { LEERER_STAND, StandFehler, geteilteFassungFestschreiben, teilenOffenVermerken, type GeteilteFassung, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /** Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund). */
 const SCHLUESSEL = "amtlos.unterlagen.v1";
@@ -83,6 +83,10 @@ interface Zustand {
    * PDF neu erzeugen. Die Festschreibung wird sofort gespeichert (G3).
    */
   ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean): boolean;
+  /** E-193 (4): Android – geteilt, aber „Nein, noch nicht“ verschickt: die ausgegebene Fassung merken, nicht festschreiben */
+  teilenOffen(id: string, f: Omit<GeteilteFassung, "am">): void;
+  /** E-193 (4): „Doch verschickt – festschreiben“: die zuletzt geteilte Fassung festschreiben (sofort gespeichert) */
+  geteiltFestschreiben(id: string): boolean;
   erinnerungenSetzen(an: boolean): void;
   stornieren(id: string): Unterlage | null;
   kopieren(id: string): Unterlage | null;
@@ -543,6 +547,17 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         if (!ausgabeMoeglich(aktuell.current, id, daten)) return false;
         setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256, absender, eRechnung));
         // Festschreibung sofort speichern, nicht erst nach der Wartezeit (G3)
+        schreiben();
+        return true;
+      },
+      teilenOffen: (id, f) => {
+        setzen(teilenOffenVermerken(aktuell.current, id, new Date(), f));
+        schreiben();
+      },
+      geteiltFestschreiben: (id) => {
+        const s = geteilteFassungFestschreiben(aktuell.current, id, new Date());
+        if (!s.unterlagen.find((u) => u.id === id)?.festgeschrieben) return false;
+        setzen(s);
         schreiben();
         return true;
       },
