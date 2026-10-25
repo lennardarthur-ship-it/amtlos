@@ -205,6 +205,8 @@ describe.skipIf(!DB_VERFUEGBAR)("Server-Kern gegen PostgreSQL", () => {
     const [ziel] = await alsEigentuemer<{ id: string }>(
       "update app.erinnerung set geplant_fuer = now() - interval '1 minute' where id = (select id from app.erinnerung where status = 'geplant' order by geplant_fuer limit 1) returning id",
     );
+    // nur diese eine Erinnerung ist fällig – sonst würden mit fortschreitendem Kalender weitere fällig (Test hing am Datum)
+    await alsEigentuemer("update app.erinnerung set geplant_fuer = now() + interval '30 days' where id <> $1 and status = 'geplant' and geplant_fuer <= now() + interval '1 day'", [ziel!.id]);
     let versuche = 0;
     const kaputt = { email: async () => { versuche++; throw new Error("SMTP 421"); } };
     expect(await versendeFaelligeErinnerungen(worker, kaputt, "x")).toEqual({ gesendet: 0, fehler: 1 });
@@ -215,6 +217,8 @@ describe.skipIf(!DB_VERFUEGBAR)("Server-Kern gegen PostgreSQL", () => {
     expect(await versendeFaelligeErinnerungen(worker, kaputt, "x")).toEqual({ gesendet: 0, fehler: 0 });
     await worker.imKontext({ unternehmenId }, (tx) => planeErinnerungen(tx, unternehmenId, STICHTAG));
     expect(await alsEigentuemer("select 1 from app.erinnerung where id = $1", [ziel!.id])).toHaveLength(1);
+    // die Neuplanung setzt andere Erinnerungen mit vergangenem Termin wieder fällig – wieder nach hinten schieben
+    await alsEigentuemer("update app.erinnerung set geplant_fuer = now() + interval '30 days' where id <> $1 and status = 'geplant' and geplant_fuer <= now() + interval '1 day'", [ziel!.id]);
     // Abstand abgelaufen: diesmal klappt es – genau eine Mail
     await alsEigentuemer("update app.erinnerung set naechster_versuch = now() - interval '1 second' where id = $1", [ziel!.id]);
     const versand = new ProtokollVersand();

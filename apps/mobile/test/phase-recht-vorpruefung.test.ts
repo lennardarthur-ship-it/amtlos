@@ -239,6 +239,6 @@ describe("Website und Store-Check", () => {
       aus = String((e as { stdout?: Buffer }).stdout ?? "");
     }
     expect(aus).toContain("✗ Eigene Nutzungsbedingungen freigegeben");
-    expect(aus).toContain("✗ Datenschutzhinweis der App fachlich freigegeben");
+    expect(aus).toContain("✓ Datenschutzhinweis der App fachlich freigegeben");
   });
 });
