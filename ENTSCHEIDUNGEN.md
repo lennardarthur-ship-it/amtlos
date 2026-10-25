@@ -1152,6 +1152,58 @@ StB Busch, T. Koch und Dr. Weber haben zu Recht beanstandet, dass Einträge als 
 
 Nachtrag (23.10.2026): Die Freigabe-Dateien und der Katalogauszug der Prüfmappe enthielten die Felder „Erklärung“ und „Zuständige Stelle“ nicht, die App zeigt sie aber in den Pflicht-Details. Bis die Prüfer sie bestätigt haben, gilt kein Eintrag als geprüft (Register: `felder_fehlen`). Der Abgleich zeigt sie deshalb für alle Einträge; neue Freigabe-Dateien enthalten beide Spalten.
 
+### E-174 · Arbeitsmedizinische Vorsorge prüft RA Dr. Weber (23.10.2026)
+
+Die Sifa (T. Koch) hat `arbeitsschutz.arbeitsmedizinische_vorsorge` (E.56) als ärztliches Fachgebiet abgegeben. Statt eines Betriebsarztes prüft RA Dr. Weber die rechtliche Seite (ArbMedVV mit Anhang, § 3 Abs. 4, AMR 2.1, § 10 ArbMedVV); der Eintrag enthält keine medizinischen Inhalte. Umsetzung: `RECHT_STATT_ARBEITSSCHUTZ` in `docs/freigabe-katalog/anwenden.py`; Bestätigungsblatt Dr. Weber beschränkt die Prüfung dort auf die rechtliche Seite. Entscheidung des Gründers.
+
+### E-175 · Freigaben vom 23.10.2026 eingetragen; Änderungen umgesetzt (23.10.2026)
+
+Alle vier Prüfer haben den Abgleich zurückgeschickt und ihr Bestätigungsblatt unterschrieben (docs/pruefberichte/2026-10-23-*). Eingetragen in freigaben.yaml mit `felder_fehlen: []`: Dr. Weber 148 (alles) + 6 (Folgen Lebensmittel), StB Busch 30, T. Koch 24, T. Baum 12 → 211 von 223 Einträgen freigegeben. Die 11 mit „ändern“ markierten Einträge und die Ergänzungen Dr. Webers zur arbeitsmedizinischen Vorsorge sind umgesetzt (neue Versionen, Wortlaut der Prüfer); sie gehen in einer kurzen Nachprüfung zurück. Abweichungen: § 26 Nr. 1 ArbSchG (beharrliche Wiederholung) nicht übernommen, weil es nur § 25 Abs. 1 Nr. 2 Buchst. a betrifft; Koffein/Chinin-Folgen nicht eingetragen (Wortlaut widerspricht der Anmerkung, T-162). OHG/KG: Die App bietet sie nicht als Rechtsform an; Buchführungspflicht und E-Bilanz greifen bei „Andere“ als „kommt in Frage“ (T-163). „Amtlos“ in den Prüfdateien ist der redaktionelle Name der Katalogtexte; die App zeigt den Markennamen (katalog-buendel.mjs) – die Abgleich-Dateien zeigen jetzt ebenfalls „Betriebsklar“.
+
+### E-176 · OHG und KG als eigene Rechtsformen (23.10.2026)
+
+Entscheidung des Gründers (T-163): Die Rechtsformen `ohg` und `kg` kommen in `profil.rechtsform` (fakten.json), in den Check (nach GbR/e. K.: „OHG (offene Handelsgesellschaft)“, „KG (Kommanditgesellschaft)“) und in alle Rechtsform-Texte der App. Die Notlösung vom 23.10.2026 (Auslöser „Andere“ bei Buchführung und E-Bilanz) ist entfernt – „Andere“ steht nicht mehr für OHG/KG. Abgeleitete Fakten: OHG und KG sind eingetragene Personengesellschaften (`abgeleitet.ist_eingetragene_gesellschaft`, § 20 Abs. 1 GwG, § 106 HGB), aber weder Kapitalgesellschaft noch § 264a-Gesellschaft (`ist_kapitalgesellschaft_oder_co_kg` bleibt falsch: mindestens ein Gesellschafter haftet persönlich, §§ 126, 161 Abs. 1 HGB) und nicht kraft Rechtsform gewerblich (Gewerbe oder freier Beruf wird weiter gefragt). Register- und Gesellschaftsfragen gelten auch für OHG/KG; die Gewinnermittlung der App (`bilanzierend`) behandelt OHG und KG als bilanzierend (§§ 6, 238 HGB; § 241a HGB nur für Einzelkaufleute). Geänderte Katalogeinträge (Freigabe entfällt, Nachprüfung): Steuern (StB Busch) – `steuern.buchfuehrungspflicht` v7, `steuern.e_bilanz` v6, `steuern.euer` v6, `steuern.feststellungserklaerung` v4; Recht (RA Dr. Weber) – `gesellschaft.handelsregister_anmeldung` v6, `gesellschaft.transparenzregister` v6. Unverändert, weil sie für OHG/KG schon richtig auslösen bzw. richtig nicht auslösen: Gewerbeanzeige, IHK/HWK, Gewerbesteuer, Istkaufmann (nur Einzelunternehmen/GbR), Gesellschaftsvertrag beim Notar, Stammkapital, Insolvenzantragspflicht, Jahresabschluss und Offenlegung (§ 264a HGB), Körperschaftsteuer. Neue Fixtures `e176-ohg-gruendung`, `e176-kg-bestand`. Offene Punkte: T-164 bis T-167.
+
+### E-177 · Nachprüfung und Vorlagen-Freigabe 23.10.2026 eingetragen (23.10.2026)
+
+Katalog: Freigaben aus der Nachprüfung eingetragen (Dr. Weber 5, StB Busch 3, T. Koch 2, T. Baum 2) → 219 von 223 freigegeben. Unterschriften: T. Baum liegt vor; Dr. Weber und T. Koch schreiben, sie hätten unterschrieben (Scans fehlen noch), StB Busch ergänzt seine Bestätigung nach EÜR/Feststellung – `unterschrieben: false` im Register bis zum Scan. Vorlagen: 25 Vorlagen mit Prüfsumme in `geprueft.ts` (StB Busch 5, unterschrieben; T. Koch 5; Dr. Weber 15), neutraler Vermerk. Datenschutzhinweis der App freigegeben (Dr. Weber, Build ohne Sync) → `DATENSCHUTZ.freigegeben: true`. Offen: Änderungswünsche an 15 Vorlagen, 4 Katalogeinträgen, neuer Eintrag „Pflichtangaben auf Geschäftsbriefen“, Jahresabschluss für OHG/KG/e. K., Nutzungsbedingungen (Fassungsdatum), Website-Datenschutz (Hoster). Hygieneplan Friseur/Kosmetik: kein Prüfer (Koch: nicht sein Bereich).
+
+### E-178 · Rückmeldungen der Nachprüfung im Katalog umgesetzt (23.10.2026)
+
+Transparenzregister erst ab Registereintragung, für alle Rechtsformen (Dr. Weber). Neue Einträge: Pflichtangaben auf Geschäftsbriefen (B.23, § 37a HGB, § 125/§ 177a HGB – § 125a HGB ist seit 1.1.2024 aufgehoben –, § 35a GmbHG) und Gesellschaftsvertrag OHG/KG (Hinweis, B.14), beide nach Dr. Weber; Jahresabschluss OHG/KG/e. K. (B.18, eigener Eintrag ohne feste Frist, § 243 Abs. 3, § 245 HGB, Prüfer StB Busch). Zusatzstoffe: Folgen nach Dr. Weber, Koffein-Satz offen (§ 6 LMIDV erfasst Anhang III LMIV nur für vorverpackte Ware). Schankanlage (Stelle, Quelle DGUV Regel 110-010) und Fluchtplan (redaktionell) nach T. Koch. Nutzungsbedingungen: Fassung vom 23.10.2026.
+
+### E-179 · Nachprüfung der Vorlagen umgesetzt (23.10.2026)
+
+StB Busch (bilanz_guv, ust_voranmeldung, oss_meldung, zm_meldung, steuererklaerung, kassenbuch, aufbewahrung, sv_meldedaten), T. Koch (betriebsanweisung – Piktogramme nur als Text –, betriebsanweisung_biostoffe, expositionsverzeichnis, hautschutzplan; Bausteine B-054, B-200, B-218, B-226, B-231, B-233, B-236, B-238, B-240, B-241, B-283, B-284, B-286; Hinweis Durchgangsarzt/PEP im Hygieneplan Beauty), RA Dr. Weber (handelsregister für OHG/KG), jeweils im Wortlaut der Prüfer. Die Gefährdungsbeurteilung verliert den Vermerk (Bausteine geändert) und geht erneut an T. Koch. Weber-Empfehlungen zu avv, gewerbeanmeldung, schluesselquittung und ausweis_hinweis zurückgestellt (würden die Freigabe aufheben).
+
+### E-180 · Rückmeldungen Runde 3 (24.10.2026)
+
+Jahresabschluss OHG/KG/e. K. wiederholt sich jährlich (kein Termin, § 243 Abs. 3 HGB). Geschäftsbriefe auch für PartG/PartG mbB über § 7 Abs. 3 PartGG (nicht Abs. 5 – seit dem MoPeG); eGbR nicht (§ 707b BGB verweist nicht auf § 125/§ 37a HGB). B-276 und Hygieneplan Beauty mit PEP-Obergrenze 24 Stunden (AWMF 055-004), Infektionsstatus nur freiwillig nach Stichverletzung (Art. 9 Abs. 2 lit. a DSGVO), Rechtsgrundlage § 17 Abs. 4 IfSG. Bilanz: Angaben unter der Bilanz nur bei Kapitalgesellschaften/GmbH & Co. KG, Unterschrift Komplementär-GmbH. Eine Vorlage kann mehrere Freigaben je Fassung haben (`weitere`). Beispiel-PDFs je Rechtsform: apps/mobile/werkzeuge/vorlagen-beispiele.mjs.
+
+### E-181 · Runde 4 Dr. Weber, Freigabe je Rechtsform (25.10.2026)
+
+Geschäftsbriefe v2 und Gesellschaftsvertrag OHG/KG v3 (Vorabfreigabe für den ersetzten Satz) freigegeben; Hygieneplan Friseur/Kosmetik als zweite Freigabe des Hygieneplans (`weitere`, nur Beauty-Vorschläge). Handelsregister: § 106 Abs. 2 Nr. 3 HGB statt Nr. 4 (Korrektur des Prüfers) – neue Prüfsumme, Bestätigung erbeten; Freigaben können auf Rechtsformen beschränkt werden (`rechtsformen`, Vermerk nur bei passender Rechtsform aus Unterlage oder „Mein Betrieb“). Antwort zu § 5 Abs. 2 der Vereinbarung: keine serverseitige Textsteuerung, Entfernung per App-Update. Empfehlungen ohne Bedingung zurückgestellt (Hygieneplan: „nur mit ihrem Einverständnis“, Landesverordnung, „Friseur:“-Zeile; Handelsregister: Komplementär-GmbH, Hinweis Nr. 4).
+
+### E-182 · Handelsregister bestätigt, Zwölf-Monats-Regel, Anlage 1 bereinigt (25.10.2026)
+
+Dr. Weber bestätigt die Handelsregister-Vorlage (Prüfsumme e2cd7a14a6c1) für GmbH, OHG und KG → `rechtsformen` in geprueft.ts. Nennung eines Prüfers kann zeitlich begrenzt werden (`nennungMonate`, Dr. Weber 12 Monate, Vergleich mit dem Gerätedatum, ohne Server – Vereinbarung § 4 Abs. 3). Anlage 1 nennt je Eintrag die bestätigte Version; bei „nur Folgen“ (Allergene v4, Kontaktmaterialien v2) bleibt der Vermerk, weil die Folgen wortgleich sind und T. Baum die übrigen Felder der neuen Fassung bestätigt hat (E-173) – Erzeugung: docs/freigabe-katalog/anlage1-weber.py.
+
+### E-183 · Katalog vollständig freigegeben (25.10.2026)
+
+Alle 226 Katalogeinträge freigegeben (T. Koch: Schankanlage v4, Fluchtplan v5). Vorlagen: T. Koch Betriebsanweisung, Expositionsverzeichnis, Hautschutzplan (ohne arbeitsmedizinische Angaben); B-022 und B-105 (Gefährdungsbeurteilung) nach Abgleich Dr. Weber (AWMF 055-004, § 11 Abs. 5 BioStoffV), B-105 wörtlich nach seinem Satz. Gefährdungsbeurteilung und Betriebsanweisung Biostoffe: T. Koch gleicht die aktuellen PDFs ab (er unterschreibt keine Fassung, die er nicht gesehen hat). T. Koch hält einen Betriebsarzt für die PEP-Angaben für richtig; Entscheidung des Gründers: Abgleich durch Dr. Weber.
+
+### E-184 · Kochs Teil abgeschlossen (25.10.2026)
+
+Gefährdungsbeurteilung (1063d59082d4) und Betriebsanweisung Biostoffe (70fe591f5a3e) nach Abgleich der aktuellen PDFs durch T. Koch freigegeben, arbeitsmedizinische Stellen ausgenommen (Abgleich Dr. Weber). Vorlagen: 42 von 43 freigegeben; offen nur Bilanz/GuV (Unterschrift StB Busch).
+
+### E-185 · Alle Vorlagen freigegeben (25.10.2026)
+
+Bilanz/GuV (5d2246459fe6) von StB Busch freigegeben (Nachtrag unterschrieben). Damit sind alle 226 Katalogeinträge und alle 43 Vorlagen fachlich freigegeben (Handelsregister nur für GmbH, OHG, KG; arbeitsmedizinische Bausteine durch Abgleich Dr. Weber). PRUEFLISTE T-52 erledigt.
+
+### E-186 · Expo SDK 58 / React Native 0.88 (25.10.2026)
+
+Die aktuelle Expo-Go-App auf dem iPhone des Gründers öffnet nur noch SDK-58-Projekte; deshalb `apps/mobile` von SDK 57 auf 58 angehoben. Versionen nach `bundledNativeModules.json` von expo@58.0.19 (entspricht `npx expo install --fix`): expo ~58.0.19, alle expo-* auf ~58, react/react-dom 19.3.0, react-native 0.88.0, @types/react ~19.3.0, react-native-screens ~4.30.0, react-native-safe-area-context ~5.10.1, react-native-webview 14.0.1, @react-native-community/datetimepicker 9.2.1, react-native-web ~0.21.4; typescript ~6.0.3 nur in `apps/mobile` (Version der SDK-58-Vorlage, damit das Testpaket keine Abweichung meldet – übriger Workspace bleibt auf TS 5.9). React Navigation, RevenueCat, Cloud-Storage unverändert (Peer-Bereiche passen). Code: Strict-TypeScript-API von RN 0.88 – Ref der horizontalen ScrollView als `ScrollViewInstance` (`ui/bausteine.tsx`); `Linking.getInitialURL()` liefert jetzt auch `undefined` (`seiten/Partner.tsx`). InteractionManager (schon durch requestIdleCallback ersetzt), Touchable, ImageBackground, `animated` an Modal und StatusBar-Props aus react-native werden nicht genutzt. Nicht hier prüfbar: nativer iOS-Build (Scene-Lifecycle mit SceneDelegate bei prebuild/EAS), R8 im Android-Release-Build (RevenueCat/Cloud-Storage ggf. Keep-Regeln) und der Lauf in Expo Go selbst.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
