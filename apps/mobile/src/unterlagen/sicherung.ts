@@ -9,6 +9,7 @@ import { pbkdf2 } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha2";
 import { istBelegDateiname } from "@amtlos/fachlogik";
 import { StandFehler, dateienImStand, standAus, type Stand } from "./speicher";
+import { kompaktJson } from "./kompakt";
 import { MARKE } from "@amtlos/marke";
 
 export const SICHERUNG_FORMAT = "amtlos-sicherung";
@@ -60,9 +61,14 @@ export class SicherungsFehler extends Error {
 /** Dateien zu Belegen (Name → Base64), seit Version 2 in der Sicherung (E-133) */
 export type Dateien = Record<string, string>;
 
-/** Klartext in der Sicherung: Version 1 = nur der Stand, Version 2 = Stand und Belegdateien */
+/**
+ * Klartext in der Sicherung: Version 1 = nur der Stand, Version 2 = Stand und Belegdateien. Der Stand steht in
+ * kompakter Schreibweise (E-194: große Texte wie das Logo nur einmal). Die Sicherung als Datei schreibt seit E-194
+ * Version 3 (`sicherungContainer.ts`); Version 1 bleibt das Format der automatischen Sicherung (Stand ohne Fotos).
+ */
 function inhalt(stand: Stand, dateien?: Dateien): { version: 1 | 2; text: string } {
-  return dateien && Object.keys(dateien).length ? { version: 2, text: JSON.stringify({ stand, dateien }) } : { version: 1, text: JSON.stringify(stand) };
+  const s = kompaktJson(stand);
+  return dateien && Object.keys(dateien).length ? { version: 2, text: `{"stand":${s},"dateien":${JSON.stringify(dateien)}}` } : { version: 1, text: s };
 }
 
 interface Datei {
@@ -247,7 +253,7 @@ export function sicherungLesen(text: string, passwort: string): Stand {
 }
 
 /** Sicherung lesen – mit den Belegdateien (leer bei Version 1) und dem abgeleiteten Schlüssel (für Belege in iCloud). */
-export function sicherungLesenMitDateien(text: string, passwort: string): { stand: Stand; dateien: Dateien; schluessel: Uint8Array } {
+export function sicherungLesenMitDateien(text: string, passwort: string): { stand: Stand; dateien: Dateien; schluessel: Uint8Array; version: 1 | 2; kdf: { salz: Uint8Array; iterationen: number } } {
   let d: Partial<Datei>;
   try {
     d = JSON.parse(text) as Partial<Datei>;
@@ -256,7 +262,9 @@ export function sicherungLesenMitDateien(text: string, passwort: string): { stan
   }
   if (d.format !== SICHERUNG_FORMAT || (d.version !== 1 && d.version !== 2) || d.kdf?.name !== "PBKDF2-SHA256" || d.chiffre?.name !== "AES-256-GCM" || typeof d.daten !== "string" || !(d.kdf.iterationen > 0) || d.kdf.iterationen > ITERATIONEN_HOECHSTENS) throw new SicherungsFehler("format");
   let klar: Uint8Array;
-  const k = schluessel(passwort, ausBase64(d.kdf.salz), d.kdf.iterationen);
+  const salz = ausBase64(d.kdf.salz);
+  const kdf = { salz, iterationen: d.kdf.iterationen };
+  const k = schluessel(passwort, salz, d.kdf.iterationen);
   try {
     klar = gcm(k, ausBase64(d.chiffre.nonce), utf8(ZUSATZ)).decrypt(ausBase64(d.daten));
   } catch {
@@ -272,7 +280,7 @@ export function sicherungLesenMitDateien(text: string, passwort: string): { stan
       throw e;
     }
   };
-  if (d.version === 1) return { stand: lesen(klartext), dateien: {}, schluessel: k };
+  if (d.version === 1) return { stand: lesen(klartext), dateien: {}, schluessel: k, version: 1, kdf };
   let roh: { stand?: unknown; dateien?: unknown };
   try {
     roh = JSON.parse(klartext) as { stand?: unknown; dateien?: unknown };
@@ -282,7 +290,7 @@ export function sicherungLesenMitDateien(text: string, passwort: string): { stan
   const dateien: Dateien = {};
   // nur Dateinamen, wie die App sie vergibt (G-1)
   if (roh.dateien && typeof roh.dateien === "object") for (const [k, v] of Object.entries(roh.dateien as Record<string, unknown>)) if (typeof v === "string" && istBelegDateiname(k)) dateien[k] = v;
-  return { stand: lesen(JSON.stringify(roh.stand ?? null)), dateien, schluessel: k };
+  return { stand: lesen(JSON.stringify(roh.stand ?? null)), dateien, schluessel: k, version: 2, kdf };
 }
 
 /**

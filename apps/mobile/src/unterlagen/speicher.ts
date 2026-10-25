@@ -1,11 +1,12 @@
 /**
  * Unterlagen und Betrieb – nur auf dem Gerät (E-121). Reine Funktionen über einem unveränderlichen Stand, damit sie
- * ohne Gerät testbar sind; zustand.tsx speichert den Stand in AsyncStorage.
+ * ohne Gerät testbar sind; zustand.tsx speichert den Stand über standAblage.ts in verschlüsselten Teildateien (E-194).
  */
 import { letzteVollsicherung, nachweisText, nachweiseAus, type SicherungsNachweis } from "./sicherungNachweis";
 import { KU_HINWEIS, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, kontenvorgabenAus, kontenvorgabenGesetzt, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Kontenvorgaben, type Sachentnahme } from "@amtlos/fachlogik";
 import { LEERER_BETRIEB, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, istGutschriftNummer, leereDaten, type Beleg, naechsteNummer, zahlbetrag, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 import { partnerIdAus } from "../partner/partner";
+import { istKompakt, kompaktAufloesen } from "./kompakt";
 import { zustimmungAus, type Zustimmung } from "../rechtliches";
 
 export interface Unterlage {
@@ -386,6 +387,14 @@ export function standAus(json: string | null): Stand {
     geparst = JSON.parse(json);
   } catch {
     throw new StandFehler("unlesbar");
+  }
+  // E-194: kompakte Schreibweise (große Texte wie das Logo nur einmal) auflösen
+  if (istKompakt(geparst)) {
+    try {
+      geparst = kompaktAufloesen(geparst);
+    } catch {
+      throw new StandFehler("unlesbar");
+    }
   }
   if (!istObjekt(geparst)) throw new StandFehler("unlesbar");
   const roh = migrieren(geparst) as Partial<Stand>;

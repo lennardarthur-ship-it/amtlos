@@ -22,7 +22,7 @@ Rechnungen sind fortlaufend nummeriert, werden beim Teilen festgeschrieben (GoBD
 
 ## Aufbau
 
-- `src/App.tsx` Tabs, Sperre, Tastaturleiste, Meldungen · `src/zustand.tsx` Stand (verschlüsselt in AsyncStorage) ·
+- `src/App.tsx` Tabs, Sperre, Tastaturleiste, Meldungen · `src/zustand.tsx` Stand (verschlüsselte Teildateien, `unterlagen/standAblage.ts`, E-194) ·
   `src/texte.ts` alle Texte der App.
 - `src/seiten/` ein Modul je Seite: `Pflichten`, `Check`, `Unterlagen` (Vorlagen), `Meine`, `Betrieb`, `Ablauf`, `Abschluss`,
   `Liste` (Einträge und Vorschläge), `Sicherung`, `InfoSeite`.

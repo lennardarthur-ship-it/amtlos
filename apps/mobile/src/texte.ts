@@ -831,6 +831,8 @@ export const T = {
   beleg_ungueltig_grund: "Falsch erfasst oder doppelt – in der App als ungültig markiert",
   beleg_ungueltig_gesetzt: "Als ungültig markiert. Der Beleg bleibt aufbewahrt.",
   speicher_fehler_schreiben: `${MARKE.name} kann deine letzten Änderungen gerade nicht speichern – vielleicht ist der Speicher des ${W.geraetGenitiv} voll. ${MARKE.name} versucht es weiter. Schaffe Platz und lass die App geöffnet, bis dieser Hinweis verschwindet.`,
+  // E-194: alter Speicher (Android) kann einen sehr großen Eintrag nicht mehr lesen – er bleibt unangetastet
+  ladefehler_zu_gross: `Deine Daten sind zu groß für den bisherigen Speicher dieses ${W.geraetGenitiv} und ließen sich nicht lesen. ${MARKE.name} hat nichts gelöscht und nichts überschrieben – sie bleiben auf dem ${W.geraet} aufbewahrt. Stelle deine letzte Sicherung wieder her; danach speichert ${MARKE.name} in einem Speicher ohne diese Grenze.`,
   ladefehler_version: `Deine Daten stammen aus einer neueren Version von ${MARKE.name}. Bitte aktualisiere die App ${ANDROID ? "über Google Play" : "im App Store"} – bis dahin wird nichts überschrieben.`,
   ladefehler_alles_loeschen_wirklich: "Trotz Ladefehler neu beginnen?",
   ladefehler_alles_loeschen_text: `Die Daten ließen sich nicht lesen. Sie werden nicht gelöscht, sondern auf diesem ${W.geraet} beiseitegelegt – samt Belegdateien und Schlüssel. Du startest mit leeren Daten.`,
@@ -848,8 +850,8 @@ export const T = {
   steuerpaket_fortschritt_zip: "Das Paket wird gepackt …",
   steuerpaket_gross: (mb: number) => `Dieses Paket wird etwa ${mb} MB groß. Auf dem ${W.geraet} kann das am Arbeitsspeicher scheitern. Wähle besser einen kürzeren Zeitraum (Quartal oder Monat) – oder erstelle es trotzdem.`,
   trotzdem_erstellen: "Trotzdem erstellen",
-  sicherung_gross: (fotos: number, mb: number) => `Diese Sicherung enthält ${fotos} Belegdateien (etwa ${mb} MB). Eine so große Sicherungsdatei kann ${MARKE.name} auf dem ${W.geraet} abbrechen lassen, weil sie ganz in den Arbeitsspeicher muss. Empfohlen: die automatische ${ANDROID ? "Sicherung in einen Ordner" : "iCloud-Sicherung"} – sie legt jede Belegdatei einzeln ab. Du kannst trotzdem eine Datei erstellen.`,
-  sicherung_trotzdem: "Trotzdem sichern",
+  // E-194: die Datei entsteht Stück für Stück (kein Absturz mehr) – nur noch ein Hinweis auf Dauer und Größe
+  sicherung_gross: (fotos: number, mb: number) => `Diese Sicherung enthält ${fotos} Belegdateien (etwa ${mb} MB). Das Erstellen dauert einen Moment, und die Datei ist entsprechend groß – wähle einen Ablageort mit genug Platz.`,
   sicherung_fortschritt: (n: number, von: number) => `Belegdateien ${n} von ${von} …`,
   // (R9 Performance, Nachtrag) Pflichten, die bald in Kraft treten
   kommt_demnaechst_titel: "Kommt demnächst",
