@@ -144,7 +144,8 @@ describe("Oberfläche ohne Pro (E-188)", () => {
     expect(frei).not.toMatch(/a\.kommend|a\.gruendung|SchonErledigt|Jahresraster/);
     const c = lies("seiten/Check.tsx");
     expect(c).toMatch(/const schon = Boolean\(a\) && z\.pro &&/);
-    expect(c).toMatch(/<GesperrtePflichten anzahl=\{a\.gilt\.length - anfangen\.length\} \/>/);
+    // E-192: „… und N weitere Pflichten“ zählt nur echte Pflichten (`weiterePflichten`, wie `zaehlung`)
+    expect(c).toMatch(/<GesperrtePflichten anzahl=\{weiterePflichten\(a, frei\)\} \/>/);
     const h = lies("seiten/Heute.tsx");
     expect(h).toMatch(/filter\(\(p\) => !frei \|\| frei\.has\(p\.id\)\)/);
   });

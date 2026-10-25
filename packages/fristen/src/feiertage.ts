@@ -96,11 +96,31 @@ export function gesetzlicheFeiertage(jahr: number): Feiertag[] {
 }
 
 /**
- * Schließtage des Zahlungsverkehrssystems (TARGET), zusätzlich zu Samstag und Sonntag.
- * [FACHLICH ZU PRÜFEN]: Ob für "Bankarbeitstag" im Sinne der jeweiligen Pflicht (z. B. Fälligkeit
- * der SV-Beiträge) zusätzlich regionale Feiertage gelten, ist je Pflicht zu klären.
+ * Schließtage des Zahlungsverkehrssystems TARGET (EZB), zusätzlich zu Samstag und Sonntag – nur zur Information.
+ * Für Fristen gilt `keineBankarbeitstage` (E-192): Der TARGET-Kalender kennt weder den 24. und 31. Dezember noch
+ * Christi Himmelfahrt, Pfingstmontag oder den Tag der Deutschen Einheit; mit ihm lagen SV-Fälligkeiten im Dezember
+ * und Beitragsnachweise im Mai bis zu drei Tage zu spät.
  */
 export function bankSchliesstage(jahr: number): Datum[] {
   const ostern = ostersonntag(jahr);
   return [datum(jahr, 1, 1), plusTage(ostern, -2), plusTage(ostern, 1), datum(jahr, 5, 1), datum(jahr, 12, 25), datum(jahr, 12, 26)];
+}
+
+/**
+ * Werktage (Montag bis Freitag), die keine Bankarbeitstage im Sinne der Fälligkeit der Gesamtsozialversicherungsbeiträge
+ * sind (§ 23 Abs. 1 SGB IV: drittletzter Bankarbeitstag; Beitragsnachweis zwei Arbeitstage davor, § 28f Abs. 3 SGB IV),
+ * E-192. Nach den Fälligkeitstabellen der Einzugsstellen (AOK, BKK24, IKK/BKK über informationsportal.de) sind keine
+ * Bankarbeitstage: Samstage, Sonntage, gesetzliche Feiertage sowie der 24. und 31. Dezember. Landesfeiertage zählen
+ * nach dem Sitz der Krankenkasse (AOK 2027, Fußnote zu Fronleichnam). Die App kennt die Krankenkassen nicht (bei
+ * mehreren Beschäftigten oft mehrere) – deshalb zählt jeder Landesfeiertag, der in mindestens einem Land gilt: Das
+ * ergibt den frühesten der möglichen Termine, nie einen zu späten (PRUEFLISTE T-184).
+ */
+export function keineBankarbeitstage(jahr: number, zusatz: readonly Feiertag[] = []): Feiertag[] {
+  return [
+    ...gesetzlicheFeiertage(jahr),
+    // kommunale Feiertage (ags) bleiben außen vor – sie gelten am Sitz keiner Krankenkasse landesweit
+    ...zusatz.filter((f) => !f.ags && f.datum.startsWith(`${String(jahr).padStart(4, "0")}-`)),
+    { datum: datum(jahr, 12, 24), name: "Heiligabend (kein Bankarbeitstag)" },
+    { datum: datum(jahr, 12, 31), name: "Silvester (kein Bankarbeitstag)" },
+  ];
 }

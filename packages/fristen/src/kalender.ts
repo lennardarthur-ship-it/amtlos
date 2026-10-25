@@ -1,5 +1,5 @@
 import { jahrVon, plusTage, wochentag, type Datum } from "./datum.js";
-import { bankSchliesstage, gesetzlicheFeiertage, type Feiertag, type Ort } from "./feiertage.js";
+import { gesetzlicheFeiertage, keineBankarbeitstage, type Feiertag, type Ort } from "./feiertage.js";
 
 /** Welcher Feiertagskalender für eine Frist maßgeblich ist (pflicht.schema.json → verschiebung.kalender). */
 export type KalenderArt = "bundeseinheitlich" | "bundesland" | "gemeinde" | "bankarbeitstage";
@@ -20,6 +20,10 @@ export interface Verschiebung {
 export interface Kalender {
   /** Feiertag nach der gewählten Kalenderart am Ort? Liefert den Namen oder undefined. */
   feiertag(d: Datum, art: KalenderArt, ort: Ort): string | undefined;
+  /**
+   * Bankarbeitstag im Sinne von § 23 Abs. 1 SGB IV (E-192): Montag bis Freitag, kein gesetzlicher Feiertag (bundesweit
+   * oder in einem Land), nicht der 24. und 31. Dezember – siehe `keineBankarbeitstage`.
+   */
   istBankarbeitstag(d: Datum): boolean;
 }
 
@@ -29,7 +33,7 @@ export interface Kalender {
  */
 export class StandardKalender implements Kalender {
   private readonly cache = new Map<number, Feiertag[]>();
-  private readonly bankCache = new Map<number, Set<Datum>>();
+  private readonly bankCache = new Map<number, Map<Datum, string>>();
 
   constructor(private readonly zusatz: readonly Feiertag[] = []) {}
 
@@ -43,7 +47,7 @@ export class StandardKalender implements Kalender {
   }
 
   feiertag(d: Datum, art: KalenderArt, ort: Ort): string | undefined {
-    if (art === "bankarbeitstage") return this.istBankarbeitstag(d) ? undefined : "Bank-Schließtag";
+    if (art === "bankarbeitstage") return this.keinBankarbeitstag(d);
     for (const f of this.feiertageImJahr(jahrVon(d))) {
       if (f.datum !== d) continue;
       const bundesweit = !f.bundeslaender && !f.ags;
@@ -61,13 +65,19 @@ export class StandardKalender implements Kalender {
   istBankarbeitstag(d: Datum): boolean {
     const wt = wochentag(d);
     if (wt === 0 || wt === 6) return false;
+    return this.keinBankarbeitstag(d) === undefined;
+  }
+
+  /** Name des Feiertags bzw. Tags, an dem kein Bankarbeitstag ist (ohne Wochenende) – sonst undefined. */
+  private keinBankarbeitstag(d: Datum): string | undefined {
     const jahr = jahrVon(d);
     let tage = this.bankCache.get(jahr);
     if (!tage) {
-      tage = new Set(bankSchliesstage(jahr));
+      tage = new Map();
+      for (const f of keineBankarbeitstage(jahr, this.zusatz)) if (!tage.has(f.datum)) tage.set(f.datum, f.name);
       this.bankCache.set(jahr, tage);
     }
-    return !tage.has(d);
+    return tage.get(d);
   }
 }
 
@@ -78,7 +88,7 @@ export interface Werktagspruefung {
 
 export function pruefeWerktag(d: Datum, v: Verschiebung, ort: Ort, kal: Kalender): Werktagspruefung {
   if (v.kalender === "bankarbeitstage" || v.regel.endsWith("bankarbeitstag")) {
-    return kal.istBankarbeitstag(d) ? { werktag: true } : { werktag: false, grund: wochenendName(d) ?? "Bank-Schließtag" };
+    return kal.istBankarbeitstag(d) ? { werktag: true } : { werktag: false, grund: wochenendName(d) ?? kal.feiertag(d, "bankarbeitstage", ort) ?? "kein Bankarbeitstag" };
   }
   const we = wochenendName(d, v.samstag_ist_werktag ?? false);
   if (we) return { werktag: false, grund: we };

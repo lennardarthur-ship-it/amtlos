@@ -37,7 +37,7 @@ export const T = {
   als_naechstes: "Als Nächstes",
   alle_pflichten: "Zur Liste",
   /** Satz nach „nichts dringend“ – verspricht nur eine Erinnerung, wenn sie eingeschaltet ist */
-  nichts_dran_erinnerung: (an: boolean) => (an ? `Dein ${W.geraet} erinnert dich drei Tage vor dem nächsten Termin.` : `Neue Termine siehst du hier – mit „An Fristen erinnern“ (Pro) meldet sich dein ${W.geraet} vorher.`),
+  nichts_dran_erinnerung: (an: boolean) => (an ? `Dein ${W.geraet} erinnert dich drei Tage vor jeder Frist.` : `Neue Termine siehst du hier – mit „An Fristen erinnern“ (Pro) meldet sich dein ${W.geraet} vorher.`),
   offen_label: (betrag: string, zusatz: string, monat: string) => `Offen bei Kunden: ${betrag}, ${zusatz}. ${monat}`,
   oeffnet_unterlagen: "Öffnet deine Unterlagen",
   kachel_offen: "Offen",
@@ -327,8 +327,15 @@ export const T = {
   naechste_wochen: (n: number) => `In den nächsten Wochen (${n})`,
   alle_nach_bereich: "Pflichten nach Bereich",
   erinnern: "An Fristen erinnern",
-  erinnern_hilfe: `Dein ${W.geraet} erinnert dich drei Tage vor den nächsten Terminen, jeweils um 9 Uhr.`,
-  erinnern_hilfe_frei: `Mit Pro erinnert dich dein ${W.geraet} drei Tage vor jeder Frist, jeweils um 9 Uhr.`,
+  // E-192: drei Tage vorher und am Tag selbst, Versäumtes weiter, bis es abgehakt ist – auch wenn die App zu bleibt
+  erinnern_hilfe: `Dein ${W.geraet} erinnert dich drei Tage vor jeder Frist und am Tag selbst, jeweils um 9 Uhr – an Versäumtes, bis du es abhakst. Auch wenn ${MARKE.name} geschlossen bleibt.`,
+  erinnern_hilfe_frei: `Mit Pro erinnert dich dein ${W.geraet} drei Tage vor jeder Frist und am Tag selbst, jeweils um 9 Uhr.`,
+  /** E-192: Ehrlichkeitshinweis, wenn die geplanten Mitteilungen (höchstens 60, Grenze des Systems) vor dem Ende der Fristen enden */
+  erinnern_geplant_bis: (datum: string) => `Erinnerungen sind bis ${datum} geplant – öffne ${MARKE.name} bis dahin einmal, dann plant es die nächsten Fristen.`,
+  /** E-192: Mitteilungen (lokal, 9 Uhr) */
+  mitteilung_mehrere: (n: number) => `${n} Fristen`,
+  mitteilung_vorher: (datum: string) => `Fällig am ${datum}`,
+  mitteilung_ansehen: `In ${MARKE.name} ansehen.`,
   // E-156: Pflicht-Details (Pro) – kompakter Hinweis statt der Details
   pro_pflicht_teaser_titel: "Mit Pro: Erklärung, Folgen, Schritte",
   // Vorprüfung Katalog (21.10.2026, Abschnitt 7 RDG): „kommt nach deinen Angaben in Frage“ statt „gilt für dich“

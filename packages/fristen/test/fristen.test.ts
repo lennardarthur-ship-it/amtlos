@@ -94,10 +94,19 @@ describe("Feiertage", () => {
     expect(kal.feiertag("2025-08-08", "bundesland", { bundesland: "BY", ags: "09761000" })).toBeUndefined();
   });
 
-  it("kennt Bankarbeitstage", () => {
+  it("kennt Bankarbeitstage im Sinne von § 23 SGB IV (E-192)", () => {
     expect(kal.istBankarbeitstag("2026-04-03")).toBe(false); // Karfreitag
-    expect(kal.istBankarbeitstag("2026-06-04")).toBe(true); // Fronleichnam ist kein Bank-Schließtag
     expect(kal.istBankarbeitstag("2026-10-10")).toBe(false); // Samstag
+    // anders als im TARGET-Kalender: 24. und 31. Dezember, Christi Himmelfahrt, Pfingstmontag, 3. Oktober
+    expect(kal.istBankarbeitstag("2026-12-24")).toBe(false);
+    expect(kal.istBankarbeitstag("2026-12-31")).toBe(false);
+    expect(kal.istBankarbeitstag("2026-05-14")).toBe(false);
+    expect(kal.istBankarbeitstag("2026-05-25")).toBe(false);
+    // Landesfeiertage zählen am Sitz der Krankenkasse – unbekannt, also der frühere Termin (Fronleichnam in BW, BY …)
+    expect(kal.istBankarbeitstag("2026-06-04")).toBe(false);
+    // kommunale Feiertage zählen nicht
+    expect(kal.istBankarbeitstag("2025-08-08")).toBe(true);
+    expect(kal.istBankarbeitstag("2026-12-23")).toBe(true);
   });
 });
 
@@ -144,7 +153,8 @@ describe("Perioden", () => {
     const okt = { schluessel: "2026-10", beginn: "2026-10-01", ende: "2026-10-31" };
     expect(rohtermin(okt, { art: "n_letzter_bankarbeitstag", n: 3 }, kal)).toBe("2026-10-28");
     const dez = { schluessel: "2026-12", beginn: "2026-12-01", ende: "2026-12-31" };
-    expect(rohtermin(dez, { art: "n_letzter_bankarbeitstag", n: 3 }, kal)).toBe("2026-12-29");
+    // 31.12. ist kein Bankarbeitstag (E-192; vorher fälschlich 29.12.)
+    expect(rohtermin(dez, { art: "n_letzter_bankarbeitstag", n: 3 }, kal)).toBe("2026-12-28");
     expect(rohtermin(okt, { art: "n_letzter_bankarbeitstag", n: 3, arbeitstage_vorher: 2 }, kal)).toBe("2026-10-26");
   });
 });
@@ -192,3 +202,92 @@ describe("Termine", () => {
     expect(relativerTermin("2026-10-03", { versatz: "P0D", verschiebung: werktag }, BE, kal).faellig_am).toBe("2026-10-05");
   });
 });
+
+/**
+ * Regression E-192: Fälligkeit der Gesamtsozialversicherungsbeiträge (drittletzter Bankarbeitstag, § 23 Abs. 1 SGB IV)
+ * und Eingang des Beitragsnachweises (zwei Arbeitstage davor = fünftletzter Bankarbeitstag, 0 Uhr, § 28f Abs. 3 SGB IV)
+ * für alle Monate 2026 und 2027, verglichen mit den veröffentlichten Tabellen der Einzugsstellen:
+ * - 2026: AOK „Termine 2026“ https://www.aok.de/fk/fileadmin/user_upload/tools/downloads/universell/aok-kalender-faelligkeiten-sv-beitraege-2026-beitragsnachweise.pdf
+ *   (gleich: BKK24 https://www.bkk24.de/fileadmin/user_upload/Inhalte/Arbeitgeber/Infoblatt-Beitragsfaelligkeit-2026-RZ.pdf
+ *   und https://www.informationsportal.de/wp-content/uploads/Faelligkeitstermine-Sozialversicherung-2026.pdf), abgerufen 25.10.2026
+ * - 2027: AOK „Fälligkeit der Sozialversicherungsbeiträge 2027“
+ *   https://www.aok.de/fk/niedersachsen/tools/weitere-inhalte/beitraege-und-rechengroessen-der-sozialversicherung/faelligkeit-der-sozialversicherungsbeitraege/werte-2027/
+ *   (abgerufen 25.10.2026). Mai 2027 hat dort zwei Zeilen: 24.05./26.05. für Krankenkassen mit Sitz in einem Land mit
+ *   Fronleichnam (27.05.2027), sonst 25.05./27.05. Die App kennt die Krankenkasse nicht und nimmt den früheren Termin.
+ */
+describe("SV-Fälligkeiten 2026 und 2027 (amtliche Tabellen, E-192)", () => {
+  const TABELLE: Record<string, [nachweis: string, faellig: string]> = {
+    "2026-01": ["2026-01-26", "2026-01-28"],
+    "2026-02": ["2026-02-23", "2026-02-25"],
+    "2026-03": ["2026-03-25", "2026-03-27"],
+    "2026-04": ["2026-04-24", "2026-04-28"],
+    "2026-05": ["2026-05-22", "2026-05-27"],
+    "2026-06": ["2026-06-24", "2026-06-26"],
+    "2026-07": ["2026-07-27", "2026-07-29"],
+    "2026-08": ["2026-08-25", "2026-08-27"],
+    "2026-09": ["2026-09-24", "2026-09-28"],
+    "2026-10": ["2026-10-26", "2026-10-28"],
+    "2026-11": ["2026-11-24", "2026-11-26"],
+    "2026-12": ["2026-12-22", "2026-12-28"],
+    "2027-01": ["2027-01-25", "2027-01-27"],
+    "2027-02": ["2027-02-22", "2027-02-24"],
+    "2027-03": ["2027-03-23", "2027-03-25"],
+    "2027-04": ["2027-04-26", "2027-04-28"],
+    // Zeile mit Fußnote 2 (Sitz der Krankenkasse in einem Land mit Fronleichnam) – der frühere Termin
+    "2027-05": ["2027-05-24", "2027-05-26"],
+    "2027-06": ["2027-06-24", "2027-06-28"],
+    "2027-07": ["2027-07-26", "2027-07-28"],
+    "2027-08": ["2027-08-25", "2027-08-27"],
+    "2027-09": ["2027-09-24", "2027-09-28"],
+    "2027-10": ["2027-10-25", "2027-10-27"],
+    "2027-11": ["2027-11-24", "2027-11-26"],
+    "2027-12": ["2027-12-23", "2027-12-28"],
+  };
+  const ohneZusatz = new StandardKalender();
+  const sv = (arbeitstage_vorher?: number) =>
+    wiederkehrendeTermine(
+      { rhythmus: "monatlich", faellig: { art: "n_letzter_bankarbeitstag", n: 3, ...(arbeitstage_vorher ? { arbeitstage_vorher } : {}) }, verschiebung: { regel: "keine", kalender: "bankarbeitstage" } },
+      "2026-01-01",
+      "2027-12-31",
+      {},
+      ohneZusatz,
+    );
+  it("Fälligkeit der Beiträge (drittletzter Bankarbeitstag) wie in der Tabelle", () => {
+    expect(Object.fromEntries(sv().map((t) => [t.periode, t.faellig_am]))).toEqual(Object.fromEntries(Object.entries(TABELLE).map(([m, [, f]]) => [m, f])));
+  });
+  it("Beitragsnachweis (zwei Arbeitstage vor Fälligkeit) wie in der Tabelle", () => {
+    expect(Object.fromEntries(sv(2).map((t) => [t.periode, t.faellig_am]))).toEqual(Object.fromEntries(Object.entries(TABELLE).map(([m, [n]]) => [m, n])));
+  });
+  it("hängt nicht vom Bundesland des Betriebs ab (maßgeblich ist die Krankenkasse)", () => {
+    for (const bundesland of ["BE", "BY", "NW", "SN"] as const) {
+      const t = wiederkehrendeTermine({ rhythmus: "monatlich", faellig: { art: "n_letzter_bankarbeitstag", n: 3 }, verschiebung: { regel: "keine", kalender: "bankarbeitstage" } }, "2027-05-01", "2027-05-31", { bundesland }, ohneZusatz);
+      expect(t.map((x) => x.faellig_am)).toEqual(["2027-05-26"]);
+    }
+  });
+});
+
+/**
+ * E-192: Umsatzsteuer-Voranmeldung und Lohnsteuer-Anmeldung (10. des Folgemonats, § 18 Abs. 1 UStG, § 41a Abs. 1 EStG)
+ * rechnen nicht mit Bankarbeitstagen, sondern nach § 108 Abs. 3 AO: fällt das Fristende auf einen Samstag, Sonntag oder
+ * gesetzlichen Feiertag, endet sie am nächsten Werktag – 24. und 31. Dezember sind Werktage. Vergleich mit den
+ * Steuerterminen 2026 der IHK Neubrandenburg (https://www.neubrandenburg.ihk.de/fileadmin/user_upload/Recht_und_Steuern/IHK-Steuerinformationen/Steuertermine-2026.pdf,
+ * abgerufen 25.10.2026); 2027 nach den Wochentagen (10.01. Sonntag, 10.04. Samstag, 10.07. Samstag, 10.10. Sonntag).
+ */
+describe("Steuertermine am 10. (§ 108 Abs. 3 AO, E-192)", () => {
+  const zehnter = (von: string, bis: string, ort = BE) =>
+    wiederkehrendeTermine({ rhythmus: "monatlich", faellig: { art: "tag_nach_periodenende", monate_nach: 1, tag: 10 }, verschiebung: werktag }, von, bis, ort, new StandardKalender()).map((t) => t.faellig_am);
+  it("2026 wie in der veröffentlichten Übersicht", () => {
+    expect(zehnter("2026-01-01", "2026-12-31")).toEqual(["2026-01-12", "2026-02-10", "2026-03-10", "2026-04-10", "2026-05-11", "2026-06-10", "2026-07-10", "2026-08-10", "2026-09-10", "2026-10-12", "2026-11-10", "2026-12-10"]);
+  });
+  it("2027 nach Wochenenden verschoben", () => {
+    expect(zehnter("2027-01-01", "2027-12-31")).toEqual(["2027-01-11", "2027-02-10", "2027-03-10", "2027-04-12", "2027-05-10", "2027-06-10", "2027-07-12", "2027-08-10", "2027-09-10", "2027-10-11", "2027-11-10", "2027-12-10"]);
+  });
+  it("Feiertag am 10.: Christi Himmelfahrt 10.05.2029 → Freitag 11.05.2029", () => {
+    expect(zehnter("2029-05-01", "2029-05-31")).toEqual(["2029-05-11"]);
+  });
+  it("Silvester und Heiligabend sind für § 108 Abs. 3 AO Werktage", () => {
+    expect(verschiebe("2027-12-31", werktag, BE, new StandardKalender()).datum).toBe("2027-12-31");
+    expect(verschiebe("2026-12-24", werktag, BE, new StandardKalender()).datum).toBe("2026-12-24");
+  });
+});
+

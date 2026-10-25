@@ -5,7 +5,7 @@ import { T as TEXT } from "../texte";
 import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Stempel, Symbol, Karte, Knopf, MehrfachWahl, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
-import { CHECK_FELDER, auswertung, checkFragenAnzahl, beantwortet, checkFragen, dringlichkeit, folgeAntworten, offeneFragenNachWirkung, selten, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
+import { CHECK_FELDER, auswertung, checkFragenAnzahl, beantwortet, checkFragen, dringlichkeit, folgeAntworten, offeneFragenNachWirkung, selten, terminStand, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { umsatzFakten } from "../unterlagen/kuUmsatz";
 import { GesperrtePflichten, PflichtZeile } from "./Pflichten";
@@ -13,7 +13,7 @@ import { langBestehend, schonDaKandidaten } from "./schonDa";
 import { WasHastDuSchon } from "./WasHastDu";
 import { useAmtlos } from "../zustand";
 import { checkHinweis, rechtsHinweis } from "../rechtshinweis";
-import { bezahlschirmNachCheck, freiePflichten } from "../pro/regeln";
+import { bezahlschirmNachCheck, freiePflichten, weiterePflichten } from "../pro/regeln";
 import { paywallVerfuegbar } from "../pro/kauf";
 import { ProSeite } from "./Pro";
 
@@ -209,7 +209,9 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
       setZwischen(true);
     }
   }, [voll, amEnde, zusatz, z.stand.profil, liste]);
-  const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen, z.stand.mitarbeiter, umsatzFakten(z.stand, heute())) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen, z.stand.mitarbeiter, z.stand.kasse, z.stand.sachentnahmen]);
+  const roh = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen, z.stand.mitarbeiter, umsatzFakten(z.stand, heute())) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen, z.stand.mitarbeiter, z.stand.kasse, z.stand.sachentnahmen]);
+  // E-192: mit dem Stand der Haken – ein versäumter Termin steht vorn (wie im Pflichten-Tab)
+  const a = useMemo(() => (roh ? terminStand(roh, z.stand, heute()) : null), [roh, z.stand.erledigt, z.stand.zeiten]);
   const d = useMemo(() => (a ? dringlichkeit(a, { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb }, heute()) : null), [a, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb]);
   // R10: Pflichten, Hinweise und Optionen getrennt (Rechtsprüfung) – „Mit diesen fängst du an“ nur echte Pflichten
   const zahl = a ? zaehlung(a.gilt) : { pflichten: 0, hinweise: 0, optionen: 0 };
@@ -307,7 +309,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
                   </Karte>
                 </View>
               ) : null}
-              {frei && a ? <GesperrtePflichten anzahl={a.gilt.length - anfangen.length} /> : null}
+              {frei && a ? <GesperrtePflichten anzahl={weiterePflichten(a, frei)} /> : null}
               <Karte stil={{ marginTop: 16 }}>
                 {[
                   { symbol: "doc.text", ton: "amt" as const, text: TEXT.ergebnis_vorlagen(a.gilt.filter((p) => p.vorlage).length) },

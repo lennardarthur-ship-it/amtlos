@@ -8,7 +8,7 @@ import { VORLAGEN, fehlendeAngaben, vorlageFuer, type Betrieb } from "@amtlos/fa
 // Monatsende-Regel der Fristen: 31.01. + 1 Monat = 28./29.02., 29.02. + 12 Monate = 28.02.
 import { StandardKalender, plusMonate } from "@amtlos/fristen";
 import { SCHRITTE, type Frage } from "@amtlos/i18n";
-import { auswerten, entscheidendeSaetze, zuErfragendeFakten, type Ereignis, type Katalog, type Pflicht } from "@amtlos/rules-engine";
+import { QUELLFAKTEN, auswerten, entscheidendeSaetze, zuErfragendeFakten, type Ereignis, type Katalog, type Knoten, type Pflicht } from "@amtlos/rules-engine";
 import roh from "./katalog.json";
 import { istGeprueft, pruefVermerk, type PruefungRoh } from "./pruefer";
 
@@ -304,6 +304,18 @@ export interface PflichtInfo {
   naechsterTermin: string | null;
   /** alle Termine ab heute in den nächsten zwölf Monaten (ISO, aufsteigend) – für den Jahresblick */
   termine: string[];
+  /**
+   * E-192: Termine einer wiederkehrenden Pflicht (Katalog `frist.typ: wiederkehrend`) in den letzten 13 Monaten vor dem
+   * Stichtag (ISO, aufsteigend) – daraus bestimmt `terminStand`, ob ein Termin überfällig ist. Sonst leer.
+   */
+  vergangeneTermine?: string[];
+  /**
+   * E-192: überfällige, nicht abgehakte Termine (ISO, aufsteigend), gesetzt von `terminStand` – der älteste ist dann
+   * `naechsterTermin`, bis er abgehakt ist. Ohne `terminStand` bzw. ohne Überfälliges nicht gesetzt.
+   */
+  ueberfaellig?: string[];
+  /** E-192: Profilangaben, auf denen das Ergebnis beruht (ohne „profil.“) – ab ihrer letzten Änderung zählen Termine als versäumt */
+  ausloeserFelder?: string[];
   /** Fragen, die für eine unklare Pflicht noch fehlen (Profilfelder) */
   offeneFragen: string[];
   /** wiederkehrend (z. B. jährlich): „erledigt“ gilt nur bis zum nächsten Termin */
@@ -559,6 +571,17 @@ export function offeneVoraussetzungen(p: PflichtInfo, a: Auswertung, e: Erledigt
   return (p.voraussetzungen ?? []).map((id) => alle.find((x) => x.id === id)).filter((x): x is PflichtInfo => Boolean(x) && !istErledigt(x!, e));
 }
 
+/** E-192: so weit zurück rechnet die Auswertung Termine wiederkehrender Pflichten (für überfällige Termine). */
+export const RUECKBLICK_MONATE = 13;
+
+/** E-192: Profilangaben (ohne „profil.“), die im Begründungsbaum vorkommen – abgeleitete Fakten über ihre Quellen. */
+function profilFelder(k: Knoten, aus = new Set<string>()): string[] {
+  if (k.art === "vergleich") {
+    for (const q of QUELLFAKTEN[k.feld] ?? [k.feld]) if (q.startsWith("profil.")) aus.add(q.slice("profil.".length));
+  } else if (k.art === "all" || k.art === "any" || k.art === "not") for (const x of k.kinder) profilFelder(x, aus);
+  return [...aus].sort();
+}
+
 /**
  * Katalog für dieses Profil auswerten. Pflichten im Rechtsänderungs-Radar (Entwurf, geplant) zählen nicht mit.
  * Ereignisse leitet `ereignisseAusStand` aus Profil und Unterlagen ab (z. B. Beschäftigte ⇒ Einstellung).
@@ -580,12 +603,14 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
   // § 17 MiLoG: in den Branchen nach § 2a SchwarzArbG alle, sonst die Minijobber (Art aus „Mitarbeiter“; ohne Angabe nach Zahl)
   const zeitPersonen = alle2a ? aktuell.map(person) : mitArt ? aktuell.filter((m) => m.art === "minijob").map(person) : null;
   const zeitAnzahl = alle2a ? (zahl(profil, "beschaeftigte.gesamt") ?? 0) : (zahl(profil, "beschaeftigte.minijob") ?? 0);
-  const ergebnisse = auswerten({ katalog: KATALOG, fakten, ereignisse, stichtag, kalender: new StandardKalender(), fenster: { von: stichtag, bis: plusMonate(stichtag, 12) } });
+  // E-192: auch die Termine der letzten 13 Monate – ein versäumter Termin bleibt sichtbar, bis er abgehakt ist (`terminStand`)
+  const ergebnisse = auswerten({ katalog: KATALOG, fakten, ereignisse, stichtag, kalender: new StandardKalender(), fenster: { von: plusMonate(stichtag, -RUECKBLICK_MONATE), bis: plusMonate(stichtag, 12) } });
   const nachId = new Map(KATALOG.pflichten.map((p) => [p.id, p]));
   const info = (e: (typeof ergebnisse)[number]): PflichtInfo => {
     const p = nachId.get(e.pflicht_id) as Pflicht & { stelle?: unknown; quellen?: { titel: string; url?: string }[]; pruefung?: PruefungRoh };
     const termine = e.termine.map((t) => t.faellig_am).filter((d) => d >= stichtag).sort();
     const termin = termine[0] ?? null;
+    const vergangen = p.frist.typ === "wiederkehrend" ? [...new Set(e.termine.map((t) => t.faellig_am).filter((d) => d < stichtag))].sort() : [];
     return {
       id: p.id,
       titel: text(p.titel),
@@ -609,6 +634,8 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       vorlagen: VORLAGEN_JE_PFLICHT.get(p.id) ?? [],
       naechsterTermin: termin,
       termine,
+      vergangeneTermine: vergangen,
+      ausloeserFelder: profilFelder(e.begruendung),
       offeneFragen: zuErfragendeFakten(e.fehlende_fakten)
         .filter((f) => f.startsWith("profil."))
         .map((f) => f.slice("profil.".length))
@@ -650,7 +677,7 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
   const kommend: PflichtInfo[] = [];
   for (const tag of ab) {
     const spaeter = auswerten({ katalog: { ...KATALOG, pflichten: KATALOG.pflichten.filter((p) => p.gueltig_ab === tag) }, fakten, ereignisse, stichtag: tag, kalender: new StandardKalender(), fenster: { von: tag, bis: plusMonate(tag, 12) } });
-    for (const e of spaeter.filter((x) => !x.radar && x.ergebnis === "gilt")) kommend.push({ ...info(e), naechsterTermin: tag, termine: [tag] });
+    for (const e of spaeter.filter((x) => !x.radar && x.ergebnis === "gilt")) kommend.push({ ...info(e), naechsterTermin: tag, termine: [tag], vergangeneTermine: [] });
   }
   return {
     gilt: sortiert(gilt.filter((e) => !ausGruendung(e) && !beiEinstellung(e)).map(info)),
@@ -694,6 +721,8 @@ export interface Erledigt {
   betrieb: Betrieb;
   /** Stichtag für laufende Pflichten (R10); ohne Angabe heute (Europe/Berlin) */
   heute?: string;
+  /** E-192: Zeitpunkte der Antworten (`Stand.zeiten`, „profil:<feld>“) – ab wann die App eine Pflicht begleitet */
+  zeiten?: Record<string, string>;
 }
 
 const TAG = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" });
@@ -729,6 +758,64 @@ export function haken(wert: string | undefined): { datum: string; termin: string
   if (!wert) return null;
   const [datum, termin] = wert.split("|");
   return { datum: datum!, termin: termin || null };
+}
+
+/** Kalendertag (Europe/Berlin) eines ISO-Zeitpunkts bzw. ISO-Datums */
+const tagVon = (iso: string) => (ISO.test(iso) ? iso : TAG.format(new Date(iso)));
+
+/**
+ * E-192: Ab welchem Tag die App eine Pflicht begleitet – erste Antwort im Check, bei später geänderten Angaben, auf denen
+ * die Pflicht beruht (z. B. „Beschäftigte“), der Tag der letzten Änderung. Termine davor gelten nicht als versäumt (sie
+ * lagen vor der App bzw. bevor die Pflicht galt). null: ohne Zeitpunkte (ältere Daten, Tests) – dann zählt nur ein Haken.
+ */
+export function begleitetSeit(p: Pick<PflichtInfo, "ausloeserFelder">, zeiten: Readonly<Record<string, string>> | undefined): string | null {
+  if (!zeiten) return null;
+  const antworten = Object.entries(zeiten).filter(([k, v]) => k.startsWith("profil:") && typeof v === "string" && v).map(([k, v]) => [k.slice("profil:".length), tagVon(v)] as const);
+  if (!antworten.length) return null;
+  let seit = antworten.map(([, t]) => t).sort()[0]!;
+  const felder = new Set(p.ausloeserFelder ?? []);
+  for (const [k, t] of antworten) if (felder.has(k) && t > seit) seit = t;
+  return seit;
+}
+
+/**
+ * E-192: Überfällige Termine einer wiederkehrenden Pflicht. Ein Haken bei einer wiederkehrenden Pflicht gilt für einen
+ * Termin X und alle davor (abhaken lässt sich immer nur der älteste offene). Überfällig sind die vergangenen Termine
+ * nach X – ohne Haken die ab `begleitetSeit`. Laufende Pflichten je Zeitraum (HACCP, Arbeitszeit) bleiben außen vor.
+ */
+export function ueberfaelligeTermine(p: PflichtInfo, e: Pick<Erledigt, "erledigt" | "zeiten">, heute: string): string[] {
+  const vergangen = (p.vergangeneTermine ?? []).filter((t) => t < heute);
+  if (!vergangen.length || (p.erledigung?.zeitraum && p.erledigung.art !== "einmalig")) return [];
+  const h = haken(e.erledigt[p.id]);
+  const bis = h ? (h.termin ?? h.datum.slice(0, 10)) : null;
+  const seit = begleitetSeit(p, e.zeiten);
+  if (!bis && !seit) return [];
+  return vergangen.filter((t) => (!bis || t > bis) && (!seit || t >= seit));
+}
+
+/**
+ * E-192: Auswertung mit dem Stand der Haken – ein versäumter Termin verschwindet nicht. Der älteste überfällige, nicht
+ * abgehakte Termin wird `naechsterTermin` (oben in „Jetzt dran“ und auf „Heute“, „Seit N Tagen überfällig“), bis er
+ * abgehakt ist; dann folgt der nächste. Gehört direkt hinter `auswertung` (billig, nur die Haken).
+ */
+export function terminStand(a: Auswertung, e: Pick<Erledigt, "erledigt" | "zeiten">, heute: string): Auswertung {
+  const mit = (p: PflichtInfo): PflichtInfo => {
+    const offen = ueberfaelligeTermine(p, e, heute);
+    return offen.length ? { ...p, naechsterTermin: offen[0]!, ueberfaellig: offen } : p;
+  };
+  return { gilt: a.gilt.map(mit), gruendung: a.gruendung.map(mit), unbekannt: a.unbekannt.map(mit), beiEinstellung: a.beiEinstellung.map(mit), kommend: a.kommend };
+}
+
+/**
+ * E-192: Haken einer wiederkehrenden Pflicht entfernen. Der Haken stand für den Termin X und alle davor; ohne ihn gilt
+ * der Termin davor als letzter erledigter (er war es, sonst hätte X nicht abgehakt werden können) – so kehren ältere,
+ * längst erledigte Termine nicht als „überfällig“ zurück. null: Haken ganz entfernen.
+ */
+export function hakenOhne(p: PflichtInfo, wert: string | undefined): { datum: string; termin: string } | null {
+  const h = haken(wert);
+  if (!h?.termin || !p.wiederkehrend) return null;
+  const davor = [...(p.vergangeneTermine ?? []), ...p.termine].filter((t) => t < h.termin!).sort().pop();
+  return davor ? { datum: h.datum, termin: davor } : null;
 }
 
 /**
@@ -935,24 +1022,4 @@ export function gruendungsSchritte(a: Auswertung, profil: Profil, e: Erledigt, s
   const phase = new Map(KATALOG.pflichten.map((p) => [p.id, p.phase]));
   const l = a.gilt.filter((p) => phase.get(p.id) === "gruendung" && !istErledigt(p, { ...e, heute: e.heute ?? stichtag }));
   return l.length >= ab ? l : [];
-}
-
-export interface Erinnerung {
-  pflichtId: string;
-  titel: string;
-  termin: string;
-  /** Tag der Benachrichtigung (ISO), morgens zugestellt */
-  am: string;
-}
-
-/** Lokale Erinnerungen: für offene Pflichten mit Termin, `vorlauf` Tage vorher (nicht in der Vergangenheit), höchstens `max`. */
-export function erinnerungsPlan(a: Auswertung, e: Erledigt, heute: string, vorlauf = 3, max = 30): Erinnerung[] {
-  return a.gilt
-    .filter((p) => p.naechsterTermin && p.naechsterTermin >= heute && !p.lohnbuero && !istErledigt(p, { ...e, heute: e.heute ?? heute }))
-    .map((p) => {
-      const frueh = plusTage(p.naechsterTermin!, -vorlauf);
-      return { pflichtId: p.id, titel: p.titel, termin: p.naechsterTermin!, am: frueh > heute ? frueh : heute };
-    })
-    .sort((x, y) => x.am.localeCompare(y.am) || x.titel.localeCompare(y.titel, "de"))
-    .slice(0, max);
 }
