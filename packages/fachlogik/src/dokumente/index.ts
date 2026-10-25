@@ -19,8 +19,8 @@ import { PRUEFHINWEIS } from "./html.js";
 import { VORLAGEN_GEPRUEFT, fassungPasst, freigabeUnterschrieben, freigabenFuer, geprueftVermerk, kanonisch, sha256, sichtbarerText, type VorlagenFreigabe } from "./geprueft.js";
 import { PRUEFSTAENDE } from "./pruefstaende.js";
 import { LEERER_BETRIEB } from "./typen.js";
-import { pruefstandBerechnen, type PruefstandErgebnis } from "./pruefvarianten.js";
-export { PRUEF_RECHTSFORMEN, PRUEFSUMME_TAG, gedruckterText, pruefAuspraegungen, pruefBetriebe, pruefstandBerechnen, type PruefstandApi, type PruefsummenApi } from "./pruefvarianten.js";
+import { EIGENE_GRUPPEN, PRUEF_LAENDER, PRUEF_RECHTSFORMEN, pruefAuspraegungenFuer, pruefstandBerechnen, type Auspraegung, type PruefstandErgebnis } from "./pruefvarianten.js";
+export { EIGENE_GRUPPEN, PRUEF_LAENDER, PRUEF_RECHTSFORMEN, PRUEFSUMME_TAG, TEILSUMME_LAENGE, gedruckterText, neutralerBetrieb, pruefAuspraegungen, pruefBetriebe, pruefstandBerechnen, rechtsformBetrieb, type Auspraegung, type PruefstandApi, type PruefsummenApi } from "./pruefvarianten.js";
 
 export * from "./typen.js";
 export { ALLERGENE, GETREIDEARTEN, NUSSARTEN, WARNFARBSTOFFE, WEIZENARTEN_FUSSNOTE, ZUSATZSTOFFE, ZUSATZSTOFFE_QUELLE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, HANDLUNGSBEDARF, RISIKO_MATRIX, RISIKO_STUFEN, SCHUTZZIELE, SCHWERE, SONSTIGE_UNTERPUNKTE, WAHRSCHEINLICHKEIT, risikoAus } from "./konstanten.js";
@@ -408,7 +408,7 @@ const pruefstaende = new WeakMap<Vorlage, Map<object, Pruefstand>>();
 /** Markierung offener Prüfpunkte im gedruckten Text einer Vorlage (Bausteine mit Prüfstand „offen“) */
 export const OFFEN_MARKE = "fachlich zu prüfen";
 
-/** SHA-256 über alle Ausprägungen und Zahl der Stellen mit „fachlich zu prüfen“ (pruefvarianten.ts) */
+/** SHA-256 über alle Teilsummen, Teilsumme je Variantengruppe und Zahl der Stellen mit „fachlich zu prüfen“ (pruefvarianten.ts) */
 export type Pruefstand = PruefstandErgebnis;
 
 /**
@@ -436,6 +436,11 @@ export function vorlagenPruefstand(v: Vorlage, freigabe: Pick<VorlagenFreigabe, 
   return stand;
 }
 
+/** Alle Ausprägungen (Daten, Betrieb, Variantengruppe), über die `vorlagenPruefstand` rechnet – z. B. für Beispiel-PDFs zur Nachprüfung. */
+export function vorlagenAuspraegungen(v: Vorlage, freigabe: Pick<VorlagenFreigabe, "fassung" | "gruppen" | "rechtsformen"> | undefined = VORLAGEN_GEPRUEFT[v.id]): Auspraegung[] {
+  return pruefAuspraegungenFuer(v, freigabe, { dokumentHtml, leereDaten, eintragAusVorschlag, leererBetrieb: LEERER_BETRIEB });
+}
+
 /** Prüfsumme einer Vorlage (siehe `vorlagenPruefstand`). */
 export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, "fassung" | "gruppen" | "rechtsformen"> | undefined = VORLAGEN_GEPRUEFT[v.id]): string {
   return vorlagenPruefstand(v, freigabe).summe;
@@ -447,7 +452,41 @@ export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, 
  * zu den Daten passt und deren Prüfsumme stimmt. Sonst `undefined`.
  */
 export function vorlageGeprueft(v: Vorlage, d?: Daten, liste: Readonly<Record<string, VorlagenFreigabe>> = VORLAGEN_GEPRUEFT, betrieb?: Betrieb): Omit<VorlagenFreigabe, "weitere"> | undefined {
-  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && freigabeUnterschrieben(f) && fassungPasst(f, d) && rechtsformPasst(f, d, betrieb) && aktuellerPruefstand(v, f, liste).summe === f.pruefsumme);
+  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && freigabeUnterschrieben(f) && fassungPasst(f, d) && rechtsformPasst(f, d, betrieb) && variantenPassen(v, f, liste, d, betrieb));
+}
+
+/**
+ * E-196: Passen die Teilsummen der Varianten, die diese Unterlage braucht (`pruefGruppenFuer`), zur Freigabe? Ohne
+ * gespeicherte Teilsummen (eigene Freigaben in Tests und Werkzeugen) muss die ganze Prüfsumme passen.
+ */
+function variantenPassen(v: Vorlage, f: Omit<VorlagenFreigabe, "weitere">, liste: Readonly<Record<string, VorlagenFreigabe>>, d?: Daten, betrieb?: Betrieb): boolean {
+  const heute = aktuellerPruefstand(v, f, liste);
+  if (!f.teilsummen) return heute.summe === f.pruefsumme;
+  return pruefGruppenFuer(v, f.teilsummen, d, betrieb).every((g) => Boolean(f.teilsummen![g]) && heute.teile[g] === f.teilsummen![g]);
+}
+
+/**
+ * E-196: Variantengruppen (pruefvarianten.ts), die eine Unterlage braucht: immer `basis`; die Rechtsform aus „Mein Betrieb“
+ * (ohne Angabe aus dem Namen, sonst Einzelunternehmen – ohne Rechtsformzusatz im Namen ist der Betrieb nicht eingetragen);
+ * das Land; `ku` bei Kleinunternehmern mit Wechseldatum; bei der Rechnung die Gruppe der Rechnungsart (Schlussrechnung,
+ * Storno, Storno einer Schlussrechnung mit Abschlägen). Ohne Betrieb (allgemeine Ansicht ohne Angaben) alle Gruppen der
+ * Freigabe – der Vermerk erscheint dann nur, wenn keine Variante geändert ist.
+ */
+export function pruefGruppenFuer(v: Vorlage, freigegeben: Readonly<Record<string, string>>, d?: Daten, betrieb?: Betrieb): string[] {
+  if (!betrieb) return Object.keys(freigegeben).filter((g) => !EIGENE_GRUPPEN[v.id]?.some((x) => x.gruppe === g));
+  const g = ["basis"];
+  const name = betrieb.name ?? "";
+  const ugCoKg = /\bUG\b/.test(name) && /&\s*Co\.?\s*KG\b/.test(name) ? "UG (haftungsbeschränkt) & Co. KG" : null;
+  const roh = betrieb.rechtsform || ugCoKg || formImNamen(name) || "Einzelunternehmen";
+  g.push(`rf:${rechtsformAus(roh, PRUEF_RECHTSFORMEN)}`);
+  if (PRUEF_LAENDER.includes(betrieb.bundesland)) g.push(`land:${betrieb.bundesland}`);
+  if (betrieb.ku_bis) g.push("ku");
+  const gesetzt = (x: unknown) => x === true || (typeof x === "string" && x.trim() !== "");
+  const eigene = (EIGENE_GRUPPEN[v.id] ?? [])
+    .filter((x) => (x.verdeckt && Object.keys(x.verdeckt).every((k) => gesetzt(d?.[k]))) || (x.auswahl && Object.entries(x.auswahl).every(([k, w]) => d?.[k] === w)))
+    .sort((a, b) => Object.keys(b.verdeckt ?? {}).length - Object.keys(a.verdeckt ?? {}).length)[0];
+  if (eigene) g.push(eigene.gruppe);
+  return g;
 }
 
 /**

@@ -144,9 +144,11 @@ Arbeitssicherheit, Lebensmittelfachbeauftragter). Die App zeigt einen Prüfverme
 Freigabe genau diese Fassung abdeckt (Stand 25.10.2026: 209 der 228 Pflichten; die übrigen warten auf die
 Unterschrift bzw. sind neu) – mit der Rolle, nie mit Namen, z. B. „Inhalt fachlich geprüft von einem Rechtsanwalt,
 Stand …“; Einschränkungen stehen dabei („ohne arbeitsmedizinische Angaben“), offene Punkte als „teilweise geprüft“.
-Die Vorlagen zeigen zurzeit keinen Vermerk: Ihre heutige Fassung ist noch nicht mit Unterschrift bestätigt
-(Nachprüfung läuft). Jede Änderung hebt einen Vermerk auf, bis erneut geprüft ist. Rechtsberatung im Einzelfall
-ist die App nicht.
+Bei den Vorlagen zeigen zurzeit fünf einen Vermerk (Steuerberater, unterschrieben): EÜR, Verfahrensdokumentation,
+Kassenmeldung, Lohnkonto und Rechnung – die Rechnung nicht für GmbH & Co. KG / UG & Co. KG und nicht beim Storno
+einer Schlussrechnung mit Abschlägen (seit der Prüfung geändert). Die übrigen Vorlagen warten auf die Unterschrift.
+Der Vermerk gilt je Variante (Rechtsform, Land, Rechnungsart): Jede Änderung hebt ihn für die betroffene Variante auf,
+bis erneut geprüft ist. Rechtsberatung im Einzelfall ist die App nicht.
 
 
 RECHTLICHES IN DER APP („Über {{MARKE}}“)

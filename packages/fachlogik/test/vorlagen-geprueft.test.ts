@@ -1,13 +1,14 @@
 /**
  * Vermerk unter den Vorlagen (zuerst Nachkontrolle Lebensmittelfachbeauftragter, 23.10.2026; E-196): nur bei
- * unterschriebener Freigabe, solange die Prüfsumme aller gedruckten Ausprägungen zum freigegebenen Stand passt; mit Rolle
- * statt Namen, mit Einschränkung des Prüfers und „teilweise“, wenn die Vorlage noch „fachlich zu prüfen“ enthält.
+ * unterschriebener Freigabe, solange die Teilsummen der gedruckten Ausprägungen, die die Unterlage betreffen (Rechtsform,
+ * Land, Rechnungsart …), zum freigegebenen Stand passen; mit Rolle statt Namen, mit Einschränkung des Prüfers und
+ * „teilweise“, wenn die Vorlage noch „fachlich zu prüfen“ enthält.
  */
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LEERER_BETRIEB, PRUEFHINWEIS, PRUEFSTAENDE, PRUEF_ROLLEN, VERIFIZIERUNG, VORLAGEN, aktuellerPruefstand, dokumentHtml, freigabeUnterschrieben, freigabenFuer, leereDaten, VORLAGEN_GEPRUEFT, geprueftVermerk, pruefHinweisFuer, sha256, vorlageFuer, vorlageGeprueft, vorlagenPruefstand, vorlagenPruefsumme, type Daten, type Vorlage, type VorlagenFreigabe } from "../src/index.js";
+import { LEERER_BETRIEB, PRUEFHINWEIS, PRUEFSTAENDE, PRUEF_ROLLEN, VERIFIZIERUNG, VORLAGEN, aktuellerPruefstand, pruefGruppenFuer, type Betrieb, dokumentHtml, freigabeUnterschrieben, freigabenFuer, leereDaten, VORLAGEN_GEPRUEFT, geprueftVermerk, pruefHinweisFuer, sha256, vorlageFuer, vorlageGeprueft, vorlagenPruefstand, vorlagenPruefsumme, type Daten, type Vorlage, type VorlagenFreigabe } from "../src/index.js";
 
 const WURZEL = path.resolve(__dirname, "../../..");
 const FUENF = ["haccp", "hygieneplan", "allergene", "ifsg_belehrung", "hygieneschulung"];
@@ -22,9 +23,13 @@ const NUR_RECHTSFORM = ["handelsregister"];
 const ALLE = [...FUENF, ...WEITERE];
 // E-196: unterschrieben liegt nur die Bestätigung des Steuerberaters vom 23.10.2026 vor (fünf Vorlagen)
 const UNTERSCHRIEBEN = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung", "lohnkonto"];
-// E-196: Vorlagen, die heute einen Vermerk zeigen – keine: Die fünf unterschriebenen haben seit der Freigabe die neue
-// Fußzeile der GmbH & Co. KG (E-193), alle übrigen sind ohne unterschriebenes Blatt. Nach erneuter Freigabe hier eintragen.
-const MIT_VERMERK: string[] = [];
+// E-196: Vorlagen, die heute einen Vermerk zeigen (Einzelunternehmen): die fünf unterschriebenen. Geändert ist seit der
+// Freigabe nur bei der Rechnung etwas Gedrucktes – die Fußzeile der GmbH & Co. KG / UG & Co. KG (E-193; die übrigen
+// Vorlagen drucken die Fußleiste nicht) und das Storno einer Schlussrechnung mit Abschlägen; diese Varianten zeigen keinen
+// Vermerk. Alle übrigen Vorlagen sind ohne unterschriebenes Blatt.
+const MIT_VERMERK: string[] = [...UNTERSCHRIEBEN];
+const CAFE: Betrieb = { ...LEERER_BETRIEB, name: "Café Sonne", bundesland: "Berlin" };
+const CO_KG = ["rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"];
 const alleFreigaben = () => Object.keys(VORLAGEN_GEPRUEFT).flatMap((id) => freigabenFuer(id).map((f, i) => ({ id, f, schluessel: i ? `${id}#${i}` : id })));
 const datenFuer = (id: string, f: Omit<VorlagenFreigabe, "weitere">): Daten => ({ ...(f.fassung ? { [f.fassung.feld]: f.fassung.wert } : {}), ...(f.rechtsformen ? { rechtsform: f.rechtsformen[0]! } : {}), ...(id === "hygieneplan" && !f.fassung ? { art: "lebensmittel" } : {}) });
 
@@ -67,8 +72,9 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
     for (const rolle of Object.keys(PRUEF_ROLLEN)) {
       for (const { id, f } of alleFreigaben().filter((x) => x.f.rolle === rolle)) {
         const v = vorlageFuer(id)!;
-        const soll = freigabeUnterschrieben(f) && aktuellerPruefstand(v, f).summe === f.pruefsumme;
-        const hinweis = pruefHinweisFuer(v, datenFuer(id, f));
+        const heute = aktuellerPruefstand(v, f).teile;
+        const soll = freigabeUnterschrieben(f) && pruefGruppenFuer(v, f.teilsummen!, datenFuer(id, f), CAFE).every((g) => heute[g] === f.teilsummen![g]);
+        const hinweis = pruefHinweisFuer(v, datenFuer(id, f), CAFE);
         expect(hinweis !== PRUEFHINWEIS, `${rolle} ${id}`).toBe(soll);
         if (soll) {
           gezeigt.push(id);
@@ -79,14 +85,40 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
       }
     }
     expect(gezeigt.sort()).toEqual([...MIT_VERMERK].sort());
-    for (const v of VORLAGEN) if (!MIT_VERMERK.includes(v.id)) expect(pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}), v.id).toBe(PRUEFHINWEIS);
+    for (const v of VORLAGEN) if (!MIT_VERMERK.includes(v.id)) expect(pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}, CAFE), v.id).toBe(PRUEFHINWEIS);
+    // ohne Betrieb: alle Varianten müssen passen – bei der Rechnung nicht, bei den vier übrigen unterschriebenen ja
+    for (const id of UNTERSCHRIEBEN) expect(pruefHinweisFuer(vorlageFuer(id)!, {}) !== PRUEFHINWEIS, id).toBe(id !== "rechnung");
+    // GmbH & Co. KG: nur die Rechnung druckt die geänderte Fußzeile
+    const coKg: Betrieb = { ...CAFE, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" };
+    for (const id of UNTERSCHRIEBEN) expect(pruefHinweisFuer(vorlageFuer(id)!, {}, coKg) !== PRUEFHINWEIS, id).toBe(id !== "rechnung");
   });
 
-  it("E-196: heutige Prüfsumme weicht bei allen Vorlagen außer dem Handelsregister vom freigegebenen Stand ab (Fußzeile GmbH & Co. KG, E-193)", () => {
-    for (const { id, f } of alleFreigaben()) {
-      const gleich = aktuellerPruefstand(vorlageFuer(id)!, f).summe === f.pruefsumme;
-      expect(gleich, id).toBe(id === "handelsregister");
+  it("E-196: geändert seit der Freigabe sind nur diese Varianten (Rechnung: Fußzeile GmbH & Co. KG und Storno, E-193)", () => {
+    const geaendert: Record<string, string[]> = {};
+    for (const { f, schluessel } of alleFreigaben()) {
+      const heute = PRUEFSTAENDE[schluessel]!.teile;
+      expect(Object.keys(heute).sort(), schluessel).toEqual(Object.keys(f.teilsummen!).sort());
+      geaendert[schluessel] = Object.keys(heute).filter((g) => heute[g] !== f.teilsummen![g]).sort();
     }
+    for (const [k, g] of Object.entries(geaendert)) {
+      // Bilanz: nur der Hilfetext eines Felds (E-196 A: „Steuerberater“ statt des Namens) – gehört zum gemeinsamen Teil
+      const soll = k === "rechnung" ? [...CO_KG, "storno_schluss"] : k === "bilanz_guv" ? ["basis"] : [];
+      expect(g, k).toEqual([...soll].sort());
+    }
+  });
+
+  it("E-196: Rechnung des Einzelunternehmens mit Vermerk, GmbH & Co. KG und Storno einer Schlussrechnung ohne", () => {
+    const re = vorlageFuer("rechnung")!;
+    const ja = (d: Daten, b?: Betrieb) => pruefHinweisFuer(re, d, b) !== PRUEFHINWEIS;
+    expect(ja({}, CAFE)).toBe(true);
+    expect(ja({}, { ...CAFE, name: "Sonne GmbH", rechtsform: "GmbH" })).toBe(true);
+    expect(ja({ schluss: true }, CAFE)).toBe(true);
+    expect(ja({ storno_zu: "RE-1" }, CAFE)).toBe(true);
+    expect(ja({ storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, CAFE)).toBe(false);
+    expect(ja({}, { ...CAFE, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" })).toBe(false);
+    expect(ja({}, { ...CAFE, name: "Sonne UG (haftungsbeschränkt) & Co. KG" })).toBe(false);
+    expect(ja({}, { ...CAFE, name: "Sonne AG" })).toBe(false);
+    expect(pruefHinweisFuer(re, {}, CAFE)).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 23.10.2026)");
   });
 
   it("Vermerk mit Rolle, Einschränkung und offenen Stellen – ohne Rolle der frühere Wortlaut", () => {
@@ -103,7 +135,7 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
     const g = vorlageFuer("gefaehrdungsbeurteilung")!;
     const f = VORLAGEN_GEPRUEFT.gefaehrdungsbeurteilung!;
     expect(PRUEFSTAENDE.gefaehrdungsbeurteilung!.offen).toBeGreaterThan(0);
-    const test: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, gefaehrdungsbeurteilung: { ...f, unterschrieben_am: "2026-10-25", unterschrift: "test.jpg", pruefsumme: vorlagenPruefsumme({ ...g }, f) } };
+    const test: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, gefaehrdungsbeurteilung: { ...f, unterschrieben_am: "2026-10-25", unterschrift: "test.jpg", pruefsumme: vorlagenPruefsumme({ ...g }, f), teilsummen: undefined } };
     const frei = vorlageGeprueft(g, {}, test)!;
     expect(frei).toBeDefined();
     expect(geprueftVermerk(frei.stand, frei, vorlagenPruefstand({ ...g }, f).offen)).toMatch(/^Vorlage teilweise fachlich durchgesehen von einer Fachkraft für Arbeitssicherheit \(ohne arbeitsmedizinische Angaben\)/);
@@ -166,13 +198,88 @@ describe("E-196: Prüfsumme über alle gedruckten Ausprägungen", () => {
   });
 });
 
+describe("E-196: Vermerk je Variantengruppe – eine Textänderung in einer Variante nimmt genau dieser den Vermerk", () => {
+  const re = vorlageFuer("rechnung")!;
+  const haccp = vorlageFuer("haccp")!;
+  const UNTERSCHRIFT = { unterschrieben_am: "2026-10-23", unterschrift: "test.jpg" };
+  const freigabeFuer = (v: Vorlage): Record<string, VorlagenFreigabe> => {
+    const st = vorlagenPruefstand({ ...v }, {});
+    return { ...VORLAGEN_GEPRUEFT, [v.id]: { stand: "2026-10-23", rolle: "steuern", bezug: "Test", ...UNTERSCHRIFT, pruefsumme: st.summe, teilsummen: st.teile } };
+  };
+  const reFrei = freigabeFuer(re);
+  const haccpFrei = freigabeFuer(haccp);
+  const geaendert = (v: Vorlage, frei: Record<string, VorlagenFreigabe>) => {
+    const heute = vorlagenPruefstand({ ...v }, {}).teile;
+    const alt = frei[v.id]!.teilsummen!;
+    return Object.keys(alt).filter((g) => heute[g] !== alt[g]).sort();
+  };
+  const CO: Betrieb = { ...CAFE, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" };
+  const UG: Betrieb = { ...CAFE, name: "Sonne UG", rechtsform: "UG (haftungsbeschränkt)" };
+
+  it("Fußzeile nur der GmbH & Co. KG: nur rf:GmbH & Co. KG verliert den Vermerk", () => {
+    const v: Vorlage = { ...re, html: (d, b) => (b.rechtsform === "GmbH & Co. KG" ? re.html(d, b).replace("Rechnung", "Rechnung (neu)") : re.html(d, b)) };
+    expect(geaendert(v, reFrei)).toEqual(["rf:GmbH & Co. KG"]);
+    expect(vorlageGeprueft(v, {}, reFrei, CAFE)).toBeDefined();
+    expect(vorlageGeprueft(v, {}, reFrei, UG)).toBeDefined();
+    expect(vorlageGeprueft(v, {}, reFrei, CO)).toBeUndefined();
+    expect(vorlageGeprueft(v, {}, reFrei)).toBeUndefined();
+  });
+
+  it("nur bei der UG: nur rf:UG verliert den Vermerk", () => {
+    const v: Vorlage = { ...re, html: (d, b) => (b.rechtsform === "UG (haftungsbeschränkt)" ? `${re.html(d, b)}<p>UG neu</p>` : re.html(d, b)) };
+    expect(geaendert(v, reFrei)).toEqual(["rf:UG (haftungsbeschränkt)"]);
+    expect(vorlageGeprueft(v, {}, reFrei, UG)).toBeUndefined();
+    expect(vorlageGeprueft(v, {}, reFrei, CAFE)).toBeDefined();
+  });
+
+  it("nur im Storno einer Schlussrechnung mit Abschlägen: nur diese Rechnungsart verliert den Vermerk", () => {
+    const v: Vorlage = { ...re, html: (d, b) => (d.storno_abschlaege === true ? `${re.html(d, b)}<p>Storno neu</p>` : re.html(d, b)) };
+    expect(geaendert(v, reFrei)).toEqual(["storno_schluss"]);
+    expect(vorlageGeprueft(v, { storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, reFrei, CAFE)).toBeUndefined();
+    expect(vorlageGeprueft(v, { storno_zu: "RE-1" }, reFrei, CAFE)).toBeDefined();
+    expect(vorlageGeprueft(v, {}, reFrei, CAFE)).toBeDefined();
+  });
+
+  it("nur im einfachen Storno: Storno ohne, Rechnung und Storno der Schlussrechnung behalten ihn", () => {
+    const v: Vorlage = { ...re, html: (d, b) => (d.storno_zu && d.storno_abschlaege !== true ? `${re.html(d, b)}<p>Storno neu</p>` : re.html(d, b)) };
+    expect(geaendert(v, reFrei)).toEqual(["storno"]);
+    expect(vorlageGeprueft(v, { storno_zu: "RE-1" }, reFrei, CAFE)).toBeUndefined();
+    expect(vorlageGeprueft(v, {}, reFrei, CAFE)).toBeDefined();
+  });
+
+  it("nur in Bayern: nur land:Bayern verliert den Vermerk", () => {
+    const v: Vorlage = { ...haccp, html: (d, b) => (b.bundesland === "Bayern" ? `${haccp.html(d, b)}<p>Bayern neu</p>` : haccp.html(d, b)) };
+    expect(geaendert(v, haccpFrei)).toEqual(["land:Bayern"]);
+    expect(vorlageGeprueft(v, {}, haccpFrei, { ...CAFE, bundesland: "Bayern" })).toBeUndefined();
+    expect(vorlageGeprueft(v, {}, haccpFrei, CAFE)).toBeDefined();
+  });
+
+  it("Änderung im gemeinsamen Teil (Formular, Text für alle): alle verlieren den Vermerk", () => {
+    const v: Vorlage = { ...haccp, html: (d, b) => haccp.html(d, b).replace("Gefahrenanalyse", "Gefahrenanalyse (geändert)") };
+    expect(geaendert(v, haccpFrei)).toContain("basis");
+    for (const b of [CAFE, CO, UG, { ...CAFE, bundesland: "Bayern" }]) expect(vorlageGeprueft(v, {}, haccpFrei, b)).toBeUndefined();
+  });
+
+  it("Fußleiste zählt nur, wo sie gedruckt wird (Briefe wie die Rechnung), nicht bei ausgeblendeter Fußleiste (EÜR)", () => {
+    const anders = (v: Vorlage): Vorlage => ({ ...v, html: (d, b) => v.html(d, b).replace(/Persönlich haftende Gesellschafterin/g, "Komplementärin") });
+    const euer = vorlageFuer("euer")!;
+    expect(vorlagenPruefsumme(anders(euer), {})).toBe(vorlagenPruefsumme({ ...euer }, {}));
+    expect(geaendert(anders(re), reFrei)).toEqual(["rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"]);
+  });
+
+  it("unbekannte Rechtsform (nicht in der Prüfung): kein Vermerk", () => {
+    expect(vorlageGeprueft(re, {}, reFrei, { ...CAFE, name: "Sonne AG", rechtsform: "AG" })).toBeUndefined();
+    expect(vorlageGeprueft(re, {}, reFrei, CAFE)).toBeDefined();
+  });
+});
+
 describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026)", () => {
   const h = vorlageFuer("hygieneplan")!;
   const lm = VORLAGEN_GEPRUEFT.hygieneplan!;
   const BEAUTY = { fassung: { feld: "art", wert: "beauty" } };
   const UNTERSCHRIFT = { rolle: "recht" as const, unterschrieben_am: "2026-11-02", unterschrift: "test.jpg" };
   // erfundene, unterschriebene Freigaben – nur im Test, nicht in geprueft.ts
-  const lmTest = { ...lm, ...UNTERSCHRIFT, rolle: "hygiene" as const, unterschrieben_am: "2026-10-23", pruefsumme: vorlagenPruefsumme({ ...h }, lm) };
+  const lmTest = { ...lm, ...UNTERSCHRIFT, rolle: "hygiene" as const, unterschrieben_am: "2026-10-23", pruefsumme: vorlagenPruefsumme({ ...h }, lm), teilsummen: vorlagenPruefstand({ ...h }, lm).teile };
   const beautyFreigabe = { stand: "2026-11-02", bezug: "Test", pruefsumme: vorlagenPruefsumme(h, BEAUTY), ...BEAUTY, ...UNTERSCHRIFT };
   const mitBeauty: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, hygieneplan: { ...lmTest, weitere: [beautyFreigabe] } };
 
@@ -208,7 +315,7 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
   });
 
   it("passt die Prüfsumme einer Fassung nicht mehr, entfällt nur deren Vermerk", () => {
-    const veraltet: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, hygieneplan: { ...lmTest, weitere: [{ ...beautyFreigabe, pruefsumme: "0".repeat(64) }] } };
+    const veraltet: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, hygieneplan: { ...lmTest, weitere: [{ ...beautyFreigabe, pruefsumme: "0".repeat(64), teilsummen: { basis: "0".repeat(24) } }] } };
     expect(vorlageGeprueft(h, { art: "beauty" }, veraltet)).toBeUndefined();
     expect(vorlageGeprueft(h, { art: "lebensmittel" }, veraltet)).toBe(veraltet.hygieneplan);
     const geaendert: Vorlage = { ...h, grundlageFuer: (d, b) => `${h.grundlageFuer!(d, b)}${d.art === "beauty" ? " (geändert)" : ""}` };

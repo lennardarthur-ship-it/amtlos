@@ -17,15 +17,15 @@ for (const id of Object.keys(F.VORLAGEN_GEPRUEFT)) {
   const v = F.vorlageFuer(id);
   F.freigabenFuer(id).forEach((f, i) => {
     const s = F.vorlagenPruefstand(v, f);
-    zeilen.push(`  ${JSON.stringify(i ? `${id}#${i}` : id)}: { summe: "${s.summe}", offen: ${s.offen} },`);
+    zeilen.push(`  ${JSON.stringify(i ? `${id}#${i}` : id)}: { summe: "${s.summe}", offen: ${s.offen}, teile: ${JSON.stringify(s.teile)} },`);
   });
 }
 const text = `/**
  * Erzeugt von werkzeuge/pruefstaende-erzeugen.mjs (E-196) – nicht von Hand ändern. Heutiger Prüfstand je Freigabe in
- * geprueft.ts (Schlüssel: Vorlage, weitere Freigaben mit „#1“ usw.): Prüfsumme über alle Ausprägungen und Zahl der Stellen
- * mit „fachlich zu prüfen“. Der Test e196-vorlagen-pruefstand prüft, dass die Werte zur Rechnung passen.
+ * geprueft.ts (Schlüssel: Vorlage, weitere Freigaben mit „#1“ usw.): Prüfsumme über alle Ausprägungen, Teilsummen je
+ * Variantengruppe und Zahl der Stellen mit „fachlich zu prüfen“. Der Test e196-vorlagen-pruefstand prüft, dass die Werte zur Rechnung passen.
  */
-export const PRUEFSTAENDE: Readonly<Record<string, { summe: string; offen: number }>> = {
+export const PRUEFSTAENDE: Readonly<Record<string, { summe: string; offen: number; teile: Record<string, string> }>> = {
 ${zeilen.join("\n")}
 };
 `;

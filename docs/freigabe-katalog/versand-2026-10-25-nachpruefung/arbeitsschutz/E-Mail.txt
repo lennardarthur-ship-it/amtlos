@@ -8,7 +8,7 @@ Bitte prüfen und bestätigen Sie die Positionen in der beiliegenden Liste (Betr
 
 - 3 Katalogeinträge, die Sie freigegeben haben, zu denen uns aber kein unterschriebenes Blatt vorliegt. Bis zu Ihrer Unterschrift zeigt die App dort keinen Prüfvermerk.
 - 2 Einträge, bei denen der Vermerk jetzt Ihre Einschränkung nennt (z. B. „ohne arbeitsmedizinische Angaben“).
-- 9 Vorlagen: Seit Ihrer Freigabe hat sich die Fußzeile für die GmbH & Co. KG geändert (Angaben der Komplementärin), und/oder uns fehlt das unterschriebene Blatt. Wir rechnen die Prüfsumme jetzt über alle gedruckten Fassungen (auch mit Angaben aus „Mein Betrieb“); dadurch zeigt sich jede Änderung. Die aktuellen PDFs liegen bei.
+- 9 Vorlagen: Uns fehlt das unterschriebene Blatt und/oder eine Variante hat sich seit Ihrer Freigabe geändert. Wir prüfen den Inhalt jetzt je Variante (Rechtsform, Land, Rechnungsart …) über alle gedruckten Fassungen; der Vermerk entfällt nur für eine geänderte Variante. Inhaltlich hat sich seit Ihrer Freigabe nichts geändert.
 - die Nennung im Vermerk: Die App nennt keine Personen mehr, nur noch die Rolle (z. B. „von einem Steuerberater“). Bitte bestätigen Sie, dass das so in Ordnung ist.
 
 Je Zeile genügt die Auswahl in der Spalte „Entscheidung“; am Ende bitte das Blatt „Unterschrift“ ausfüllen und unterschreiben (Scan genügt).
@@ -19,4 +19,3 @@ Mit freundlichen Grüßen
 
 Anlagen:
 - Betriebsklar-Nachpruefliste-Sifa.xlsx
-- aktuelle PDFs der genannten Vorlagen (leer, Auswahl, voll und Beispiel GmbH & Co. KG)

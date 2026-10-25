@@ -2,14 +2,18 @@
 E-196: Prüfsummen der freigegebenen Vorlagen nach der neuen Rechnung (alle Ausprägungen, pruefvarianten.ts) – einmal für
 den Stand, den der Prüfer freigegeben hat, und einmal für den aktuellen Stand.
 
-Für jede Freigabe in geprueft.ts wird der erste Commit gesucht, in dem ihre (alte) Prüfsumme in geprueft.ts steht – das ist
-die freigegebene Fassung. Die Quellen von packages/fachlogik/src aus diesem Commit werden ausgepackt, die heutige
+Für jede Freigabe in geprueft.ts wird der erste Commit gesucht, in dem ihre Prüfsumme nach der Rechnung vor E-196
+(`pruefsumme_alt`) in geprueft.ts steht – das ist die freigegebene Fassung. Die Quellen von packages/fachlogik/src aus diesem Commit werden ausgepackt, die heutige
 Rechnung (pruefvarianten.ts) dazugelegt und mit esbuild gebündelt. Gleiche neue Prüfsumme alt und heute = der gedruckte
 Inhalt hat sich seit der Freigabe in keiner Ausprägung geändert; die Freigabe gilt mit der neuen Prüfsumme weiter.
-Verschieden = der Inhalt hat sich geändert (z. B. Fußzeile der GmbH & Co. KG oder Storno, E-193) – der Vermerk entfällt bis
-zur erneuten Freigabe.
+Verschieden = der Inhalt hat sich geändert (z. B. Fußzeile der GmbH & Co. KG oder Storno, E-193).
 
-    python3 packages/fachlogik/werkzeuge/pruefsummen-abgleich.py <ausgabe.json>
+Verglichen wird je Variantengruppe (basis, rf:<Rechtsform>, land:<Land>, ku, bei der Rechnung schlussrechnung, storno,
+storno_schluss): Der Vermerk entfällt nur für die Gruppen, deren Teilsumme sich geändert hat. Mit --schreiben werden die
+freigegebenen Teilsummen nach src/dokumente/geprueft-teilsummen.ts geschrieben und `pruefsumme` in geprueft.ts auf die
+Gesamtsumme der freigegebenen Fassung gesetzt.
+
+    python3 packages/fachlogik/werkzeuge/pruefsummen-abgleich.py <ausgabe.json> [--schreiben]
 """
 import glob
 import json
@@ -51,7 +55,7 @@ def freigaben():
     js = """import('./packages/fachlogik/dist/index.js').then((F) => {
       const out = [];
       for (const [id, f] of Object.entries(F.VORLAGEN_GEPRUEFT)) {
-        F.freigabenFuer(id).forEach((x, i) => out.push({ id, schluessel: i ? `${id}#${i}` : id, pruefsumme: x.pruefsumme, stand: x.stand,
+        F.freigabenFuer(id).forEach((x, i) => out.push({ id, schluessel: i ? `${id}#${i}` : id, pruefsumme: x.pruefsumme, pruefsumme_alt: x.pruefsumme_alt, stand: x.stand,
           freigabe: { ...(x.fassung ? { fassung: x.fassung } : {}), ...(x.gruppen ? { gruppen: x.gruppen } : {}), ...(x.rechtsformen ? { rechtsformen: x.rechtsformen } : {}) } }));
       }
       console.log(JSON.stringify(out));
@@ -85,7 +89,7 @@ if __name__ == "__main__":
     alle = freigaben()
     je_commit = {}
     for f in alle:
-        f["commit"] = erster_commit(f["pruefsumme"])
+        f["commit"] = erster_commit(f.get("pruefsumme_alt") or f["pruefsumme"])
         je_commit.setdefault(f["commit"], []).append(f)
     # Arbeitsordner unter packages/fachlogik, damit gebündelte Pakete (qrcode-generator) aus node_modules auflösen
     with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "packages/fachlogik"), prefix=".abgleich-") as arbeit:
@@ -99,8 +103,10 @@ if __name__ == "__main__":
                 ta, th = a.get("texte") or [], h.get("texte") or []
                 geaendert = sorted({w for i in range(max(len(ta), len(th))) if (ta[i] if i < len(ta) else None) != (th[i] if i < len(th) else None)
                                     for w in set((th[i] if i < len(th) else "").split(" ")) - set((ta[i] if i < len(ta) else "").split(" "))})
-                ergebnis.append({**f, "neu_freigegeben": a.get("summe"), "alt_bestaetigt": a.get("alt") == f["pruefsumme"], "neu_heute": h["summe"], "offen_heute": h["offen"],
+                ergebnis.append({**f, "neu_freigegeben": a.get("summe"), "alt_bestaetigt": a.get("alt") == (f.get("pruefsumme_alt") or f["pruefsumme"]), "neu_heute": h["summe"], "offen_heute": h["offen"],
                                  "unveraendert": a.get("summe") == h["summe"],
+                                 "teile_freigegeben": a.get("teile") or {}, "teile_heute": h.get("teile") or {},
+                                 "gruppen_geaendert": sorted(g for g in set(a.get("teile") or {}) | set(h.get("teile") or {}) if (a.get("teile") or {}).get(g) != (h.get("teile") or {}).get(g)),
                                  "auspraegungen_geaendert": sum(1 for i in range(max(len(ta), len(th))) if (ta[i] if i < len(ta) else None) != (th[i] if i < len(th) else None)),
                                  "auspraegungen": len(th), "neue_woerter": geaendert[:40],
                                  # ohne Kopf- und Fußzeile (Meta-Angaben): Änderungen im Dokument selbst
@@ -110,4 +116,23 @@ if __name__ == "__main__":
                 ergebnis[-1]["neue_woerter"] = geaendert[:40]
     json.dump(ergebnis, open(sys.argv[1], "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     for e in ergebnis:
-        print(f"{e['schluessel']:32} {e['commit'][:10] if e['commit'] else '-':10} alt ok={e['alt_bestaetigt']!s:5} unverändert={e['unveraendert']!s:5} offen={e['offen_heute']}")
+        print(f"{e['schluessel']:32} {e['commit'][:10] if e['commit'] else '-':10} alt ok={e['alt_bestaetigt']!s:5} unverändert={e['unveraendert']!s:5} offen={e['offen_heute']} geändert={','.join(e['gruppen_geaendert']) or '-'}")
+    if "--schreiben" in sys.argv:
+        zeilen = []
+        for e in ergebnis:
+            if not e["alt_bestaetigt"] or not e["teile_freigegeben"]:
+                continue
+            teile = ", ".join(f"{json.dumps(g, ensure_ascii=False)}: \"{t}\"" for g, t in sorted(e["teile_freigegeben"].items()))
+            zeilen.append(f"  {json.dumps(e['schluessel'])}: {{ {teile} }},")
+        open(os.path.join(ROOT, "packages/fachlogik/src/dokumente/geprueft-teilsummen.ts"), "w", encoding="utf-8").write(
+            "/**\n * Erzeugt von werkzeuge/pruefsummen-abgleich.py --schreiben (E-196) – nicht von Hand ändern. Teilsummen der freigegebenen\n"
+            " * Fassung je Variantengruppe (pruefvarianten.ts), gerechnet über die Quellen des Commits, in dem die Freigabe eingetragen\n"
+            " * wurde. Schlüssel: Vorlage, weitere Freigaben mit „#1“ usw.\n */\n"
+            "export const FREIGEGEBENE_TEILSUMMEN: Readonly<Record<string, Readonly<Record<string, string>>>> = {\n" + "\n".join(zeilen) + "\n};\n")
+        g = open(os.path.join(ROOT, GEPRUEFT), encoding="utf-8").read()
+        for e in ergebnis:
+            if e["alt_bestaetigt"] and e["neu_freigegeben"] and e["pruefsumme"] != e["neu_freigegeben"]:
+                assert g.count(e["pruefsumme"]) == 1, e["schluessel"]
+                g = g.replace(e["pruefsumme"], e["neu_freigegeben"])
+        open(os.path.join(ROOT, GEPRUEFT), "w", encoding="utf-8").write(g)
+        print(f"✓ {len(zeilen)} Freigaben mit Teilsummen → src/dokumente/geprueft-teilsummen.ts")

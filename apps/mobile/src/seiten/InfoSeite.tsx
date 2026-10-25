@@ -6,11 +6,13 @@ import { Unterseite } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { pflichtenFuer, rechtsgrundlagen } from "../unterlagen/katalog";
 import { mitVorlagenHinweis } from "../rechtshinweis";
+import { useAmtlos } from "../zustand";
 import { BEREICH_SYMBOL, Gruppe, Inhalt, RechtsHinweis } from "./gemeinsam";
 
 /** „Wozu brauche ich das?“ – Zweck, Rechtsgrundlage und Quellen einer Vorlage, nur auf Nachfrage (E-124). */
 export function InfoSeite({ id }: { id: string }) {
   const f = useFarben();
+  const z = useAmtlos();
   const v = vorlageFuer(id)!;
   const pflichten = pflichtenFuer(v);
   const quellen = pflichten.flatMap((p) => p.quellen).filter((q, i, a) => a.findIndex((x) => x.url === q.url) === i);
@@ -53,7 +55,7 @@ export function InfoSeite({ id }: { id: string }) {
         {mitVorlagenHinweis(v) ? <RechtsHinweis art="vorlage" oben={20} /> : null}
         {/* Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026): bei fachlich durchgesehenen Vorlagen der Vermerk statt des Prüfhinweises –
             ohne Unterlage nicht bei Vorlagen, die nur in einer Fassung freigegeben sind (Hygieneplan) */}
-        <T v="caption" leise stil={{ marginTop: mitVorlagenHinweis(v) ? 4 : 20 }}>{pruefHinweisFuer(v)}</T>
+        <T v="caption" leise stil={{ marginTop: mitVorlagenHinweis(v) ? 4 : 20 }}>{pruefHinweisFuer(v, undefined, z.stand.betrieb)}</T>
       </Inhalt>
     </Unterseite>
   );

@@ -9,7 +9,8 @@ Inhalt je Rolle (recht, steuern, arbeitsschutz, hygiene):
   - Katalogeinträge, die freigegeben sind, deren unterschriebenes Blatt aber nicht vorliegt (Register: `unterschrieben_am`
     fehlt) – mit Version und Quelle der Freigabe,
   - offene Prüfpunkte (offene-punkte.yaml) und Einschränkungen, die der Vermerk jetzt nennt,
-  - Vorlagen: fehlende Unterschrift und/oder geänderter Inhalt seit der Freigabe (Prüfsumme freigegeben ↔ heute, E-196)
+  - Vorlagen: fehlende Unterschrift und/oder geänderte Varianten seit der Freigabe (Teilsumme je Variantengruppe freigegeben ↔ heute, E-196);
+    PDFs der geänderten Varianten erzeugt apps/mobile/werkzeuge/nachpruef-pdfs.mjs in <rolle>/vorlagen/
     sowie Stellen mit „fachlich zu prüfen“,
   - Steuern: die Konten für § 13b-Eingangsleistungen (SKR03/SKR04),
   - die Nennung der Rolle im Vermerk (statt keines Namens bzw. des Namens).
@@ -73,7 +74,8 @@ def vorlagen():
       const out = [];
       for (const id of Object.keys(F.VORLAGEN_GEPRUEFT)) F.freigabenFuer(id).forEach((f, i) => {
         const k = i ? `${id}#${i}` : id; const s = F.PRUEFSTAENDE[k];
-        out.push({ id, schluessel: k, titel: F.vorlageFuer(id).titel, ...f, heute: s.summe, offen: s.offen, unterschrieben: F.freigabeUnterschrieben(f) });
+        const frei = f.teilsummen ?? {}; const geaendert = Object.keys(s.teile).filter((g) => frei[g] !== s.teile[g]);
+        out.push({ id, schluessel: k, titel: F.vorlageFuer(id).titel, ...f, heute: s.summe, offen: s.offen, unterschrieben: F.freigabeUnterschrieben(f), geaendert, varianten: Object.keys(s.teile).length });
       });
       console.log(JSON.stringify(out));
     })"""
@@ -119,11 +121,18 @@ def zeilen_fuer(rolle, kat, vorl):
             continue
         name = v["titel"] + (f" (Fassung {v['fassung']['wert']})" if v.get("fassung") else "") + (f" – nur {', '.join(v['rechtsformen'])}" if v.get("rechtsformen") else "")
         teile = []
-        if v["heute"] != v["pruefsumme"]:
-            aenderung = "die Fußzeile bei GmbH & Co. KG und UG (haftungsbeschränkt) & Co. KG (Zeile „Persönlich haftende Gesellschafterin: …“ mit den Angaben der Komplementärin, E-193)"
-            if v["id"] == "rechnung":
-                aenderung += " sowie das Storno einer Schlussrechnung (die abgesetzten Abschlagsrechnungen werden mit umgekehrtem Vorzeichen gespiegelt, E-193)"
-            teile.append(f"Seit Ihrer Freigabe geändert: {aenderung}. Prüfsumme der freigegebenen Fassung {v['pruefsumme'][:12]} (bisherige Rechnung {v['pruefsumme_alt'][:12]}), heute {v['heute'][:12]}.")
+        if v["geaendert"]:
+            namen = {"rf:GmbH & Co. KG": "GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG": "UG (haftungsbeschränkt) & Co. KG",
+                     "storno_schluss": "Storno einer Schlussrechnung mit Abschlägen (die abgesetzten Abschlagsrechnungen werden mit umgekehrtem Vorzeichen gespiegelt, E-193)",
+                     "basis": "Hilfetext eines Formularfelds: „Steuerberater“ statt Ihres Namens (das gedruckte Dokument ist unverändert)"}
+            was = "; ".join(namen.get(g, g) for g in v["geaendert"])
+            fuss = any(g.endswith("& Co. KG") for g in v["geaendert"])
+            pdfs = [f"{v['id']}-{d}.pdf" for g, d in (("rf:GmbH & Co. KG", "gmbh-co-kg"), ("rf:UG (haftungsbeschränkt) & Co. KG", "ug-co-kg"), ("storno_schluss", "storno-schlussrechnung")) if g in v["geaendert"]]
+            teile.append(f"Seit Ihrer Freigabe geändert sind nur diese Varianten: {was}"
+                         + (" – bei GmbH & Co. KG / UG & Co. KG die Fußzeile mit der Zeile „Persönlich haftende Gesellschafterin: …“ (Angaben der Komplementärin, E-193)" if fuss else "")
+                         + f". Die übrigen {v['varianten'] - len(v['geaendert'])} von {v['varianten']} Varianten (Rechtsformen, Länder, Kleinunternehmer"
+                         + (", Schlussrechnung, Storno" if v["id"] == "rechnung" else "") + ") sind unverändert; für sie gilt Ihre Freigabe weiter."
+                         + (f" Beispiel-PDFs der geänderten Varianten: vorlagen/{', vorlagen/'.join(pdfs)}." if pdfs else ""))
         if not v["unterschrieben"]:
             teile.append(f"Ein unterschriebenes Blatt liegt uns nicht vor ({fuer_pruefer(v.get('unterschrift_offen', ''))}).")
         if v["offen"]:
@@ -131,7 +140,8 @@ def zeilen_fuer(rolle, kat, vorl):
         if v.get("einschraenkung"):
             teile.append(f"Der Vermerk nennt Ihre Einschränkung: „{v['einschraenkung']}“.")
         if teile:
-            z.append(("Vorlage", v["id"], v["heute"][:12], name, " ".join(teile) + " Bitte die heutige Fassung (Prüfsumme rechts) durchsehen und bestätigen."))
+            bitte = " Bitte die geänderten Varianten durchsehen und bestätigen." if v["geaendert"] else " Inhalt seit Ihrer Freigabe unverändert – bitte nur die Freigabe mit Unterschrift bestätigen."
+            z.append(("Vorlage", v["id"], v["heute"][:12], name, " ".join(teile) + bitte))
     z.append(("Nennung im Vermerk", "alle", "–", "Rolle statt Name",
               f"Die App nennt Personen nicht mehr. Bisher {BISHER[rolle]}; künftig nennt der Vermerk Ihre Rolle: {WORTLAUT[rolle]} "
               "(bei Einschränkungen mit dem Zusatz in Klammern, bei offenen Punkten „teilweise“). Bitte bestätigen, dass die Nennung der Rolle so in Ordnung ist."))
@@ -155,10 +165,10 @@ def mappe(rolle, z, ordner, datei=None, ueberschrift=None):
               ["Bitte prüfen und bestätigen. Diese Liste nennt alles, was nach unserer Durchsicht der Freigaben noch Ihre Prüfung oder Ihre Unterschrift braucht:"],
               ["• Unterschrift fehlt: Sie haben die Fassung freigegeben, uns liegt aber kein unterschriebenes Blatt vor. Bis dahin zeigt die App bei diesen Einträgen keinen Prüfvermerk."],
               ["• Offener Punkt / Einschränkung: Der Vermerk lautet bis zur Klärung „teilweise geprüft“ bzw. nennt Ihre Einschränkung."],
-              ["• Vorlage: Inhalt seit Ihrer Freigabe geändert und/oder ohne unterschriebenes Blatt. Die Prüfsumme bestimmt die Fassung; jede Änderung ergibt eine neue."],
+              ["• Vorlage: ohne unterschriebenes Blatt und/oder eine Variante (Rechtsform, Land, Rechnungsart …) seit Ihrer Freigabe geändert. Je Variante bestimmt eine Prüfsumme die Fassung; eine Änderung betrifft nur ihre Variante."],
               ["• Nennung im Vermerk: Die App nennt keine Namen mehr, sondern die Rolle."],
               [""], ["Je Zeile bitte in Spalte „Entscheidung“ wählen: bestätigt / ändern (Anmerkung) / nicht mein Bereich."],
-              ["Am Ende das Blatt „Unterschrift“ ausfüllen und unterschreiben (Scan genügt). Zu den Vorlagen liegen die aktuellen PDFs bei."]]:
+              ["Am Ende das Blatt „Unterschrift“ ausfüllen und unterschreiben (Scan genügt). Zu geänderten Varianten von Vorlagen liegen PDFs bei (Ordner „vorlagen“)."]]:
         hw.append(r)
     hw["A1"].font = Font(bold=True, size=14)
     hw.column_dimensions["A"].width = 140
@@ -209,7 +219,7 @@ def mappe(rolle, z, ordner, datei=None, ueberschrift=None):
     return datei
 
 
-def mail(rolle, z, datei, extra=None):
+def mail(rolle, z, datei, extra=None, vorl=()):
     titel, _, _ = ROLLE[rolle]
     arten = {}
     for art, *_ in z:
@@ -222,10 +232,18 @@ def mail(rolle, z, datei, extra=None):
     if arten.get("Einschränkung"):
         punkte.append(f"- {arten['Einschränkung']} Einträge, bei denen der Vermerk jetzt Ihre Einschränkung nennt (z. B. „ohne arbeitsmedizinische Angaben“).")
     if arten.get("Vorlage"):
-        punkte.append(f"- {arten['Vorlage']} Vorlagen: Seit Ihrer Freigabe hat sich die Fußzeile für die GmbH & Co. KG geändert (Angaben der Komplementärin), und/oder uns fehlt das unterschriebene Blatt. Wir rechnen die Prüfsumme jetzt über alle gedruckten Fassungen (auch mit Angaben aus „Mein Betrieb“); dadurch zeigt sich jede Änderung. Die aktuellen PDFs liegen bei.")
+        geaendert = [v for v in vorl if v.get("rolle") == rolle and v["geaendert"]]
+        satz = f"- {arten['Vorlage']} Vorlagen: Uns fehlt das unterschriebene Blatt und/oder eine Variante hat sich seit Ihrer Freigabe geändert. Wir prüfen den Inhalt jetzt je Variante (Rechtsform, Land, Rechnungsart …) über alle gedruckten Fassungen; der Vermerk entfällt nur für eine geänderte Variante."
+        if geaendert:
+            satz += " Geändert: " + "; ".join(f"{v['titel']} ({', '.join(x.replace('rf:', '').replace('storno_schluss', 'Storno einer Schlussrechnung mit Abschlägen').replace('basis', 'Hilfetext im Formular') for x in v['geaendert'])})" for v in geaendert) + " – die PDFs dieser Varianten liegen bei; alle übrigen Vorlagen sind seit Ihrer Freigabe unverändert."
+        else:
+            satz += " Inhaltlich hat sich seit Ihrer Freigabe nichts geändert."
+        punkte.append(satz)
     if extra:
         punkte.append(f"- in einem eigenen kurzen Blatt ({extra}): die vier Konten für § 13b-Eingangsleistungen (SKR03 3120/3123/3140/3143, SKR04 5920/5923/5940/5943). Ihr Prüfbericht vom 21./22.10.2026 bezeichnet sie als richtig; eine unterschriebene Bestätigung fehlt.")
     punkte.append("- die Nennung im Vermerk: Die App nennt keine Personen mehr, nur noch die Rolle (z. B. „von einem Steuerberater“). Bitte bestätigen Sie, dass das so in Ordnung ist.")
+    pdfs = sorted(os.listdir(os.path.join(ZIEL, rolle, "vorlagen"))) if os.path.isdir(os.path.join(ZIEL, rolle, "vorlagen")) else []
+    anlage_pdfs = "".join(f"- vorlagen/{d}{chr(10)}" for d in pdfs if d.endswith(".pdf"))
     text = f"""Betreff: Betriebsklar – Nachprüfliste {titel}: bitte prüfen und bestätigen
 
 Sehr geehrter Herr [Name],
@@ -244,8 +262,7 @@ Mit freundlichen Grüßen
 
 Anlagen:
 - {datei}
-{"- " + extra + chr(10) if extra else ""}- aktuelle PDFs der genannten Vorlagen (leer, Auswahl, voll und Beispiel GmbH & Co. KG)
-"""
+{"- " + extra + chr(10) if extra else ""}{anlage_pdfs}"""
     return text
 
 
@@ -258,7 +275,7 @@ if __name__ == "__main__":
         z = zeilen_fuer(rolle, kat, vorl)
         datei = mappe(rolle, z, ordner)
         extra = mappe(rolle, konten13b(), ordner, "Betriebsklar-Konten-13b-Steuerberater.xlsx", f"Betriebsklar – Konten für § 13b-Eingangsleistungen (Stand {STAND})") if rolle == "steuern" else None
-        open(os.path.join(ordner, "E-Mail.txt"), "w", encoding="utf-8").write(mail(rolle, z, datei, extra))
+        open(os.path.join(ordner, "E-Mail.txt"), "w", encoding="utf-8").write(mail(rolle, z, datei, extra, vorl))
         zahl = {}
         for art, *_ in z:
             zahl[art] = zahl.get(art, 0) + 1
