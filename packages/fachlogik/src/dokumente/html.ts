@@ -12,9 +12,11 @@ import { rundeCent } from "../rechnung.js";
 
 /**
  * Hinweis zur fachlichen Abnahme (PRUEFLISTE T-52 ff.). Steht in der App vor dem Erstellen, nicht im Dokument: Die
- * Unterlage ist das Dokument des Betriebs und muss bei einer Prüfung vorzeigbar sein.
+ * Unterlage ist das Dokument des Betriebs und muss bei einer Prüfung vorzeigbar sein. E-196: Viele Vorlagen sind
+ * fachlich durchgesehen, aber ihre heutige Fassung ist nicht mit Unterschrift bestätigt (Nachprüfung läuft) – der Hinweis
+ * sagt deshalb nicht „noch nicht geprüft“, sondern dass diese Fassung nicht bestätigt ist.
  */
-export const PRUEFHINWEIS = "Die Vorlagen sind noch nicht von Fachleuten geprüft. Prüfe die Inhalte, bevor du sie verwendest.";
+export const PRUEFHINWEIS = "Diese Fassung der Vorlage ist noch nicht fachlich bestätigt. Prüfe die Inhalte, bevor du sie verwendest.";
 /** Platzhalter für Text-Ausgaben (z. B. Website-Text); im Dokument stehen stattdessen Linien zum Ausfüllen. */
 export const LEER = "(noch nicht angegeben)";
 /** Leere Angabe im Dokument: eine Linie zum Ausfüllen von Hand. */

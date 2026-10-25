@@ -1,5 +1,5 @@
 /**
- * R12 GoBD (Steuerberatung, Betriebsprüfung): Kartentrinkgeld, Gutscheine, „auf Rechnung“, Buchung nur des Bargelds
+ * R12 GoBD (interne Prüfrunde Steuern und Betriebsprüfung): Kartentrinkgeld, Gutscheine, „auf Rechnung“, Buchung nur des Bargelds
  * über die Kasse, Kassendifferenzen, Nacherfassung, Eigenbelege, Kassensturz, Sachentnahmen, Skonto bei igL und auf
  * Nicht-Waren, feste Belegnummern.
  */

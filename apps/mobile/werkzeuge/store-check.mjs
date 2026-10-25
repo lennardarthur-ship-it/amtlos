@@ -141,6 +141,18 @@ pruefe(s.bilder.every((x) => fs.existsSync(path.join(webBilder, `${x.bildschirm}
 // Fachliche Freigabe
 const pl =fs.readFileSync(path.join(APP, "../../PRUEFLISTE.md"), "utf8");
 pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche Freigabe der Vorlagen (PRUEFLISTE T-52 ff.) – vor dem Livegang durch Fachleute");
+// E-196: Prüfvermerk nur aus unterschriebenen Freigaben – was noch auf Unterschrift oder Nachprüfung wartet
+{
+  const katalog = JSON.parse(lies("src/pflichten/katalog.json"));
+  const wartend = katalog.pflichten.filter((p) => p.pruefung?.status === "in_pruefung").map((p) => p.id);
+  pruefe(!wartend.length, `Katalog: alle freigegebenen Einträge mit Unterschrift (E-196)${wartend.length ? ` – ${wartend.length} warten auf Unterschrift bzw. Nachprüfung (docs/freigabe-katalog/versand-2026-10-25-nachpruefung, PRUEFLISTE T-200)` : ""}`);
+  const geprueft = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/geprueft.ts"), "utf8");
+  const staende = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/pruefstaende.ts"), "utf8");
+  const heute = Object.fromEntries([...staende.matchAll(/"([\w#]+)": \{ summe: "([0-9a-f]{64})"/g)].map((m) => [m[1], m[2]]));
+  const freigaben = [...geprueft.matchAll(/^ {2}(\w+): \{ stand: "[\d-]+", rolle: "\w+", unterschrieben_am: ("[\d-]+"|null)[^\n]*?pruefsumme: "([0-9a-f]{64})"/gm)];
+  const ohne = freigaben.filter((m) => m[2] === "null" || heute[m[1]] !== m[3]).map((m) => m[1]);
+  pruefe(freigaben.length > 0 && !ohne.length, `Vorlagen: heutige Fassung mit Unterschrift bestätigt (E-196)${ohne.length ? ` – ${ohne.length} von ${freigaben.length} ohne Unterschrift oder mit geändertem Inhalt seit der Freigabe (Nachprüfliste, PRUEFLISTE T-204)` : ""}`);
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Google Play (E-190): Android-App in gleicher Qualität. Was im Code geht, ist erledigt; offen bleibt, was das

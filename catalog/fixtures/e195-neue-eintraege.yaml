@@ -1,0 +1,18 @@
+persona: agentur
+beschreibung: E-195 (Fixture nachgetragen mit E-196) – GmbH mit Website und Beschäftigten, Lohnsteuer monatlich angemeldet; Künstlersozialabgabe als Hinweis, elektronische Lohnsteuerbescheinigung als Pflicht
+stichtag: "2026-10-25"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2020-03-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 3
+  profil.personal.lohnsteuer_anmeldezeitraum: monatlich
+  profil.kunden.segmente: [b2b]
+  profil.vertrieb.kanaele: [vor_ort_beim_kunden]
+  profil.produkte.arten: [dienstleistung]
+  profil.online.website: true
+  profil.bundesland: BW
+  profil.gemeinde_ags: "08415061"
+erwartet:
+  personal.kuenstlersozialabgabe: gilt
+  personal.lohnsteuerbescheinigung: gilt

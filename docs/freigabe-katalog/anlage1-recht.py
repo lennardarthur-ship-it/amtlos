@@ -26,7 +26,8 @@ for p in sorted(glob.glob("catalog/pflichten/*.yaml")):
     rows.append((d.get("katalog_nr", ""), d["id"], f["version"], umfang, f["stand"]))
 rows.sort(key=lambda z: [int(x) if x.isdigit() else x for x in str(z[0]).replace(".", " ").split()])
 gp = open("packages/fachlogik/src/dokumente/geprueft.ts").read()
-vorl = [(i, s, h[:12], "") for i, s, h in re.findall(r'\n\s+(\w+): \{ stand: "([\d-]+)", bezug: RECHT, pruefsumme: "([0-9a-f]{64})"', gp)]
+# E-196: bestätigt hat der Rechtsanwalt die Prüfsumme nach der Rechnung vor E-196 (`pruefsumme_alt`)
+vorl = [(i, s, h[:12], "") for i, s, h in re.findall(r'\n {2}(\w+): \{ stand: "([\d-]+)", rolle: "recht",[^\n]*?pruefsumme_alt: "([0-9a-f]{64})"', gp) if i != "handelsregister"]
 vorl += [("hygieneplan (Fassung Friseur/Kosmetik, Beauty-Vorschläge)", "2026-10-25", "101632b4de7a", "Abgleich mit Rechtsgrundlagen und AWMF 055-004; Länderzusatz nur für Bayern geprüft"),
          ("handelsregister", "2026-10-25", "e2cd7a14a6c1", "nur GmbH, OHG, KG")]
 texte = [("Datenschutzhinweis der App (Build ohne Sync)", "2026-10-23", "892aa8818e0e"), ("Impressum der Website (Vor-UG)", "2026-10-23", "004a6165d087"),

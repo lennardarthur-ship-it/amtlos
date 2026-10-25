@@ -11,7 +11,7 @@
  * rechnet darin als Leistungsempfänger ab, sie sind keine eigenen Umsätze. Kleinunternehmer (§ 19 UStG) übernehmen
  * nichts – ihre Umsätze gehören in keine Kennzahl der Voranmeldung. Fachlich zu prüfen: T-70.
  *
- * R10 (Steuerberatung, Freiberuf, Elektro):
+ * R10 (interne Prüfrunde Steuern, Freiberuf, Elektro – nicht von der Steuerberatung bestätigt, PRUEFLISTE T-113):
  * - Abschlagsrechnungen zählen bei Soll im Zeitraum des Zahlungseingangs (Mindest-Ist), unbezahlt noch gar nicht.
  * - Rein formales Storno mit Neuausstellung (gleiche Beträge, gleicher Kunde, gleiche Leistung): Storno und Ersatz-
  *   rechnung gehören in den Zeitraum der ursprünglichen Leistung – sie heben sich dort auf. Ändert sich das Entgelt,
@@ -21,7 +21,7 @@
  * - Kleinunternehmer je Zeitraum: Sind alle Rechnungen des Zeitraums Kleinunternehmer-Rechnungen (bzw. keine), gilt
  *   das für diesen Zeitraum – auch wenn der Pflichten-Check heute etwas anderes sagt (Wechsel zum Jahreswechsel).
  *
- * R11 (Steuerberatung):
+ * R11 (interne Prüfrunde Steuern – nicht von der Steuerberatung bestätigt, PRUEFLISTE T-117):
  * - Rechnungen mit Umsatzsteuer werden immer übernommen, auch in einem Zeitraum, der sonst als Kleinunternehmer-Zeitraum
  *   gilt (Überschreiten der 100.000 €, § 19 Abs. 1 Satz 2 UStG n. F.; sonst schuldet man die Steuer nach § 14c, Kz 69).
  *   Vorsteuer dann erst aus Belegen ab der ersten solchen Rechnung.

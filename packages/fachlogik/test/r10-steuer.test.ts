@@ -1,5 +1,5 @@
 /**
- * R10 Steuer (Steuerberatung, Elektro, Freiberuf): Steuerart der Rechnung, Hinweise ohne Hindernis, Leitweg-ID und
+ * R10 Steuer (interne Prüfrunde Steuern, Elektro, Freiberuf): Steuerart der Rechnung, Hinweise ohne Hindernis, Leitweg-ID und
  * Bestellnummer in der XRechnung, Gutschrift mit den Steuerdaten des Leistenden, Abschlagsrechnung, § 13b-Belege,
  * Voranmeldung mit Kz 87/21/46–47/84–85/67/39, fremd adressierte E-Rechnung.
  */

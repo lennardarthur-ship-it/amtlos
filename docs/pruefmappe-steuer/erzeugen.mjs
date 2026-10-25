@@ -182,7 +182,7 @@ const SACH = [
   ["Erlöse Kleinunternehmer (§ 19 UStG)", K3.erloese.ku, K4.erloese.ku, "–", "buchungen.ts erloeskonto"],
   ["Erlöse steuerfreie innergemeinschaftliche Lieferung (mit USt-IdNr. in Feld „EU-Land u. UStID“)", K3.erloese.igl, K4.erloese.igl, "–", "buchungen.ts erloeskonto"],
   ["Erlöse § 13b im Inland (Leistungsempfänger schuldet die Steuer)", K3.erloese.rc13b, K4.erloese.rc13b, "–", "buchungen.ts erloeskonto"],
-  ["Erlöse sonstige Leistung an Unternehmen im übrigen Gemeinschaftsgebiet (Kz 21) – simulierte StB nannte 8338", K3.erloese.eu, K4.erloese.eu, "–", "buchungen.ts erloeskonto"],
+  ["Erlöse sonstige Leistung an Unternehmen im übrigen Gemeinschaftsgebiet (Kz 21) – eine frühere interne Prüfrunde nannte 8338; Prüfbericht der Steuerberatung B-1: 8336", K3.erloese.eu, K4.erloese.eu, "–", "buchungen.ts erloeskonto"],
   ["Erlöse im Drittland steuerbare Leistung (im Inland nicht steuerbar)", K3.erloese.drittland, K4.erloese.drittland, "–", "buchungen.ts erloeskonto"],
   ["Gewährte Skonti 19 % (§ 17 UStG, zum Zahltag)", K3.skontiGewaehrt[19], K4.skontiGewaehrt[19], "kein BU (Automatik)", "buchungen.ts skontoBuchungenRechnung"],
   ["Gewährte Skonti 7 %", K3.skontiGewaehrt[7], K4.skontiGewaehrt[7], "kein BU (Automatik)", "buchungen.ts"],

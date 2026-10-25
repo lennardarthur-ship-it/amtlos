@@ -1,5 +1,5 @@
 /**
- * R11 Steuer (simulierte Steuerberatung, Gebäudereinigung, Kosmetik, Tischlerei): Gutschrift als XRechnung (Typ 389,
+ * R11 Steuer (interne Prüfrunde Steuern, Gebäudereinigung, Kosmetik, Tischlerei): Gutschrift als XRechnung (Typ 389,
  * Leistender als Verkäufer), Steuerkategorien Z/G/O, Abschlagsrechnung 326, Bruttopreise, § 13b-Haken mit 19 %,
  * Kleinunternehmer bis zu einem Wechseldatum, Abschlag mit „Leistungsdatum = Rechnungsdatum“, Gutschein zu 0 %,
  * Grundstücks-Hinweis im Handwerk, Vorsteuer bei nur steuerfreien Umsätzen.

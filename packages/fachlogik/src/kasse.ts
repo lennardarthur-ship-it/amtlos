@@ -14,7 +14,7 @@
  *   Differenz steht als Kassendifferenz da (gebucht wird sie nicht – PRUEFLISTE).
  * - Umsatzsteuer: Netto je Steuersatz aus der Summe der Bruttobeträge je Kalendermonat herausgerechnet.
  *
- * R12 GoBD (Steuerberatung, Betriebsprüfung):
+ * R12 GoBD (interne Prüfrunde Steuern und Betriebsprüfung – nicht von der Steuerberatung bestätigt, PRUEFLISTE T-118):
  * - Kartentrinkgeld (`trinkgeld_cent`): im Kartenbetrag enthalten, an das Personal bar ausgezahlt – durchlaufend, kein
  *   Umsatz, keine Umsatzsteuer (§ 3 Nr. 51 EStG beim Personal). Die Kasse verliert den Betrag, die Bank bekommt ihn.
  * - Zahlungsarten getrennt: Karte und App (Geldtransit), „auf Rechnung“ (Forderungen), Gutscheine (Einzweck: Umsatz beim

@@ -40,7 +40,7 @@ ARBEITSSCHUTZ_BRANCHE = {"branche.handwerk_gefaehrdung_gewerk", "branche.bau_bau
 LEBENSMITTEL_RECHT = {"branche.gastro_preisverzeichnis", "branche.gastro_mehrweg", "branche.gastro_ppwr_radar"}
 
 PRUEFER = {
-    "steuer": ("Steuern", "Steuerberater (Steuerberatungskanzlei)"),
+    "steuer": ("Steuern", "Steuerberater"),
     "arbeitsschutz": ("Arbeitsschutz", "Fachkraft für Arbeitssicherheit"),
     "lebensmittel": ("Lebensmittelhygiene", "Lebensmittelfachbeauftragter"),
     "recht": ("Recht", "Rechtsanwalt"),

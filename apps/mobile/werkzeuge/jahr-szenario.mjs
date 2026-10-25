@@ -164,7 +164,7 @@ const liste = (bytes) => {
 };
 const isoAusDe = (t) => (/^\d{2}\.\d{2}\.\d{4}/.test(t) ? `${t.slice(6, 10)}-${t.slice(3, 5)}-${t.slice(0, 2)}` : "");
 /**
- * Neuerungen nach der Durchsicht der Steuerberaterin (Oktober 2026): Spalten und Summenzeilen der Listen, Amtlos-Belegnummer
+ * Neuerungen nach der internen Prüfrunde Steuern (Oktober 2026): Spalten und Summenzeilen der Listen, Amtlos-Belegnummer
  * in Liste, Dateiname und DATEV, Buchungs-GUID, Buchungstext, Fragen-Datei, Mandanten- und „Nicht enthalten“-Block.
  */
 function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {

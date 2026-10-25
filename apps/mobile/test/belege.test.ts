@@ -151,7 +151,7 @@ describe("Paket für die Steuerberatung (E-133)", () => {
   });
 });
 
-describe("Paket für die Steuerberatung: LIESMICH, Fragen, Listen (Durchsicht Steuerberaterin)", () => {
+describe("Paket für die Steuerberatung: LIESMICH, Fragen, Listen (interne Prüfrunde Steuern)", () => {
   /** Jahr 2026: Rechnungen (eine an einen Privatkunden ohne E-Mail, eine storniert im Folgequartal, eine offen), Belege aller Fragearten */
   function jahr(): Stand {
     let s: Stand = { ...LEERER_STAND, betrieb: { ...BETRIEB, rechtsform: "Einzelunternehmen", versteuerung: "soll", ust_idnr: "DE123456789" }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "1001", mandantennummer: "42" } };

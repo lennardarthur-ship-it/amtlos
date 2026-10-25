@@ -277,14 +277,14 @@ export const T = {
   check_hinweis: `Wichtig: ${MARKE.name} zeigt allgemeine Informationen zu typischen Pflichten und Vorlagen – keine Rechts- oder Steuerberatung. Pflichten und Vorlagen sind noch nicht von Fachleuten geprüft. Prüfe Ergebnisse, bevor du dich darauf verlässt.`,
   // E-171: sobald Einträge fachlich geprüft sind (je nach Anteil)
   check_hinweis_teil: `Wichtig: ${MARKE.name} zeigt allgemeine Informationen zu typischen Pflichten und Vorlagen – keine Rechts- oder Steuerberatung. Ein Teil der Pflichten ist fachlich geprüft – das steht dann bei der Pflicht. Prüfe Ergebnisse, bevor du dich darauf verlässt.`,
-  check_hinweis_alle: `Wichtig: ${MARKE.name} zeigt allgemeine Informationen zu typischen Pflichten und Vorlagen – keine Rechts- oder Steuerberatung. Pflichten und Vorlagen sind fachlich geprüft, nicht aber dein Einzelfall. Prüfe Ergebnisse, bevor du dich darauf verlässt.`,
+  check_hinweis_alle: `Wichtig: ${MARKE.name} zeigt allgemeine Informationen zu typischen Pflichten und Vorlagen – keine Rechts- oder Steuerberatung. Die Pflichten sind fachlich geprüft – das steht bei jeder Pflicht –, nicht aber dein Einzelfall. Prüfe Ergebnisse, bevor du dich darauf verlässt.`,
   // Phase 1 (RDG): ruhige Hinweise unter Pflichten, Vorlagen und „Rechtliches“ – zusammen mit dem Rechtsstand (src/rechtshinweis.ts)
   hinweis_pflichten: `Allgemeine Informationen zu typischen Pflichten für Betriebe wie deinen – keine Rechts- oder Steuerberatung. Aus dem ${MARKE.name}-Katalog, fachlich noch nicht geprüft.`,
   hinweis_pflichten_teil: `Allgemeine Informationen zu typischen Pflichten für Betriebe wie deinen – keine Rechts- oder Steuerberatung. Aus dem ${MARKE.name}-Katalog, teilweise fachlich geprüft (steht bei der Pflicht).`,
   hinweis_pflichten_alle: `Allgemeine Informationen zu typischen Pflichten für Betriebe wie deinen – keine Rechts- oder Steuerberatung. Aus dem ${MARKE.name}-Katalog, fachlich geprüft.`,
   /** E-171: in den Details einer geprüften Pflicht; danach der Vermerk des Prüfers */
   hinweis_pflicht_geprueft: (vermerk: string) => `Allgemeine Informationen – keine Rechts- oder Steuerberatung. ${vermerk}`,
-  hinweis_pflicht_ungeprueft: `Allgemeine Informationen – keine Rechts- oder Steuerberatung. Diese Pflicht ist fachlich noch nicht geprüft.`,
+  hinweis_pflicht_ungeprueft: `Allgemeine Informationen – keine Rechts- oder Steuerberatung. Diese Pflicht ist in ihrer aktuellen Fassung noch nicht fachlich bestätigt.`,
   hinweis_vorlage: "Vorlage, keine Rechts- oder Steuerberatung. Prüfe die Angaben für deinen Betrieb – im Zweifel mit Anwalt oder Steuerberatung.",
   hinweis_recht: `${MARKE.name} gibt allgemeine Informationen und Vorlagen – keine Rechts- oder Steuerberatung.`,
   check_starten: "Los geht’s",

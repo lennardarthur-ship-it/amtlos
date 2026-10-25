@@ -1,5 +1,5 @@
 /**
- * Runde 11 (simulierte Steuerberatung und Szenarien Gebäudereinigung, Kosmetik, Tischlerei): EÜR für Kleinunternehmer
+ * Runde 11 (interne Prüfrunde Steuern, nicht von der Steuerberatung bestätigt, und Szenarien Gebäudereinigung, Kosmetik, Tischlerei): EÜR für Kleinunternehmer
  * mit „davon“, gemischter Kleinunternehmer-Zeitraum, Vorsteuer aus Gutschriften bei Ist, Ersatzrechnung über
  * `ersetzt`, Buchungsstapel bei Ist-Versteuerung und unbezahlten Abschlägen, § 13b ohne Vorsteuerabzug, Barbelege,
  * Gutscheine, Kleinunternehmer bis zu einem Wechseldatum.

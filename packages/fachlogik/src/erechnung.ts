@@ -21,7 +21,7 @@ interface Partei {
 /**
  * Rechnung → UBL-Struktur als JSON (Format der Bibliothek @e-invoice-eu/core auf dem Server, hier auch Grundlage für das XML der App).
  *
- * R11 (Steuerberatung):
+ * R11 (interne Prüfrunde Steuern – nicht von der Steuerberatung bestätigt, PRUEFLISTE T-117):
  * - Gutschrift (§ 14 Abs. 2 Satz 2 UStG): Typ 389, Verkäufer (BG-4) ist der Leistende mit seiner Steuernummer bzw.
  *   USt-IdNr., Käufer (BG-7) der Betrieb, der die Gutschrift ausstellt.
  * - Steuerkategorien: Nullsteuersatz Z, Ausfuhrlieferung G (VATEX-EU-G, nur mit USt-IdNr. des Verkäufers – BR-G-02,

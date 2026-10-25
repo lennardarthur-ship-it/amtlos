@@ -139,11 +139,14 @@ Im Store-Build gibt es diesen Knopf nicht.
 
 FACHLICHE PRÜFUNG
 
-Alle 226 Pflichten des Katalogs und alle 43 Vorlagen sind von Fachleuten freigegeben (Rechtsanwalt, Steuerberater,
-Fachkraft für Arbeitssicherheit, Lebensmittelfachbeauftragter; Stand 25.10.2026). Die App zeigt das je Pflicht
-(„Inhalt fachlich geprüft, Stand …“) und je Vorlage („Vorlagen fachlich durchgesehen (Stand …)“) – nur solange der
-Inhalt der geprüften Fassung entspricht; jede Änderung hebt den Vermerk auf, bis erneut geprüft ist. Die
-Handelsregister-Vorlage ist für GmbH, OHG und KG geprüft. Rechtsberatung im Einzelfall ist die App nicht.
+Den Katalog und die Vorlagen haben Fachleute durchgesehen (Rechtsanwalt, Steuerberater, Fachkraft für
+Arbeitssicherheit, Lebensmittelfachbeauftragter). Die App zeigt einen Prüfvermerk nur, wo eine unterschriebene
+Freigabe genau diese Fassung abdeckt (Stand 25.10.2026: 209 der 228 Pflichten; die übrigen warten auf die
+Unterschrift bzw. sind neu) – mit der Rolle, nie mit Namen, z. B. „Inhalt fachlich geprüft von einem Rechtsanwalt,
+Stand …“; Einschränkungen stehen dabei („ohne arbeitsmedizinische Angaben“), offene Punkte als „teilweise geprüft“.
+Die Vorlagen zeigen zurzeit keinen Vermerk: Ihre heutige Fassung ist noch nicht mit Unterschrift bestätigt
+(Nachprüfung läuft). Jede Änderung hebt einen Vermerk auf, bis erneut geprüft ist. Rechtsberatung im Einzelfall
+ist die App nicht.
 
 
 RECHTLICHES IN DER APP („Über {{MARKE}}“)
