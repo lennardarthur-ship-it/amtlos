@@ -3,7 +3,7 @@ import * as Haptics from "expo-haptics";
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
 import { NavigationContext } from "@react-navigation/native";
 import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { AccessibilityInfo, ActivityIndicator, Animated, Pressable, Text as RNText, ScrollView, Switch, TextInput, View, useWindowDimensions, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { AccessibilityInfo, ActivityIndicator, Animated, Pressable, Text as RNText, ScrollView, Switch, TextInput, View, useWindowDimensions, type ScrollViewInstance, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { datumLesen, isoAus, nurJahr, uhrzeitLesen } from "./datum";
@@ -1046,7 +1046,7 @@ export function Suchfeld({ wert, setzen, label = TEXT.suchen, buehne }: { wert: 
  * scrollt beim Öffnen zum gewählten Chip, mit Seitenrand davor (A16). Radio-Semantik wie `Wahl`.
  */
 export function ChipLeiste<W extends string>({ label, wert, aendern, optionen, hilfe, stil }: { label?: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[]; hilfe?: string; stil?: StyleProp<ViewStyle> }) {
-  const ref = useRef<ScrollView>(null);
+  const ref = useRef<ScrollViewInstance>(null);
   const lagen = useRef(new Map<string, number>());
   const gescrollt = useRef(false);
   const hin = (x: number | undefined) => {

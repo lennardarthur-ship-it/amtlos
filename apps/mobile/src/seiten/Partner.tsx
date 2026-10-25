@@ -156,7 +156,7 @@ export function PartnerLink() {
   const erster = useRef(false);
   useEffect(() => {
     if (!bereit || ladefehler) return;
-    const verarbeiten = (url: string | null) => {
+    const verarbeiten = (url: string | null | undefined) => {
       const code = partnerCodeAusLink(url);
       if (!code) return;
       const t = partnerAusCode(code);
