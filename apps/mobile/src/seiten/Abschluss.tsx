@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { GMBH_ANGABEN, KU_HINWEIS, betragUnplausibel, pruefHinweisFuer, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Daten, type Vorlage } from "@amtlos/fachlogik";
+import { GMBH_ANGABEN, KG_ANGABEN, KU_HINWEIS, betragUnplausibel, pruefHinweisFuer, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Daten, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -13,9 +13,10 @@ import { mitVorlagenHinweis } from "../rechtshinweis";
 import { drucken, pdfTeilenMitHash } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
-import { absenderFuer, heute } from "../unterlagen/speicher";
+import { absenderFuer, geteiltOffenLetzte, heute } from "../unterlagen/speicher";
 import { euroText, faelligAm, offenBrutto, rechnungBrutto } from "../unterlagen/ablage";
 import { useAmtlos } from "../zustand";
+import { versandBestaetigt } from "./versand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { AbsenderSeite } from "./Betrieb";
 import { BetriebTeilSeite } from "./Absender";
@@ -98,8 +99,12 @@ export function useTeilen(id: string) {
       const erg = art === "teilen" ? await pdfTeilenMitHash(html, pdfDateiname(v, u.daten, heute()), v.querformat) : { ok: await drucken(html, pdfDateiname(v, u.daten, heute()), v.querformat) };
       // abgebrochen: nichts festschreiben, nichts vom Freikontingent verbrauchen
       if (!erg.ok) return;
+      const sha = "sha256" in erg ? erg.sha256 : undefined;
+      // E-193 (4): Android meldet einen Abbruch des Teilen-Menüs (und des Druckdialogs) nicht – erst nach „Ja“ festschreiben;
+      // bei „Nein“ bleibt der Entwurf, die ausgegebene Fassung wird vermerkt (später „Doch verschickt – festschreiben“)
+      if (!(await versandBestaetigt(u, v, art === "drucken"))) return z.teilenOffen(id, { daten: pdfDaten, art: art === "drucken" ? "druck" : "pdf", ...(sha ? { pdfSha256: sha } : {}), absender });
       const erstesMal = !u.ausgegeben;
-      if (!z.ausgeben(id, pdfDaten, "sha256" in erg ? erg.sha256 : undefined, absender)) return melden(TEXT.pdf_geaendert, "info");
+      if (!z.ausgeben(id, pdfDaten, sha, absender)) return melden(TEXT.pdf_geaendert, "info");
       if (erstesMal && v.festschreiben) z.erfolg();
     } catch {
       setFehler(TEXT.pdf_fehler);
@@ -124,7 +129,10 @@ export function useTeilen(id: string) {
     const xmlDaten = u.daten;
     try {
       // R12 GoBD: eine festgeschriebene Rechnung gibt ihr festgehaltenes Original weiter
-      if (await dateiTeilen(`E-Rechnung-${dateinamenTeil(daten.nummer, 60) || "ohne-Nummer"}.xml`, u.festgeschrieben && u.xml ? u.xml : xrechnungUbl(daten, KU_HINWEIS), "application/xml") && !z.ausgeben(id, xmlDaten, undefined, absender, true)) melden(TEXT.pdf_geaendert, "info");
+      if (!(await dateiTeilen(`E-Rechnung-${dateinamenTeil(daten.nummer, 60) || "ohne-Nummer"}.xml`, u.festgeschrieben && u.xml ? u.xml : xrechnungUbl(daten, KU_HINWEIS), "application/xml"))) return;
+      // E-193 (4): auf Android erst nach „Ja, festschreiben“ (wie beim PDF)
+      if (!(await versandBestaetigt(u, v, false))) return z.teilenOffen(id, { daten: xmlDaten, art: "xml", absender });
+      if (!z.ausgeben(id, xmlDaten, undefined, absender, true)) melden(TEXT.pdf_geaendert, "info");
     } catch {
       setFehler(TEXT.e_rechnung_fehler);
     }
@@ -138,10 +146,10 @@ export function useTeilen(id: string) {
 }
 
 
-/** R12: Angabe aus „Mein Betrieb“ ergänzen – Gesellschaftsangaben (§ 35a GmbHG) bzw. Absender. */
+/** R12: Angabe aus „Mein Betrieb“ ergänzen – Gesellschaftsangaben (§ 35a GmbHG; E-193: §§ 125a, 177a HGB) bzw. Absender. */
 export function betriebOeffnen(nav: ReturnType<typeof useNav>, fehlt: string[]) {
   const betrieb = fehlt.filter((x) => x.includes("Mein Betrieb"));
-  if (betrieb.length && betrieb.every((x) => x.includes(GMBH_ANGABEN))) nav.oeffnen("betrieb-gesellschaft", () => <BetriebTeilSeite teil="gesellschaft" />, true);
+  if (betrieb.length && betrieb.every((x) => x.includes(GMBH_ANGABEN) || x.includes(KG_ANGABEN))) nav.oeffnen("betrieb-gesellschaft", () => <BetriebTeilSeite teil="gesellschaft" />, true);
   else nav.oeffnen("absender", () => <AbsenderSeite />, true);
 }
 
@@ -193,6 +201,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const jeSchritt = fehltJeSchritt(v, d);
   const alle = fehltFuer(z.stand, u);
   const fest = Boolean(u.festgeschrieben);
+  // E-193 (4): zuletzt geteilte, auf Android nicht als verschickt bestätigte Fassung
+  const offen = geteiltOffenLetzte(u);
   const nummerSchritt = v.fortlaufend ? v.abschnitte.findIndex((a) => a.felder.some((x) => x.id === v.fortlaufend)) : -1;
   const storno = u.storniertDurch ? z.stand.unterlagen.find((x) => x.id === u.storniertDurch) : undefined;
   const imFormular = new Set(jeSchritt.flat());
@@ -313,6 +323,23 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             ))}
           </Karte>
         ) : null}
+        {/* E-193 (4): auf Android geteilt, aber nicht als verschickt bestätigt – nicht mehr ändern, sondern die geteilte Fassung festschreiben */}
+        {offen ? (
+          <View accessibilityRole="summary" style={{ marginTop: fest ? 12 : 0, marginBottom: 12, backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12, gap: 4 }}>
+            <T v="klein" fett>{TEXT.fs_offen_titel(datumDe(offen.fassung.am))}</T>
+            <T v="caption">{TEXT.fs_offen_text(Boolean(v.storno))}</T>
+            {offen.geaendert ? <T v="caption">{TEXT.fs_offen_geaendert}</T> : null}
+            <TextKnopf
+              symbol="lock"
+              text={TEXT.fs_offen_knopf}
+              onPress={() =>
+                void bestaetigen({ titel: TEXT.fs_offen_wirklich(datumDe(offen.fassung.am)), text: TEXT.fs_offen_wirklich_text(offen.geaendert, Boolean(v.storno)), ja: TEXT.fs_offen_ja }).then((ok) => {
+                  if (ok && z.geteiltFestschreiben(id)) z.erfolg();
+                })
+              }
+            />
+          </View>
+        ) : null}
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
         {/* Plausibilität (G6): nur ein Hinweis, kein Hindernis */}
         {v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? <Hinweis art="warnung" text={TEXT.betrag_unplausibel} /> : null}
@@ -382,7 +409,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
               gefahr
               text={TEXT.loeschen}
               onPress={() =>
-                void bestaetigen({ titel: TEXT.loeschen_wirklich, ja: TEXT.loeschen_ja }).then((ok) => {
+                void bestaetigen({ titel: TEXT.loeschen_wirklich, ...(offen ? { text: TEXT.fs_loeschen_text(datumDe(offen.fassung.am)) } : {}), ja: TEXT.loeschen_ja }).then((ok) => {
                   if (!ok) return;
                   z.loeschen(id);
                   melden(TEXT.geloescht, "info");

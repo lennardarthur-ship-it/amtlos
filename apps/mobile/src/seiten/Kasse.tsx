@@ -23,6 +23,7 @@ import { useAmtlos } from "../zustand";
 import { kasseErfassenErlaubt } from "../pro/regeln";
 import { BuehnenBlatt, GrosserBetrag, Gruppe, Leer } from "./gemeinsam";
 import { useProSperre } from "./Pro";
+import { versandBestaetigt } from "./versand";
 
 /**
  * E-188: neue Kassendaten erfassen nur mit Pro – sonst der Bezahlschirm (Grund „Kasse“); `los` läuft gleich bzw. nach
@@ -211,6 +212,8 @@ function KassenbuchSeite({ monat, standort }: { monat: string; standort: string 
     try {
       const ok = await pdfTeilen(html, `Kassenbuch-${monat}${standort ? `-${standort.replace(/[^A-Za-z0-9]/g, "")}` : ""}.pdf`, true);
       if (!ok) return;
+      // E-193 (4): Android meldet einen Abbruch des Teilens nicht – erst nach „Ja, festschreiben“
+      if (!(await versandBestaetigt({ festgeschrieben: gleich && fest ? fest.festgeschrieben : undefined }, v, false))) return;
       z.kassenbuchFestschreiben(monat, standort, daten, bytesToHex(sha256(utf8(JSON.stringify(daten)))));
       melden(TEXT.r12g_kassenbuch_geteilt);
     } catch {

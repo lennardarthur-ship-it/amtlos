@@ -185,6 +185,12 @@ export interface RechnungsDaten {
    * deutsche Voranmeldung. Die Positionen tragen dann den Steuersatz des Bestimmungslands.
    */
   oss?: { land: string; satz: number } | null;
+  /**
+   * E-193 (5): Zahlungsbedingung als Text (BT-20), wenn es kein Fälligkeitsdatum aus einem Zahlungsziel in Tagen gibt –
+   * „Zahlbar sofort ohne Abzug.“ bzw. „Der Rechnungsbetrag wurde am … bezahlt.“, wörtlich wie auf dem PDF. Ohne BT-9
+   * und BT-20 verletzt eine Rechnung mit positivem Zahlbetrag BR-CO-25.
+   */
+  zahlungsbedingung?: string | null;
 }
 
 /** Eine abgesetzte Abschlagsrechnung (Schlussrechnung, C-4): Nummer, Datum, Entgelt und Steuer je Steuersatz. */

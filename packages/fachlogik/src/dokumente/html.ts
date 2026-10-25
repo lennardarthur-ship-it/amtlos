@@ -929,6 +929,31 @@ const rechtsformImNamen = (b: Betrieb) => {
   return !rf || n(b.name).includes(rf) || (rf.startsWith("ug") && /\bUG\b/.test(b.name));
 };
 
+/**
+ * E-193 (8a): GmbH & Co. KG bzw. UG (haftungsbeschränkt) & Co. KG nach der Rechtsform aus „Mein Betrieb“, ohne Angabe
+ * dort nach dem Namen – eine KG, deren einzige persönlich haftende Gesellschafterin eine GmbH bzw. UG ist.
+ */
+export function istCoKg(b: Pick<Betrieb, "rechtsform" | "name">): boolean {
+  const co = /\b(?:GmbH|UG)\b[^&]*&\s*Co\.?\s*KG\b/i;
+  const rf = (b.rechtsform ?? "").trim();
+  return rf ? co.test(rf) : co.test(b.name ?? "");
+}
+
+/**
+ * E-193 (8a): Angaben zur Komplementärin auf Geschäftsbriefen einer GmbH & Co. KG (§ 125a Abs. 1 Satz 2, § 177a HGB): ihre
+ * Firma und für sie die Angaben nach § 35a GmbHG – Rechtsform (wenn nicht schon in der Firma), Sitz, Registergericht und
+ * Registernummer; ihre Geschäftsführer folgen in der Zeile „Geschäftsführung“. Leer, wenn keine Firma eingetragen ist.
+ */
+export function komplementaerZeile(b: Betrieb): string {
+  const t = (x: string | undefined) => (x ?? "").trim();
+  if (!istCoKg(b) || !t(b.komplementaer)) return "";
+  const n = (x: string) => x.toLocaleLowerCase("de").replace(/[\s.()]/g, "");
+  const rf = t(b.komplementaer_rechtsform);
+  const rfImNamen = !rf || n(t(b.komplementaer)).includes(n(rf)) || (n(rf).startsWith("ug") && /\bUG\b/.test(t(b.komplementaer)));
+  const teile = [t(b.komplementaer), rfImNamen ? "" : rf, t(b.komplementaer_sitz) ? `Sitz ${t(b.komplementaer_sitz)}` : "", [t(b.komplementaer_registergericht), t(b.komplementaer_registernummer)].filter(Boolean).join(" ")].filter(Boolean);
+  return `Persönlich haftende Gesellschafterin: ${teile.join(", ")}`;
+}
+
 /** Spalten der Geschäfts-Fußzeile aus „Mein Betrieb“ (leere entfallen). Zeilen mit **…** werden fett. */
 export function fussSpalten(b: Betrieb): string[][] {
   const t = (x: string | undefined) => (x ?? "").trim();
@@ -941,8 +966,10 @@ export function fussSpalten(b: Betrieb): string[][] {
       t(b.ust_idnr) ? `USt-IdNr. ${t(b.ust_idnr)}` : "",
       // Gesellschaften: Rechtsform (wenn nicht schon im Namen), Sitz, Registergericht und -nummer, Geschäftsführung (§ 35a GmbHG, § 37a HGB)
       t(b.rechtsform) && t(b.registergericht) ? `${rechtsformImNamen(b) ? "" : `${t(b.rechtsform)}, `}Sitz ${t(b.ort)}, ${[t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" ")}` : [t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" "),
+      // E-193 (8a): GmbH & Co. KG – die Komplementärin mit ihren Angaben (§§ 125a, 177a HGB), danach ihre Geschäftsführung
+      komplementaerZeile(b),
       // R12 (Bäckerei #14): beim e. K. „Inhaber“, bei Personengesellschaften „Gesellschafter“, sonst „Geschäftsführung“
-      t(b.vertretung) ? `${vertretungLabel(b.rechtsform)}: ${t(b.vertretung)}` : "",
+      t(b.vertretung) ? `${istCoKg(b) ? "Geschäftsführung" : vertretungLabel(b.rechtsform)}: ${t(b.vertretung)}` : "",
     ],
   ];
   return spalten.map((s) => s.filter(Boolean)).filter((s) => s.length);

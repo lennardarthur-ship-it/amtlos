@@ -89,8 +89,9 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
   const nachlassIdx = r.positionen.map((_, i) => i).filter(nachlass);
   const zeilenSumme = zeilenIdx.reduce((a, i) => a + s.zeilen[i]!, 0);
   const nachlassSumme = nachlassIdx.reduce((a, i) => a - s.zeilen[i]!, 0);
-  // C-4: Schlussrechnung – abgesetzte Abschläge (brutto) als vorausbezahlter Betrag
-  const abschlaege = !gs && r.art !== "storno" ? (r.abschlaege ?? []) : [];
+  // C-4: Schlussrechnung – abgesetzte Abschläge (brutto) als vorausbezahlter Betrag; E-193 (8b): beim Storno einer
+  // Schlussrechnung gespiegelt (BT-113 negativ wie alle Beträge der Rechnungskorrektur), zu erstatten ist nur der Rest
+  const abschlaege = !gs ? (r.abschlaege ?? []) : [];
   const voraus = abschlagsSumme(abschlaege).brutto_cent;
   const zahlbar = s.brutto_cent - voraus;
   const verweise = [
@@ -155,7 +156,11 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     // Skonto vom zu zahlenden Betrag (BT-115) – bei einer Schlussrechnung vom Rest nach den Abschlägen
     ...(r.skonto && !gs && r.art !== "storno" && zahlbar > 0
       ? { "cac:PaymentTerms": { "cbc:Note": zahlungsbedingungenMitSkonto(r.skonto, `Bei Zahlung bis zum ${r.skonto.bis.slice(8, 10)}.${r.skonto.bis.slice(5, 7)}.${r.skonto.bis.slice(0, 4)} (innerhalb von ${r.skonto.tage} Tagen) ${prozentText(r.skonto.prozent)} % Skonto (${betrag(skontoBetrag(zahlbar, r.skonto.prozent))} EUR).`) } }
-      : {}),
+      : // E-193 (5): „zahlbar sofort“ bzw. schon bezahlt – Zahlungsbedingung als Text (BT-20), sonst fehlt bei positivem
+        // Zahlbetrag ohne Fälligkeitsdatum sowohl BT-9 als auch BT-20 (BR-CO-25) und Eingangsportale weisen die Rechnung ab
+        r.zahlungsbedingung && r.art !== "storno" && zahlbar > 0
+        ? { "cac:PaymentTerms": { "cbc:Note": r.zahlungsbedingung } }
+        : {}),
     // C-16: Nachlässe als Abschlag auf Dokumentebene (BG-20) mit Grund (BT-97) und Steuerkategorie (BT-95/96)
     ...(nachlassIdx.length
       ? {
@@ -188,7 +193,7 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
       "cbc:TaxInclusiveAmount": m(s.brutto_cent).wert, "cbc:TaxInclusiveAmount@currencyID": "EUR",
       ...(nachlassIdx.length ? { "cbc:AllowanceTotalAmount": betrag(nachlassSumme), "cbc:AllowanceTotalAmount@currencyID": "EUR" } : {}),
       // BT-113: bereits gezahlte Abschläge (Schlussrechnung); BT-115 = Rest
-      ...(voraus ? { "cbc:PrepaidAmount": betrag(voraus), "cbc:PrepaidAmount@currencyID": "EUR" } : {}),
+      ...(voraus ? { "cbc:PrepaidAmount": m(voraus).wert, "cbc:PrepaidAmount@currencyID": "EUR" } : {}),
       "cbc:PayableAmount": m(zahlbar).wert, "cbc:PayableAmount@currencyID": "EUR",
     },
     "cac:InvoiceLine": zeilenIdx.map((i, n) => ({ p: r.positionen[i]!, i, n })).map(({ p, i, n }) => ({

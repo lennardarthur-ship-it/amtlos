@@ -24,8 +24,18 @@ export interface Betrieb {
   rechtsform?: string;
   registergericht?: string;
   registernummer?: string;
-  /** Geschäftsführung bzw. vertretungsberechtigte Personen */
+  /** Geschäftsführung bzw. vertretungsberechtigte Personen – bei der GmbH & Co. KG die Geschäftsführer der Komplementärin */
   vertretung?: string;
+  /**
+   * E-193 (8a): GmbH & Co. KG bzw. UG (haftungsbeschränkt) & Co. KG – Angaben zur persönlich haftenden Gesellschafterin
+   * (Komplementärin) für Geschäftsbriefe und Rechnungen (§ 125a Abs. 1 Satz 2, § 177a HGB i. V. m. § 35a GmbHG): Firma,
+   * Rechtsform, Sitz, Registergericht und Registernummer; ihre Geschäftsführer stehen in `vertretung`.
+   */
+  komplementaer?: string;
+  komplementaer_rechtsform?: string;
+  komplementaer_sitz?: string;
+  komplementaer_registergericht?: string;
+  komplementaer_registernummer?: string;
   /** Umsatzsteuer nach vereinbarten („soll“) oder vereinnahmten („ist“) Entgelten (§§ 16, 20 UStG) */
   versteuerung?: string;
   /**
@@ -49,7 +59,7 @@ export interface Betrieb {
   vorsteuerquote?: string;
 }
 
-export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "", rechtsform: "", registergericht: "", registernummer: "", vertretung: "", versteuerung: "", ku_bis: "", logo: "", farbe: "", bank: "", bic: "", website: "", vorsteuerquote: "" };
+export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "", rechtsform: "", registergericht: "", registernummer: "", vertretung: "", komplementaer: "", komplementaer_rechtsform: "", komplementaer_sitz: "", komplementaer_registergericht: "", komplementaer_registernummer: "", versteuerung: "", ku_bis: "", logo: "", farbe: "", bank: "", bic: "", website: "", vorsteuerquote: "" };
 
 /** Ein Wert in einem Listeneintrag. */
 export type EintragWert = string | boolean | string[] | null;

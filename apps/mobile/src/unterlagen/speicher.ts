@@ -4,7 +4,7 @@
  */
 import { letzteVollsicherung, nachweisText, nachweiseAus, type SicherungsNachweis } from "./sicherungNachweis";
 import { KU_HINWEIS, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, kontenvorgabenAus, kontenvorgabenGesetzt, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Kontenvorgaben, type Sachentnahme } from "@amtlos/fachlogik";
-import { LEERER_BETRIEB, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, istGutschriftNummer, leereDaten, type Beleg, naechsteNummer, zahlbetrag, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
+import { LEERER_BETRIEB, STORNO_ABSCHLAEGE, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, istGutschriftNummer, leereDaten, type Beleg, naechsteNummer, zahlbetrag, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 import { partnerIdAus } from "../partner/partner";
 import { istKompakt, kompaktAufloesen } from "./kompakt";
 import { zustimmungAus, type Zustimmung } from "../rechtliches";
@@ -66,7 +66,24 @@ export interface Unterlage {
   /** R12 GoBD: Kassenbuch aus den Tagesabschlüssen – Monat und Standort, SHA-256 des festgeschriebenen Inhalts */
   kassenbuch?: { monat: string; standort: string };
   inhaltSha256?: string;
+  /**
+   * E-193 (4): auf Android geteilt bzw. gedruckt, aber nicht als verschickt bestätigt („Nein, noch nicht“) – Android meldet
+   * einen Abbruch des Teilen-Menüs nicht. Je Ausgabe die Fassung, wie sie hinausging (Inhalt, PDF-Hash, Absender), älteste
+   * zuerst. „Doch verschickt – festschreiben“ schreibt die letzte davon fest; nur anhängen, beim Zusammenführen vereint.
+   */
+  geteiltOffen?: GeteilteFassung[];
 }
+
+/** E-193 (4): eine auf Android ausgegebene Fassung, deren Versand (noch) nicht bestätigt ist. */
+export interface GeteilteFassung {
+  am: string;
+  art: "pdf" | "druck" | "xml";
+  daten: Daten;
+  pdfSha256?: string;
+  absender?: Betrieb;
+}
+/** höchstens so viele unbestätigte Ausgaben je Unterlage (die ältesten fallen weg) */
+const GETEILT_OFFEN_HOECHSTENS = 20;
 
 /**
  * R12 GoBD: Protokoll von Löschungen und Korrekturen (nur anhängen, nie ändern) – geht ins Steuerberater-Paket und ins
@@ -365,7 +382,20 @@ function unterlageAus(u: Record<string, unknown>): Unterlage {
   if (typeof u.xml !== "string" || !u.xml.startsWith("<")) delete r.xml;
   if (!(istObjekt(u.kassenbuch) && typeof u.kassenbuch.monat === "string" && typeof u.kassenbuch.standort === "string")) delete r.kassenbuch;
   if (typeof u.inhaltSha256 !== "string") delete r.inhaltSha256;
+  // E-193 (4): unbestätigte Ausgaben – nur Lesbares (Zeitpunkt, Art, Inhalt)
+  const offen = geteiltOffenAus(u.geteiltOffen);
+  if (offen.length) r.geteiltOffen = offen;
+  else delete r.geteiltOffen;
   return r;
+}
+
+function geteiltOffenAus(roh: unknown): GeteilteFassung[] {
+  if (!Array.isArray(roh)) return [];
+  return (roh as unknown[])
+    .filter((x): x is Record<string, unknown> => istObjekt(x) && istIso(x.am) && (x.art === "pdf" || x.art === "druck" || x.art === "xml") && istObjekt(x.daten))
+    .map((x) => ({ am: x.am as string, art: x.art as GeteilteFassung["art"], daten: x.daten as Daten, ...(typeof x.pdfSha256 === "string" && x.pdfSha256 ? { pdfSha256: x.pdfSha256 } : {}), ...(istObjekt(x.absender) ? { absender: { ...LEERER_BETRIEB, ...Object.fromEntries(Object.entries(x.absender).filter(([, w]) => typeof w === "string")) } as Betrieb } : {}) }))
+    .sort((a, b) => a.am.localeCompare(b.am))
+    .slice(-GETEILT_OFFEN_HOECHSTENS);
 }
 
 /** R12: Betriebsstätten lesen – unlesbare Einträge fallen weg. */
@@ -778,6 +808,44 @@ export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSh
   return neu;
 }
 
+/**
+ * E-193 (4): Android – geteilt bzw. gedruckt, aber „Nein, noch nicht“ verschickt: nicht festschreiben, nur die Fassung
+ * merken, die das Gerät verlassen haben könnte (für „Doch verschickt – festschreiben“ und als Nachweis). Nur bei Vorlagen
+ * mit `festschreiben`, die noch nicht festgeschrieben sind.
+ */
+export function teilenOffenVermerken(s: Stand, id: string, jetzt: Date, f: Omit<GeteilteFassung, "am">): Stand {
+  return {
+    ...s,
+    unterlagen: s.unterlagen.map((u) => {
+      if (u.id !== id || u.festgeschrieben || !vorlageFuer(u.vorlage)?.festschreiben) return u;
+      const g: GeteilteFassung = { am: jetzt.toISOString(), art: f.art, daten: f.daten, ...(f.pdfSha256 ? { pdfSha256: f.pdfSha256 } : {}), ...(f.absender ? { absender: { ...f.absender } } : {}) };
+      return { ...u, geteiltOffen: [...(u.geteiltOffen ?? []), g].slice(-GETEILT_OFFEN_HOECHSTENS) };
+    }),
+  };
+}
+
+/** E-193 (4): zuletzt geteilte, unbestätigte Fassung – und ob die Unterlage seitdem geändert wurde. */
+export function geteiltOffenLetzte(u: Pick<Unterlage, "geteiltOffen" | "daten" | "festgeschrieben">): { fassung: GeteilteFassung; geaendert: boolean } | null {
+  const f = !u.festgeschrieben ? u.geteiltOffen?.at(-1) : undefined;
+  return f ? { fassung: f, geaendert: JSON.stringify(f.daten) !== JSON.stringify(u.daten) } : null;
+}
+
+/**
+ * E-193 (4): „Doch verschickt – festschreiben“ – die zuletzt geteilte Fassung wird festgeschrieben, genau mit dem Inhalt,
+ * PDF-Hash und Absender, mit dem sie hinausging (GoBD: was das Gerät verlassen hat, ändert sich nicht mehr). Änderungen
+ * seit dem Teilen werden dabei verworfen. Erste Ausgabe = erste unbestätigte Ausgabe; festgeschrieben = jetzt.
+ */
+export function geteilteFassungFestschreiben(s: Stand, id: string, jetzt: Date): Stand {
+  const u = s.unterlagen.find((x) => x.id === id);
+  const letzte = u ? geteiltOffenLetzte(u) : null;
+  if (!u || !letzte) return s;
+  const f = letzte.fassung;
+  const erste = u.ausgegeben ?? u.geteiltOffen![0]!.am;
+  const vorher: Stand = { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...x, daten: f.daten, ...(letzte.geaendert ? { geaendert: jetzt.toISOString() } : {}) } : x)) };
+  const fest = ausgeben(vorher, id, jetzt, f.daten, f.pdfSha256, f.absender, f.art === "xml");
+  return { ...fest, unterlagen: fest.unterlagen.map((x) => (x.id === id && x.festgeschrieben ? { ...x, ausgegeben: erste } : x)) };
+}
+
 const zahltagVon = (b: Pick<Beleg, "datum" | "bezahlt">) => b.bezahlt || b.datum;
 const MONATSNAMEN = ["januar", "februar", "märz", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "dezember"];
 
@@ -828,6 +896,8 @@ export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [
   if (Array.isArray(daten.positionen)) daten.positionen = (daten.positionen as Record<string, unknown>[]).map((e) => ({ ...e, preis: negativ(e.preis) })) as Daten[string];
   daten.storno_zu = typeof alt.daten.nummer === "string" ? alt.daten.nummer : "";
   daten.storno_zu_datum = typeof alt.daten.datum === "string" ? alt.daten.datum : null;
+  // E-193 (8b): Storno einer Schlussrechnung spiegelt auch die abgesetzten Abschläge – es hebt nur den Rest auf
+  if (alt.daten.schluss === true) daten[STORNO_ABSCHLAEGE] = true;
   daten.datum = heute(jetzt);
   if (v.fortlaufend) daten[v.fortlaufend] = naechste(s, v.id, v.fortlaufend, jetzt);
   const u: Unterlage = { id: neu, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString(), stornoZuId: id };
@@ -923,7 +993,7 @@ export function betriebSetzen(s: Stand, b: Betrieb): Stand {
   return { ...mitZeit(s, "betrieb"), betrieb: b };
 }
 
-export const steuerberatungSetzen = (s: Stand, sb: Stand["steuerberatung"]): Stand => ({ ...mitZeit(s, "steuerberatung"), steuerberatung: sb });
+export const steuerberatungSetzen = (s: Stand, sb: Stand["steuerberatung"], jetzt = new Date()): Stand => ({ ...mitZeit(s, "steuerberatung", jetzt), steuerberatung: sb });
 
 /** Zuletzt bearbeitete zuerst. */
 // je Unterlagenliste einmal sortiert (R9 Performance: Seiten fragen das bei jedem Zeichnen ab) – nicht verändern
@@ -1322,6 +1392,11 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
   const eRechnung = frueher(lokal.eRechnungGeteilt, andere.eRechnungGeteilt);
   if (eRechnung) r.eRechnungGeteilt = eRechnung;
   if (fl && fa && sl === sa) r.festgeschrieben = frueher(lokal.festgeschrieben, andere.festgeschrieben);
+  // E-193 (4): unbestätigte Ausgaben beider Seiten (nach Zeitpunkt) – keine geht verloren
+  const offen = new Map<string, GeteilteFassung>();
+  for (const g of [...(lokal.geteiltOffen ?? []), ...(andere.geteiltOffen ?? [])]) if (!offen.has(g.am)) offen.set(g.am, g);
+  if (offen.size) r.geteiltOffen = [...offen.values()].sort((a, b) => a.am.localeCompare(b.am)).slice(-GETEILT_OFFEN_HOECHSTENS);
+  else delete r.geteiltOffen;
   // R12: Fassungen beider Seiten – keine geht verloren (nach Zeitpunkt der Festschreibung)
   const fassungen = new Map<string, Fassung>();
   for (const f of [...(lokal.fassungen ?? []), ...(andere.fassungen ?? [])]) if (!fassungen.has(f.festgeschrieben)) fassungen.set(f.festgeschrieben, f);
@@ -1420,6 +1495,23 @@ export interface Zusammenfuehrung {
  * zurück (M7); ausdrücklich wiederhergestellte Belege schon – sie bekommen einen neuen Zeitstempel, damit sie einen
  * Löschvermerk schlagen (H2). Personen, Antworten und Haken werden ergänzt; „Mein Betrieb“ nur übernommen, wenn er leer ist.
  */
+/** Steuerberatung noch wie im leeren Stand (SKR03, keine Nummern, keine Kontenvorgaben)? */
+const steuerberatungLeer = (sb: Stand["steuerberatung"]) => JSON.stringify(sb) === JSON.stringify(LEERER_STAND.steuerberatung);
+
+/**
+ * E-193 (8c): Angaben für die Steuerberatung beim Wiederherstellen – bisher blieb immer die Fassung des Geräts, auf einem
+ * neuen Gerät also der Standard SKR03 ohne Berater- und Mandantennummer, und das nächste Paket ging still im falschen
+ * Kontenrahmen hinaus. Jetzt wie bei der Synchronisation: die zuletzt geänderte Fassung (`zeiten.steuerberatung`); hat
+ * das Gerät keinen Zeitpunkt, die aus der Sicherung – außer beide haben keinen (ältere Daten) und nur das Gerät hat Angaben.
+ */
+export function steuerberatungVereinen(aktuell: Pick<Stand, "steuerberatung" | "zeiten">, gesichert: Pick<Stand, "steuerberatung" | "zeiten">): Stand["steuerberatung"] {
+  const tl = aktuell.zeiten.steuerberatung;
+  const tg = gesichert.zeiten.steuerberatung;
+  if (tl) return !tg || tl >= tg ? aktuell.steuerberatung : gesichert.steuerberatung;
+  if (!tg && steuerberatungLeer(gesichert.steuerberatung)) return aktuell.steuerberatung;
+  return gesichert.steuerberatung;
+}
+
 export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Date()): Zusammenfuehrung {
   // Löschvermerke für Entwürfe beider Seiten (M7) – festgeschriebene Unterlagen werden nie gelöscht
   const geloescht: Record<string, string> = { ...aktuell.geloescht };
@@ -1456,9 +1548,15 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
   const belegNachId = belegeVereinen(lokaleBelege, wieder);
   const alleBelege = [...belegNachId.values()];
   const erledigt = { ...gesichert.erledigt, ...aktuell.erledigt };
+  // E-193 (8c): Zeitpunkte je Bereich beider Seiten (der spätere je Schlüssel) – sonst hielte eine spätere
+  // Synchronisation die wiederhergestellten Angaben für älter als die leeren des Geräts
+  const zeiten: Record<string, string> = { ...gesichert.zeiten };
+  for (const [k, v] of Object.entries(aktuell.zeiten)) if (!zeiten[k] || v > zeiten[k]!) zeiten[k] = v;
   const stand: Stand = {
     ...aktuell,
     betrieb: betriebFehlt(aktuell.betrieb) ? gesichert.betrieb : aktuell.betrieb,
+    steuerberatung: steuerberatungVereinen(aktuell, gesichert),
+    zeiten,
     unterlagen,
     belege: alleBelege.filter((b) => !b.ungueltig),
     belegArchiv: alleBelege.filter((b) => b.ungueltig),
@@ -1481,6 +1579,9 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
   // Phase 2.3: Partner aus der Sicherung nur übernehmen, wenn auf dem Gerät keiner gesetzt ist
   const partnerId = aktuell.partnerId ?? gesichert.partnerId;
   if (partnerId) stand.partnerId = partnerId;
+  // E-193 (8c): Nachweise der Vollsicherung (StB GoBD, D-11) beider Seiten – der Nachweis geht mit der Sicherung nicht verloren
+  const nachweise = nachweiseAus([...(aktuell.sicherungsNachweis ?? []), ...(gesichert.sicherungsNachweis ?? [])].filter((n, i, a) => a.findIndex((x) => x.am === n.am && x.ziel === n.ziel) === i));
+  if (nachweise.length) stand.sicherungsNachweis = nachweise;
   return { stand: belegNummernSichern(stand), neu, behalten, aktualisiert, nummernKonflikte: nummernKonflikteVon(stand), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(stand.unterlagen) };
 }
 

@@ -1,7 +1,7 @@
 import { standSpeicher } from "../unterlagen/standSpeicher";
 import { useEffect, useRef, useState } from "react";
 import { Image, Pressable, View } from "react-native";
-import { BUNDESLAENDER, HAUSFARBEN, PERSONEN_FELDER, VERSTEUERUNG, VORLAGEN, emailGueltig, ibanGueltig, plzGueltig, type Betrieb as BetriebDaten, type PersonenArt } from "@amtlos/fachlogik";
+import { BUNDESLAENDER, HAUSFARBEN, PERSONEN_FELDER, VERSTEUERUNG, VORLAGEN, emailGueltig, ibanGueltig, istCoKg, plzGueltig, type Betrieb as BetriebDaten, type PersonenArt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { logoWaehlen } from "../unterlagen/logo";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -187,6 +187,8 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
     fehler: verlassen.has(k) ? pruefung(k, b[k] ?? "") : null,
     onBlur: () => setVerlassen((v) => (v.has(k) ? v : new Set(v).add(k))),
   });
+  // E-193 (8a): GmbH & Co. KG bzw. UG & Co. KG – Angaben zur Komplementärin
+  const coKg = istCoKg(b);
   const zeigt = (t: Teil) => (teile ? teile.includes(t) : !teil || teil === t) && (t !== "gesellschaft" || Boolean(teil) || mitGesellschaft(stand.profil, b));
   // Rechtsform aus dem Pflichten-Check vorbelegen, solange sie leer ist (R10) – einmal beim Öffnen des Abschnitts
   // eine GbR im Gesellschaftsregister führt den Zusatz „eGbR“ (§ 707a Abs. 2 BGB)
@@ -272,8 +274,24 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
             <Feld label={TEXT.b_rechtsform} {...feld("rechtsform")} placeholder="z. B. GmbH" />
             <Feld label={TEXT.b_registergericht} {...feld("registergericht")} placeholder="z. B. Amtsgericht München" />
             <Feld label={TEXT.b_registernummer} {...feld("registernummer")} placeholder="z. B. HRB 123456" autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
-            <Feld label={TEXT.b_vertretung} {...feld("vertretung")} placeholder="Vor- und Nachname, mehrere mit Komma" />
+            <Feld label={coKg ? TEXT.b_vertretung_cokg : TEXT.b_vertretung} {...feld("vertretung")} placeholder="Vor- und Nachname, mehrere mit Komma" />
           </Karte>
+          {/* E-193 (8a): GmbH & Co. KG – die Komplementärin mit ihren Angaben (§§ 125a, 177a HGB) */}
+          {coKg ? (
+            <View>
+              <View style={{ marginTop: 20, marginBottom: 8, marginLeft: 4 }}>
+                <T v="klein" fett leise accessibilityRole="header">{TEXT.b_komplementaer_titel}</T>
+                <T v="caption" leise stil={{ marginTop: 2 }}>{TEXT.b_komplementaer_text}</T>
+              </View>
+              <Karte stil={{ paddingBottom: 14 }}>
+                <Feld label={TEXT.b_komplementaer} {...feld("komplementaer")} placeholder="z. B. Muster Verwaltungs-GmbH" />
+                <Feld label={TEXT.b_komplementaer_rechtsform} {...feld("komplementaer_rechtsform")} placeholder="z. B. GmbH" />
+                <Feld label={TEXT.b_komplementaer_sitz} {...feld("komplementaer_sitz")} placeholder="z. B. Hamburg" />
+                <Feld label={TEXT.b_komplementaer_registergericht} {...feld("komplementaer_registergericht")} placeholder="z. B. Amtsgericht Hamburg" />
+                <Feld label={TEXT.b_komplementaer_registernummer} {...feld("komplementaer_registernummer")} placeholder="z. B. HRB 123456" autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
+              </Karte>
+            </View>
+          ) : null}
         </View>
       ) : null}
       <T v="caption" leise stil={{ marginTop: 8, marginLeft: 4 }}>{TEXT.gespeichert_auto}</T>

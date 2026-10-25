@@ -15,7 +15,7 @@ import { STEUERART_NULLSATZ } from "../steuerart.js";
 import { KUNDEN_ARTEN } from "./kundenarten.js";
 import { formImNamen, istKapitalgesellschaft } from "./betrieb.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
-import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, angaben, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, steuerHinweis, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, istCoKg, komplementaerZeile, absatz, angaben, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, steuerHinweis, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 import { MARKE } from "@amtlos/marke";
 
@@ -218,9 +218,45 @@ export const GMBH_REGISTERNUMMER = `Registernummer, z. B. HRB 12345 (Mein Betrie
 export const GMBH_GESCHAEFTSFUEHRUNG = `Alle Geschäftsführerinnen und Geschäftsführer (Mein Betrieb, ${GMBH_ANGABEN})`;
 export const GMBH_SITZ = `Ort des Betriebs als Sitz der Gesellschaft (Mein Betrieb, ${GMBH_ANGABEN})`;
 export function gmbhAngabenFehlen(b: Betrieb): string[] {
-  if (!istKapitalgesellschaft(b.rechtsform, b.name) || (formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name)) === "AG") return [];
+  // E-193 (8a): eine UG (haftungsbeschränkt) & Co. KG ist eine KG – ihre Angaben prüft `komplementaerAngabenFehlen`
+  if (istCoKg(b) || !istKapitalgesellschaft(b.rechtsform, b.name) || (formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name)) === "AG") return [];
   const t = (x: string | undefined) => (x ?? "").trim();
   return [!t(b.registergericht) ? GMBH_REGISTERGERICHT : "", !t(b.registernummer) ? GMBH_REGISTERNUMMER : "", !t(b.vertretung) ? GMBH_GESCHAEFTSFUEHRUNG : "", !t(b.ort) ? GMBH_SITZ : ""].filter(Boolean);
+}
+
+/**
+ * E-193 (8a): Angaben auf Geschäftsbriefen einer GmbH & Co. KG bzw. UG (haftungsbeschränkt) & Co. KG: die der KG selbst
+ * (Rechtsform, Sitz, Registergericht, Registernummer – § 125a Abs. 1 Satz 1, § 177a HGB) und, weil keine natürliche
+ * Person persönlich haftet, die Firma der Komplementärin mit den Angaben nach § 35a GmbHG (Rechtsform, Sitz,
+ * Registergericht, Registernummer, alle Geschäftsführer – § 125a Abs. 1 Satz 2 HGB). Zusatz „(Mein Betrieb, §§ 125a, 177a
+ * HGB)“, damit die App gleich die Gesellschaftsangaben öffnet.
+ */
+export const KG_ANGABEN = "§§ 125a, 177a HGB";
+export const KG_REGISTERGERICHT = `Registergericht der KG (Mein Betrieb, ${KG_ANGABEN})`;
+export const KG_REGISTERNUMMER = `Registernummer der KG, z. B. HRA 12345 (Mein Betrieb, ${KG_ANGABEN})`;
+export const KG_SITZ = `Ort des Betriebs als Sitz der KG (Mein Betrieb, ${KG_ANGABEN})`;
+export const KG_KOMPLEMENTAER = `Firma der persönlich haftenden Gesellschafterin (Mein Betrieb, ${KG_ANGABEN})`;
+export const KG_KOMPLEMENTAER_RECHTSFORM = `Rechtsform der persönlich haftenden Gesellschafterin (Mein Betrieb, ${KG_ANGABEN})`;
+export const KG_KOMPLEMENTAER_SITZ = `Sitz der persönlich haftenden Gesellschafterin (Mein Betrieb, ${KG_ANGABEN})`;
+export const KG_KOMPLEMENTAER_REGISTERGERICHT = `Registergericht der persönlich haftenden Gesellschafterin (Mein Betrieb, ${KG_ANGABEN})`;
+export const KG_KOMPLEMENTAER_REGISTERNUMMER = `Registernummer der persönlich haftenden Gesellschafterin, z. B. HRB 12345 (Mein Betrieb, ${KG_ANGABEN})`;
+export const KG_GESCHAEFTSFUEHRUNG = `Alle Geschäftsführerinnen und Geschäftsführer der persönlich haftenden Gesellschafterin (Mein Betrieb, ${KG_ANGABEN})`;
+export function komplementaerAngabenFehlen(b: Betrieb): string[] {
+  if (!istCoKg(b)) return [];
+  const t = (x: string | undefined) => (x ?? "").trim();
+  // Rechtsform der Komplementärin: eigenes Feld oder Zusatz in ihrer Firma („Holzbau Verwaltungs-GmbH“)
+  const rfKomplementaer = t(b.komplementaer_rechtsform) || /\b(GmbH|UG)\b/.test(t(b.komplementaer));
+  return [
+    !t(b.registergericht) ? KG_REGISTERGERICHT : "",
+    !t(b.registernummer) ? KG_REGISTERNUMMER : "",
+    !t(b.ort) ? KG_SITZ : "",
+    !t(b.komplementaer) ? KG_KOMPLEMENTAER : "",
+    t(b.komplementaer) && !rfKomplementaer ? KG_KOMPLEMENTAER_RECHTSFORM : "",
+    !t(b.komplementaer_sitz) ? KG_KOMPLEMENTAER_SITZ : "",
+    !t(b.komplementaer_registergericht) ? KG_KOMPLEMENTAER_REGISTERGERICHT : "",
+    !t(b.komplementaer_registernummer) ? KG_KOMPLEMENTAER_REGISTERNUMMER : "",
+    !t(b.vertretung) ? KG_GESCHAEFTSFUEHRUNG : "",
+  ].filter(Boolean);
 }
 
 /** R12 (UX #15): Empfänger, der wie eine Privatperson heißt („Lea Schmitz“) – kein Firmenzusatz, keine Behörde, zwei bis vier Wörter. */
@@ -312,9 +348,24 @@ export const RECHNUNG_OSS_VORSCHLAG = (land: string) => `Empfänger ist eine Pri
 
 /** C-4: Schlussrechnung – die gestellten Abschlagsrechnungen werden abgesetzt (§ 14 Abs. 5 Satz 2 UStG, A 14.8 Abs. 10 UStAE). */
 const schlussD = (d: Daten) => ja(d, "schluss") && !text(d, "storno_zu") && !gutschriftD(d) && !ja(d, "abschlag");
-/** Abgesetzte Abschläge aus der Liste „abschlaege“; Umsatzsteuer aus dem Entgelt, wenn nicht eingetragen. */
+/**
+ * E-193 (8b): Stornorechnung zu einer Schlussrechnung, die die abgesetzten Abschläge spiegelt (Merker
+ * `storno_abschlaege`, gesetzt beim Stornieren). Ohne Merker (Stornos aus früheren Versionen) wie bisher ohne Abschläge –
+ * ein schon geteiltes Storno-PDF soll beim erneuten Teilen nicht anders aussehen als das verschickte.
+ */
+export const STORNO_ABSCHLAEGE = "storno_abschlaege";
+const stornoSchlussD = (d: Daten) => ja(d, "schluss") && !!text(d, "storno_zu") && ja(d, STORNO_ABSCHLAEGE) && !gutschriftD(d) && !ja(d, "abschlag");
+/**
+ * Abgesetzte Abschläge aus der Liste „abschlaege“; Umsatzsteuer aus dem Entgelt, wenn nicht eingetragen. Bei der
+ * Stornorechnung einer Schlussrechnung (E-193) mit umgekehrtem Vorzeichen wie ihre Positionen – das Storno hebt nur den
+ * Rest auf, die Abschlagsrechnungen bleiben bestehen.
+ */
 export function abschlaegeAus(d: Daten): Abschlag[] {
+  if (stornoSchlussD(d)) return abschlaegeListe(d).map((a) => ({ ...a, netto_cent: 0 - a.netto_cent, ust_cent: 0 - a.ust_cent }));
   if (!schlussD(d)) return [];
+  return abschlaegeListe(d);
+}
+function abschlaegeListe(d: Daten): Abschlag[] {
   const ku = kuFuer(d);
   return liste(d, "abschlaege")
     .filter((e) => text(e, "nummer") || text(e, "netto"))
@@ -485,12 +536,19 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
   const leistungsdatum = leistungGleich(d) ? datum || null : vorauszahlungD(d) && !text(d, "leistung").trim() ? isoAus(text(d, "bezahlt_am")) : isoAus(text(d, "leistung"));
   // Gutschrift und ihr Storno: in der E-Rechnung ist der Leistende der Verkäufer (R11)
   const gutschrift = gutschriftD(d);
+  // E-193 (5): Zahlungsbedingung wörtlich wie auf dem PDF – schon bezahlt („Der Rechnungsbetrag wurde am … bezahlt.“)
+  // bzw. „Zahlbar sofort ohne Abzug.“; ein Zahlungsziel in Tagen steht als Fälligkeitsdatum (BT-9) darin
+  const bezahltVorher = isoAus(text(d, "bezahlt_am"));
+  const schonBezahlt = !storno && !gutschrift && !!bezahltVorher && !!datum && bezahltVorher <= datum;
+  const zahlungsbedingung = storno ? null : schonBezahlt ? `Der Rechnungsbetrag wurde am ${datumDe(bezahltVorher!)} bezahlt.` : ziel === "sofort" ? `Zahlbar ${ZIEL.sofort}.` : null;
   const daten: RechnungsDaten = {
     nummer: text(d, "nummer"),
     rechnungsdatum: datum,
     leistungsdatum,
     ...(leistungsdatum ? {} : { leistungszeitraum: leistungszeitraumAus(text(d, "leistung")) }),
-    faellig_am: datum && ziel && ziel !== "sofort" ? faelligAm(datum, Number(ziel), b.bundesland) || null : null,
+    // E-193 (5): „Sofort“ – fällig am Rechnungsdatum (BT-9), dazu der Satz vom PDF als Zahlungsbedingung (BT-20, unten)
+    faellig_am: datum && ziel === "sofort" ? (storno ? null : datum) : datum && ziel ? faelligAm(datum, Number(ziel), b.bundesland) || null : null,
+    ...(zahlungsbedingung ? { zahlungsbedingung } : {}),
     steller: { name: b.name.trim(), strasse: b.strasse.trim(), plz: b.plz.trim(), ort: b.ort.trim(), land: "DE", email: b.email.trim(), telefon: b.telefon.trim() || null, steuernummer: b.steuernummer.trim() || null, ust_idnr: b.ust_idnr.trim() || null, iban: b.iban.trim() || null, ...registerAngaben(b) },
     // Leitweg-ID bzw. Käuferreferenz (BT-10), ohne sie wie bisher die Rechnungsnummer
     kunde: {
@@ -515,7 +573,8 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     // R12: Skonto (BT-20) – nicht für schon Bezahltes
     ...(skontoFuer(d, b.bundesland) && !(isoAus(text(d, "bezahlt_am")) && isoAus(text(d, "bezahlt_am"))! <= datum) ? { skonto: skontoFuer(d, b.bundesland) } : {}),
     // StB-Prüfung: Schlussrechnung (C-4), Ersatzrechnung (C-6), OSS (5.2)
-    ...(abschlaegeAus(d).length ? { abschlaege: abschlaegeAus(d) } : {}),
+    // E-193 (8b): beim Storno tragen die Positionen hier das ursprüngliche Vorzeichen (siehe oben) – die Abschläge ebenso
+    ...(abschlaegeAus(d).length ? { abschlaege: storno ? abschlaegeAus(d).map((a) => ({ ...a, netto_cent: 0 - a.netto_cent, ust_cent: 0 - a.ust_cent })) : abschlaegeAus(d) } : {}),
     ...(ersetztNummer(d) ? { ersetzt_nummer: ersetztNummer(d) } : {}),
     ...(ossSatz(d) !== null && a.land ? { oss: { land: a.land, satz: ossSatz(d)! } } : {}),
   };
@@ -523,6 +582,9 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
   // C-13: öffentliche Stelle ohne Leitweg-ID – die Eingangsplattformen weisen die XRechnung zurück
   if (kundeArt(d) === "oeffentlich" && !gutschrift && !text(d, "kunde_leitweg_id").trim()) fehlt.push(RECHNUNG_LEITWEG_FEHLT);
   if (!a.land && a.plz) fehlt.push(E_LAND_FEHLT);
+  // E-193 (5): ohne Zahlungsziel, Skonto oder Zahlungsvermerk hätte die E-Rechnung weder Fälligkeit (BT-9) noch
+  // Zahlungsbedingung (BT-20) – BR-CO-25; erfunden wird keine, das Zahlungsziel ist zu wählen
+  if (!storno && !ziel && !zahlungsbedingung && !daten.skonto) fehlt.push(E_ZAHLUNGSZIEL_FEHLT);
   if (!daten.nummer) fehlt.unshift("Rechnungsnummer");
   if (!datum) fehlt.unshift("Rechnungsdatum");
   return { daten, fehlt };
@@ -541,10 +603,14 @@ function registerAngaben(b: Betrieb): { register?: string; rechtliches?: string 
   const nr = (b.registernummer ?? "").trim();
   if (!nr) return {};
   const form = (formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name) ?? (b.rechtsform ?? "").trim()) || "";
-  const teile = [form, b.ort.trim() ? `Sitz ${b.ort.trim()}` : "", [(b.registergericht ?? "").trim(), nr].filter(Boolean).join(" "), (b.vertretung ?? "").trim() ? `Geschäftsführung: ${(b.vertretung ?? "").trim().replace(/\s*\n\s*/g, ", ")}` : ""].filter(Boolean);
+  // E-193 (8a): GmbH & Co. KG – mit der Komplementärin und ihren Angaben (§§ 125a, 177a HGB), vor ihrer Geschäftsführung
+  const teile = [form, b.ort.trim() ? `Sitz ${b.ort.trim()}` : "", [(b.registergericht ?? "").trim(), nr].filter(Boolean).join(" "), komplementaerZeile(b), (b.vertretung ?? "").trim() ? `Geschäftsführung: ${(b.vertretung ?? "").trim().replace(/\s*\n\s*/g, ", ")}` : ""].filter(Boolean);
   return { register: nr, rechtliches: teile.join(", ") };
 }
 
+
+/** E-193 (5): E-Rechnung ohne Zahlungsziel (BR-CO-25) – Bezeichnung des Felds, damit „Ergänzen“ den Schritt öffnet. */
+export const E_ZAHLUNGSZIEL_FEHLT = "Zahlungsziel";
 
 /** Meldungen der Rechnungsprüfung (auch für die Zuordnung zu einem Feld im Abschluss). */
 export const RECHNUNG_PLZ_FEHLT = "PLZ und Ort des Empfängers fehlen (letzte Zeile der Anschrift, z. B. 10115 Berlin)";
@@ -726,6 +792,8 @@ export const rechnung: Vorlage = {
     } else if (!b.steuernummer.trim() && !b.ust_idnr.trim()) f.push("Steuernummer oder USt-IdNr. (Mein Betrieb)");
     // R12 (Kfz #6): GmbH bzw. UG ohne Registerangaben – Pflicht auf jedem Geschäftsbrief (§ 35a GmbHG)
     f.push(...gmbhAngabenFehlen(b));
+    // E-193 (8a): GmbH & Co. KG – Angaben der KG und der Komplementärin (§§ 125a, 177a HGB)
+    f.push(...komplementaerAngabenFehlen(b));
     // Anschrift des Empfängers: PLZ und Ort in der letzten Zeile (im Ausland: Land in der Zeile danach – dort keine Prüfung)
     const anschrift_ = text(d, "kunde_anschrift");
     if (anschrift_) {
