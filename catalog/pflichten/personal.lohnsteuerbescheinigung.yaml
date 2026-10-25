@@ -1,0 +1,87 @@
+# Externe Prüfung 25.10.2026 (E-195): fehlte im Katalog – Entwurf des Gründers, ungeprüft; Freigabe StB Busch angefragt
+schema_version: 1
+id: personal.lohnsteuerbescheinigung
+version: 1
+katalog_nr: D.50
+titel:
+  de: Elektronische Lohnsteuerbescheinigung
+kurz:
+  de: Bis Ende Februar übermittelst du für jede beschäftigte Person mit Lohnsteuerabzug die Lohnsteuerbescheinigung des Vorjahres ans Finanzamt und gibst ihr einen Ausdruck.
+erklaerung:
+  de: 'Bei Ende des Dienstverhältnisses oder am Ende des Kalenderjahres schließt du das Lohnkonto ab und übermittelst auf dieser Grundlage elektronisch eine Lohnsteuerbescheinigung, unter anderem mit Dauer des Dienstverhältnisses, Arbeitslohn, einbehaltener Lohnsteuer, Solidaritätszuschlag und Kirchensteuer sowie den Sozialversicherungsbeiträgen (§ 41b Abs. 1 Sätze 1 und 2 EStG). Frist ist der letzte Tag im Februar des Folgejahres (§ 93c Abs. 1 Nr. 1 AO); fällt er auf ein Wochenende oder einen Feiertag, reicht der nächste Werktag (§ 108 Abs. 3 AO). Die Übermittlung macht in der Regel das Lohnprogramm, die Steuerberatung oder das Lohnbüro über ELSTER. Der beschäftigten Person gibst du binnen angemessener Frist einen Ausdruck nach amtlichem Muster oder stellst ihn elektronisch bereit (§ 41b Abs. 1 Satz 3 EStG). Für Arbeitslohn, der pauschal besteuert wird (§§ 40 bis 40b EStG, z. B. Minijobs mit Pauschsteuer), gibt es keine Lohnsteuerbescheinigung (§ 41b Abs. 6 EStG). Stellst du später fest, dass übermittelte Daten falsch waren, korrigierst du sie unverzüglich (§ 93c Abs. 3 AO).'
+rechtsgrundlage:
+- § 41b EStG
+- § 93c AO
+kategorie: personal
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - feld: profil.personal.lohnsteuer_anmeldezeitraum
+    op: vorhanden
+    label:
+      de: Du hast deinen Anmeldezeitraum angegeben.
+  # „keine“: nur Minijobs mit einheitlicher Pauschsteuer – pauschal besteuerter Lohn braucht keine Bescheinigung (§ 41b Abs. 6 EStG)
+  - feld: profil.personal.lohnsteuer_anmeldezeitraum
+    op: '!='
+    wert: keine
+    label:
+      de: Du meldest Lohnsteuer beim Finanzamt an.
+frist:
+  typ: wiederkehrend
+  rhythmus: jaehrlich
+  # Periode Kalenderjahr, fällig am letzten Tag des Februar im Folgejahr (28. bzw. 29. – Tag wird auf die Monatslänge begrenzt)
+  faellig:
+    art: tag_nach_periodenende
+    monate_nach: 2
+    tag: 29
+  verschiebung:
+    regel: naechster_werktag
+    kalender: bundesland
+wiederholung:
+  art: periodisch
+stelle:
+  de: Finanzamt (über das Lohnprogramm)
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Übermittelst du die Lohnsteuerbescheinigung vorsätzlich oder grob fahrlässig nicht, unrichtig oder unvollständig, haftest du für die dadurch entgangene Steuer (§ 72a Abs. 4 AO). Als Arbeitgeber haftest du außerdem für Lohnsteuer, die wegen fehlerhafter Angaben in der Lohnsteuerbescheinigung verkürzt wird (§ 42d Abs. 1 Nr. 3 EStG).
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Einkommensteuergesetz § 41b
+  url: https://www.gesetze-im-internet.de/estg/__41b.html
+  abgerufen: '2026-10-25'
+- titel: Abgabenordnung § 93c
+  url: https://www.gesetze-im-internet.de/ao_1977/__93c.html
+  abgerufen: '2026-10-25'
+- titel: Abgabenordnung § 108
+  url: https://www.gesetze-im-internet.de/ao_1977/__108.html
+  abgerufen: '2026-10-25'
+- titel: Abgabenordnung § 72a
+  url: https://www.gesetze-im-internet.de/ao_1977/__72a.html
+  abgerufen: '2026-10-25'
+- titel: Einkommensteuergesetz § 42d
+  url: https://www.gesetze-im-internet.de/estg/__42d.html
+  abgerufen: '2026-10-25'
+- titel: ELSTER – Informationen für Arbeitgeber
+  url: https://www.elster.de/eportal/infoseite/arbeitgeber
+  abgerufen: '2026-10-25'
+fachlich_zu_pruefen:
+- 'Frist bei Ende des Dienstverhältnisses im laufenden Jahr: Das Lohnkonto wird beim Ausscheiden abgeschlossen (§ 41b Abs. 1 Satz 1 EStG); als Übermittlungsfrist ist der letzte Februartag des Folgejahres angenommen (§ 93c Abs. 1 Nr. 1 AO) – keine frühere Pflicht? Die App zeigt nur den Jahrestermin.'
+- 'Auslöser wie bei der Lohnsteuer-Anmeldung (Anmeldezeitraum angegeben und nicht „keine“): Betriebe, die nur Minijobs mit Pauschsteuer von 20 % nach § 40a Abs. 2a EStG beim Finanzamt anmelden, sehen den Eintrag, obwohl § 41b Abs. 6 EStG pauschal besteuerten Lohn ausnimmt – Hinweis im Text genügt, oder eigene Frage?'
+- 'Folgen: keine eigene Bußgeldvorschrift gefunden (§ 41b Abs. 2a EStG ist weggefallen, § 379 AO nennt § 93c AO nicht) – genannt sind nur die Haftung nach § 72a Abs. 4 AO und § 42d Abs. 1 Nr. 3 EStG. Vollständig? Zwangsgeld (§§ 328, 329 AO) erwähnen? Schwere „mittel“ angemessen?'
+- 'Verschiebung auf den nächsten Werktag (§ 108 Abs. 3 AO) auch für die Frist des § 93c Abs. 1 Nr. 1 AO? Kalender bundesland wie bei der Lohnsteuer-Anmeldung.'
+- 'Ausnahme Privathaushalt ohne maschinelle Lohnabrechnung mit nur geringfügig Beschäftigten (§ 41b Abs. 3 EStG, Papierbescheinigung) nicht erwähnt, weil die App Betriebe anspricht – in Ordnung?'
+- 'Doppelung geprüft: personal.lohnsteuer_anmeldung (§ 41a EStG) und personal.lohnabrechnung (Meldungen SV) decken § 41b EStG nicht ab. Ein Querverweis in personal.lohnsteuer_anmeldung wäre eine Änderung am freigegebenen Eintrag (PRUEFLISTE T-198).'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

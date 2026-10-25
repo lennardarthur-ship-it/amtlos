@@ -27,6 +27,8 @@ NUR_OFFEN = "--nur-offen" in sys.argv
 IDS = set(sys.argv[sys.argv.index("--ids") + 1].split(",")) if "--ids" in sys.argv else None
 NAME = sys.argv[sys.argv.index("--name") + 1] if "--name" in sys.argv else None
 RUNDE = int(sys.argv[sys.argv.index("--runde") + 1]) if "--runde" in sys.argv else 2
+# E-195: neue Einträge (Entwurf des Gründers) zur Erstprüfung – eigener Einleitungstext, Prüfvermerk über alle Spalten
+NEU = sys.argv[sys.argv.index("--neu") + 1] if "--neu" in sys.argv else None
 RUECKFRAGEN = {}
 if "--rueckfragen" in sys.argv:
     import json
@@ -89,6 +91,16 @@ def frist(f):
     if t == "dauerhaft":
         return "laufend (keine feste Frist)"
     teile = [t]
+    if t == "wiederkehrend":
+        teile.append(f"Rhythmus: {f.get('rhythmus') if isinstance(f.get('rhythmus'), str) else 'je nach Angabe'}")
+        fa = f.get("faellig") or {}
+        if fa.get("art") == "tag_nach_periodenende":
+            teile.append(f"fällig am {fa.get('tag')}. Tag (höchstens Monatsende) im {fa.get('monate_nach', 1)}. Monat nach Periodenende")
+        elif fa.get("art") == "feste_termine":
+            teile.append("Termine (MM-TT): " + ", ".join(fa.get("termine") or []))
+        v = f.get("verschiebung") or {}
+        if v.get("regel"):
+            teile.append(f"Verschiebung: {v['regel']}")
     for k in ("bezug", "versatz", "zeitpunkt", "datum", "termin", "monat", "tag", "rrule"):
         if k in f:
             v = f[k]
@@ -119,6 +131,9 @@ GRAU = PatternFill("solid", fgColor="EDEDED")
 uebersicht = []
 for schluessel, (name, person) in PRUEFER.items():
     teil = [d for d in eintraege if gebiet(d) == schluessel] if IDS is None else (eintraege if schluessel == "recht" else [])
+    if NEU:  # Name und Person schon für Überschrift und Prüfvermerk (E-195)
+        name = NAME or name
+        person = sys.argv[sys.argv.index("--person") + 1] if "--person" in sys.argv else person
     wb = Workbook()
     ws = wb.active
     ws.title = "Einträge"
@@ -151,11 +166,11 @@ for schluessel, (name, person) in PRUEFER.items():
 
     hw = wb.create_sheet("So geht's")
     for zeile in [
-        [f"Freigabe Pflichtenkatalog Betriebsklar – {name}"],
+        [f"Freigabe Pflichtenkatalog Betriebsklar – {name}" if not NEU else f"Freigabe neuer Katalogeinträge Betriebsklar – {person}"],
         [""],
         ["Betriebsklar (iPhone-App, Lang Ventures UG (haftungsbeschränkt) i. G.) zeigt kleinen Betrieben aus einem festen Katalog, welche Pflichten typischerweise gelten (regelbasiert, keine KI, keine Einzelfallprüfung)."],
-        [f"Diese Datei enthält die {len(teil)} noch offenen Einträge Ihres Fachgebiets (Runde {RUNDE}). Alle anderen sind nach Ihrer ersten Rückmeldung umgesetzt und freigegeben. In der Spalte „Unsere Rückfrage“ steht je Eintrag, was wir umgesetzt haben, wo wir nach dem Gesetzeswortlaut von Ihrem Hinweis abweichen oder was neu ist. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen."] if NUR_OFFEN else [f"Diese Datei enthält die {len(teil)} Einträge Ihres Fachgebiets. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen, bei „ändern“ die Änderung daneben eintragen."],
-        ["Die Spalte „Folgen bei Verstoß“ haben wir am 22.10.2026 vorab aus dem Gesetzeswortlaut ergänzt (Fundstelle steht dabei; Vermerk in „Offene Fachfragen“). Bitte besonders hier prüfen."],
+        [f"Diese Datei enthält {'einen neuen Eintrag' if len(teil) == 1 else f'{len(teil)} neue Einträge'} ({NEU}), {'der' if len(teil) == 1 else 'die'} bisher im Katalog fehlte{'' if len(teil) == 1 else 'n'}. Es handelt sich um einen Entwurf des Gründers aus dem Gesetzeswortlaut und amtlichen Quellen; die App zeigt ihn bzw. sie bis zu Ihrer Freigabe als „fachlich noch nicht geprüft“. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen, bei „ändern“ die Änderung daneben eintragen."] if NEU else [f"Diese Datei enthält die {len(teil)} noch offenen Einträge Ihres Fachgebiets (Runde {RUNDE}). Alle anderen sind nach Ihrer ersten Rückmeldung umgesetzt und freigegeben. In der Spalte „Unsere Rückfrage“ steht je Eintrag, was wir umgesetzt haben, wo wir nach dem Gesetzeswortlaut von Ihrem Hinweis abweichen oder was neu ist. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen."] if NUR_OFFEN else [f"Diese Datei enthält die {len(teil)} Einträge Ihres Fachgebiets. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen, bei „ändern“ die Änderung daneben eintragen."],
+        ["Die Spalte „Folgen bei Verstoß“ haben wir am 22.10.2026 vorab aus dem Gesetzeswortlaut ergänzt (Fundstelle steht dabei; Vermerk in „Offene Fachfragen“). Bitte besonders hier prüfen."] if not NEU else ["Alle Spalten stammen aus dem Gesetzeswortlaut bzw. den genannten amtlichen Quellen (abgerufen am 25.10.2026). Die App zeigt Titel, Kurztext, Erklärung, Zuständige Stelle, Frist, Rechtsgrundlage und Folgen – bitte alle Spalten prüfen."],
         ["„Offene Fachfragen“ sind unsere eigenen Zweifel zum Eintrag – bitte beantworten oder als erledigt markieren."],
         ["Geprüft wird: Rechtsgrundlage, Auslöser (für wen gilt es), Frist, Folgen, Kurztext in einfacher Sprache. Die App formuliert bedingt („gilt typischerweise, wenn …“) und verweist auf Beratung."],
         ["Nach der Rücksendung tragen wir je freigegebenem Eintrag Ihren Namen und das Datum ein; der Hinweis „fachlich noch nicht geprüft“ entfällt dann für diesen Eintrag."],
@@ -172,7 +187,7 @@ for schluessel, (name, person) in PRUEFER.items():
     for zeile in [
         ["Prüfvermerk"],
         [""],
-        [f"Ich habe die {len(teil)} Einträge im Blatt „Einträge“ fachlich geprüft. Mit „freigegeben“ markierte Einträge sind in Rechtsgrundlage, Auslöser, Frist und Folgen zutreffend; für „ändern“ gelten meine Anmerkungen."],
+        [f"Ich habe die {len(teil)} Einträge im Blatt „Einträge“ fachlich geprüft. Mit „freigegeben“ markierte Einträge sind in Rechtsgrundlage, Auslöser, Frist und Folgen zutreffend; für „ändern“ gelten meine Anmerkungen."] if not NEU else [f"Ich habe {'den Eintrag' if len(teil) == 1 else f'die {len(teil)} Einträge'} im Blatt „Einträge“ in der dort genannten Version fachlich geprüft, einschließlich Erklärung und Zuständiger Stelle. Mit „freigegeben“ markierte Einträge sind in allen Spalten zutreffend; für „ändern“ gelten meine Anmerkungen."],
         ["Stand der Prüfung (Datum):", ""],
         ["Name, Funktion:", person],
         ["Ort, Datum, Unterschrift:", ""],
@@ -193,12 +208,12 @@ for schluessel, (name, person) in PRUEFER.items():
         name = NAME
     if "--person" in sys.argv:
         person = sys.argv[sys.argv.index("--person") + 1]
-    datei = f"Betriebsklar-Freigabe-Katalog-{name.replace(' ', '')}{f'-Runde{RUNDE}' if NUR_OFFEN else ''}.xlsx"
+    datei = f"Betriebsklar-Freigabe-Katalog-{name.replace(' ', '')}{f'-Runde{RUNDE}' if NUR_OFFEN else ''}{'-neue-Eintraege' if NEU else ''}.xlsx"
     wb.save(os.path.join(ZIEL, datei))
     offen = sum(1 for d in teil if "noch nicht fachlich erfasst" in de((d.get("sanktion") or {}).get("text")))
     uebersicht.append((name, person, len(teil), offen, datei))
 
-with open(os.path.join(ZIEL, "UEBERSICHT.md"), "w", encoding="utf-8") as f:
+with open(os.path.join(ZIEL, "UEBERSICHT.md") if not NEU else os.devnull, "w", encoding="utf-8") as f:
     f.write("# Freigabe Pflichtenkatalog – Übersicht\n\n| Fachgebiet | Prüfer | Einträge | davon Folgen noch offen | Datei |\n|---|---|---|---|---|\n")
     for z in uebersicht:
         f.write("| " + " | ".join(str(x) for x in z) + " |\n")

@@ -562,7 +562,8 @@ export function standBauen(): Bau {
   };
   // Plausibilität für eine Kleinunternehmerin ohne Beschäftigte, freier Beruf
   const unplausibel: [RegExp, string][] = [
-    [/^personal\.|^arbeitsschutz\./, "betrifft Arbeitgeber – keine Beschäftigten"],
+    // E-195: Künstlersozialabgabe betrifft auch Betriebe ohne Beschäftigte (Aufträge an selbstständige Kreative, § 24 Abs. 2 KSVG)
+    [/^personal\.(?!kuenstlersozialabgabe$)|^arbeitsschutz\./, "betrifft Arbeitgeber – keine Beschäftigten"],
     [/gewst|gewerbesteuer/, "Gewerbesteuer – freier Beruf"],
     [/gewerbeanzeige|ihk|handwerk/, "Gewerbe/IHK/Handwerk – freier Beruf"],
     [/ust_voranmeldung|ust_sondervorauszahlung|ust_jahreserklaerung|zusammenfassende|^steuern\.zm/, "Umsatzsteuer-Meldung – Kleinunternehmerin (außer § 13b)"],

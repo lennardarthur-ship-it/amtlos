@@ -28,7 +28,9 @@ PRUEFEN = "--pruefen" in sys.argv
 STEUER_GRUENDUNG = {"gruendung.fragebogen_steuerliche_erfassung", "gruendung.ust_idnr",
                     # StB Busch 23.10.2026: Jahresabschluss der OHG, KG und e. K. (sein Vorschlag, er sieht ihn durch)
                     "gesellschaft.jahresabschluss_personenhandel"}
-ARBEITSSCHUTZ_BRANCHE = {"branche.handwerk_gefaehrdung_gewerk", "branche.bau_baustellenverordnung", "branche.beauty_hautschutzplan", "branche.gastro_schankanlage_fluessiggas"}
+# E-195: elektronische Lohnsteuerbescheinigung (§ 41b EStG, § 93c AO) ist Steuerrecht – StB Busch, obwohl Kategorie „personal“
+STEUER_PERSONAL = {"personal.lohnsteuerbescheinigung"}
+ARBEITSSCHUTZ_BRANCHE ={"branche.handwerk_gefaehrdung_gewerk", "branche.bau_baustellenverordnung", "branche.beauty_hautschutzplan", "branche.gastro_schankanlage_fluessiggas"}
 LEBENSMITTEL_RECHT = {"branche.gastro_preisverzeichnis", "branche.gastro_mehrweg", "branche.gastro_ppwr_radar", "branche.gastro_einwegkunststofffonds"}
 WEBER, BUSCH, KOCH, BAUM = "RA Dr. Ulrich Weber", "StB Lutz Busch", "Thomas Koch (Fachkraft für Arbeitssicherheit)", "Tim Baum (Lebensmittelfachbeauftragter)"
 NICHT_VERGLICHEN = {"version", "pruefung", "fachlich_zu_pruefen", "aenderungsnotiz"}
@@ -44,7 +46,7 @@ def gebiet(d):
         return "recht"
     if i in ARBEITSSCHUTZ_BRANCHE or k == "arbeitsschutz":
         return "arbeitsschutz"
-    if k == "steuern" or i in STEUER_GRUENDUNG:
+    if k == "steuern" or i in STEUER_GRUENDUNG or i in STEUER_PERSONAL:
         return "steuer"
     if i.startswith("branche.gastro_") and i not in LEBENSMITTEL_RECHT:
         return "lebensmittel"

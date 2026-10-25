@@ -1,0 +1,87 @@
+# Externe Prüfung 25.10.2026 (E-195): fehlte im Katalog – Entwurf des Gründers, ungeprüft; Freigabe RA Dr. Weber angefragt
+# Auslöser vorläufig über Website/Social Media (Eigenwerbung), bis es eine eigene Frage gibt (PRUEFLISTE T-197)
+schema_version: 1
+id: personal.kuenstlersozialabgabe
+version: 1
+katalog_nr: D.51
+titel:
+  de: Künstlersozialabgabe prüfen
+kurz:
+  de: Beauftragst du selbstständige Kreative, etwa für Grafik, Fotos oder Texte deiner Werbung, kann Künstlersozialabgabe anfallen – Meldung an die Künstlersozialkasse bis 31. März.
+erklaerung:
+  de: 'Künstlersozialabgabe zahlen typische Verwerter wie Verlage oder Werbeagenturen (§ 24 Abs. 1 KSVG), außerdem Unternehmen, die für ihre eigene Werbung oder Öffentlichkeitsarbeit selbstständige Künstler oder Publizisten beauftragen oder deren Werke für ihr Unternehmen nutzen, um damit Einnahmen zu erzielen (§ 24 Abs. 2 KSVG). In diesen Fällen gilt die Pflicht nur, wenn die Entgelte im Kalenderjahr zusammen mehr als 1.000 € betragen (§ 24 Abs. 2 KSVG). Bemessungsgrundlage sind alle Entgelte an selbstständige Künstler und Publizisten im Kalenderjahr, auch an solche, die selbst nicht über die Künstlersozialkasse versichert sind; nicht dazu zählen die gesondert ausgewiesene Umsatzsteuer, Zahlungen an Verwertungsgesellschaften und steuerfreie Aufwandsentschädigungen (§ 25 KSVG). Den Abgabesatz legt das Bundesarbeitsministerium jedes Jahr per Verordnung fest (§ 26 KSVG); 2026 beträgt er 4,9 % (Künstlersozialabgabe-Verordnung 2026). Die Summe der Entgelte des Vorjahres meldest du bis zum 31. März auf dem Vordruck der Künstlersozialkasse (§ 27 Abs. 1 KSVG); danach zahlst du monatliche Vorauszahlungen, jeweils innerhalb von zehn Tagen nach Monatsende, sofern sie mehr als 40 € betragen (§ 27 Abs. 2, 3 KSVG). Die Entgelte zeichnest du laufend auf und bewahrst die Aufzeichnungen mindestens fünf Jahre nach Ablauf des Jahres auf, in dem sie fällig wurden (§ 28 KSVG). Die Deutsche Rentenversicherung prüft die Abgabe bei ihren Betriebsprüfungen mit (§ 28p Abs. 1a SGB IV).'
+rechtsgrundlage:
+- §§ 23 bis 25 KSVG
+- § 26 KSVG mit der Künstlersozialabgabe-Verordnung
+- §§ 27, 28 KSVG
+- § 36 KSVG
+- § 28p Abs. 1a SGB IV
+kategorie: personal
+ausloeser:
+  any:
+  - feld: profil.online.website
+    op: ==
+    wert: true
+    label:
+      de: Du hast eine eigene Website.
+  - feld: profil.online.social_media
+    op: ==
+    wert: true
+    label:
+      de: Du hast ein geschäftliches Profil in sozialen Netzwerken.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Künstlersozialkasse
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: Wer als Abgabepflichtiger die Entgelte nicht rechtzeitig oder nicht richtig meldet, keine ordnungsgemäßen Aufzeichnungen führt oder Auskünfte und Unterlagen auf Verlangen nicht vorlegt, handelt ordnungswidrig – Bußgeld bis 50.000 € (§ 36 Abs. 2, 3 KSVG). Ohne Meldung schätzt die Künstlersozialkasse bzw. die Rentenversicherung die Entgelte (§ 27 Abs. 1 KSVG).
+  schwere: mittel
+automatisierung: hinweis
+einordnung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Künstlersozialversicherungsgesetz § 24
+  url: https://www.gesetze-im-internet.de/ksvg/__24.html
+  abgerufen: '2026-10-25'
+- titel: Künstlersozialversicherungsgesetz § 25
+  url: https://www.gesetze-im-internet.de/ksvg/__25.html
+  abgerufen: '2026-10-25'
+- titel: Künstlersozialversicherungsgesetz § 27
+  url: https://www.gesetze-im-internet.de/ksvg/__27.html
+  abgerufen: '2026-10-25'
+- titel: Künstlersozialversicherungsgesetz § 28
+  url: https://www.gesetze-im-internet.de/ksvg/__28.html
+  abgerufen: '2026-10-25'
+- titel: Künstlersozialversicherungsgesetz § 36
+  url: https://www.gesetze-im-internet.de/ksvg/__36.html
+  abgerufen: '2026-10-25'
+- titel: Künstlersozialabgabe-Verordnung 2026
+  url: https://www.gesetze-im-internet.de/ksabg2026v/BJNR0DC0A0025.html
+  abgerufen: '2026-10-25'
+- titel: Sozialgesetzbuch IV § 28p
+  url: https://www.gesetze-im-internet.de/sgb_4/__28p.html
+  abgerufen: '2026-10-25'
+- titel: Künstlersozialkasse, Informationsschrift Nr. 25 – Informationen für Steuerberater (Stand 09.2026)
+  url: https://www.Kuenstlersozialkasse.de/fileadmin/Dokumente/Mediencenter_Unternehmer_Verwerter/Informationsschriften/Info_25_-_Informationen_fuer_Steuerberater.pdf
+  abgerufen: '2026-10-25'
+fachlich_zu_pruefen:
+- 'Auslöser: Es gibt keine Frage nach Aufträgen an selbstständige Kreative. Vorläufig erscheint der Hinweis bei eigener Website oder Social-Media-Profil (typischer Anlass für Eigenwerbung, § 24 Abs. 2 KSVG) – vertretbar, oder zu breit? Vorschlag einer eigenen Frage für den Gründer: PRUEFLISTE T-197. Bis dahin Einordnung „Hinweis“ ohne Termin; mit eigener Frage als Pflicht mit Termin 31.3. (§ 27 Abs. 1 KSVG).'
+- 'Gliederung von § 24 KSVG: Eigenwerbung und Nutzung für Einnahmen sind als § 24 Abs. 2 (Satz 1 Nr. 1 und 2), die 1.000-€-Grenze als Teil von Abs. 2 zitiert; Abs. 3 ist weggefallen. Die Vorgabe der externen Prüfung („§ 24 Abs. 1 Satz 2 Generalklausel“, „§ 24 Abs. 3, 450 €“) entspricht nicht der aktuellen Fassung – Satz-Zitate bitte bestätigen.'
+- 'Geringfügigkeitsgrenze: Gesetzestext nennt 1.000 € im Kalenderjahr; laut KSK (Info 25) 450 € bis 2024, 700 € für 2025, 1.000 € ab 2026. Übergangsregel für 2025 nur aus der KSK-Schrift, nicht im Text genannt.'
+- 'Abgabesatz ändert sich jährlich: 4,9 % gilt nur für 2026; für 2027 ist laut Fachpresse 5,0 % angekündigt – nach Verkündung der Künstlersozialabgabe-Verordnung 2027 Text und Version anpassen (oder Satz als Regelwert pflegen).'
+- 'Beispiele „Grafik, Fotos oder Texte“ in der Kurzfassung: ob ein Auftrag (z. B. Webdesign mit technischem Schwerpunkt) künstlerisch oder publizistisch ist, entscheidet der Einzelfall – Formulierung in Ordnung?'
+- 'Zahlungen an juristische Personen und an OHG/KG zählen laut KSK nicht zur Bemessungsgrundlage (Info 25) – nicht in die Erklärung aufgenommen, weil nicht aus § 25 KSVG selbst; aufnehmen?'
+- 'Ausnahmen in § 24 Abs. 2 KSVG (höchstens drei Veranstaltungen im Jahr; Musikvereine mit Chorleitern/Dirigenten) nicht erwähnt – nötig?'
+- 'Kanal „post“ nach dem Wortlaut „Vordruck“ (§ 27 Abs. 1 KSVG); ob die KSK eine Online-Meldung anbietet, nicht geprüft. Erstmalige Erfassung bei der KSK (Anmeldung als Abgabepflichtiger) nicht eigens beschrieben.'
+- 'Prüfer: RA Dr. Weber (Sozialversicherungsrecht wie die übrigen Personal-Einträge); alternativ StB Busch – siehe E-195.'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null
