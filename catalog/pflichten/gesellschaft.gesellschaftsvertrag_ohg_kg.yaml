@@ -1,16 +1,17 @@
+# RA Dr. Weber Runde 3 (24.10.2026): Einschränkung „kein Notar“ (Grundstück, GmbH-Anteil) in seinem Wortlaut; „Kein Bußgeld“ bestätigt
 # Neu nach RA Dr. Weber, Nachprüfung 23.10.2026 (zu B.15, Frage 2): kurzer Hinweis zum Gesellschaftsvertrag der OHG/KG – Text nach seinem Wortlaut
 # („formfrei (kein Notar), sollte aber schriftlich geschlossen werden; ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161 ff. HGB)“);
 # als eigener Hinweis im Gründungsablauf wie gesellschaft.gesellschaftsvertrag_notar für UG/GmbH – gesellschaft.handelsregister_anmeldung (v6, freigegeben) bleibt unverändert
 schema_version: 1
 id: gesellschaft.gesellschaftsvertrag_ohg_kg
-version: 1
+version: 2
 katalog_nr: B.14
 titel:
   de: Gesellschaftsvertrag der OHG oder KG schließen
 kurz:
-  de: Den Gesellschaftsvertrag einer OHG oder KG schließt ihr ohne Notar – am besten schriftlich.
+  de: Den Gesellschaftsvertrag einer OHG oder KG schließt ihr in der Regel ohne Notar – am besten schriftlich.
 erklaerung:
-  de: Der Gesellschaftsvertrag der OHG und der KG ist formfrei, du brauchst dafür keinen Notar. Er sollte aber schriftlich geschlossen werden. Ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161 ff. HGB).
+  de: Der Gesellschaftsvertrag der OHG und der KG ist grundsätzlich formfrei – ein Notar ist nur nötig, wenn zum Beispiel ein Grundstück oder ein GmbH-Anteil eingebracht wird (§ 311b Abs. 1 BGB, § 15 Abs. 3, 4 GmbHG). Er sollte aber schriftlich geschlossen werden. Ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161 ff. HGB).
 rechtsgrundlage:
 - §§ 105 ff. HGB
 - §§ 161 ff. HGB
