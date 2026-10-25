@@ -143,7 +143,9 @@ describe("Defekt 8a: GmbH & Co. KG – Angaben zur Komplementärin (§§ 125a, 1
     expect(tag(x, "CompanyLegalForm")).toBe("GmbH &amp; Co. KG, Sitz Hamburg, Amtsgericht Hamburg HRA 12345, Persönlich haftende Gesellschafterin: Holzbau Nord Verwaltungs-GmbH, Sitz Hamburg, Amtsgericht Hamburg HRB 67890, Geschäftsführung: Jana Holm, Tom Berg");
   });
 
-  it("Prüfsumme der Rechnungsvorlage bleibt (gerechnet mit leerem Betrieb) – Nachprüfung über PRUEFLISTE T-191", () => {
-    expect(vorlagenPruefsumme(vorlageFuer("rechnung")!)).toBe(VORLAGEN_GEPRUEFT.rechnung!.pruefsumme);
+  it("E-196: die neue Fußzeile ändert die Prüfsumme der Rechnungsvorlage – der Vermerk entfällt bis zur erneuten Durchsicht (T-191)", () => {
+    // freigegeben war die Fassung vor E-193 (pruefsumme = dieselbe Fassung nach der Rechnung seit E-196)
+    expect(vorlagenPruefsumme(vorlageFuer("rechnung")!)).not.toBe(VORLAGEN_GEPRUEFT.rechnung!.pruefsumme);
+    expect(VORLAGEN_GEPRUEFT.rechnung!.pruefsumme_alt).toBe("8c2e773d415398dea57ab58922035136df2317e273cb2e82db72f0f86a6cda9e");
   });
 });

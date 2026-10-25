@@ -1,5 +1,5 @@
-# Katalog C.21 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
-# Rechtsstand 22.10.2026 (StB Busch): § 18 Abs. 2 Satz 6 UStG gilt nur für 2021 bis 2026, keine Verlängerung bekannt → ab 2027
+# Katalog C.21 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt
+# Rechtsstand 22.10.2026 (Steuerberater): § 18 Abs. 2 Satz 6 UStG gilt nur für 2021 bis 2026, keine Verlängerung bekannt → ab 2027
 # wieder Satz 4 (geltendes Recht, daher in_kraft ab 01.01.2027 statt Radar)
 schema_version: 1
 id: steuern.ust_va_neugruender_radar
@@ -59,10 +59,11 @@ quellen:
   url: https://www.haufe.de/id/beitrag/umsatzsteuer-voranmeldung-2026-15-voranmeldung-bei-beginn-der-unternehmerischen-taetigkeit-HI16943563.html
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'StB Busch 22.10.2026: Stand 22.10.2026 keine Verlängerung von § 18 Abs. 2 Satz 6 UStG über 2026 hinaus bekannt – bis zum Start und noch einmal zum Jahreswechsel prüfen (Jahressteuergesetz)'
+- 'Steuerberater 22.10.2026: Stand 22.10.2026 keine Verlängerung von § 18 Abs. 2 Satz 6 UStG über 2026 hinaus bekannt – bis zum Start und noch einmal zum Jahreswechsel prüfen (Jahressteuergesetz)'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 3
+  unterschrieben_am: '2026-10-23'

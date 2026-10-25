@@ -65,10 +65,11 @@ quellen:
   url: https://www.ihk.de/fulda/handel-dienstleistungen/eu-plattform-zur-streitbeilegung-wird-abgeschafft-6503696
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Aufhebung zum 20.07.2025 durch VO (EU) 2024/3228 bestätigt, Abmahnrisiko eines veralteten Links nach Prüfvermerk RA Dr. Weber 22.10.2026 – Fundstelle (ABl.) der Quelle noch eintragen'
+- 'Aufhebung zum 20.07.2025 durch VO (EU) 2024/3228 bestätigt, Abmahnrisiko eines veralteten Links nach Prüfvermerk Rechtsanwalt 22.10.2026 – Fundstelle (ABl.) der Quelle noch eintragen'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 5
+  unterschrieben_am: '2026-10-23'

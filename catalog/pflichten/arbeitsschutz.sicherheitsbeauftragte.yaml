@@ -57,10 +57,11 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Sifa Runde 2 (23.10.2026): § 22 Abs. 1 Satz 4 SGB VII n. F. am Wortlaut (lxgesetze, Stand 12.5.2026, abgerufen 23.10.2026) ergänzt: „In Unternehmen mit regelmäßig weniger als 250 Beschäftigten und keiner besonderen Gefährdung für Leben und Gesundheit erfüllt der Unternehmer die Voraussetzungen nach Satz 1, wenn er einen Sicherheitsbeauftragten bestellt.“ Eine Anpassung der Anlage 2 zur DGUV Vorschrift 1 an die Neuregelung ist nicht belegt (DGUV Vorschrift 1 laut Handwerksblatt 13.5.2026 in Überarbeitung) – deshalb Verweis auf die Neuregelung'
-- 'Zählweise (G-05) laut RA Dr. Weber (Antwort auf die Rechtsfrage aus der Sifa-Prüfung, Rückmeldung Runde 2): Schwelle „regelmäßig mehr als 20 Beschäftigte“ (§ 22 SGB VII, § 20 DGUV Vorschrift 1) nach Köpfen – Teilzeit voll, Auszubildende und Leiharbeitnehmer beim Entleiher, keine anteilige Umrechnung wie in § 23 KSchG (DGUV Regel 100-001, Abschnitt 4.2); Zahl der Sicherheitsbeauftragten nach Anlage 2 DGUV Vorschrift 1 – im Text. Der Auslöser zählt so: profil.beschaeftigte.gesamt ist die Kopfzahl aus der Frage „Wie viele Menschen arbeiten für dich?“ (Hilfe: Vollzeit, Teilzeit, Minijob, Azubis), ohne Umrechnung; die Engine leitet daraus keine eigene Zählung ab (packages/rules-engine/src/fakten.ts). Leiharbeitnehmer nennt die Hilfe nicht ausdrücklich – die Angabe gilt für alle Personal-Pflichten (z. B. Sozialversicherung), deshalb nicht erweitert'
+- 'Zählweise (G-05) laut Rechtsanwalt (Antwort auf die Rechtsfrage aus der Sifa-Prüfung, Rückmeldung Runde 2): Schwelle „regelmäßig mehr als 20 Beschäftigte“ (§ 22 SGB VII, § 20 DGUV Vorschrift 1) nach Köpfen – Teilzeit voll, Auszubildende und Leiharbeitnehmer beim Entleiher, keine anteilige Umrechnung wie in § 23 KSchG (DGUV Regel 100-001, Abschnitt 4.2); Zahl der Sicherheitsbeauftragten nach Anlage 2 DGUV Vorschrift 1 – im Text. Der Auslöser zählt so: profil.beschaeftigte.gesamt ist die Kopfzahl aus der Frage „Wie viele Menschen arbeiten für dich?“ (Hilfe: Vollzeit, Teilzeit, Minijob, Azubis), ohne Umrechnung; die Engine leitet daraus keine eigene Zählung ab (packages/rules-engine/src/fakten.ts). Leiharbeitnehmer nennt die Hilfe nicht ausdrücklich – die Angabe gilt für alle Personal-Pflichten (z. B. Sozialversicherung), deshalb nicht erweitert'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - Thomas Koch (Fachkraft für Arbeitssicherheit)
+    - arbeitsschutz
   geprueft_am: '2026-10-23'
   geprueft_version: 4
+  unterschrieben_am: '2026-10-23'

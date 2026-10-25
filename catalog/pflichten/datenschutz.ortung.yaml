@@ -48,10 +48,11 @@ quellen:
   url: https://gesetze.legal/eu/vo_eu_2016_679/83
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: Rechtsgrundlage Art. 6 Abs. 1 lit. f (§ 26 BDSG nur ergänzend, nicht genannt), DSFA nach Muss-Liste, Zustelldaten als Hinweis – umgesetzt; Zustelldaten nicht als eigene Pflicht abgebildet'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: Rechtsgrundlage Art. 6 Abs. 1 lit. f (§ 26 BDSG nur ergänzend, nicht genannt), DSFA nach Muss-Liste, Zustelldaten als Hinweis – umgesetzt; Zustelldaten nicht als eigene Pflicht abgebildet'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 3
+  unterschrieben_am: '2026-10-23'

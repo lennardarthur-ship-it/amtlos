@@ -8,5 +8,5 @@ fakten:
   profil.bundesland: BY
   profil.gemeinde_ags: "09162000"
 erwartet:
-  # steuern.ust_va_neugruender_radar: in Kraft erst ab 2027 (StB Busch 22.10.2026) – siehe busch-neugruender-2027-bestand
+  # steuern.ust_va_neugruender_radar: in Kraft erst ab 2027 (Steuerberater 22.10.2026) – siehe steuern-neugruender-2027-bestand
   gruendung.gruendungsbeschleunigung_radar: gilt_nicht

@@ -28,7 +28,7 @@ interface Partei {
  *   sonst wie bisher E), Steuerschuldnerschaft eines Empfängers im Drittland O (VATEX-EU-O: nicht im Inland steuerbar).
  * - Abschlagsrechnung: Typ 326 (Teilrechnung) statt 380.
  *
- * StB-Prüfung Heckler und Busch (21.10.2026):
+ * StB-Prüfung Steuerberatungskanzlei (21.10.2026):
  * - C-4: Schlussrechnung – die abgesetzten Abschläge als vorausbezahlter Betrag (BT-113) mit Verweis auf jede
  *   Abschlagsrechnung (BG-3) und einer Anmerkung (BT-22) mit Entgelt und Steuer je Abschlag; zu zahlen ist der Rest.
  * - C-6: Ersatzrechnung mit Verweis auf die stornierte Rechnung (BG-3).

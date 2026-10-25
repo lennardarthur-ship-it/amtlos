@@ -1,6 +1,6 @@
 # E-176 (23.10.2026): OHG und KG als eigene Rechtsformen im Auslöser (Personengesellschaften, § 180 Abs. 1 Nr. 2 Buchst. a AO)
 # R10: neu (Steuerprüfung: bei Personengesellschaften gibt die Gesellschaft die Feststellungserklärung ab, § 180 AO; die Gesellschafter die ESt)
-# StB-Durchsicht Busch 22.10.2026 umgesetzt (bis auf 19 Monate, siehe fachlich_zu_pruefen)
+# StB-Durchsicht 22.10.2026 umgesetzt (bis auf 19 Monate, siehe fachlich_zu_pruefen)
 schema_version: 1
 id: steuern.feststellungserklaerung
 version: 4
@@ -85,8 +85,6 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen: []
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - StB Lutz Busch
-  geprueft_am: '2026-10-23'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

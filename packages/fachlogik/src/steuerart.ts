@@ -2,7 +2,7 @@
  * Steuerart einer Ausgangsrechnung – gemeinsam für Rechnung, E-Rechnung, Voranmeldung und Buchungen (DATEV), damit
  * alle Stellen denselben Wert prüfen.
  *
- * StB-Prüfung Heckler und Busch (21.10.2026, B-2/C-12): Der Nullsteuersatz (§ 12 Abs. 3 UStG, Photovoltaik) ist eine
+ * StB-Prüfung Steuerberatungskanzlei (21.10.2026, B-2/C-12): Der Nullsteuersatz (§ 12 Abs. 3 UStG, Photovoltaik) ist eine
  * eigene Steuerart – steuerpflichtig zu 0 % (Kz 87, XRechnung Kategorie Z), nicht „befreit“ (Kz 48, Kategorie E).
  */
 export type Steuerart = "standard" | "reverse_charge" | "igl" | "befreit" | "nullsatz";

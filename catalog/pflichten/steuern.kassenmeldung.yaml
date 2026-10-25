@@ -1,4 +1,4 @@
-# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
+# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.kassenmeldung
 version: 6
@@ -26,7 +26,7 @@ frist:
     ereignis: kasse_angeschafft
   versatz: P1M
   zeitpunkt: spaetestens
-  # Fristende am Wochenende oder Feiertag: § 108 Abs. 3 AO ist anzuwenden (StB Busch 22.10.2026)
+  # Fristende am Wochenende oder Feiertag: § 108 Abs. 3 AO ist anzuwenden (Steuerberater 22.10.2026)
   verschiebung:
     regel: naechster_werktag
     kalender: bundesland
@@ -70,6 +70,7 @@ fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 6
+  unterschrieben_am: '2026-10-23'

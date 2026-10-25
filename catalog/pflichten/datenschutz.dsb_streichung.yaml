@@ -61,12 +61,15 @@ quellen:
   url: https://gefahrgut-consulting.de/paragraf-38-bdsg-streichung/
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Rechtsstand 21.10.2026: nur Ankündigung (Modernisierungsagenda, Koalitionsausschuss 2.7.2026), kein Referentenentwurf gefunden – vor Launch und zum Jahreswechsel erneut prüfen (Prüfvermerk RA Dr. Weber 22.10.2026: „Vor Launch prüfen“; Stand 22.10.2026 weiterhin kein Entwurf gefunden); erwartet_ab bewusst leer (Zusage betrifft nur das Einbringen bis 31.12.2026)'
+- 'Rechtsstand 21.10.2026: nur Ankündigung (Modernisierungsagenda, Koalitionsausschuss 2.7.2026), kein Referentenentwurf gefunden – vor Launch und zum Jahreswechsel erneut prüfen (Prüfvermerk Rechtsanwalt 22.10.2026: „Vor Launch prüfen“; Stand 22.10.2026 weiterhin kein Entwurf gefunden); erwartet_ab bewusst leer (Zusage betrifft nur das Einbringen bis 31.12.2026)'
 - Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)
 - Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 3
+  unterschrieben_am: '2026-10-23'
+  offen:
+    - "Stand des Gesetzesvorhabens vor dem Start erneut zu prüfen"

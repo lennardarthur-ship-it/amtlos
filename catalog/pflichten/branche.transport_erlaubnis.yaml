@@ -22,7 +22,7 @@ ausloeser:
     wert: transport_logistik
     label:
       de: Dein Betrieb gehört zu Transport und Logistik.
-  # Prüfvermerk RA Dr. Weber 22.10.2026: Werkverkehr (nur eigene Güter) ist erlaubnisfrei – Angabe profil.fahrzeuge.befoerderung
+  # Prüfvermerk Rechtsanwalt 22.10.2026: Werkverkehr (nur eigene Güter) ist erlaubnisfrei – Angabe profil.fahrzeuge.befoerderung
   - feld: profil.fahrzeuge.befoerderung
     op: enthaelt
     wert: fremde_gueter
@@ -81,14 +81,15 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Kurier #3): Erlaubnis über 3,5 t (§§ 1, 3 GüKG), Gemeinschaftslizenz über 2,5 t grenzüberschreitend seit 21.5.2022 (IHK Berlin) – Ausnahmen nach § 2 GüKG nicht abgebildet'
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: Personenbeförderung (PBefG) als eigener Auslöser – umgesetzt als eigener Eintrag branche.personenbefoerderung_genehmigung mit der neuen Angabe profil.fahrzeuge.befoerderung („Personen gegen Entgelt“); hier nur noch ein Satz im Text, PBefG aus der Rechtsgrundlage genommen'
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: Werkverkehr als Ausnahme „in Auslöser/Text“ – umgesetzt: Auslöser verlangt „Güter für andere gegen Entgelt“ (profil.fahrzeuge.befoerderung, gefragt bei Transport und Logistik mit Firmenfahrzeugen); wer nur eigene Güter fährt, bekommt den Eintrag nicht; ohne Angabe „unklar“. Werkverkehr außerhalb der Branche Transport und Logistik (Handwerk, Bäckerei, Handel) löst den Eintrag ohnehin nicht aus. Freigabe RA Dr. Weber Runde 2 (23.10.2026): Werkverkehr-Ausnahme und Personenbeförderung sauber getrennt, Rechtsgrundlagen und Sanktion bestätigt; Werkverkehr außerhalb der Branche ohne Eintrag richtig (erlaubnisfrei, § 1 Abs. 2 GüKG). Hinweis auf die Anzeige zur Werkverkehrsdatei (§ 15a GüKG) „erwägen“ – nicht umgesetzt: bräuchte eine neue Angabe (zulässige Gesamtmasse und Beförderungsart fragt der Check nur bei Transport und Logistik), Werkverkehr anderer Branchen erreicht der Katalog nicht'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: Personenbeförderung (PBefG) als eigener Auslöser – umgesetzt als eigener Eintrag branche.personenbefoerderung_genehmigung mit der neuen Angabe profil.fahrzeuge.befoerderung („Personen gegen Entgelt“); hier nur noch ein Satz im Text, PBefG aus der Rechtsgrundlage genommen'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: Werkverkehr als Ausnahme „in Auslöser/Text“ – umgesetzt: Auslöser verlangt „Güter für andere gegen Entgelt“ (profil.fahrzeuge.befoerderung, gefragt bei Transport und Logistik mit Firmenfahrzeugen); wer nur eigene Güter fährt, bekommt den Eintrag nicht; ohne Angabe „unklar“. Werkverkehr außerhalb der Branche Transport und Logistik (Handwerk, Bäckerei, Handel) löst den Eintrag ohnehin nicht aus. Freigabe Rechtsanwalt Runde 2 (23.10.2026): Werkverkehr-Ausnahme und Personenbeförderung sauber getrennt, Rechtsgrundlagen und Sanktion bestätigt; Werkverkehr außerhalb der Branche ohne Eintrag richtig (erlaubnisfrei, § 1 Abs. 2 GüKG). Hinweis auf die Anzeige zur Werkverkehrsdatei (§ 15a GüKG) „erwägen“ – nicht umgesetzt: bräuchte eine neue Angabe (zulässige Gesamtmasse und Beförderungsart fragt der Check nur bei Transport und Logistik), Werkverkehr anderer Branchen erreicht der Katalog nicht'
 - 'Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 6
+  unterschrieben_am: '2026-10-23'

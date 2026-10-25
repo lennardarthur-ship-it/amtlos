@@ -188,7 +188,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
     z.profilSetzen({ ...folgeAntworten(feld, w, z.stand.profil), ...(feld === "taetigkeit.branchen" ? sofortmeldeVorbelegung(z.stand.profil, w) : {}), [feld]: w }, bl);
     // R12 (Kfz #6): Rechtsform gleich in „Mein Betrieb“, solange dort keine steht – Rechnungen prüfen damit § 35a GmbHG
     if (feld === "rechtsform" && typeof w === "string" && RECHTSFORM_TEXT[w] && !(z.stand.betrieb.rechtsform ?? "").trim()) z.betriebSpeichern({ ...z.stand.betrieb, rechtsform: RECHTSFORM_TEXT[w] });
-    // Freigabe Weber 22.10.2026 (B.16): eine GbR im Gesellschaftsregister führt den Zusatz „eGbR“ (§ 707a Abs. 2 BGB)
+    // Freigabe Rechtsanwalt 22.10.2026 (B.16): eine GbR im Gesellschaftsregister führt den Zusatz „eGbR“ (§ 707a Abs. 2 BGB)
     if (feld === "gesellschaft.handelsregister" && w === "eingetragen" && z.stand.profil.rechtsform === "gbr" && ["", "GbR"].includes((z.stand.betrieb.rechtsform ?? "").trim())) z.betriebSpeichern({ ...z.stand.betrieb, rechtsform: "eGbR" });
     // mit VoiceOver nicht von selbst weiterspringen – sonst verliert man unangekündigt die Frage
     if (springen && !vorleser.current) {

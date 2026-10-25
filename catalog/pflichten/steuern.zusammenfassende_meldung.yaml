@@ -1,4 +1,4 @@
-# Katalog C.25 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
+# Katalog C.25 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.zusammenfassende_meldung
 version: 7
@@ -42,9 +42,9 @@ ausloeser:
       de: Du hast Kunden in anderen EU-Ländern.
 frist:
   typ: wiederkehrend
-  # StB Busch 22.10.2026: Meldezeitraum abfragen – monatlich als Regel, vierteljährlich wählbar bis 50.000 € je Quartal
+  # Steuerberater 22.10.2026: Meldezeitraum abfragen – monatlich als Regel, vierteljährlich wählbar bis 50.000 € je Quartal
   # (§ 18a Abs. 1 Satz 2 UStG), nur sonstige Leistungen vierteljährlich. Mit Warenlieferungen ohne Angabe fragt Amtlos nach.
-  # StB Busch Runde 3 (23.10.2026): Abfrage in der Prüfmappe nicht erkennbar (Mappe zeigt nur Kurztext und Fristtyp) – jetzt im Kurztext.
+  # Steuerberater Runde 3 (23.10.2026): Abfrage in der Prüfmappe nicht erkennbar (Mappe zeigt nur Kurztext und Fristtyp) – jetzt im Kurztext.
   rhythmus:
     waehle:
     - wenn:
@@ -86,7 +86,7 @@ frist:
     art: tag_nach_periodenende
     monate_nach: 1
     tag: 25
-  # StB Busch 22.10.2026: ob das BZSt die Frist nach § 108 Abs. 3 AO verschiebt, ist nicht abschließend geklärt – den 25. nennen
+  # Steuerberater 22.10.2026: ob das BZSt die Frist nach § 108 Abs. 3 AO verschiebt, ist nicht abschließend geklärt – den 25. nennen
   verschiebung:
     regel: keine
     kalender: bundeseinheitlich
@@ -118,6 +118,7 @@ fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 7
+  unterschrieben_am: '2026-10-23'

@@ -1,5 +1,5 @@
 /**
- * Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 12, ✎): Schulungsnachweis Lebensmittelhygiene nach § 4 LMHV.
+ * Prüfbericht Lebensmittelhygiene (Lebensmittelfachbeauftragter, 22.10.2026, Frage 12, ✎): Schulungsnachweis Lebensmittelhygiene nach § 4 LMHV.
  * Die Fachkenntnisse sind „auf Verlangen der zuständigen Behörde nachzuweisen“ (§ 4 Abs. 1 Satz 2 LMHV) – ohne Dokument
  * lässt sich das nicht nachweisen. Themen: die zehn Sachgebiete der Anlage 1 LMHV (Wortlaut der Überschriften) und die
  * Themen, die der Prüfbericht zusätzlich nennt (Personalhygiene, Schädlingsbekämpfung, Allergene). Wiederholung jährlich
@@ -33,7 +33,7 @@ export const SCHULUNG_THEMEN: Option[] = [
 export const SCHULUNG_HILFE = {
   wer: "Wer bei dir mit leicht verderblichen Lebensmitteln arbeitet – auch du selbst –, braucht Fachkenntnisse in Lebensmittelhygiene aus einer Schulung (§ 4 Abs. 1 LMHV). Ausnahme: Wer eine Berufsausbildung abgeschlossen hat, die Kenntnisse in Lebensmittelhygiene vermittelt (z. B. Bäcker/in, Koch/Köchin), gilt für eine entsprechende Tätigkeit als geschult (§ 4 Abs. 2 LMHV).",
   abgrenzung: "Nicht verwechseln mit der Belehrung nach § 43 IfSG: Die Belehrung betrifft den Infektionsschutz (Krankheiten), die Schulung die Fachkenntnisse in Hygiene. Beides geht am selben Termin, braucht aber je eine eigene Unterschriftsliste.",
-  // Nachkontrolle T. Baum (23.10.2026, Antwort 4, Hinweis 2): Empfehlung, keine gesetzliche Frist
+  // Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026, Antwort 4, Hinweis 2): Empfehlung, keine gesetzliche Frist
   wiederholung: "Wiederholung jährlich empfohlen (DIN 10514) – eine gesetzliche Frist gibt es nicht.",
 };
 

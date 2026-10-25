@@ -1,5 +1,5 @@
 # R11 (Rechtsprüfung T-114): Hygieneschulung nach § 4 LMHV und Anhang II Kapitel XII VO (EG) Nr. 852/2004
-# Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 12): Nachweis, jährliche Wiederholung, Abgrenzung zur IfSG-Belehrung
+# Prüfbericht Lebensmittelhygiene (Lebensmittelfachbeauftragter, 22.10.2026, Frage 12): Nachweis, jährliche Wiederholung, Abgrenzung zur IfSG-Belehrung
 schema_version: 1
 id: branche.gastro_hygieneschulung
 version: 4
@@ -71,13 +71,14 @@ quellen:
   url: https://www.dinmedia.de/de/norm/din-10514/381020683
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): DIN 10514 aus der Rechtsgrundlage genommen und als Quelle geführt; jährliche Wiederholung als Empfehlung, keine gesetzliche Frist; Folgen bestätigt (Bußgeld knüpft an das Arbeiten ohne Fachkenntnisse an, § 10 Nr. 3 LMHV, nicht an den fehlenden Nachweis); Ausnahme § 4 Abs. 2 LMHV und Abgrenzung zur IfSG-Belehrung bestätigt'
-- 'Erledigung bleibt laufend je Kalenderjahr (erledigung laufend/jahr) – bildet die empfohlene jährliche Wiederholung ab, keine gesetzliche Frist; T. Baum hat dazu nichts angegeben'
-- 'RA Dr. Weber Runde 3 (23.10.2026), Folgen freigegeben: § 10 Nr. 3 i. V. m. § 4 Abs. 1 LMHV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB, bis 50.000 € – bestätigt; das Bußgeld setzt am Arbeiten ohne Fachkenntnisse an, nicht am fehlenden Nachweis'
+- 'Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): DIN 10514 aus der Rechtsgrundlage genommen und als Quelle geführt; jährliche Wiederholung als Empfehlung, keine gesetzliche Frist; Folgen bestätigt (Bußgeld knüpft an das Arbeiten ohne Fachkenntnisse an, § 10 Nr. 3 LMHV, nicht an den fehlenden Nachweis); Ausnahme § 4 Abs. 2 LMHV und Abgrenzung zur IfSG-Belehrung bestätigt'
+- 'Erledigung bleibt laufend je Kalenderjahr (erledigung laufend/jahr) – bildet die empfohlene jährliche Wiederholung ab, keine gesetzliche Frist; Lebensmittelfachbeauftragter hat dazu nichts angegeben'
+- 'Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: § 10 Nr. 3 i. V. m. § 4 Abs. 1 LMHV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB, bis 50.000 € – bestätigt; das Bußgeld setzt am Arbeiten ohne Fachkenntnisse an, nicht am fehlenden Nachweis'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - Tim Baum (Lebensmittelfachbeauftragter)
-    - RA Dr. Ulrich Weber
+    - hygiene
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 4
+  unterschrieben_am: '2026-10-23'

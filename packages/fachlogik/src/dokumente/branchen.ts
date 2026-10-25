@@ -268,7 +268,7 @@ export const allergenAushang: Vorlage = {
       ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["", "Allergen", "Umfasst"], nummern.map((id, i) => [kz(i), esc(ALLERGENE[id]!), esc(ohneLatein(ALLERGENE_UMFANG[i]?.umfasst ?? ""))]), { breiten: ["6%", "28%", "66%"], klasse: "legende" }), g.length ? "zusammen" : "neue-seite zusammen")
       : "";
     return dokument({
-      // Nachkontrolle T. Baum (23.10.2026, Hinweis 3): die Liste enthält auch die Zusatzstoffe
+      // Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026, Hinweis 3): die Liste enthält auch die Zusatzstoffe
       titel: "Allergene und Zusatzstoffe in unseren Speisen und Getränken",
       betrieb: b,
       meta: `Stand: ${datumDe(text(d, "stand"))}`,
@@ -280,7 +280,7 @@ export const allergenAushang: Vorlage = {
 
 /** Geräte für das Monatsraster zum Antippen (neben den eigenen Kontrollpunkten). */
 /**
- * Nachkontrolle T. Baum (23.10.2026, Antwort 5): Klarspültemperatur ist gute Hygienepraxis, kein eigener CCP – die
+ * Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026, Antwort 5): Klarspültemperatur ist gute Hygienepraxis, kein eigener CCP – die
  * Korrekturmaßnahme steht im Hilfetext zum Monatsraster.
  */
 export const SPUELMASCHINE_KORREKTUR = "Spülmaschine (Nachspültemperatur) unter Richtwert: Geschirr erneut spülen, Gerät vom Kundendienst prüfen lassen.";
@@ -331,7 +331,7 @@ function haccpKern(d: Daten): string {
       { rand: "Art. 5 Abs. 2 lit. a, b" },
     ) +
     abschnitt(
-      // Nachkontrolle T. Baum (23.10.2026, Hinweis 5): die Tabelle führt auch Kühlstellen als „Kontrollpunkt (GHP)“
+      // Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026, Hinweis 5): die Tabelle führt auch Kühlstellen als „Kontrollpunkt (GHP)“
       "Kritische Kontrollpunkte (CCP) und Temperaturkontrollen (GHP)",
       tabelle(["CCP / Prozessschritt", "Grenzwert", "Überwachung", "Korrekturmaßnahme"], cZeilen, { breiten: ["20%", "24%", "28%", "28%"], ...(c.length ? {} : { hoch: true }) }) +
         (c.some(ghp) ? `<p class="klein">${esc(GHP_HINWEIS)}</p>` : ""),
@@ -650,7 +650,7 @@ const haut = (gruppe: string, anlass: string, handschuhe: string, norm: string, 
 });
 const DESINF_BEHANDLUNG = "vor und nach jeder Behandlung und nach dem Ausziehen der Handschuhe";
 export const HAUTSCHUTZ_WEITERE: Vorschlag[] = [
-  // Durchsicht T. Koch 23.10.2026 (B-286): bei Acrylaten nach direktem Kontakt sofort wechseln – „nach jeder Kundin“ allein reicht nicht
+  // Durchsicht Sifa 23.10.2026 (B-286): bei Acrylaten nach direktem Kontakt sofort wechseln – „nach jeder Kundin“ allein reicht nicht
   haut("Kosmetik", "Nagelmodellage: Kleber, Acrylate, Gele und Aktivatoren", "Nitril-Einmalhandschuhe, nach direktem Kontakt mit Acrylaten sofort und nach jeder Kundin bzw. jedem Kunden wechseln – dünne Nitril-Einmalhandschuhe bieten nur kurzzeitigen Schutz", "Nitril, DIN EN ISO 374", { desinfektion: DESINF_BEHANDLUNG }),
   haut("Kosmetik", "Kosmetische Behandlung und Fußpflege mit möglichem Blutkontakt", "Flüssigkeitsdichte Einmalhandschuhe", "Nitril, DIN EN ISO 374 bzw. DIN EN 455", { desinfektion: DESINF_BEHANDLUNG }),
   haut("Gastronomie / Café", "Spülen und Arbeiten in der Spülküche (Feuchtarbeit)", "Flüssigkeitsdichte Handschuhe mit Stulpe, darunter Baumwoll-Unterziehhandschuhe", "DIN EN ISO 374", { reinigung: "Hände mit pH-hautneutralem Flüssigsyndet waschen; gut abtrocknen" }),
@@ -679,7 +679,7 @@ const HAUT_PRODUKTE: [string, string][] = [
 ];
 
 /**
- * Durchsicht T. Koch 23.10.2026: Die TRGS 530 gilt nur für das Friseurhandwerk – als Rechtsgrundlage nur beim Bereich
+ * Durchsicht Sifa 23.10.2026: Die TRGS 530 gilt nur für das Friseurhandwerk – als Rechtsgrundlage nur beim Bereich
  * Friseur (Bereich nennt „Friseur“ oder der Plan enthält eine Zeile aus dem Friseur-Muster), sonst nur TRGS 401.
  */
 const FRISEUR_ZEILEN = new Set(HAUTSCHUTZ_FRISEUR.map((x) => x.titel));
@@ -796,14 +796,14 @@ const HYGIENE_SPALTEN: [string, string, string][] = [
 ];
 
 /**
- * Nachkontrolle Dr. Weber (21.10.2026): Hygieneplan für Lebensmittelbetriebe nach den allgemeinen Hygienevorschriften
+ * Nachkontrolle Rechtsanwalt (21.10.2026): Hygieneplan für Lebensmittelbetriebe nach den allgemeinen Hygienevorschriften
  * (Art. 4 Abs. 2, Anhang II VO (EG) Nr. 852/2004) und der LMHV (§ 3 allgemeine Anforderungen, § 4 Schulung) – mit eigenen
  * Themenbereichen statt der Beauty-Zeilen (Instrumentenaufbereitung, Hautdesinfektion). Die Eigenkontrollen nach HACCP
  * (Art. 5) bleiben eine eigene Vorlage. Zahlen sind übliche Richtwerte; alles fachlich zu prüfen (Lebensmittelhygiene).
  */
 export const HYGIENE_THEMEN_LEBENSMITTEL = ["Reinigung und Desinfektion", "Personalhygiene", "Schädlingsbekämpfung", "Temperaturkontrollen", "Wareneingang", "Lagerung", "Trennung rein/unrein", "Allergenmanagement", "Abfall", "Trinkwasser", "Schulungen"] as const;
 /**
- * Prüfbericht Lebensmittelhygiene (Baum, 22.10.2026): neue Themenbereiche „Lagerung“ (Anhang II Kap. IX) und
+ * Prüfbericht Lebensmittelhygiene (Lebensmittelfachbeauftragter, 22.10.2026): neue Themenbereiche „Lagerung“ (Anhang II Kap. IX) und
  * „Allergenmanagement“. Pläne, die noch keinen der beiden nutzen (vor dem Prüfbericht angelegt), prüft der Hinweis
  * „fehlt noch“ nur auf die bisherigen Themenbereiche.
  */
@@ -820,7 +820,7 @@ const lm = (thema: (typeof HYGIENE_THEMEN_LEBENSMITTEL)[number], was: string, wa
   quelle: geprueft ? quelle : `${quelle} – ${PRUEFEN_LM}`,
 });
 /**
- * Nachkontrolle T. Baum (23.10.2026, Antwort 6): alle Zeilen fachlich in Ordnung, die Markierung „fachlich zu prüfen“
+ * Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026, Antwort 6): alle Zeilen fachlich in Ordnung, die Markierung „fachlich zu prüfen“
  * entfällt (Prüfmappe v3: L-094, L-095, L-097 bis L-100, L-103, L-104, L-108 bis L-113); Ergänzungen bei Milchschäumer
  * (L-097) und Schankanlage (L-099).
  */
@@ -920,7 +920,7 @@ function lebensmittelPlan(d: Daten, b: Betrieb): string {
 
 export const HYGIENE_GRUNDLAGE_LEBENSMITTEL = "Art. 4 Abs. 2, Art. 5, Anhang II VO (EG) Nr. 852/2004; §§ 3, 4 LMHV";
 /**
- * RA Dr. Weber, Fachfragen Runde 3 (24.10.2026, Nr. 4): Die Hygieneverordnungen der Länder beruhen auf § 17 Abs. 4 IfSG
+ * Rechtsanwalt, Fachfragen Runde 3 (24.10.2026, Nr. 4): Die Hygieneverordnungen der Länder beruhen auf § 17 Abs. 4 IfSG
  * (nicht auf § 36 IfSG) – im Dokument der Beauty-Fassung präziser als „auf Grundlage des IfSG“. Nur über `grundlageFuer`:
  * `grundlage` gehört zur Prüfsumme der freigegebenen Lebensmittel-Fassung und bleibt unverändert.
  */
@@ -964,7 +964,7 @@ export const hygieneplan: Vorlage = {
             { id: "womit", art: "mehrzeilig", label: "Womit" },
             { id: "wie", art: "mehrzeilig", label: "Wie" },
             { id: "wer", art: "text", label: "Wer" },
-            // Nachkontrolle Dr. Weber: Themenbereich ordnet den Plan eines Lebensmittelbetriebs
+            // Nachkontrolle Rechtsanwalt: Themenbereich ordnet den Plan eines Lebensmittelbetriebs
             { id: "thema", selten: true, art: "text", label: "Themenbereich (Lebensmittelbetrieb)", vorschlaege: [...HYGIENE_THEMEN_LEBENSMITTEL] },
           ],
         },
@@ -980,7 +980,7 @@ export const hygieneplan: Vorlage = {
     },
   ],
   ausProfil: { mit_beschaeftigten: "beschaeftigte.gesamt" },
-  // Nachkontrolle Dr. Weber: im Lebensmittelbetrieb keine Beauty-Zeilen; die Themenbereiche vollständig
+  // Nachkontrolle Rechtsanwalt: im Lebensmittelbetrieb keine Beauty-Zeilen; die Themenbereiche vollständig
   hinweise(d) {
     if (text(d, "art") !== "lebensmittel") return [];
     const e = liste(d, "eintraege").filter((x) => text(x, "was"));

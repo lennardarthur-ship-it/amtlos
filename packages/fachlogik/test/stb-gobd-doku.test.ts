@@ -1,5 +1,5 @@
 /**
- * StB GoBD (Prüfbericht Heckler und Busch vom 21.10.2026, Abschnitte 6–8, 10): Verfahrensdokumentation (Kasse, ersetzendes
+ * StB GoBD (Prüfbericht Steuerberatungskanzlei vom 21.10.2026, Abschnitte 6–8, 10): Verfahrensdokumentation (Kasse, ersetzendes
  * Scannen, IKS, Sicherungsnachweis), Kassenbuch aus den Tagesabschlüssen, Bilanz/GuV (Ertragsteuern, Angaben unter der
  * Bilanz, Unterschriften aller Geschäftsführer), Lohnkonto-Übersicht und der Hinweis „Übertragungshilfe, keine
  * Steuerberatung“ auf den Steuer-PDFs.

@@ -63,7 +63,7 @@ describe("Hinweis „keine Rechts- oder Steuerberatung“ mit Rechtsstand", () =
   });
 
   it("nie im PDF: die Unterlage gehört dem Betrieb", () => {
-    // StB GoBD (Prüfbericht Heckler und Busch, Abschnitt 8): Nur die Steuer-PDFs tragen „Übertragungshilfe … Keine
+    // StB GoBD (Prüfbericht Steuerberatungskanzlei, Abschnitt 8): Nur die Steuer-PDFs tragen „Übertragungshilfe … Keine
     // Steuerberatung“ – auf Empfehlung der Kanzlei gehört dieser Hinweis auf das PDF, nicht nur in die App
     const STEUER_PDFS = new Set(["ust_voranmeldung", "euer", "steuererklaerung", "lohnkonto"]);
     for (const v of VORLAGEN) {

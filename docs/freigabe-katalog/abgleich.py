@@ -19,16 +19,16 @@ from openpyxl.worksheet.datavalidation import DataValidation
 HIER = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HIER, "../.."))
 sys.argv_ = sys.argv
-src = open(os.path.join(HIER, "anwenden.py"), encoding="utf-8").read().split("abweichung, uebersicht")[0]
+src = open(os.path.join(HIER, "anwenden.py"), encoding="utf-8").read().split('if __name__ == "__main__":')[0]
 g = {"__file__": os.path.join(HIER, "anwenden.py")}
 exec(compile(src, "anwenden.py", "exec"), g)
 gebiet, BENOETIGT, frei, fassung, gueltig, abgedeckt = g["gebiet"], g["BENOETIGT"], g["frei"], g["fassung"], g["gueltig"], g["abgedeckt"]
-WEBER, BUSCH, KOCH, BAUM = g["WEBER"], g["BUSCH"], g["KOCH"], g["BAUM"]
+RECHT, STEUERN, SIFA, LMH = g["RECHT"], g["STEUERN"], g["SIFA"], g["LMH"]
 
 ziel = os.path.abspath([a for a in sys.argv[1:] if not a.startswith("--")][0])
 os.makedirs(ziel, exist_ok=True)
 notizen = json.load(open(sys.argv[sys.argv.index("--notizen") + 1], encoding="utf-8")) if "--notizen" in sys.argv else {}
-AUSGENOMMEN = set()  # E.56 seit E-174 bei RA Dr. Weber
+AUSGENOMMEN = set()  # E.56 seit E-174 bei Rechtsanwalt
 
 FELDER = [("titel", "Titel"), ("kurz", "Kurztext"), ("erklaerung", "Erklärung"), ("ausloeser", "Auslöser"), ("frist", "Frist"),
           ("wiederholung", "Wiederholung"), ("rechtsgrundlage", "Rechtsgrundlage"), ("sanktion", "Folgen bei Verstoß"),
@@ -93,8 +93,8 @@ def text(v, k=None):
     return yaml.safe_dump(v, allow_unicode=True, default_flow_style=True, width=200).strip()
 
 
-PERSON = {WEBER: "RA Dr. Ulrich Weber (Weber & Merz)", BUSCH: "StB Lutz Busch (Heckler und Busch)", KOCH: "Thomas Koch, Fachkraft für Arbeitssicherheit", BAUM: "Tim Baum, Lebensmittelfachbeauftragter"}
-NAME = {WEBER: "Dr-Weber", BUSCH: "StB-Busch", KOCH: "Thomas-Koch", BAUM: "Tim-Baum"}
+PERSON = {RECHT: "Rechtsanwalt", STEUERN: "Steuerberater", SIFA: "Fachkraft für Arbeitssicherheit", LMH: "Lebensmittelfachbeauftragter"}
+NAME = {RECHT: "Rechtsanwalt", STEUERN: "Steuerberater", SIFA: "Sifa", LMH: "Lebensmittelhygiene"}
 register = yaml.safe_load(open(os.path.join(ROOT, "docs/freigabe-katalog/freigaben.yaml"), encoding="utf-8"))
 GESEHEN = {(r["pruefer"], r["umfang"]): r.get("gesehen") or {} for r in register}
 je = {p: [] for p in PERSON}

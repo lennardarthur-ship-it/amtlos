@@ -1,4 +1,4 @@
-# Umsetzung des Prüfberichts Heckler und Busch vom 21.10.2026
+# Umsetzung des Prüfberichts Steuerberatungskanzlei vom 21.10.2026
 
 Stand: 22.10.2026. Die Szenario-Pakete dieser Mappe sind mit dem neuen Stand erzeugt (bitte für den Testimport nach Abschnitt 3.3 diese verwenden).
 
@@ -30,7 +30,7 @@ Offene Fragen an Sie (Stand Nachtrag): SKR04-Gegenstück zu 0731 (Verrechnungsko
 
 ## Nachtrag 22.10.2026
 
-Umsetzung Ihrer Hinweise zum korrigierten Bericht (`2026-10-22-steuer-heckler-busch.pdf`). Die Szenarien und Pakete dieser Mappe (v3) sind mit diesem Stand erzeugt.
+Umsetzung Ihrer Hinweise zum korrigierten Bericht (`2026-10-22-steuerberatung.pdf`). Die Szenarien und Pakete dieser Mappe (v3) sind mit diesem Stand erzeugt.
 
 | Punkt | Ihr Hinweis | Umsetzung |
 |---|---|---|

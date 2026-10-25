@@ -485,6 +485,28 @@
             "null"
           ],
           "description": "Version des Eintrags, die geprüft wurde. Weicht `version` davon ab, gilt der Eintrag als ungeprüft, bis er erneut geprüft ist (E-171)."
+        },
+        "unterschrieben_am": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date",
+          "description": "Tag der Unterschrift unter der Freigabe (E-196); der Stand im Vermerk liegt nie danach."
+        },
+        "einschraenkung": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Grenze der Prüfung laut Prüfer, z. B. „ohne arbeitsmedizinische Angaben“ (E-196); steht im Vermerk."
+        },
+        "offen": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Themen offener Prüfpunkte (docs/freigabe-katalog/offene-punkte.yaml); die App zeigt dann „teilweise geprüft“ (E-196)."
         }
       }
     }

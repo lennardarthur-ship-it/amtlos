@@ -20,7 +20,7 @@ fakten:
   profil.beschaeftigte.gesamt: 0
   profil.gesellschafter.anzahl: 2
   profil.gesellschafter.auslaendische_investoren: false
-  # Freigabe Weber 22.10.2026: AWV-Meldung auch ohne Investoren bei Zahlungen von/an Gebietsfremde über 50.000 €
+  # Freigabe Rechtsanwalt 22.10.2026: AWV-Meldung auch ohne Investoren bei Zahlungen von/an Gebietsfremde über 50.000 €
   profil.auslandszahlungen.ueber_meldegrenze: false
   profil.gesellschaft.handelsregister: nicht_beantragt
   profil.gesellschaft.geschaeftsjahr: kalenderjahr
@@ -31,7 +31,7 @@ erwartet:
   gesellschaft.stammkapital_einzahlen: gilt
   gesellschaft.handelsregister_anmeldung: gilt
   gesellschaft.ug_ruecklage: gilt
-  # Weber 23.10.2026 (B.16): Transparenzregister erst ab Eintragung (§ 20 Abs. 1 S. 1 GwG)
+  # Rechtsanwalt 23.10.2026 (B.16): Transparenzregister erst ab Eintragung (§ 20 Abs. 1 S. 1 GwG)
   gesellschaft.transparenzregister: gilt_nicht
   gesellschaft.geschaeftsbriefe_pflichtangaben: gilt_nicht
   gesellschaft.gesellschafterliste_aktualisieren: gilt_nicht

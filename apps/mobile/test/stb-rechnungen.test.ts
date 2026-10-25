@@ -1,5 +1,5 @@
 /**
- * Steuerliche Prüfung Heckler und Busch (21.10.2026) in der App: Voranmeldung ohne OSS-Rechnungen und mit dem Rest der
+ * Steuerliche Prüfung Steuerberatungskanzlei (21.10.2026) in der App: Voranmeldung ohne OSS-Rechnungen und mit dem Rest der
  * Schlussrechnung, Liste der nach Rechnungsdatum zugeordneten Rechnungen, OSS-Erklärung und Zusammenfassende Meldung
  * aus den Rechnungen, eigener Nummernkreis für Gutschriften, offener Betrag der Schlussrechnung.
  */

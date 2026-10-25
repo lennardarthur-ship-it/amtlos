@@ -1,9 +1,9 @@
-# v2 nach StB Busch, Rückmeldung 24.10.2026 (Abgleich Runde 3, B.18): Wiederholung von „einmalig“ auf jährlich wiederkehrend umgestellt –
+# v2 nach Steuerberater, Rückmeldung 24.10.2026 (Abgleich Runde 3, B.18): Wiederholung von „einmalig“ auf jährlich wiederkehrend umgestellt –
 # „Der Jahresabschluss ist nach jedem Geschäftsjahr aufzustellen“. Weiter ohne festen Termin (§ 243 Abs. 3 HGB): Wiederholung periodisch,
 # erledigt gilt der Eintrag jeweils für ein Kalenderjahr (erledigung laufend/jahr, wie bei anderen jährlichen Pflichten ohne festen Termin).
-# Neu nach StB Busch, Mail zur Nachprüfung 23.10.2026 (Frage Jahresabschluss): Jahresabschluss (Bilanz und GuV, § 242 HGB) für alle Kaufleute – OHG, KG und e. K. (außer § 241a HGB);
+# Neu nach Steuerberater, Mail zur Nachprüfung 23.10.2026 (Frage Jahresabschluss): Jahresabschluss (Bilanz und GuV, § 242 HGB) für alle Kaufleute – OHG, KG und e. K. (außer § 241a HGB);
 # keine feste Frist (§ 243 Abs. 3 HGB), Unterschrift nach § 245 HGB, keine Offenlegung außerhalb des PublG. Eigener Eintrag statt Zweig in gesellschaft.jahresabschluss
-# (dort steht die Dreimonatsfrist der Kapitalgesellschaften im Text; der freigegebene Eintrag bleibt unverändert). Prüfung durch StB Busch (docs/freigabe-katalog/anwenden.py).
+# (dort steht die Dreimonatsfrist der Kapitalgesellschaften im Text; der freigegebene Eintrag bleibt unverändert). Prüfung durch Steuerberater (docs/freigabe-katalog/anwenden.py).
 # Wortlaut gelesen 23.10.2026: § 242 HGB (lxgesetze.de/hgb/242), § 243 Abs. 3 HGB (lexmea.de/de/gesetz/hgb/243), § 245 HGB (lexmea.de/en/gesetz/hgb/245).
 # Auslöser e. K. wie steuern.buchfuehrungspflicht (§ 241a HGB über Vorjahr bzw. Schätzung im Gründungsjahr, § 242 Abs. 4 Satz 2 HGB).
 schema_version: 1
@@ -24,7 +24,7 @@ rechtsgrundlage:
 kategorie: gesellschaft
 ausloeser:
   any:
-  # StB Busch 23.10.2026: OHG und KG sind Kaufleute (§ 6 HGB) – § 241a HGB gilt nur für Einzelkaufleute
+  # Steuerberater 23.10.2026: OHG und KG sind Kaufleute (§ 6 HGB) – § 241a HGB gilt nur für Einzelkaufleute
   - feld: profil.rechtsform
     op: in
     wert:
@@ -80,7 +80,7 @@ ausloeser:
 # keine feste Frist (§ 243 Abs. 3 HGB) – deshalb kein Termin, nur der Text
 frist:
   typ: dauerhaft
-# StB Busch 24.10.2026: nach jedem Geschäftsjahr – jährlich wiederkehrend (ohne festen Termin, deshalb erledigt je Kalenderjahr)
+# Steuerberater 24.10.2026: nach jedem Geschäftsjahr – jährlich wiederkehrend (ohne festen Termin, deshalb erledigt je Kalenderjahr)
 wiederholung:
   art: periodisch
 stelle:
@@ -120,11 +120,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/stgb/__283.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'v2 (StB Busch, 24.10.2026): nur die Wiederholung geändert – jährlich wiederkehrend statt einmalig; ohne festen Termin, erledigt jeweils für ein Kalenderjahr. Alle anderen Felder unverändert gegenüber v1.'
-- 'Neu nach StB Busch (Mail 23.10.2026) – bitte ganz prüfen. Erklärung nach seinen drei Punkten (Aufstellung § 243 Abs. 3, Unterschrift § 245, Offenlegung) und § 242 HGB; Folgen bei Verstoß aus gesellschaft.jahresabschluss (freigegeben von RA Dr. Weber, v5) übernommen und auf alle Kaufleute verallgemeinert („wenn später die Zahlungen eingestellt werden“ wie in steuern.buchfuehrungspflicht) – § 283b StGB rechtlich ggf. durch RA Dr. Weber gegenlesen. Stelle „in der Regel mit deiner Steuerberatung“ nach steuern.buchfuehrungspflicht.'
+- 'v2 (Steuerberater, 24.10.2026): nur die Wiederholung geändert – jährlich wiederkehrend statt einmalig; ohne festen Termin, erledigt jeweils für ein Kalenderjahr. Alle anderen Felder unverändert gegenüber v1.'
+- 'Neu nach Steuerberater (Mail 23.10.2026) – bitte ganz prüfen. Erklärung nach seinen drei Punkten (Aufstellung § 243 Abs. 3, Unterschrift § 245, Offenlegung) und § 242 HGB; Folgen bei Verstoß aus gesellschaft.jahresabschluss (freigegeben von Rechtsanwalt, v5) übernommen und auf alle Kaufleute verallgemeinert („wenn später die Zahlungen eingestellt werden“ wie in steuern.buchfuehrungspflicht) – § 283b StGB rechtlich ggf. durch Rechtsanwalt gegenlesen. Stelle „in der Regel mit deiner Steuerberatung“ nach steuern.buchfuehrungspflicht.'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - StB Lutz Busch
-  geprueft_am: '2026-10-25'
-  geprueft_version: 2
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

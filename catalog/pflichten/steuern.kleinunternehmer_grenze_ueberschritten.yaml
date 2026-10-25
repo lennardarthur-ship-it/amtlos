@@ -1,5 +1,5 @@
-# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt; Auslöser seit v5 nach Zahlungseingängen (vereinnahmte Entgelte)
-# v6 (StB Busch, Runde 2): nur tatsächliche Zahlungseingänge ohne offene Rechnungen (finanzen.umsatz.bezahlt_*), steuerfreie Umsätze herausgerechnet
+# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt; Auslöser seit v5 nach Zahlungseingängen (vereinnahmte Entgelte)
+# v6 (Steuerberater, Runde 2): nur tatsächliche Zahlungseingänge ohne offene Rechnungen (finanzen.umsatz.bezahlt_*), steuerfreie Umsätze herausgerechnet
 schema_version: 1
 id: steuern.kleinunternehmer_grenze_ueberschritten
 version: 7
@@ -129,10 +129,11 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'StB Busch 22.10.2026, Runde 2 – umgesetzt (v6): Umsatzbegriff vereinnahmte Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.). Auslöser über finanzen.umsatz.bezahlt_laufendes_jahr und …_vorjahr: nur tatsächliche Zahlungseingänge auf Rechnungen, Kasse und Sachentnahmen (§ 3 Abs. 1b UStG, bestätigt); offene Rechnungen zählen nicht (§ 14c Abs. 2 UStG) – liegt die Grenze nur mit ihnen darüber, zeigt Amtlos steuern.kleinunternehmer_grenze_offene_rechnungen. Steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App heraus; Anlagenverkäufe kann sie nicht erkennen (Hinweis im Text). Zu prüfen: Wortlaut der Erklärung und Abgrenzung „steuerfrei“ nur mit Hinweis auf die Steuerbefreiung; der Server kennt keine Zahlungseingänge – dort gelten nur die Zweige aus den Profilangaben'
+- 'Steuerberater 22.10.2026, Runde 2 – umgesetzt (v6): Umsatzbegriff vereinnahmte Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.). Auslöser über finanzen.umsatz.bezahlt_laufendes_jahr und …_vorjahr: nur tatsächliche Zahlungseingänge auf Rechnungen, Kasse und Sachentnahmen (§ 3 Abs. 1b UStG, bestätigt); offene Rechnungen zählen nicht (§ 14c Abs. 2 UStG) – liegt die Grenze nur mit ihnen darüber, zeigt Amtlos steuern.kleinunternehmer_grenze_offene_rechnungen. Steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App heraus; Anlagenverkäufe kann sie nicht erkennen (Hinweis im Text). Zu prüfen: Wortlaut der Erklärung und Abgrenzung „steuerfrei“ nur mit Hinweis auf die Steuerbefreiung; der Server kennt keine Zahlungseingänge – dort gelten nur die Zweige aus den Profilangaben'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 7
+  unterschrieben_am: '2026-10-23'

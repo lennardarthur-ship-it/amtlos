@@ -1,5 +1,5 @@
 # R11 (Rechtsprüfung Befund 2): Hinweispflicht nach § 2a Abs. 2 SchwarzArbG für die Branchen nach § 2a Abs. 1 (SchwarzArbMoDiG)
-# Freigabe Weber 22.10.2026: Termin „vor Beginn“ (Vortag) statt „spätestens bei Arbeitsbeginn“; eigener Auslöser für Inhaber ohne Beschäftigte empfohlen – bräuchte einen eigenen Eintrag ohne Einstellungsbezug, hier nur als Satz in der Erklärung
+# Freigabe Rechtsanwalt 22.10.2026: Termin „vor Beginn“ (Vortag) statt „spätestens bei Arbeitsbeginn“; eigener Auslöser für Inhaber ohne Beschäftigte empfohlen – bräuchte einen eigenen Eintrag ohne Einstellungsbezug, hier nur als Satz in der Erklärung
 schema_version: 1
 id: personal.ausweis_hinweis
 version: 4
@@ -92,6 +92,7 @@ quellen:
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 4
+  unterschrieben_am: '2026-10-23'

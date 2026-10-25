@@ -1,6 +1,6 @@
 # Prüfmappe für die fachliche Prüfung Lebensmittelhygiene
 
-Stand: Oktober 2026. Diese Mappe ist für eine Lebensmitteltechnikerin, Lebensmittelchemikerin oder eine Beraterin für HACCP und Lebensmittelhygiene (bzw. die männlichen Kollegen), idealerweise mit Erfahrung in kleinen Betrieben (Café, Restaurant, Bäckerei, Imbiss, Foodtruck). Sie soll den Prüfauftrag eingrenzen und damit die Kosten planbar machen. Die rechtliche Prüfung hat Rechtsanwalt Dr. Weber übernommen; sie ist hier nicht Gegenstand.
+Stand: Oktober 2026. Diese Mappe ist für eine Lebensmitteltechnikerin, Lebensmittelchemikerin oder eine Beraterin für HACCP und Lebensmittelhygiene (bzw. die männlichen Kollegen), idealerweise mit Erfahrung in kleinen Betrieben (Café, Restaurant, Bäckerei, Imbiss, Foodtruck). Sie soll den Prüfauftrag eingrenzen und damit die Kosten planbar machen. Die rechtliche Prüfung hat Rechtsanwalt übernommen; sie ist hier nicht Gegenstand.
 
 Anbieter: Lang Ventures UG (haftungsbeschränkt) i. G., Reutlingen. App: **Betriebsklar** (iPhone).
 
@@ -32,7 +32,7 @@ Betriebsklar ist eine iPhone-App für kleine Betriebe in Deutschland. Für Leben
 ## Woher die Bausteine kommen
 
 - **Recherche vom 12.10.2026** (`docs/recherche/2026-10-12/lebensmittel_beauty.json`): HACCP-Kontrollpunkte aus Merkblättern der Lebensmittelüberwachung (Mainz, LAVES Niedersachsen, BfR, BgVV-Empfehlungen), die 14 Allergene mit Erläuterung, Anforderungen an lose Ware, Inhalte der Belehrung und Tätigkeitsverbote nach § 42 IfSG. Das Skript `packages/fachlogik/werkzeuge/bausteine-erzeugen.mjs` übernimmt sie nach `bausteine.ts`; Korrekturen der Druckfassung (Einheiten, zwei Behördenwerte nebeneinander, Quellen aus dem Drucktext ins Quellenfeld) stehen dort als Liste.
-- **Hygieneplan für Lebensmittelbetriebe** (`branchen.ts`, nach der Nachkontrolle von Dr. Weber): 17 Zeilen in neun Themenbereichen, belegt mit Anhang II VO (EG) Nr. 852/2004, LMHV und § 42 IfSG; Zahlen darin als „üblicher Richtwert, fachlich zu prüfen“ gekennzeichnet.
+- **Hygieneplan für Lebensmittelbetriebe** (`branchen.ts`, nach der Nachkontrolle von Rechtsanwalt): 17 Zeilen in neun Themenbereichen, belegt mit Anhang II VO (EG) Nr. 852/2004, LMHV und § 42 IfSG; Zahlen darin als „üblicher Richtwert, fachlich zu prüfen“ gekennzeichnet.
 - **HACCP-Kern und Zeilen für Bäckerei und Foodtruck** (`haccp.ts`, E-166): Gefahrenanalyse je Prozessschritt, kritische Kontrollpunkte mit Grenzwert, Überwachung und Korrekturmaßnahme, Verifizierung und Aufzeichnungen; Hygieneplan-Zeilen für Bäckerei (8) und Foodtruck (5). Quellen: Art. 5 VO (EG) Nr. 852/2004 (Wortlaut), Bekanntmachung 2022/C 355/01 (Flexibilität), Entscheidungsbaum nach Codex CXC 1-1969 (Fassung 2023), BfR (72 °C für 2 Minuten, Heißhalten ≥ 60 °C), Kühlwerte aus der Recherche, Anhang II Kap. III VO (EG) Nr. 852/2004 und § 11 Abs. 2 TrinkwV für den Foodtruck. Alles als Vorschlag „fachlich zu prüfen“, Häufigkeiten als „üblicher Richtwert, fachlich zu prüfen“.
 - **Branchen:** Gefahrenanalyse, CCP und Hygieneplan haben die Gruppen „Gastronomie / Café“, „Bäckerei“ und „Foodtruck / mobiler Verkauf“; die App zeigt die passende zuerst. Kontrollpunkte, Allergene und IfSG haben keine Gruppe. Imbiss und Laden mit Lebensmitteln sehen die Gastronomie-Vorschläge; eine Gruppe für Metzgereien gibt es nicht.
 
@@ -57,7 +57,7 @@ Betriebsklar ist eine iPhone-App für kleine Betriebe in Deutschland. Für Leben
 
 ### D. Belehrung nach § 43 IfSG
 
-`ifsg_belehrung-*.pdf`: Inhalte zum Ankreuzen, Tätigkeitsverbote mit Krankheitszeichen in einfachen Worten und Lebensmittel nach § 42 Abs. 2 IfSG im Dokument, Merkblatt des Gesundheitsamts als Anlage, Teilnahmeliste mit Datum der Erstbelehrung, Hinweis bei einer Bescheinigung, die am ersten Arbeitstag älter als drei Monate ist, nächster Termin nach zwei Jahren. Rechtlich hat Dr. Weber die Belehrung bereits geprüft; hier geht es um die fachliche Richtigkeit und Verständlichkeit der Inhalte.
+`ifsg_belehrung-*.pdf`: Inhalte zum Ankreuzen, Tätigkeitsverbote mit Krankheitszeichen in einfachen Worten und Lebensmittel nach § 42 Abs. 2 IfSG im Dokument, Merkblatt des Gesundheitsamts als Anlage, Teilnahmeliste mit Datum der Erstbelehrung, Hinweis bei einer Bescheinigung, die am ersten Arbeitstag älter als drei Monate ist, nächster Termin nach zwei Jahren. Rechtlich hat Rechtsanwalt die Belehrung bereits geprüft; hier geht es um die fachliche Richtigkeit und Verständlichkeit der Inhalte.
 
 ### E. Katalog-Stichprobe
 
@@ -111,7 +111,7 @@ Stand nach E-166 (22.10.2026). Geschlossen: Gefahrenanalyse, CCP mit Entscheidun
 
 ## Nicht Gegenstand dieser Prüfung
 
-- **Rechtliches:** Das hat Rechtsanwalt Dr. Weber geprüft (Prüfbericht vom 21.10.2026), z. B. § 43 IfSG (Fristen, Dokumentation, Bescheinigung auch für Inhaberinnen), die Rechtsgrundlagen der Vorlagen, PPWR und VerpackDG im Katalog. Seine Ergänzungen sind umgesetzt: Die Belehrung führt die Tätigkeitsverbote aus bzw. nennt das Merkblatt als Anlage; der Hygieneplan eines Lebensmittelbetriebs stützt sich auf VO (EG) Nr. 852/2004 und LMHV statt auf die Hygieneverordnung des Landes. Die fachlichen Inhalte von HACCP, Hygieneplan und Allergenliste hat er ausdrücklich an die Lebensmittelhygiene verwiesen.
+- **Rechtliches:** Das hat Rechtsanwalt geprüft (Prüfbericht vom 21.10.2026), z. B. § 43 IfSG (Fristen, Dokumentation, Bescheinigung auch für Inhaberinnen), die Rechtsgrundlagen der Vorlagen, PPWR und VerpackDG im Katalog. Seine Ergänzungen sind umgesetzt: Die Belehrung führt die Tätigkeitsverbote aus bzw. nennt das Merkblatt als Anlage; der Hygieneplan eines Lebensmittelbetriebs stützt sich auf VO (EG) Nr. 852/2004 und LMHV statt auf die Hygieneverordnung des Landes. Die fachlichen Inhalte von HACCP, Hygieneplan und Allergenliste hat er ausdrücklich an die Lebensmittelhygiene verwiesen.
 - Der Hygieneplan für Beauty-Betriebe (Friseur, Kosmetik, Nagelstudio, Fußpflege) und alle Arbeitsschutz-Vorlagen – letztere in einer eigenen Prüfmappe für die Fachkraft für Arbeitssicherheit.
 - Steuern, Preisangaben, Jugendschutz, Datenschutz, Technik der App.
 

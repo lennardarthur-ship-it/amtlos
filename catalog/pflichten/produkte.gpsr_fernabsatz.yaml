@@ -1,4 +1,4 @@
-# Prüfvermerk RA Dr. Weber 22.10.2026 zu produkte.gpsr (G.73): Fernabsatzangaben (Art. 19) nur beim Online-Verkauf – eigener Auslöser
+# Prüfvermerk Rechtsanwalt 22.10.2026 zu produkte.gpsr (G.73): Fernabsatzangaben (Art. 19) nur beim Online-Verkauf – eigener Auslöser
 schema_version: 1
 id: produkte.gpsr_fernabsatz
 version: 1
@@ -73,11 +73,12 @@ quellen:
   url: https://www.gesetze-im-internet.de/prodsg_2021/__28.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Prüfvermerk RA Dr. Weber 22.10.2026 zu produkte.gpsr („Auslöser trennen“). Freigabe RA Dr. Weber Runde 2 (23.10.2026): Art. 19 Buchst. a–d GPSR (Name/Anschrift des Herstellers, der verantwortlichen Person, Produktkennung, Warnhinweise), Sanktion § 28 Abs. 2 Nr. 26 ProdSG und Schwere „mittel“ bestätigt'
+- 'Neu nach Prüfvermerk Rechtsanwalt 22.10.2026 zu produkte.gpsr („Auslöser trennen“). Freigabe Rechtsanwalt Runde 2 (23.10.2026): Art. 19 Buchst. a–d GPSR (Name/Anschrift des Herstellers, der verantwortlichen Person, Produktkennung, Warnhinweise), Sanktion § 28 Abs. 2 Nr. 26 ProdSG und Schwere „mittel“ bestätigt'
 - 'Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 1
+  unterschrieben_am: '2026-10-23'

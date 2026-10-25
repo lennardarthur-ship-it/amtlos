@@ -37,7 +37,7 @@ if "--auch" in args:
 ziel, pruefer, name, stand, nennung = args[:5]
 
 HIER = os.path.dirname(os.path.abspath(__file__))
-_src = open(os.path.join(HIER, "anwenden.py"), encoding="utf-8").read().split("abweichung, uebersicht")[0]
+_src = open(os.path.join(HIER, "anwenden.py"), encoding="utf-8").read().split('if __name__ == "__main__":')[0]
 _g = {"__file__": os.path.join(HIER, "anwenden.py")}
 exec(compile(_src, "anwenden.py", "exec"), _g)
 ids = set(opt["--ids"].split(",")) if "--ids" in opt else None

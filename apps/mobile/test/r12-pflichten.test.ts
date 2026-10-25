@@ -59,7 +59,7 @@ describe("R12: Coach – Bestandsbetrieb, Rentenversicherung, Einordnung", () =>
   it("bei 0 Beschäftigten hängen Jugendarbeitsschutz, Minijob-Grenze und Ausbildungsvergütung nicht mehr ab; Einzelperson ohne Investoren", () => {
     const a = auswertung(coach, "2026-10-21");
     for (const id of ["personal.jugendarbeitsschutz", "personal.minijob_grenze", "personal.ausbildungsverguetung", "gesellschaft.investitionspruefung_hinweis"]) expect(ids(a.unbekannt), id).not.toContain(id);
-    // Freigabe Weber 22.10.2026: AWV-Meldung hängt bei Einzelpersonen nur noch an der Frage nach Auslandszahlungen über 50.000 €, nicht an Investoren
+    // Freigabe Rechtsanwalt 22.10.2026: AWV-Meldung hängt bei Einzelpersonen nur noch an der Frage nach Auslandszahlungen über 50.000 €, nicht an Investoren
     expect(a.unbekannt.find((p) => p.id === "gesellschaft.awv_meldung")?.offeneFragen).toEqual(["auslandszahlungen.ueber_meldegrenze"]);
   });
 
@@ -117,7 +117,7 @@ describe("R12: abgeleitete Antworten und künftige Pflichten", () => {
   });
 
   it("E-Rechnungen versenden ab 2028 gilt erst in der Zukunft – nicht als „schon erledigt“ abhakbar", () => {
-    // StB Busch 22.10.2026: in Kraft, gültig ab 01.01.2028 – vorher nicht unter „gilt“, in den zwölf Monaten davor als „kommend“
+    // Steuerberater 22.10.2026: in Kraft, gültig ab 01.01.2028 – vorher nicht unter „gilt“, in den zwölf Monaten davor als „kommend“
     const profil = { "taetigkeit.branchen": ["handwerk"], rechtsform: "einzelunternehmen", "kunden.segmente": ["b2b"], "ust.kleinunternehmer": false, gruendungsdatum: "2018-01-01" };
     const a = auswertung(profil, "2026-10-21");
     expect(finde(a, "steuern.e_rechnung_versand_2028")).toBeUndefined();

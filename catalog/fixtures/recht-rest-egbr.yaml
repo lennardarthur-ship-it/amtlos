@@ -1,0 +1,19 @@
+persona: kleiner_betrieb
+beschreibung: "Freigabe Rechtsanwalt 22.10.2026 (B.16): GbR mit Gewerbe, im Gesellschaftsregister eingetragen (eGbR) – Transparenzregister wie bei eingetragenen Personengesellschaften (§ 20 Abs. 1 GwG), keine Handelsregisteranmeldung, kein Hinweis zur Eintragung mehr; Istkaufmann und Feststellungserklärung wie bei jeder GbR"
+stichtag: "2026-10-22"
+fakten:
+  profil.rechtsform: gbr
+  profil.gesellschaft.handelsregister: eingetragen
+  profil.gruendungsdatum: "2022-03-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [handwerk]
+  profil.beschaeftigte.gesamt: 0
+  profil.bundesland: BW
+erwartet:
+  gesellschaft.transparenzregister: gilt
+  gesellschaft.handelsregister_anmeldung: gilt_nicht
+  gesellschaft.egbr_hinweis: gilt_nicht
+  gesellschaft.istkaufmann_pruefen: gilt
+  steuern.feststellungserklaerung: gilt
+  # Rechtsanwalt 24.10.2026 (Geschäftsbriefe): § 707b BGB verweist nicht auf § 125 HGB – die eGbR ist nicht aufgenommen
+  gesellschaft.geschaeftsbriefe_pflichtangaben: gilt_nicht

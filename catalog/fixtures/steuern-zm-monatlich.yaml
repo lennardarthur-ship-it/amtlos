@@ -1,0 +1,17 @@
+persona: gewerbe
+beschreibung: Steuerberater Runde 3 (23.10.2026) – Warenlieferungen an Unternehmen in der EU, monatlicher Meldezeitraum (Regel nach § 18a Abs. 1 Satz 1 UStG); Termin je Monat am 25. ohne Verschiebung
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2018-01-01"
+  profil.ust.kleinunternehmer: false
+  profil.kunden.segmente: [b2b]
+  profil.kunden.regionen: [inland, eu]
+  profil.produkte.arten: [physisch]
+  profil.ust.zm_meldezeitraum: monatlich
+  profil.bundesland: NW
+erwartet:
+  steuern.zusammenfassende_meldung: gilt
+termine_enthaelt:
+  # 25.10.2026 ist ein Sonntag – Amtlos nennt den 25.
+  steuern.zusammenfassende_meldung: [["2026-09", "2026-10-25"], ["2026-10", "2026-11-25"]]

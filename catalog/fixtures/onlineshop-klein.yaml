@@ -28,7 +28,7 @@ erwartet:
   produkte.verpackung: gilt
   produkte.elektrogeraete: gilt_nicht
   produkte.gpsr: gilt
-  # Prüfvermerk RA Dr. Weber 22.10.2026: GPSR-Auslöser getrennt – Fernabsatz gilt, Herstellerpflichten hängen an der Frage „eigene Produkte?“
+  # Prüfvermerk Rechtsanwalt 22.10.2026: GPSR-Auslöser getrennt – Fernabsatz gilt, Herstellerpflichten hängen an der Frage „eigene Produkte?“
   produkte.gpsr_fernabsatz: gilt
   produkte.gpsr_hersteller: unbekannt
   produkte.geldwaesche_gueterhaendler: gilt_nicht

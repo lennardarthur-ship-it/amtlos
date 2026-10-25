@@ -1,4 +1,4 @@
-# Prüfvermerk RA Dr. Weber 22.10.2026 zu produkte.gpsr (G.73): Herstellerpflichten (Art. 9) nur bei Herstellung, Eigenmarke oder Import – eigener Auslöser
+# Prüfvermerk Rechtsanwalt 22.10.2026 zu produkte.gpsr (G.73): Herstellerpflichten (Art. 9) nur bei Herstellung, Eigenmarke oder Import – eigener Auslöser
 schema_version: 1
 id: produkte.gpsr_hersteller
 version: 2
@@ -91,11 +91,12 @@ quellen:
   url: https://freirecht.de/g/ProdSG:26
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Prüfvermerk RA Dr. Weber 22.10.2026 zu produkte.gpsr („Auslöser trennen“). Freigabe RA Dr. Weber Runde 2 (23.10.2026) (ändern): Sanktionen § 28 Abs. 2 Nr. 1–6 ProdSG bestätigt; ergänzt: verantwortliche Person in der EU (Art. 16 GPSR), Rückruf- und Meldepflichten (Art. 9 Abs. 8, Art. 20 Safety-Business-Gateway) als Hinweis, Schwere „hoch“ (Marktüberwachung, Rücknahmeanordnungen nach § 26 ProdSG). Art. 9, 16, 20 GPSR am 22.10.2026 gelesen (gesetze.legal), § 26 ProdSG über freirecht.de (Abs. 2 Nr. 7, Abs. 4: Rücknahme/Rückruf)'
+- 'Neu nach Prüfvermerk Rechtsanwalt 22.10.2026 zu produkte.gpsr („Auslöser trennen“). Freigabe Rechtsanwalt Runde 2 (23.10.2026) (ändern): Sanktionen § 28 Abs. 2 Nr. 1–6 ProdSG bestätigt; ergänzt: verantwortliche Person in der EU (Art. 16 GPSR), Rückruf- und Meldepflichten (Art. 9 Abs. 8, Art. 20 Safety-Business-Gateway) als Hinweis, Schwere „hoch“ (Marktüberwachung, Rücknahmeanordnungen nach § 26 ProdSG). Art. 9, 16, 20 GPSR am 22.10.2026 gelesen (gesetze.legal), § 26 ProdSG über freirecht.de (Abs. 2 Nr. 7, Abs. 4: Rücknahme/Rückruf)'
 - 'Frist nicht in der Spezifikation genannt – Frist „vor dem Inverkehrbringen“ ohne Termin'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 2
+  unterschrieben_am: '2026-10-23'

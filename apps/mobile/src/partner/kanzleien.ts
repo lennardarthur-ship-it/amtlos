@@ -1,7 +1,7 @@
 /**
  * Partnerkanzleien „Steuerberatung finden“ – reine Daten, ohne Gerät testbar (docs/15-partnerkanzleien.md).
  *
- * Berufsrecht (Prüfbericht Dr. Weber, Abschnitt 7): Eine Kanzlei zahlt eine feste Gebühr für die Listung – nie eine
+ * Berufsrecht (Prüfbericht Rechtsanwalt, Abschnitt 7): Eine Kanzlei zahlt eine feste Gebühr für die Listung – nie eine
  * Provision oder sonst ein Entgelt je Mandat (§ 9 StBerG, § 49b Abs. 3 BRAO). Die App bleibt ein Werkzeug zur
  * Selbsthilfe; die Kanzlei berät unter eigenem Namen und in eigener Verantwortung. Daten gehen nur an eine Kanzlei,
  * wenn der Nutzer sie selbst sendet (Teilen-Menü bzw. eigene Mail-App).

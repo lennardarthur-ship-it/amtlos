@@ -1,4 +1,4 @@
-# Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
+# Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.e_rechnung_versand_2027
 version: 3
@@ -62,7 +62,7 @@ automatisierung: hinweis
 aktion:
   art: abhaken
 status_recht: in_kraft
-# StB Busch 22.10.2026: in Kraft, gültig ab 01.01.2027
+# Steuerberater 22.10.2026: in Kraft, gültig ab 01.01.2027
 gueltig_ab: '2027-01-01'
 gueltig_bis: null
 quellen:
@@ -85,11 +85,14 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustdv_1980/__34.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'StB Busch 22.10.2026: Übergangsfristen am 22.10.2026 unverändert – vor dem Start und vor dem 01.01.2027 erneut prüfen'
+- 'Steuerberater 22.10.2026: Übergangsfristen am 22.10.2026 unverändert – vor dem Start und vor dem 01.01.2027 erneut prüfen'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 3
+  unterschrieben_am: '2026-10-23'
+  offen:
+    - "Übergangsfristen vor dem Start erneut zu prüfen"

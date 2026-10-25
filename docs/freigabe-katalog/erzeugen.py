@@ -40,10 +40,10 @@ ARBEITSSCHUTZ_BRANCHE = {"branche.handwerk_gefaehrdung_gewerk", "branche.bau_bau
 LEBENSMITTEL_RECHT = {"branche.gastro_preisverzeichnis", "branche.gastro_mehrweg", "branche.gastro_ppwr_radar"}
 
 PRUEFER = {
-    "steuer": ("Steuern", "StB Lutz Busch (Heckler und Busch)"),
+    "steuer": ("Steuern", "Steuerberater (Steuerberatungskanzlei)"),
     "arbeitsschutz": ("Arbeitsschutz", "Fachkraft für Arbeitssicherheit"),
-    "lebensmittel": ("Lebensmittelhygiene", "Tim Baum, Lebensmittelfachbeauftragter"),
-    "recht": ("Recht", "RA Dr. Ulrich Weber (Weber & Merz)"),
+    "lebensmittel": ("Lebensmittelhygiene", "Lebensmittelfachbeauftragter"),
+    "recht": ("Recht", "Rechtsanwalt"),
 }
 
 

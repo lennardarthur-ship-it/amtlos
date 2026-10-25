@@ -51,10 +51,11 @@ quellen:
   url: https://lxgesetze.de/juschg/28
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: § 3 Abs. 1 JuSchG und Sanktion § 28 Abs. 1 Nr. 1, Abs. 5 bestätigt. Aushang auch in Verkaufsstellen für Filme und Spiele (§§ 11–13 JuSchG) – Auslöser „bei Bedarf erweitern“, nicht umgesetzt (keine Angabe dazu im Profil)'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: § 3 Abs. 1 JuSchG und Sanktion § 28 Abs. 1 Nr. 1, Abs. 5 bestätigt. Aushang auch in Verkaufsstellen für Filme und Spiele (§§ 11–13 JuSchG) – Auslöser „bei Bedarf erweitern“, nicht umgesetzt (keine Angabe dazu im Profil)'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 1
+  unterschrieben_am: '2026-10-23'

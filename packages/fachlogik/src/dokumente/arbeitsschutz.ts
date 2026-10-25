@@ -235,7 +235,7 @@ const SCHUTZBEDUERFTIG: Record<string, string> = { jugendliche: "Jugendliche", s
 /**
  * E-167 (Blatt „B Vorlagen“, § 3 Abs. 6 BetrSichV): Art, Umfang und Fristen der Prüfungen von Arbeitsmitteln. Vorschläge
  * mit Frist aus der genannten Quelle; wo die Frist erst die Gefährdungsbeurteilung ergibt, steht das so da. Durchsicht
- * T. Koch 23.10.2026: Fristen „mindestens jährlich“, Tabelle 1B vollständig (B-226), DGUV Regel 110-010 statt DGUV
+ * Sifa 23.10.2026: Fristen „mindestens jährlich“, Tabelle 1B vollständig (B-226), DGUV Regel 110-010 statt DGUV
  * Vorschrift 79 (B-200, B-233), TRBA 220 gestrichen (B-218).
  */
 const pruef = (gruppe: string | undefined, arbeitsmittel: string, pruefart: string, frist: string, befaehigt: string, quelle: string): Vorschlag => ({ ...(gruppe ? { gruppe } : {}), titel: arbeitsmittel, werte: { arbeitsmittel, pruefart, frist, befaehigt }, quelle });
@@ -258,7 +258,7 @@ export const PRUEF_VORSCHLAEGE: Vorschlag[] = [
 ];
 /**
  * Nächster Prüftermin als Vorschlag: letzte Prüfung plus erste Monats- bzw. Jahreszahl der Frist („12 Monate“, „2 Jahre“);
- * „mindestens jährlich“ (Durchsicht T. Koch 23.10.2026, B-231/B-236/B-238) zählt als 12 Monate.
+ * „mindestens jährlich“ (Durchsicht Sifa 23.10.2026, B-231/B-236/B-238) zählt als 12 Monate.
  */
 export function naechstePruefung(letzte: string, frist: string): string {
   const m = /(\d+)\s*(Monat|Monate|Jahr|Jahre)\b/.exec(frist);
@@ -806,7 +806,7 @@ export const gefahrstoffverzeichnis: Vorlage = {
  * E-167 (Sifa-Durchsicht, Blatt „B Vorlagen“, B-079, B-085): Verzeichnis der Beschäftigten mit Tätigkeiten mit
  * krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A oder 1B, mit Höhe und
  * Dauer der Exposition (§ 10a GefStoffV in der Fassung vom 2.12.2024) – z. B. Hartholzstaub in der Tischlerei,
- * Dieselmotoremissionen in der Werkstatt. Durchsicht T. Koch 23.10.2026 (TRGS 410 Nr. 5): Geburtsdatum, eindeutige
+ * Dieselmotoremissionen in der Werkstatt. Durchsicht Sifa 23.10.2026 (TRGS 410 Nr. 5): Geburtsdatum, eindeutige
  * Stoffkennung bzw. Tätigkeit nach TRGS 906, Ermittlungsmethode und Beurteilungsmaßstab als Feldhinweis, Datum der
  * Aktualisierung; Fußtext mit 5-Jahres-Frist für ausschließlich reproduktionstoxische Stoffe und der ZED.
  */
@@ -901,7 +901,7 @@ const BA_TEILE: BaTeil[] = [
 ];
 /**
  * E-167 (Blatt „B Vorlagen“, TRGS 555 Nr. 3.1, 3.2): Beschäftigungsbeschränkungen als eigener Kasten, nur wenn ausgefüllt.
- * Wortlaut nach der Durchsicht T. Koch 23.10.2026 (B-240: § 22 Abs. 2 JArbSchG wie B-266; B-241: kein pauschales Verbot).
+ * Wortlaut nach der Durchsicht Sifa 23.10.2026 (B-240: § 22 Abs. 2 JArbSchG wie B-266; B-241: kein pauschales Verbot).
  */
 export const BESCHRAENKUNG_VORSCHLAEGE = ["Jugendliche dürfen mit diesem Stoff nur arbeiten, soweit dies zur Erreichung des Ausbildungsziels erforderlich ist, und unter Aufsicht einer fachkundigen Person (§ 22 Abs. 2 JArbSchG).", "Schwangere und stillende Frauen dürfen mit diesem Stoff nicht arbeiten, soweit die Gefährdungsbeurteilung eine unverantwortbare Gefährdung ergibt (§ 11 MuSchG für Schwangere, § 12 MuSchG für Stillende)."];
 const BA_BESCHRAENKUNG: BaTeil = { id: "beschraenkung", label: "Beschäftigungsbeschränkungen", hilfe: "z. B. für Jugendliche, Schwangere und stillende Frauen", vorschlaege: BESCHRAENKUNG_VORSCHLAEGE, wennGefuellt: true, pflicht: false };
@@ -945,7 +945,7 @@ export function baAushang(o: { d: Daten; b: Betrieb; band: string; untertitel: s
 
 /**
  * Signalwort und Piktogramme (E-167, TRGS 555 Nr. 3.2.4 Abs. 3): Zeile im Kopfkasten; leer zum Ankreuzen bzw. Eintragen.
- * Durchsicht T. Koch 23.10.2026: Piktogramme nur als Text („GHS02 Flamme“) ohne Raute – eine nummerierte Raute ohne Symbol
+ * Durchsicht Sifa 23.10.2026: Piktogramme nur als Text („GHS02 Flamme“) ohne Raute – eine nummerierte Raute ohne Symbol
  * ist kein Piktogramm nach CLP und kann verwechselt werden.
  */
 function ghsZeile(d: Daten): string {

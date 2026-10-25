@@ -1,4 +1,4 @@
-# RA Dr. Weber Runde 3 (23.10.2026, zu branche.gastro_mehrweg): eigener Hinweis-Eintrag Einwegkunststofffonds (EWKFondsG)
+# Rechtsanwalt Runde 3 (23.10.2026, zu branche.gastro_mehrweg): eigener Hinweis-Eintrag Einwegkunststofffonds (EWKFondsG)
 schema_version: 1
 id: branche.gastro_einwegkunststofffonds
 version: 1
@@ -62,13 +62,14 @@ quellen:
   url: https://www.ihk.de/wiesbaden/recht/rechtsberatung/umwelt/umweltrecht-abfallwirtschaft/einwegkunststofffondsgesetz-6164876
   abgerufen: '2026-10-23'
 fachlich_zu_pruefen:
-- 'Neu am 23.10.2026 auf Verlangen von RA Dr. Weber (Runde 3, zu branche.gastro_mehrweg), Prüfung der Fassung durch RA Dr. Weber ausstehend. Titel und Kurztext nach seiner Vorgabe; Schwere „mittel“ wie vorgegeben; Zahlen zu Inkrafttreten (seit 2024) und erster Meldung (für 2024 bis 15.5.2025) aus seiner Rückmeldung'
-- 'Bußgeld: RA Dr. Weber nennt „§ 24 EWKFondsG (Höhe am Wortlaut prüfen)“ – § 24 EWKFondsG regelt aber „Besetzung und Benennung“ der Einwegkunststoffkommission (gesetze-im-internet.de, 23.10.2026). Die Bußgeldvorschriften stehen in § 26: Abs. 1 Nr. 1 „entgegen § 7 Absatz 1 Satz 1 sich nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig registrieren lässt“, Nr. 9 „entgegen § 11 Absatz 1 Satz 1 eine Meldung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig macht“; Abs. 2: bis 100.000 € in den Fällen des Abs. 1 Nr. 1, 2 Buchst. a und Nr. 3 bis 6, sonst bis 10.000 € (gesetze-im-internet.de und gesetze.legal, 23.10.2026). Auf § 12 (Abgabe) verweist § 26 Abs. 1 nicht. Fundstelle § 26 mit dem Prüfer bestätigen'
+- 'Neu am 23.10.2026 auf Verlangen von Rechtsanwalt (Runde 3, zu branche.gastro_mehrweg), Prüfung der Fassung durch Rechtsanwalt ausstehend. Titel und Kurztext nach seiner Vorgabe; Schwere „mittel“ wie vorgegeben; Zahlen zu Inkrafttreten (seit 2024) und erster Meldung (für 2024 bis 15.5.2025) aus seiner Rückmeldung'
+- 'Bußgeld: Rechtsanwalt nennt „§ 24 EWKFondsG (Höhe am Wortlaut prüfen)“ – § 24 EWKFondsG regelt aber „Besetzung und Benennung“ der Einwegkunststoffkommission (gesetze-im-internet.de, 23.10.2026). Die Bußgeldvorschriften stehen in § 26: Abs. 1 Nr. 1 „entgegen § 7 Absatz 1 Satz 1 sich nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig registrieren lässt“, Nr. 9 „entgegen § 11 Absatz 1 Satz 1 eine Meldung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig macht“; Abs. 2: bis 100.000 € in den Fällen des Abs. 1 Nr. 1, 2 Buchst. a und Nr. 3 bis 6, sonst bis 10.000 € (gesetze-im-internet.de und gesetze.legal, 23.10.2026). Auf § 12 (Abgabe) verweist § 26 Abs. 1 nicht. Fundstelle § 26 mit dem Prüfer bestätigen'
 - '§ 7 Abs. 1 Satz 1 am Wortlaut gelesen („Hersteller haben sich vor der Aufnahme ihrer Tätigkeit … beim Umweltbundesamt registrieren zu lassen“, gesetze.legal); § 11 (jährlich bis 15. Mai, Plattform DIVID) und § 12 nicht selbst am Wortlaut gelesen – § 11 nur über IHK Wiesbaden („jährlich bis zum 15. Mai“), § 12 nur über die Inhaltsübersicht („Abgabepflicht“); gesetze-im-internet.de war für §§ 11, 27 am 23.10.2026 nicht erreichbar'
 - 'Jährliche Meldung bis 15. Mai nicht als Termin abgebildet (Hinweis-Eintrag nach Vorgabe, Frist dauerhaft); Auslöser wie branche.gastro_mehrweg (Frage „Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen?“ – unterscheidet nicht nach Kunststoff)'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 1
+  unterschrieben_am: '2026-10-23'

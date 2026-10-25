@@ -1,4 +1,4 @@
-# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
+# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.kasse_tse_belegausgabe
 version: 4
@@ -35,7 +35,7 @@ kosten: null
 sanktion:
   text:
     de: 'Bußgeld bis 25.000 €, wenn die Kasse nicht oder nicht richtig verwendet oder nicht oder nicht richtig durch eine TSE geschützt wird und dadurch Steuerverkürzungen ermöglicht werden (§ 379 Abs. 1 Satz 1 Nr. 4, 5, Abs. 6 AO). Für die fehlende Belegausgabe nach § 146a Abs. 2 AO sieht § 379 AO kein Bußgeld vor. Ohne ordnungsgemäße TSE verliert die Kassenführung ihre Beweiskraft; das Finanzamt kann Umsätze hinzuschätzen (§ 158, § 162 AO). Die Kasse kann jederzeit ohne Ankündigung geprüft werden (Kassen-Nachschau, § 146b AO).'
-  # StB Busch 22.10.2026: „hoch“
+  # Steuerberater 22.10.2026: „hoch“
   schwere: hoch
 automatisierung: hinweis
 aktion:
@@ -67,6 +67,7 @@ fachlich_zu_pruefen:
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 4
+  unterschrieben_am: '2026-10-23'

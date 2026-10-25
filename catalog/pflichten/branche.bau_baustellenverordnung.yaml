@@ -56,6 +56,7 @@ fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:
-    - Thomas Koch (Fachkraft für Arbeitssicherheit)
+    - arbeitsschutz
   geprueft_am: '2026-10-23'
   geprueft_version: 3
+  unterschrieben_am: '2026-10-23'

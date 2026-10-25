@@ -37,7 +37,7 @@ function standardKonto(id: KontenvorgabeKonto, kr: "SKR03" | "SKR04"): string {
 }
 
 /**
- * Kontenvorgaben der Kanzlei (StB-Prüfung Heckler und Busch, B-4/B-6/B-9/B-10/B-11): einzelne Konten und Optionen, die
+ * Kontenvorgaben der Kanzlei (StB-Prüfung Steuerberatungskanzlei, B-4/B-6/B-9/B-10/B-11): einzelne Konten und Optionen, die
  * der Buchungsstapel statt der Standardkonten verwendet – von Hand oder aus der Datei der Kanzlei.
  */
 export function KontenvorgabenSeite() {

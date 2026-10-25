@@ -23,7 +23,7 @@ fakten:
   profil.vorauszahlung.gewst: true
   profil.kunden.segmente: [b2c]
   profil.kunden.regionen: [inland]
-  # StB Busch 22.10.2026: USt-IdNr. auch bei Einkäufen in anderen EU-Ländern
+  # Steuerberater 22.10.2026: USt-IdNr. auch bei Einkäufen in anderen EU-Ländern
   profil.einkauf.eu_unternehmen: false
   profil.kasse.elektronisch: true
   profil.betriebsstaetten.anzahl: 1
@@ -62,7 +62,7 @@ erwartet:
   steuern.euer: gilt
   steuern.rechnungen_pflichtangaben: gilt
   steuern.e_rechnung_empfang: gilt
-  # E-Rechnung-Versand 2027/2028: gültig erst ab 01.01.2027 bzw. 2028 (StB Busch 22.10.2026) – siehe grenzfall-e-rechnung-*
+  # E-Rechnung-Versand 2027/2028: gültig erst ab 01.01.2027 bzw. 2028 (Steuerberater 22.10.2026) – siehe grenzfall-e-rechnung-*
   steuern.gobd_verfahrensdokumentation: gilt
   steuern.aufbewahrung: gilt
   steuern.kassenmeldung: gilt

@@ -1,5 +1,5 @@
 /**
- * E-165 (StB-Prüfung Heckler und Busch, Abschnitt 10 Prio 3) im Stand und im Steuerberater-Paket: Personenkonten
+ * E-165 (StB-Prüfung Steuerberatungskanzlei, Abschnitt 10 Prio 3) im Stand und im Steuerberater-Paket: Personenkonten
  * (A-3) mit dauerhaft gespeicherten Nummern, Stammdaten-Datei und LIESMICH; Vorsteuer-Teilabzug je Beleg (5.2) in
  * Voranmeldung, EÜR, Stapel und Belegliste; Hinweis auf Umsätze außerhalb der App (Praxis); Migration 7 → 8.
  */

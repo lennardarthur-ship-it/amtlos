@@ -1,4 +1,4 @@
-# Externe Prüfung 25.10.2026 (E-195): fehlte im Katalog – Entwurf des Gründers, ungeprüft; Freigabe RA Dr. Weber angefragt
+# Externe Prüfung 25.10.2026 (E-195): fehlte im Katalog – Entwurf des Gründers, ungeprüft; Freigabe Rechtsanwalt angefragt
 # Auslöser vorläufig über Website/Social Media (Eigenwerbung), bis es eine eigene Frage gibt (PRUEFLISTE T-197)
 schema_version: 1
 id: personal.kuenstlersozialabgabe
@@ -80,7 +80,7 @@ fachlich_zu_pruefen:
 - 'Zahlungen an juristische Personen und an OHG/KG zählen laut KSK nicht zur Bemessungsgrundlage (Info 25) – nicht in die Erklärung aufgenommen, weil nicht aus § 25 KSVG selbst; aufnehmen?'
 - 'Ausnahmen in § 24 Abs. 2 KSVG (höchstens drei Veranstaltungen im Jahr; Musikvereine mit Chorleitern/Dirigenten) nicht erwähnt – nötig?'
 - 'Kanal „post“ nach dem Wortlaut „Vordruck“ (§ 27 Abs. 1 KSVG); ob die KSK eine Online-Meldung anbietet, nicht geprüft. Erstmalige Erfassung bei der KSK (Anmeldung als Abgabepflichtiger) nicht eigens beschrieben.'
-- 'Prüfer: RA Dr. Weber (Sozialversicherungsrecht wie die übrigen Personal-Einträge); alternativ StB Busch – siehe E-195.'
+- 'Prüfer: Rechtsanwalt (Sozialversicherungsrecht wie die übrigen Personal-Einträge); alternativ Steuerberater – siehe E-195.'
 pruefung:
   status: entwurf
   geprueft_von: null

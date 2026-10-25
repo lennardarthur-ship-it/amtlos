@@ -16,8 +16,11 @@ import { GESTALT_MARKE, GRUNDLAGE_MARKE, RAENDER, RAENDER_MARKE, SEITE_MARKE, ce
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Option, Vorlage, Vorschlag } from "./typen.js";
 import { KURZ } from "./ablauf.js";
 import { PRUEFHINWEIS } from "./html.js";
-import { VORLAGEN_GEPRUEFT, fassungPasst, freigabenFuer, geprueftVermerk, kanonisch, sha256, sichtbarerText, type VorlagenFreigabe } from "./geprueft.js";
+import { VORLAGEN_GEPRUEFT, fassungPasst, freigabeUnterschrieben, freigabenFuer, geprueftVermerk, kanonisch, sha256, sichtbarerText, type VorlagenFreigabe } from "./geprueft.js";
+import { PRUEFSTAENDE } from "./pruefstaende.js";
 import { LEERER_BETRIEB } from "./typen.js";
+import { pruefstandBerechnen, type PruefstandErgebnis } from "./pruefvarianten.js";
+export { PRUEF_RECHTSFORMEN, PRUEFSUMME_TAG, gedruckterText, pruefAuspraegungen, pruefBetriebe, pruefstandBerechnen, type PruefstandApi, type PruefsummenApi } from "./pruefvarianten.js";
 
 export * from "./typen.js";
 export { ALLERGENE, GETREIDEARTEN, NUSSARTEN, WARNFARBSTOFFE, WEIZENARTEN_FUSSNOTE, ZUSATZSTOFFE, ZUSATZSTOFFE_QUELLE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, HANDLUNGSBEDARF, RISIKO_MATRIX, RISIKO_STUFEN, SCHUTZZIELE, SCHWERE, SONSTIGE_UNTERPUNKTE, WAHRSCHEINLICHKEIT, risikoAus } from "./konstanten.js";
@@ -47,11 +50,12 @@ export { RECHTSFORMEN } from "./bausteine.js";
 export { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN, arbeitsminuten, arbeitszeitPruefung, monatAus, monatSchluessel, stunden } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent, fassungText, zahl } from "./html.js";
-export { VORLAGEN_GEPRUEFT, freigabenFuer, geprueftVermerk, sha256, type VorlagenFreigabe } from "./geprueft.js";
-// StB-Prüfung Heckler und Busch (21.10.2026): Rechnungen, Voranmeldung, OSS und ZM
+export { PRUEF_ROLLEN, VORLAGEN_GEPRUEFT, freigabeUnterschrieben, freigabenFuer, geprueftVermerk, sha256, type PruefRolle, type VorlagenFreigabe } from "./geprueft.js";
+export { PRUEFSTAENDE } from "./pruefstaende.js";
+// StB-Prüfung Steuerberatungskanzlei (21.10.2026): Rechnungen, Voranmeldung, OSS und ZM
 export { GUTSCHRIFT_PRAEFIX, KUNDEN_ARTEN, NULLSATZ_HINWEIS as NULLSATZ_TEXT, RECHNUNG_EINHEIT_CODE, RECHNUNG_GUTSCHRIFT_NUMMER, RECHNUNG_LEITWEG_FEHLT, RECHNUNG_LEITWEG_FORMAT, RECHNUNG_NULLSATZ_GEMISCHT, RECHNUNG_OSS_LAND, RECHNUNG_OSS_SATZ, RECHNUNG_OSS_VORSCHLAG, RECHNUNG_SCHLUSS_HOCH, RECHNUNG_SCHLUSS_LEER, RECHNUNG_SCHLUSS_SATZ, SATZ_NULLSATZ, abschlaegeAus, euPrivatLand, istGutschriftNummer, leitwegFormatOk, mitGrundstueckHinweis, ossSatz, satzZahl, vollEuro } from "./buchhaltung.js";
 export { EU_LAENDER_NAMEN, OSS_FRIST, OSS_NICHT_VA, ZM_ARTEN, ZM_FRIST, ZM_SKONTO, landName } from "./eumeldungen.js";
-// Nachprüfung der Vorlagen 23.10.2026 (StB Busch, T. Koch, RA Dr. Weber)
+// Nachprüfung der Vorlagen 23.10.2026 (Steuerberater, Sifa, Rechtsanwalt)
 export { OSS_KORREKTUR, OSS_LIEFERSCHWELLE, ZM_ZEITRAUM } from "./eumeldungen.js";
 export { BILANZ_ANHANG, BILANZ_FORM, BILANZ_OHNE_ANHANG, BILANZ_UNTERSCHRIFT, BILANZ_UNTERSCHRIFT_GMBH_CO_KG, KASSENBUCH_BESTAND_NEGATIV, KASSENBUCH_ELEKTRONISCH, KASSENBUCH_NEGATIV, KASSENBUCH_REGELN, UST_OHNE_IGE } from "./buchhaltung.js";
 export { SV_GESCHLECHT_HILFE } from "./lohn.js";
@@ -399,48 +403,42 @@ export function dokumentHtml(v: Vorlage, d: Daten, b: Betrieb): string {
     .replace(RAENDER_MARKE, RAENDER[v.gestalt ?? "nachweis"].join(","));
 }
 
-/** Fester Stichtag und leerer Betrieb für die Prüfsumme – das Ergebnis hängt nicht vom heutigen Datum ab. */
-const PRUEFSUMME_TAG = "2026-01-01";
 /** Merkliste je Vorlage und Freigabe (Objekt aus VORLAGEN_GEPRUEFT) – eigene Freigaben (Tests, Werkzeuge) rechnen neu */
-const pruefsummen = new WeakMap<Vorlage, Map<object, string>>();
+const pruefstaende = new WeakMap<Vorlage, Map<object, Pruefstand>>();
+/** Markierung offener Prüfpunkte im gedruckten Text einer Vorlage (Bausteine mit Prüfstand „offen“) */
+export const OFFEN_MARKE = "fachlich zu prüfen";
+
+/** SHA-256 über alle Ausprägungen und Zahl der Stellen mit „fachlich zu prüfen“ (pruefvarianten.ts) */
+export type Pruefstand = PruefstandErgebnis;
 
 /**
- * Prüfsumme der Bausteine und Texte einer Vorlage (Nachkontrolle T. Baum, 23.10.2026): SHA-256 über
+ * Prüfsumme der Bausteine und Texte einer Vorlage (Nachkontrolle Lebensmittelfachbeauftragter, 23.10.2026; E-196):
+ * SHA-256 über
  *   1. die Formularbeschreibung als JSON mit sortierten Schlüsseln (Titel, Beschreibung, Rechtsgrundlage, alle Abschnitte
  *      mit Hilfetexten, Feldern, Auswahllisten, Textbausteinen und Vorschlägen; Funktionen entfallen),
  *   2. den Kurztext der Vorlage in der App (KURZ),
- *   3. den sichtbaren Text des Dokuments mit den Startwerten und
- *   4. den sichtbaren Text des Dokuments mit allen Vorschlägen und allen Textbausteinen ausgewählt
- * (3 und 4 ohne Gestaltung: ohne <style>, Tags und Attribute; leerer Betrieb, Stichtag 1.1.2026). Bei einer Freigabe nur
- * für eine Fassung (`fassung`) wird mit dieser Fassung gerechnet, bei `gruppen` zählen nur Vorschläge dieser Gruppen.
- * Ohne Angabe: die erste Freigabe der Vorlage (bei mehreren Freigaben die übrigen mit `vorlagenPruefsumme(v, f)`).
+ *   3. den gedruckten Text (sichtbarer Text samt Fußzeile und Kopfangaben) jeder Ausprägung aus `pruefAuspraegungen`
+ *      (pruefvarianten.ts): Startwerte und alles ausgewählt ohne Betrieb und für Beispielbetriebe je Rechtsform, jede
+ *      einzelne Auswahl, Listen mit Beispieleinträgen, verdeckte Angaben wie Storno – Stichtag 1.1.2026.
+ * Bei einer Freigabe nur für eine Fassung (`fassung`) wird mit dieser Fassung gerechnet, bei `gruppen` zählen nur
+ * Vorschläge dieser Gruppen, bei `rechtsformen` nur Beispielbetriebe dieser Rechtsformen. Ohne Angabe: die erste Freigabe
+ * der Vorlage (bei mehreren Freigaben die übrigen mit `vorlagenPruefsumme(v, f)`).
  */
-export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, "fassung" | "gruppen"> | undefined = VORLAGEN_GEPRUEFT[v.id]): string {
+export function vorlagenPruefstand(v: Vorlage, freigabe: Pick<VorlagenFreigabe, "fassung" | "gruppen" | "rechtsformen"> | undefined = VORLAGEN_GEPRUEFT[v.id]): Pruefstand {
   const merken = freigabe !== undefined && freigabenFuer(v.id).includes(freigabe as VorlagenFreigabe);
-  const gemerkt = merken ? pruefsummen.get(v)?.get(freigabe) : undefined;
+  const gemerkt = merken ? pruefstaende.get(v)?.get(freigabe) : undefined;
   if (gemerkt) return gemerkt;
-  const passt = (x: Vorschlag) => !freigabe?.gruppen || freigabe.gruppen.includes(x.gruppe ?? "");
-  const abschnitte = v.abschnitte.map((a) => ({ ...a, felder: a.felder.map((f) => (f.art === "liste" && f.vorschlaege ? { ...f, vorschlaege: f.vorschlaege.filter(passt) } : f)) }));
-  const fassung: Daten = freigabe?.fassung ? { [freigabe.fassung.feld]: freigabe.fassung.wert } : {};
-  const start: Daten = { ...leereDaten(v, LEERER_BETRIEB, PRUEFSUMME_TAG), ...fassung };
-  const voll: Daten = { ...start };
-  for (const a of abschnitte)
-    for (const f of a.felder) {
-      if (f.art === "liste" && f.vorschlaege?.length) voll[f.id] = f.vorschlaege.map((x) => eintragAusVorschlag(f, x, LEERER_BETRIEB, PRUEFSUMME_TAG));
-      else if (f.art === "bausteine") voll[f.id] = f.optionen.map((o) => o.wert);
-    }
-  const teile = [
-    `vorlage:${kanonisch({ id: v.id, titel: v.titel, beschreibung: v.beschreibung, grundlage: v.grundlage, abschnitte })}`,
-    `kurz:${KURZ[v.id] ?? ""}`,
-    `start:${sichtbarerText(dokumentHtml(v, start, LEERER_BETRIEB))}`,
-    `voll:${sichtbarerText(dokumentHtml(v, voll, LEERER_BETRIEB))}`,
-  ];
-  const summe = sha256(teile.join("\n"));
+  const stand: Pruefstand = pruefstandBerechnen(v, freigabe, { dokumentHtml, leereDaten, eintragAusVorschlag, leererBetrieb: LEERER_BETRIEB, kurz: KURZ, kanonisch, sha256, sichtbarerText });
   if (merken) {
-    if (!pruefsummen.has(v)) pruefsummen.set(v, new Map());
-    pruefsummen.get(v)!.set(freigabe, summe);
+    if (!pruefstaende.has(v)) pruefstaende.set(v, new Map());
+    pruefstaende.get(v)!.set(freigabe, stand);
   }
-  return summe;
+  return stand;
+}
+
+/** Prüfsumme einer Vorlage (siehe `vorlagenPruefstand`). */
+export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, "fassung" | "gruppen" | "rechtsformen"> | undefined = VORLAGEN_GEPRUEFT[v.id]): string {
+  return vorlagenPruefstand(v, freigabe).summe;
 }
 
 /**
@@ -449,10 +447,24 @@ export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, 
  * zu den Daten passt und deren Prüfsumme stimmt. Sonst `undefined`.
  */
 export function vorlageGeprueft(v: Vorlage, d?: Daten, liste: Readonly<Record<string, VorlagenFreigabe>> = VORLAGEN_GEPRUEFT, betrieb?: Betrieb): Omit<VorlagenFreigabe, "weitere"> | undefined {
-  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && fassungPasst(f, d) && rechtsformPasst(f, d, betrieb) && vorlagenPruefsumme(v, f) === f.pruefsumme);
+  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && freigabeUnterschrieben(f) && fassungPasst(f, d) && rechtsformPasst(f, d, betrieb) && aktuellerPruefstand(v, f, liste).summe === f.pruefsumme);
 }
 
-/** Freigabe auf Rechtsformen beschränkt (RA Dr. Weber 25.10.2026, Handelsregister nur GmbH, OHG, KG)? */
+/**
+ * Prüfstand der Vorlage für eine Freigabe: für die Vorlagen und Freigaben der App aus der erzeugten Liste PRUEFSTAENDE
+ * (die Rechnung über alle Ausprägungen dauert für große Vorlagen auf dem Gerät zu lange; ein Test prüft, dass die Liste
+ * zur Rechnung passt), sonst neu gerechnet (Tests, Werkzeuge, geänderte Vorlagen).
+ */
+export function aktuellerPruefstand(v: Vorlage, f: Omit<VorlagenFreigabe, "weitere">, liste: Readonly<Record<string, VorlagenFreigabe>> = VORLAGEN_GEPRUEFT): Pruefstand {
+  if (liste === VORLAGEN_GEPRUEFT && vorlageFuer(v.id) === v) {
+    const i = freigabenFuer(v.id).indexOf(f);
+    const gemerkt = i >= 0 ? PRUEFSTAENDE[i ? `${v.id}#${i}` : v.id] : undefined;
+    if (gemerkt) return gemerkt;
+  }
+  return vorlagenPruefstand(v, f);
+}
+
+/** Freigabe auf Rechtsformen beschränkt (Rechtsanwalt 25.10.2026, Handelsregister nur GmbH, OHG, KG)? */
 function rechtsformPasst(f: Pick<VorlagenFreigabe, "rechtsformen">, d?: Daten, betrieb?: Betrieb): boolean {
   if (!f.rechtsformen?.length) return true;
   const roh = (typeof d?.rechtsform === "string" && d.rechtsform) || betrieb?.rechtsform || (betrieb?.name ? formImNamen(betrieb.name) ?? "" : "");
@@ -463,5 +475,5 @@ function rechtsformPasst(f: Pick<VorlagenFreigabe, "rechtsformen">, d?: Daten, b
 /** Hinweis in der App unter einer Vorlage: „Vorlagen fachlich durchgesehen (Stand …)“ oder der allgemeine Prüfhinweis. */
 export function pruefHinweisFuer(v: Vorlage, d?: Daten, betrieb?: Betrieb): string {
   const f = vorlageGeprueft(v, d, VORLAGEN_GEPRUEFT, betrieb);
-  return f ? geprueftVermerk(f.stand) : PRUEFHINWEIS;
+  return f ? geprueftVermerk(f.stand, f, aktuellerPruefstand(v, f).offen) : PRUEFHINWEIS;
 }

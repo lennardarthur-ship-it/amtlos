@@ -24,7 +24,7 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
     // R12: juristische Personen und eingetragene Personengesellschaften (§ 20 Abs. 1 GwG, Registeranmeldung).
     // E-176: OHG und KG sind zur Eintragung ins Handelsregister anzumelden (§ 106 Abs. 1, § 161 Abs. 2 HGB) – wie GmbH & Co. KG
     f["abgeleitet.ist_eingetragene_gesellschaft"] = ["ug", "gmbh", "gmbh_co_kg", "ohg", "kg", "partg", "partg_mbb"].includes(rechtsform);
-    // Freigabe Weber 22.10.2026 (B.16): die GbR ist eingetragene Personengesellschaft erst mit dem Eintrag im
+    // Freigabe Rechtsanwalt 22.10.2026 (B.16): die GbR ist eingetragene Personengesellschaft erst mit dem Eintrag im
     // Gesellschaftsregister (eGbR, § 707 BGB) – Angabe wie bei den anderen Gesellschaften; ohne Angabe unbekannt (E-033)
     if (rechtsform === "gbr") {
       const register = profil["profil.gesellschaft.handelsregister"];
@@ -40,7 +40,7 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
     f["abgeleitet.ist_vorjahr_gruendungsjahr"] = j === s - 1;
     f["abgeleitet.noch_nicht_gestartet"] = gruendung > stichtag; // ISO-Daten sind lexikographisch vergleichbar
   }
-  // StB Busch 22.10.2026: Fristen ab Eröffnung bzw. Aufnahme der Tätigkeit (§ 138 Abs. 4 AO) – eigene Angabe, sonst das
+  // Steuerberater 22.10.2026: Fristen ab Eröffnung bzw. Aufnahme der Tätigkeit (§ 138 Abs. 4 AO) – eigene Angabe, sonst das
   // Startdatum (die Startfrage lautet „Wann hast du angefangen oder wann willst du anfangen?“)
   const beginn = profil["profil.taetigkeit_beginn"];
   if (typeof beginn === "string") f["abgeleitet.taetigkeit_beginn"] = beginn;

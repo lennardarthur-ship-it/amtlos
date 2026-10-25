@@ -1,4 +1,4 @@
-# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
+# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.kassenmeldung_ausserbetriebnahme
 version: 5
@@ -24,9 +24,9 @@ frist:
     ereignis: kasse_ausser_betrieb
   versatz: P1M
   zeitpunkt: spaetestens
-  # StB Busch 22.10.2026: Bezug auf jedes Ereignis, nicht nur das erste
+  # Steuerberater 22.10.2026: Bezug auf jedes Ereignis, nicht nur das erste
   je_ereignis: true
-  # Fristende am Wochenende oder Feiertag: § 108 Abs. 3 AO ist anzuwenden (StB Busch 22.10.2026)
+  # Fristende am Wochenende oder Feiertag: § 108 Abs. 3 AO ist anzuwenden (Steuerberater 22.10.2026)
   verschiebung:
     regel: naechster_werktag
     kalender: bundesland
@@ -69,6 +69,7 @@ fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 5
+  unterschrieben_am: '2026-10-23'

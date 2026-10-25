@@ -589,7 +589,7 @@ describe("Dokumentvorlagen", () => {
     expect(sv).toContain("<th>Personengruppe (trägt der Arbeitgeber ein)</th>");
     expect(sv).not.toContain("101 –");
     expect(sv).toContain("Geburtsname (falls abweichend)");
-    // StB Busch (23.10.2026): Geschlecht in den Personenangaben – Beschäftigung beginnt mit Feld 12
+    // Steuerberater (23.10.2026): Geschlecht in den Personenangaben – Beschäftigung beginnt mit Feld 12
     expect(sv).toMatch(/<td class="nr">12<\/td><th>Beginn<\/th>/);
     const svVoll = html("sv_meldedaten", { name: "Kim", art: "vollzeit", personengruppe: "101", vertragsform: "1", schulabschluss: "4" });
     expect(svVoll).toContain("1 – Vollzeit, unbefristet");
@@ -790,7 +790,7 @@ describe("Vorlagen, vierte Durchsicht", () => {
     expect(se).toMatch(/Summe Einkommensteuer<\/th><td class="zahl">200,00 €/);
     expect(se).toMatch(/Summe Gewerbesteuer<\/th><td class="zahl">50,00 €/);
     expect(se).not.toContain("250,00 €");
-    // StB Busch (23.10.2026): auch bei nur einer Steuerart die Summe je Steuerart
+    // Steuerberater (23.10.2026): auch bei nur einer Steuerart die Summe je Steuerart
     expect(html("steuererklaerung", { jahr: "2025", vorauszahlungen: [{ art: "Einkommensteuer Q1", betrag: "100" }, { art: "Einkommensteuer Q2", betrag: "50" }] })).toMatch(/Summe Einkommensteuer<\/th><td class="zahl">150,00 €/);
     // Rechtsgrundlage nach den gewählten Erklärungen bzw. Rechtsform (Szenario Praxis: kein KStG beim Einzelunternehmen)
     const rg = (d: Daten, b: Betrieb = BETRIEB) => vorlageFuer("steuererklaerung")!.grundlageFuer!(d, b);

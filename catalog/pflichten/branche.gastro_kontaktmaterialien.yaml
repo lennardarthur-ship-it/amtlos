@@ -1,5 +1,5 @@
-# T. Baum Abgleich 23.10.2026: Konformitätserklärung nur bei EU-Einzelvorschriften, wörtlich nach seinem Vorschlag
-# Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (b), Frage 15): Materialien mit Lebensmittelkontakt – Konformitätserklärungen
+# Lebensmittelfachbeauftragter Abgleich 23.10.2026: Konformitätserklärung nur bei EU-Einzelvorschriften, wörtlich nach seinem Vorschlag
+# Prüfbericht Lebensmittelhygiene (Lebensmittelfachbeauftragter, 22.10.2026, Frage 14 (b), Frage 15): Materialien mit Lebensmittelkontakt – Konformitätserklärungen
 schema_version: 1
 id: branche.gastro_kontaktmaterialien
 version: 3
@@ -60,13 +60,14 @@ quellen:
   url: https://lxgesetze.de/lfgb/39
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Folgen bei Verstoß übernommen (§ 39 LFGB am 22.10.2026 gelesen), Schwere „niedrig“; Kurztext bleibt – „außer Einzelhandel“ in Art. 16 VO (EG) Nr. 1935/2004 meint den Verkauf von Bedarfsgegenständen an Verbraucher, nicht den Gastronomiebetrieb als Abnehmer'
+- 'Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): Folgen bei Verstoß übernommen (§ 39 LFGB am 22.10.2026 gelesen), Schwere „niedrig“; Kurztext bleibt – „außer Einzelhandel“ in Art. 16 VO (EG) Nr. 1935/2004 meint den Verkauf von Bedarfsgegenständen an Verbraucher, nicht den Gastronomiebetrieb als Abnehmer'
 - 'Als Hinweis über die Branche – Amtlos fragt nicht ab, welche Verpackungen und Behälter der Betrieb nutzt'
-- 'RA Dr. Weber Runde 3 (23.10.2026), Folgen freigegeben: Konformitätserklärung ist Pflicht des Inverkehrbringers (Art. 16 VO (EG) Nr. 1935/2004); für den Gastronomiebetrieb keine Bußgeldnorm, Anordnung nach § 39 LFGB; Schwere „niedrig“ passt'
+- 'Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: Konformitätserklärung ist Pflicht des Inverkehrbringers (Art. 16 VO (EG) Nr. 1935/2004); für den Gastronomiebetrieb keine Bußgeldnorm, Anordnung nach § 39 LFGB; Schwere „niedrig“ passt'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - Tim Baum (Lebensmittelfachbeauftragter)
-    - RA Dr. Ulrich Weber
+    - hygiene
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 3
+  unterschrieben_am: '2026-10-23'

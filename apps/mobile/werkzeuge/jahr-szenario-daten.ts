@@ -50,7 +50,7 @@ export const BETRIEB = {
   plz: "04229",
   ort: "Leipzig",
   bundesland: "Sachsen",
-  verantwortlich: "Jana Weber",
+  verantwortlich: "Jana Winter",
   telefon: "0341 4927183",
   email: "hallo@cafe-morgenrot.example",
   website: "www.cafe-morgenrot.example",
@@ -63,7 +63,7 @@ export const BETRIEB = {
   versteuerung: "soll",
   farbe: "#B5462F",
 };
-export const INHABERIN = { name: "Jana Weber", geburtsname: "Jana Lehmann", geburtsdatum: "1986-11-03", geburtsort: "Leipzig", wohnanschrift: "Holbeinstraße 21\n04229 Leipzig" };
+export const INHABERIN = { name: "Jana Winter", geburtsname: "Jana Lehmann", geburtsdatum: "1986-11-03", geburtsort: "Leipzig", wohnanschrift: "Holbeinstraße 21\n04229 Leipzig" };
 export const GRUENDUNG = "2022-03-01";
 
 export const KUNDEN = {
@@ -383,7 +383,7 @@ export const BELEGE: BelegRoh[] = [
   einfach({ id: "b27", datum: "2026-01-15", lieferant: "Mitteldeutsche Gastro-Versicherung AG", anschrift: "Augustusplatz 9\n04109 Leipzig", nummer: "VS-88213-2026", kategorie: "versicherungen", art: "brutto", vorsteuer: false, zahlung: "bank", bezahlt: "2026-01-15", datei: "pdf", worum: "Betriebshaftpflicht und Inhaltsversicherung (keine USt, Versicherungsteuer)",
     pos: [{ text: "Betriebshaftpflicht und Inhaltsversicherung 2026 (Beitrag inkl. 19 % Versicherungsteuer, keine Umsatzsteuer)", satz: 0, betrag: 61240 }] }),
   einfach({ id: "b28", datum: "2026-09-10", lieferant: "Akademie für Lebensmittelhygiene Sachsen", anschrift: "Prager Straße 26\n04103 Leipzig", nummer: "ALS-26-0931", kategorie: "fortbildung", art: "netto", vorsteuer: true, zahlung: "bank", bezahlt: "2026-09-10", datei: "pdf", worum: "Hygieneschulung HACCP (19 %)",
-    pos: [{ text: "Tagesseminar „HACCP in der Gastronomie“, Teilnehmerin Jana Weber", satz: 19, betrag: 10000 }] }),
+    pos: [{ text: "Tagesseminar „HACCP in der Gastronomie“, Teilnehmerin Jana Winter", satz: 19, betrag: 10000 }] }),
   einfach({ id: "b29", datum: "2026-07-22", lieferant: "Kältetechnik Möckern GmbH", anschrift: "Max-Liebermann-Straße 80\n04159 Leipzig", nummer: "KM-1987", kategorie: "sonstiges", art: "netto", vorsteuer: true, zahlung: "bank", bezahlt: "2026-07-30", datei: "pdf", worum: "Reparatur Kuchenvitrine (19 %)",
     pos: [{ text: "Austausch Lüftermotor Kuchenvitrine, Material", satz: 19, betrag: 14500 }, { text: "Arbeitszeit Kältetechniker 2 Std. × 72,50 €", satz: 19, betrag: 14500 }] }),
   einfach({ id: "b30", datum: "2026-03-30", lieferant: "SchädlingsStopp Leipzig", anschrift: "Theodor-Heuss-Straße 14\n04318 Leipzig", nummer: "SST-2026-112", kategorie: "fremdleistungen", art: "netto", vorsteuer: true, zahlung: "bank", bezahlt: "2026-04-07", datei: "pdf", worum: "Schädlingsmonitoring Jahrespauschale (19 %)",

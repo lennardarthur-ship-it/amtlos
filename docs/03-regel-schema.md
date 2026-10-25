@@ -101,7 +101,7 @@ Fälligkeitsregeln bei `wiederkehrend`: `tag_nach_periodenende` (USt-VA, Lohnste
   "pflicht_id": "steuern.ust_voranmeldung",
   "pflicht_version": 1,
   "ergebnis": "gilt",                         // gilt | gilt_nicht | unbekannt
-  "begruendung": {                            // Baum, Knoten mit label und Ist-Wert
+  "begruendung": {                            // Lebensmittelfachbeauftragter, Knoten mit label und Ist-Wert
     "op": "all", "ergebnis": "gilt",
     "kinder": [
       { "feld": "profil.ust.kleinunternehmer", "ist": false, "soll": false, "ergebnis": "gilt",

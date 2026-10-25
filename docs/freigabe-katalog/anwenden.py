@@ -1,19 +1,27 @@
 """
-Freigaben aus dem Register (docs/freigabe-katalog/freigaben.yaml) in den Katalog schreiben (E-173).
+Freigaben aus dem Register (docs/freigabe-katalog/freigaben.yaml) in den Katalog schreiben (E-173, E-196).
 
     python3 docs/freigabe-katalog/anwenden.py            # schreibt pruefung-Blöcke, druckt Übersicht
     python3 docs/freigabe-katalog/anwenden.py --pruefen  # schreibt nichts, Exit 1 wenn der Katalog vom Register abweicht
+    python3 docs/freigabe-katalog/anwenden.py --bericht  # zusätzlich: je Rolle, was ohne Unterschrift freigegeben ist
 
 Regel: Eine Freigabe gilt nur für die Fassung (Version), die der Prüfer gesehen hat. Ein Eintrag ist freigegeben, wenn
-für seinen Bereich alle nötigen Freigaben zur aktuellen Version passen:
-- Recht → RA Dr. Weber; Steuern → StB Busch; Arbeitsschutz → T. Koch;
-- Lebensmittel → T. Baum (Inhalt ohne Folgen) UND RA Dr. Weber (nur Folgen bei Verstoß).
+für seinen Bereich alle nötigen Freigaben zur aktuellen Version passen UND unterschrieben sind:
+- Recht → `recht` (Rechtsanwalt); Steuern → `steuern` (Steuerberater); Arbeitsschutz → `arbeitsschutz` (Sifa);
+- Lebensmittel → `hygiene` (Lebensmittelfachbeauftragter, Inhalt ohne Folgen) UND `recht` (nur Folgen bei Verstoß).
+Unterschrieben (E-196) heißt: Der Block hat `unterschrieben_am` und `unterschrift` (Datei mit der Unterschrift unter
+docs/pruefberichte). Freigaben per Mail oder auf Blättern, deren unterschriebenes Exemplar nicht vorliegt, zählen nicht –
+sie stehen mit `--bericht` in der Liste „Unterschrift fehlt“ (Nachprüfliste). Das Datum im Vermerk (`geprueft_am`) ist
+der Stand der Freigabe und liegt nie nach dem Tag der Unterschrift.
 Bei Teil-Umfängen („ohne_sanktion“ / „sanktion“) bleibt eine Freigabe gültig, wenn sich seit der freigegebenen Version
 nur Felder außerhalb ihres Umfangs geändert haben (Vergleich mit der Fassung aus der git-Historie).
-Alles andere wird `in_pruefung` (zuvor freigegeben) bzw. bleibt `entwurf`. Die App zeigt „geprüft“ nur bei
-`geprueft_version == version` (apps/mobile/src/pflichten/pruefer.ts).
+Einschränkungen des Prüfers je Eintrag (`einschraenkung`, z. B. „ohne arbeitsmedizinische Angaben“) und offene
+Prüfpunkte (docs/freigabe-katalog/offene-punkte.yaml) kommen in den pruefung-Block; die App zeigt sie im Vermerk.
+Alles andere wird `in_pruefung` (zuvor oder ohne Unterschrift freigegeben) bzw. bleibt `entwurf`. Die App zeigt
+„geprüft“ nur bei `geprueft_version == version` (apps/mobile/src/pflichten/pruefer.ts).
 """
 import glob
+import json
 import os
 import re
 import subprocess
@@ -24,19 +32,30 @@ import yaml
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../.."))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 PRUEFEN = "--pruefen" in sys.argv
+BERICHT = "--bericht" in sys.argv
 
 STEUER_GRUENDUNG = {"gruendung.fragebogen_steuerliche_erfassung", "gruendung.ust_idnr",
-                    # StB Busch 23.10.2026: Jahresabschluss der OHG, KG und e. K. (sein Vorschlag, er sieht ihn durch)
+                    # Steuerberater 23.10.2026: Jahresabschluss der OHG, KG und e. K. (sein Vorschlag, er sieht ihn durch)
                     "gesellschaft.jahresabschluss_personenhandel"}
-# E-195: elektronische Lohnsteuerbescheinigung (§ 41b EStG, § 93c AO) ist Steuerrecht – StB Busch, obwohl Kategorie „personal“
+# E-195: elektronische Lohnsteuerbescheinigung (§ 41b EStG, § 93c AO) ist Steuerrecht – Steuerberater, obwohl Kategorie „personal“
 STEUER_PERSONAL = {"personal.lohnsteuerbescheinigung"}
-ARBEITSSCHUTZ_BRANCHE ={"branche.handwerk_gefaehrdung_gewerk", "branche.bau_baustellenverordnung", "branche.beauty_hautschutzplan", "branche.gastro_schankanlage_fluessiggas"}
+ARBEITSSCHUTZ_BRANCHE = {"branche.handwerk_gefaehrdung_gewerk", "branche.bau_baustellenverordnung", "branche.beauty_hautschutzplan", "branche.gastro_schankanlage_fluessiggas"}
 LEBENSMITTEL_RECHT = {"branche.gastro_preisverzeichnis", "branche.gastro_mehrweg", "branche.gastro_ppwr_radar", "branche.gastro_einwegkunststofffonds"}
-WEBER, BUSCH, KOCH, BAUM = "RA Dr. Ulrich Weber", "StB Lutz Busch", "Thomas Koch (Fachkraft für Arbeitssicherheit)", "Tim Baum (Lebensmittelfachbeauftragter)"
+# Rollen statt Personen (E-196): Schlüssel in freigaben.yaml und in `pruefung.geprueft_von`
+RECHT, STEUERN, SIFA, LMH = "recht", "steuern", "arbeitsschutz", "hygiene"
+ROLLEN = {RECHT: "Rechtsanwalt", STEUERN: "Steuerberater", SIFA: "Fachkraft für Arbeitssicherheit", LMH: "Lebensmittelfachbeauftragter"}
 NICHT_VERGLICHEN = {"version", "pruefung", "fachlich_zu_pruefen", "aenderungsnotiz"}
+# Wörter in `fachlich_zu_pruefen`, die eine weitere fachliche Prüfung verlangen – jeder solche Punkt muss in
+# offene-punkte.yaml als offen oder erledigt eingeordnet sein (E-196)
+OFFEN_STICHWORTE = [r'bestätigen lassen', r'bitte ganz prüfen', r'bitte prüfen', r'Nummer und Höhe bestätigen', r'Betriebsarzt',
+                    r'gegen das Amtsblatt', r'gegenlesen', r'nicht am Wortlaut gelesen', r'nicht gelesen\)', r'Tatbestände nicht gelesen',
+                    r'nicht geprüft', r'ausstehend', r'\bOffen:', r'weiterhin offen', r'nötig\?', r'erneut vorlegen', r'vor de[mn] Launch',
+                    r'nach Verkündung', r'nach Umsetzungsgesetz', r'fachlich festlegen', r'fachlich erstellen', r'fachlich prüfen',
+                    r'fachlich zu bestätigen', r'nicht ergänzt', r'Platzhalter', r'nicht bestätigt', r'prüfen\)?$', r'am Wortlaut prüfen',
+                    r'bitte .*prüfen', r'nicht wie angegeben übernommen', r'Höhe .*nicht g', r'erneut prüfen']
+TECHNIK = [r'\(Technik', r'Technik\)']
 
-
-# E-174: arbeitsmedizinische Vorsorge (ArbMedVV) prüft RA Dr. Weber rechtlich – die Sifa hat sie als ärztliches Fachgebiet abgegeben
+# E-174: arbeitsmedizinische Vorsorge (ArbMedVV) prüft der Rechtsanwalt rechtlich – die Sifa hat sie als ärztliches Fachgebiet abgegeben
 RECHT_STATT_ARBEITSSCHUTZ = {"arbeitsschutz.arbeitsmedizinische_vorsorge"}
 
 
@@ -53,17 +72,39 @@ def gebiet(d):
     return "recht"
 
 
-BENOETIGT = {"recht": [(WEBER, "alles")], "steuer": [(BUSCH, "alles")], "arbeitsschutz": [(KOCH, "alles")],
-             "lebensmittel": [(BAUM, "ohne_sanktion"), (WEBER, "sanktion")]}
+BENOETIGT = {"recht": [(RECHT, "alles")], "steuer": [(STEUERN, "alles")], "arbeitsschutz": [(SIFA, "alles")],
+             "lebensmittel": [(LMH, "ohne_sanktion"), (RECHT, "sanktion")]}
 
 register = yaml.safe_load(open(os.path.join(ROOT, "docs/freigabe-katalog/freigaben.yaml"), encoding="utf-8"))
+
+
+def unterschrieben(r):
+    """Datum der Unterschrift, wenn der Block unterschrieben ist und das unterschriebene Blatt vorliegt – sonst None."""
+    am, beleg = r.get("unterschrieben_am"), r.get("unterschrift")
+    if not am or not beleg:
+        return None
+    if not os.path.isfile(os.path.join(ROOT, beleg)):
+        raise SystemExit(f"freigaben.yaml: Beleg der Unterschrift fehlt: {beleg}")
+    return str(am)
+
+
 # mehrere Blöcke je Prüfer/Umfang möglich (z. B. Nachtrag, der Erklärung und Stelle bestätigt)
-BLOECKE = [(r["pruefer"], r["umfang"], set(r.get("felder_fehlen") or []), r["eintraege"]) for r in register]
+BLOECKE = [(r["pruefer"], r["umfang"], set(r.get("felder_fehlen") or []), r["eintraege"], unterschrieben(r)) for r in register]
+for _r in register:
+    assert _r["pruefer"] in ROLLEN, f"freigaben.yaml: unbekannte Rolle {_r['pruefer']}"
+    _am = unterschrieben(_r)
+    for _i, _f in _r["eintraege"].items():
+        # Der Stand im Vermerk liegt nie nach der Unterschrift
+        assert not _am or str(_f["stand"]) <= _am, f"freigaben.yaml: {_i} Stand {_f['stand']} nach der Unterschrift {_am}"
 frei = {}
-for _p, _u, _fehl, _e in BLOECKE:
+for _p, _u, _fehl, _e, _am in BLOECKE:
     for _i, _f in _e.items():
         frei.setdefault((_p, _u), {})[_i] = _f  # jüngster Block gewinnt (für Anzeige/Abgleich)
 SONDERFELDER = {"erklaerung", "stelle"}
+
+_offen_roh = yaml.safe_load(open(os.path.join(ROOT, "docs/freigabe-katalog/offene-punkte.yaml"), encoding="utf-8"))
+OFFEN = _offen_roh.get("offen") or []
+ERLEDIGT = _offen_roh.get("erledigt") or []
 
 _hist = {}
 
@@ -104,39 +145,105 @@ def gueltig(pfad, d, f, umfang):
     return all(alt.get(k) == d.get(k) for k in felder)
 
 
-def abgedeckt(pfad, d, p, u):
-    """Sind alle Felder im Umfang für die aktuelle Version freigegeben (inkl. Erklärung und Stelle)?"""
+def deckung(pfad, d, p, u, nur_unterschrieben):
+    """(abgedeckt, Stand, Unterschrift, Einschränkungen) für Prüfer p mit Umfang u in der aktuellen Version."""
     noetig = {"rest"} if u == "sanktion" else {"rest"} | SONDERFELDER
-    gedeckt = set()
-    for bp, bu, fehl, e in BLOECKE:
-        if (bp, bu) == (p, u) and gueltig(pfad, d, e.get(d["id"]), u):
+    gedeckt, staende, unterschriften, einschr = set(), [], [], []
+    for bp, bu, fehl, e, am in BLOECKE:
+        if (bp, bu) != (p, u) or (nur_unterschrieben and not am):
+            continue
+        f = e.get(d["id"])
+        if gueltig(pfad, d, f, u):
             gedeckt |= ({"rest"} | SONDERFELDER) - fehl
-    return noetig <= gedeckt
+            staende.append(str(f["stand"]))
+            if am:
+                unterschriften.append(am)
+            if f.get("einschraenkung"):
+                einschr.append(f["einschraenkung"])
+    ok = noetig <= gedeckt
+    return ok, (max(staende) if ok else None), (max(unterschriften) if ok and unterschriften else None), sorted(set(einschr))
 
 
-abweichung, uebersicht = [], {"freigegeben": 0, "in_pruefung": 0, "entwurf": 0}
-for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
-    text = open(pfad, encoding="utf-8").read()
-    d = yaml.safe_load(text)
+def abgedeckt(pfad, d, p, u, nur_unterschrieben=False):
+    """Sind alle Felder im Umfang für die aktuelle Version freigegeben (inkl. Erklärung und Stelle)?"""
+    return deckung(pfad, d, p, u, nur_unterschrieben)[0]
+
+
+def offene_punkte(d):
+    """Themen offener Prüfpunkte des Eintrags; prüft, dass jeder Stichwort-Punkt eingeordnet ist."""
+    themen, fehlend = [], []
+    for x in d.get("fachlich_zu_pruefen") or []:
+        x = str(x)
+        if any(re.search(t, x) for t in TECHNIK) or not any(re.search(o, x) for o in OFFEN_STICHWORTE):
+            continue
+        anfang = x[:60]
+        o = [p for p in OFFEN if p["id"] == d["id"] and p["punkt"] == anfang]
+        if o:
+            themen.append(o[0]["thema"])
+        elif not any(p["id"] == d["id"] and p["punkt"] == anfang for p in ERLEDIGT):
+            fehlend.append(anfang)
+    return themen, fehlend
+
+
+def auswerten(pfad, d):
+    """Prüfstand eines Eintrags: Status, Block für den Katalog und Angaben für Bericht und Nachprüfliste."""
     noetig = BENOETIGT[gebiet(d)]
-    passt = [(p, u, frei.get((p, u), {}).get(d["id"])) for p, u in noetig]
-    if all(abgedeckt(pfad, d, p, u) for p, u, _ in passt):
-        stand = max(f["stand"] for _, _, f in passt)
-        block = "pruefung:\n  status: freigegeben\n  geprueft_von:\n" + "".join(f"    - {p}\n" for p, _, _ in passt) + f"  geprueft_am: '{stand}'\n  geprueft_version: {d['version']}\n"
+    signiert = [(p, u) + deckung(pfad, d, p, u, True)[1:] + (deckung(pfad, d, p, u, True)[0],) for p, u in noetig]
+    themen, fehlend = offene_punkte(d)
+    info = {"id": d["id"], "version": d["version"], "rollen": [p for p, _ in noetig], "offen": themen, "nicht_eingeordnet": fehlend,
+            "ohne_unterschrift": [], "einschraenkung": []}
+    for p, u in noetig:
+        if not abgedeckt(pfad, d, p, u, True) and abgedeckt(pfad, d, p, u, False):
+            info["ohne_unterschrift"].append({"rolle": p, "umfang": u})
+    if all(s[-1] for s in signiert):
+        stand = max(s[2] for s in signiert)
+        am = max(s[3] for s in signiert)
+        einschr = sorted({e for s in signiert for e in s[4]})
+        info["einschraenkung"] = einschr
+        block = ("pruefung:\n  status: freigegeben\n  geprueft_von:\n" + "".join(f"    - {p}\n" for p, _ in noetig)
+                 + f"  geprueft_am: '{stand}'\n  geprueft_version: {d['version']}\n  unterschrieben_am: '{am}'\n")
+        if einschr:
+            block += f"  einschraenkung: {json.dumps('; '.join(einschr), ensure_ascii=False)}\n"
+        if themen:
+            block += "  offen:\n" + "".join(f"    - {json.dumps(t, ensure_ascii=False)}\n" for t in themen)
         status = "freigegeben"
     else:
-        irgendeine = any(f for _, _, f in passt)
+        irgendeine = any(frei.get((p, u), {}).get(d["id"]) for p, u in noetig)
         status = "in_pruefung" if irgendeine else "entwurf"
         block = f"pruefung:\n  status: {status}\n  geprueft_von: null\n  geprueft_am: null\n"
-    uebersicht[status] += 1
-    neu, n = re.subn(r"^pruefung:.*?(?=^[^\s#-]|\Z)", block, text, count=1, flags=re.M | re.S)
-    assert n == 1, d["id"]
-    if neu != text:
-        abweichung.append(d["id"])
-        if not PRUEFEN:
-            open(pfad, "w", encoding="utf-8").write(neu)
+    info["status"] = status
+    return status, block, info
 
-print(uebersicht, f"geändert: {len(abweichung)}")
-if PRUEFEN and abweichung:
-    print("Katalog weicht vom Freigabe-Register ab:", ", ".join(abweichung[:20]))
-    sys.exit(1)
+
+def alle():
+    for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
+        text = open(pfad, encoding="utf-8").read()
+        yield pfad, text, yaml.safe_load(text)
+
+
+if __name__ == "__main__":
+    abweichung, uebersicht, berichte, ungeordnet = [], {"freigegeben": 0, "in_pruefung": 0, "entwurf": 0}, [], []
+    for pfad, text, d in alle():
+        status, block, info = auswerten(pfad, d)
+        uebersicht[status] += 1
+        berichte.append(info)
+        ungeordnet += [f"{d['id']}: {x}" for x in info["nicht_eingeordnet"]]
+        neu, n = re.subn(r"^pruefung:.*?(?=^[^\s#-]|\Z)", block, text, count=1, flags=re.M | re.S)
+        assert n == 1, d["id"]
+        if neu != text:
+            abweichung.append(d["id"])
+            if not PRUEFEN:
+                open(pfad, "w", encoding="utf-8").write(neu)
+
+    je_rolle = {r: sum(1 for b in berichte if b["status"] == "freigegeben" and r in b["rollen"]) for r in ROLLEN}
+    print(uebersicht, f"geändert: {len(abweichung)}", "je Rolle:", je_rolle)
+    if BERICHT:
+        for b in berichte:
+            if b["ohne_unterschrift"] or b["offen"] or b["einschraenkung"]:
+                print(json.dumps(b, ensure_ascii=False))
+    if ungeordnet:
+        print("Prüfpunkte ohne Einordnung in offene-punkte.yaml:", *ungeordnet, sep="\n  ")
+        sys.exit(1)
+    if PRUEFEN and abweichung:
+        print("Katalog weicht vom Freigabe-Register ab:", ", ".join(abweichung[:20]))
+        sys.exit(1)

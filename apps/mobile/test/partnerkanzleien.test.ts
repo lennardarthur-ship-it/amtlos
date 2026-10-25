@@ -1,6 +1,6 @@
 /**
  * Partnerkanzleien „Steuerberatung finden“ (docs/15-partnerkanzleien.md): feste Listungsgebühr, nie Provision je Mandat
- * (§ 9 StBerG, § 49b Abs. 3 BRAO – Prüfbericht Dr. Weber, Abschnitt 7). Vorsorglich gebaut und verborgen, solange die
+ * (§ 9 StBerG, § 49b Abs. 3 BRAO – Prüfbericht Rechtsanwalt, Abschnitt 7). Vorsorglich gebaut und verborgen, solange die
  * gebündelte Liste leer ist.
  */
 import fs from "node:fs";

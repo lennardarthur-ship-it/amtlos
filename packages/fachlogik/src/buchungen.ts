@@ -5,7 +5,7 @@
  * ohne Gerät; die Kodierung nach Windows-1252 liefert `datevExtfBytes`, das Schreiben der Datei ist Sache des Aufrufers.
  *
  * Fachlich zu prüfen – siehe `pruefpunkteBuchungen()` und PRUEFLISTE:
- * - Die Spaltenliste der Buchungszeile (125 Felder der Version 700) hat die Kanzlei Heckler und Busch (21.10.2026, 3.1)
+ * - Die Spaltenliste der Buchungszeile (125 Felder der Version 700) hat die Steuerberatungskanzlei (21.10.2026, 3.1)
  *   byteweise gegen das DATEV-Format geprüft: formal konform. Gefüllt werden die Kernfelder 1–14, Beleginfo 1 (stabile
  *   Buchungs-GUID), 36 KOST1, 40 EU-Land u. UStID, 114 Festschreibung (0), 115/116 und 118 Generalumkehr.
  * - Im Dateikopf stehen „Datum vom“ und „Datum bis“ als JJJJMMTT (wie der Wirtschaftsjahresbeginn), nicht als TTMMJJJJ;
@@ -18,7 +18,7 @@
  * Belege einer Kapitalgesellschaft bleiben aus dem Stapel (nur Belegliste); Leistungsdatum und Datum der Steuerperiode
  * stehen in den Feldern 115/116; Forderungen und Verbindlichkeiten auf Konten ohne Kontokorrent.
  *
- * StB-Prüfung Heckler und Busch (21.10.2026, Abschnitt 3 und 4):
+ * StB-Prüfung Steuerberatungskanzlei (21.10.2026, Abschnitt 3 und 4):
  * - A-1: Bei Belegen (Eingangsrechnungen, Gutschriften, Kassenfehlbeträgen) steht das Verbindlichkeits-, Kassen-, Bank-
  *   bzw. Privatkonto in Feld 7 „Konto“ (im Haben), das Sachkonto mit BU-Schlüssel in Feld 8 „Gegenkonto“ – der
  *   BU-Schlüssel bezieht sich in DATEV auf das Gegenkonto. Erlös- und Skontobuchungen waren schon so aufgebaut.
@@ -152,7 +152,7 @@ export interface AusgangsRechnungFuerBuchung {
 
 /**
  * OSS, Feld 40 „EU-Land u. UStID (Bestimmung)“: bei Fernverkäufen und Leistungen an Privatpersonen nur das
- * Länderkennzeichen des Bestimmungslands, keine USt-IdNr. (Nachtrag der Kanzlei Heckler und Busch vom 22.10.2026).
+ * Länderkennzeichen des Bestimmungslands, keine USt-IdNr. (Nachtrag der Steuerberatungskanzlei vom 22.10.2026).
  * Kennzeichen wie in der USt-IdNr. bzw. im OSS-Verfahren – Griechenland „EL“ statt ISO „GR“.
  */
 export const ossLandKennzeichen = (land: string) => {
@@ -244,8 +244,8 @@ export const BUCHUNGSKONTEN: Record<
     erloese: { 19: string; 7: string; 0: string; ku: string; igl: string; rc13b: string; eu: string; drittland: string; nullsatz: string; oss: string };
     /*
      * Koordination Rechnungen (OSS, § 18j UStG): `erloese.oss` – „Erlöse aus im anderen EU-Land steuerpflichtigen
-     * Lieferungen“ SKR03 8320 / SKR04 4320 (DATEV-Bereich 8320–8329 bzw. 4320–4329), Kontenbereich von der Kanzlei Heckler
-     * und Busch bestätigt (Nachtrag 22.10.2026). Land in Feld 40 (bei Privatpersonen nur das Länderkennzeichen, keine
+     * Lieferungen“ SKR03 8320 / SKR04 4320 (DATEV-Bereich 8320–8329 bzw. 4320–4329), Kontenbereich von die Steuerberatungskanzlei
+     * und Steuerberater bestätigt (Nachtrag 22.10.2026). Land in Feld 40 (bei Privatpersonen nur das Länderkennzeichen, keine
      * USt-IdNr.) und Steuersatz des Bestimmungslands in Feld 41. Offen (PRUEFLISTE T-128): Steuerschlüssel – über die
      * Kontenvorgaben änderbar.
      */

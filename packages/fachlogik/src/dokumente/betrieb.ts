@@ -166,7 +166,7 @@ export const HR_KAPITAL_EURO = "Stammkapital und Geschäftsanteile in vollen Eur
 
 const HR_FORMEN = ["GmbH", "UG (haftungsbeschränkt)", "e. K.", "OHG", "KG", "GmbH & Co. KG"].map((r) => ({ wert: r, text: r }));
 /**
- * Nachprüfung RA Dr. Weber (23.10.2026): für OHG und KG Rechtsform-abhängige Abschnitte – Kommanditisten mit Hafteinlage
+ * Nachprüfung Rechtsanwalt (23.10.2026): für OHG und KG Rechtsform-abhängige Abschnitte – Kommanditisten mit Hafteinlage
  * (§ 162 Abs. 1 HGB), Vertretungsregelung der Gesellschafter (§ 106 Abs. 2 Nr. 3 HGB) und der Hinweis, dass alle
  * Gesellschafter anmelden (§ 106 Abs. 7 HGB).
  */
@@ -245,7 +245,7 @@ export const handelsregister: Vorlage = {
     const rechtsform = hrRechtsform(d, b);
     // Kapitalgesellschaft: Gesellschafter und Stammkapital gehören immer dazu (leer als Zeilen zum Ausfüllen)
     const kapitalgesellschaft = rechtsform === "GmbH" || rechtsform === "UG (haftungsbeschränkt)";
-    // Dr. Weber (23.10.2026): OHG und KG – Gesellschafter mit Stellung und Hafteinlage, Vertretungsregelung, alle melden an
+    // Rechtsanwalt (23.10.2026): OHG und KG – Gesellschafter mit Stellung und Hafteinlage, Vertretungsregelung, alle melden an
     const personengesellschaft = HR_PERSONENGESELLSCHAFT.includes(rechtsform);
     const kg = HR_KG.includes(rechtsform);
     const stellung = (x: Eintrag) => {

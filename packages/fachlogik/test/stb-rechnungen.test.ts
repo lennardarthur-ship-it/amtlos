@@ -1,5 +1,5 @@
 /**
- * Steuerliche Prüfung Heckler und Busch (21.10.2026): Rechnungen, XRechnung, Voranmeldung, OSS und ZM –
+ * Steuerliche Prüfung Steuerberatungskanzlei (21.10.2026): Rechnungen, XRechnung, Voranmeldung, OSS und ZM –
  * Nullsteuersatz (B-2, C-12), Privatkunde mit Grundstücksbezug (C-3), Leitweg-ID (C-13), Skonto in BT-20 (C-15),
  * Schlussrechnung (C-4), Ersatzrechnung (C-6), volle Euro in der Voranmeldung (5.2), OSS und ZM (5.2, C-9),
  * Gutschrift-Nummernkreis (B-12), Einheitencodes (C-17), Nachlass als AllowanceCharge (C-16), Registerangaben (C-14).

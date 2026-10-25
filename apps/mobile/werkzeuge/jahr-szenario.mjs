@@ -399,7 +399,7 @@ md.push(`# Jahres-Szenario „${B.name}“ 2026`, "",
   "**Neu erzeugen:** `cd apps/mobile && node werkzeuge/jahr-szenario.mjs /tmp/claude-0/jahr` (optional `KOSIT=<ordner mit v/ und cfg/>` für den KoSIT-Validator). Alle Namen, Anschriften, Steuer- und Kontonummern sind erfunden.", "",
   "## Betrieb", "",
   tab(["Angabe", "Wert"], [
-    ["Name", `${B.name}, ${B.strasse}, ${B.plz} ${B.ort} (${B.bundesland})`], ["Rechtsform", "Einzelunternehmen, Inhaberin Jana Weber, gegründet 01.03.2022"], ["Steuer", `StNr ${B.steuernummer}, USt-IdNr ${B.ust_idnr}, Regelbesteuerung, Soll-Versteuerung, Voranmeldung vierteljährlich, Gewinnermittlung EÜR`],
+    ["Name", `${B.name}, ${B.strasse}, ${B.plz} ${B.ort} (${B.bundesland})`], ["Rechtsform", "Einzelunternehmen, Inhaberin Jana Winter, gegründet 01.03.2022"], ["Steuer", `StNr ${B.steuernummer}, USt-IdNr ${B.ust_idnr}, Regelbesteuerung, Soll-Versteuerung, Voranmeldung vierteljährlich, Gewinnermittlung EÜR`],
     ["Bank", `${B.bank}, IBAN ${B.iban}, BIC ${B.bic}`], ["Kontakt", `${B.telefon}, ${B.email}, ${B.website}`], ["Beschäftigte", "Sabine Krüger (Köchin, Vollzeit seit 03/2022), Leon Schubert (Service, Minijob seit 09/2025)"],
     ["Kasse", "Tablet-Kasse KassaVista mit Cloud-TSE (Kassenmeldung 2025); Bargeldkasse mit Kassenbuch"], ["Steuerberatung", "Albrecht & Partner (Jahresabschluss), DATEV SKR03, Berater 29098 / Mandant 10457"],
   ]), "");

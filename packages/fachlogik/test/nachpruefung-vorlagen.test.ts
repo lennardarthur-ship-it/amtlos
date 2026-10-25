@@ -1,6 +1,6 @@
 /**
  * Nachprüfung der Vorlagen (23.10.2026, docs/pruefberichte/2026-10-23-rueckmeldungen-runde-nachpruefung.json): Änderungen
- * nach StB Busch (8 Vorlagen), T. Koch (4 Vorlagen, 14 Baustein-Anmerkungen, Hinweise zum Hygieneplan) und RA Dr. Weber
+ * nach Steuerberater (8 Vorlagen), Sifa (4 Vorlagen, 14 Baustein-Anmerkungen, Hinweise zum Hygieneplan) und Rechtsanwalt
  * (Handelsregister für OHG/KG).
  */
 import { describe, expect, it } from "vitest";
@@ -17,7 +17,7 @@ const leer = (id: string, b: Betrieb = B) => glatt(dokumentHtml(vorlageFuer(id)!
 const feld = (id: string, f: string) => vorlageFuer(id)!.abschnitte.flatMap((a) => a.felder).find((x) => x.id === f);
 const vorschlaege = (id: string, f: string) => (feld(id, f) as ListenFeld).vorschlaege ?? [];
 
-describe("StB Busch: Bilanz und GuV", () => {
+describe("Steuerberater: Bilanz und GuV", () => {
   it("Anhang nur bei Kapitalgesellschaft und GmbH & Co. KG; OHG, KG und e. K. ohne Anhang", () => {
     expect(html("bilanz_guv", { kleinst: false }, { ...B, rechtsform: "GmbH" })).toContain(BILANZ_ANHANG);
     expect(html("bilanz_guv", { kleinst: false }, { ...B, name: "Muster GmbH & Co. KG", rechtsform: "GmbH & Co. KG" })).toContain(BILANZ_ANHANG);
@@ -37,7 +37,7 @@ describe("StB Busch: Bilanz und GuV", () => {
   });
 });
 
-describe("StB Busch: Umsatzsteuer-Voranmeldung – innergemeinschaftliche Erwerbe", () => {
+describe("Steuerberater: Umsatzsteuer-Voranmeldung – innergemeinschaftliche Erwerbe", () => {
   it("Kz 89/93 mit Steuer aus vollen Euro, Vorsteuer Kz 61, Zahllast", () => {
     const v = vorlageFuer("ust_voranmeldung")!;
     const d: Daten = { zeitraum: "Oktober 2026", umsatz_19: "1.000,00", vorsteuer: "0", ige_19: "500,50", ige_7: "100,00", vorsteuer_ige: "102,00" };
@@ -55,7 +55,7 @@ describe("StB Busch: Umsatzsteuer-Voranmeldung – innergemeinschaftliche Erwerb
   });
 });
 
-describe("StB Busch: OSS, ZM, Steuererklärung, Kassenbuch, Aufbewahrung, Personalfragebogen", () => {
+describe("Steuerberater: OSS, ZM, Steuererklärung, Kassenbuch, Aufbewahrung, Personalfragebogen", () => {
   it("OSS: Lieferschwelle im Wortlaut, Korrekturen früherer Quartale; Hinweis bei negativen Beträgen", () => {
     const h = leer("oss_meldung");
     expect(h).toContain(OSS_LIEFERSCHWELLE);
@@ -104,7 +104,7 @@ describe("StB Busch: OSS, ZM, Steuererklärung, Kassenbuch, Aufbewahrung, Person
   });
 });
 
-describe("T. Koch: Vorlagen", () => {
+describe("Sifa: Vorlagen", () => {
   it("Betriebsanweisung: Piktogramme nur als Text, ohne Raute; B-240 und B-241 im Wortlaut des Prüfers", () => {
     const h = html("betriebsanweisung", { piktogramme: ["GHS02", "GHS05"] });
     expect(h).toContain('<span class="ghs-eintrag">GHS02 Flamme</span>');
@@ -144,14 +144,14 @@ describe("T. Koch: Vorlagen", () => {
     const nagel = vorschlaege("hautschutzplan", "eintraege").find((x) => x.titel.startsWith("Nagelmodellage"))!;
     expect(nagel.werte!.handschuhe).toMatch(/nach direktem Kontakt mit Acrylaten sofort/);
   });
-  it("Hygieneplan (Beauty): Durchgangsarzt statt Hausarzt, HIV-PEP möglichst innerhalb von 2 Stunden (seit Weber Runde 3 mit Obergrenze)", () => {
+  it("Hygieneplan (Beauty): Durchgangsarzt statt Hausarzt, HIV-PEP möglichst innerhalb von 2 Stunden (seit Rechtsanwalt Runde 3 mit Obergrenze)", () => {
     const z = HYGIENE.find((x) => x.titel === "Umgang mit Blut – Stich-/Schnittverletzung der beschäftigten Person")!;
     expect(z.werte!.wie).toContain("sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen – eine HIV-Postexpositionsprophylaxe sollte möglichst innerhalb von 2 Stunden beginnen");
     expect(z.werte!.wie).not.toContain("Hausarzt");
   });
 });
 
-describe("T. Koch: Bausteine der Gefährdungsbeurteilung", () => {
+describe("Sifa: Bausteine der Gefährdungsbeurteilung", () => {
   const gef = vorschlaege("gefaehrdungsbeurteilung", "gefaehrdungen");
   it("DGUV Regel 110-010 statt DGUV Vorschrift 79 (B-054, B-200, B-233); TRBA 220 gestrichen (B-218)", () => {
     for (const x of [...gef, ...PRUEF_VORSCHLAEGE]) expect(x.quelle ?? "", x.titel).not.toContain("DGUV Vorschrift 79");
@@ -169,7 +169,7 @@ describe("T. Koch: Bausteine der Gefährdungsbeurteilung", () => {
   });
 });
 
-describe("RA Dr. Weber: Handelsregister für OHG und KG", () => {
+describe("Rechtsanwalt: Handelsregister für OHG und KG", () => {
   it("KG: Kommanditisten mit Hafteinlage, Vertretungsregelung der Gesellschafter, alle Gesellschafter melden an", () => {
     const d: Daten = { rechtsform: "KG", firma: "Muster KG", gesellschafter: [{ name: "Anna Berg", geburtsdatum: "1980-01-01", wohnort: "Ulm", stellung: "phg" }, { name: "Ben Kurz", geburtsdatum: "1985-02-02", wohnort: "Ulm", stellung: "kommandit", hafteinlage: "10.000" }], vertretung: "Anna Berg vertritt allein." };
     const h = html("handelsregister", d);

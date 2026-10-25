@@ -1,5 +1,5 @@
 /**
- * Personenkonten für Kunden und Lieferanten (E-165, StB-Prüfung Heckler und Busch A-3/E-1, Abschnitt 10 Prio 3):
+ * Personenkonten für Kunden und Lieferanten (E-165, StB-Prüfung Steuerberatungskanzlei A-3/E-1, Abschnitt 10 Prio 3):
  * optional (Kontenvorgabe „Personenkonten für Kunden und Lieferanten (OPOS)“, Standard aus) bekommt jeder Kunde ein
  * Debitorenkonto und jeder Lieferant ein Kreditorenkonto. Die Kanzlei kann dann offene Posten (OPOS) führen und
  * Bankzahlungen aus dem Kontoauszug gegen die Rechnungsnummer (Belegfeld 1) ausziffern.

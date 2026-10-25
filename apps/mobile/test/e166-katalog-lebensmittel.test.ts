@@ -1,5 +1,5 @@
 /**
- * Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026), Abschnitt E: Katalog – Wassertank im Check mit Frist ab der
+ * Prüfbericht Lebensmittelhygiene (Lebensmittelfachbeauftragter, 22.10.2026), Abschnitt E: Katalog – Wassertank im Check mit Frist ab der
  * Inbetriebnahme, abgepackte Ware, Rückverfolgbarkeit auch im Onlinehandel mit Lebensmitteln, neue Hinweise
  * (Kontaktmaterialien, Acrylamid), Schulungsnachweis und Zusatzstoffe im Text.
  */
@@ -42,14 +42,14 @@ describe("Prüfbericht Lebensmittelhygiene: Wassertank im Check", () => {
 describe("Prüfbericht Lebensmittelhygiene: neue und geänderte Katalogeinträge", () => {
   it("abgepackte Ware: Frage im Check der Lebensmittelbranche, Kennzeichnung nur bei Ja", () => {
     expect(felder(cafe)).toContain("gastro.vorverpackt");
-    // Rückmeldung T. Baum 22.10.2026: Onlinehändler mit Lebensmitteln werden ebenfalls gefragt, ohne Lebensmittel nicht
+    // Rückmeldung Lebensmittelfachbeauftragter 22.10.2026: Onlinehändler mit Lebensmitteln werden ebenfalls gefragt, ohne Lebensmittel nicht
     expect(felder(feinkost)).toContain("gastro.vorverpackt");
     expect(felder({ ...feinkost, "produkte.arten": ["physisch"] })).not.toContain("gastro.vorverpackt");
     expect(finde(auswertung(cafe, "2026-10-22"), "branche.gastro_kennzeichnung_vorverpackt")!.offeneFragen).toContain("gastro.vorverpackt");
     expect(ids(auswertung({ ...cafe, "gastro.vorverpackt": true }, "2026-10-22").gilt)).toContain("branche.gastro_kennzeichnung_vorverpackt");
     expect(finde(auswertung({ ...cafe, "gastro.vorverpackt": false }, "2026-10-22"), "branche.gastro_kennzeichnung_vorverpackt")).toBeUndefined();
   });
-  it("abgepackte Ware im Onlinehandel mit Lebensmitteln (Rückmeldung T. Baum): Kennzeichnung bei Ja, Abgrenzung zu loser Ware im Text", () => {
+  it("abgepackte Ware im Onlinehandel mit Lebensmitteln (Rückmeldung Lebensmittelfachbeauftragter): Kennzeichnung bei Ja, Abgrenzung zu loser Ware im Text", () => {
     expect(finde(auswertung(feinkost, "2026-10-22"), "branche.gastro_kennzeichnung_vorverpackt")!.offeneFragen).toContain("gastro.vorverpackt");
     expect(ids(auswertung({ ...feinkost, "gastro.vorverpackt": true }, "2026-10-22").gilt)).toContain("branche.gastro_kennzeichnung_vorverpackt");
     expect(finde(auswertung({ ...feinkost, "gastro.vorverpackt": true, "produkte.arten": ["physisch"] }, "2026-10-22"), "branche.gastro_kennzeichnung_vorverpackt")).toBeUndefined();
@@ -62,7 +62,7 @@ describe("Prüfbericht Lebensmittelhygiene: neue und geänderte Katalogeinträge
     expect(finde(auswertung({ ...feinkost, "produkte.arten": ["physisch"] }, "2026-10-22"), "branche.gastro_rueckverfolgbarkeit")).toBeUndefined();
     expect(text(pflicht("branche.gastro_rueckverfolgbarkeit").erklaerung)).toMatch(/Ware sperren, Lebensmittelüberwachung informieren \(Art\. 19 VO \(EG\) Nr\. 178\/2002\)/);
   });
-  it("Acrylamid nur, wer selbst backt oder frittiert (Rückmeldung T. Baum): Frage nur in der Lebensmittelbranche", () => {
+  it("Acrylamid nur, wer selbst backt oder frittiert (Rückmeldung Lebensmittelfachbeauftragter): Frage nur in der Lebensmittelbranche", () => {
     expect(felder(cafe)).toContain("gastro.backen_frittieren");
     expect(felder(feinkost)).not.toContain("gastro.backen_frittieren");
     expect(finde(auswertung(cafe, "2026-10-22"), "branche.gastro_acrylamid")!.offeneFragen).toContain("gastro.backen_frittieren");

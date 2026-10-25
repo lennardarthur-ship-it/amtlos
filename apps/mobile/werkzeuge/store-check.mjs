@@ -162,7 +162,7 @@ const pruefeA = (bed, text) => (bed ? okA : offenA).push(text);
     if (rcAndroid) pruefeA(/^goog_/.test(rcAndroid), "RevenueCat-Schlüssel ist der öffentliche Google-Play-Schlüssel (beginnt mit „goog_“)");
   }
   // Rechtstexte
-  pruefeA(/export const DATENSCHUTZ_ANDROID = \{\s*freigegeben: true/.test(recht), "Datenschutzhinweis der Android-App freigegeben (DATENSCHUTZ_ANDROID.freigegeben, Entwurf docs/datenschutz-android-entwurf.md – RA Dr. Weber, PRUEFLISTE T-177)");
+  pruefeA(/export const DATENSCHUTZ_ANDROID = \{\s*freigegeben: true/.test(recht), "Datenschutzhinweis der Android-App freigegeben (DATENSCHUTZ_ANDROID.freigegeben, Entwurf docs/datenschutz-android-entwurf.md – Rechtsanwalt, PRUEFLISTE T-177)");
   pruefeA(/export const NUTZUNGSBEDINGUNGEN = \{[^}]*?freigegeben: true/.test(recht), "Nutzungsbedingungen mit Android-Teil freigegeben (docs/nutzungsbedingungen-android-entwurf.md, PRUEFLISTE T-178) – bis dahin zeigt die Android-App keinen Link auf Nutzungsbedingungen");
   // Play Console
   const ds = play.datensicherheit ?? {};

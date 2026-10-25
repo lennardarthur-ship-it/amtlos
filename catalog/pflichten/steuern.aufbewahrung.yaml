@@ -1,4 +1,4 @@
-# Katalog C.32 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
+# Katalog C.32 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt
 # Ablaufhemmung: in der ab 01.01.2025 geltenden Fassung § 147 Abs. 3 Satz 5 AO (Satz 3, 4: Lieferscheine) – lxgesetze.de 22.10.2026
 schema_version: 1
 id: steuern.aufbewahrung
@@ -68,6 +68,7 @@ fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 4
+  unterschrieben_am: '2026-10-23'

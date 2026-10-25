@@ -1,5 +1,5 @@
 /**
- * StB-Prüfung Heckler und Busch (21.10.2026, Abschnitt 5.2, C-9, Frage 14): Meldungen an das Bundeszentralamt für
+ * StB-Prüfung Steuerberatungskanzlei (21.10.2026, Abschnitt 5.2, C-9, Frage 14): Meldungen an das Bundeszentralamt für
  * Steuern zu Umsätzen mit dem übrigen Gemeinschaftsgebiet – als Übertragungshilfe wie die Voranmeldung:
  *
  * - OSS-Erklärung (One-Stop-Shop, § 18j UStG): Fernverkäufe und Leistungen an Privatpersonen im EU-Ausland, die dort
@@ -33,11 +33,11 @@ export const landName = (t: string) => EU_LAENDER_NAMEN[t.trim().toUpperCase() =
 export const OSS_FRIST = "bis zum letzten Tag des Monats nach Ablauf des Quartals über das BZStOnline-Portal zu übermitteln und zu zahlen (§ 18j Abs. 4 UStG) – die Frist verschiebt sich nicht, wenn sie auf ein Wochenende oder einen Feiertag fällt";
 export const OSS_NICHT_VA = "OSS-Umsätze gehören nicht in die deutsche Umsatzsteuer-Voranmeldung; die Steuer zahlst du an das BZSt, das sie an die Bestimmungsländer weiterleitet.";
 export const ZM_FRIST = "bis zum 25. Tag nach Ablauf des Meldezeitraums elektronisch an das BZSt zu übermitteln (§ 18a Abs. 1 UStG)";
-/** StB Busch (Durchsicht 23.10.2026): Lieferschwelle nach § 3c Abs. 4 UStG (Wortlaut des Prüfers). */
+/** Steuerberater (Durchsicht 23.10.2026): Lieferschwelle nach § 3c Abs. 4 UStG (Wortlaut des Prüfers). */
 export const OSS_LIEFERSCHWELLE = "Die Lieferschwelle von 10.000 € gilt EU-weit für Fernverkäufe von Waren sowie Telekommunikations-, Rundfunk- und elektronische Dienstleistungen an Privatpersonen; sie ist überschritten, wenn diese Umsätze im Vorjahr oder im laufenden Jahr insgesamt mehr als 10.000 € betragen (§ 3c Abs. 4 UStG).";
-/** StB Busch (Durchsicht 23.10.2026): Korrekturen früherer Quartale. */
+/** Steuerberater (Durchsicht 23.10.2026): Korrekturen früherer Quartale. */
 export const OSS_KORREKTUR = "Korrekturen früherer Quartale gehören nicht als negative Beträge in das laufende Quartal, sondern in den Berichtigungsteil einer späteren Erklärung.";
-/** StB Busch (Durchsicht 23.10.2026): Meldezeitraum nach § 18a Abs. 1 Satz 2 UStG. */
+/** Steuerberater (Durchsicht 23.10.2026): Meldezeitraum nach § 18a Abs. 1 Satz 2 UStG. */
 export const ZM_ZEITRAUM = "Meldezeitraum ist der Kalendermonat; vierteljährlich ist wählbar, wenn die innergemeinschaftlichen Lieferungen weder im laufenden noch in einem der vier vorangegangenen Quartale jeweils 50.000 € übersteigen (§ 18a Abs. 1 Satz 2 UStG), und bei nur sonstigen Leistungen. Wird die Grenze im laufenden Quartal überschritten, ist ab dem Monat der Überschreitung monatlich zu melden.";
 export const ZM_SKONTO = "Ändert sich die Bemessungsgrundlage später (z. B. Skonto, Rabatt, Rücksendung), ist die Meldung für den ursprünglichen Meldezeitraum innerhalb eines Monats zu berichtigen (§ 18a Abs. 10 UStG).";
 
@@ -93,7 +93,7 @@ export const oss: Vorlage = {
   pruefen(d) {
     return ossZeilen(d).some((z) => z.satz === null && text(z.e, "satz").trim()) ? ["Steuersatz je Zeile als Zahl, z. B. 20 oder 5,5"] : [];
   },
-  // StB Busch (Durchsicht 23.10.2026): negative Beträge sind meist Korrekturen früherer Quartale
+  // Steuerberater (Durchsicht 23.10.2026): negative Beträge sind meist Korrekturen früherer Quartale
   hinweise(d) {
     return ossZeilen(d).some((z) => z.netto < 0) ? [OSS_KORREKTUR] : [];
   },

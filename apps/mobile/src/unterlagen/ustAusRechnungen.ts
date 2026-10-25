@@ -30,7 +30,7 @@
  * - Ersatzrechnung nach Storno über die ausdrückliche Verknüpfung (`ersetzt`, gesetzt beim Kopieren aus der stornierten
  *   Rechnung); nur bei älteren Daten ohne Verknüpfung vorsichtig geraten: gleicher Kunde, gleicher Betrag, gleiche Leistung.
  *
- * StB-Prüfung Heckler und Busch (21.10.2026):
+ * StB-Prüfung Steuerberatungskanzlei (21.10.2026):
  * - C-6: Ersatzrechnung auch über das Feld „Ersetzt die stornierte Rechnung Nr.“ – wirkt als Korrektur im Zeitraum des
  *   Stornos (Nettoeffekt dort), nicht als neue Leistung.
  * - C-4: Schlussrechnung zählt nur mit dem Rest nach den abgesetzten Abschlägen (die Abschläge sind mit ihrer Zahlung

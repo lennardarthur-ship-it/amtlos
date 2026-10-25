@@ -1289,7 +1289,7 @@ export const T = {
   r12_beleg_skonto: "Skonto abgezogen (brutto)",
   r12_beleg_skonto_hilfe: "Hast du beim Bezahlen Skonto abgezogen? Dann mindert sich die Vorsteuer im Monat der Zahlung (§ 17 UStG).",
   r12_beleg_gezahlt: (b: string) => `Gezahlt: ${b}`,
-  // StB Rechnungen (Prüfbericht Heckler und Busch, 21.10.2026: Rechnung, Voranmeldung, OSS, ZM)
+  // StB Rechnungen (Prüfbericht Steuerberatungskanzlei, 21.10.2026: Rechnung, Voranmeldung, OSS, ZM)
   stb_ersatz_nummern: (nummern: string[]) => `Nach dem Rechnungsdatum zugeordnet: ${nummern.join(", ")} – die Liste steht auch auf der Voranmeldung.`,
   stb_oss_nicht_va: (n: number) => `${n === 1 ? "1 OSS-Rechnung" : `${n} OSS-Rechnungen`} mit der Steuer des Bestimmungslands nicht übernommen – sie ${n === 1 ? "gehört" : "gehören"} in die OSS-Erklärung beim BZSt.`,
   stb_eu_titel: { oss: "Aus deinen OSS-Rechnungen übernehmen", zm: "Aus deinen Rechnungen an Unternehmen in der EU übernehmen" },
@@ -1574,7 +1574,7 @@ export const T = {
   go_h_grund: "Bei einer Gründung: Neuerrichtung bzw. Neugründung.",
   go_h_erlaubnis: "Nur bei erlaubnispflichtigem Gewerbe oder zulassungspflichtigem Handwerk: Ausstellungsdatum und Behörde bzw. Handwerkskammer.",
   go_h_erlaubnis_noetig: "Nach deinen Angaben im Check kommt eine Erlaubnis oder die Handwerkskarte in Frage: Ausstellungsdatum und Behörde bzw. Handwerkskammer.",
-  // StB GoBD (Prüfbericht Heckler und Busch, D-11): Vollsicherung außerhalb des Geräts mit Erinnerung und Nachweis
+  // StB GoBD (Prüfbericht Steuerberatungskanzlei, D-11): Vollsicherung außerhalb des Geräts mit Erinnerung und Nachweis
   stb_vollsicherung_titel: "Zeit für eine Vollsicherung",
   stb_vollsicherung_faellig: (tage: number | null) => (tage === null ? `Noch keine Sicherung außerhalb des ${W.geraetGenitiv}. Geht es verloren, wären Rechnungen und Belege weg – einmal im Monat sichern.` : `Deine letzte Sicherung außerhalb des ${W.geraetGenitiv} ist ${tage} Tage alt. Einmal im Monat als Datei sichern – auf dem Computer, einem USB-Stick oder in einem Cloud-Speicher.`),
   stb_letzte_vollsicherung: (t: string | null) => (t ? `Letzte Sicherung außerhalb des Geräts: ${t}` : "Noch keine Sicherung außerhalb des Geräts festgehalten."),

@@ -1,7 +1,7 @@
 # 15 · Partnerkanzleien: „Steuerberatung finden“
 
 Stand: 2026-10-21. Vorsorglich gebaut und **verborgen**: Die gebündelte Liste `KANZLEIEN` ist leer, deshalb zeigt die
-App den Bereich nirgends. Markierungen: **[mit Anwalt klären]** = vor dem ersten Listungsvertrag von Dr. Weber prüfen
+App den Bereich nirgends. Markierungen: **[mit Anwalt klären]** = vor dem ersten Listungsvertrag von Rechtsanwalt prüfen
 lassen.
 
 ## 1. Modell
@@ -19,14 +19,14 @@ lassen.
 - **Free/Pro:** Liste und Kontakt sind für alle frei (Verweis, keine Funktion). Das Steuerberater-Paket selbst bleibt
   Pro wie bisher – auch, wenn es an eine gelistete Kanzlei geht.
 
-### Rechtsgrundlage (Prüfbericht Dr. Weber, 21.10.2026, Abschnitt 7, Frage 4)
+### Rechtsgrundlage (Prüfbericht Rechtsanwalt, 21.10.2026, Abschnitt 7, Frage 4)
 
 > Vermittlung gegen Erfolgsprovision an Anwälte verstößt gegen § 49b Abs. 3 BRAO; gegenüber Steuerberatern § 9 StBerG.
 > Zulässig sind feste Listungsgebühren oder Plattformentgelte ohne Bezug zum Mandat. Nicht bauen, bevor das
 > Vergütungsmodell steht (J-4).
 
 Das Vergütungsmodell ist damit festgelegt: feste Listungsgebühr ohne Bezug zum Mandat. J-4 (ENTSCHEIDUNGEN.md) gilt
-als geklärt, sobald Dr. Weber den Listungsvertrag und die Texte unten freigegeben hat. Anwälte werden vorerst nicht
+als geklärt, sobald Rechtsanwalt den Listungsvertrag und die Texte unten freigegeben hat. Anwälte werden vorerst nicht
 gelistet (Berufsbezeichnung nur Steuerberater/in bzw. Steuerberatungsgesellschaft).
 
 ## 2. Was die App zeigt
@@ -103,7 +103,7 @@ im Blatt ist sie auswählbar. Ein Mail-Composer mit vorausgefülltem Empfänger 
 - **Werbung/Berufsrecht:** Kanzlei sichert zu, dass ihre Angaben dem Berufsrecht entsprechen (§ 57a StBerG,
   sachliche Information); keine Bewertungen oder „Empfehlungen“ der App.
 
-## 5. Vor dem Livegang mit Dr. Weber prüfen  **[mit Anwalt klären]**
+## 5. Vor dem Livegang mit Rechtsanwalt prüfen  **[mit Anwalt klären]**
 
 - Listungsvertrag (Muster nach Abschnitt 4).
 - Wortlaut in der App: Transparenzsatz, „laut Kanzlei“, Abschnittstitel „Steuerberatung finden“, Hinweis

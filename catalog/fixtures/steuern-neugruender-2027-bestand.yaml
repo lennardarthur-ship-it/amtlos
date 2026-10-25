@@ -1,0 +1,11 @@
+persona: bestand
+beschreibung: Steuerberater 22.10.2026 – etablierter Betrieb, die monatliche Voranmeldung für Neugründer ab 2027 betrifft ihn nicht
+stichtag: "2027-01-15"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2010-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.bundesland: BY
+  profil.gemeinde_ags: "09162000"
+erwartet:
+  steuern.ust_va_neugruender_radar: gilt_nicht

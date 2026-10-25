@@ -80,7 +80,7 @@ export const KUNDEN = {
   k7: { name: "Nordwind Consulting GmbH", anschrift: "Neuer Wall 50\n20354 Hamburg", email: "office@nordwind-consulting.example" },
   k8: { name: "Tanja Möller", anschrift: "Am Felde 9\n22765 Hamburg" },
   // Nachtrag StB 22.10.2026: Privatpersonen im EU-Ausland, die per E-Mail (nicht über den Shop) bestellen – OSS-Rechnungen
-  k9: { name: "Katharina Weber", anschrift: "Gumpendorfer Straße 72\n1060 Wien\nÖsterreich" },
+  k9: { name: "Katharina Winter", anschrift: "Gumpendorfer Straße 72\n1060 Wien\nÖsterreich" },
   k10: { name: "Sanne de Vries", anschrift: "Oudegracht 211\n3511 NG Utrecht\nNiederlande" },
   k11: { name: "Camille Rousseau", anschrift: "12 Rue Mercière\n69002 Lyon\nFrankreich" },
   k12: { name: "Pieter Claes", anschrift: "Korenlei 9\n9000 Gent\nBelgien" },
@@ -194,7 +194,7 @@ export const RECHNUNGEN: Rechnung[] = [
   { id: "r19", nummer: "2026-019", datum: "2026-12-15", leistung: "2026-12-14", ziel: "30", kunde: "k5", hinweis: DANKE, bezahlt: "2027-01-12",
     worum: "Händlerin Lübeck: Nachbestellung Weihnachten – zum 31.12. offen (USt Dezember, Einnahme erst 2027).",
     pos: [p(KERZE, 48, "Stück", 1120), p(SEIFE, 48, "Stück", 395), p(SET, 24, "Stück", 2250), p(VERSAND, 1, "Pauschale", 1490)] },
-  // ---- Nachtrag StB 22.10.2026 (Heckler und Busch): Fernverkäufe an Privatpersonen in AT, NL, FR, BE per E-Mail-Bestellung
+  // ---- Nachtrag StB 22.10.2026 (Steuerberatungskanzlei): Fernverkäufe an Privatpersonen in AT, NL, FR, BE per E-Mail-Bestellung
   // (nicht über den Shop, also nicht im Shop-Bericht) nach Überschreiten der EU-Schwelle am 17.07. – OSS mit dem Regelsatz
   // des Bestimmungslands; im DATEV-Stapel auf 8320 mit Land in Feld 40 (ohne USt-IdNr.) und Satz in Feld 41.
   { id: "r20", nummer: "2026-020", datum: "2026-12-16", leistung: "2026-12-15", ziel: "7", kunde: "k9", oss: "AT", hinweis: OSS_HINWEIS("AT"), bezahlt: "2026-12-18",

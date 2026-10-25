@@ -1,7 +1,7 @@
 # Kontenvorgaben der Kanzlei
 
 Kanzleien haben feste Hausregeln für einzelne Konten – Verrechnungskonto Gesellschafter, Gutscheine, Kassendifferenz,
-Bank statt Verbindlichkeiten, Anlagenkonten nach Art, Homeoffice (Prüfbericht Kanzlei Heckler und Busch vom
+Bank statt Verbindlichkeiten, Anlagenkonten nach Art, Homeoffice (Prüfbericht Steuerberatungskanzlei vom
 21.10.2026, Befunde B-4, B-6, B-9, B-10, B-11). Der Kontenrahmen (SKR03/SKR04) allein reicht dafür nicht. Die App
 verwendet deshalb **Kontenvorgaben**: Ohne Vorgabe gilt das Standardkonto des Kontenrahmens, mit Vorgabe das Konto der
 Kanzlei – im DATEV-Buchungsstapel, in Buchungsliste und Belegliste und in den Texten von `LIESMICH.txt`.

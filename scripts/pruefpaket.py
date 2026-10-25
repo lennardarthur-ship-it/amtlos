@@ -60,7 +60,7 @@ def wert_text(w):
 
 
 def ausloeser_text(a, tiefe=0):
-    """Auslöser-Baum (all/any/not, Bedingungen mit Label) als eingerückter Klartext."""
+    """Auslöser-Lebensmittelfachbeauftragter (all/any/not, Bedingungen mit Label) als eingerückter Klartext."""
     pre = "  " * tiefe
     if a is None:
         return ""

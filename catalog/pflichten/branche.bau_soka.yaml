@@ -27,7 +27,7 @@ ausloeser:
     wert: true
     label:
       de: Du beschäftigst mindestens eine Person.
-# Prüfvermerk RA Dr. Weber 22.10.2026: Meldung monatlich bis zum 15. des Folgemonats
+# Prüfvermerk Rechtsanwalt 22.10.2026: Meldung monatlich bis zum 15. des Folgemonats
 frist:
   typ: wiederkehrend
   rhythmus: monatlich
@@ -57,10 +57,11 @@ quellen:
   url: https://www.gesetze-im-internet.de/sokasig/
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: Folgen, Prüfhinweis (§ 1 Abs. 2 VTV), monatliche Meldung bis zum 15. des Folgemonats und Schwere „hoch“ übernommen. Verschiebung bei Wochenende/Feiertag nicht angegeben – „keine“; ob der Termin für alle Baubetriebe mit Beschäftigten gilt, hängt von der Erfassung nach VTV ab (nur als Prüfhinweis)'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: Folgen, Prüfhinweis (§ 1 Abs. 2 VTV), monatliche Meldung bis zum 15. des Folgemonats und Schwere „hoch“ übernommen. Verschiebung bei Wochenende/Feiertag nicht angegeben – „keine“; ob der Termin für alle Baubetriebe mit Beschäftigten gilt, hängt von der Erfassung nach VTV ab (nur als Prüfhinweis)'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 3
+  unterschrieben_am: '2026-10-23'

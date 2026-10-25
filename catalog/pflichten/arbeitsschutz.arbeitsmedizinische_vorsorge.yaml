@@ -1,4 +1,4 @@
-# RA Dr. Weber Abgleich 23.10.2026: § 26 Nr. 2 ArbSchG und Aufsichtsbehörde ergänzt (beharrliche Wiederholung nach § 26 Nr. 1 betrifft nur § 25 Abs. 1 Nr. 2 Buchst. a – nicht übernommen)
+# Rechtsanwalt Abgleich 23.10.2026: § 26 Nr. 2 ArbSchG und Aufsichtsbehörde ergänzt (beharrliche Wiederholung nach § 26 Nr. 1 betrifft nur § 25 Abs. 1 Nr. 2 Buchst. a – nicht übernommen)
 # Katalog E.56 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.56, Frage 15, bestätigt) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.arbeitsmedizinische_vorsorge
@@ -55,8 +55,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Fristen je Vorsorgeart nach AMR 2.1 und Bewertung Kosmetik mit Blutkontakt durch einen Betriebsarzt bestätigen lassen (laut Freigabe Sifa 22.10.2026 weiterhin offen; Auslöser für alle Betriebe mit Beschäftigten bestätigt)'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 6
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

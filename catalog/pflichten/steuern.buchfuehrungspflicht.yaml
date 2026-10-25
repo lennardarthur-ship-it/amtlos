@@ -1,5 +1,5 @@
 # E-176 (23.10.2026): OHG und KG als eigene Rechtsformen – Auslöser „Andere“ (Notlösung vom Abgleich) ersetzt durch ohg/kg
-# StB Busch Abgleich 23.10.2026: OHG und KG in Erklärung und Auslöser (über Rechtsform „Andere“)
+# Steuerberater Abgleich 23.10.2026: OHG und KG in Erklärung und Auslöser (über Rechtsform „Andere“)
 # Katalog C.28 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.buchfuehrungspflicht
@@ -32,7 +32,7 @@ ausloeser:
     wert: gmbh_co_kg
     label:
       de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
-  # StB Busch 23.10.2026: OHG und KG sind als Handelsgesellschaften stets buchführungspflichtig (§§ 6, 238 HGB); § 241a HGB
+  # Steuerberater 23.10.2026: OHG und KG sind als Handelsgesellschaften stets buchführungspflichtig (§§ 6, 238 HGB); § 241a HGB
   # gilt nur für Einzelkaufleute. E-176: eigene Rechtsformen statt „Andere“ – „Andere“ löst die Pflicht nicht mehr aus.
   - feld: profil.rechtsform
     op: in
@@ -163,8 +163,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - StB Lutz Busch
-  geprueft_am: '2026-10-23'
-  geprueft_version: 7
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

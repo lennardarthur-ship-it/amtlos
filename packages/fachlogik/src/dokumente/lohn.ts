@@ -456,7 +456,7 @@ const ARTEN = [
 ];
 
 /**
- * StB Busch (Durchsicht 23.10.2026): Geschlecht für die Anmeldung ohne Sozialversicherungsnummer (mit Geburtsname,
+ * Steuerberater (Durchsicht 23.10.2026): Geschlecht für die Anmeldung ohne Sozialversicherungsnummer (mit Geburtsname,
  * Geburtsort und Staatsangehörigkeit für die Vergabe), fünfstellige Tätigkeit (KldB 2010) und Kennzeichen
  * Arbeitnehmerüberlassung im Tätigkeitsschlüssel, bei Minijobs die Befreiung von der Rentenversicherungspflicht.
  */

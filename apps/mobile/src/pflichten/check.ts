@@ -35,7 +35,7 @@ export const CHECK_FELDER = [
   "gesellschaft.handelsregister",
   // R12 (UX #20): das Startdatum steuert Gründungsschritte und „Was hast du schon?“ – direkt nach der Rechtsform
   "gruendungsdatum",
-  // StB Busch 22.10.2026: bei eingetragenen Gesellschaften der Beginn der Tätigkeit (Frist des Fragebogens, § 138 Abs. 4 AO)
+  // Steuerberater 22.10.2026: bei eingetragenen Gesellschaften der Beginn der Tätigkeit (Frist des Fragebogens, § 138 Abs. 4 AO)
   "taetigkeit_beginn",
   "taetigkeit.einordnung",
   "bundesland",
@@ -60,7 +60,7 @@ export const CHECK_FELDER = [
   "fahrzeuge.anzahl",
   "fahrzeuge.gesamtmasse",
   "fahrzeuge.ausland",
-  // Prüfvermerk RA Dr. Weber 22.10.2026 (H.5): Werkverkehr erlaubnisfrei, Personenbeförderung mit Genehmigung
+  // Prüfvermerk Rechtsanwalt 22.10.2026 (H.5): Werkverkehr erlaubnisfrei, Personenbeförderung mit Genehmigung
   "fahrzeuge.befoerderung",
   "umwelt.taetigkeiten",
   "bauleistungen.fuer_unternehmen",
@@ -81,7 +81,7 @@ export const CHECK_FELDER = [
   "gastro.to_go",
   // Prüfbericht Lebensmittelhygiene 22.10.2026 (Frage 14): abgepackte Ware im Regal; Wassertank im Foodtruck oder Stand
   "gastro.vorverpackt",
-  // Rückmeldung Lebensmittel T. Baum 22.10.2026: Acrylamid nur, wer selbst backt oder frittiert
+  // Rückmeldung Lebensmittel Lebensmittelfachbeauftragter 22.10.2026: Acrylamid nur, wer selbst backt oder frittiert
   "gastro.backen_frittieren",
   "gastro.wassertank",
   "gastro.wassertank_ab",
@@ -139,7 +139,7 @@ function passtImmer(feld: string, p: Profil): boolean {
   if ((feld === "fahrzeuge.gesamtmasse" || feld === "fahrzeuge.ausland") && zahl(p, "fahrzeuge.anzahl") === 0) return false;
   if (feld === "fahrzeuge.ausland" && liste(p, "fahrzeuge.gesamtmasse") && !liste(p, "fahrzeuge.gesamtmasse")!.some((x) => MITTELSCHWER.includes(x))) return false;
   if (feld === "fahrzeuge.befoerderung" && zahl(p, "fahrzeuge.anzahl") === 0) return false;
-  // Prüfvermerk RA Dr. Weber 22.10.2026: Produktliste nach § 1 Abs. 2 BFSG nur bei Elektrogeräten, erstes Inverkehrbringen nur bei verpackter Ware
+  // Prüfvermerk Rechtsanwalt 22.10.2026: Produktliste nach § 1 Abs. 2 BFSG nur bei Elektrogeräten, erstes Inverkehrbringen nur bei verpackter Ware
   if (feld === "produkte.bfsg_produkte" && liste(p, "produkte.arten") && !liste(p, "produkte.arten")!.includes("elektrogeraete")) return false;
   if (feld === "produkte.verpackung_ab" && liste(p, "produkte.arten") && !liste(p, "produkte.arten")!.includes("verpackung")) return false;
   // R12 (Kurier #14): wer kein Bargeld annimmt, braucht keine Kasse
@@ -149,16 +149,16 @@ function passtImmer(feld: string, p: Profil): boolean {
   if (VORJAHR_FRAGEN.includes(feld) && ohneVorjahr(p)) return false;
   // R11 (Nutzertest Kosmetik #1): wer die Kleinunternehmerregelung nutzt, gibt keine Voranmeldung ab – keine Frage nach der Zahllast
   if ((feld === "ust.zahllast_vorjahr" || feld === "ust.dauerfristverlaengerung") && p["ust.kleinunternehmer"] === true) return false;
-  // StB Busch 22.10.2026: Kleinunternehmer geben keine Zusammenfassende Meldung ab (§ 18a Abs. 4 UStG)
+  // Steuerberater 22.10.2026: Kleinunternehmer geben keine Zusammenfassende Meldung ab (§ 18a Abs. 4 UStG)
   if (feld === "ust.zm_meldezeitraum" && p["ust.kleinunternehmer"] === true) return false;
   if (feld === "taetigkeit.einordnung" && typeof p.rechtsform === "string" && KRAFT_RECHTSFORM_GEWERBE.includes(p.rechtsform)) return false;
   // R11: Lebensmittel-Fragen nach § 42 IfSG nur in der Gastronomie und Lebensmittelbranche
   if ((feld === "ifsg.beschaeftigte" || feld === "ifsg.selbst" || feld === "gastro.to_go" || feld === "gastro.backen_frittieren" || feld === "gastro.wassertank") && !inBranche(p, "gastronomie_lebensmittel")) return false;
-  // Rückmeldung T. Baum 22.10.2026: selbst abgepackte Lebensmittel auch im Onlinehandel mit Lebensmitteln
+  // Rückmeldung Lebensmittelfachbeauftragter 22.10.2026: selbst abgepackte Lebensmittel auch im Onlinehandel mit Lebensmitteln
   if (feld === "gastro.vorverpackt" && !inBranche(p, "gastronomie_lebensmittel") && !(inBranche(p, "onlinehandel") && (liste(p, "produkte.arten")?.includes("lebensmittel") ?? true))) return false;
   // Inbetriebnahme des Wassertanks nur, wenn es einen gibt (wie die Anschaffung der Kasse)
   if (feld === "gastro.wassertank_ab" && p["gastro.wassertank"] !== true) return false;
-  // Prüfvermerk RA Dr. Weber 22.10.2026: Beginn der NIS2-Betroffenheit nur, wenn das Unternehmen darunter fällt
+  // Prüfvermerk Rechtsanwalt 22.10.2026: Beginn der NIS2-Betroffenheit nur, wenn das Unternehmen darunter fällt
   if (feld === "nis2.betroffen_seit" && p["nis2.betroffen"] !== "ja") return false;
   // Alkoholausschank nur bei Gaststätte bzw. Getränkeausschank; Anschaffung der Kasse nur mit elektronischer Kasse
   if (feld === "erlaubnis.alkohol" && p["erlaubnis.gaststaette"] !== true) return false;

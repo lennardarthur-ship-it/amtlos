@@ -115,7 +115,7 @@ describe("Gestaltung der Dokumente (E-130)", () => {
     expect(uw).toContain('<table class="liste hoch teilnahme">');
     expect(uw).toContain("table.liste.teilnahme td { height: 10mm; }");
     // Nachweis: kurze Punkte als Angabenzeilen unter einer Randnummer, die Nummerierung läuft weiter
-    const nw = v("nachweis_arbeitsbedingungen", { name: "Kim", beginn: "2026-03-01", taetigkeit: "Koch", probezeit: "6" });
+    const nw = v("nachweis_arbeitsbedingungen", { name: "Kim", beginn: "2026-03-01", taetigkeit: "Sifa", probezeit: "6" });
     expect(nw).toMatch(/<section class="abschnitt gruppe zusammen" style="counter-increment: abschnitt 5"><div class="gruppe-nr">2\.–6\.<\/div><table class="angaben"><tr><th>Beginn<\/th><td>01\.03\.2026<\/td><\/tr>/);
     for (const k of ["Befristung", "Arbeitsort", "Tätigkeit", "Probezeit"]) expect(nw).toContain(`<th>${k}</th>`);
     expect(nw).toContain("<h2>Arbeitsentgelt</h2>");

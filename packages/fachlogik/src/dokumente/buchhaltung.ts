@@ -307,7 +307,7 @@ function positionen(d: Daten): { e: Eintrag; p: Position }[] {
   });
 }
 
-// ---------------------------------------------------------------- StB-Prüfung Heckler und Busch (21.10.2026): Rechnungen
+// ---------------------------------------------------------------- StB-Prüfung Steuerberatungskanzlei (21.10.2026): Rechnungen
 
 /**
  * C-3/C-13: Art des Empfängers am Kunden gemerkt – Unternehmen, Privatperson oder öffentliche Stelle. Privatperson mit
@@ -1210,7 +1210,7 @@ const istGmbhCoKg = (b: Betrieb) => (formImNamen(b.rechtsform ?? "") ?? formImNa
 
 /**
  * StB GoBD (E-5, § 245 HGB): wer den Jahresabschluss unterschreibt – alle Geschäftsführer bzw. alle persönlich haftenden
- * Gesellschafter. StB Busch (24.10.2026): bei der GmbH & Co. KG die Geschäftsführer der Komplementär-GmbH.
+ * Gesellschafter. Steuerberater (24.10.2026): bei der GmbH & Co. KG die Geschäftsführer der Komplementär-GmbH.
  */
 export function bilanzUnterzeichner(b: Betrieb): string[] {
   const namen = (b.vertretung ?? "")
@@ -1228,7 +1228,7 @@ const bilanzKapital = (b: Betrieb) => istKapitalgesellschaft(b.rechtsform, b.nam
 /** OHG, KG und e. K. nach der Rechtsform aus „Mein Betrieb“ bzw. dem Zusatz im Namen – sie stellen keinen Anhang auf. */
 const bilanzOhneAnhang = (b: Betrieb) => ["OHG", "KG", "e. K."].includes(formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name) ?? "");
 /**
- * StB Busch (24.10.2026): Die Angaben unter der Bilanz (§ 264 Abs. 1 Satz 5 HGB) erscheinen im Formular nur bei
+ * Steuerberater (24.10.2026): Die Angaben unter der Bilanz (§ 264 Abs. 1 Satz 5 HGB) erscheinen im Formular nur bei
  * Kapitalgesellschaften und der GmbH & Co. KG. Startwert aus „Mein Betrieb“ (profilStart); ohne Angabe (ältere Unterlagen)
  * entscheidet die Rechtsform in „Mein Betrieb“ wie bisher.
  */
@@ -1238,14 +1238,14 @@ export const BILANZ_FORM: Option[] = [
 ];
 const bilanzFormAus = (b: Betrieb): string | null => (bilanzKapital(b) ? "kapital" : bilanzOhneAnhang(b) ? "personen" : null);
 /**
- * StB Busch (Durchsicht 23.10.2026): Anhang nur bei Kapitalgesellschaften und GmbH & Co. KG – Kleinstkapitalgesellschaften
+ * Steuerberater (Durchsicht 23.10.2026): Anhang nur bei Kapitalgesellschaften und GmbH & Co. KG – Kleinstkapitalgesellschaften
  * brauchen keinen, wenn die Angaben unter der Bilanz stehen; OHG, KG und e. K. stellen keinen Anhang auf.
  */
 export const BILANZ_ANHANG = "Zum Jahresabschluss gehört ein Anhang (§§ 264, 284 ff. HGB) – er kommt aus der Buchführung der Kanzlei. Kleinstkapitalgesellschaften brauchen keinen Anhang, wenn die Angaben nach § 264 Abs. 1 Satz 5 HGB unter der Bilanz stehen.";
 export const BILANZ_OHNE_ANHANG = "OHG, KG und e. K. stellen keinen Anhang auf.";
-/** StB Busch (Durchsicht 23.10.2026, § 245 HGB): wer unterschreibt, je Rechtsform. */
+/** Steuerberater (Durchsicht 23.10.2026, § 245 HGB): wer unterschreibt, je Rechtsform. */
 export const BILANZ_UNTERSCHRIFT = "Den Jahresabschluss unterschreiben mit Datum: bei GmbH und UG alle Geschäftsführer, bei der GmbH & Co. KG alle Geschäftsführer der Komplementär-GmbH, bei OHG und KG alle persönlich haftenden Gesellschafter, beim e. K. der Kaufmann bzw. die Kauffrau (§ 245 HGB).";
-/** StB Busch (24.10.2026, § 245 HGB): Unterschrift bei der GmbH & Co. KG – sein Wortlaut, ergänzt um das Datum wie bei den anderen Rechtsformen. */
+/** Steuerberater (24.10.2026, § 245 HGB): Unterschrift bei der GmbH & Co. KG – sein Wortlaut, ergänzt um das Datum wie bei den anderen Rechtsformen. */
 export const BILANZ_UNTERSCHRIFT_GMBH_CO_KG = "Zu unterschreiben von allen Geschäftsführern der Komplementär-GmbH, mit dem Datum der Aufstellung (§ 245 HGB).";
 
 export const bilanzGuv: Vorlage = {
@@ -1255,7 +1255,7 @@ export const bilanzGuv: Vorlage = {
   beschreibung: "Vorlage – Werte aus der Buchführung der Kanzlei: Erträge, Aufwendungen und Ertragsteuern, Vermögen und Kapital, Angaben unter der Bilanz und Unterschriften – mit Prüfung, ob Aktiva und Passiva aufgehen.",
   bereich: "steuern",
   pflichten: ["steuern.buchfuehrungspflicht", "steuern.e_bilanz"],
-  // StB Busch (Durchsicht 23.10.2026): §§ 264, 266, 275 HGB nur bei Kapitalgesellschaften und GmbH & Co. KG
+  // Steuerberater (Durchsicht 23.10.2026): §§ 264, 266, 275 HGB nur bei Kapitalgesellschaften und GmbH & Co. KG
   grundlage: "§§ 238, 242, 245 HGB; § 5b EStG",
   grundlageFuer: (_d, b) => (bilanzKapital(b) ? "§§ 238, 242, 245, 264, 266, 275 HGB; § 5b EStG" : ""),
   namensFeld: "stichtag",
@@ -1273,7 +1273,7 @@ export const bilanzGuv: Vorlage = {
       felder: [
         posten("ertraege", "Erträge", "Ertrag", "z. B. Umsatzerlöse"),
         posten("aufwendungen", "Aufwendungen", "Aufwand", "z. B. Materialaufwand, Personalaufwand"),
-        { id: "ertragsteuern", art: "betrag", label: "Steuern vom Einkommen und vom Ertrag (€)", hilfe: "Steuern des Jahres laut Kanzlei – steht vor dem Jahresüberschuss (§ 275 HGB). Kapitalgesellschaften: Körperschaft- und Gewerbesteuer; e. K., OHG, KG und GmbH & Co. KG: nur Gewerbesteuer (die Einkommensteuer der Inhaber ist kein Aufwand des Unternehmens; StB Busch 25.10.2026)" },
+        { id: "ertragsteuern", art: "betrag", label: "Steuern vom Einkommen und vom Ertrag (€)", hilfe: "Steuern des Jahres laut Kanzlei – steht vor dem Jahresüberschuss (§ 275 HGB). Kapitalgesellschaften: Körperschaft- und Gewerbesteuer; e. K., OHG, KG und GmbH & Co. KG: nur Gewerbesteuer (die Einkommensteuer der Inhaber ist kein Aufwand des Unternehmens; Steuerberater 25.10.2026)" },
       ],
     },
     { titel: "Bilanz", felder: [posten("aktiva", "Aktiva", "Aktivposten", "z. B. Betriebs- und Geschäftsausstattung, Bank"), posten("passiva", "Passiva", "Passivposten", "z. B. Eigenkapital, Verbindlichkeiten")] },
@@ -1281,7 +1281,7 @@ export const bilanzGuv: Vorlage = {
       titel: "Angaben unter der Bilanz",
       hilfe: "Nur für GmbH, UG, AG und GmbH & Co. KG – OHG, KG und e. K. stellen keinen Anhang auf. Eine Kleinstkapitalgesellschaft (höchstens eine der Grenzen überschritten: 450.000 € Bilanzsumme, 900.000 € Umsatzerlöse, 10 Beschäftigte im Jahresdurchschnitt; § 267a HGB) braucht keinen Anhang, wenn diese Angaben unter der Bilanz stehen (§ 264 Abs. 1 Satz 5 HGB).",
       felder: [
-        // StB Busch (24.10.2026): nur bei Kapitalgesellschaften und GmbH & Co. KG – Startwert aus „Mein Betrieb“
+        // Steuerberater (24.10.2026): nur bei Kapitalgesellschaften und GmbH & Co. KG – Startwert aus „Mein Betrieb“
         { id: "anhang_form", art: "wahl", label: "Rechtsform (Anhang)", optionen: BILANZ_FORM, hilfe: "Aus „Mein Betrieb“. Nur Kapitalgesellschaften und die GmbH & Co. KG stellen einen Anhang auf bzw. machen die Angaben unter der Bilanz." },
         { id: "kleinst", art: "schalter", label: "Kleinstkapitalgesellschaft – Angaben unter der Bilanz statt Anhang", vorbelegung: true, wenn: { feld: "anhang_form", ist: "personen", nicht: true } },
         // § 264 Abs. 1 Satz 5 Nr. 1 und 2 HGB: von diesen Angaben hängt die Befreiung vom Anhang ab
@@ -1290,7 +1290,7 @@ export const bilanzGuv: Vorlage = {
       ],
     },
   ],
-  // StB Busch (24.10.2026): Rechtsform für Anhang und Angaben unter der Bilanz aus „Mein Betrieb“
+  // Steuerberater (24.10.2026): Rechtsform für Anhang und Angaben unter der Bilanz aus „Mein Betrieb“
   profilStart(_profil, b): Daten {
     const form = b ? bilanzFormAus(b) : null;
     return form ? { anhang_form: form } : {};
@@ -1300,7 +1300,7 @@ export const bilanzGuv: Vorlage = {
     if (b.vertretung?.trim()) return [];
     if (istKapitalgesellschaft(b.rechtsform, b.name)) return ["Geschäftsführung in „Mein Betrieb“ eintragen – alle Geschäftsführer unterschreiben den Jahresabschluss (§ 245 HGB)."];
     if (istGmbhCoKg(b)) return ["Geschäftsführer der Komplementär-GmbH in „Mein Betrieb“ eintragen – sie unterschreiben alle den Jahresabschluss (§ 245 HGB)."];
-    // StB Busch (Durchsicht 23.10.2026): bei OHG und KG alle persönlich haftenden Gesellschafter
+    // Steuerberater (Durchsicht 23.10.2026): bei OHG und KG alle persönlich haftenden Gesellschafter
     return istPersonengesellschaft(b.rechtsform, b.name) ? ["Persönlich haftende Gesellschafter in „Mein Betrieb“ eintragen – sie unterschreiben alle den Jahresabschluss (§ 245 HGB)."] : [];
   },
   ergebnis(d) {
@@ -1344,8 +1344,8 @@ export const bilanzGuv: Vorlage = {
     const mitSteuern = kapital || guvLeer || Boolean(text(d, "ertragsteuern"));
     const akt = summe(l("aktiva"), "betrag");
     const pas = summe(l("passiva"), "betrag");
-    // Anhang bzw. Angaben unter der Bilanz: Kapitalgesellschaften und GmbH & Co. KG (StB Busch 23.10.2026)
-    // StB Busch (24.10.2026): die Angabe in der Unterlage geht vor, ohne sie die Rechtsform aus „Mein Betrieb“
+    // Anhang bzw. Angaben unter der Bilanz: Kapitalgesellschaften und GmbH & Co. KG (Steuerberater 23.10.2026)
+    // Steuerberater (24.10.2026): die Angabe in der Unterlage geht vor, ohne sie die Rechtsform aus „Mein Betrieb“
     const form = text(d, "anhang_form") || bilanzFormAus(b);
     const mitAnhang = form === "kapital";
     const kleinst = mitAnhang && ja(d, "kleinst");
@@ -1398,7 +1398,7 @@ function ust(d: Daten) {
   const s85 = cent(text(d, "rc_bau_steuer")) ?? 0;
   const v67 = cent(text(d, "vorsteuer_13b")) ?? 0;
   const svz = cent(text(d, "sondervorauszahlung")) ?? 0;
-  // StB Busch (Durchsicht 23.10.2026): innergemeinschaftliche Erwerbe Kz 89 (19 %) und Kz 93 (7 %) mit Steuer, Vorsteuer Kz 61
+  // Steuerberater (Durchsicht 23.10.2026): innergemeinschaftliche Erwerbe Kz 89 (19 %) und Kz 93 (7 %) mit Steuer, Vorsteuer Kz 61
   const g19 = cent(text(d, "ige_19")) ?? 0;
   const g7 = cent(text(d, "ige_7")) ?? 0;
   const v61 = cent(text(d, "vorsteuer_ige")) ?? 0;
@@ -1438,7 +1438,7 @@ const UST_OHNE_STEUER: { id: string; kz?: string; text: string; hinweis?: string
   { id: "umsatz_frei", text: "Weitere steuerfreie oder nicht steuerbare Umsätze", hinweis: `${KZ_FREI_HINWEIS[0]!.toUpperCase()}${KZ_FREI_HINWEIS.slice(1)}` },
 ];
 
-/** StB Busch (Durchsicht 23.10.2026): ausdrücklicher Hinweis, wenn keine innergemeinschaftlichen Erwerbe eingetragen sind. */
+/** Steuerberater (Durchsicht 23.10.2026): ausdrücklicher Hinweis, wenn keine innergemeinschaftlichen Erwerbe eingetragen sind. */
 export const UST_OHNE_IGE = "Innergemeinschaftliche Erwerbe (Kz 89 bzw. 93 mit Steuer, Vorsteuer Kz 61) sind nicht enthalten – die App übernimmt sie nicht aus den Belegen. Wer Waren aus anderen EU-Ländern bezieht, trägt sie im Formular ein.";
 /** Hinweis bei steuerfreien Umsätzen ohne Vorsteuerabzug (Voranmeldung, Steuerberater-Paket). */
 export const VORSTEUER_AUFTEILEN = "Steuerfreie Umsätze ohne Vorsteuerabzug und Vorsteuer im selben Zeitraum: Vorsteuer aus Eingangsleistungen, die diesen Umsätzen dienen, ist nicht abziehbar (§ 15 Abs. 2 UStG); dienen sie beiden Arten von Umsätzen, ist sie aufzuteilen (§ 15 Abs. 4 UStG). Bitte die Vorsteuer prüfen.";
@@ -1500,7 +1500,7 @@ export const ustVoranmeldung: Vorlage = {
       ],
     },
     {
-      // StB Busch (Durchsicht 23.10.2026): betrifft jeden Betrieb, der Waren aus anderen EU-Ländern bezieht – die App kann
+      // Steuerberater (Durchsicht 23.10.2026): betrifft jeden Betrieb, der Waren aus anderen EU-Ländern bezieht – die App kann
       // die Erwerbe nicht aus den Rechnungen ableiten, deshalb zum Eintragen
       titel: "Innergemeinschaftliche Erwerbe",
       hilfe: "Wenn du Waren von Unternehmen aus anderen EU-Ländern bezogen hast: Bemessungsgrundlage nach Steuersatz, darauf schuldest du die Umsatzsteuer; die Vorsteuer daraus steht in Kz 61. Die App übernimmt die Erwerbe nicht aus deinen Belegen – bitte von Hand eintragen.",
@@ -1570,7 +1570,7 @@ export const ustVoranmeldung: Vorlage = {
           : "") +
         // Kz 46/84 sind Bemessungsgrundlagen (volle Euro), Kz 47/85 Steuerbeträge (mit Cent)
         (mitRc ? abschnitt("Steuerschuldnerschaft als Leistungsempfänger", kennzahlen(rc.map((z) => ({ kz: z.kz, text: z.text, ...(z.hinweis ? { hinweis: z.hinweis } : {}), betrag: z.hinweis ? euroVoll(z.c) : euro(z.c) })))) : "") +
-        // StB Busch (Durchsicht 23.10.2026): innergemeinschaftliche Erwerbe – Bemessungsgrundlage in vollen Euro, Steuer daraus
+        // Steuerberater (Durchsicht 23.10.2026): innergemeinschaftliche Erwerbe – Bemessungsgrundlage in vollen Euro, Steuer daraus
         (mitIge
           ? abschnitt(
               "Innergemeinschaftliche Erwerbe",
@@ -1631,7 +1631,7 @@ const ERKLAERUNGEN = [
   { wert: "feststellung", text: "Feststellungserklärung (Personengesellschaft)" },
 ];
 
-/** Steuerart einer Vorauszahlung (StB Busch 23.10.2026: Summe je Steuerart getrennt). */
+/** Steuerart einer Vorauszahlung (Steuerberater 23.10.2026: Summe je Steuerart getrennt). */
 const VORAUSZAHLUNG_ARTEN: Option[] = [
   { wert: "est", text: "Einkommensteuer" },
   { wert: "kst", text: "Körperschaftsteuer" },
@@ -1693,7 +1693,7 @@ export const steuererklaerung: Vorlage = {
     },
     {
       titel: "Vorauszahlungen",
-      // StB Busch (Durchsicht 23.10.2026): Summe je Steuerart getrennt – deshalb die Steuerart zur Auswahl
+      // Steuerberater (Durchsicht 23.10.2026): Summe je Steuerart getrennt – deshalb die Steuerart zur Auswahl
       felder: [{ id: "vorauszahlungen", art: "liste", label: "Vorauszahlungen", eintrag: "Vorauszahlung", titelFeld: "art", felder: [{ id: "steuerart", art: "wahl", label: "Steuerart", optionen: VORAUSZAHLUNG_ARTEN, pflicht: true }, { id: "art", art: "text", label: "Zeitraum bzw. Bezeichnung", hilfe: "z. B. Q1 oder 10.03.", pflicht: true }, { id: "betrag", art: "betrag", label: "Betrag (€)", pflicht: true }] }],
     },
     {
@@ -1711,7 +1711,7 @@ export const steuererklaerung: Vorlage = {
     const we = liste(d, "weiteres").filter((x) => text(x, "was"));
     // Blatt zum Ausfüllen (keine Zahlen eingegeben): Erklärungen zum Ankreuzen, alle Zeilen und Tabellen zum Eintragen
     const leer = !["gewinn", "umsatz", "ust_jahr", "vorsteuer_jahr"].some((k) => text(d, k)) && !vz.length && !we.length;
-    // StB Busch (Durchsicht 23.10.2026): je Steuerart getrennt summieren, nie über verschiedene Steuerarten. Steuerart aus
+    // Steuerberater (Durchsicht 23.10.2026): je Steuerart getrennt summieren, nie über verschiedene Steuerarten. Steuerart aus
     // der Auswahl; ältere Einträge ohne Auswahl: das erste Wort der Bezeichnung („Einkommensteuer Q1“ → „einkommensteuer“)
     const artText = (x: Eintrag) => VORAUSZAHLUNG_ARTEN.find((o) => o.wert === text(x, "steuerart"))?.text ?? "";
     const steuerart = (x: Eintrag) => text(x, "steuerart") || (text(x, "art").trim().split(/\s+/)[0] ?? "").toLocaleLowerCase("de");
@@ -1764,7 +1764,7 @@ export const steuererklaerung: Vorlage = {
 
 // ---------------------------------------------------------------- Kassenbuch
 
-/** StB Busch (Durchsicht 23.10.2026): Regeln für das Kassenbuch (§ 146 Abs. 1 Satz 2 AO). */
+/** Steuerberater (Durchsicht 23.10.2026): Regeln für das Kassenbuch (§ 146 Abs. 1 Satz 2 AO). */
 export const KASSENBUCH_REGELN = "Der Kassenbestand darf nie negativ werden. Korrekturen nicht als negative Einnahme oder Ausgabe, sondern als Gegenbuchung mit Beleg. Einträge täglich (§ 146 Abs. 1 Satz 2 AO).";
 export const KASSENBUCH_ELEKTRONISCH = "Für Betriebe mit elektronischer Kasse ist das Kassenbuch nur ergänzend; die Einzelaufzeichnung bleibt beim Kassensystem.";
 export const KASSENBUCH_NEGATIV = "Negativer Betrag: Korrekturen nicht als negative Einnahme oder Ausgabe eintragen, sondern als Gegenbuchung mit Beleg.";
@@ -1824,7 +1824,7 @@ export const kassenbuch: Vorlage = {
       ],
     },
   ],
-  // StB Busch (Durchsicht 23.10.2026): negative Beträge und negativer Bestand nicht ohne Hinweis annehmen
+  // Steuerberater (Durchsicht 23.10.2026): negative Beträge und negativer Bestand nicht ohne Hinweis annehmen
   hinweise(d) {
     const k = kasse(d);
     return [...(k.zeilen.some((z) => z.ein < 0 || z.aus < 0) ? [KASSENBUCH_NEGATIV] : []), ...(k.negativ ? [KASSENBUCH_BESTAND_NEGATIV] : [])];
@@ -2064,7 +2064,7 @@ export const aufbewahrung: Vorlage = {
       betrieb: b,
       inhalt:
         tabelle(["Unterlagen", "Frist", "Jahr der letzten Eintragung bzw. des Belegs", "Aufbewahren mindestens bis", "Wo"], l.map((x) => [zelle(text(x, "art")), text(x, "jahre") ? `${esc(text(x, "jahre"))} ${zahl(text(x, "jahre")) === 1 ? "Jahr" : "Jahre"}` : ZELLE_LINIE, text(x, "letzte") ? zelle(text(x, "letzte")) : ZELLE_LINIE, aufbewahrenBis(text(x, "letzte"), text(x, "jahre")) ?? ZELLE_LINIE, text(x, "ort") ? zelle(text(x, "ort")) : ZELLE_LINIE]), { breiten: ["42%", "10%", "17%", "14%", "17%"], leerzeilen: leer ? 3 : 0 }) +
-        // StB Busch (Durchsicht 23.10.2026): „aufgestellt“ wie in § 147 Abs. 4 AO (nicht „festgestellt“)
+        // Steuerberater (Durchsicht 23.10.2026): „aufgestellt“ wie in § 147 Abs. 4 AO (nicht „festgestellt“)
         nachsatz("Die Frist beginnt mit dem Schluss des Kalenderjahres, in dem die letzte Eintragung gemacht, das Inventar bzw. der Jahresabschluss aufgestellt, der Brief empfangen oder abgesandt oder der Buchungsbeleg entstanden ist (§ 147 Abs. 4 AO). Sie läuft nicht ab, solange die Unterlagen für Steuern von Bedeutung sind, deren Festsetzungsfrist noch nicht abgelaufen ist (§ 147 Abs. 3 AO)."),
     });
   },

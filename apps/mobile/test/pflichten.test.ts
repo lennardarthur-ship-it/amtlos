@@ -18,7 +18,7 @@ describe("Pflichten-Check", () => {
     expect(felder).not.toContain("gesellschaft.handelsregister");
     // Einzelunternehmen: keine Investoren-Frage (Nutzertests Mehmet, Jonas, Sabine)
     expect(felder).not.toContain("gesellschafter.auslaendische_investoren");
-    // Freigabe Weber 22.10.2026: die AWV-Meldung gilt für alle Zahlungen von/an Gebietsfremde über 50.000 € – auch Einzelunternehmen werden danach gefragt
+    // Freigabe Rechtsanwalt 22.10.2026: die AWV-Meldung gilt für alle Zahlungen von/an Gebietsfremde über 50.000 € – auch Einzelunternehmen werden danach gefragt
     expect(felder).toContain("auslandszahlungen.ueber_meldegrenze");
     const nein = { ...salon, "gesellschafter.auslaendische_investoren": false, "auslandszahlungen.ueber_meldegrenze": false };
     expect(ids(auswertung(nein, "2026-10-13").unbekannt)).not.toEqual(expect.arrayContaining(["gesellschaft.awv_meldung"]));
@@ -197,7 +197,7 @@ describe("Pflichten-Check", () => {
     expect(d.jetzt.map((p) => p.id)).toContain("test.dringend");
     expect(d.imBlick.map((p) => p.id)).toContain("test.ruhig");
     // Katalog: die angezeigte Schwere bleibt „mittel“ (keine eigene Bußgeldvorschrift), die Dringlichkeit trägt das eigene Feld
-    // (HACCP ist nach der Rückmeldung T. Baum 22.10.2026 wieder „hoch“ – Beispiel jetzt die Lebensmittelregistrierung)
+    // (HACCP ist nach der Rückmeldung Lebensmittelfachbeauftragter 22.10.2026 wieder „hoch“ – Beispiel jetzt die Lebensmittelregistrierung)
     const registrierung = KATALOG.pflichten.find((x) => x.id === "branche.gastro_lebensmittelregistrierung")!;
     expect(registrierung.sanktion.schwere).toBe("mittel");
     expect(registrierung.dringend_ohne_termin).toBe(true);

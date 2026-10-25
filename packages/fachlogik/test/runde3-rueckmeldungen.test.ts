@@ -1,6 +1,6 @@
 /**
- * Rückmeldungen Runde 3 (24.10.2026): RA Dr. Weber (Fachfragen, docs/pruefberichte/2026-10-24-runde3-fachfragen-weber.xlsx)
- * zu B-276 und zum Hygieneplan Beauty; StB Busch (docs/pruefberichte/2026-10-24-runde3-vorlagen-busch.xlsx) zu Bilanz/GuV.
+ * Rückmeldungen Runde 3 (24.10.2026): Rechtsanwalt (Fachfragen, docs/pruefberichte/2026-10-24-runde3-fachfragen-recht.xlsx)
+ * zu B-276 und zum Hygieneplan Beauty; Steuerberater (docs/pruefberichte/2026-10-24-runde3-vorlagen-steuern.xlsx) zu Bilanz/GuV.
  */
 import { describe, expect, it } from "vitest";
 import {
@@ -18,7 +18,7 @@ const feld = (id: string, f: string) => vorlageFuer(id)!.abschnitte.flatMap((a) 
 const PEP = "sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen – eine HIV-Postexpositionsprophylaxe sollte möglichst innerhalb von 2 Stunden beginnen, nach einer Stich- oder Schnittverletzung spätestens bis 24 Stunden; auch später noch ärztlich abklären lassen.";
 const AUSKUNFT = "Kundin/Kunde fragen, ob sie freiwillig Auskunft über bekannte Infektionen (Hepatitis B/C, HIV) geben möchten – die Antwort ist freiwillig; nur an den Durchgangsarzt weitergeben, nicht im Verbandbuch notieren.";
 
-describe("RA Dr. Weber, Fachfragen Runde 3: HIV-PEP und Hygieneplan Beauty", () => {
+describe("Rechtsanwalt, Fachfragen Runde 3: HIV-PEP und Hygieneplan Beauty", () => {
   it("B-276: Obergrenze nach Stich- oder Schnittverletzung im Wortlaut des Prüfers, Kurzbeleg S2k-Leitlinie", () => {
     const f = feld("betriebsanweisung_biostoffe", "unfall") as { vorschlaege: string[]; hilfe: string };
     expect(f.vorschlaege[0]).toBe(`Nach einer Stich- oder Schnittverletzung: Wunde desinfizieren und ${PEP}`);
@@ -52,12 +52,17 @@ describe("RA Dr. Weber, Fachfragen Runde 3: HIV-PEP und Hygieneplan Beauty", () 
     for (const land of ["Baden-Württemberg", "Nordrhein-Westfalen", ""]) expect(html("hygieneplan", d, { ...B, bundesland: land }), land).not.toContain("Bayern");
   });
 
-  it("die freigegebene Lebensmittel-Fassung behält ihre Prüfsumme", () => {
-    expect(vorlagenPruefsumme(vorlageFuer("hygieneplan")!)).toBe(VORLAGEN_GEPRUEFT.hygieneplan!.pruefsumme);
+  it("die Beauty-Ergänzungen ändern die Lebensmittel-Fassung nicht (nur Beauty-Gruppen und Fassung beauty)", () => {
+    // E-196: Die Lebensmittel-Fassung hat seit ihrer Freigabe eine neue Fußzeile (GmbH & Co. KG, E-193) – ihre Prüfsumme
+    // weicht deshalb ab; die Beauty-Vorschläge gehören aber nicht dazu: eine Änderung dort lässt sie unverändert
+    const h = vorlageFuer("hygieneplan")!;
+    const lm = VORLAGEN_GEPRUEFT.hygieneplan!;
+    const beauty = { ...h, abschnitte: h.abschnitte.map((a) => ({ ...a, felder: a.felder.map((f) => (f.art === "liste" && f.vorschlaege ? { ...f, vorschlaege: f.vorschlaege.map((x) => (x.gruppe === "Alle Beauty-Betriebe" ? { ...x, titel: `${x.titel} (geändert)` } : x)) } : f)) })) };
+    expect(vorlagenPruefsumme(beauty, lm)).toBe(vorlagenPruefsumme({ ...h }, lm));
   });
 });
 
-describe("StB Busch, Runde 3: Bilanz und GuV", () => {
+describe("Steuerberater, Runde 3: Bilanz und GuV", () => {
   const v = vorlageFuer("bilanz_guv")!;
   const GMBH: Betrieb = { ...B, name: "Muster GmbH", rechtsform: "GmbH", vertretung: "Anna Berg, Ben Kurz" };
   const COKG: Betrieb = { ...B, name: "Muster GmbH & Co. KG", rechtsform: "GmbH & Co. KG", vertretung: "Anna Berg" };

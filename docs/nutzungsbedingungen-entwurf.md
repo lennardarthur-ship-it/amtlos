@@ -8,7 +8,7 @@
 
 1.1 Diese Bedingungen gelten für die Nutzung der App „Betriebsklar“ (im Folgenden „App“) von Lang Ventures UG (haftungsbeschränkt) i. G., Gomaringer Str. 33, 72770 Reutlingen, vertreten durch Lennard Lang (Geschäftsführer), Registergericht und Registernummer: [nach Eintragung], USt-IdNr.: [nach Eintragung], E-Mail: hallo@betriebsklar.de (im Folgenden „wir“).
 
-> RA Dr. Weber (Vorlagen-Freigabe 23.10.2026, Nr. 18, ändern): Die Platzhalter für Registergericht/Registernummer und USt-IdNr. bleiben bis zur Eintragung; solange die UG „i. G.“ ist, steht das hier in 1.1 (ist der Fall). Nach der Eintragung: `ANBIETER` in `rechtliches.ts` und diese Ziffer füllen, „i. G.“ streichen, neues Datum „Fassung vom …“ und `NUTZUNGSBEDINGUNGEN.fassung` setzen. Freigabe zur Veröffentlichung erst, wenn Fassungsdatum und Platzhalter erledigt sind.
+> Rechtsanwalt (Vorlagen-Freigabe 23.10.2026, Nr. 18, ändern): Die Platzhalter für Registergericht/Registernummer und USt-IdNr. bleiben bis zur Eintragung; solange die UG „i. G.“ ist, steht das hier in 1.1 (ist der Fall). Nach der Eintragung: `ANBIETER` in `rechtliches.ts` und diese Ziffer füllen, „i. G.“ streichen, neues Datum „Fassung vom …“ und `NUTZUNGSBEDINGUNGEN.fassung` setzen. Freigabe zur Veröffentlichung erst, wenn Fassungsdatum und Platzhalter erledigt sind.
 
 1.2 Die Bedingungen gelten für Unternehmer (§ 14 BGB) und Verbraucher (§ 13 BGB). Wo Regeln nur für eine Gruppe gelten, ist das gesagt.
 
@@ -86,7 +86,7 @@
 
 8.2a Gegenüber Unternehmern ist unsere Haftung nach Ziffer 8.2 auf 5.000 € je Schadensfall begrenzt.
 
-> Entscheidung des Gründers (21.10.2026): Haftung so gering wie zulässig. Festbetrag 5.000 € je Schadensfall gegenüber Unternehmern nach dem Vorschlag im Prüfbericht von Dr. Weber (Abschnitt 9). Ein niedrigerer Betrag erhöht das Risiko, dass die Klausel nach § 307 BGB unwirksam ist – dann haften wir unbegrenzt. Mit der Deckungssumme der Vermögensschadenhaftpflicht abstimmen.
+> Entscheidung des Gründers (21.10.2026): Haftung so gering wie zulässig. Festbetrag 5.000 € je Schadensfall gegenüber Unternehmern nach dem Vorschlag im Prüfbericht von Rechtsanwalt (Abschnitt 9). Ein niedrigerer Betrag erhöht das Risiko, dass die Klausel nach § 307 BGB unwirksam ist – dann haften wir unbegrenzt. Mit der Deckungssumme der Vermögensschadenhaftpflicht abstimmen.
 
 8.3 Im Übrigen ist die Haftung ausgeschlossen. Das gilt insbesondere für Bußgelder, Abmahnkosten oder Steuernachzahlungen, die entstehen, weil du dich ohne eigene Prüfung oder Beratung auf allgemeine Informationen oder Muster der App verlassen hast – es sei denn, ein Fall von 8.1 oder 8.2 liegt vor.
 
@@ -124,6 +124,6 @@
 
 12.2 Legst du Sicherungen in iCloud Drive ab, gelten dafür die Bedingungen von Apple für iCloud.
 
-> Fassungsdatum (RA Dr. Weber 23.10.2026): Das bisherige Fassungsdatum (21.10.2026) passte nicht mehr zum geänderten Text (u. a. 6.3, Erstattung über Apple) – gesetzt auf den 23.10.2026, die Fassung, die so veröffentlicht werden soll. Ändert sich der Text vor der Veröffentlichung noch einmal, Datum hier und in `NUTZUNGSBEDINGUNGEN.fassung` erneut anpassen.
+> Fassungsdatum (Rechtsanwalt 23.10.2026): Das bisherige Fassungsdatum (21.10.2026) passte nicht mehr zum geänderten Text (u. a. 6.3, Erstattung über Apple) – gesetzt auf den 23.10.2026, die Fassung, die so veröffentlicht werden soll. Ändert sich der Text vor der Veröffentlichung noch einmal, Datum hier und in `NUTZUNGSBEDINGUNGEN.fassung` erneut anpassen.
 
 Fassung vom 23.10.2026

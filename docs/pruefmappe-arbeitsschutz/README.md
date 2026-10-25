@@ -1,6 +1,6 @@
 # Prüfmappe für die fachliche Prüfung Arbeitsschutz
 
-Stand: Oktober 2026. Diese Mappe ist für eine **Fachkraft für Arbeitssicherheit** (Sifa) und – für die Fragen zur arbeitsmedizinischen Vorsorge – eine **Betriebsärztin oder einen Betriebsarzt**, idealerweise mit Erfahrung in der Betreuung kleiner Betriebe (Gastronomie, Friseur/Kosmetik, Handwerk, Werkstatt, Reinigung, Büro). Sie soll den Prüfauftrag eingrenzen und damit die Kosten planbar machen. Die rechtliche Prüfung (Arbeitsrecht, Datenschutz, RDG, Nutzungsbedingungen) hat Rechtsanwalt Dr. Weber übernommen; sie ist hier nicht Gegenstand.
+Stand: Oktober 2026. Diese Mappe ist für eine **Fachkraft für Arbeitssicherheit** (Sifa) und – für die Fragen zur arbeitsmedizinischen Vorsorge – eine **Betriebsärztin oder einen Betriebsarzt**, idealerweise mit Erfahrung in der Betreuung kleiner Betriebe (Gastronomie, Friseur/Kosmetik, Handwerk, Werkstatt, Reinigung, Büro). Sie soll den Prüfauftrag eingrenzen und damit die Kosten planbar machen. Die rechtliche Prüfung (Arbeitsrecht, Datenschutz, RDG, Nutzungsbedingungen) hat Rechtsanwalt übernommen; sie ist hier nicht Gegenstand.
 
 Anbieter: Lang Ventures UG (haftungsbeschränkt) i. G., Reutlingen. App: **Betriebsklar** (iPhone).
 
@@ -112,7 +112,7 @@ Stand nach E-166 (22.10.2026). Geschlossen: eigene Gruppe Praxis/Gesundheit für
 
 ## Nicht Gegenstand dieser Prüfung
 
-- **Rechtliches:** Das hat Rechtsanwalt Dr. Weber geprüft (Prüfbericht vom 21.10.2026): Gefährdungsbeurteilung im Abgleich mit ArbSchG, MuSchG und JArbSchG, RDG, Nutzungsbedingungen, Datenschutz. Sein Bericht hält ausdrücklich fest, dass die fachliche Freigabe der Bausteine (Risikobewertung, Grenzwerte) zur Fachkraft für Arbeitssicherheit gehört und nicht zur Anwältin; die Kennzahlen müssten je Baustein mit Quelle freigegeben werden (T-62). Gefahrstoff-Bausteine und Prüfprotokoll Elektro hat er an die Fachkraft für Arbeitssicherheit bzw. Elektrofachkraft verwiesen. Seine rechtlichen Ergänzungen (Spalte „bis wann“, Information nach § 14 Abs. 2 MuSchG, Abschnitt Jugendliche, leeres Blatt mit den sechs Faktoren) sind umgesetzt.
+- **Rechtliches:** Das hat Rechtsanwalt geprüft (Prüfbericht vom 21.10.2026): Gefährdungsbeurteilung im Abgleich mit ArbSchG, MuSchG und JArbSchG, RDG, Nutzungsbedingungen, Datenschutz. Sein Bericht hält ausdrücklich fest, dass die fachliche Freigabe der Bausteine (Risikobewertung, Grenzwerte) zur Fachkraft für Arbeitssicherheit gehört und nicht zur Anwältin; die Kennzahlen müssten je Baustein mit Quelle freigegeben werden (T-62). Gefahrstoff-Bausteine und Prüfprotokoll Elektro hat er an die Fachkraft für Arbeitssicherheit bzw. Elektrofachkraft verwiesen. Seine rechtlichen Ergänzungen (Spalte „bis wann“, Information nach § 14 Abs. 2 MuSchG, Abschnitt Jugendliche, leeres Blatt mit den sechs Faktoren) sind umgesetzt.
 - Lebensmittelhygiene (HACCP, Hygieneplan für Lebensmittelbetriebe, Allergene, Belehrung nach § 43 IfSG) – eigene Prüfmappe. Der Hygieneplan für Beauty-Betriebe (Infektionshygiene nach den Hygieneverordnungen der Länder) ist ebenfalls nicht Teil dieser Mappe.
 - Steuern, Buchhaltung, Lohn; Datenschutz; Technik der App.
 

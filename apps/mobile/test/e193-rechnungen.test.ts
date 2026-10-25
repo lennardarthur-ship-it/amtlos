@@ -134,10 +134,10 @@ describe("8c: Wiederherstellen behält Kontenrahmen, Berater- und Mandantennumme
   });
 
   it("Kontenvorgaben der Kanzlei und Nachweise der Vollsicherung gehen beim Wiederherstellen nicht verloren", () => {
-    const mit = steuerberatungSetzen(LEERER_STAND, { ...SB, kontenvorgaben: { kanzlei: "Heckler und Busch", personenkonten: true } }, t("2026-10-21"));
+    const mit = steuerberatungSetzen(LEERER_STAND, { ...SB, kontenvorgaben: { kanzlei: "Steuerberatungskanzlei", personenkonten: true } }, t("2026-10-21"));
     const gesichert: Stand = { ...mit, sicherungsNachweis: [{ am: "2026-10-21T10:00:00.000Z", ziel: "datei" }] };
     const z = zusammenfuehren(LEERER_STAND, gesichert).stand;
-    expect(z.steuerberatung.kontenvorgaben).toMatchObject({ kanzlei: "Heckler und Busch", personenkonten: true });
+    expect(z.steuerberatung.kontenvorgaben).toMatchObject({ kanzlei: "Steuerberatungskanzlei", personenkonten: true });
     expect(z.sicherungsNachweis).toEqual([{ am: "2026-10-21T10:00:00.000Z", ziel: "datei" }]);
   });
 });

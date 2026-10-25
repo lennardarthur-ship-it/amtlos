@@ -1,6 +1,6 @@
 # Datenschutzhinweis der Android-App – Entwurf zur Freigabe (E-190)
 
-> **ENTWURF – NICHT FREIGEGEBEN.** Vorzulegen bei RA Dr. Weber (PRUEFLISTE T-177). Der freigegebene Datenschutzhinweis
+> **ENTWURF – NICHT FREIGEGEBEN.** Vorzulegen bei Rechtsanwalt (PRUEFLISTE T-177). Der freigegebene Datenschutzhinweis
 > der iPhone-App (`DATENSCHUTZ` in `apps/mobile/src/rechtliches.ts`, Freigabe 23.10.2026, Prüfsumme 892aa8818e0e) bleibt
 > **unverändert** und gilt weiter nur für das iPhone. Die Android-Fassung steht im Code als `DATENSCHUTZ_ANDROID`
 > (`freigegeben: false`): Die Android-App zeigt sie mit dem Vermerk „Entwurf – dieser Hinweis ist fachlich noch nicht
@@ -43,7 +43,7 @@ Der vollständige Text steht in `apps/mobile/src/rechtliches.ts` → `DATENSCHUT
 unter „Mein Betrieb → Datenschutz“). Der Sync-Zusatz (nur Builds mit Server, auch auf dem iPhone nicht freigegeben)
 wird auf Android nur in den Gerätewörtern und „Google statt Apple“ angepasst.
 
-## Fragen an RA Dr. Weber
+## Fragen an Rechtsanwalt
 
 1. **Google als eigener Verantwortlicher** für Google Play und die Bezahlung – übertragbar wie bei Apple? Wer beim Kauf
    über Google Play Vertragspartner ist, ergibt sich aus den aktuellen Nutzungsbedingungen von Google Play – von uns

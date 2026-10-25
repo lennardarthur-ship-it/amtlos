@@ -1,4 +1,4 @@
-# T. Baum Abgleich 23.10.2026: Erklärung und Stelle nach seinem Vorschlag (letzter Satz mit Produktname wie in allen Katalogtexten)
+# Lebensmittelfachbeauftragter Abgleich 23.10.2026: Erklärung und Stelle nach seinem Vorschlag (letzter Satz mit Produktname wie in allen Katalogtexten)
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gastro_allergene
@@ -62,12 +62,13 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Liste der 14 Allergene (Anhang II LMIV) im Werkzeug prüfen'
-- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, freigegeben): Auslöser, Frist laufend und Kurztext fachlich richtig; Form bei loser Ware in der Allergenliste-Vorlage umgesetzt (Art. 44 LMIV, § 4 LMIDV); Folgen aus dem Wortlaut nachvollziehbar; Schwere wieder „hoch“ (umgesetzt)'
-- 'RA Dr. Weber Runde 3 (23.10.2026), Folgen freigegeben: § 6 Abs. 4 Nr. 1, 2 LMIDV i. V. m. § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB, bis 50.000 € – Fundstelle und Höhe bestätigt'
+- 'Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, freigegeben): Auslöser, Frist laufend und Kurztext fachlich richtig; Form bei loser Ware in der Allergenliste-Vorlage umgesetzt (Art. 44 LMIV, § 4 LMIDV); Folgen aus dem Wortlaut nachvollziehbar; Schwere wieder „hoch“ (umgesetzt)'
+- 'Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: § 6 Abs. 4 Nr. 1, 2 LMIDV i. V. m. § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB, bis 50.000 € – Fundstelle und Höhe bestätigt'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - Tim Baum (Lebensmittelfachbeauftragter)
-    - RA Dr. Ulrich Weber
+    - hygiene
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 5
+  unterschrieben_am: '2026-10-23'

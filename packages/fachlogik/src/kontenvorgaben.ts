@@ -1,5 +1,5 @@
 /**
- * Kontenvorgaben der Kanzlei (StB-Prüfung Heckler und Busch, 21.10.2026, B-4/B-6/B-9/B-10/B-11): Kanzleien haben feste
+ * Kontenvorgaben der Kanzlei (StB-Prüfung Steuerberatungskanzlei, 21.10.2026, B-4/B-6/B-9/B-10/B-11): Kanzleien haben feste
  * Hausregeln für einzelne Konten (Verrechnungskonto Gesellschafter, Gutscheine, Kassendifferenz, Bank statt
  * Verbindlichkeiten, Anlagenkonten nach Art, Homeoffice). Der Kontenrahmen allein reicht dafür nicht.
  *

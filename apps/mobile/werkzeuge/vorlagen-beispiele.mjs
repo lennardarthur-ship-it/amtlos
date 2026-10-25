@@ -1,5 +1,5 @@
 /**
- * Beispiel-PDFs für die fachliche Durchsicht (Rückmeldungen Runde 3, 24.10.2026): StB Busch und RA Dr. Weber konnten in den
+ * Beispiel-PDFs für die fachliche Durchsicht (Rückmeldungen Runde 3, 24.10.2026): Steuerberater und Rechtsanwalt konnten in den
  * Vorlagen-PDFs nur das GmbH- bzw. Lebensmittel-Beispiel sehen. Dieses Werkzeug erzeugt realistisch ausgefüllte Beispiele
  * für die Rechtsformen und Fassungen, die dort fehlten – gedruckt wie die App (A4, Ränder je Gestalt, eingebettete Schriften,
  * Fußzeile; Chromium wie werkzeuge/dokumente-pruefen.mjs):

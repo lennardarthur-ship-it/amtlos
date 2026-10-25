@@ -1,6 +1,6 @@
 # Prüfmappe für die steuerliche Prüfung
 
-Stand: Oktober 2026. Diese Mappe ist für eine Steuerberaterin oder einen Steuerberater mit Erfahrung in **Finanzbuchhaltung mit DATEV Kanzlei-Rechnungswesen**, **Umsatzsteuer** und **Kassenführung/GoBD** kleiner Betriebe. Sie soll den Prüfauftrag eingrenzen und damit die Kosten planbar machen. Die rechtliche Prüfung (Arbeitsrecht, Datenschutz, RDG, Nutzungsbedingungen) hat Dr. Weber übernommen; sie ist hier nicht Gegenstand.
+Stand: Oktober 2026. Diese Mappe ist für eine Steuerberaterin oder einen Steuerberater mit Erfahrung in **Finanzbuchhaltung mit DATEV Kanzlei-Rechnungswesen**, **Umsatzsteuer** und **Kassenführung/GoBD** kleiner Betriebe. Sie soll den Prüfauftrag eingrenzen und damit die Kosten planbar machen. Die rechtliche Prüfung (Arbeitsrecht, Datenschutz, RDG, Nutzungsbedingungen) hat Rechtsanwalt übernommen; sie ist hier nicht Gegenstand.
 
 Anbieter: Lang Ventures UG (haftungsbeschränkt) i. G., Reutlingen. App: **Betriebsklar** (iPhone).
 
@@ -132,11 +132,11 @@ Verdichtet aus `PRUEFLISTE-steuer.md` (Nummern in Klammern).
 
 ### Grenze zur Steuerberatung (§ 2 StBerG)
 
-22. Der Prüfbericht von Dr. Weber (21.10.2026) hält fest: Die Berechnung der USt-Voranmeldung aus den Rechnungen braucht den Hinweis „Übertragungshilfe, keine Steuerberatung“; die Kleinunternehmer-Warnung aus den Rechnungsdaten ist „vertretbar, weil rein rechnerisch, aber an der Grenze zur Steuerberatung (§ 2 StBerG)“ und muss als Rechenergebnis erkennbar bleiben. **Heute** heißt die Vorlage im Untertitel „Übertragungshilfe für ELSTER“; der allgemeine Hinweis „keine Rechts- oder Steuerberatung“ steht in der App bei jeder Vorlage, nicht auf dem PDF. Bitte bestätigen oder korrigieren Sie den Wortlaut – für die Voranmeldung, die EÜR-Übernahme, die Kleinunternehmer-Warnung und die `Fragen_*.txt` im Paket („nur Sachverhalte, keine steuerliche Bewertung“). Die direkte ELSTER-Übermittlung (J-1, T-71) ist nicht gebaut.
+22. Der Prüfbericht von Rechtsanwalt (21.10.2026) hält fest: Die Berechnung der USt-Voranmeldung aus den Rechnungen braucht den Hinweis „Übertragungshilfe, keine Steuerberatung“; die Kleinunternehmer-Warnung aus den Rechnungsdaten ist „vertretbar, weil rein rechnerisch, aber an der Grenze zur Steuerberatung (§ 2 StBerG)“ und muss als Rechenergebnis erkennbar bleiben. **Heute** heißt die Vorlage im Untertitel „Übertragungshilfe für ELSTER“; der allgemeine Hinweis „keine Rechts- oder Steuerberatung“ steht in der App bei jeder Vorlage, nicht auf dem PDF. Bitte bestätigen oder korrigieren Sie den Wortlaut – für die Voranmeldung, die EÜR-Übernahme, die Kleinunternehmer-Warnung und die `Fragen_*.txt` im Paket („nur Sachverhalte, keine steuerliche Bewertung“). Die direkte ELSTER-Übermittlung (J-1, T-71) ist nicht gebaut.
 
 ## Nicht Gegenstand dieser Prüfung
 
-- Alles, was Dr. Weber geprüft hat oder prüft: RDG-Einordnung des Pflichten-Checks, Nutzungsbedingungen und Haftung, Datenschutz der App und der Website, Impressum, NachwG-Nachweis, AVV, Datenschutzinformation, Gefährdungsbeurteilung und die übrigen arbeits- und datenschutzrechtlichen Vorlagen.
+- Alles, was Rechtsanwalt geprüft hat oder prüft: RDG-Einordnung des Pflichten-Checks, Nutzungsbedingungen und Haftung, Datenschutz der App und der Website, Impressum, NachwG-Nachweis, AVV, Datenschutzinformation, Gefährdungsbeurteilung und die übrigen arbeits- und datenschutzrechtlichen Vorlagen.
 - Arbeitsschutz, Lebensmittelhygiene (HACCP, Allergene, Hygieneplan), Gefahrstoffe, Elektroprüfung.
 - Katalogpflichten außerhalb von `katalog-steuer.csv` und die Website.
 - Technik der App (Verschlüsselung, Synchronisation, Abo).

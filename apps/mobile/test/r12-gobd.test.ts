@@ -42,7 +42,7 @@ import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
 import { MARKE } from "@amtlos/marke";
 
 const t = (d: string, h = 9) => new Date(`${d}T${String(h).padStart(2, "0")}:00:00Z`);
-const BETRIEB = { ...LEERER_STAND.betrieb, name: "Café Morgenrot", strasse: "Karl-Heine-Str. 1", plz: "04229", ort: "Leipzig", email: "info@cafe.example", telefon: "0341 1", steuernummer: "231/100/40001", iban: "DE89370400440532013000", verantwortlich: "Jana Weber" };
+const BETRIEB = { ...LEERER_STAND.betrieb, name: "Café Morgenrot", strasse: "Karl-Heine-Str. 1", plz: "04229", ort: "Leipzig", email: "info@cafe.example", telefon: "0341 1", steuernummer: "231/100/40001", iban: "DE89370400440532013000", verantwortlich: "Jana Winter" };
 const BASIS: Stand = { ...LEERER_STAND, betrieb: BETRIEB, profil: { "kasse.elektronisch": true, "ust.kleinunternehmer": false } };
 const SB = { kontenrahmen: "SKR03" as const, beraternummer: "1001", mandantennummer: "42" };
 const tag = (datum: string, o: Partial<KassenInhalt> = {}): KassenInhalt => ({ datum, zbon: null, umsatz: [{ satz: 19, brutto_cent: 11900 }, { satz: 7, brutto_cent: 10700 }], karte_cent: 10000, sonstige_cent: 0, bewegungen: [], ...o });

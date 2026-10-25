@@ -1,6 +1,6 @@
 # Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 # Rechtsstand 21.10.2026: Referentenentwurf BMAS (Juni 2026) in der Ressortabstimmung, kein Kabinettsbeschluss
-# Freigabe RA Dr. Weber 22.10.2026: als Entwurf/Radar korrekt; keine Angaben zu Fristen bestätigbar, solange kein Kabinettsbeschluss vorliegt – vor dem Launch Stand prüfen
+# Freigabe Rechtsanwalt 22.10.2026: als Entwurf/Radar korrekt; keine Angaben zu Fristen bestätigbar, solange kein Kabinettsbeschluss vorliegt – vor dem Launch Stand prüfen
 # Offen (Produkt, kein Prüfpunkt): Schwelle 10 als Regelwert führen, sobald beschlossen
 schema_version: 1
 id: personal.arbeitszeit_neuregelung
@@ -61,11 +61,14 @@ quellen:
   url: https://www.handwerksblatt.de/themen-specials/arbeitszeit-erfassen-aber-wie/elektronische-erfassung-der-arbeitszeit-wird-pflicht
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Übergangsfristen laut Handwerksblatt (unter 250: zwei Jahre, unter 50: fünf Jahre; 1.10.2026 zusätzlich „ab 250 mindestens ein Jahr“) – gegen den Entwurfstext prüfen; laut Freigabe Weber 22.10.2026 sind Angaben zu Fristen nicht bestätigbar, solange kein Kabinettsbeschluss vorliegt'
-- 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): als Radar ohne Fristangaben freigegeben; vor dem Launch und nach dem Kabinettsbeschluss erneut vorlegen'
+- 'Übergangsfristen laut Handwerksblatt (unter 250: zwei Jahre, unter 50: fünf Jahre; 1.10.2026 zusätzlich „ab 250 mindestens ein Jahr“) – gegen den Entwurfstext prüfen; laut Freigabe Rechtsanwalt 22.10.2026 sind Angaben zu Fristen nicht bestätigbar, solange kein Kabinettsbeschluss vorliegt'
+- 'Freigabe Rechtsanwalt Runde 2 (23.10.2026): als Radar ohne Fristangaben freigegeben; vor dem Launch und nach dem Kabinettsbeschluss erneut vorlegen'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 3
+  unterschrieben_am: '2026-10-23'
+  offen:
+    - "vor dem Start und nach dem Kabinettsbeschluss erneut vorzulegen"

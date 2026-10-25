@@ -37,7 +37,7 @@ describe("Zustimmung zu den Nutzungsbedingungen: Schalter aus (heutiger Stand)",
     expect(zustimmungNoetig(LEERER_STAND.nutzungsbedingungen)).toBe(false);
   });
 
-  it("Datenschutzhinweis freigegeben (RA Dr. Weber 23.10.2026, Build ohne Sync)", () => {
+  it("Datenschutzhinweis freigegeben (Rechtsanwalt 23.10.2026, Build ohne Sync)", () => {
     expect(DATENSCHUTZ.freigegeben).toBe(true);
   });
 });

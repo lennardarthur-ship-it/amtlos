@@ -31,7 +31,7 @@
     {
       "pfad": "profil.taetigkeit_beginn",
       "typ": "datum",
-      "herleitung": "Onboarding (StB Busch 22.10.2026): Eröffnung des Betriebs bzw. Aufnahme der Tätigkeit (§ 138 Abs. 1b Satz 1, Abs. 4 AO) – gefragt bei eingetragenen Gesellschaften, bei denen Beurkundung, Registereintrag und erste Tätigkeit auseinanderliegen können",
+      "herleitung": "Onboarding (Steuerberater 22.10.2026): Eröffnung des Betriebs bzw. Aufnahme der Tätigkeit (§ 138 Abs. 1b Satz 1, Abs. 4 AO) – gefragt bei eingetragenen Gesellschaften, bei denen Beurkundung, Registereintrag und erste Tätigkeit auseinanderliegen können",
       "ab": 2
     },
     {
@@ -228,7 +228,7 @@
     {
       "pfad": "profil.einkauf.eu_unternehmen",
       "typ": "bool",
-      "herleitung": "Onboarding (StB Busch 22.10.2026): kauft Waren oder Leistungen bei Unternehmen in anderen EU-Ländern ein, z. B. Software oder Werbung – USt-IdNr. auch für Einkäufe (§ 27a UStG)",
+      "herleitung": "Onboarding (Steuerberater 22.10.2026): kauft Waren oder Leistungen bei Unternehmen in anderen EU-Ländern ein, z. B. Software oder Werbung – USt-IdNr. auch für Einkäufe (§ 27a UStG)",
       "ab": 2
     },
     {
@@ -240,7 +240,7 @@
         "keine_warenlieferungen",
         "unklar"
       ],
-      "herleitung": "Onboarding (StB Busch 22.10.2026): Meldezeitraum der Zusammenfassenden Meldung bei innergemeinschaftlichen Warenlieferungen – monatlich als Regel, vierteljährlich wählbar, wenn die Lieferungen weder im laufenden noch in einem der vier vorangegangenen Quartale jeweils 50.000 € übersteigen (§ 18a Abs. 1 Satz 2 UStG); „keine_warenlieferungen“ = nur sonstige Leistungen, vierteljährlich (§ 18a Abs. 2 UStG)",
+      "herleitung": "Onboarding (Steuerberater 22.10.2026): Meldezeitraum der Zusammenfassenden Meldung bei innergemeinschaftlichen Warenlieferungen – monatlich als Regel, vierteljährlich wählbar, wenn die Lieferungen weder im laufenden noch in einem der vier vorangegangenen Quartale jeweils 50.000 € übersteigen (§ 18a Abs. 1 Satz 2 UStG); „keine_warenlieferungen“ = nur sonstige Leistungen, vierteljährlich (§ 18a Abs. 2 UStG)",
       "ab": 2
     },
     {
@@ -315,13 +315,13 @@
     {
       "pfad": "profil.gastro.vorverpackt",
       "typ": "bool",
-      "herleitung": "Onboarding (Prüfbericht Lebensmittelhygiene 22.10.2026, Frage 14): verkauft selbst abgepackte Lebensmittel, z. B. Kekse, Marmelade oder Granola im Regal oder im Onlineversand – Kennzeichnung nach Art. 9 LMIV; gefragt in der Lebensmittelbranche und bei Onlinehandel mit Lebensmitteln (Rückmeldung T. Baum 22.10.2026)",
+      "herleitung": "Onboarding (Prüfbericht Lebensmittelhygiene 22.10.2026, Frage 14): verkauft selbst abgepackte Lebensmittel, z. B. Kekse, Marmelade oder Granola im Regal oder im Onlineversand – Kennzeichnung nach Art. 9 LMIV; gefragt in der Lebensmittelbranche und bei Onlinehandel mit Lebensmitteln (Rückmeldung Lebensmittelfachbeauftragter 22.10.2026)",
       "ab": 2
     },
     {
       "pfad": "profil.gastro.backen_frittieren",
       "typ": "bool",
-      "herleitung": "Onboarding (Rückmeldung Lebensmittel T. Baum 22.10.2026): backt selbst (Brot, Backwaren) oder frittiert (z. B. Pommes frites) – Acrylamid-Minimierung nach Art. 2 VO (EU) 2017/2158",
+      "herleitung": "Onboarding (Rückmeldung Lebensmittel Lebensmittelfachbeauftragter 22.10.2026): backt selbst (Brot, Backwaren) oder frittiert (z. B. Pommes frites) – Acrylamid-Minimierung nach Art. 2 VO (EU) 2017/2158",
       "ab": 2
     },
     {
@@ -352,13 +352,13 @@
         "ebook_reader",
         "keine"
       ],
-      "herleitung": "Onboarding (Prüfvermerk RA Dr. Weber 22.10.2026, G.70): Produkte nach § 1 Abs. 2 BFSG im Sortiment – Hardwaresysteme für Universalrechner (Nr. 1), Zahlungsterminals (Nr. 2 Buchst. a), Selbstbedienungsterminals (Nr. 2 Buchst. b), Verbraucherendgeräte für Telekommunikationsdienste (Nr. 3) und für audiovisuelle Mediendienste (Nr. 4), E-Book-Lesegeräte (Nr. 5)",
+      "herleitung": "Onboarding (Prüfvermerk Rechtsanwalt 22.10.2026, G.70): Produkte nach § 1 Abs. 2 BFSG im Sortiment – Hardwaresysteme für Universalrechner (Nr. 1), Zahlungsterminals (Nr. 2 Buchst. a), Selbstbedienungsterminals (Nr. 2 Buchst. b), Verbraucherendgeräte für Telekommunikationsdienste (Nr. 3) und für audiovisuelle Mediendienste (Nr. 4), E-Book-Lesegeräte (Nr. 5)",
       "ab": 2
     },
     {
       "pfad": "profil.produkte.verpackung_ab",
       "typ": "datum",
-      "herleitung": "Onboarding (Prüfvermerk RA Dr. Weber 22.10.2026, G.71): ab wann der Betrieb erstmals verpackte Waren in Verkehr bringt – nur, wenn er damit noch nicht begonnen hat; Bezug der Registrierung vor dem erstmaligen Bereitstellen (§§ 6, 7 VerpackDG)",
+      "herleitung": "Onboarding (Prüfvermerk Rechtsanwalt 22.10.2026, G.71): ab wann der Betrieb erstmals verpackte Waren in Verkehr bringt – nur, wenn er damit noch nicht begonnen hat; Bezug der Registrierung vor dem erstmaligen Bereitstellen (§§ 6, 7 VerpackDG)",
       "ab": 2
     },
     {
@@ -453,7 +453,7 @@
         "eigene_gueter",
         "personen"
       ],
-      "herleitung": "Onboarding (Prüfvermerk RA Dr. Weber 22.10.2026, H.5): was mit den Firmenfahrzeugen befördert wird – Güter für andere (gewerblicher Güterkraftverkehr, § 1 Abs. 1 GüKG), nur eigene Güter (Werkverkehr, § 1 Abs. 2, 3 GüKG), Personen gegen Entgelt (§§ 1, 2 PBefG)",
+      "herleitung": "Onboarding (Prüfvermerk Rechtsanwalt 22.10.2026, H.5): was mit den Firmenfahrzeugen befördert wird – Güter für andere (gewerblicher Güterkraftverkehr, § 1 Abs. 1 GüKG), nur eigene Güter (Werkverkehr, § 1 Abs. 2, 3 GüKG), Personen gegen Entgelt (§§ 1, 2 PBefG)",
       "ab": 2
     },
     {
@@ -706,7 +706,7 @@
     {
       "pfad": "profil.nis2.betroffen_seit",
       "typ": "datum",
-      "herleitung": "Onboarding (Prüfvermerk RA Dr. Weber 22.10.2026, F.64): seit wann das Unternehmen (erstmals oder erneut) unter NIS2 fällt – Bezug der Registrierungsfrist von drei Monaten (§ 33 BSIG); bei Betroffenheit schon zum Inkrafttreten der 6.12.2025",
+      "herleitung": "Onboarding (Prüfvermerk Rechtsanwalt 22.10.2026, F.64): seit wann das Unternehmen (erstmals oder erneut) unter NIS2 fällt – Bezug der Registrierungsfrist von drei Monaten (§ 33 BSIG); bei Betroffenheit schon zum Inkrafttreten der 6.12.2025",
       "ab": 6
     },
     {
@@ -718,7 +718,7 @@
     {
       "pfad": "profil.bauleistungen.fuer_unternehmen",
       "typ": "bool",
-      "herleitung": "Onboarding (Bauleistungen nach § 48 Abs. 1 EStG an Unternehmer oder juristische Personen des öffentlichen Rechts; Privatbauherren behalten nichts ein – StB Busch 22.10.2026)",
+      "herleitung": "Onboarding (Bauleistungen nach § 48 Abs. 1 EStG an Unternehmer oder juristische Personen des öffentlichen Rechts; Privatbauherren behalten nichts ein – Steuerberater 22.10.2026)",
       "ab": 2
     },
     {
@@ -730,7 +730,7 @@
     {
       "pfad": "profil.auslandszahlungen.ueber_meldegrenze",
       "typ": "bool",
-      "herleitung": "Onboarding: Zahlungen von oder an Gebietsfremde über 50.000 € (Meldegrenze § 67 Abs. 2 Nr. 1 AWV, Freigabe Weber 22.10.2026)",
+      "herleitung": "Onboarding: Zahlungen von oder an Gebietsfremde über 50.000 € (Meldegrenze § 67 Abs. 2 Nr. 1 AWV, Freigabe Rechtsanwalt 22.10.2026)",
       "ab": 3
     },
     {
@@ -741,7 +741,7 @@
         "beantragt",
         "eingetragen"
       ],
-      "herleitung": "Onboarding / Gründungsassistent (Kapitalgesellschaft, R12 auch GmbH & Co. KG und Partnerschaftsgesellschaft, E-176 auch OHG und KG: Handels- bzw. Partnerschaftsregister; Freigabe Weber 22.10.2026, B.16: bei der GbR das Gesellschaftsregister – „eingetragen“ = eGbR, § 707 BGB)",
+      "herleitung": "Onboarding / Gründungsassistent (Kapitalgesellschaft, R12 auch GmbH & Co. KG und Partnerschaftsgesellschaft, E-176 auch OHG und KG: Handels- bzw. Partnerschaftsregister; Freigabe Rechtsanwalt 22.10.2026, B.16: bei der GbR das Gesellschaftsregister – „eingetragen“ = eGbR, § 707 BGB)",
       "ab": 3
     },
     {
@@ -829,7 +829,7 @@
     {
       "pfad": "abgeleitet.taetigkeit_beginn",
       "typ": "datum",
-      "herleitung": "taetigkeit_beginn, ohne diese Angabe gruendungsdatum (die Startfrage lautet „Wann hast du angefangen?“) – Bezug der Frist nach § 138 Abs. 4 AO (StB Busch 22.10.2026)",
+      "herleitung": "taetigkeit_beginn, ohne diese Angabe gruendungsdatum (die Startfrage lautet „Wann hast du angefangen?“) – Bezug der Frist nach § 138 Abs. 4 AO (Steuerberater 22.10.2026)",
       "ab": 2
     },
     {
@@ -841,13 +841,13 @@
     {
       "pfad": "finanzen.umsatz.laufendes_jahr",
       "typ": "betrag",
-      "herleitung": "Abgelöst durch finanzen.umsatz.vereinnahmt_laufendes_jahr (StB Busch 22.10.2026) – nur noch für ältere Katalog-Releases: Summe der in Amtlos gestellten Ausgangsrechnungen (netto, Stornos abgezogen) im Kalenderjahr nach Rechnungsdatum (Server)",
+      "herleitung": "Abgelöst durch finanzen.umsatz.vereinnahmt_laufendes_jahr (Steuerberater 22.10.2026) – nur noch für ältere Katalog-Releases: Summe der in Amtlos gestellten Ausgangsrechnungen (netto, Stornos abgezogen) im Kalenderjahr nach Rechnungsdatum (Server)",
       "ab": 4
     },
     {
       "pfad": "finanzen.umsatz.vereinnahmt_laufendes_jahr",
       "typ": "betrag",
-      "herleitung": "Gesamtumsatz nach § 19 Abs. 2 UStG (nach vereinnahmten Entgelten, netto; StB Busch 22.10.2026) vom 1.1. bis zum Stichtag aus den Daten in Amtlos, MIT Ersatzregel für offene Rechnungen – Zählweise der Warnungen 80 %/95 % (StB Busch: für eine Warnung vertretbar). Nur wenn in Amtlos Rechnungen gestellt bzw. Kassenabschlüsse erfasst sind. App (apps/mobile/src/unterlagen/kuUmsatz.ts): Zahlungseingänge auf Ausgangsrechnungen (je Zahlung bzw. am Tag „bezahlt“, Schlussrechnung abzüglich Abschläge, bezahlte Stornos negativ), Kasseneinnahmen laut Tagesabschlüssen, Sachentnahmen (§ 3 Abs. 1b UStG, von StB Busch bestätigt); ohne Gutschriften, ohne nicht steuerbare Umsätze (Kleinunternehmer-Leistungen an Unternehmen im Ausland, OSS) und ohne steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit der Steuerart „befreit“, z. B. Heilbehandlungen; der Nullsteuersatz nach § 12 Abs. 3 UStG zählt mit). Ersatzregel (vorsichtig): Rechnungen ohne jeden Zahlungsvermerk zählen mit dem Rechnungsdatum; unbezahlt stornierte Rechnungen samt Storno zählen nicht. Server (packages/server/src/finanzen.ts): speichert keine Zahlungseingänge, daher gilt dort die Ersatzregel für alle gestellten Rechnungen (Rechnungsdatum; eine Steuerart „befreit“ gibt es dort nicht). Verkäufe von Anlagegütern (§ 19 Abs. 2 Satz 2 UStG) erkennt Amtlos nicht – als Rechnung erfasst, ist der Wert zu hoch",
+      "herleitung": "Gesamtumsatz nach § 19 Abs. 2 UStG (nach vereinnahmten Entgelten, netto; Steuerberater 22.10.2026) vom 1.1. bis zum Stichtag aus den Daten in Amtlos, MIT Ersatzregel für offene Rechnungen – Zählweise der Warnungen 80 %/95 % (Steuerberater: für eine Warnung vertretbar). Nur wenn in Amtlos Rechnungen gestellt bzw. Kassenabschlüsse erfasst sind. App (apps/mobile/src/unterlagen/kuUmsatz.ts): Zahlungseingänge auf Ausgangsrechnungen (je Zahlung bzw. am Tag „bezahlt“, Schlussrechnung abzüglich Abschläge, bezahlte Stornos negativ), Kasseneinnahmen laut Tagesabschlüssen, Sachentnahmen (§ 3 Abs. 1b UStG, von Steuerberater bestätigt); ohne Gutschriften, ohne nicht steuerbare Umsätze (Kleinunternehmer-Leistungen an Unternehmen im Ausland, OSS) und ohne steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit der Steuerart „befreit“, z. B. Heilbehandlungen; der Nullsteuersatz nach § 12 Abs. 3 UStG zählt mit). Ersatzregel (vorsichtig): Rechnungen ohne jeden Zahlungsvermerk zählen mit dem Rechnungsdatum; unbezahlt stornierte Rechnungen samt Storno zählen nicht. Server (packages/server/src/finanzen.ts): speichert keine Zahlungseingänge, daher gilt dort die Ersatzregel für alle gestellten Rechnungen (Rechnungsdatum; eine Steuerart „befreit“ gibt es dort nicht). Verkäufe von Anlagegütern (§ 19 Abs. 2 Satz 2 UStG) erkennt Amtlos nicht – als Rechnung erfasst, ist der Wert zu hoch",
       "ab": 4
     },
     {
@@ -859,7 +859,7 @@
     {
       "pfad": "finanzen.umsatz.bezahlt_laufendes_jahr",
       "typ": "betrag",
-      "herleitung": "Gesamtumsatz nach § 19 Abs. 2 UStG wie finanzen.umsatz.vereinnahmt_laufendes_jahr, aber OHNE Ersatzregel: nur tatsächliche Zahlungseingänge auf Ausgangsrechnungen, Kasseneinnahmen und Sachentnahmen vom 1.1. bis zum Stichtag – offene Rechnungen zählen nicht (StB Busch 22.10.2026, Runde 2: wer wegen offener Rechnungen zu früh Umsatzsteuer ausweist, schuldet sie nach § 14c Abs. 2 UStG). Zählweise für „Grenze überschritten“ und „ab 1. Januar“. Nur in der App (apps/mobile/src/unterlagen/kuUmsatz.ts); der Server kennt keine Zahlungseingänge und liefert den Fakt nicht – die Zweige mit diesem Fakt sind dort über „vorhanden“ abgesichert und gelten nicht",
+      "herleitung": "Gesamtumsatz nach § 19 Abs. 2 UStG wie finanzen.umsatz.vereinnahmt_laufendes_jahr, aber OHNE Ersatzregel: nur tatsächliche Zahlungseingänge auf Ausgangsrechnungen, Kasseneinnahmen und Sachentnahmen vom 1.1. bis zum Stichtag – offene Rechnungen zählen nicht (Steuerberater 22.10.2026, Runde 2: wer wegen offener Rechnungen zu früh Umsatzsteuer ausweist, schuldet sie nach § 14c Abs. 2 UStG). Zählweise für „Grenze überschritten“ und „ab 1. Januar“. Nur in der App (apps/mobile/src/unterlagen/kuUmsatz.ts); der Server kennt keine Zahlungseingänge und liefert den Fakt nicht – die Zweige mit diesem Fakt sind dort über „vorhanden“ abgesichert und gelten nicht",
       "ab": 4
     },
     {

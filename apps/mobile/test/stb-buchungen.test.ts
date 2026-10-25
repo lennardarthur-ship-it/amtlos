@@ -1,5 +1,5 @@
 /**
- * StB-Prüfung Kanzlei Heckler und Busch (21.10.2026) im Steuerberater-Paket: Soll-Stapel einer GmbH mit
+ * StB-Prüfung Steuerberatungskanzlei (21.10.2026) im Steuerberater-Paket: Soll-Stapel einer GmbH mit
  * Zahlungseingängen und offenen Forderungen zum 31.12. (A-4), Verrechnungskonto Gesellschafter (B-6), EÜR gesperrt
  * (E-4), Kontenvorgaben in Stapel, LIESMICH, Stand und Migration 6 → 7.
  */
@@ -140,7 +140,7 @@ describe("Nachtrag 22.10.2026: OSS-Rechnung in Stapel und EÜR", () => {
   it("Feld 40 nur Länderkennzeichen, Feld 41 Satz, Konto 8320; EÜR: Netto „nicht umsatzsteuerbar“, ausländische USt als vereinnahmte USt", () => {
     let s: Stand = { ...LEERER_STAND, betrieb: { ...LEERER_STAND.betrieb, name: "Kerzenwerk Lina Hoff", rechtsform: "Einzelunternehmen", ust_idnr: "DE347215896", versteuerung: "soll" }, steuerberatung: SB };
     const [s1] = anlegen(s, "rechnung", t("2026-12-16"), "o1");
-    s = felderSetzen(s1, "o1", { datum: "2026-12-16", leistung_gleich: true, kunde_name: "Katharina Weber", kunde_anschrift: "Gumpendorfer Straße 72\n1060 Wien\nÖsterreich", kunde_art: "privat", oss: true, oss_satz: "20", positionen: [{ bezeichnung: "Geschenkset", menge: "1", einheit: "", preis: "100,00", satz: "19" }] }, t("2026-12-16"));
+    s = felderSetzen(s1, "o1", { datum: "2026-12-16", leistung_gleich: true, kunde_name: "Katharina Winter", kunde_anschrift: "Gumpendorfer Straße 72\n1060 Wien\nÖsterreich", kunde_art: "privat", oss: true, oss_satz: "20", positionen: [{ bezeichnung: "Geschenkset", menge: "1", einheit: "", preis: "100,00", satz: "19" }] }, t("2026-12-16"));
     s = bezahltSetzen(ausgeben(s, "o1", t("2026-12-16")), "o1", "2026-12-18");
     const z = latin1(steuerpaket(s, JAHR, SB, {}, "2027-02-15T10:00:00"), "EXTF_Buchungsstapel_2026.csv").split("\r\n").slice(2, -1).map((x) => x.split(";"));
     expect(z.map((f) => [f[0], f[6], f[7], f[39], f[40]])).toEqual([["120,00", "1410", "8320", '"AT"', "20,00"]]);

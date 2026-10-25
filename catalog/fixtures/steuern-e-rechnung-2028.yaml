@@ -1,0 +1,16 @@
+persona: grenzfall
+beschreibung: Steuerberater 22.10.2026 – E-Rechnung-Versand für alle im B2B-Geschäft gilt ab 01.01.2028 (in Kraft, gültig ab 2028); vorher erscheint die Pflicht nicht im Ergebnis
+stichtag: '2028-01-03'
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: '2015-01-01'
+  profil.ust.kleinunternehmer: false
+  profil.kunden.segmente:
+  - b2b
+  profil.umsatz.prognose_laufendes_jahr: 700000
+  profil.bundesland: BE
+  profil.umsatz.vorjahr: 700000
+erwartet:
+  steuern.e_rechnung_versand_2028: gilt
+termine_enthaelt:
+  steuern.e_rechnung_versand_2028: [["einmalig", "2028-01-01"]]

@@ -285,7 +285,7 @@ export function uebertragung(felderNamen: string[]): string {
 /** Hinweis am Dokumentende (Gesetzestext, Wiederholungsfrist) – klein, abgesetzt, kein Kasten. */
 export const nachsatz = (t: string) => `<p class="nachsatz">${esc(t)}</p>`;
 
-/** StB GoBD (Prüfbericht Heckler und Busch, Abschnitt 8): Wer die Verantwortung trägt – gleich auf jedem Steuer-PDF. */
+/** StB GoBD (Prüfbericht Steuerberatungskanzlei, Abschnitt 8): Wer die Verantwortung trägt – gleich auf jedem Steuer-PDF. */
 export const KEINE_STEUERBERATUNG = "Keine Steuerberatung – Vollständigkeit und steuerliche Beurteilung liegen beim Unternehmer bzw. seiner Steuerberatung.";
 /**
  * StB GoBD (Abschnitt 8, § 2 StBerG): Hinweis „Übertragungshilfe, keine Steuerberatung“ auf den Steuer-PDFs – nicht nur in

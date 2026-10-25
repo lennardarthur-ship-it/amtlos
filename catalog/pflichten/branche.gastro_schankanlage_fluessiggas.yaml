@@ -1,4 +1,4 @@
-# Sifa T. Koch Nachprüfung 23.10.2026 (H.1, ändern): Zuständige Stelle wie bei DGUV V3 („Du selbst (Prüfung durch eine zur Prüfung befähigte Person …)“, verantwortlich bleibt der Betreiber); Quelle DGUV Regel 110-010 ergänzt (publikationen.dguv.de, Ausgabe 2022.12, aktualisiert 2024.11, gelesen 23.10.2026)
+# Sifa Nachprüfung 23.10.2026 (H.1, ändern): Zuständige Stelle wie bei DGUV V3 („Du selbst (Prüfung durch eine zur Prüfung befähigte Person …)“, verantwortlich bleibt der Betreiber); Quelle DGUV Regel 110-010 ergänzt (publikationen.dguv.de, Ausgabe 2022.12, aktualisiert 2024.11, gelesen 23.10.2026)
 # Sifa Abgleich 23.10.2026: auf BetrSichV und DGUV Regel 110-010 umgestellt, „Sachkundiger nach DGUV Vorschrift 79“ gestrichen; BG-Hinweis bleibt
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Getränkeschankanlagen / Flüssiggas prüfen“, Fragen 1)
 schema_version: 1
@@ -68,12 +68,10 @@ quellen:
   url: https://publikationen.dguv.de/regelwerk/dguv-regeln/3406/verwendung-von-fluessiggas
   abgerufen: '2026-10-23'
 fachlich_zu_pruefen:
-- 'Sifa T. Koch Nachprüfung 23.10.2026 (ändern) umgesetzt: Zuständige Stelle wörtlich nach seinem Vorschlag, Link zur DGUV Regel 110-010 ergänzt; übrige Felder hat er freigegeben'
+- 'Sifa Nachprüfung 23.10.2026 (ändern) umgesetzt: Zuständige Stelle wörtlich nach seinem Vorschlag, Link zur DGUV Regel 110-010 ergänzt; übrige Felder hat er freigegeben'
 - 'Sifa Runde 2 (23.10.2026) umgesetzt: Fristen über die Gefährdungsbeurteilung (§ 3 Abs. 6 BetrSichV, Wortlaut gesetze-im-internet.de 23.10.2026) mit DGUV Regel 110-007 und DGUV Vorschrift 79 als Anhaltspunkt (im Text, Frist bleibt „dauerhaft“ – es gibt kein Ereignis zur Inbetriebnahme der Anlage); Kurztext „befähigte Person (bei Flüssiggas Sachkundiger nach DGUV Vorschrift 79)“; Hinweis CO2-Warneinrichtung. „oder“ im Kurztext bleibt (Sifa: Pflicht gilt schon für eine der beiden Anlagen). Rückfrage an die Sifa: Die Publikationsseite der DGUV (abgerufen 23.10.2026) meldet, dass die DGUV die Zurückziehung der DGUV Vorschrift 79 empfohlen hat und die DGUV Regel 110-010 „Flüssiggas“ erschienen ist; Geltung beim Unfallversicherungsträger erfragen – im Text als Hinweis, bitte bestätigen oder Verweis auf DGUV Regel 110-010 umstellen'
 - 'Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis über die Branche (Amtlos fragt Schankanlage und Flüssiggas nicht ab); Prüffristen (Schankanlage, DGUV V79 Flüssiggas) und Fundstellen nicht abgerufen; Gefährdungsbausteine CO2 und Gas sind Sache der Vorlage'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - Thomas Koch (Fachkraft für Arbeitssicherheit)
-  geprueft_am: '2026-10-25'
-  geprueft_version: 4
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

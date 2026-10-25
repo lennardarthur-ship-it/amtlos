@@ -250,7 +250,7 @@ function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbs
   const u = z.stand.unterlagen.find((x) => x.id === id);
   // R12 (Bäckerei #7): Hygiene-, Lebensmittel- und Arbeitszeitnachweise einer Betriebsstätte zuordnen – ohne eigene
   // Zuordnung gilt beim Arbeitszeitnachweis die Betriebsstätte der Person
-  // Nachkontrolle Dr. Weber: Form der Unterlage (NachwG) – oben, wenn sie feststeht; ändert sie sich durch eine Eingabe
+  // Nachkontrolle Rechtsanwalt: Form der Unterlage (NachwG) – oben, wenn sie feststeht; ändert sie sich durch eine Eingabe
   // auf diesem Bildschirm (Branche gewählt), steht der Kasten direkt unter der Auswahl statt oben
   const form = v.formHinweis?.(daten)?.form;
   const [formVorher, setFormVorher] = useState<string | null | undefined>(undefined);
@@ -258,7 +258,7 @@ function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbs
   const person = v.person ? z.stand.mitarbeiter.find((p) => typeof daten[v.person!.felder.name ?? ""] === "string" && p.name.trim().toLocaleLowerCase("de") === (daten[v.person!.felder.name!] as string).trim().toLocaleLowerCase("de")) : undefined;
   return (
     <View>
-      {/* Nachkontrolle Dr. Weber: Form gleich am Anfang, wenn sie feststeht (NachwG: Schriftform in den § 2a-Branchen aus dem Check) */}
+      {/* Nachkontrolle Rechtsanwalt: Form gleich am Anfang, wenn sie feststeht (NachwG: Schriftform in den § 2a-Branchen aus dem Check) */}
       {index === 0 && form && form !== "offen" && !formUnten ? <FormHinweis v={v} d={daten} unten={16} /> : null}
       {index === 0 && STAETTEN_VORLAGEN.has(v.id) && z.stand.betriebsstaetten.length ? <StaettenWahl wert={u?.betriebsstaette ?? person?.betriebsstaette ?? HAUPT_STAETTE} aendern={(st) => z.unterlageStaette(id, st)} hilfe={TEXT.r12p_staette_unterlage_hilfe} /> : null}
       {mitPerson ? <PersonenWahl v={v} id={id} daten={daten} /> : null}

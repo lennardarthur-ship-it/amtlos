@@ -7,7 +7,7 @@ import { ANDROID } from "./plattform";
 export const ANBIETER = {
   /**
    * Firma mit Rechtsform, z. B. „Muster GmbH“. Bis zur Eintragung ins Handelsregister mit „i. G.“ (Vor-UG, persönliche
-   * Haftung nach § 11 Abs. 2 GmbHG – Nachkontrolle Dr. Weber, E-160). Nach der Eintragung „ i. G.“ entfernen und
+   * Haftung nach § 11 Abs. 2 GmbHG – Nachkontrolle Rechtsanwalt, E-160). Nach der Eintragung „ i. G.“ entfernen und
    * `register` füllen; docs/nutzungsbedingungen-entwurf.md Ziff. 1.1 gleich mit anpassen (die Website prüft das).
    */
   name: "Lang Ventures UG (haftungsbeschränkt) i. G.",
@@ -72,7 +72,7 @@ const DRITTLAND_REVENUECAT = `Übermittlung in die USA auf Grundlage der ${SCC_F
  * in eckigen Klammern trägt der Gründer vor der Veröffentlichung ein – die App erfindet keine Angaben, der Store-Check
  * meldet sie. Fachlich zu prüfen (T-77): bis zur Freigabe `freigegeben: false`.
  */
-// Freigegeben von RA Dr. Weber 23.10.2026 für den Build ohne Sync (docs/pruefberichte/2026-10-23-vorlagen-weber.xlsx, Prüfsumme
+// Freigegeben von Rechtsanwalt 23.10.2026 für den Build ohne Sync (docs/pruefberichte/2026-10-23-vorlagen-recht.xlsx, Prüfsumme
 // 892aa8818e0e der Fassung aus docs/pruefmappe-anwalt). Bei Textänderung erneut vorlegen; der Sync-Zusatz ist nicht freigegeben.
 export const DATENSCHUTZ = {
   freigegeben: true,
@@ -115,11 +115,11 @@ export const DATENSCHUTZ_SYNC = {
 
 /**
  * ENTWURF – NICHT FREIGEGEBEN (E-190, PRUEFLISTE T-177). Datenschutzhinweis der Android-App: gleicher Aufbau wie der von
- * RA Dr. Weber freigegebene iPhone-Text (oben, unverändert), nur dort geändert, wo die Android-App technisch etwas anderes
+ * Rechtsanwalt freigegebene iPhone-Text (oben, unverändert), nur dort geändert, wo die Android-App technisch etwas anderes
  * tut – Google Play statt App Store (Kauf über das Google-Konto, Kaufbelege von Google Play bei RevenueCat), automatische
  * Sicherung in einen selbst gewählten Ordner (Speicherzugriffs-Framework von Android) statt iCloud, Android-Schlüsselspeicher
  * statt Schlüsselbund, keine Gerätesicherung durch Android (`allowBackup: false`). Die rechtliche Einordnung (Google und
- * der Anbieter des Cloud-Ordners als eigene Verantwortliche) ist aus dem iPhone-Text übertragen und von Dr. Weber zu
+ * der Anbieter des Cloud-Ordners als eigene Verantwortliche) ist aus dem iPhone-Text übertragen und von Rechtsanwalt zu
  * prüfen – Gegenüberstellung in docs/datenschutz-android-entwurf.md. Die App zeigt ihn nur auf Android, mit dem Hinweis
  * „Entwurf“; der Store-Check meldet ihn als offen; die Website zeigt ihn erst nach der Freigabe.
  */
@@ -172,7 +172,7 @@ export const PLATZHALTER_RECHT = "[vor Veröffentlichung eintragen]";
 export const NUTZUNGSBEDINGUNGEN = {
   freigegeben: false,
   /** Datum der Fassung (ISO) – eine neue Fassung fragt erneut nach der Zustimmung */
-  // RA Dr. Weber 23.10.2026: Datum der Fassung, die veröffentlicht wird (vorher 21.10.2026 – passte nicht mehr zum geänderten Text)
+  // Rechtsanwalt 23.10.2026: Datum der Fassung, die veröffentlicht wird (vorher 21.10.2026 – passte nicht mehr zum geänderten Text)
   fassung: "2026-10-23",
   /** Adresse auf der Website (apps/website/bauen.mjs schreibt nutzungsbedingungen.html) */
   url: `${MARKE.website}/nutzungsbedingungen.html`,

@@ -1,6 +1,6 @@
 # Nutzungsbedingungen – was für die Android-App fehlt (E-190)
 
-> **ENTWURF – NICHT FREIGEGEBEN, keine neuen Rechtstexte.** Vorzulegen bei RA Dr. Weber (PRUEFLISTE T-178). Die
+> **ENTWURF – NICHT FREIGEGEBEN, keine neuen Rechtstexte.** Vorzulegen bei Rechtsanwalt (PRUEFLISTE T-178). Die
 > Fassung zur Freigabe (`docs/nutzungsbedingungen-entwurf.md`, Fassung vom 23.10.2026) ist für den Vertrieb über Apples
 > App Store geschrieben und bleibt unverändert. Diese Liste nennt nur die Stellen, die für den Vertrieb über Google Play
 > nicht passen, und was die App technisch tut – den Wortlaut für Android formuliert der Anwalt.

@@ -1,4 +1,4 @@
-# Prüfvermerk RA Dr. Weber 22.10.2026 (G.72): Vertreiberpflichten (Rücknahme von Gerätebatterien) als eigener Hinweis
+# Prüfvermerk Rechtsanwalt 22.10.2026 (G.72): Vertreiberpflichten (Rücknahme von Gerätebatterien) als eigener Hinweis
 # Wortlaut gelesen am 22.10.2026: § 14 BattDG, Art. 62 VO (EU) 2023/1542, § 4 Abs. 2 und § 60 BattDG
 schema_version: 1
 id: produkte.geraetebatterien_ruecknahme
@@ -56,11 +56,12 @@ quellen:
   url: https://www.gesetze-im-internet.de/battdg/__60.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): § 14 BattDG (Rücknahmepflicht des Händlers für Geräte- und LV-Altbatterien, unentgeltlich, ohne Kaufzwang), Art. 62 VO (EU) 2023/1542 und Sanktionsstaffel (§ 60 Abs. 1 Nr. 1 Buchst. b, Nr. 6, Abs. 2 Nr. 26, Abs. 3 BattDG) bestätigt; Hinweis „Rücknahme auf haushaltsübliche Mengen des eigenen Sortiments beschränkt (§ 14 Abs. 1 S. 2 BattDG)“ im Text (Wortlaut gesetze.legal, 22.10.2026: „die Menge an Altbatterien, derer sich private Endnutzer üblicherweise entledigen“; Abs. 1 hat drei Sätze – Verweis „Satz 2 bis 4“ berichtigt)'
+- 'Freigabe Rechtsanwalt Runde 2 (23.10.2026): § 14 BattDG (Rücknahmepflicht des Händlers für Geräte- und LV-Altbatterien, unentgeltlich, ohne Kaufzwang), Art. 62 VO (EU) 2023/1542 und Sanktionsstaffel (§ 60 Abs. 1 Nr. 1 Buchst. b, Nr. 6, Abs. 2 Nr. 26, Abs. 3 BattDG) bestätigt; Hinweis „Rücknahme auf haushaltsübliche Mengen des eigenen Sortiments beschränkt (§ 14 Abs. 1 S. 2 BattDG)“ im Text (Wortlaut gesetze.legal, 22.10.2026: „die Menge an Altbatterien, derer sich private Endnutzer üblicherweise entledigen“; Abs. 1 hat drei Sätze – Verweis „Satz 2 bis 4“ berichtigt)'
 - 'Auslöser „Batterien“ im Sortiment (profil.produkte.arten) – das Profil unterscheidet nicht nach Batteriekategorie; wer nur Geräte mit eingebauten Batterien oder nur Starterbatterien verkauft, fällt nicht unter § 14 BattDG (Starterbatterien: produkte.starterbatterien_ruecknahme)'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 2
+  unterschrieben_am: '2026-10-23'

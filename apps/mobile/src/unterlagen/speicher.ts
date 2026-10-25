@@ -227,7 +227,7 @@ export const STAND_VERSION = 8;
  * - 4 → 5 (Phase 2.3): Partner-ID (`partnerId`) für „Empfohlen von …“ – anfangs nicht gesetzt.
  * - 5 → 6 (Vorprüfung Recht): Zustimmung zu den Nutzungsbedingungen (`nutzungsbedingungen`) – anfangs nicht gesetzt;
  *   die App fragt erst danach, wenn die eigenen Bedingungen freigegeben sind.
- * - 6 → 7 (StB-Prüfung Heckler und Busch): Kontenvorgaben der Kanzlei (`steuerberatung.kontenvorgaben`) – anfangs keine,
+ * - 6 → 7 (StB-Prüfung Steuerberatungskanzlei): Kontenvorgaben der Kanzlei (`steuerberatung.kontenvorgaben`) – anfangs keine,
  *   es gelten die Standardkonten des Kontenrahmens; Vorhandenes wird nur bereinigt.
  * - 7 → 8 (E-165, Personenkonten): Lieferanten-Verzeichnis (`lieferanten`, anfangs leer). Personenkonten werden erst
  *   vergeben, wenn die Kontenvorgabe „Personenkonten“ eingeschaltet ist (`personenkontenVergeben` in steuerpaket.ts).

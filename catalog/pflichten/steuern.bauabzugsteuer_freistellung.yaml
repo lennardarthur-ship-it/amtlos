@@ -1,4 +1,4 @@
-# Katalog C.35 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt (Höchstdauer drei Jahre nicht, siehe fachlich_zu_pruefen)
+# Katalog C.35 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt (Höchstdauer drei Jahre nicht, siehe fachlich_zu_pruefen)
 schema_version: 1
 id: steuern.bauabzugsteuer_freistellung
 version: 4
@@ -22,7 +22,7 @@ kategorie: steuern
 branchen:
 - bau
 - handwerk
-# StB Busch 22.10.2026: nur bei Bauleistungen an Unternehmer oder juristische Personen des öffentlichen Rechts (§ 48 Abs. 1 EStG);
+# Steuerberater 22.10.2026: nur bei Bauleistungen an Unternehmer oder juristische Personen des öffentlichen Rechts (§ 48 Abs. 1 EStG);
 # Bau und Handwerk über die Angabe, solche Bauleistungen zu erbringen
 ausloeser:
   all:
@@ -71,11 +71,12 @@ quellen:
   url: https://lxgesetze.de/estg/48
   abgerufen: '2026-10-22'
   fundstelle: § 48 Abs. 1 Satz 1 und 3 EStG
-# StB Busch Runde 2 (22.10.2026): Höchstdauer drei Jahre steht im BMF-Schreiben vom 19.07.2022, Rz. 35 (nicht im Gesetz) – Hinweis im Text ohne Erinnerung freigegeben
+# Steuerberater Runde 2 (22.10.2026): Höchstdauer drei Jahre steht im BMF-Schreiben vom 19.07.2022, Rz. 35 (nicht im Gesetz) – Hinweis im Text ohne Erinnerung freigegeben
 fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 4
+  unterschrieben_am: '2026-10-23'

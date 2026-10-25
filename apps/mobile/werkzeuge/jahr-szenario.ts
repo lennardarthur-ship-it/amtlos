@@ -351,7 +351,7 @@ export function standBauen(): Bau {
     // wie „Tagesabschluss speichern“ in der App: bar kassierte Rechnung an der Rechnung vermerken
     if (r15) s = zahlungVermerken(s, r15.id, { datum: k.datum, betrag_cent: inhalt.rechnungen_bar![0]!.betrag_cent }, t(k.datum, 22));
     // Kassensturz am Morgen des Zähltags (Zählprotokoll für die Kassennachschau)
-    if (k.datum === SO.kassensturz.datum) [s] = kassensturzSpeichern(s, { gezaehlt_cent: 41230, stueckelung: { "5000": 4, "2000": 6, "1000": 7, "500": 5, "200": 8, "100": 12, "50": 10, "20": 15, "10": 6, "5": 4, "2": 5, "1": 2 }, anwesend: "Jana Weber" }, t(k.datum, 9), "sturz1");
+    if (k.datum === SO.kassensturz.datum) [s] = kassensturzSpeichern(s, { gezaehlt_cent: 41230, stueckelung: { "5000": 4, "2000": 6, "1000": 7, "500": 5, "200": 8, "100": 12, "50": 10, "20": 15, "10": 6, "5": 4, "2": 5, "1": 2 }, anwesend: "Jana Winter" }, t(k.datum, 9), "sturz1");
   }
   {
     // R12 GoBD: Sonderfälle prüfen
@@ -388,7 +388,7 @@ export function standBauen(): Bau {
   const m1 = s.mitarbeiter.find((m) => m.id === "m1")!;
   const m2 = s.mitarbeiter.find((m) => m.id === "m2")!;
 
-  dok({ id: "gewerbe", vorlage: "gewerbeanmeldung", datum: "2022-02-14", worum: "Gewerbeanmeldung, wie sie zur Gründung (Beginn 01.03.2022) ausgesehen hätte: Inhaberin Jana Weber, Café mit Catering, Hauptbetrieb, 1 Beschäftigte.",
+  dok({ id: "gewerbe", vorlage: "gewerbeanmeldung", datum: "2022-02-14", worum: "Gewerbeanmeldung, wie sie zur Gründung (Beginn 01.03.2022) ausgesehen hätte: Inhaberin Jana Winter, Café mit Catering, Hauptbetrieb, 1 Beschäftigte.",
     daten: () => ({ name: D.INHABERIN.name, geburtsname: D.INHABERIN.geburtsname, geburtsdatum: D.INHABERIN.geburtsdatum, geburtsort: D.INHABERIN.geburtsort, staatsangehoerigkeit: "deutsch", wohnanschrift: D.INHABERIN.wohnanschrift, rechtsform: "Einzelunternehmen",
       taetigkeit: "Betrieb eines Cafés: Abgabe von Speisen und Getränken (auch alkoholischer Getränke) zum Verzehr an Ort und Stelle und zum Mitnehmen; Catering für Veranstaltungen; Verkauf von Röstkaffee und Backwaren",
       beginn: D.GRUENDUNG, erwerb: "haupt", beschaeftigte: "1 (Vollzeit)", erlaubnis: "Gaststättenrecht Sachsen: Anzeige des Gaststättenbetriebs zusammen mit der Gewerbeanmeldung (SächsGastG) – keine Handwerkskarte nötig" }) });
@@ -397,7 +397,7 @@ export function standBauen(): Bau {
     daten: (h) => ({ stand: "2025-06-12", kassen: eintraege("kassenmeldung", "kassen", [{ art: "Tablet-/App-Kassensysteme", hersteller: "KassaVista GmbH", modell: "KassaVista POS auf iPad (10. Generation)", seriennummer: "KV-2022-018734", software: "KassaVista POS 6.4", anschaffung: "2022-02-20", tse_art: "Cloud-TSE", tse_seriennummer: "9f3c27a1d84e5b06c2f1e7a9b3d04c18e6f2a5b7c9d1e3f5a7b9c2d4e6f8a0b1", tse_zertifikat: "BSI-K-TR-0490-2022" }], h) }) });
 
   dok({ id: "impressum", vorlage: "impressum", datum: "2026-01-12", worum: "Impressum der Website: Einzelunternehmen, Inhaberin, Wirtschafts-ID, Verantwortliche für Inhalte, keine Teilnahme an Verbraucherschlichtung.",
-    daten: () => ({ rechtsform: "Einzelunternehmen", vertreten: "Jana Weber", wirtschafts_id: "DE318452976-00001", redaktion: `Jana Weber, ${B.strasse}, ${B.plz} ${B.ort}`, vsbg: "nicht_bereit" }) });
+    daten: () => ({ rechtsform: "Einzelunternehmen", vertreten: "Jana Winter", wirtschafts_id: "DE318452976-00001", redaktion: `Jana Winter, ${B.strasse}, ${B.plz} ${B.ort}`, vsbg: "nicht_bereit" }) });
 
   dok({ id: "dse", vorlage: "datenschutzerklaerung_website", datum: "2026-01-12", worum: "Datenschutzerklärung der Website: Hosting bei Hostwerk Leipzig, Server-Logfiles 14 Tage, Kontakt per E-Mail/Telefon, Schriften lokal eingebunden, Link zu Instagram, keine Cookies/kein Tracking.",
     daten: () => ({ website: "https://www.cafe-morgenrot.example", module: ["hosting", "server_logfiles", "kontakt", "google_fonts_lokal", "social_media_links"], hoster_name: "Hostwerk Leipzig GmbH", hoster_anschrift: "Spinnereistraße 7, 04179 Leipzig", logfile_tage: "14", netzwerke: "Instagram", stand: "2026-01-12" }) });
@@ -413,7 +413,7 @@ export function standBauen(): Bau {
 
   dok({ id: "vvt", vorlage: "datenschutz_dokumentation", datum: "2026-01-14", worum: "Verzeichnis der Verarbeitungstätigkeiten: 9 Tätigkeiten aus den Vorschlägen (Catering-Kunden, Rechnungen, Lohn, Personal, Website, Kontakt, E-Mail, Lieferanten, Kasse) und 18 TOM; Dienstleister Hostwerk, KassaVista, Lohnbüro (je mit AVV), Steuerkanzlei (eigenverantwortlich).",
     daten: (h) => ({
-      verantwortlich: "Jana Weber",
+      verantwortlich: "Jana Winter",
       verarbeitungen: [
         vorschlag("datenschutz_dokumentation", "verarbeitungen", "Kundenverwaltung", h, { bezeichnung: "Kundenverwaltung (Catering- und Bestellkunden)" }),
         vorschlag("datenschutz_dokumentation", "verarbeitungen", "Rechnungsstellung", h),
@@ -429,7 +429,7 @@ export function standBauen(): Bau {
         "Website ausschließlich über HTTPS", "WLAN mit aktueller Verschlüsselung", "Geräteverschlüsselung und Bildschirmsperre", "Persönliche Benutzerkonten", "Starke, individuelle Passwörter", "Zwei-Faktor-Authentisierung",
         "Abschließbare Räume/Schränke", "Verpflichtung aller Beschäftigten", "Akten- und Datenträgervernichtung", "Auftragsverarbeitungsverträge", "Automatische Sicherheitsupdates", "Firewall des Routers",
         "Protokollierung von Änderungen in Kassen", "Regelmäßige Datensicherung", "Mindestens eine Sicherungskopie", "Regelmäßiger Test der Wiederherstellung", "Jährliche Überprüfung des Verzeichnisses", "Regelmäßige Sensibilisierung",
-      ].map((x) => vorschlag("datenschutz_dokumentation", "tom", x, h, { umgesetzt_am: "2025-03-01", verantwortlich: "Jana Weber" })),
+      ].map((x) => vorschlag("datenschutz_dokumentation", "tom", x, h, { umgesetzt_am: "2025-03-01", verantwortlich: "Jana Winter" })),
       dienstleister: eintraege("datenschutz_dokumentation", "dienstleister", [
         { name: "Hostwerk Leipzig GmbH", leistung: "Website-Hosting", auftragsverarbeitung: true, avv_vorhanden: true, avv_datum: "2024-05-10", drittland: "keine Übermittlung in Drittländer" },
         { name: "KassaVista GmbH", leistung: "Kassensystem", auftragsverarbeitung: true, avv_vorhanden: true, avv_datum: "2022-02-20", drittland: "keine Übermittlung in Drittländer" },
@@ -439,8 +439,8 @@ export function standBauen(): Bau {
     }) });
 
   dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-15", worum: `Verfahrensdokumentation (GoBD): ${MARKE.name} für Rechnungen/Belege, KassaVista mit Cloud-TSE, Online-Banking, Kanzleiportal; Belege teils Papier (fotografiert), teils digital und E-Rechnung; tägliche Kassenzählung.`,
-    daten: () => ({ version: "1.2", verantwortlich: "Jana Weber",
-      organisation: "Café mit 34 Sitzplätzen und Catering für Firmen- und Privatkunden. Inhaberin Jana Weber (Buchhaltung, Einkauf, Service), eine Köchin in Vollzeit, eine Servicekraft im Minijob. Öffnungszeiten Di–So 8–18 Uhr.",
+    daten: () => ({ version: "1.2", verantwortlich: "Jana Winter",
+      organisation: "Café mit 34 Sitzplätzen und Catering für Firmen- und Privatkunden. Inhaberin Jana Winter (Buchhaltung, Einkauf, Service), eine Köchin in Vollzeit, eine Servicekraft im Minijob. Öffnungszeiten Di–So 8–18 Uhr.",
       steuerberatung: "Jahresabschluss durch die Steuerberatung; laufende Buchführung im Betrieb",
       systeme: eintraege("verfahrensdokumentation", "systeme", [
         { name: `${MARKE.name} (App, iPhone)`, zweck: "Rechnungsprogramm", version: "seit 01/2026" },
@@ -499,24 +499,24 @@ export function standBauen(): Bau {
   dok({ id: "azn", vorlage: "arbeitszeitnachweis", datum: "2026-06-01", worum: "Arbeitszeitnachweis Mai 2026 für den Minijobber (§ 17 MiLoG): 8 Einsätze à 4,5 Std. (zweimal 10–15 Uhr mit 30 Min. Pause), Urlaub am 23.05. (4,5 Std. vergütet) → 36 Std. gearbeitet, 40,5 Std. vergütet = 587,25 €.",
     daten: (h) => ({ name: m2.name, monat: "Mai 2026", leerzeilen: false, tage: eintraege("arbeitszeitnachweis", "tage", azn, h) }) });
 
-  dok({ id: "ki", vorlage: "ki_kompetenz", datum: "2026-02-10", worum: "KI-Kompetenz-Schulung (Art. 4 KI-VO): Textassistent für Instagram-Texte und Übersetzung der Speisekarte; Teilnehmende Jana Weber, Leon Schubert.",
-    daten: (h) => ({ thema: "Sicherer Umgang mit KI-Assistenten im Betrieb", ki_systeme: "Textassistent (Chatbot)\nÜbersetzungsprogramm", dauer: "60 Minuten", durchgefuehrt_von: "Jana Weber",
+  dok({ id: "ki", vorlage: "ki_kompetenz", datum: "2026-02-10", worum: "KI-Kompetenz-Schulung (Art. 4 KI-VO): Textassistent für Instagram-Texte und Übersetzung der Speisekarte; Teilnehmende Jana Winter, Leon Schubert.",
+    daten: (h) => ({ thema: "Sicherer Umgang mit KI-Assistenten im Betrieb", ki_systeme: "Textassistent (Chatbot)\nÜbersetzungsprogramm", dauer: "60 Minuten", durchgefuehrt_von: "Jana Winter",
       themen: ["Funktionsweise und Grenzen der eingesetzten KI-Werkzeuge", "Keine personenbezogenen oder vertraulichen Daten in KI-Werkzeuge eingeben, soweit nicht ausdrücklich freigegeben", "Ergebnisse von KI-Werkzeugen vor der Verwendung prüfen", "Umgang mit KI-erzeugten Texten und Bildern gegenüber Kundinnen und Kunden"],
-      inhalt: "Allergenangaben und Preise werden nie aus KI-Texten übernommen, sondern immer aus der Allergenliste bzw. der Kasse.", teilnehmer: eintraege("ki_kompetenz", "teilnehmer", [{ name: "Jana Weber" }, { name: "Leon Schubert" }], h) }) });
+      inhalt: "Allergenangaben und Preise werden nie aus KI-Texten übernommen, sondern immer aus der Allergenliste bzw. der Kasse.", teilnehmer: eintraege("ki_kompetenz", "teilnehmer", [{ name: "Jana Winter" }, { name: "Leon Schubert" }], h) }) });
 
   // Arbeitsschutz
   const gb = (bereich: string, titel: string[], extra: Eintrag[], h: string) => [
-    ...titel.map((x) => vorschlag("gefaehrdungsbeurteilung", "gefaehrdungen", x, h, { verantwortlich: "Jana Weber", umsetzen_bis: "2026-03-31", umgesetzt_am: "2026-02-20" })),
-    ...eintraege("gefaehrdungsbeurteilung", "gefaehrdungen", extra.map((e) => ({ verantwortlich: "Jana Weber", umsetzen_bis: "2026-03-31", umgesetzt_am: "2026-02-20", ...e })), h),
+    ...titel.map((x) => vorschlag("gefaehrdungsbeurteilung", "gefaehrdungen", x, h, { verantwortlich: "Jana Winter", umsetzen_bis: "2026-03-31", umgesetzt_am: "2026-02-20" })),
+    ...eintraege("gefaehrdungsbeurteilung", "gefaehrdungen", extra.map((e) => ({ verantwortlich: "Jana Winter", umsetzen_bis: "2026-03-31", umgesetzt_am: "2026-02-20", ...e })), h),
   ];
   dok({ id: "gb-kueche", vorlage: "gefaehrdungsbeurteilung", datum: "2026-02-05", worum: "Gefährdungsbeurteilung Küche: 9 Gastro-Vorschläge der App (Rutschen, Lüftung, Schnitt, Glasbruch, Verbrennung, Feuchtarbeit, Reinigungsmittel, Heben, Lagergut, Gerätemängel) plus eigene Zeile Siebträger/Dampflanze; Mutterschutz: Umgestaltung.",
-    daten: (h) => ({ arbeitsbereich: "Küche", taetigkeiten: "Zubereitung von Frühstück, Mittagstisch, Kuchen und Catering; Spülen (Haubenspülmaschine); Wareneingang und Lagerung", beschaeftigte: "2", beurteilt_von: "Jana Weber", mitwirkung: "Beschäftigte des Bereichs\nFachkraft für Arbeitssicherheit", datum: "2026-02-05",
+    daten: (h) => ({ arbeitsbereich: "Küche", taetigkeiten: "Zubereitung von Frühstück, Mittagstisch, Kuchen und Catering; Spülen (Haubenspülmaschine); Wareneingang und Lagerung", beschaeftigte: "2", beurteilt_von: "Jana Winter", mitwirkung: "Beschäftigte des Bereichs\nFachkraft für Arbeitssicherheit", datum: "2026-02-05",
       gefaehrdungen: gb("kueche", ["Ausrutschen und Stürzen", "Hohe Temperatur und Feuchte", "Schnittverletzungen an Messern", "Schnittverletzungen durch Glasbruch", "Verbrennungen und Verbrühungen", "Hautbelastung durch Wasser", "Verätzungen und Reizungen", "Muskel-Skelett-Belastung", "Unerkannte Mängel"],
         [{ beschreibung: "Verbrühung an Dampflanze und Brühgruppe der Siebträgermaschine sowie beim Entleeren der Haubenspülmaschine.", massnahme: "Dampflanze nur mit Kännchen öffnen, Haube erst nach Ende des Programms öffnen; Unterweisung neuer Beschäftigter am Gerät.", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "arbeitsmittel" }], h),
       mutterschutz_ergebnis: "umgestaltung", mutterschutz_details: "Kein Heben über 5 kg regelmäßig bzw. 10 kg gelegentlich, keine Arbeiten an Spülmaschine und Herd mit Verbrühungsgefahr, kein Umgang mit ätzenden Reinigern (Ofenreiniger), Sitzgelegenheit und zusätzliche Pausen.",
       wirksamkeit: "wirksam", wirksamkeit_am: "2026-09-15", bemerkung: "Begehung mit der Fachkraft für Arbeitssicherheit am 15.09.2026, keine neuen Gefährdungen.", fortschreibung: "bei Änderungen von Tätigkeiten, Arbeitsmitteln oder Arbeitsstoffen, nach Unfällen sowie jährlich" }) });
   dok({ id: "gb-service", vorlage: "gefaehrdungsbeurteilung", datum: "2026-02-05", worum: "Gefährdungsbeurteilung Gastraum und Service: Rutschen, Glasbruch, heiße Getränke, Tragen, Gästekontakt (Vorschläge) plus eigene Zeilen Kellertreppe zum Lager, Bargeld/Überfall, Außengastronomie; Mutterschutz: keine Maßnahmen nötig über die allgemeinen hinaus.",
-    daten: (h) => ({ arbeitsbereich: "Gastraum und Service", taetigkeiten: "Bedienung im Gastraum und auf der Terrasse, Kasse, Zubereitung von Kaffeegetränken an der Theke, Abräumen", beschaeftigte: "2", beurteilt_von: "Jana Weber", datum: "2026-02-05",
+    daten: (h) => ({ arbeitsbereich: "Gastraum und Service", taetigkeiten: "Bedienung im Gastraum und auf der Terrasse, Kasse, Zubereitung von Kaffeegetränken an der Theke, Abräumen", beschaeftigte: "2", beurteilt_von: "Jana Winter", datum: "2026-02-05",
       gefaehrdungen: gb("service", ["Ausrutschen und Stürzen", "Schnittverletzungen durch Glasbruch", "Verbrennungen und Verbrühungen", "Muskel-Skelett-Belastung", "Psychische Belastung"],
         [
           { beschreibung: "Sturz auf der steilen Kellertreppe zum Getränkelager beim Tragen von Kisten.", massnahme: "Handlauf beidseitig, Stufenkanten markiert, Beleuchtung mit Bewegungsmelder; Kisten nur einzeln tragen, Sackkarre oben.", schwere: "schwer", wahrscheinlichkeit: "moeglich", faktor: "arbeitsstaette" },
@@ -526,9 +526,9 @@ export function standBauen(): Bau {
       mutterschutz_ergebnis: "keine_massnahmen", mutterschutz_details: "Allgemeine Maßnahmen genügen: kein Tragen schwerer Kisten über die Kellertreppe, Sitzgelegenheit.", wirksamkeit: "wirksam", wirksamkeit_am: "2026-09-15", fortschreibung: "bei Änderungen von Tätigkeiten, Arbeitsmitteln oder Arbeitsstoffen, nach Unfällen sowie jährlich" }) });
 
   dok({ id: "unterweisung", vorlage: "unterweisung", datum: "2026-02-10", worum: "Jährliche Unterweisung Arbeitsschutz (45 Min.) für beide Beschäftigten: Gefährdungen, Erste Hilfe, Brandschutz, Rutschen, Elektrogeräte, Gefahrstoffe, Hautschutz, Heben, Konflikte, Bargeld/Überfall.",
-    daten: (h) => ({ thema: "Jährliche Unterweisung Arbeitsschutz", anlass: "wiederholung", dauer: "45 Minuten", durchgefuehrt_von: "Jana Weber",
+    daten: (h) => ({ thema: "Jährliche Unterweisung Arbeitsschutz", anlass: "wiederholung", dauer: "45 Minuten", durchgefuehrt_von: "Jana Winter",
       themen: ["gefaehrdungen_am_eigenen_arbeitsplatz_un", "erste_hilfe_ersthelfer_standort_verbandk", "brandschutz_verhalten_im_brandfall_umgan", "stolper_rutsch_und_sturzgefahren_ordnung", "elektrische_geraete_sichtpruefung_vor_be", "gefahrstoffe_inhalt_der_betriebsanweisun", "hautschutz_hautschutzplan_richtige_schut", "heben_und_tragen_hilfsmittel_rueckengere", "psychische_belastungen_verhalten_bei_kon", "umgang_mit_zahlungsmitteln_und_verhalten"],
-      inhalt: "Ersthelferin: Jana Weber (Kurs 11/2025). Verbandkasten und Brandschutzdecke in der Küche neben der Tür, Feuerlöscher an Theke und Küchenausgang. Neue Haubenspülmaschine: Haube erst nach Programmende öffnen.",
+      inhalt: "Ersthelferin: Jana Winter (Kurs 11/2025). Verbandkasten und Brandschutzdecke in der Küche neben der Tür, Feuerlöscher an Theke und Küchenausgang. Neue Haubenspülmaschine: Haube erst nach Programmende öffnen.",
       teilnehmer: eintraege("unterweisung", "teilnehmer", [{ name: "Sabine Krüger" }, { name: "Leon Schubert" }], h) }) });
 
   const STOFFE: Eintrag[] = [
@@ -541,7 +541,7 @@ export function standBauen(): Bau {
     { bezeichnung: "Sanitärreiniger sauer", hersteller: "Hygienewerk Sachsen GmbH", gefahren: "Achtung; H290, H315, H319", menge: "1 bis 10 kg bzw. l", arbeitsbereich: "Gäste- und Personal-WC", verwendung: "tägliche Reinigung", sdb: "fehlt" },
   ];
   dok({ id: "gefahrstoffe", vorlage: "gefahrstoffverzeichnis", datum: "2026-02-03", worum: "Gefahrstoffverzeichnis mit 7 Reinigungs-/Desinfektionsmitteln (H-Sätze, Mengen, Bereiche); beim Sanitärreiniger fehlt das Sicherheitsdatenblatt noch.",
-    daten: (h) => ({ stand: "2026-02-03", verantwortlich: "Jana Weber", stoffe: eintraege("gefahrstoffverzeichnis", "stoffe", STOFFE, h) }) });
+    daten: (h) => ({ stand: "2026-02-03", verantwortlich: "Jana Winter", stoffe: eintraege("gefahrstoffverzeichnis", "stoffe", STOFFE, h) }) });
 
   dok({ id: "ba", vorlage: "betriebsanweisung", datum: "2026-02-03", worum: "Betriebsanweisung (TRGS 555) für den stark alkalischen Backofen- und Grillreiniger (H290, H314) in der Küche.",
     daten: () => ({ stoff: "ProClean Backofen- und Grillreiniger (enthält Natriumhydroxid)", arbeitsbereich: "Küche", nummer: "BA-03",
@@ -550,7 +550,7 @@ export function standBauen(): Bau {
       gefahrfall: "Verschüttete Substanz sofort mit Schutzhandschuhen und Bindemittel aufnehmen.\nRaum lüften.",
       erste_hilfe: "Nach Augenkontakt: sofort mindestens 10 Minuten unter fließendem Wasser spülen, Augenarzt aufsuchen.\nNach Hautkontakt: verunreinigte Kleidung ausziehen, mit viel Wasser spülen.\nNach Verschlucken: Mund ausspülen, kein Erbrechen herbeiführen, sofort Arzt rufen.",
       entsorgung: "Restentleerte Gebinde mit dem Gelben Sack bzw. über den Lieferanten; Reste nicht in den Ausguss.\nEntsorgung mit der örtlichen Gewerbeabfallberatung klären.",
-      notruf: "Notruf 112 – Ersthelferin Jana Weber, Giftnotruf Erfurt 0361 730730", erstellt_von: "Jana Weber", datum: "2026-02-03" }) });
+      notruf: "Notruf 112 – Ersthelferin Jana Winter, Giftnotruf Erfurt 0361 730730", erstellt_von: "Jana Winter", datum: "2026-02-03" }) });
 
   const geraete: Eintrag[] = [
     ["Siebträger-Espressomaschine", "Baristatec Duo 2-gruppig", "INV-01", "Theke", "bestanden", ""], ["Espressomühle", "Gastrotechnik EM-64", "INV-02", "Theke", "bestanden", ""], ["Kaffeemühle Filterkaffee", "Baristatec FM-2", "INV-03", "Theke", "bestanden", ""],
@@ -567,15 +567,15 @@ export function standBauen(): Bau {
       { anlass: "Gemüse, Obst, Fleisch und Fisch vorbereiten", schutz: "–", handschuhe: "Einmalhandschuhe Nitril (lebensmittelgeeignet), bei Schneidarbeiten schnitthemmende Handschuhe", reinigung: "Flüssigsyndet", pflege: "Pflegecreme in Pausen" },
       { anlass: "Reinigung mit Backofenreiniger und Sanitärreiniger (Gefahrstoffe)", schutz: "–", handschuhe: "Chemikalienschutzhandschuhe Nitril, lang (EN ISO 374)", reinigung: "Flüssigsyndet", pflege: "Pflegecreme nach Arbeitsende" },
       { anlass: "Service und Theke (häufiges Händewaschen, Desinfektion)", schutz: "Hautschutzcreme vor Arbeitsbeginn", handschuhe: "keine", reinigung: "Flüssigsyndet; Händedesinfektion statt häufigem Waschen", pflege: "Pflegecreme in Pausen und nach Arbeitsende" },
-    ], h), erstellt_von: "Jana Weber", datum: "2026-02-05" }) });
+    ], h), erstellt_von: "Jana Winter", datum: "2026-02-05" }) });
 
   // Gastronomie
   dok({ id: "ifsg", vorlage: "ifsg_belehrung", datum: "2026-02-10", worum: "Folgebelehrung nach § 43 Abs. 4 IfSG für Köchin (Erstbelehrung 15.02.2022) und Minijobber (Erstbelehrung 20.08.2025), alle sechs Inhalte, Liste nach § 42 angehängt.",
-    daten: (h) => ({ belehrt_von: "Jana Weber", inhalte: (leereDatenVon("ifsg_belehrung", h).inhalte as string[]).concat(["bei Krankheitszeichen ärztlichen Rat einholen und mitteilen, dass man mit Lebensmitteln arbeitet (Merkblatt Gesundheitsamt)"]), liste_anhaengen: true,
+    daten: (h) => ({ belehrt_von: "Jana Winter", inhalte: (leereDatenVon("ifsg_belehrung", h).inhalte as string[]).concat(["bei Krankheitszeichen ärztlichen Rat einholen und mitteilen, dass man mit Lebensmitteln arbeitet (Merkblatt Gesundheitsamt)"]), liste_anhaengen: true,
       teilnehmer: eintraege("ifsg_belehrung", "teilnehmer", [{ name: "Sabine Krüger", erstbelehrung_am: "2022-02-15", letzte_belehrung_am: "2024-02-12" }, { name: "Leon Schubert", erstbelehrung_am: "2025-08-20" }], h) }) });
   // Prüfbericht Lebensmittelhygiene (22.10.2026, Frage 12): Schulungsnachweis nach § 4 LMHV am selben Termin, eigene Liste
   dok({ id: "hygieneschulung", vorlage: "hygieneschulung", datum: "2026-02-10", worum: "Jährliche Hygieneschulung nach § 4 LMHV für Köchin und Minijobber am Termin der IfSG-Belehrung – eigene Unterschriftsliste.",
-    daten: () => ({ thema: "Jährliche Hygieneschulung", datum: "2026-02-10", dauer: "60 Minuten", geschult_von: "Jana Weber", themen: ["herstellung", "warenkontrolle", "behandlung", "kuehlung_lagerung", "reinigung", "personalhygiene", "allergene"],
+    daten: () => ({ thema: "Jährliche Hygieneschulung", datum: "2026-02-10", dauer: "60 Minuten", geschult_von: "Jana Winter", themen: ["herstellung", "warenkontrolle", "behandlung", "kuehlung_lagerung", "reinigung", "personalhygiene", "allergene"],
       teilnehmer: [{ name: "Sabine Krüger", taetigkeit: "Küche" }, { name: "Leon Schubert", taetigkeit: "Service und Theke" }] }) });
 
   // Prüfbericht Lebensmittelhygiene (22.10.2026, Frage 9): Getreide- und Nussart als Pflichtangabe
@@ -638,7 +638,7 @@ export function standBauen(): Bau {
     { was: "Wischtücher und Arbeitskleidung", wann: "täglich wechseln", womit: "Waschmaschine 60 °C", wie: "getrennt von Privatwäsche waschen", wer: "Inhaberin" },
   ];
   dok({ id: "hygiene", vorlage: "hygieneplan", datum: "2026-02-05", worum: "Hygiene- und Reinigungsplan für Café-Küche und Gastraum (12 eigene Einträge), weil die Vorlage nur Beauty-Vorschläge hat.",
-    daten: (h) => ({ bereich: "Café Morgenrot – Küche, Theke und Gastraum", eintraege: eintraege("hygieneplan", "eintraege", HYG, h), erstellt_von: "Jana Weber", datum: "2026-02-05" }) });
+    daten: (h) => ({ bereich: "Café Morgenrot – Küche, Theke und Gastraum", eintraege: eintraege("hygieneplan", "eintraege", HYG, h), erstellt_von: "Jana Winter", datum: "2026-02-05" }) });
 
   // Kassenbuch Mai
   dok({ id: "kassenbuch", vorlage: "kassenbuch", datum: "2026-06-01", worum: `Kassenbuch der Bargeldkasse Mai 2026: Anfangsbestand ${euro(D.KASSENBUCH_ANFANG)} €, ${D.KASSE_MAI.length} Tageseinnahmen bar laut Z-Bon, Geldtransit zur Bank dienstags, drei Bareinkäufe (Belege b17, b18, b19), eine Privatentnahme; Endbestand unabhängig ${euro(D.kassenbuchEnde())} €.`,
@@ -835,7 +835,7 @@ function belegHtml(b: D.BelegRoh): string {
   const steuer = sm.jeSatz.map((x) => `<tr><td>${x.satz ? `${bon ? "enth. " : ""}USt ${x.satz} %` : "ohne USt"}</td><td class="r">netto ${D.eur(x.netto)} €</td><td class="r">${x.satz ? `${D.eur(x.ust)} €` : "–"}</td></tr>`).join("");
   const css = `body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#222;margin:0}.blatt{${bon ? "width:80mm;margin:10mm auto;border:1px dashed #999;padding:6mm" : "margin:18mm 20mm"}}table{width:100%;border-collapse:collapse;margin-top:6mm}td,th{padding:3px 4px;border-bottom:1px solid #ddd;vertical-align:top}th{text-align:left;border-bottom:2px solid #444}.r{text-align:right;white-space:nowrap}.lief{font-size:${bon ? "10pt" : "11pt"}}h1{font-size:${bon ? "13pt" : "18pt"};margin:6mm 0 2mm}.an{margin-top:10mm}.summe td{font-weight:bold;border-top:2px solid #444}small{color:#666}`;
   const titel = b.kategorie === "personal" ? "Lohnjournal (Eigenbeleg)" : bon ? "Kassenbon" : "Rechnung";
-  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><style>${css}</style></head><body><div class="blatt">${kopf}${bon || b.kategorie === "personal" ? "" : `<div class="an">${esc(D.BETRIEB.name)}<br>Jana Weber<br>${esc(D.BETRIEB.strasse)}<br>${D.BETRIEB.plz} ${D.BETRIEB.ort}</div>`}
+  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><style>${css}</style></head><body><div class="blatt">${kopf}${bon || b.kategorie === "personal" ? "" : `<div class="an">${esc(D.BETRIEB.name)}<br>Jana Winter<br>${esc(D.BETRIEB.strasse)}<br>${D.BETRIEB.plz} ${D.BETRIEB.ort}</div>`}
 <h1>${titel}${b.nummer ? ` ${esc(b.nummer)}` : ""}</h1><div>Datum: ${D.de(b.datum)}${!bon && b.kategorie !== "personal" ? ` · Leistung: ${D.de(b.datum)} bzw. laut Positionen` : ""}</div>
 <table><tr><th>${bon ? "Artikel" : "Position"}</th><th class="r">USt</th><th class="r">${bon ? "Brutto" : b.art === "netto" ? "Netto" : "Betrag"}</th></tr>${zeilen}</table>
 <table>${steuer}<tr class="summe"><td>${bon ? "SUMME" : "Rechnungsbetrag"}</td><td></td><td class="r">${D.eur(sm.brutto)} €</td></tr></table>

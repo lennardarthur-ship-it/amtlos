@@ -1,0 +1,17 @@
+Betreff: Betriebsklar – bereinigte Anlage 1, Handelsregister und Zwölf-Monats-Regel
+
+Sehr geehrter Herr [Name],
+
+vielen Dank für den sorgfältigen Abgleich.
+
+1. Handelsregister: Ihre Bestätigung für e2cd7a14a6c1 (GmbH, OHG, KG) ist eingetragen; die App zeigt den Vermerk nur bei diesen drei Rechtsformen. Ich bestätige, dass sich die Fassung von f4f0d39422b6 nur an den drei Stellen „Nr. 4“ → „Nr. 3“ unterscheidet. Zum Beispiel-PDF: Der Verweis steht in der App als Hilfetext zum Feld „Vertretungsregelung“ und im PDF als Randvermerk – diese Vorlage ist aber als Formular gestaltet, und dort druckt die App Randvermerke nicht mit. Deshalb war er in keinem Beispiel zu sehen. Ich lege das OHG-Beispiel und ein Blatt mit den drei Fundstellen bei.
+
+2. Allergene und Kontaktmaterialien: Sie haben recht, die Liste hätte die von Ihnen bestätigten Fassungen nennen müssen – v4 bzw. v2. In der bereinigten Anlage 1 steht das jetzt so. Zur Anzeige in der App: Ihre Bestätigung betrifft bei beiden nur die Folgen bei Verstoß, und dieser Text ist in v5 bzw. v3 wortgleich mit der von Ihnen bestätigten Fassung; geändert haben sich nur Erklärung bzw. Zuständige Stelle, die Lebensmittelfachbeauftragter in der neuen Fassung bestätigt hat. Den Vermerk setzen wir nur, wenn beides zusammenpasst; das Freigabe-Register prüft das Feld für Feld anhand der Versionsgeschichte, und jede spätere Änderung hebt den Vermerk auf. Es erscheint also kein ungeprüfter Text mit Vermerk, und Ihr Name erscheint dort ohnehin nicht. Wenn Sie die Folgen-Texte in der neuen Fassung trotzdem sehen möchten, schicke ich sie Ihnen gern.
+
+3. B-283 und Grenzwerte: Die Prüfsummen eedd5b3ffeca und 88409edcac2d sind in der bereinigten Anlage 1 ergänzt, ebenso die Handelsregister-Vorlage.
+
+4. Zwölf-Monats-Regel (§ 4 Abs. 3): Ja, das geht ohne Server. Das Prüfdatum ist in der App gespeichert; die App vergleicht es beim Anzeigen mit dem Datum des Geräts und zeigt Ihren Namen nach zwölf Monaten nicht mehr, sondern nur noch den neutralen Vermerk. Das ist bereits eingebaut. Ihre Anpassung von § 5 Abs. 2 (Widerruf per App-Update) passt so.
+
+Mit freundlichen Grüßen
+Lennard Lang
+Lang Ventures UG (haftungsbeschränkt) i. G.

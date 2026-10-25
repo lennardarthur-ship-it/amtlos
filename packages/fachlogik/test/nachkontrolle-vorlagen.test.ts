@@ -1,5 +1,5 @@
 /**
- * Nachkontrolle Dr. Weber (21.10.2026), Vorlagen: Ausschlussfrist im NachwG-Nachweis, sichtbarer Schriftform-Hinweis für
+ * Nachkontrolle Rechtsanwalt (21.10.2026), Vorlagen: Ausschlussfrist im NachwG-Nachweis, sichtbarer Schriftform-Hinweis für
  * die Branchen nach § 2a SchwarzArbG und Hygieneplan für Lebensmittelbetriebe.
  */
 import { describe, expect, it } from "vitest";
@@ -97,7 +97,7 @@ describe("NachwG: Schriftform in den Branchen nach § 2a SchwarzArbG", () => {
 describe("Hygieneplan für Lebensmittelbetriebe", () => {
   const liste = feld("hygieneplan", "eintraege") as unknown as ListenFeld;
   const lm = liste.vorschlaege!.filter((x) => x.gruppe === "Gastronomie / Café");
-  const voll = (extra: Daten = {}): Daten => ({ art: "lebensmittel", bereich: "Küche und Theke", erstellt_von: "Jana Weber", datum: "2026-10-21", eintraege: lm.map((x) => ({ ...x.werte })), ...extra });
+  const voll = (extra: Daten = {}): Daten => ({ art: "lebensmittel", bereich: "Küche und Theke", erstellt_von: "Jana Winter", datum: "2026-10-21", eintraege: lm.map((x) => ({ ...x.werte })), ...extra });
 
   it("Rechtsgrundlage VO (EG) Nr. 852/2004 (Art. 4, 5, Anhang II) und LMHV (§§ 3, 4)", () => {
     const h = html("hygieneplan", voll());
@@ -111,7 +111,7 @@ describe("Hygieneplan für Lebensmittelbetriebe", () => {
     expect(HYGIENE_THEMEN_LEBENSMITTEL).toEqual(["Reinigung und Desinfektion", "Personalhygiene", "Schädlingsbekämpfung", "Temperaturkontrollen", "Wareneingang", "Lagerung", "Trennung rein/unrein", "Allergenmanagement", "Abfall", "Trinkwasser", "Schulungen"]);
     const alles = JSON.stringify(lm);
     for (const s of ["Händewaschen", "Arbeitskleidung und Schmuck", "Ringe, Uhren", "§ 42 IfSG", "Schädlingsmonitoring", "Wareneingang", "rohe und verzehrfertige", "Abfall", "Trinkwasser", "§ 4 LMHV"]) expect(alles, s).toContain(s);
-    // Nachkontrolle T. Baum (23.10.2026, Antwort 6): alle Zeilen geprüft – keine trägt mehr „fachlich zu prüfen“
+    // Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026, Antwort 6): alle Zeilen geprüft – keine trägt mehr „fachlich zu prüfen“
     for (const x of lm) expect(x.quelle, x.titel).not.toMatch(/zu prüfen/);
     const zeile = (t: string) => lm.find((x) => x.titel === t)!.werte;
     expect(zeile("Milchschäumer und Milchlanzen").wie).toContain("Milch nicht länger als nötig ungekühlt, Restmilch im Kännchen verwerfen");

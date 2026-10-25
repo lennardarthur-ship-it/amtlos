@@ -88,7 +88,7 @@ export const SCHRITTE: Schritt[] = [
     id: "register",
     titel: { de: "Register", en: "Register" },
     // R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG und Partnerschaftsgesellschaften werden eingetragen;
-    // Freigabe Weber 22.10.2026 (B.16): die GbR kann sich ins Gesellschaftsregister eintragen lassen (eGbR, § 707 BGB);
+    // Freigabe Rechtsanwalt 22.10.2026 (B.16): die GbR kann sich ins Gesellschaftsregister eintragen lassen (eGbR, § 707 BGB);
     // E-176: OHG und KG werden ins Handelsregister eingetragen (§ 106 Abs. 1, § 161 Abs. 2 HGB)
     nurWenn: { feld: "rechtsform", in: ["ug", "gmbh", "gmbh_co_kg", "ohg", "kg", "partg", "partg_mbb", "gbr"] },
     fragen: [
@@ -126,7 +126,7 @@ export const SCHRITTE: Schritt[] = [
         },
       },
       { feld: "gesellschafter.anzahl", art: "zahl", frage: { de: "Wie viele Gesellschafter gibt es?", en: "How many shareholders are there?" } },
-      // StB Busch 22.10.2026: Frist für den Fragebogen zur steuerlichen Erfassung ab Eröffnung bzw. Aufnahme der Tätigkeit (§ 138 Abs. 4 AO)
+      // Steuerberater 22.10.2026: Frist für den Fragebogen zur steuerlichen Erfassung ab Eröffnung bzw. Aufnahme der Tätigkeit (§ 138 Abs. 4 AO)
       {
         feld: "taetigkeit_beginn",
         art: "datum",
@@ -304,7 +304,7 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Sind Investoren aus dem Ausland an deinem Unternehmen beteiligt oder geplant?", en: "Are investors from abroad involved in your business or planned?" },
         hilfe: { de: "Zum Beispiel Gesellschafter, stille Beteiligte oder Geldgeber mit Sitz im Ausland. Wenn nicht: Nein.", en: "For example shareholders, silent partners or backers based abroad. If not: No." },
       },
-      // Freigabe Weber 22.10.2026 (B.21): AWV-Meldepflicht für alle Zahlungen von oder an Gebietsfremde über 50.000 €, nicht nur bei Investoren
+      // Freigabe Rechtsanwalt 22.10.2026 (B.21): AWV-Meldepflicht für alle Zahlungen von oder an Gebietsfremde über 50.000 €, nicht nur bei Investoren
       {
         feld: "auslandszahlungen.ueber_meldegrenze",
         art: "janein",
@@ -370,7 +370,7 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Fahrt ihr mit Waren auch ins Ausland?", en: "Do you also carry goods abroad?" },
         hilfe: { de: "Grenzüberschreitende Fahrten oder Fahrten innerhalb eines anderen EU-Staats. Dafür gelten ab 2,5 t eigene Regeln.", en: "Cross-border trips or trips within another EU country. Separate rules apply from 2.5 t." },
       },
-      // Prüfvermerk RA Dr. Weber 22.10.2026 (H.5): Werkverkehr ist erlaubnisfrei (§ 1 Abs. 2, 3 GüKG), Personenbeförderung braucht eine Genehmigung (PBefG)
+      // Prüfvermerk Rechtsanwalt 22.10.2026 (H.5): Werkverkehr ist erlaubnisfrei (§ 1 Abs. 2, 3 GüKG), Personenbeförderung braucht eine Genehmigung (PBefG)
       {
         feld: "fahrzeuge.befoerderung",
         art: "mehrfach",
@@ -448,7 +448,7 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Hast du eine Dauerfristverlängerung?", en: "Do you have a permanent filing extension (Dauerfristverlängerung)?" },
         hilfe: { de: "Damit gibst du die Voranmeldung einen Monat später ab.", en: "It lets you file advance returns one month later." },
       },
-      // StB Busch 22.10.2026: Meldezeitraum der Zusammenfassenden Meldung abfragen (§ 18a Abs. 1 Satz 2 UStG)
+      // Steuerberater 22.10.2026: Meldezeitraum der Zusammenfassenden Meldung abfragen (§ 18a Abs. 1 Satz 2 UStG)
       {
         feld: "ust.zm_meldezeitraum",
         art: "auswahl",
@@ -504,7 +504,7 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Wo sitzen deine Kunden?", en: "Where are your customers?" },
         optionen: { inland: { de: "Deutschland", en: "Germany" }, eu: { de: "Andere EU-Länder", en: "Other EU countries" }, drittland: { de: "Außerhalb der EU", en: "Outside the EU" } },
       },
-      // StB Busch 22.10.2026: die USt-IdNr. braucht auch, wer bei Unternehmen in anderen EU-Ländern einkauft (§ 27a UStG)
+      // Steuerberater 22.10.2026: die USt-IdNr. braucht auch, wer bei Unternehmen in anderen EU-Ländern einkauft (§ 27a UStG)
       {
         feld: "einkauf.eu_unternehmen",
         art: "janein",
@@ -583,7 +583,7 @@ export const SCHRITTE: Schritt[] = [
           en: "For example biscuits, jam or granola that you pack and put on the shelf or ship. Bread or pastries that you pack at the counter for sale on the same day or at the customer's request do not count.",
         },
       },
-      // Rückmeldung Lebensmittel T. Baum 22.10.2026: Acrylamid nur, wer selbst backt oder frittiert (VO (EU) 2017/2158)
+      // Rückmeldung Lebensmittel Lebensmittelfachbeauftragter 22.10.2026: Acrylamid nur, wer selbst backt oder frittiert (VO (EU) 2017/2158)
       {
         feld: "gastro.backen_frittieren",
         art: "janein",
@@ -627,7 +627,7 @@ export const SCHRITTE: Schritt[] = [
           digital: { de: "Digitale Produkte", en: "Digital products" },
         },
       },
-      // Prüfvermerk RA Dr. Weber 22.10.2026 (G.70): Produktliste § 1 Abs. 2 BFSG als Auswahl
+      // Prüfvermerk Rechtsanwalt 22.10.2026 (G.70): Produktliste § 1 Abs. 2 BFSG als Auswahl
       {
         feld: "produkte.bfsg_produkte",
         art: "mehrfach",
@@ -636,7 +636,7 @@ export const SCHRITTE: Schritt[] = [
           de: "Für diese Produkte gelten Anforderungen an die Barrierefreiheit (§ 1 Abs. 2 Barrierefreiheitsstärkungsgesetz), wenn sie nach dem 28.6.2025 in Verkehr gebracht wurden.",
           en: "Accessibility requirements apply to these products (§ 1(2) Accessibility Strengthening Act, BFSG) if they were placed on the market after 28.6.2025.",
         },
-        // Runde 2 RA Dr. Weber (23.10.2026): Notebook, Tablet, Smartphone = Nr. 1 (Hardwaresysteme), Router = Nr. 3, Smart-TV = Nr. 4, E-Book-Reader = Nr. 5
+        // Runde 2 Rechtsanwalt (23.10.2026): Notebook, Tablet, Smartphone = Nr. 1 (Hardwaresysteme), Router = Nr. 3, Smart-TV = Nr. 4, E-Book-Reader = Nr. 5
         optionen: {
           universalrechner: { de: "Computer, Notebooks, Tablets und Smartphones mit Betriebssystem", en: "Computers, notebooks, tablets and smartphones with operating system" },
           zahlungsterminal: { de: "Zahlungsterminals (Kartenterminals)", en: "Payment terminals (card terminals)" },
@@ -647,7 +647,7 @@ export const SCHRITTE: Schritt[] = [
           keine: { de: "Nichts davon", en: "None of these" },
         },
       },
-      // Prüfvermerk RA Dr. Weber 22.10.2026 (G.71): Registrierung vor dem erstmaligen Bereitstellen verpackter Waren (§§ 6, 7 VerpackDG)
+      // Prüfvermerk Rechtsanwalt 22.10.2026 (G.71): Registrierung vor dem erstmaligen Bereitstellen verpackter Waren (§§ 6, 7 VerpackDG)
       {
         feld: "produkte.verpackung_ab",
         art: "datum",
@@ -860,7 +860,7 @@ export const SCHRITTE: Schritt[] = [
         feld: "datenschutz.dsb_gruende",
         art: "mehrfach",
         frage: { de: "Trifft einer dieser Fälle auf deine Datenverarbeitung zu?", en: "Does any of these apply to your data processing?" },
-        // Prüfvermerk RA Dr. Weber 22.10.2026 (F.61): Erwägungsgrund 91 DSGVO – ein einzelner Arzt oder Therapeut verarbeitet nicht „umfangreich“
+        // Prüfvermerk Rechtsanwalt 22.10.2026 (F.61): Erwägungsgrund 91 DSGVO – ein einzelner Arzt oder Therapeut verarbeitet nicht „umfangreich“
         hilfe: {
           de: "Arbeitest du allein als Ärztin, Therapeut oder in einem ähnlichen Beruf mit den Daten deiner Patientinnen und Patienten, gilt das nach Erwägungsgrund 91 DSGVO nicht als umfangreiche Verarbeitung.",
           en: "If you work alone as a doctor, therapist or in a similar profession with your patients' data, this does not count as large-scale processing under Recital 91 GDPR.",
@@ -900,7 +900,7 @@ export const SCHRITTE: Schritt[] = [
         hilfe: { de: "Das hängt von Branche und Größe ab. Das BSI bietet dafür eine Betroffenheitsprüfung an.", en: "This depends on sector and size. The BSI (German Federal Office for Information Security) offers a check." },
         optionen: { ja: { de: "Ja", en: "Yes" }, nein: { de: "Nein", en: "No" }, unklar: { de: "Weiß ich nicht", en: "I don't know" } },
       },
-      // Prüfvermerk RA Dr. Weber 22.10.2026 (F.64): Registrierung spätestens drei Monate nach Beginn der Betroffenheit (§ 33 BSIG)
+      // Prüfvermerk Rechtsanwalt 22.10.2026 (F.64): Registrierung spätestens drei Monate nach Beginn der Betroffenheit (§ 33 BSIG)
       {
         feld: "nis2.betroffen_seit",
         art: "datum",

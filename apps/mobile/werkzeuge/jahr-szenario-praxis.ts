@@ -685,7 +685,7 @@ export function standBauen(): Bau {
       weiteres: eintraege("steuererklaerung", "weiteres", [{ was: "Krankenversicherung (privat) und Pflegeversicherung", betrag: "6.480,00", beleg: true }, { was: "Basisrente (Rürup), Beiträge 2026", betrag: "6.000,00", beleg: true }], h),
       notiz: `Umsätze 2026 (vereinnahmt, netto): steuerpflichtig ${euro(jq.pflichtig)} €, steuerfrei nach § 4 Nr. 14 UStG ${euro(jq.frei)} € → Umsatzschlüssel ${jq.exakt.toFixed(2).replace(".", ",")} % (gerundet ${jq.quote} %, vorläufig ${D.QUOTE_VORLAEUFIG} %). USt 19 % ${euro(uj.ust)} € + § 13b ${euro(uj.st13b)} €; Vorsteuer ${euro(uj.vorsteuer)} €. Jahreszahllast ${euro(uj.jahr)} €, Vorauszahlungen ${euro(uj.vorauszahlungen)} € → Abschlusszahlung ${euro(uj.abschluss)} €. Freier Beruf: keine Gewerbesteuer. Kleinunternehmergrenze: steuerpflichtiger Umsatz 2026 über 25.000 €? ${jq.pflichtig > 2500000 ? "ja" : "nein"} (steuerfreie Heilbehandlungen zählen nicht).` }) });
   vergleich("Steuererklärung", "Gewinn = EÜR (unabhängig)", ausEuro(gewinn[1]) * (gewinn[0] === "Verlust" ? -1 : 1), eu.ergebnis);
-  // StB Busch, Runde 2 (C.23): Gesamtumsatz nach § 19 Abs. 2 UStG laut App ohne die steuerfreien Heilbehandlungen (Positionen
+  // Steuerberater, Runde 2 (C.23): Gesamtumsatz nach § 19 Abs. 2 UStG laut App ohne die steuerfreien Heilbehandlungen (Positionen
   // zu 0 % auf Rechnungen mit Hinweis auf die Steuerbefreiung) – nur Rechnungen (Abrechnungszentrum und Zuzahlungen sind keine
   // Rechnungen in der App, ohnehin steuerfrei). Offene Rechnungen zählen nur in der Zählweise mit Ersatzregel.
   {

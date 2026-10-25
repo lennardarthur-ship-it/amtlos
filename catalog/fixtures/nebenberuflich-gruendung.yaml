@@ -41,6 +41,6 @@ erwartet:
 termine_enthaelt:
   # Anmeldung bei Beginn, Fragebogen einen Monat danach, Berufsgenossenschaft eine Woche danach
   gruendung.gewerbeanzeige: [["einmalig", "2026-12-01"]]
-  # StB Busch 22.10.2026: § 108 Abs. 3 AO – 1.1.2027 ist Neujahr, 2./3.1. Wochenende → Montag 4.1.2027
+  # Steuerberater 22.10.2026: § 108 Abs. 3 AO – 1.1.2027 ist Neujahr, 2./3.1. Wochenende → Montag 4.1.2027
   gruendung.fragebogen_steuerliche_erfassung: [["einmalig", "2027-01-04"]]
   gruendung.berufsgenossenschaft: [["einmalig", "2026-12-08"]]

@@ -1,5 +1,5 @@
 /**
- * StB-Prüfung Kanzlei Heckler und Busch (21.10.2026), Abschnitte 3 und 4: Kontoseite des BU-Schlüssels (A-1),
+ * StB-Prüfung Steuerberatungskanzlei (21.10.2026), Abschnitte 3 und 4: Kontoseite des BU-Schlüssels (A-1),
  * Feldbelegung 103/114/118 (3.1), Soll-Stapel mit Zahlungseingängen (A-4), Verrechnungskonto Gesellschafter (B-6),
  * Nullsteuersatz (B-2), Kleinunternehmer-Wareneingang (A-2) und Kontenvorgaben der Kanzlei (B-4/B-9/B-10/B-11).
  */

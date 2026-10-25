@@ -1,5 +1,5 @@
 /**
- * StB GoBD (Prüfbericht Heckler und Busch, D-1/D-9): Kassenbuch aus den Tagesabschlüssen – „nur lesbar“ mit Fassungsnummer
+ * StB GoBD (Prüfbericht Steuerberatungskanzlei, D-1/D-9): Kassenbuch aus den Tagesabschlüssen – „nur lesbar“ mit Fassungsnummer
  * und Erstellungszeitpunkt auf jeder Seite, dazu wo die Einzelaufzeichnungen liegen (Kassensystem aus der Kassenmeldung
  * bzw. der Verfahrensdokumentation). Die Angaben kommen nur in die Anzeige, nicht in die festgeschriebenen Daten – so bleibt
  * der Vergleich „gleicher Inhalt, keine neue Fassung“ unberührt.

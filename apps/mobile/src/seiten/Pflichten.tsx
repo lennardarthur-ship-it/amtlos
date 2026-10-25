@@ -55,7 +55,7 @@ function useAuswertungOhneHaken() {
   // R10: aus „Mitarbeiter“ zählen Geburtsdatum (unter 18) und „Beschäftigt seit“ (Neueinstellung)
   // R12 (Zoll #1, #6): Name, Art und „Beschäftigt bis“ bestimmen die Nachweise je Person
   const personen = mitarbeiter.map((m) => `${m.name ?? ""}:${m.geburtsdatum ?? ""}:${m.beginn ?? ""}:${m.art ?? ""}:${m.ende ?? ""}:${m.staatsangehoerigkeit ?? ""}`).join("|");
-  // Kleinunternehmer-Wächter (C.23, StB Busch 22.10.2026): vereinnahmter Umsatz aus Rechnungen, Zahlungseingängen und Kasse
+  // Kleinunternehmer-Wächter (C.23, Steuerberater 22.10.2026): vereinnahmter Umsatz aus Rechnungen, Zahlungseingängen und Kasse
   const kasse = useStandWahl((s) => s.kasse);
   const sachentnahmen = useStandWahl((s) => s.sachentnahmen);
   const betrieb = useStandWahl((s) => s.betrieb);

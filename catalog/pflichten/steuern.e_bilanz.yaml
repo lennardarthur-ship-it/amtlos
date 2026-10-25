@@ -1,6 +1,6 @@
 # E-176 (23.10.2026): OHG und KG als eigene Rechtsformen – Auslöser „Andere“ ersetzt durch ohg/kg (gleich wie steuern.buchfuehrungspflicht)
-# StB Busch Abgleich 23.10.2026: OHG und KG im Auslöser (gleich wie steuern.buchfuehrungspflicht)
-# Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
+# Steuerberater Abgleich 23.10.2026: OHG und KG im Auslöser (gleich wie steuern.buchfuehrungspflicht)
+# Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.e_bilanz
 version: 6
@@ -32,7 +32,7 @@ ausloeser:
     wert: gmbh_co_kg
     label:
       de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
-  # StB Busch 23.10.2026: OHG und KG sind als Handelsgesellschaften stets buchführungspflichtig (§§ 6, 238 HGB); § 241a HGB
+  # Steuerberater 23.10.2026: OHG und KG sind als Handelsgesellschaften stets buchführungspflichtig (§§ 6, 238 HGB); § 241a HGB
   # gilt nur für Einzelkaufleute. E-176: eigene Rechtsformen statt „Andere“ – „Andere“ löst die Pflicht nicht mehr aus.
   - feld: profil.rechtsform
     op: in
@@ -121,7 +121,7 @@ ausloeser:
 frist:
   typ: wiederkehrend
   rhythmus: jaehrlich
-  # StB Busch 22.10.2026: mit der KSt- bzw. ESt-/Feststellungserklärung – Fristen wie dort (§ 149 Abs. 2, 3 AO, § 108 Abs. 3 AO)
+  # Steuerberater 22.10.2026: mit der KSt- bzw. ESt-/Feststellungserklärung – Fristen wie dort (§ 149 Abs. 2, 3 AO, § 108 Abs. 3 AO)
   faellig:
     art: tag_nach_periodenende
     monate_nach: 7
@@ -170,8 +170,6 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen: []
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - StB Lutz Busch
-  geprueft_am: '2026-10-23'
-  geprueft_version: 6
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

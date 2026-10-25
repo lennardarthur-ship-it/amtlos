@@ -1124,7 +1124,7 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
       return [...erloese, ...skontoBuchungenRechnung(r, minderungen, sb.kontenrahmen, bo)];
     });
   // StB-Prüfung (A-4): bilanzierende Betriebe – Zahlungseingänge Bank an Forderungen nur mit der Kontenvorgabe
-  // „Zahlungseingänge buchen“. Nachtrag 22.10.2026 (Kanzlei Heckler und Busch): Standard AUS – Kanzleien buchen die Bank
+  // „Zahlungseingänge buchen“. Nachtrag 22.10.2026 (Steuerberatungskanzlei): Standard AUS – Kanzleien buchen die Bank
   // aus dem Kontoauszug; sonst stünden die Zahlungen doppelt im Mandanten. Bar an der Kasse kassierte Rechnungen bucht
   // schon die Kasse (Kasse an Forderungen); Gutschriften und Gutscheine zu 0 % nicht.
   const zahlungenBuchen = bilanz && vorgaben?.zahlungenBuchen === true;

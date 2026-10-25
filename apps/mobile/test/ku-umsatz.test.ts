@@ -1,7 +1,7 @@
 /**
- * Kleinunternehmer-Wächter nach vereinnahmten Entgelten (§ 19 Abs. 2 UStG n. F., StB Busch 22.10.2026, Katalog C.23):
+ * Kleinunternehmer-Wächter nach vereinnahmten Entgelten (§ 19 Abs. 2 UStG n. F., Steuerberater 22.10.2026, Katalog C.23):
  * Zahlungseingänge statt Rechnungsdatum, Ersatzregel für Rechnungen ohne Zahlungsvermerk, Kasse, nicht steuerbare
- * Auslandsumsätze, Stornos – und die vier Einträge in der Auswertung der App. Runde 2 (StB Busch): steuerfreie Umsätze
+ * Auslandsumsätze, Stornos – und die vier Einträge in der Auswertung der App. Runde 2 (Steuerberater): steuerfreie Umsätze
  * herausgerechnet, zwei Zählweisen (mit Ersatzregel für die Warnungen, nur Zahlungen für „überschritten“ und „ab 1. Januar“)
  * und der Hinweis „mit offenen Rechnungen“.
  */
@@ -88,7 +88,7 @@ const GEMISCHT: Pos[] = [
   { bezeichnung: "Theraband", preis: "100,00", satz: "19" },
 ];
 
-describe("Steuerfreie Umsätze (§ 19 Abs. 2 UStG, StB Busch Runde 2)", () => {
+describe("Steuerfreie Umsätze (§ 19 Abs. 2 UStG, Steuerberater Runde 2)", () => {
   it("Regelbesteuerung (wie Praxis-Szenario): Positionen zu 0 % mit Steuerbefreiung zählen nicht – bezahlt und offen", () => {
     let s = rechnung(stand(), "r1", "2026-03-01", "", { ku: false, positionen: GEMISCHT, befreiung: BEFREIUNG, bezahlt: "2026-03-10" });
     expect(vereinnahmterUmsatz(s, ...JAHR)).toEqual({ cent: 10000, ersatz_cent: 0, ersatz: 0, steuerfrei_cent: 30000 });

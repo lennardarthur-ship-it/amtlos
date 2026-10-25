@@ -48,11 +48,12 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Vorlage Hygieneplan nach Prüfung (6.4)
-- 'Prüfvermerk RA Dr. Weber 22.10.2026 (Nummer am Wortlaut prüfen): § 73 Abs. 1a Nr. 24 IfSG am 22.10.2026 gelesen – erfasst Rechtsverordnungen nach § 17 Abs. 4 Satz 1, „soweit die Rechtsverordnung für einen bestimmten Tatbestand auf diese Bußgeldvorschrift verweist“; Abs. 2: bis 25.000 €. Landesverordnungen (BW HygieneVO, BY HygV, NRW HygVO) nicht einzeln gelesen'
-- 'Frist „vor Aufnahme der Tätigkeit, laufend aktualisieren“ (Prüfvermerk RA Dr. Weber 22.10.2026) nur im Text – Frist bleibt dauerhaft'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026 (Nummer am Wortlaut prüfen): § 73 Abs. 1a Nr. 24 IfSG am 22.10.2026 gelesen – erfasst Rechtsverordnungen nach § 17 Abs. 4 Satz 1, „soweit die Rechtsverordnung für einen bestimmten Tatbestand auf diese Bußgeldvorschrift verweist“; Abs. 2: bis 25.000 €. Landesverordnungen (BW HygieneVO, BY HygV, NRW HygVO) nicht einzeln gelesen'
+- 'Frist „vor Aufnahme der Tätigkeit, laufend aktualisieren“ (Prüfvermerk Rechtsanwalt 22.10.2026) nur im Text – Frist bleibt dauerhaft'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 2
+  unterschrieben_am: '2026-10-23'

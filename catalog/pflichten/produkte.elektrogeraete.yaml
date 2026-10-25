@@ -58,12 +58,13 @@ quellen:
   url: https://lxgesetze.de/elektrog/45
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: Herstellerbegriff § 3 Nr. 9 ElektroG und Inlandsgroßhandel = Vertreiber bestätigt; Pflichten als Vertreiber (Rücknahme) nicht abgebildet'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: Herstellerbegriff § 3 Nr. 9 ElektroG und Inlandsgroßhandel = Vertreiber bestätigt; Pflichten als Vertreiber (Rücknahme) nicht abgebildet'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 6
+  unterschrieben_am: '2026-10-23'

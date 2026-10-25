@@ -69,7 +69,7 @@ function kuendigungText(d: Daten): string {
 /** Vorprüfung 21.10.2026: Form je Branche – § 2a-Branchen Schriftform, sonst Textform mit Empfangsnachweis (§ 2 Abs. 1 NachwG). */
 const NW_BRANCHEN = [...BRANCHEN_2A, { wert: "keine", text: "Keine dieser Branchen" }];
 /**
- * Nachkontrolle Dr. Weber (21.10.2026): sichtbarer Schriftform-Hinweis für die Branchen nach § 2a Abs. 1 SchwarzArbG –
+ * Nachkontrolle Rechtsanwalt (21.10.2026): sichtbarer Schriftform-Hinweis für die Branchen nach § 2a Abs. 1 SchwarzArbG –
  * am Anfang des Ablaufs, im Abschluss vor dem Teilen und als Zeile über den Unterschriften im PDF.
  */
 export const NACHWG_SCHRIFTFORM_HINWEIS = "In deiner Branche gilt die Schriftform: Nachweis ausdrucken, eigenhändig unterschreiben und aushändigen – ein PDF oder eine E-Mail genügt nicht (§ 2 Abs. 1 S. 3 NachwG, § 2a SchwarzArbG).";
@@ -79,7 +79,7 @@ export const NACHWG_FORM_SCHRIFT = (branche: string) => `${NACHWG_SCHRIFTFORM_HI
 export const NACHWG_FORM_TEXT = "PDF genügt (Textform, § 2 Abs. 1 NachwG): Das Dokument muss für die beschäftigte Person zugänglich, speicher- und ausdruckbar sein – lass dir den Empfang bestätigen (Empfangsnachweis), z. B. per Antwort-E-Mail. Verlangt die beschäftigte Person einen schriftlichen Nachweis, ausdrucken und unterschreiben.";
 export const NACHWG_FORM_OFFEN = `Form: In den Branchen nach § 2a Abs. 1 SchwarzArbG (${BRANCHEN_2A_TEXT}) gilt die Schriftform – ausdrucken, beide unterschreiben, aushändigen. Sonst genügt seit 1.1.2025 die Textform (z. B. PDF per E-Mail), wenn das Dokument speicher- und ausdruckbar ist und du einen Empfangsnachweis anforderst (§ 2 Abs. 1 NachwG). Wähle die Branche im Formular, dann steht hier, was für dich gilt.`;
 /**
- * Nachkontrolle Dr. Weber (21.10.2026): Beispiel einer Ausschlussfrist für „Weitere Vereinbarungen“. Ausgenommen sind
+ * Nachkontrolle Rechtsanwalt (21.10.2026): Beispiel einer Ausschlussfrist für „Weitere Vereinbarungen“. Ausgenommen sind
  * Haftung für Verletzung von Leben, Körper und Gesundheit sowie für Vorsatz und grobe Fahrlässigkeit (§ 309 Nr. 7 BGB
  * entsprechend, § 202 Abs. 1 BGB), der gesetzliche Mindestlohn (§ 3 Satz 1 MiLoG) und unverzichtbare Ansprüche; beide
  * Stufen mindestens drei Monate (BAG). Ein Muster – nur nach rechtlicher Beratung übernehmen. Fachlich zu prüfen.
@@ -218,7 +218,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
         { id: "kollektiv", art: "wahl", label: "Tarifverträge, Betriebsvereinbarungen", optionen: [{ wert: "keine", text: "keine" }, { wert: "ja", text: "finden Anwendung" }], vorbelegung: "keine", hilfe: "Allgemeinverbindliche Tarifverträge gelten auch ohne Mitgliedschaft im Arbeitgeberverband – z. B. in der Gebäudereinigung, teils regional im Friseurhandwerk. Nachschlagen: Verzeichnis der allgemeinverbindlichen Tarifverträge des BMAS." },
         { id: "kollektiv_text", art: "text", label: "Welche", wenn: { feld: "kollektiv", ist: "ja" }, pflicht: true },
         // Vorprüfung 21.10.2026: die Liste in § 2 Abs. 1 NachwG ist nicht abschließend
-        // Nachkontrolle Dr. Weber (21.10.2026): Beispiel einer Ausschlussfrist mit den nötigen Ausnahmen – ein Muster
+        // Nachkontrolle Rechtsanwalt (21.10.2026): Beispiel einer Ausschlussfrist mit den nötigen Ausnahmen – ein Muster
         { id: "weitere", art: "mehrzeilig", label: "Weitere Vereinbarungen", hilfe: "Ausschlussfristen und Wettbewerbsverbote gehören hinein, wenn sie vereinbart sind – die Liste in § 2 Abs. 1 NachwG ist nicht abschließend. Der Nachweis gibt nur wieder, was im Arbeitsvertrag vereinbart ist. Das Beispiel einer Ausschlussfrist ist ein Muster: Klauseln wie diese nur nach rechtlicher Beratung übernehmen und an deinen Vertrag anpassen – ohne die Ausnahmen (Körperschäden, Vorsatz und grobe Fahrlässigkeit, Mindestlohn) ist eine Ausschlussfrist unwirksam. Werden Überstunden nicht mit dem laufenden Entgelt abgegolten, muss die Frist zur Fälligkeit nach Nr. 7 passen.", vorschlaege: [NACHWG_AUSSCHLUSSFRIST_BEISPIEL] },
         { id: "ausgestellt_am", art: "datum", label: "Ausgestellt am", vorbelegung: "heute" },
       ],
@@ -237,7 +237,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
     if (ja(d, "minijob") && grenze !== null && monat !== null && monat > grenze) f.push(`Monatsentgelt (rechnerisch ${euro(monat)}) liegt über der Minijob-Grenze von ${euro(grenze)}`);
     return f;
   },
-  // Nachkontrolle Dr. Weber (21.10.2026): Form sichtbar am Anfang des Ablaufs und im Abschluss vor dem Teilen
+  // Nachkontrolle Rechtsanwalt (21.10.2026): Form sichtbar am Anfang des Ablaufs und im Abschluss vor dem Teilen
   formHinweis(d) {
     const branche = BRANCHEN_2A.find((o) => o.wert === text(d, "branche"));
     if (branche) return { form: "schrift", text: NACHWG_FORM_SCHRIFT(branche.text) };
@@ -252,7 +252,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       r.push("Befristung: Die Befristungsabrede muss vor Arbeitsbeginn schriftlich vereinbart und von beiden unterschrieben sein (§ 14 Abs. 4 TzBfG) – dieser Nachweis ersetzt sie nicht.");
       if (text(d, "probezeit") && text(d, "probezeit") !== "keine") r.push("Probezeit bei Befristung: Sie muss im Verhältnis zur Dauer der Befristung und zur Art der Tätigkeit stehen (§ 15 Abs. 3 TzBfG).");
     }
-    // Nachkontrolle Dr. Weber: Ausschlussfrist ohne die nötigen Ausnahmen; Überstunden widersprüchlich
+    // Nachkontrolle Rechtsanwalt: Ausschlussfrist ohne die nötigen Ausnahmen; Überstunden widersprüchlich
     const weitere = text(d, "weitere");
     if (/Ausschlussfrist|verfall/i.test(weitere)) {
       const fehlt = AUSSCHLUSS_AUSNAHMEN.filter(([re]) => !re.test(weitere)).map(([, t]) => t);
@@ -351,7 +351,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
         abschnitt("Vertragsparteien", parteien({ rolle: "Arbeitgeber", name: b.name, anschrift: anschriftMehrzeilig(b), zusatz: vertreten || undefined }, { rolle: "beschäftigte Person", name: text(d, "name"), anschrift: text(d, "anschrift"), anschriftPflicht: true })) +
         punkteNw.join("") +
         fassungNachsatz(d) +
-        // Nachkontrolle Dr. Weber: in den § 2a-Branchen die Form direkt über den Unterschriften (Anweisung, kein App-Hinweis)
+        // Nachkontrolle Rechtsanwalt: in den § 2a-Branchen die Form direkt über den Unterschriften (Anweisung, kein App-Hinweis)
         (BRANCHEN_2A.some((o) => o.wert === text(d, "branche")) ? `<p class="schriftform">${esc(NACHWG_SCHRIFTFORM_PDF)}</p>` : "") +
         unterschriften([vertreten ? `Arbeitgeber/in, ${vertreten}` : "Arbeitgeber/in", "Beschäftigte Person (Erhalt bestätigt)"], { ortDatum: true }),
     });

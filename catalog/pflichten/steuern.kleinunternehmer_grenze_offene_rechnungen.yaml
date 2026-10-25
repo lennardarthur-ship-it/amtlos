@@ -1,4 +1,4 @@
-# Katalog C.23 · neu am 22.10.2026 nach StB Busch, Rückmeldung Runde 2: „Grenze überschritten“ und „ab 1. Januar“ zählen nur
+# Katalog C.23 · neu am 22.10.2026 nach Steuerberater, Rückmeldung Runde 2: „Grenze überschritten“ und „ab 1. Januar“ zählen nur
 # tatsächliche Zahlungseingänge (finanzen.umsatz.bezahlt_*); liegt die Grenze nur zusammen mit offenen Rechnungen darüber
 # (finanzen.umsatz.vereinnahmt_*, Ersatzregel Rechnungsdatum), dieser Hinweis statt einer Aussage zur Steuerpflicht.
 # Wortlaut gelesen am 22.10.2026: § 14c Abs. 2 Satz 1 UStG (gesetze-im-internet.de)
@@ -158,12 +158,13 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__14c.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'neu am 22.10.2026, Prüfung durch StB Busch ausstehend (Steuer-Eintrag; Anlass: seine Rückmeldung Runde 2 zu steuern.kleinunternehmer_grenze_ueberschritten und …_naechstes_jahr)'
+- 'neu am 22.10.2026, Prüfung durch Steuerberater ausstehend (Steuer-Eintrag; Anlass: seine Rückmeldung Runde 2 zu steuern.kleinunternehmer_grenze_ueberschritten und …_naechstes_jahr)'
 - 'Auslöser: Zählung mit Ersatzregel (finanzen.umsatz.vereinnahmt_*, offene Rechnungen ab Rechnungsdatum) über einer Grenze, Zählung nur aus Zahlungseingängen (finanzen.umsatz.bezahlt_*) nicht – Gründungsjahr 25.000 €, laufendes Jahr 100.000 € und 25.000 € (ab 1. Januar), Vorjahr 25.000 €. Auf dem Server fehlen die Zahlungsfakten (dort keine Zahlungseingänge): Er zeigt den Hinweis, sobald seine Rechnungen nach Rechnungsdatum über einer Grenze liegen – fachlich prüfen, ob der Text dafür passt'
-- 'Formulierung „weist keine Umsatzsteuer aus, solange …“ nach Busch (§ 14c Abs. 2 UStG); RDG: als Information formuliert – prüfen. Wortlaut § 19 UStG n. F. am 22.10.2026 nicht abrufbar (Allowlist), Inhalt nach StB Busch'
+- 'Formulierung „weist keine Umsatzsteuer aus, solange …“ nach Steuerberater (§ 14c Abs. 2 UStG); RDG: als Information formuliert – prüfen. Wortlaut § 19 UStG n. F. am 22.10.2026 nicht abrufbar (Allowlist), Inhalt nach Steuerberater'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 1
+  unterschrieben_am: '2026-10-23'

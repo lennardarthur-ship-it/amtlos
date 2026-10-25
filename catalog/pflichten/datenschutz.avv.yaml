@@ -70,10 +70,11 @@ quellen:
   url: https://gesetze.legal/eu/vo_eu_2016_679/83
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Frist „vor Beginn der Verarbeitung“ (Prüfvermerk RA Dr. Weber 22.10.2026) nur im Text – kein Ereignis „Dienstleister beauftragt“'
+- 'Frist „vor Beginn der Verarbeitung“ (Prüfvermerk Rechtsanwalt 22.10.2026) nur im Text – kein Ereignis „Dienstleister beauftragt“'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 4
+  unterschrieben_am: '2026-10-23'

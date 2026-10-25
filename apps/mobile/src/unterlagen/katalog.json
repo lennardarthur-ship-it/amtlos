@@ -61,7 +61,7 @@
     "url": "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "arbeitsschutz.erstunterweisung",
@@ -587,7 +587,7 @@
     "url": "https://lxgesetze.de/hgb/176"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "gesellschaft.transparenzregister",
@@ -619,7 +619,7 @@
     "url": "https://www.ihk.de/bayreuth/hauptnavigation/service/recht/geldwaesche/mitteilungspflicht-transparenzregister-4819528"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "gruendung.gewerbeanzeige",
@@ -962,7 +962,7 @@
     "url": "https://www.gesetze-im-internet.de/stgb/__283.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.e_bilanz",
@@ -994,7 +994,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.est_erklaerung",
@@ -1074,7 +1074,7 @@
     "url": "https://www.gesetze-im-internet.de/ao_1977/__152.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.feststellungserklaerung",
@@ -1111,7 +1111,7 @@
     "url": "https://lexetius.com/AO/329,2"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.gewst_erklaerung",
@@ -1311,7 +1311,7 @@
     "url": "https://www.bzst.de/DE/Unternehmen/Umsatzsteuer/One-Stop-Shop_EU/one_stop_shop_eu_node.html"
    }
   ],
-  "geprueft": true
+  "geprueft": false
  },
  {
   "id": "steuern.rechnungen_pflichtangaben",

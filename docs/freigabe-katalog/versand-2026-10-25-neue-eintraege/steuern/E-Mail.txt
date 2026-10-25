@@ -1,0 +1,18 @@
+Betreff: Betriebsklar – neuer Katalogeintrag „Elektronische Lohnsteuerbescheinigung“: Bitte prüfen und freigeben
+
+Sehr geehrter Herr [Name],
+
+bei einer externen Durchsicht des Pflichtenkatalogs ist aufgefallen, dass die elektronische Lohnsteuerbescheinigung (§ 41b EStG) fehlt. Die Lohnsteuer-Anmeldung (§ 41a EStG) und die Meldungen zur Sozialversicherung sind im Katalog, die Bescheinigung zum Jahresende bisher nicht. Ich habe den Eintrag aus dem Gesetzeswortlaut entworfen (§ 41b EStG, §§ 93c, 72a, 108 AO, § 42d EStG). Bis zu Ihrer Freigabe zeigt die App ihn als „fachlich noch nicht geprüft“.
+
+Bitte prüfen Sie den Eintrag in der beigefügten Datei („Betriebsklar-Freigabe-Katalog-Steuerberater-neue-Eintraege.xlsx“) und geben Sie ihn frei:
+
+- Blatt „Einträge“: in der gelben Spalte „Entscheidung“ freigegeben / ändern / streichen wählen, bei „ändern“ die Änderung daneben eintragen. Bitte alle Spalten prüfen, auch Erklärung und Zuständige Stelle.
+- In der Spalte „Offene Fachfragen“ stehen meine eigenen Zweifel. Besonders wichtig sind mir:
+  1. Frist: Ich gehe davon aus, dass auch beim Ausscheiden während des Jahres erst der letzte Februartag des Folgejahres die Frist ist (§ 93c Abs. 1 Nr. 1 AO). Stimmt das?
+  2. Auslöser: Der Eintrag erscheint wie die Lohnsteuer-Anmeldung, also nicht, wenn nur Minijobs mit einheitlicher Pauschsteuer an die Minijob-Zentrale gehen. Betriebe, die nur Minijobs mit 20 % Pauschsteuer (§ 40a Abs. 2a EStG) beim Finanzamt anmelden, sehen ihn trotzdem. Genügt dafür der Hinweis im Text auf § 41b Abs. 6 EStG?
+  3. Folgen: Eine eigene Bußgeldvorschrift habe ich nicht gefunden. Genannt ist nur die Haftung nach § 72a Abs. 4 AO und § 42d Abs. 1 Nr. 3 EStG. Ist das vollständig?
+- Blatt „Prüfvermerk“: bitte ausfüllen und unterschreiben (Scan genügt).
+
+Mit freundlichen Grüßen
+Lennard Lang
+Lang Ventures UG (haftungsbeschränkt) i. G.

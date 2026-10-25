@@ -35,7 +35,7 @@ describe("neue Vorlagen", () => {
     const l = leer("betriebsanweisung_biostoffe");
     expect(l).toContain("für Tätigkeiten mit Biostoffen gemäß § 14 BioStoffV");
     for (const k of ["Gefahren für die Beschäftigten", "Schutzmaßnahmen und Verhaltensregeln", "Verhalten bei Verletzungen, Unfällen und Betriebsstörungen – Erste Hilfe", "Sachgerechte Inaktivierung und Entsorgung"]) expect(l).toContain(`<h2>${k}</h2>`);
-    // Durchsicht T. Koch 23.10.2026: beide Abschnitte auch auf dem leeren Blatt
+    // Durchsicht Sifa 23.10.2026: beide Abschnitte auch auf dem leeren Blatt
     expect(l).toContain("<h2>Arbeitsmedizinische Vorsorge und Impfungen</h2>");
     expect(l).toContain("<h2>Beschäftigungsbeschränkungen</h2>");
     const h = html("betriebsanweisung_biostoffe", { taetigkeit: "Blutentnahme", biostoffe: "HBV, HCV, HIV", schutzstufe: "2", vorsorge: "Impfangebot Hepatitis B." });

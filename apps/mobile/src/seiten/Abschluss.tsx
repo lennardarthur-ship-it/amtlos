@@ -29,7 +29,7 @@ import { GEWERBE_VORLAGE } from "../gewerbe/felder";
 import { GewerbeOnlineSeite } from "./GewerbeOnline";
 
 /**
- * Nachkontrolle Dr. Weber (21.10.2026): Form der Unterlage als Kasten – am Anfang des Ablaufs und im Abschluss vor dem
+ * Nachkontrolle Rechtsanwalt (21.10.2026): Form der Unterlage als Kasten – am Anfang des Ablaufs und im Abschluss vor dem
  * Teilen (NachwG: Schriftform in den Branchen nach § 2a SchwarzArbG, sonst Textform mit Empfangsnachweis).
  */
 export function FormHinweis({ v, d, unten = 12 }: { v: Vorlage; d: Daten; unten?: number }) {
@@ -343,7 +343,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
         {/* Plausibilität (G6): nur ein Hinweis, kein Hindernis */}
         {v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? <Hinweis art="warnung" text={TEXT.betrag_unplausibel} /> : null}
-        {/* Nachkontrolle Dr. Weber: die Form vor dem Teilen als eigener Kasten – Schriftform auch nach dem Teilen (ausdrucken) */}
+        {/* Nachkontrolle Rechtsanwalt: die Form vor dem Teilen als eigener Kasten – Schriftform auch nach dem Teilen (ausdrucken) */}
         {!fest || v.formHinweis?.(d)?.form === "schrift" || v.formHinweis?.(d)?.form === "unterschrift" ? <FormHinweis v={v} d={d} /> : null}
         {/* R10: fachliche Hinweise der Vorlage (Leitweg-ID, EU-Kunde, Abweichung vom Pflichten-Check) – kein Hindernis */}
         {!fest
@@ -354,7 +354,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           : null}
         {/* Phase 1 (RDG): in der App, nie im PDF – die Unterlage gehört dem Betrieb; Rechnungen ohne (Geschäftsvorgang) */}
         {mitVorlagenHinweis(v) ? <RechtsHinweis art="vorlage" oben={4} /> : null}
-        {/* Nachkontrolle T. Baum (23.10.2026): „Vorlagen fachlich durchgesehen (Stand …)“, solange die Vorlage dem
+        {/* Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026): „Vorlagen fachlich durchgesehen (Stand …)“, solange die Vorlage dem
             freigegebenen Stand entspricht (Prüfsumme) – beim Hygieneplan nur in der Fassung für Lebensmittelbetriebe */}
         <T v="caption" leise stil={{ marginTop: 4 }}>{pruefHinweisFuer(v, d, z.stand.betrieb)}</T>
 

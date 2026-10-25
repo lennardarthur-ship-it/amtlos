@@ -1,9 +1,9 @@
 /**
- * Kleinunternehmergrenze (§ 19 Abs. 1, 2 UStG; StB Busch 22.10.2026, Katalog C.23): „Gesamtumsatz ist die nach
+ * Kleinunternehmergrenze (§ 19 Abs. 1, 2 UStG; Steuerberater 22.10.2026, Katalog C.23): „Gesamtumsatz ist die nach
  * vereinnahmten Entgelten berechnete Summe der vom Unternehmer ausgeführten steuerbaren Umsätze“ (§ 19 Abs. 2 Satz 1
  * UStG n. F.) – für Kleinunternehmer immer nach Zufluss, unabhängig von der Versteuerungsart.
  *
- * Aus den Daten auf dem Gerät, in zwei Zählweisen (StB Busch, Rückmeldung Runde 2):
+ * Aus den Daten auf dem Gerät, in zwei Zählweisen (Steuerberater, Rückmeldung Runde 2):
  * - mit Ersatzregel `finanzen.umsatz.vereinnahmt_laufendes_jahr` / `…_vorjahr` (für die Warnungen 80 %/95 % – vorsichtig):
  *   eine gestellte Rechnung ohne jeden Zahlungsvermerk zählt mit dem Rechnungsdatum, die Warnung kommt so eher zu früh;
  * - ohne offene Rechnungen `finanzen.umsatz.bezahlt_laufendes_jahr` / `…_vorjahr` (für „Grenze überschritten“ und

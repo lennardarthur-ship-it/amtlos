@@ -298,7 +298,7 @@ export function kuUmsatz() {
   const inland = sum(bez.filter((x) => KUNDE_ORT[x.kunde] === "inland").map((x) => x.vz * x.s.netto));
   const ausland = sum(bez.filter((x) => KUNDE_ORT[x.kunde] !== "inland").map((x) => x.vz * x.s.netto));
   const vereinbart = sum(umsatzVorgaenge().map((x) => x.vz * x.s.netto));
-  // Ersatzregel des Wächters in der App (StB Busch 22.10.2026, src/unterlagen/kuUmsatz.ts): Rechnungen ohne Zahlungsvermerk
+  // Ersatzregel des Wächters in der App (Steuerberater 22.10.2026, src/unterlagen/kuUmsatz.ts): Rechnungen ohne Zahlungsvermerk
   // zählen vorsichtshalber mit dem Rechnungsdatum, unbezahlt stornierte nicht; Auslandsumsätze bleiben draußen
   const ersatz = sum(umsatzVorgaenge().filter((x) => x.vz === 1 && !x.bezahlt && !x.r.storno && x.datum.startsWith(`${JAHR}-`) && KUNDE_ORT[x.kunde] === "inland").map((x) => x.s.netto));
   return { inland, ausland, vereinbart, ersatz, grenzeLaufendOk: inland <= KU_GRENZE_LAUFEND, vorjahrOk: UMSATZ_VORJAHR * 100 <= KU_GRENZE_VORJAHR };

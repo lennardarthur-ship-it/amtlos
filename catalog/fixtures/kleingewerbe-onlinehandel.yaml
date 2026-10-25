@@ -47,7 +47,7 @@ erwartet:
   steuern.gewst_erklaerung: gilt
   steuern.buchfuehrungspflicht: gilt_nicht
   steuern.euer: gilt
-  # E-Rechnung-Versand 2027/2028: gültig erst ab 01.01.2027 bzw. 2028 (StB Busch 22.10.2026) – siehe grenzfall-e-rechnung-*
+  # E-Rechnung-Versand 2027/2028: gültig erst ab 01.01.2027 bzw. 2028 (Steuerberater 22.10.2026) – siehe grenzfall-e-rechnung-*
   steuern.kassenmeldung: gilt_nicht
   arbeitsschutz.gefaehrdungsbeurteilung: gilt_nicht
 termine_enthaelt:

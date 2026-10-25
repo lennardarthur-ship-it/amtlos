@@ -1,5 +1,5 @@
 /**
- * E-165 (StB-Prüfung Heckler und Busch, Abschnitt 10 Prio 3): Personenkonten für Kunden und Lieferanten (A-3) und
+ * E-165 (StB-Prüfung Steuerberatungskanzlei, Abschnitt 10 Prio 3): Personenkonten für Kunden und Lieferanten (A-3) und
  * Vorsteuer-Teilabzug je Beleg (5.2, § 15 Abs. 4 UStG). Erwartungswerte von Hand gerechnet (siehe Kommentare).
  */
 import { describe, expect, it } from "vitest";

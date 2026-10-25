@@ -60,7 +60,7 @@ const REALISTISCH = {
   nachweis_arbeitsbedingungen: {
     name: "Jana Becker", anschrift: "Lindenstraße 12\n80469 München", branche: "friseur_kosmetik", beginn: "2026-11-01", taetigkeit: "Friseurin",
     entgelt_art: "monat", entgelt_betrag: "2.650,00", wochenstunden: "38,5", tage_pro_woche: "5", verteilung: "Dienstag bis Samstag nach Dienstplan",
-    // Nachkontrolle Dr. Weber (21.10.2026): Überstunden widerspruchsfrei – angeordnet (Nr. 10), gesondert vergütet mit dem
+    // Nachkontrolle Rechtsanwalt (21.10.2026): Überstunden widerspruchsfrei – angeordnet (Nr. 10), gesondert vergütet mit dem
     // rechnerischen Stundenlohn (Monatsgehalt, kein vereinbarter Stundenlohn) und mit dem Folgemonat fällig (Ausschlussfrist)
     ueberstunden: "ja",
     ueberstunden_verguetung: "Jede angeordnete Überstunde wird mit dem rechnerischen Stundenlohn (Monatsgehalt geteilt durch 167 Stunden) zuzüglich eines Zuschlags von 25 % vergütet und mit dem Gehalt des Folgemonats ausgezahlt.",
@@ -83,7 +83,7 @@ const REALISTISCH = {
 };
 
 /**
- * Hygieneplan (Nachkontrolle Dr. Weber): die Einträge passend zur Art des Betriebs – Beauty-Zeilen im Salon, die Zeilen
+ * Hygieneplan (Nachkontrolle Rechtsanwalt): die Einträge passend zur Art des Betriebs – Beauty-Zeilen im Salon, die Zeilen
  * „Gastronomie / Café“ im Lebensmittelbetrieb (sonst stünden Instrumentenaufbereitung und Hautdesinfektion im Café-Plan).
  */
 const LM_GRUPPEN = ["Gastronomie / Café", "Bäckerei", "Foodtruck / mobiler Verkauf"];
@@ -135,7 +135,7 @@ function lebensmittelVoll(v) {
     return {
       datum: "2026-10-01", belehrt_von: "Mara Lindner",
       // Prüfbericht Lebensmittelhygiene (D): letzte Belehrung durch den Arbeitgeber je Person
-      teilnehmer: [["Tom Kessler", "2024-03-04", "2024-03-15", false, "2025-03-17"], ["Aylin Demir", "2026-09-10", "2026-10-01", true, ""], ["Jonas Weber", "2025-06-02", "2025-06-16", false, "2025-06-16"], ["Lena Hofmann", "2023-11-20", "2023-12-01", false, "2025-03-17"]].map(([name, erstbelehrung_am, erster_arbeitstag, erstmals, letzte_belehrung_am]) => ({ name, erstbelehrung_am, erster_arbeitstag, erstmals, letzte_belehrung_am })),
+      teilnehmer: [["Tom Kessler", "2024-03-04", "2024-03-15", false, "2025-03-17"], ["Aylin Demir", "2026-09-10", "2026-10-01", true, ""], ["Jonas Winter", "2025-06-02", "2025-06-16", false, "2025-06-16"], ["Lena Hofmann", "2023-11-20", "2023-12-01", false, "2025-03-17"]].map(([name, erstbelehrung_am, erster_arbeitstag, erstmals, letzte_belehrung_am]) => ({ name, erstbelehrung_am, erster_arbeitstag, erstmals, letzte_belehrung_am })),
     };
   }
   // Prüfbericht Lebensmittelhygiene (Frage 12): Schulungsnachweis nach § 4 LMHV
@@ -144,7 +144,7 @@ function lebensmittelVoll(v) {
       thema: "Jährliche Hygieneschulung", datum: "2026-10-01", dauer: "90 Minuten", geschult_von: "Mara Lindner",
       themen: ["eigenschaften", "herstellung", "warenkontrolle", "eigenkontrollen", "behandlung", "kuehlung_lagerung", "reinigung", "personalhygiene", "schaedlinge", "allergene"],
       inhalt: "Kerntemperatur der Quiche messen und eintragen\nAllergenliste nach Rezeptänderung aktualisieren",
-      teilnehmer: [["Tom Kessler", "Backstube"], ["Aylin Demir", "Service und Theke"], ["Jonas Weber", "Küche"], ["Lena Hofmann", "Verkauf"]].map(([name, taetigkeit]) => ({ name, taetigkeit })),
+      teilnehmer: [["Tom Kessler", "Backstube"], ["Aylin Demir", "Service und Theke"], ["Jonas Winter", "Küche"], ["Lena Hofmann", "Verkauf"]].map(([name, taetigkeit]) => ({ name, taetigkeit })),
     };
   }
   return {};
@@ -168,7 +168,7 @@ function arbeitsschutzVoll(v, d) {
     };
   if (v.id === "pruefprotokoll_elektro") return { ...d, einsatz: feld("einsatz").optionen[3].wert, qualifikation: "efk", geraete: (d.geraete ?? []).map((e) => ({ ...e, naechste: null })) };
   if (v.id === "betriebsanweisung_maschine") return { ...d, maschine: "Aufschnittmaschine", arbeitsbereich: "Küche", nummer: "BA-M-01", gefahren: vorschlaegeVon("gefahren").split("\n").slice(0, 2).join("\n"), schutz: vorschlaegeVon("schutz").split("\n").slice(0, 4).join("\n"), stoerung: vorschlaegeVon("stoerung"), unfall: vorschlaegeVon("unfall"), instandhaltung: vorschlaegeVon("instandhaltung"), beschraenkung: "", notruf: "Notruf 112 · Ersthelferin: Mara Lindner, Tel. 0151 2345678" };
-  if (v.id === "betriebsanweisung_biostoffe") return { ...d, taetigkeit: "Blutentnahme und Injektionen", biostoffe: "Krankheitserreger in Blut und Körperflüssigkeiten (z. B. Hepatitis-B-, Hepatitis-C-Virus, HIV)", schutzstufe: "2", nummer: "BA-B-01", gefahren: vorschlaegeVon("gefahren").split("\n").slice(0, 2).join("\n"), schutz: vorschlaegeVon("schutz"), unfall: vorschlaegeVon("unfall").split("\n").slice(0, 3).join("\n"), entsorgung: vorschlaegeVon("entsorgung"), vorsorge: vorschlaegeVon("vorsorge"), beschraenkung: vorschlaegeVon("beschraenkung"), notruf: "Notruf 112 · Ersthelfer: Dr. Jonas Weber, Tel. 0151 9876543" };
+  if (v.id === "betriebsanweisung_biostoffe") return { ...d, taetigkeit: "Blutentnahme und Injektionen", biostoffe: "Krankheitserreger in Blut und Körperflüssigkeiten (z. B. Hepatitis-B-, Hepatitis-C-Virus, HIV)", schutzstufe: "2", nummer: "BA-B-01", gefahren: vorschlaegeVon("gefahren").split("\n").slice(0, 2).join("\n"), schutz: vorschlaegeVon("schutz"), unfall: vorschlaegeVon("unfall").split("\n").slice(0, 3).join("\n"), entsorgung: vorschlaegeVon("entsorgung"), vorsorge: vorschlaegeVon("vorsorge"), beschraenkung: vorschlaegeVon("beschraenkung"), notruf: "Notruf 112 · Ersthelfer: Dr. Jonas Winter, Tel. 0151 9876543" };
   if (v.id === "expositionsverzeichnis")
     return { ...d, eintraege: [["Ole Holm", "Schleifen und Fräsen von Eiche und Buche", "Hartholzstaub (z. B. Eiche, Buche)", "unter 2 mg/m³ (Messung vom 12.03.2026)", "2019-08-01", "etwa 6 Stunden je Woche"], ["Finn Berger", "Zuschnitt an der Formatkreissäge", "Hartholzstaub (z. B. Eiche, Buche)", "unter 1 mg/m³ (Abschätzung nach TRGS 553)", "2024-09-01", "etwa 3 Stunden je Woche"], ["Kai Demir", "Motorlauf bei der Fehlersuche in der Halle", "Dieselmotoremissionen", "Absaugung am Auspuff; Abschätzung nach TRGS 554", "2025-01-15", "etwa 1 Stunde je Woche"]].map(([name, taetigkeit, stoff, hoehe, von, dauer], i) => ({ name, geburtsdatum: ["1984-04-12", "1996-11-03", "1991-06-27"][i], taetigkeit, stoff, kennung: "Tätigkeit nach TRGS 906", kategorie: "k", hoehe, von, bis: null, dauer })) };
   return d;
@@ -180,7 +180,7 @@ function voll(v) {
 }
 
 /**
- * Weitere Varianten (Nachkontrolle Dr. Weber): Nachweis ohne § 2a-Branche (Textform, ohne Schriftform-Zeile) und
+ * Weitere Varianten (Nachkontrolle Rechtsanwalt): Nachweis ohne § 2a-Branche (Textform, ohne Schriftform-Zeile) und
  * Hygieneplan eines Lebensmittelbetriebs.
  */
 const EXTRA = {
@@ -228,7 +228,7 @@ function auswahl(v) {
   const d = voll(v);
   for (const a of v.abschnitte)
     for (const f of a.felder) {
-      // Durchsicht T. Koch 23.10.2026: Biostoffe mit Blutkontakt sind mindestens Schutzstufe 2 – die Auswahl bleibt dabei
+      // Durchsicht Sifa 23.10.2026: Biostoffe mit Blutkontakt sind mindestens Schutzstufe 2 – die Auswahl bleibt dabei
       if (v.id === "betriebsanweisung_biostoffe" && f.id === "schutzstufe") continue;
       // leere Textfelder mit Vorschlägen (z. B. Beschäftigungsbeschränkungen, B-266): mit den Vorschlägen, damit der Abschnitt erscheint
       if (f.art === "mehrzeilig" && !String(d[f.id] ?? "").trim() && f.vorschlaege?.length) d[f.id] = f.vorschlaege.join("\n");

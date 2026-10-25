@@ -1,4 +1,4 @@
-# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt (bis auf 19 Monate, siehe fachlich_zu_pruefen)
+# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt (bis auf 19 Monate, siehe fachlich_zu_pruefen)
 schema_version: 1
 id: steuern.est_erklaerung
 version: 4
@@ -82,6 +82,7 @@ fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 4
+  unterschrieben_am: '2026-10-23'

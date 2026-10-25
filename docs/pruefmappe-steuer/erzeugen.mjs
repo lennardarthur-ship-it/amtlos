@@ -242,7 +242,7 @@ fs.writeFileSync(path.join(ZIEL, "konten.md"), kt.join("\n"));
 // 6. README
 kopiere(path.join(HIER, "README.md"), path.join(ZIEL, "README.md"));
 kopiere(path.join(HIER, "kontenvorgaben.md"), path.join(ZIEL, "kontenvorgaben.md"));
-// Umsetzung des Prüfberichts Heckler und Busch (mit Nachtrag vom 22.10.2026)
+// Umsetzung des Prüfberichts Steuerberatungskanzlei (mit Nachtrag vom 22.10.2026)
 kopiere(path.join(HIER, "umsetzung-2026-10-22.md"), path.join(ZIEL, "UMSETZUNG.md"));
 fs.rmSync(ROH, { recursive: true, force: true });
 const anzahl = (d) => fs.readdirSync(d, { recursive: true }).filter((f) => fs.statSync(path.join(d, f)).isFile()).length;

@@ -60,14 +60,15 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Bäckerei #5): je Betrieb; neue Betriebsstätte über die Zahl der Betriebsstätten (neu_ausloesen_bei) – Filialen als eigene Objekte fehlen in der App'
-- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Folgen bei Verstoß übernommen (§ 2 LMRStV ohne Art. 6 VO (EG) Nr. 852/2004 und § 39 LFGB am 22.10.2026 gelesen); Frist „vor Beginn“ fachlich bestätigt (Art. 6 Abs. 2: Meldung jedes Betriebs vor Aufnahme der Tätigkeit); Zuständigkeit als „Lebensmittelüberwachung bzw. Veterinäramt deines Kreises oder deiner Stadt“'
-- 'Schwere „mittel“ belassen – keine eigene Bußgeldvorschrift; T. Baum hat zur Schwere nichts angegeben'
+- 'Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): Folgen bei Verstoß übernommen (§ 2 LMRStV ohne Art. 6 VO (EG) Nr. 852/2004 und § 39 LFGB am 22.10.2026 gelesen); Frist „vor Beginn“ fachlich bestätigt (Art. 6 Abs. 2: Meldung jedes Betriebs vor Aufnahme der Tätigkeit); Zuständigkeit als „Lebensmittelüberwachung bzw. Veterinäramt deines Kreises oder deiner Stadt“'
+- 'Schwere „mittel“ belassen – keine eigene Bußgeldvorschrift; Lebensmittelfachbeauftragter hat zur Schwere nichts angegeben'
 - 'Zulassung nach Art. 4 VO (EG) Nr. 853/2004 nur als Hinweis (Eigenherstellung tierischer Erzeugnisse)'
-- 'RA Dr. Weber Runde 3 (23.10.2026) (ändern): „Keine eigene Bußgeldvorschrift“ nicht bestätigt – nach seiner Kenntnis sei die unterlassene Meldung nach Art. 6 Abs. 2 VO (EG) Nr. 852/2004 in § 2 LMRStV erfasst; § 2 LMRStV auf „Artikel 6 Absatz 2 Unterabsatz 1“ durchsuchen. Ergebnis 23.10.2026: NICHT enthalten – § 2 LMRStV in der Fassung gesetze-im-internet.de (lmrstv_2006, neugefasst durch Bek. v. 9.5.2017 I 1170, zuletzt geändert durch Art. 1 V v. 19.4.2023 I Nr. 114) nennt von der VO (EG) Nr. 852/2004 nur Art. 4 Abs. 1 (Nr. 1) und Art. 4 Abs. 2 (Nr. 2–8); „Artikel 6“ kommt in der ganzen Verordnung nur in § 8 vor (Art. 6 Unterabs. 2 VO (EG) Nr. 669/2009); gegengelesen auf gesetze.legal und lxgesetze.de (gleicher Befund). Folgen und Schwere „mittel“ deshalb unverändert – Ergebnis an RA Dr. Weber zurückmelden'
+- 'Rechtsanwalt Runde 3 (23.10.2026) (ändern): „Keine eigene Bußgeldvorschrift“ nicht bestätigt – nach seiner Kenntnis sei die unterlassene Meldung nach Art. 6 Abs. 2 VO (EG) Nr. 852/2004 in § 2 LMRStV erfasst; § 2 LMRStV auf „Artikel 6 Absatz 2 Unterabsatz 1“ durchsuchen. Ergebnis 23.10.2026: NICHT enthalten – § 2 LMRStV in der Fassung gesetze-im-internet.de (lmrstv_2006, neugefasst durch Bek. v. 9.5.2017 I 1170, zuletzt geändert durch Art. 1 V v. 19.4.2023 I Nr. 114) nennt von der VO (EG) Nr. 852/2004 nur Art. 4 Abs. 1 (Nr. 1) und Art. 4 Abs. 2 (Nr. 2–8); „Artikel 6“ kommt in der ganzen Verordnung nur in § 8 vor (Art. 6 Unterabs. 2 VO (EG) Nr. 669/2009); gegengelesen auf gesetze.legal und lxgesetze.de (gleicher Befund). Folgen und Schwere „mittel“ deshalb unverändert – Ergebnis an Rechtsanwalt zurückmelden'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - Tim Baum (Lebensmittelfachbeauftragter)
-    - RA Dr. Ulrich Weber
+    - hygiene
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 6
+  unterschrieben_am: '2026-10-23'

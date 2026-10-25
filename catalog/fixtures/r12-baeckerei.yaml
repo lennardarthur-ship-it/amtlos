@@ -16,7 +16,7 @@ fakten:
   profil.gastro.to_go: true
   # Prüfbericht Lebensmittelhygiene 22.10.2026: abgepackte Kekse im Regal
   profil.gastro.vorverpackt: true
-  # Rückmeldung Lebensmittel T. Baum 22.10.2026: Acrylamid nur, wer selbst backt oder frittiert
+  # Rückmeldung Lebensmittel Lebensmittelfachbeauftragter 22.10.2026: Acrylamid nur, wer selbst backt oder frittiert
   profil.gastro.backen_frittieren: true
   profil.bundesland: BY
 erwartet:

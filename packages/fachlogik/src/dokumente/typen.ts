@@ -253,7 +253,7 @@ export interface Vorlage {
    */
   hinweise?(daten: Daten, betrieb: Betrieb, extra?: { kleinunternehmer?: boolean | null; /** R11: Handwerk oder Bau laut Pflichten-Check */ handwerk?: boolean }): string[];
   /**
-   * Nachkontrolle Dr. Weber (21.10.2026): Form, in der die Unterlage auszuhändigen ist (NachwG: Schriftform in den
+   * Nachkontrolle Rechtsanwalt (21.10.2026): Form, in der die Unterlage auszuhändigen ist (NachwG: Schriftform in den
    * Branchen nach § 2a SchwarzArbG, sonst Textform). Die App zeigt den Text als Kasten am Anfang des Ablaufs und im
    * Abschluss vor dem Teilen. `offen`: die Angabe, die die Form bestimmt, fehlt noch.
    */

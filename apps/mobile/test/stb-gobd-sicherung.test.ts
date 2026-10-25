@@ -1,5 +1,5 @@
 /**
- * StB GoBD (Prüfbericht Heckler und Busch, D-1/D-9/D-11): Vollsicherung außerhalb des Geräts mit Erinnerung und Nachweis;
+ * StB GoBD (Prüfbericht Steuerberatungskanzlei, D-1/D-9/D-11): Vollsicherung außerhalb des Geräts mit Erinnerung und Nachweis;
  * Kassenbuch aus den Tagesabschlüssen mit Fassung, Erstellungszeitpunkt und Kassensystem.
  */
 import { describe, expect, it } from "vitest";

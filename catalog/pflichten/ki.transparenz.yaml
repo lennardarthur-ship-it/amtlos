@@ -44,11 +44,12 @@ quellen:
   url: https://www.fgs.de/news-and-insights/blog/detail/eu-ai-act-was-ab-dem-2-august-2026-gilt-und-was-verschoben-wurde
   abgerufen: '2026-10-20'
 fachlich_zu_pruefen:
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: Art. 50 Abs. 1, 2 (Übergang bis 2.12.2026), Abs. 4 mit Ausnahme bei redaktioneller Kontrolle und Art. 99 Abs. 4, 6 bestätigt; Fälle für Kleinbetriebe im Text. Offen: Auslöser nur „eigene KI-Produkte“ – Betreiber, die nur KI-Bilder in der Werbung nutzen (Abs. 4), sehen den Eintrag nicht'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: Art. 50 Abs. 1, 2 (Übergang bis 2.12.2026), Abs. 4 mit Ausnahme bei redaktioneller Kontrolle und Art. 99 Abs. 4, 6 bestätigt; Fälle für Kleinbetriebe im Text. Offen: Auslöser nur „eigene KI-Produkte“ – Betreiber, die nur KI-Bilder in der Werbung nutzen (Abs. 4), sehen den Eintrag nicht'
 - Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 6
+  unterschrieben_am: '2026-10-23'

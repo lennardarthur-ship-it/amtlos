@@ -26,7 +26,7 @@ erwartet:
   it_sicherheit.nis2_meldepflichten: gilt_nicht
   ki.kompetenz: gilt_nicht
   datenschutz.datenpanne_meldung: gilt
-  # Prüfvermerk RA Dr. Weber 22.10.2026: Benachrichtigung der Betroffenen (Art. 34 DSGVO) als eigene Pflicht
+  # Prüfvermerk Rechtsanwalt 22.10.2026: Benachrichtigung der Betroffenen (Art. 34 DSGVO) als eigene Pflicht
   datenschutz.datenpanne_benachrichtigung: gilt
   datenschutz.betroffenenanfrage: gilt
 termine_enthaelt:

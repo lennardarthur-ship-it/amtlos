@@ -1,4 +1,4 @@
-# Verjährung der Mängelansprüche (H.2) – Werte laut Prüfvermerk RA Dr. Weber (22.10.2026) zu branche.handwerk_gewaehrleistung.
+# Verjährung der Mängelansprüche (H.2) – Werte laut Prüfvermerk Rechtsanwalt (22.10.2026) zu branche.handwerk_gewaehrleistung.
 - schema_version: 1
   id: branche.gewaehrleistung.werk_jahre
   version: 1
@@ -12,7 +12,7 @@
   rechtsgrundlage: ["§ 634a Abs. 1 Nr. 1 BGB"]
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 634a, url: "https://www.gesetze-im-internet.de/bgb/__634a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Wert laut Prüfvermerk RA Dr. Weber 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
+  fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
 
 - schema_version: 1
@@ -28,7 +28,7 @@
   rechtsgrundlage: ["§ 634a Abs. 1 Nr. 2 BGB"]
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 634a, url: "https://www.gesetze-im-internet.de/bgb/__634a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Wert laut Prüfvermerk RA Dr. Weber 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
+  fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
 
 - schema_version: 1
@@ -44,7 +44,7 @@
   rechtsgrundlage: ["§ 438 Abs. 1 Nr. 3 BGB"]
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 438, url: "https://www.gesetze-im-internet.de/bgb/__438.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Wert laut Prüfvermerk RA Dr. Weber 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
+  fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
 
 - schema_version: 1
@@ -60,5 +60,5 @@
   rechtsgrundlage: ["§ 477 BGB"]
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 477, url: "https://www.gesetze-im-internet.de/bgb/__477.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Wert laut Prüfvermerk RA Dr. Weber 22.10.2026; gueltig_ab (Umsetzung der Warenkaufrichtlinie) nicht geprüft"]
+  fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab (Umsetzung der Warenkaufrichtlinie) nicht geprüft"]
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

@@ -445,7 +445,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       expect(okt.uebermittlung.verfuegbar).toBe(false);
     });
 
-    // vereinnahmter Umsatz (StB Busch 22.10.2026): der Server kennt keine Zahlungseingänge – Ersatzregel Rechnungsdatum
+    // vereinnahmter Umsatz (Steuerberater 22.10.2026): der Server kennt keine Zahlungseingänge – Ersatzregel Rechnungsdatum
     it("Kleinunternehmer-Wächter: Warnung bei 80 % aus dem Umsatz der Rechnungen (Ersatzregel Rechnungsdatum)", async () => {
       const kim = await token("kim");
       const u = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${kim}`).send({ name: "Kims Atelier" }).expect(201)).body.id;
@@ -464,7 +464,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       const p = (await alsKim(http().get("/v1/pflichten")).expect(200)).body;
       expect(p.find((x: { pflicht_id: string }) => x.pflicht_id === "steuern.kleinunternehmer_warnung_80")?.ergebnis).toBe("gilt");
       expect(p.find((x: { pflicht_id: string }) => x.pflicht_id === "steuern.kleinunternehmer_warnung_95")?.ergebnis).toBe("gilt_nicht");
-      // StB Busch Runde 2: über 100.000 € nach Rechnungsdatum – der Server kennt keine Zahlungseingänge (finanzen.umsatz.bezahlt_*
+      // Steuerberater Runde 2: über 100.000 € nach Rechnungsdatum – der Server kennt keine Zahlungseingänge (finanzen.umsatz.bezahlt_*
       // fehlen), also nicht „Grenze überschritten“ (ohne Prognose offen), sondern der Hinweis zu den offenen Rechnungen
       const e2 = (await alsKim(http().post("/v1/rechnungen")).send({ kunde_id: ku.id, leistungsdatum: `${jahr}-09-02`, positionen: [{ bezeichnung: "Skizze", menge: 1, einheit: "stueck", preis_cent: 2_000_000, ust_art: "regel" }] }).expect(201)).body;
       await alsKim(http().post(`/v1/rechnungen/${e2.id}/stellen`)).expect(201);
@@ -883,13 +883,13 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     });
 
     it("IfSG-Belehrung über das Unterweisungsmodul erledigt die Pflicht der Einstellung", async () => {
-      const b = (await alsGina(http().post("/v1/beschaeftigte")).send({ vorname: "Kim", nachname: "Koch", art: "teilzeit", eintritt: heuteIso }).expect(201)).body;
+      const b = (await alsGina(http().post("/v1/beschaeftigte")).send({ vorname: "Kim", nachname: "Kraus", art: "teilzeit", eintritt: heuteIso }).expect(201)).body;
       await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
       const periode = `aenderung-${heuteIso.replaceAll("-", "")}`;
       const vor = ((await alsGina(http().get("/v1/pflichten")).expect(200)).body as { pflicht_id: string; periode: string; ergebnis: string; status: string }[]).find((x) => x.pflicht_id === "branche.gastro_ifsg_belehrung" && x.periode === periode);
       expect(vor?.ergebnis).toBe("gilt");
       const w = (await alsGina(http().post("/v1/unterweisungen")).send({ thema: "Belehrung § 43 IfSG", inhalt: "Tätigkeitsverbote, Hygiene", datum: heuteIso, durchgefuehrt_von: "Gina", art: "ifsg" }).expect(201)).body;
-      await alsGina(http().post(`/v1/unterweisungen/${w.id}/bestaetigen`)).send({ beschaeftigter_id: b.id, name: "Kim Koch" }).expect(201);
+      await alsGina(http().post(`/v1/unterweisungen/${w.id}/bestaetigen`)).send({ beschaeftigter_id: b.id, name: "Kim Kraus" }).expect(201);
       expect((await alsGina(http().post(`/v1/unterweisungen/${w.id}/abschliessen`)).expect(201)).body.erledigte_pflichten).toBe(1);
       const nach = ((await alsGina(http().get("/v1/pflichten")).expect(200)).body as { pflicht_id: string; periode: string; status: string }[]).find((x) => x.pflicht_id === "branche.gastro_ifsg_belehrung" && x.periode === periode);
       expect(nach?.status).toBe("erledigt");
@@ -911,7 +911,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
 
     it("Radar zeigt geplante Regeln, die dich betreffen würden, mit Wahrscheinlichkeit und Vorbereitung", async () => {
       const r = (await alsRosa(http().get("/v1/radar")).expect(200)).body as { eintraege: { pflicht_id: string; art: string; betroffen: string; wahrscheinlichkeit: string; vorbereitung: string[]; erwartet_ab: string | null }[]; werte: unknown[] };
-      // StB Busch 22.10.2026: die monatliche Voranmeldung für Neugründer ist geltendes Recht ab 2027 – „kommend“ statt Radar
+      // Steuerberater 22.10.2026: die monatliche Voranmeldung für Neugründer ist geltendes Recht ab 2027 – „kommend“ statt Radar
       const neugruender = r.eintraege.find((e) => e.pflicht_id === "steuern.ust_va_neugruender_radar");
       expect(neugruender).toMatchObject({ art: "kommend", betroffen: "ja", erwartet_ab: "2027-01-01" });
       const hochrisiko = r.eintraege.find((e) => e.pflicht_id === "ki.hochrisiko");
@@ -982,7 +982,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       expect(p.map((x) => x.id)).toContain(ok);
       expect(p.map((x) => x.id)).not.toContain(ungeprueft);
       expect(p.find((x) => x.id === ok)?.in_der_naehe).toBe(true);
-      await alsRosa(http().get("/v1/partner?qualifikation=koch")).expect(422);
+      await alsRosa(http().get("/v1/partner?qualifikation=konditor")).expect(422);
       await alsRosa(http().post(`/v1/partner/${ok}/anfrage`)).send({ nachricht: "Bitte um Unterstützung bei der Gründung.", einwilligung: false }).expect(422);
       await alsRosa(http().post(`/v1/partner/${ungeprueft}/anfrage`)).send({ nachricht: "Bitte um Unterstützung bei der Gründung.", einwilligung: true }).expect(404);
       await alsRosa(http().post(`/v1/partner/${ok}/anfrage`)).send({ nachricht: "Bitte um Unterstützung bei der Gründung.", paket: "Luxus", einwilligung: true }).expect(422);

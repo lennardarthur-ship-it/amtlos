@@ -51,7 +51,7 @@ export function InfoSeite({ id }: { id: string }) {
         ) : null}
         {/* Prüfstand als ruhige Fußnote (R10) – deutlich gesagt wird er einmal zu Beginn des Pflichten-Checks */}
         {mitVorlagenHinweis(v) ? <RechtsHinweis art="vorlage" oben={20} /> : null}
-        {/* Nachkontrolle T. Baum (23.10.2026): bei fachlich durchgesehenen Vorlagen der Vermerk statt des Prüfhinweises –
+        {/* Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026): bei fachlich durchgesehenen Vorlagen der Vermerk statt des Prüfhinweises –
             ohne Unterlage nicht bei Vorlagen, die nur in einer Fassung freigegeben sind (Hygieneplan) */}
         <T v="caption" leise stil={{ marginTop: mitVorlagenHinweis(v) ? 4 : 20 }}>{pruefHinweisFuer(v)}</T>
       </Inhalt>

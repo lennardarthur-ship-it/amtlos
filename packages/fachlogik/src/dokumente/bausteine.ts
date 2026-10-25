@@ -2,7 +2,7 @@
  * Bausteine aus der Recherche vom 12.10.2026 (docs/recherche/2026-10-12) – ERZEUGT von werkzeuge/bausteine-erzeugen.mjs,
  * nicht von Hand ändern. Jeder Baustein trägt einen Kurzbeleg; „unsicher“ = nicht wörtlich an der Primärquelle geprüft.
  * Fachliche Durchsicht Arbeitsschutz vom 22.10.2026 eingearbeitet (E-167, Zuordnung in sifa.ts); Abnahme: PRUEFLISTE T-62.
- * Grenzwerte der Kontrollpunkte nach dem Prüfbericht Lebensmittelhygiene vom 22.10.2026 (LM_BAUM im Skript).
+ * Grenzwerte der Kontrollpunkte nach dem Prüfbericht Lebensmittelhygiene vom 22.10.2026 (LM_HYG im Skript).
  */
 import type { Option, Vorschlag } from "./typen.js";
 

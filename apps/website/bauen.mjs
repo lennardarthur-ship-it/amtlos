@@ -154,7 +154,7 @@ schreibe(
   ),
 );
 const abschnitte = recht.datenschutzAbschnitte(false, false);
-// E-190: Abschnitt zur Android-App erst nach der Freigabe (DATENSCHUTZ_ANDROID ist bis dahin ein Entwurf für RA Dr. Weber)
+// E-190: Abschnitt zur Android-App erst nach der Freigabe (DATENSCHUTZ_ANDROID ist bis dahin ein Entwurf für Rechtsanwalt)
 const androidFrei = Boolean(recht.DATENSCHUTZ_ANDROID?.freigegeben);
 const androidTeil = androidFrei ? `\n<h2>Die Android-App {{MARKE}}</h2>\n${recht.datenschutzAbschnitte(false, true).map((a) => `<h3>${esc(a.titel)}</h3>\n<p>${esc(a.text)}</p>`).join("\n")}` : "";
 schreibe(

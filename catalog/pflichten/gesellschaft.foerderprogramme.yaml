@@ -1,5 +1,5 @@
 # Katalog B.22 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
-# Offen (Produkt, kein Prüfpunkt): Programme, Matching-Kriterien und Fristen je Land als Daten pflegen (Freigabe Weber 22.10.2026: keine rechtliche Anmerkung)
+# Offen (Produkt, kein Prüfpunkt): Programme, Matching-Kriterien und Fristen je Land als Daten pflegen (Freigabe Rechtsanwalt 22.10.2026: keine rechtliche Anmerkung)
 schema_version: 1
 id: gesellschaft.foerderprogramme
 version: 3
@@ -58,6 +58,7 @@ quellen:
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 3
+  unterschrieben_am: '2026-10-23'

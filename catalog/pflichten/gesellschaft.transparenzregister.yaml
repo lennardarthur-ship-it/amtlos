@@ -1,4 +1,4 @@
-# RA Dr. Weber Nachprüfung 23.10.2026 (B.16): Mitteilungspflicht entsteht mit der Eintragung, nicht mit dem Antrag (§ 20 Abs. 1 S. 1 GwG) – Eintrag wie bei der GbR erst ab „eingetragen“, für alle Gesellschaften (auch GmbH/UG, OHG, KG, GmbH & Co. KG, PartG)
+# Rechtsanwalt Nachprüfung 23.10.2026 (B.16): Mitteilungspflicht entsteht mit der Eintragung, nicht mit dem Antrag (§ 20 Abs. 1 S. 1 GwG) – Eintrag wie bei der GbR erst ab „eingetragen“, für alle Gesellschaften (auch GmbH/UG, OHG, KG, GmbH & Co. KG, PartG)
 # E-176 (23.10.2026): OHG und KG als eigene Rechtsformen – lösen den Eintrag über abgeleitet.ist_eingetragene_gesellschaft aus; im Text genannt
 # Katalog B.16 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
@@ -20,7 +20,7 @@ rechtsgrundlage:
 - § 19 GwG
 - § 20 GwG
 kategorie: gesellschaft
-# Weber 23.10.2026: erst ab Eintragung (bei der GbR steckt das schon im abgeleiteten Fakt); ohne Registerangabe „Angabe fehlt“
+# Rechtsanwalt 23.10.2026: erst ab Eintragung (bei der GbR steckt das schon im abgeleiteten Fakt); ohne Registerangabe „Angabe fehlt“
 ausloeser:
   all:
   - feld: abgeleitet.ist_eingetragene_gesellschaft
@@ -33,7 +33,7 @@ ausloeser:
     wert: eingetragen
     label:
       de: Deine Gesellschaft ist im Register eingetragen.
-# R11 (Nutzertest Tischlerei #4): keine Gründungs-Phase – Altgesellschaften (vor 1.8.2021) hatten Nachmeldepflichten (§ 59 Abs. 8 GwG), laut Freigabe Weber 22.10.2026 bis 31.12.2022 abgelaufen (nur historisch); Änderungen laufend
+# R11 (Nutzertest Tischlerei #4): keine Gründungs-Phase – Altgesellschaften (vor 1.8.2021) hatten Nachmeldepflichten (§ 59 Abs. 8 GwG), laut Freigabe Rechtsanwalt 22.10.2026 bis 31.12.2022 abgelaufen (nur historisch); Änderungen laufend
 # Frist „unverzüglich“ (§ 20 Abs. 1 GwG) nur im Text – das Datum der Eintragung bzw. Änderung kennt die App nicht; Rechtsform eGbR im Fragebogen siehe gesellschaft.egbr_hinweis
 frist:
   typ: dauerhaft
@@ -80,8 +80,6 @@ quellen:
   url: https://www.ihk.de/bayreuth/hauptnavigation/service/recht/geldwaesche/mitteilungspflicht-transparenzregister-4819528
   abgerufen: '2026-10-23'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-23'
-  geprueft_version: 7
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

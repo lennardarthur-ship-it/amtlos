@@ -1,0 +1,27 @@
+persona: onlinehandel
+beschreibung: "Prüfvermerk Rechtsanwalt 22.10.2026 (G.70–G.75): Gründerin eines Ladens mit Onlineshop, startet im Februar 2027 mit verpackter Ware (Registrierung bis zum Vortag), verkauft Elektrogeräte ohne Produkte nach § 1 Abs. 2 BFSG und Gerätebatterien, nimmt hohe Barzahlungen an (Radar Bargeldobergrenze ab 10.7.2027)"
+stichtag: "2026-10-22"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2027-02-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [onlinehandel]
+  profil.beschaeftigte.gesamt: 0
+  profil.kunden.segmente: [b2c]
+  profil.vertrieb.kanaele: [onlineshop, ladengeschaeft]
+  profil.produkte.arten: [physisch, verpackung, elektrogeraete, batterien]
+  profil.produkte.bfsg_produkte: [keine]
+  profil.produkte.verpackung_ab: "2027-02-15"
+  profil.produkte.erstinverkehrbringer: false
+  profil.handel.hohe_bargeschaefte: true
+  profil.bundesland: HE
+erwartet:
+  produkte.verpackung: gilt
+  produkte.barrierefreiheit: gilt_nicht
+  produkte.geraetebatterien_ruecknahme: gilt
+  produkte.batterien: gilt_nicht
+  produkte.bargeldobergrenze_radar: gilt
+  produkte.geldwaesche_gueterhaendler: gilt
+termine_enthaelt:
+  # §§ 6, 7 VerpackDG: registrieren und beteiligen vor dem erstmaligen Bereitstellen – spätestens am Vortag
+  produkte.verpackung: [["einmalig", "2027-02-14"]]

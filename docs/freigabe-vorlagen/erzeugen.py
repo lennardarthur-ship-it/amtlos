@@ -14,15 +14,15 @@ from openpyxl.worksheet.datavalidation import DataValidation
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../.."))
 MAPPEN, ZIEL = sys.argv[1], sys.argv[2]
-# --nur '{"1 RA Dr. Weber": ["handelsregister", "Nutzungsbedingungen (Entwurf)"], ...}': nur diese Vorlagen/Texte (Nachprüfung)
+# --nur '{"1 recht": ["handelsregister", "Nutzungsbedingungen (Entwurf)"], ...}': nur diese Vorlagen/Texte (Nachprüfung)
 NUR = json.loads(sys.argv[sys.argv.index("--nur") + 1]) if "--nur" in sys.argv else None
 RUNDE = " (Nachprüfung)" if NUR else ""
 NOTIZ = json.load(open(sys.argv[sys.argv.index("--notizen") + 1], encoding="utf-8")) if "--notizen" in sys.argv else {}
 STAND = "23.10.2026"
 
 ZUORDNUNG = {
-    "1 RA Dr. Weber": {
-        "name": "RA Dr. Ulrich Weber, Weber & Merz, Reutlingen",
+    "1 recht": {
+        "name": "Rechtsanwalt",
         "vorlagen": ["datenschutz_dokumentation", "datenschutzerklaerung_website", "avv", "datenschutzinformation", "datenpanne", "video_hinweisschild",
                      "anamnese_einwilligung", "arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ki_kompetenz", "ausweis_hinweis", "schluesselquittung",
                      "impressum", "gewerbeanmeldung", "handelsregister", "transparenzregister"],
@@ -32,14 +32,14 @@ ZUORDNUNG = {
                   ("Datenschutzerklärung der Website", "anwalt/website-datenschutz.html", "Website-Datenschutzerklaerung.pdf"),
                   ("Impressum der Website", "anwalt/website-impressum.html", "Website-Impressum.pdf")],
     },
-    "2 StB Busch": {
-        "name": "StB Lutz Busch, Kanzlei Heckler und Busch",
+    "2 steuern": {
+        "name": "Steuerberater",
         "vorlagen": ["rechnung", "euer", "bilanz_guv", "ust_voranmeldung", "oss_meldung", "zm_meldung", "steuererklaerung", "verfahrensdokumentation",
                      "kassenbuch", "kassenmeldung", "aufbewahrung", "lohnkonto", "sv_meldedaten"],
         "umfang": "steuerlich (Umsatzsteuer, GoBD, Kasse, Lohnkonto und SV-Meldedaten)",
     },
-    "3 Thomas Koch": {
-        "name": "Thomas Koch, Fachkraft für Arbeitssicherheit",
+    "3 arbeitsschutz": {
+        "name": "Fachkraft für Arbeitssicherheit",
         "vorlagen": ["gefaehrdungsbeurteilung", "unterweisung", "gefahrstoffverzeichnis", "betriebsanweisung", "betriebsanweisung_maschine",
                      "betriebsanweisung_biostoffe", "expositionsverzeichnis", "pruefprotokoll_elektro", "hautschutzplan", "hygieneplan"],
         "umfang": "fachlich im Arbeitsschutz",
@@ -140,10 +140,10 @@ for ordner, z in ZUORDNUNG.items():
     pdf(blatt, os.path.join(o, f"Betriebsklar-Bestaetigung-Vorlagen-{kurz}.pdf"))
     print(ordner, len(z["vorlagen"]), "Vorlagen,", len(os.listdir(os.path.join(o, "Vorlagen-PDF"))), "PDFs")
 
-# Weber zusätzlich: Datenschutzhinweis der App, Nutzungsbedingungen, Website-Texte
+# Rechtsanwalt zusätzlich: Datenschutzhinweis der App, Nutzungsbedingungen, Website-Texte
 A = os.path.join(MAPPEN, "anwalt")
-if "1 RA Dr. Weber" in ZUORDNUNG and ZUORDNUNG["1 RA Dr. Weber"].get("texte"):
-    w = os.path.join(ZIEL, "1 RA Dr. Weber", "App- und Website-Texte"); os.makedirs(w, exist_ok=True)
-    for t, q, f in ZUORDNUNG["1 RA Dr. Weber"]["texte"]:
+if "1 recht" in ZUORDNUNG and ZUORDNUNG["1 recht"].get("texte"):
+    w = os.path.join(ZIEL, "1 recht", "App- und Website-Texte"); os.makedirs(w, exist_ok=True)
+    for t, q, f in ZUORDNUNG["1 recht"]["texte"]:
         (md_zu_pdf(os.path.join(MAPPEN, q), os.path.join(w, f), t) if q.endswith(".md") else html_zu_pdf(os.path.join(MAPPEN, q), os.path.join(w, f)))
-    print("Weber: App- und Website-Texte", os.listdir(w))
+    print("Rechtsanwalt: App- und Website-Texte", os.listdir(w))

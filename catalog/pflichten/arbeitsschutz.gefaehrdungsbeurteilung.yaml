@@ -73,10 +73,11 @@ quellen:
     url: https://www.gesetze-im-internet.de/chemg/__26.html
     abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'RDG-Prüfpunkt (Vorprüfung 21.10.2026, Abschnitt 7) erledigt – RA Dr. Weber (Antwort auf die Rechtsfrage aus der Sifa-Prüfung, Rückmeldung Runde 2): Formulierung als Information statt Vorwegnahme in Ordnung; die Pflicht (§§ 5, 6 ArbSchG) darf als geltendes Recht benannt werden, nur die konkreten Gefährdungen und Maßnahmen für den einzelnen Betrieb bleiben Vorschlag („typisch für Betriebe wie deinen“); arbeitsschutzfachliche Hinweise sind keine Rechtsdienstleistung (§ 2 RDG). Erklärung entsprechend gefasst (Vorlage als Vorschlag statt „passend zu deiner Branche“)'
+- 'RDG-Prüfpunkt (Vorprüfung 21.10.2026, Abschnitt 7) erledigt – Rechtsanwalt (Antwort auf die Rechtsfrage aus der Sifa-Prüfung, Rückmeldung Runde 2): Formulierung als Information statt Vorwegnahme in Ordnung; die Pflicht (§§ 5, 6 ArbSchG) darf als geltendes Recht benannt werden, nur die konkreten Gefährdungen und Maßnahmen für den einzelnen Betrieb bleiben Vorschlag („typisch für Betriebe wie deinen“); arbeitsschutzfachliche Hinweise sind keine Rechtsdienstleistung (§ 2 RDG). Erklärung entsprechend gefasst (Vorlage als Vorschlag statt „passend zu deiner Branche“)'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - Thomas Koch (Fachkraft für Arbeitssicherheit)
+    - arbeitsschutz
   geprueft_am: '2026-10-23'
   geprueft_version: 8
+  unterschrieben_am: '2026-10-23'

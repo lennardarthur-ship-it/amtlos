@@ -11,7 +11,7 @@ fakten:
   profil.vertrieb.kanaele: [onlineshop, marktplatz, abo]
   profil.produkte.arten: [elektrogeraete, batterien, verpackung]
   profil.produkte.erstinverkehrbringer: true
-  # Prüfvermerk RA Dr. Weber 22.10.2026: Produktliste § 1 Abs. 2 BFSG als Auswahl
+  # Prüfvermerk Rechtsanwalt 22.10.2026: Produktliste § 1 Abs. 2 BFSG als Auswahl
   profil.produkte.bfsg_produkte: [universalrechner, ebook_reader]
   profil.online.website: true
   profil.handel.hohe_bargeschaefte: false

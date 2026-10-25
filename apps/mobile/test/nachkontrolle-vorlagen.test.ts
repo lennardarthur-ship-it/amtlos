@@ -1,5 +1,5 @@
 /**
- * Nachkontrolle Dr. Weber (21.10.2026): Schriftform-Hinweis für die Branchen nach § 2a SchwarzArbG sichtbar – am Anfang
+ * Nachkontrolle Rechtsanwalt (21.10.2026): Schriftform-Hinweis für die Branchen nach § 2a SchwarzArbG sichtbar – am Anfang
  * des NachwG-Ablaufs (erster Schritt) und im Abschluss vor dem Teilen, nicht erst beim Teilen.
  */
 import fs from "node:fs";

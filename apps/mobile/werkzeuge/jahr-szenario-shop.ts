@@ -118,7 +118,7 @@ export const PROFIL: Profil = {
   "vorauszahlung.gewst": true,
   "kunden.segmente": ["b2c", "b2b"],
   "kunden.regionen": ["inland", "eu"],
-  // StB Busch 22.10.2026: Meldezeitraum der Zusammenfassenden Meldung wird abgefragt – Lina meldet monatlich (die Regel)
+  // Steuerberater 22.10.2026: Meldezeitraum der Zusammenfassenden Meldung wird abgefragt – Lina meldet monatlich (die Regel)
   "ust.zm_meldezeitraum": "monatlich",
   // Marktstand seit r9 als eigene Antwort; Lohnsteuer „keine“ (nur Minijob mit Pauschsteuer); Investoren-Frage für alle Rechtsformen
   "vertrieb.kanaele": ["onlineshop", "marktstand"],
@@ -725,7 +725,7 @@ export function standBauen(): Bau {
   for (const [id, soll, warum] of ERWARTET) vergleichText(`Pflichten-Check (${D.de(stichtag)})`, `${id} (${warum})`, istDa(id), soll);
   const termin = (id: string) => [...a.gilt, ...a.gruendung].find((p) => p.id === id)?.naechsterTermin ?? "–";
   vergleichText(`Pflichten-Check (${D.de(stichtag)})`, "USt-Voranmeldung: nächster Termin (monatlich, Januar → 10.02.2026)", termin("steuern.ust_voranmeldung"), "2026-02-10");
-  // StB Busch 22.10.2026: Meldezeitraum wird abgefragt (hier monatlich); die App nennt den 25. ohne Verschiebung nach § 108 Abs. 3 AO,
+  // Steuerberater 22.10.2026: Meldezeitraum wird abgefragt (hier monatlich); die App nennt den 25. ohne Verschiebung nach § 108 Abs. 3 AO,
   // weil nicht abschließend geklärt ist, ob das BZSt die Frist verschiebt – 25.01.2026 ist ein Sonntag
   vergleichText(`Pflichten-Check (${D.de(stichtag)})`, "Zusammenfassende Meldung: nächster Termin (monatlich am 25., ohne Verschiebung – 25.01.2026 ist ein Sonntag; vierteljährlich wäre bei igL bis 50.000 € je Quartal wählbar, § 18a Abs. 1 Satz 2 UStG)", termin("steuern.zusammenfassende_meldung"), "2026-01-25");
   {

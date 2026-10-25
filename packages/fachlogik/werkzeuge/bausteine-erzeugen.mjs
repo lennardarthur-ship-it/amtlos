@@ -234,7 +234,7 @@ const ERSETZE = [
   ["HYGIENE", "nach Behandlung bei Bedarf und am Arbeitstagsende", "nach der Behandlung bei Bedarf und bei Arbeitsende"],
   ["HYGIENE", "\"Arbeitsbeginn, nach Pausen/Essen, nach Toilettenbesuch", "\"vor Arbeitsbeginn, nach Pausen und dem Essen, nach dem Toilettenbesuch"],
   ["HYGIENE", "nicht zurückstecken", "Schutzkappe nicht wieder aufsetzen"],
-  // Durchsicht T. Koch 23.10.2026 (Hygieneplan Beauty, Hinweise aus Sicht des Arbeitsschutzes): nach einem Arbeitsunfall der
+  // Durchsicht Sifa 23.10.2026 (Hygieneplan Beauty, Hinweise aus Sicht des Arbeitsschutzes): nach einem Arbeitsunfall der
   // Durchgangsarzt, nicht der Hausarzt; HIV-Postexpositionsprophylaxe möglichst innerhalb von 2 Stunden
   ["HYGIENE", "unverzüglich Hausarzt bzw. Durchgangsarzt (ggf. Postexpositionsprophylaxe)", "sofort Durchgangsarzt (HIV-Postexpositionsprophylaxe möglichst innerhalb von 2 Stunden)"],
   ["HAUTSCHUTZ_FRISEUR", "; gut abtrocknen; eincremen", "; gut abtrocknen"],
@@ -341,29 +341,29 @@ for (const [liste, alt, neu] of ERSETZE) {
   daten[liste] = JSON.parse(vorher.split(alt).join(neu));
 }
 /**
- * RA Dr. Weber, Fachfragen Runde 3 (24.10.2026, docs/pruefberichte/2026-10-24-runde3-fachfragen-weber.xlsx, Nr. 1 und 4),
+ * Rechtsanwalt, Fachfragen Runde 3 (24.10.2026, docs/pruefberichte/2026-10-24-runde3-fachfragen-recht.xlsx, Nr. 1 und 4),
  * Hygieneplan Beauty, Zeile „Umgang mit Blut – Stich-/Schnittverletzung“ – beide Sätze im Wortlaut des Prüfers:
  *   - HIV-PEP mit der Obergrenze, die die S2k-Leitlinie AWMF 055-004 nach Stich- oder Schnittverletzungen nennt (wie B-276);
  *   - keine routinemäßige Abfrage des Infektionsstatus: nur die freiwillige Auskunft der Kundin oder des Kunden
  *     (Art. 9 Abs. 2 lit. a DSGVO), nur an den Durchgangsarzt, nicht ins Verbandbuch.
  */
-const PEP_WEBER = "sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen – eine HIV-Postexpositionsprophylaxe sollte möglichst innerhalb von 2 Stunden beginnen, nach einer Stich- oder Schnittverletzung spätestens bis 24 Stunden; auch später noch ärztlich abklären lassen.";
-const AUSKUNFT_WEBER = "Kundin/Kunde fragen, ob sie freiwillig Auskunft über bekannte Infektionen (Hepatitis B/C, HIV) geben möchten – die Antwort ist freiwillig; nur an den Durchgangsarzt weitergeben, nicht im Verbandbuch notieren.";
-const WEBER_RUNDE3 = [
+const PEP_RA = "sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen – eine HIV-Postexpositionsprophylaxe sollte möglichst innerhalb von 2 Stunden beginnen, nach einer Stich- oder Schnittverletzung spätestens bis 24 Stunden; auch später noch ärztlich abklären lassen.";
+const AUSKUNFT_RA = "Kundin/Kunde fragen, ob sie freiwillig Auskunft über bekannte Infektionen (Hepatitis B/C, HIV) geben möchten – die Antwort ist freiwillig; nur an den Durchgangsarzt weitergeben, nicht im Verbandbuch notieren.";
+const RA_RUNDE3 = [
   ["HYGIENE", "Umgang mit Blut – Stich-/Schnittverletzung der beschäftigten Person", "werte.wie", (t) =>
     t.replace("abdecken; Infektionsstatus von Kundin/Kunde erfragen (Hepatitis, HIV); sofort Durchgangsarzt (HIV-Postexpositionsprophylaxe möglichst innerhalb von 2 Stunden); Unfall im Verbandbuch dokumentieren",
-      `abdecken und ${PEP_WEBER} ${AUSKUNFT_WEBER} Unfall im Verbandbuch dokumentieren.`)],
+      `abdecken und ${PEP_RA} ${AUSKUNFT_RA} Unfall im Verbandbuch dokumentieren.`)],
   ["HYGIENE", "Umgang mit Blut – Stich-/Schnittverletzung der beschäftigten Person", "quelle", (t) => `${t}; S2k-Leitlinie AWMF 055-004; Art. 9 Abs. 2 lit. a DSGVO`],
 ];
-for (const [liste, schluessel, pfad, neu] of WEBER_RUNDE3) {
+for (const [liste, schluessel, pfad, neu] of RA_RUNDE3) {
   const eintrag = daten[liste].find((x) => x.titel === schluessel);
-  if (!eintrag) throw new Error(`Korrektur Weber Runde 3: ${liste} „${schluessel}“ nicht gefunden`);
+  if (!eintrag) throw new Error(`Korrektur Rechtsanwalt Runde 3: ${liste} „${schluessel}“ nicht gefunden`);
   const teile = pfad.split(".");
   const ziel = teile.slice(0, -1).reduce((o, k) => o[k], eintrag);
   const feld = teile.at(-1);
   const alt = ziel[feld];
   ziel[feld] = neu(alt);
-  if (ziel[feld] === alt) throw new Error(`Korrektur Weber Runde 3 greift nicht mehr: ${liste} „${schluessel}“ ${pfad}`);
+  if (ziel[feld] === alt) throw new Error(`Korrektur Rechtsanwalt Runde 3 greift nicht mehr: ${liste} „${schluessel}“ ${pfad}`);
 }
 /**
  * E-167: fachliche Durchsicht durch eine Fachkraft für Arbeitssicherheit (Ergebnis vom 22.10.2026,
@@ -421,7 +421,7 @@ const SIFA = [
   ["B-051", "GEFAEHRDUNGEN", "Stromschlag durch beschädigte Leitungen und elektrische Betriebsmittel.", { quelle: "DGUV Information 203-006; DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A; BG BAU Bausteine B 171, B 172, A 002" }],
   ["B-052", "GEFAEHRDUNGEN", "Unfälle mit Kraftfahrzeugen durch technische Mängel oder ungesicherte Ladung.", { quelle: "§ 57 DGUV Vorschrift 70", "werte.massnahme": zeile("Regelmäßige Prüfung durch Fachbetrieb;", "Fahrzeuge mindestens jährlich durch eine sachkundige Person prüfen lassen (§ 57 DGUV Vorschrift 70);") }],
   ["B-053", "GEFAEHRDUNGEN", "Schwere körperliche Belastung durch Heben, Tragen, Zwangshaltungen und Knien.", { quelle: "LasthandhabV; BG BAU Baustein D 506" }],
-  ["B-054", "GEFAEHRDUNGEN", "Brand- und Explosionsgefahr durch Druckgasflaschen (z. B. Flüssiggas).", { quelle: "TRGS 510; DGUV Regel 110-010; BG BAU Bausteine A 063, A 064, A 065", "werte.unterpunkt": "brand" }], // Durchsicht T. Koch 23.10.2026: DGUV Regel 110-010 statt DGUV Vorschrift 79
+  ["B-054", "GEFAEHRDUNGEN", "Brand- und Explosionsgefahr durch Druckgasflaschen (z. B. Flüssiggas).", { quelle: "TRGS 510; DGUV Regel 110-010; BG BAU Bausteine A 063, A 064, A 065", "werte.unterpunkt": "brand" }], // Durchsicht Sifa 23.10.2026: DGUV Regel 110-010 statt DGUV Vorschrift 79
   ["B-055", "GEFAEHRDUNGEN", "Fehlende oder defekte persönliche Schutzausrüstung bzw. fehlende Kenntnis über deren Benutzung.", { quelle: "PSA-BV; BG ETEM" }],
   ["B-056", "GEFAEHRDUNGEN", "Arbeitsbedingte psychische Belastungen (z. B. Über-/Unterforderung, Stress, soziale Konflikte).", { quelle: "§ 5 Abs. 3 Nr. 6 ArbSchG; GDA; BG ETEM" }],
   ["B-057", "GEFAEHRDUNGEN", "Stolpern, Ausrutschen und Stürzen auf Böden und Verkehrswegen.", { quelle: "ASR A1.5; BGHW" }],
@@ -500,13 +500,13 @@ for (const [nr, liste, schluessel, aenderungen] of SIFA) {
   }
 }
 /**
- * Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, docs/pruefberichte/2026-10-22-lebensmittelhygiene-baum.txt):
+ * Prüfbericht Lebensmittelhygiene (Lebensmittelfachbeauftragter, 22.10.2026, docs/pruefberichte/2026-10-22-lebensmittelhygiene.txt):
  * Tabelle „Grenzwerte je Kontrollpunkt“ und Änderungsliste – je Kontrollpunkt ein Wert, Quellen aus der Tabelle. Je
  * Eintrag die Nummer der Prüfmappe (L-…). Pfade wie bei SIFA; jede Änderung muss greifen. Nicht genannte Kontrollpunkte
  * (✔ ohne Änderung) bleiben unverändert.
  */
 const LAVES = "LAVES Niedersachsen, Merkblatt Lagertemperaturen 08/2022 (DIN 10508:2019)";
-const LM_BAUM = [
+const LM_HYG = [
   ["L-057", "Kühllagerung allgemein – Temperaturkontrolle Kühleinrichtungen", { "werte.grenzwert": "Kühlschrank höchstens +7 °C", quelle: `BgVV 1999; ${LAVES}; Lebensmittelüberwachung Mainz` }],
   ["L-060", "Kühlung Hackfleisch", { "werte.grenzwert": "zugekauft bzw. vorverpackt: max. +2 °C", quelle: "Tier-LMHV Anlage 5 Kap. II Nr. 3.3.1; LAVES Niedersachsen; Lebensmittelüberwachung Mainz" }],
   ["L-062", "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)", { "werte.grenzwert": "max. +4 °C", quelle: "VO (EG) Nr. 853/2004 Anhang III Abschn. II Kap. V Nr. 3; LAVES Niedersachsen; Lebensmittelüberwachung Mainz" }],
@@ -527,7 +527,7 @@ const LM_BAUM = [
   ["L-075", "Frittierfett – polare Anteile", { "werte.grenzwert": "Eingriffswert 20 % polare Anteile: Fett wechseln (Grenze der Genusstauglichkeit 24 %); Frittiertemperatur mind. +160 °C, max. +175 °C", quelle: "DGF-Empfehlung; ALS (24 % polare Anteile); BGN-Leitlinie ortsveränderliche Betriebsstätten 2018; zvl.jena.de" }],
   ["L-077", "Schädlingsmonitoring", { "werte.haeufigkeit": "regelmäßige vorbeugende Sichtkontrollen, mindestens einmal im Monat, dokumentiert" }],
 ];
-for (const [nr, schluessel, aenderungen] of LM_BAUM) {
+for (const [nr, schluessel, aenderungen] of LM_HYG) {
   const gefunden = daten.HACCP.filter((x) => x.titel === schluessel);
   if (gefunden.length !== 1) throw new Error(`Lebensmittel ${nr}: HACCP „${schluessel}“ ${gefunden.length}-mal gefunden`);
   for (const [pfad, neu] of Object.entries(aenderungen)) {
@@ -540,7 +540,7 @@ for (const [nr, schluessel, aenderungen] of LM_BAUM) {
   }
 }
 /**
- * Nachkontrolle T. Baum (23.10.2026, Hinweis 1): Fundstellen getrennt – zugekauft (+2 °C) Tier-LMHV Anlage 5 Kap. II
+ * Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026, Hinweis 1): Fundstellen getrennt – zugekauft (+2 °C) Tier-LMHV Anlage 5 Kap. II
  * Nr. 3.3.1, eigene Herstellung (+7 °C) Nr. 3.1.3 (Prüfmappe v3: L-061, L-062).
  */
 /** L-060: ein Wert je Zeile – der Wert für selbst hergestelltes Hackfleisch als eigene Zeile direkt dahinter. */
@@ -594,7 +594,7 @@ const kopf = `/**
  * Bausteine aus der Recherche vom 12.10.2026 (docs/recherche/2026-10-12) – ERZEUGT von werkzeuge/bausteine-erzeugen.mjs,
  * nicht von Hand ändern. Jeder Baustein trägt einen Kurzbeleg; „unsicher“ = nicht wörtlich an der Primärquelle geprüft.
  * Fachliche Durchsicht Arbeitsschutz vom 22.10.2026 eingearbeitet (E-167, Zuordnung in sifa.ts); Abnahme: PRUEFLISTE T-62.
- * Grenzwerte der Kontrollpunkte nach dem Prüfbericht Lebensmittelhygiene vom 22.10.2026 (LM_BAUM im Skript).
+ * Grenzwerte der Kontrollpunkte nach dem Prüfbericht Lebensmittelhygiene vom 22.10.2026 (LM_HYG im Skript).
  */
 import type { Option, Vorschlag } from "./typen.js";
 `;

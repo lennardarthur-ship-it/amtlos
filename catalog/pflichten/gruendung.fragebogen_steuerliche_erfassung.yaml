@@ -1,4 +1,4 @@
-# Katalog A.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
+# Katalog A.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt
 schema_version: 1
 id: gruendung.fragebogen_steuerliche_erfassung
 version: 5
@@ -28,13 +28,13 @@ voraussetzungen:
 - gruendung.elster_konto
 frist:
   typ: relativ
-  # StB Busch 22.10.2026: Fristbeginn ist die Eröffnung des Betriebs bzw. die Aufnahme der Tätigkeit (§ 138 Abs. 1b Satz 1,
+  # Steuerberater 22.10.2026: Fristbeginn ist die Eröffnung des Betriebs bzw. die Aufnahme der Tätigkeit (§ 138 Abs. 1b Satz 1,
   # Abs. 4 AO), nicht das Gründungsdatum – Beginn der Tätigkeit, ohne eigene Angabe das Startdatum aus dem Profil
   bezug:
     fakt: abgeleitet.taetigkeit_beginn
   versatz: P1M
   zeitpunkt: spaetestens
-  # StB Busch 22.10.2026: § 108 Abs. 3 AO gilt
+  # Steuerberater 22.10.2026: § 108 Abs. 3 AO gilt
   verschiebung:
     regel: naechster_werktag
     kalender: bundesland
@@ -88,6 +88,7 @@ fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:
-    - StB Lutz Busch
+    - steuern
   geprueft_am: '2026-10-23'
   geprueft_version: 5
+  unterschrieben_am: '2026-10-23'

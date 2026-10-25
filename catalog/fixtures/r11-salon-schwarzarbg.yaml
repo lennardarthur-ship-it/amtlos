@@ -43,7 +43,7 @@ erwartet:
 termine_enthaelt:
   personal.lohnnachweis_bg: [["2027-02", "2027-02-16"]]
   personal.sofortmeldung: [["aenderung-20260901", "2026-09-01"]]
-  # Freigabe Weber 22.10.2026: Hinweis „vor Beginn“ der Dienst- oder Werkleistungen (§ 2a Abs. 2 SchwarzArbG n. F.) – Termin am Vortag
+  # Freigabe Rechtsanwalt 22.10.2026: Hinweis „vor Beginn“ der Dienst- oder Werkleistungen (§ 2a Abs. 2 SchwarzArbG n. F.) – Termin am Vortag
   personal.ausweis_hinweis: [["aenderung-20260901", "2026-08-31"]]
   arbeitsschutz.unterweisung_jugendliche: [["aenderung-20260901", "2027-03-01"]]
   personal.jugend_nachuntersuchung: [["aenderung-20260901", "2027-09-01"]]

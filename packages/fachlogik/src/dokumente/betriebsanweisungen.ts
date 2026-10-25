@@ -162,7 +162,7 @@ const BIO_TEILE: BaTeil[] = [
     label: "Verhalten bei Verletzungen, Unfällen und Betriebsstörungen – Erste Hilfe",
     hilfe: "Sofortmaßnahmen, Meldung im Betrieb, Erste Hilfe – Zeitfenster der HIV-Postexpositionsprophylaxe nach S2k-Leitlinie AWMF 055-004",
     ...mitGruppen([
-      // B-276, RA Dr. Weber (Fachfragen Runde 3, 24.10.2026, Abgleich mit der S2k-Leitlinie AWMF 055-004): Obergrenze nach
+      // B-276, Rechtsanwalt (Fachfragen Runde 3, 24.10.2026, Abgleich mit der S2k-Leitlinie AWMF 055-004): Obergrenze nach
       // Stich- oder Schnittverletzungen ergänzt, damit nach Ablauf von 2 Stunden niemand auf den Arztbesuch verzichtet – sein Wortlaut
       ["Nach einer Stich- oder Schnittverletzung: Wunde desinfizieren und sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen – eine HIV-Postexpositionsprophylaxe sollte möglichst innerhalb von 2 Stunden beginnen, nach einer Stich- oder Schnittverletzung spätestens bis 24 Stunden; auch später noch ärztlich abklären lassen.", BEAUTY],
       ["Bei Spritzern in Auge oder Mund sofort mit Wasser bzw. Augenspüllösung spülen und ärztlich vorstellen."],
@@ -182,14 +182,14 @@ const BIO_TEILE: BaTeil[] = [
   },
 ];
 /**
- * Durchsicht T. Koch 23.10.2026: Vorsorge und Beschäftigungsbeschränkungen stehen immer auf dem Aushang (leer mit Linien
+ * Durchsicht Sifa 23.10.2026: Vorsorge und Beschäftigungsbeschränkungen stehen immer auf dem Aushang (leer mit Linien
  * zum Ausfüllen). B-283: Impfungen nur, soweit tätigkeitsbedingt erforderlich (§ 6 Abs. 2 ArbMedVV); B-284 (pauschales
  * Verbot „mit diesem Stoff“) gestrichen – B-285 deckt den Mutterschutz bei Biostoffen ab.
  */
 const BIO_VORSORGE: BaTeil = { id: "vorsorge", label: "Arbeitsmedizinische Vorsorge und Impfungen", hilfe: "z. B. Vorsorge nach ArbMedVV Anhang Teil 2, Impfangebot", vorschlaege: ["Arbeitsmedizinische Vorsorge nach ArbMedVV Anhang Teil 2 beim Betriebsarzt; Impfungen (z. B. Hepatitis B) werden angeboten, soweit tätigkeitsbedingt erforderlich."], linien: 2, pflicht: false };
 const BIO_BESCHRAENKUNG: BaTeil = { id: "beschraenkung", label: "Beschäftigungsbeschränkungen", hilfe: "z. B. Mutterschutz", vorschlaege: ["Schwangere: Immunstatus klären; bei unverantwortbarer Gefährdung keine Tätigkeit mit diesen Biostoffen (§ 11 Abs. 2 MuSchG)."], linien: 2, pflicht: false };
 const SCHUTZSTUFE: Record<string, string> = { "1": "Schutzstufe 1", "2": "Schutzstufe 2", "3": "Schutzstufe 3", "4": "Schutzstufe 4" };
-/** Durchsicht T. Koch 23.10.2026: Tätigkeiten mit Kontakt zu Blut und Körperflüssigkeiten sind nach TRBA 250 mindestens Schutzstufe 2. */
+/** Durchsicht Sifa 23.10.2026: Tätigkeiten mit Kontakt zu Blut und Körperflüssigkeiten sind nach TRBA 250 mindestens Schutzstufe 2. */
 export const BIO_SCHUTZSTUFE_BLUT = "Tätigkeiten mit Kontakt zu Blut und Körperflüssigkeiten sind nach TRBA 250 mindestens Schutzstufe 2 – bitte die Schutzstufe prüfen.";
 
 export const betriebsanweisungBiostoffe: Vorlage = {
@@ -206,7 +206,7 @@ export const betriebsanweisungBiostoffe: Vorlage = {
       felder: [
         { id: "taetigkeit", art: "text", label: "Arbeitsbereich und Tätigkeit", hilfe: "z. B. Blutentnahme und Injektionen, Fußpflege, Kosmetikbehandlung", pflicht: true, vorschlaege: ["Untersuchung und Behandlung in der Praxis", "Blutentnahme und Injektionen", "Fußpflege", "Kosmetikbehandlung mit möglichem Blutkontakt"], vorschlagGruppen: { "Untersuchung und Behandlung in der Praxis": PRAXIS, "Blutentnahme und Injektionen": PRAXIS, Fußpflege: ["kosmetik"], "Kosmetikbehandlung mit möglichem Blutkontakt": ["kosmetik"] } },
         { id: "biostoffe", art: "text", label: "Biostoffe", hilfe: "Welche Biostoffe vorkommen können, mit Risikogruppe – aus der Gefährdungsbeurteilung (TRBA 250)", pflicht: true, vorschlaege: ["Krankheitserreger in Blut und Körperflüssigkeiten (z. B. Hepatitis-B-, Hepatitis-C-Virus, HIV)", "Erreger von Haut- und Nagelpilz"] },
-        // Durchsicht T. Koch 23.10.2026: ohne Vorbelegung, der Nutzer muss wählen; Hilfetext mit Verweis auf TRBA 250
+        // Durchsicht Sifa 23.10.2026: ohne Vorbelegung, der Nutzer muss wählen; Hilfetext mit Verweis auf TRBA 250
         { id: "schutzstufe", art: "wahl", label: "Schutzstufe der Tätigkeit", optionen: optionen(SCHUTZSTUFE), pflicht: true, hilfe: "Aus der Gefährdungsbeurteilung nach TRBA 250 – Tätigkeiten mit Kontakt zu Blut und Körperflüssigkeiten sind mindestens Schutzstufe 2" },
         { id: "nummer", selten: true, art: "text", label: "Nummer der Betriebsanweisung", hilfe: "z. B. BA-B-01" },
       ],

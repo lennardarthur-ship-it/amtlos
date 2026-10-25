@@ -1,14 +1,14 @@
-# v2 nach RA Dr. Weber, Rückmeldung 24.10.2026 (Abgleich Runde 3, Geschäftsbriefe): Partnerschaftsgesellschaft (partg, partg_mbb) ergänzt – „über § 7 Abs. 5 PartGG“.
+# v2 nach Rechtsanwalt, Rückmeldung 24.10.2026 (Abgleich Runde 3, Geschäftsbriefe): Partnerschaftsgesellschaft (partg, partg_mbb) ergänzt – „über § 7 Abs. 5 PartGG“.
 # Abweichung von seinem Wortlaut: Die Regel steht seit 1.1.2024 (MoPeG) in § 7 Abs. 3 PartGG – „Für die Angabe auf Geschäftsbriefen der Partnerschaft ist § 125 Absatz 1 Satz 1 und Absatz 2
 # des Handelsgesetzbuchs mit der Maßgabe entsprechend anzuwenden, dass bei einer Partnerschaft mit beschränkter Berufshaftung auch der von dieser gewählte Namenszusatz im Sinne des § 8 Absatz 4 Satz 3
 # anzugeben ist.“ (gesetze.legal/bund/partgg/7, Synopse buzer.de/gesetz/3018/v276650-2024-01-01.htm, gelesen 24.10.2026); die geltende Fassung hat kein Abs. 5. Bitte bestätigen.
 # § 8 Abs. 4 Satz 3 PartGG („mit beschränkter Berufshaftung“, „mbB“; gesetze.legal/bund/partgg/8, gelesen 24.10.2026).
 # eGbR nicht aufgenommen: § 707b BGB (gesetze.legal/bund/bgb/707b und lexmea.de/de/gesetz/bgb/707b, gelesen 24.10.2026) verweist für eingetragene Gesellschaften nur auf §§ 18, 21 bis 24, 30, 37
 # (Name), §§ 8, 8a Abs. 1, 9 Abs. 1 Satz 1 und Abs. 3 bis 6, 10 bis 12, 13h, 14, 16, 32 (Register) und §§ 13, 13d HGB (Zweigniederlassung) – nicht auf § 125 oder § 37a HGB.
-# Neu nach RA Dr. Weber, Nachprüfung 23.10.2026 (zu B.15, Frage 1): eigener Eintrag „Pflichtangaben auf Geschäftsbriefen“ für alle eingetragenen Unternehmen – § 37a HGB (e. K.), OHG/KG, § 35a GmbHG (GmbH/UG, bei der GmbH & Co. KG zusätzlich § 177a S. 2 HGB); Zwangsgeld § 14 HGB bzw. § 79 Abs. 1 GmbHG bis 5.000 €.
+# Neu nach Rechtsanwalt, Nachprüfung 23.10.2026 (zu B.15, Frage 1): eigener Eintrag „Pflichtangaben auf Geschäftsbriefen“ für alle eingetragenen Unternehmen – § 37a HGB (e. K.), OHG/KG, § 35a GmbHG (GmbH/UG, bei der GmbH & Co. KG zusätzlich § 177a S. 2 HGB); Zwangsgeld § 14 HGB bzw. § 79 Abs. 1 GmbHG bis 5.000 €.
 # Abweichung von seinem Wortlaut: Er nennt § 125a HGB – die Vorschrift ist seit 1.1.2024 aufgehoben (MoPeG, Synopse buzer.de/gesetz/3486/v276633-2024-01-01.htm); die Angaben stehen jetzt in § 125 HGB „Angaben auf Geschäftsbriefen“, § 177a S. 1 HGB verweist auf § 125. Bitte bestätigen.
 # Wortlaut gelesen 23.10.2026: § 37a HGB (buzer.de/37a_HGB.htm), § 19 Abs. 1 Nr. 1 HGB (lxgesetze.de/hgb/19), § 125 HGB (lexmea.de/de/gesetz/hgb/125, gesetze.legal/bund/hgb/125), § 177a HGB (lexmea.de/de/gesetz/hgb/177a), § 35a GmbHG (gesetze.legal/bund/gmbhg/35a), § 79 Abs. 1 GmbHG (lxgesetze.de/gmbhg/79); § 14 HGB wie in gesellschaft.handelsregister_anmeldung (lexmea.de, 22.10.2026).
-# v1: Partnerschaftsgesellschaft und eGbR nicht aufgenommen (von Dr. Weber nicht genannt).
+# v1: Partnerschaftsgesellschaft und eGbR nicht aufgenommen (von Rechtsanwalt nicht genannt).
 schema_version: 1
 id: gesellschaft.geschaeftsbriefe_pflichtangaben
 version: 2
@@ -28,7 +28,7 @@ rechtsgrundlage:
 - § 14 HGB
 - § 79 Abs. 1 GmbHG
 kategorie: gesellschaft
-# Weber 23.10.2026: für alle eingetragenen Unternehmen – der e. K. ist per Rechtsform eingetragen; Gesellschaften erst ab Eintragung
+# Rechtsanwalt 23.10.2026: für alle eingetragenen Unternehmen – der e. K. ist per Rechtsform eingetragen; Gesellschaften erst ab Eintragung
 # (Registergericht und Registernummer gibt es erst dann; wie gesellschaft.transparenzregister)
 ausloeser:
   any:
@@ -46,7 +46,7 @@ ausloeser:
       - gmbh_co_kg
       - ug
       - gmbh
-      # Weber 24.10.2026: Partnerschaftsgesellschaft über § 7 Abs. 3 PartGG (Partnerschaftsregister)
+      # Rechtsanwalt 24.10.2026: Partnerschaftsgesellschaft über § 7 Abs. 3 PartGG (Partnerschaftsregister)
       - partg
       - partg_mbb
       label:
@@ -116,11 +116,9 @@ quellen:
   url: https://lexmea.de/de/gesetz/hgb/14
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'v2 (RA Dr. Weber, 24.10.2026): Partnerschaftsgesellschaft ergänzt (Auslöser partg und partg_mbb ab Eintragung, Erklärung, Folgen, Rechtsgrundlage). Abweichung: § 7 Abs. 3 PartGG statt „§ 7 Abs. 5 PartGG“ – seit dem MoPeG (1.1.2024) steht die Verweisung auf § 125 Abs. 1 Satz 1 und Abs. 2 HGB in Abs. 3; „Name“ statt „Firma“ (die Partnerschaft führt einen Namen, § 2 Abs. 1 PartGG) und der Namenszusatz der PartG mbB nach dem Wortlaut von § 7 Abs. 3 PartGG. Folgen „entsprechend gegen die vertretungsberechtigten Partner“ über die Verweisung auf § 125 Abs. 2 HGB – bitte bestätigen. eGbR nicht aufgenommen: § 707b BGB verweist nicht auf § 125 oder § 37a HGB.'
-- 'Neu nach RA Dr. Weber (Nachprüfung 23.10.2026, B.15 Frage 1) – bitte ganz prüfen. Abweichungen von seiner Anmerkung: § 125 HGB statt § 125a HGB (aufgehoben seit 1.1.2024, MoPeG); Partnerschaftsgesellschaft und eGbR nicht aufgenommen; Schwere „niedrig“ (nur Zwangsgeld) von uns eingestuft. Gesellschaften erst ab Eintragung (Registerangaben), der e. K. per Rechtsform.'
+- 'v2 (Rechtsanwalt, 24.10.2026): Partnerschaftsgesellschaft ergänzt (Auslöser partg und partg_mbb ab Eintragung, Erklärung, Folgen, Rechtsgrundlage). Abweichung: § 7 Abs. 3 PartGG statt „§ 7 Abs. 5 PartGG“ – seit dem MoPeG (1.1.2024) steht die Verweisung auf § 125 Abs. 1 Satz 1 und Abs. 2 HGB in Abs. 3; „Name“ statt „Firma“ (die Partnerschaft führt einen Namen, § 2 Abs. 1 PartGG) und der Namenszusatz der PartG mbB nach dem Wortlaut von § 7 Abs. 3 PartGG. Folgen „entsprechend gegen die vertretungsberechtigten Partner“ über die Verweisung auf § 125 Abs. 2 HGB – bitte bestätigen. eGbR nicht aufgenommen: § 707b BGB verweist nicht auf § 125 oder § 37a HGB.'
+- 'Neu nach Rechtsanwalt (Nachprüfung 23.10.2026, B.15 Frage 1) – bitte ganz prüfen. Abweichungen von seiner Anmerkung: § 125 HGB statt § 125a HGB (aufgehoben seit 1.1.2024, MoPeG); Partnerschaftsgesellschaft und eGbR nicht aufgenommen; Schwere „niedrig“ (nur Zwangsgeld) von uns eingestuft. Gesellschaften erst ab Eintragung (Registerangaben), der e. K. per Rechtsform.'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - RA Dr. Ulrich Weber
-  geprueft_am: '2026-10-25'
-  geprueft_version: 2
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

@@ -70,10 +70,10 @@ export async function neuberechnenInTx(
 
   const fakten = profilZuFakten(profil.daten);
   // Kleinunternehmer-Wächter (C.23): Umsatz aus den Rechnungen in Amtlos, nur wenn welche gestellt wurden. Maßgeblich sind
-  // die vereinnahmten Entgelte (§ 19 Abs. 2 UStG, StB Busch 22.10.2026); der Server speichert keine Zahlungseingänge, also
+  // die vereinnahmten Entgelte (§ 19 Abs. 2 UStG, Steuerberater 22.10.2026); der Server speichert keine Zahlungseingänge, also
   // gilt hier für alle Rechnungen die Ersatzregel „Rechnung ohne Zahlungsvermerk zählt mit dem Rechnungsdatum“ (fakten.json).
   // `finanzen.umsatz.laufendes_jahr` bleibt für ältere Katalog-Releases.
-  // StB Busch, Runde 2: „Grenze überschritten“ und „ab 1. Januar“ zählen nur tatsächliche Zahlungseingänge
+  // Steuerberater, Runde 2: „Grenze überschritten“ und „ab 1. Januar“ zählen nur tatsächliche Zahlungseingänge
   // (`finanzen.umsatz.bezahlt_*`). Die liefert der Server bewusst NICHT – ihre Zweige sind im Katalog über „vorhanden“
   // abgesichert und gelten hier nicht; die Einträge entscheiden dann nur nach den Profilangaben (Prognose, Vorjahr) und
   // bleiben ohne sie offen. Liegen die Rechnungen nach Rechnungsdatum über einer Grenze, zeigt der Server stattdessen den

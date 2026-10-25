@@ -48,10 +48,11 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: Sanktion § 20 PAngV i. V. m. § 3 Abs. 2 WiStrG (25.000 €) bestätigt. Zusatz „künftig bis 100.000 € nach PAngG (G. v. 19.10.2026, BGBl. 2026 I Nr. 314)“ gestrichen, bis die Fundstelle mit Inkrafttretensdatum vorliegt und geprüft ist – am 22.10.2026 nicht geprüft (buzer nennt das Gesetz, aber kein Inkrafttretensdatum; BGBl. nicht abgerufen). Quellen BT-Drs. 21/5873 und BR-Drs. 499/26 dafür entfernt'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: Sanktion § 20 PAngV i. V. m. § 3 Abs. 2 WiStrG (25.000 €) bestätigt. Zusatz „künftig bis 100.000 € nach PAngG (G. v. 19.10.2026, BGBl. 2026 I Nr. 314)“ gestrichen, bis die Fundstelle mit Inkrafttretensdatum vorliegt und geprüft ist – am 22.10.2026 nicht geprüft (buzer nennt das Gesetz, aber kein Inkrafttretensdatum; BGBl. nicht abgerufen). Quellen BT-Drs. 21/5873 und BR-Drs. 499/26 dafür entfernt'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 4
+  unterschrieben_am: '2026-10-23'

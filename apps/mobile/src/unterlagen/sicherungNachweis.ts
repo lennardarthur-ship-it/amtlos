@@ -1,5 +1,5 @@
 /**
- * StB GoBD (Prüfbericht Heckler und Busch, D-11): Vollsicherung außerhalb des Geräts mit Erinnerung und Nachweis.
+ * StB GoBD (Prüfbericht Steuerberatungskanzlei, D-11): Vollsicherung außerhalb des Geräts mit Erinnerung und Nachweis.
  * Verlust oder Wechsel des iPhones darf die Bücher nicht vernichten (GoBD Rz. 103 ff.): Die App hält Datum und Art jeder
  * exportierten Vollsicherung fest (verschlüsselte Sicherungsdatei oder offenes Archiv – die automatische iCloud-Sicherung
  * zählt hier nicht, sie ist nur mit der App lesbar) und erinnert, wenn die letzte älter als 30 Tage ist.

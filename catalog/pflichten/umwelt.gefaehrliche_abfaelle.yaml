@@ -46,10 +46,11 @@ quellen:
   url: https://www.gesetze-im-internet.de/krwg/__69.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: § 9a KrWG, § 49 KrWG, NachwV und Sanktionen bestätigt; Kleinmengen bis 2 t/Jahr (§ 2 Abs. 2, §§ 12, 24 NachwV) im Text; Schwere „hoch“ vertretbar – gesetzt. Ob das Register nach § 49 KrWG bei Kleinmengen bleibt, nicht ausdrücklich beantwortet'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: § 9a KrWG, § 49 KrWG, NachwV und Sanktionen bestätigt; Kleinmengen bis 2 t/Jahr (§ 2 Abs. 2, §§ 12, 24 NachwV) im Text; Schwere „hoch“ vertretbar – gesetzt. Ob das Register nach § 49 KrWG bei Kleinmengen bleibt, nicht ausdrücklich beantwortet'
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 4
+  unterschrieben_am: '2026-10-23'

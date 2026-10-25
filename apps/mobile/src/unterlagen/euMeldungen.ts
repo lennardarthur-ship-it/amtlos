@@ -1,5 +1,5 @@
 /**
- * StB-Prüfung Heckler und Busch (21.10.2026, 5.2, C-9): OSS-Erklärung und Zusammenfassende Meldung aus den geteilten
+ * StB-Prüfung Steuerberatungskanzlei (21.10.2026, 5.2, C-9): OSS-Erklärung und Zusammenfassende Meldung aus den geteilten
  * Rechnungen – Übertragungshilfe wie die Voranmeldung, die App übermittelt nichts.
  *
  * - OSS (§ 18j UStG): Rechnungen mit dem Schalter „OSS“ (Steuer des Bestimmungslands) je Land und Steuersatz, im

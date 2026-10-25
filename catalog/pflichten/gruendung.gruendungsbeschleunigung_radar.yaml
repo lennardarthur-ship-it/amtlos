@@ -1,6 +1,6 @@
 # Katalog A.0 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 # Rechtsstand 21.10.2026: Eckpunkte der Länder (März 2026), Gesetzentwurf des Bundes noch nicht bekannt
-# Freigabe RA Dr. Weber 22.10.2026: als Radar/Hinweis freigegeben – vor dem Launch Stand des Gesetzentwurfs prüfen; ohne Bundesentwurf bleibt es beim Hinweis
+# Freigabe Rechtsanwalt 22.10.2026: als Radar/Hinweis freigegeben – vor dem Launch Stand des Gesetzentwurfs prüfen; ohne Bundesentwurf bleibt es beim Hinweis
 schema_version: 1
 id: gruendung.gruendungsbeschleunigung_radar
 version: 3
@@ -60,6 +60,7 @@ quellen:
 pruefung:
   status: freigegeben
   geprueft_von:
-    - RA Dr. Ulrich Weber
+    - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 3
+  unterschrieben_am: '2026-10-23'
