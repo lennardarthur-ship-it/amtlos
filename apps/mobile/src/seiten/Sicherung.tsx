@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
-import { Pressable, View } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AppState, Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { Fuss, Hinweis, Karte, Knopf, PasswortFeld, Schalter, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useMeldung } from "../ui/meldung";
 import { RADIUS, useFarben } from "../ui/thema";
 import { PASSWORT_EMPFOHLEN, SicherungsFehler, fehlendeDateien, passwortSchwaeche, base64, schluesselAusPasswort, schluesselKennung, sicherungErstellen, sicherungLesenMitDateien, sicherungMitSchluessel, sicherungsDatei, sicherungsDateiLesen, sicherungsKdf, sicherungsName, type Dateien, type SicherungsSchluessel } from "../unterlagen/sicherung";
-import { cloudBeiseitelegen, cloudDateiLesen, cloudDateiSchreiben, cloudDateien, cloudLesen, cloudSchreiben, cloudVerfuegbar } from "../unterlagen/cloud";
+import { ORDNER_WAHL, cloudBeiseitelegen, cloudDateiLesen, cloudDateiSchreiben, cloudDateien, cloudLesen, cloudSchreiben, cloudVerfuegbar, ordnerStatus, ordnerVergessen, ordnerWaehlen, type OrdnerStatus } from "../unterlagen/cloud";
+import { bestaetigen } from "../ui/bestaetigen";
+import { ANDROID } from "../plattform";
 import { autoSchluesselHolen, autoSchluesselLoeschen, autoSchluesselSpeichern } from "../unterlagen/schluesselbund";
 import { dateiTeilen, dateiTeilenBytes, dateiWaehlen, zufall } from "../unterlagen/sicherungDatei";
 import { dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
@@ -48,6 +50,16 @@ export function PasswortPaar({ label, pw, pw2, setPw, setPw2 }: { label: string;
   );
 }
 
+/**
+ * Android (E-190): Das Teilen-Menü von Android meldet nicht, ob die Datei wirklich gespeichert oder gesendet wurde
+ * (expo-sharing kehrt auch nach „Zurück“ zurück). Damit ein Abbruch nicht als Sicherung zählt (Löschschutz, Nachweis
+ * GoBD), fragt die App dort nach. Auf dem iPhone meldet das Teilen-Menü den Abbruch selbst – keine Frage.
+ */
+async function geteiltBestaetigt(): Promise<boolean> {
+  if (!ANDROID) return true;
+  return bestaetigen({ titel: TEXT.sicherung_geteilt_frage, text: TEXT.sicherung_geteilt_text, ja: TEXT.sicherung_geteilt_ja, nein: TEXT.sicherung_geteilt_nein });
+}
+
 /** Daten verschlüsselt sichern (E-125): Passwort zweimal, dann Datei ins Teilen-Menü. Nichts geht im Klartext raus. */
 export function SicherungSeite() {
   const z = useAmtlos();
@@ -82,6 +94,8 @@ export function SicherungSeite() {
       const text = sicherungErstellen(gesichert, pw, zufall, new Date(), undefined, dateien);
       // abgebrochen: keine Sicherung – die Erinnerung bleibt und „Alle Daten löschen“ bleibt gesperrt
       if (!(await dateiTeilen(sicherungsName(heute()), text))) return;
+      // Android (E-190) meldet einen Abbruch des Teilens nicht – erst nach ausdrücklichem „Ja“ zählt die Sicherung
+      if (!(await geteiltBestaetigt())) return;
       // fehlen Belegdateien, ist die Sicherung nicht vollständig (H3): teilen ja, aber nicht als gesichert zählen
       if (fehlend.length) {
         setMeldung({ art: "fehler", text: TEXT.sicherung_dateien_fehlen(fehlend.length) });
@@ -167,7 +181,7 @@ export function OffenesArchiv() {
         }
       setFortschritt(null);
       const a = offenesArchiv(s, dateien, new Date().toISOString(), { rechnungsPdfs });
-      if (await dateiTeilenBytes(a.dateiname, a.zip, "application/zip")) {
+      if ((await dateiTeilenBytes(a.dateiname, a.zip, "application/zip")) && (await geteiltBestaetigt())) {
         // StB GoBD (D-11): lesbare Vollsicherung außerhalb des Geräts – nur mit allen Belegdateien als Nachweis
         if (!fehlend) z.sicherungNachweisen("archiv");
         melden(TEXT.r12g_archiv_fertig);
@@ -261,16 +275,19 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
         </Karte>
       ) : null}
       <Knopf ton symbol="folder" text={datei ? TEXT.andere_datei : TEXT.datei_waehlen} onPress={() => void waehlen()} stil={{ marginTop: 12 }} />
-      {cloud ? (
+      {cloud || ORDNER_WAHL ? (
         <TextKnopf
           symbol="icloud"
-          text={TEXT.aus_icloud}
+          text={cloud ? TEXT.aus_icloud : TEXT.ordner_laden}
           onPress={() =>
-            void cloudLesen().then((text) => {
+            void (async () => {
+              // Android (E-190): ohne erreichbaren Ordner zuerst die Ordnerauswahl (z. B. auf einem neuen Smartphone)
+              if (!cloud && ORDNER_WAHL && (await ordnerWaehlen())?.art !== "ok") return;
+              const text = await cloudLesen();
               setGelesen(null);
               if (text) setDatei({ name: TEXT.icloud_sicherung_name, text });
               else setHinweis(TEXT.icloud_leer);
-            })
+            })()
           }
           stil={{ marginTop: 4 }}
         />
@@ -315,7 +332,24 @@ export function SicherungsKarte() {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
+  const ordner = useOrdnerStatus(z.stand.cloudSicherung);
   const jetzt = new Date();
+  // E-190: Android – die automatische Sicherung in den Ordner ist eingeschaltet, aber der Zugriff fehlt
+  if (z.stand.cloudSicherung && ordner?.art === "kein_zugriff") {
+    const satz = TEXT.ordner_kein_zugriff(ordner.name);
+    return (
+      <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.ordner_kein_zugriff_titel}. ${satz}`} onPress={() => void ordnerNeuWaehlen(z).catch(() => undefined)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.baldHauch, marginBottom: 18, opacity: pressed ? 0.75 : 1 })}>
+        <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: f.baldKreis, alignItems: "center", justifyContent: "center" }}>
+          <Symbol name="xmark.icloud" groesse={20} farbe={f.bald} gewicht="semibold" />
+        </View>
+        <View style={{ flex: 1 }}>
+          <T fett>{TEXT.ordner_kein_zugriff_titel}</T>
+          <T v="caption" leise numberOfLines={3}>{satz}</T>
+          <T v="caption" fett farbe={f.bald}>{TEXT.ordner_neu}</T>
+        </View>
+      </Pressable>
+    );
+  }
   const faellig = sicherungFaellig(z.stand, jetzt);
   // erst, wenn es etwas Unersetzliches gibt: eine geteilte Rechnung oder einen Beleg – nicht schon nach einem Entwurf
   // R11 (UX #12): nicht gleich nach der ersten Rechnung – erst ab drei geteilten Unterlagen bzw. Belegen oder sieben Tage
@@ -372,6 +406,60 @@ async function belegeAusCloud(text: string, stand: Stand, schluessel: Uint8Array
   return d;
 }
 
+/**
+ * Zustand des Sicherungsordners (nur Android, E-190) – beim Öffnen und bei jeder Rückkehr in die App neu geprüft
+ * (die Berechtigung kann außerhalb der App entfallen). null: kein Ordner-System (iPhone, Web) oder noch nicht geprüft.
+ */
+export function useOrdnerStatus(an = true): OrdnerStatus | null {
+  const [st, setSt] = useState<OrdnerStatus | null>(null);
+  const pruefen = useCallback(() => {
+    if (ORDNER_WAHL && an) void ordnerStatus().then(setSt).catch(() => undefined);
+  }, [an]);
+  useEffect(() => {
+    pruefen();
+    if (!ORDNER_WAHL || !an) return;
+    const abo = AppState.addEventListener("change", (a) => {
+      if (a === "active") pruefen();
+    });
+    return () => abo.remove();
+  }, [pruefen, an]);
+  return ORDNER_WAHL ? st : null;
+}
+
+/**
+ * Sichern wie nach einer Änderung (AutoSicherung): erst die fehlenden Belegdateien, dann der Stand ohne Fotos. Liefert
+ * false, wenn nichts geschrieben werden konnte (kein Schlüssel, Ziel nicht erreichbar).
+ */
+async function automatischSichern(z: ReturnType<typeof useAmtlos>): Promise<boolean> {
+  const k = await autoSchluesselHolen();
+  if (!k || !(await cloudVerfuegbar())) return false;
+  const gesichert = z.aktuellerStand();
+  // erst die Belegdateien (einzeln, nur fehlende), dann der Stand ohne Fotos – so verweist er nie auf Fehlendes
+  const ohne = await belegeHochladen(z, k, gesichert);
+  await cloudSchreiben(sicherungMitSchluessel(gesichert, k, zufall, new Date()));
+  // fehlt eine Belegdatei, gilt die Sicherung nicht als vollständig (H3) – die Erinnerung bleibt
+  if (!ohne) z.gesichert(gesichert);
+  return true;
+}
+
+/**
+ * Android (E-190): Ordner neu wählen (Zugriff verloren oder anderer Ordner) und gleich sichern. Liegt im neuen Ordner
+ * eine Sicherung mit anderem Schlüssel (anderes Passwort, anderes Gerät), wird sie beiseitegelegt statt überschrieben.
+ */
+async function ordnerNeuWaehlen(z: ReturnType<typeof useAmtlos>, melden?: (t: string) => void): Promise<OrdnerStatus | null> {
+  const st = await ordnerWaehlen();
+  if (st?.art !== "ok") return st;
+  const k = await autoSchluesselHolen();
+  const vorhanden = await cloudLesen();
+  const kdf = vorhanden ? sicherungsKdf(vorhanden) : null;
+  if (vorhanden && (!k || !kdf || schluesselKennung(kdf.salz) !== schluesselKennung(k.salz))) {
+    await cloudBeiseitelegen(vorhanden);
+    melden?.(TEXT.ordner_beiseite);
+  }
+  await automatischSichern(z).catch(() => undefined);
+  return st;
+}
+
 /** iCloud verfügbar? (nur im eigenen App-Build mit iCloud-Anmeldung) */
 export function useCloud(): boolean {
   const [da, setDa] = useState(false);
@@ -381,13 +469,22 @@ export function useCloud(): boolean {
   return da;
 }
 
-/** Schalter unter „Deine Daten“: automatisch verschlüsselt in iCloud sichern (E-129). In Expo Go unsichtbar. */
+/**
+ * Schalter unter „Deine Daten“: automatisch verschlüsselt in iCloud sichern (E-129). In Expo Go unsichtbar. Android
+ * (E-190): automatisch in einen gewählten Ordner – immer sichtbar (die Ordnerauswahl gibt es auch in Expo Go), dazu der
+ * gewählte Ordner, „Anderen Ordner wählen“ und bei verlorenem Zugriff der Hinweis mit „Ordner neu wählen“.
+ */
 export function CloudZeile() {
   const z = useAmtlos();
   const nav = useNav();
+  const melden = useMeldung();
   const cloud = useCloud();
   const sperre = useProSperre();
-  if (!cloud) return null;
+  const ordner = useOrdnerStatus(z.stand.cloudSicherung);
+  const [st, setSt] = useState<OrdnerStatus | null>(null);
+  const zeigen = st ?? ordner;
+  if (!cloud && !ORDNER_WAHL) return null;
+  const neu = () => void ordnerNeuWaehlen(z, melden).then((x) => x && setSt(x)).catch(() => undefined);
   return (
     <Karte stil={{ marginBottom: 10, paddingBottom: 12 }}>
     <Schalter
@@ -402,9 +499,23 @@ export function CloudZeile() {
         else {
           z.cloudSicherungSetzen(false);
           void autoSchluesselLoeschen().catch(() => undefined);
+          if (ORDNER_WAHL) void ordnerVergessen();
         }
       }}
     />
+    {ORDNER_WAHL && z.stand.cloudSicherung && zeigen ? (
+      zeigen.art === "kein_zugriff" ? (
+        <View style={{ gap: 6 }}>
+          <Hinweis art="warnung" text={TEXT.ordner_kein_zugriff(zeigen.name)} symbol="xmark.icloud" />
+          <Knopf ton symbol="folder.badge.plus" text={TEXT.ordner_neu} onPress={neu} />
+        </View>
+      ) : zeigen.art === "ok" ? (
+        <View>
+          <T v="klein" leise>{TEXT.ordner_gewaehlt(zeigen.name)}</T>
+          <TextKnopf symbol="folder.badge.plus" text={TEXT.ordner_anderer} onPress={neu} />
+        </View>
+      ) : null
+    ) : null}
     </Karte>
   );
 }
@@ -419,7 +530,13 @@ function CloudSicherungSeite() {
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState(false);
   const [fehlend, setFehlend] = useState(0);
-  const bereit = passwortBereit(pw, pw2);
+  // Android (E-190): zuerst der Ordner – ein schon gewählter, erreichbarer wird übernommen
+  const vorher = useOrdnerStatus();
+  const [ordner, setOrdner] = useState<OrdnerStatus | null>(null);
+  const gewaehlt = ordner ?? vorher;
+  const ordnerOk = !ORDNER_WAHL || gewaehlt?.art === "ok";
+  const bereit = passwortBereit(pw, pw2) && ordnerOk;
+  const waehlen = () => void ordnerWaehlen().then((x) => x && setOrdner(x)).catch(() => setFehler(true));
   const los = async () => {
     setFehler(false);
     setLaedt(true);
@@ -470,9 +587,18 @@ function CloudSicherungSeite() {
           </Fuss>
       }
     >
+      {ORDNER_WAHL ? (
+        <View style={{ marginBottom: 14, gap: 6 }}>
+          {gewaehlt?.art === "ok" ? <Karte stil={{ paddingVertical: 12 }}><T fett numberOfLines={1}>{TEXT.ordner_gewaehlt(gewaehlt.name)}</T></Karte> : null}
+          {gewaehlt?.art === "kein_zugriff" ? <Hinweis art="warnung" text={TEXT.ordner_kein_zugriff(gewaehlt.name)} /> : null}
+          <Knopf ton symbol="folder.badge.plus" text={gewaehlt?.art === "ok" ? TEXT.ordner_anderer : TEXT.ordner_waehlen} onPress={waehlen} />
+          <T v="caption" leise>{TEXT.ordner_tipp}</T>
+        </View>
+      ) : null}
       <PasswortPaar label={TEXT.passwort} pw={pw} pw2={pw2} setPw={setPw} setPw2={setPw2} />
       <View style={{ marginTop: 18 }}>
         <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
+        {ORDNER_WAHL && !ordnerOk && passwortBereit(pw, pw2) ? <Hinweis text={TEXT.ordner_fehlt} symbol="folder" /> : null}
         {fehler ? <Hinweis art="fehler" text={TEXT.icloud_fehler} /> : null}
         {fehlend ? <Hinweis art="fehler" text={TEXT.sicherung_dateien_fehlen(fehlend)} /> : null}
       </View>
@@ -487,16 +613,7 @@ export function AutoSicherung() {
   useEffect(() => {
     if (!offen) return;
     const zeit = setTimeout(() => {
-      void (async () => {
-        const k = await autoSchluesselHolen();
-        if (!k || !(await cloudVerfuegbar())) return;
-        const gesichert = z.aktuellerStand();
-        // erst die Belegdateien (einzeln, nur fehlende), dann der Stand ohne Fotos – so verweist er nie auf Fehlendes
-        const ohne = await belegeHochladen(z, k, gesichert);
-        await cloudSchreiben(sicherungMitSchluessel(gesichert, k, zufall, new Date()));
-        // fehlt eine Belegdatei, gilt die Sicherung nicht als vollständig (H3) – die Erinnerung bleibt
-        if (!ohne) z.gesichert(gesichert);
-      })().catch(() => undefined);
+      void automatischSichern(z).catch(() => undefined);
     }, 20_000);
     return () => clearTimeout(zeit);
   }, [offen, z.stand.geaendert]);

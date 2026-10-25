@@ -7,7 +7,7 @@ import { AuswahlZeile } from "../ui/auswahlseite";
 import { DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Schalter, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
-import { istIos, useFarben, weich } from "../ui/thema";
+import { istNativ, useFarben, weich } from "../ui/thema";
 import { belegFoto } from "../unterlagen/belegfoto";
 import { ausUtf8 } from "../unterlagen/sicherung";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
@@ -92,9 +92,9 @@ export function useBelegErfassen() {
 export function BelegErfassen({ kompakt }: { kompakt?: boolean }) {
   const e = useBelegErfassen();
   const zeilen = [
-    ...(istIos ? [{ symbol: "camera", titel: TEXT.beleg_foto, text: TEXT.beleg_foto_text, los: () => void e.foto(true) }] : []),
+    ...(istNativ ? [{ symbol: "camera", titel: TEXT.beleg_foto, text: TEXT.beleg_foto_text, los: () => void e.foto(true) }] : []),
     { symbol: "doc.text", titel: TEXT.beleg_datei, text: TEXT.beleg_datei_text, los: () => void e.datei() },
-    ...(istIos ? [{ symbol: "photo", titel: TEXT.beleg_aus_fotos, text: undefined as string | undefined, los: () => void e.foto(false) }] : []),
+    ...(istNativ ? [{ symbol: "photo", titel: TEXT.beleg_aus_fotos, text: undefined as string | undefined, los: () => void e.foto(false) }] : []),
     { symbol: "pencil", titel: TEXT.beleg_hand, text: kompakt ? undefined : TEXT.beleg_hand_text, los: e.hand },
   ];
   return (

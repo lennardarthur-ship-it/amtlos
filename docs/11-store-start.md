@@ -1,6 +1,6 @@
-# 11 · Vom Code in den App Store (E-132)
+# 11 · Vom Code in den App Store und zu Google Play (E-132, E-190)
 
-Stand: 2026-10-20 (E-142 bis E-144, App-Review-Vorprüfung R9). Alles, was im Code geht, ist erledigt. Was hier steht, braucht dein Apple-Konto, deine Firma oder eine fachliche Freigabe. `node apps/mobile/werkzeuge/store-check.mjs` zeigt jederzeit, was noch offen ist.
+Stand: 2026-10-25 (E-142 bis E-144, App-Review-Vorprüfung R9; Android E-190 → §10). Alles, was im Code geht, ist erledigt. Was hier steht, braucht dein Apple-Konto, dein Google-Play-Konto, deine Firma oder eine fachliche Freigabe. `node apps/mobile/werkzeuge/store-check.mjs` zeigt jederzeit, was noch offen ist (`--ios` bzw. `--android` für einen Store).
 
 ## 1. Firma und Konten (du)
 
@@ -111,3 +111,105 @@ cd apps/mobile && node werkzeuge/store-check.mjs      # listet, was noch fehlt (
 ```
 
 Zusätzlich auf einem echten iPhone (TestFlight): PRUEFLISTE T-82 bis T-85 – Schrift, Statusleiste, Tab-Leiste, Wischgesten, Kauf in der Sandbox, „Käufe wiederherstellen“, Face ID, iCloud, PDF teilen und drucken.
+
+## 10. Google Play (Android, E-190)
+
+Die Android-App ist dieselbe App in gleicher Qualität: gleiche Funktionen, gleiche Daten- und Sicherungsformate,
+Texte je Plattform („Smartphone“, „Google-Konto“, „Fingerabdruck oder Gesichtserkennung“ statt „iPhone“, „Apple-Account“,
+„Face ID“). Unterschiede: automatische Sicherung in einen selbst gewählten Ordner statt iCloud, Kauf über Google Play,
+kein „Code einlösen“ in der App, Kalender als Android-Dialog. **Käufe gelten je Plattform** – ein Abo aus dem App Store
+gilt nicht bei Google Play und umgekehrt (kein Konto; plattformübergreifend erst mit Konto und Synchronisation, §7).
+
+### 10.1 Konto (du)
+
+1. **Google-Play-Entwicklerkonto als Organisation** der UG anlegen – nach der Eintragung ins Handelsregister, mit
+   **D-U-N-S-Nummer** (dieselbe wie für Apple, §1). Als Organisationskonto gilt die Pflicht privater Konten zu einem
+   geschlossenen Test mit 12 Testern über 14 Tage nicht (Gründerentscheidung E-190, PRUEFLISTE T-176). Einmalige
+   Gebühr und Identitätsprüfung laut Play Console.
+2. **App anlegen:** Paketname `de.amtlos.app` (steht fest, nach dem ersten Upload nicht mehr änderbar), Standardsprache
+   Deutsch, App (nicht Spiel), kostenlos mit In-App-Käufen.
+3. **Play-App-Signatur** annehmen (Google verwaltet den App-Signaturschlüssel; EAS erzeugt und verwaltet den
+   Upload-Schlüssel beim ersten `eas build -p android`).
+4. **Dienstkonto für `eas submit`:** Google Cloud → Dienstkonto mit JSON-Schlüssel, in der Play Console unter
+   „Nutzer und Berechtigungen“ einladen (Rechte: Releases verwalten). Schlüssel nach
+   `apps/mobile/geheim/google-play-dienstkonto.json` legen – der Ordner ist in `.gitignore`, nie einchecken. Pfad steht in
+   `eas.json` → `submit.production.android.serviceAccountKeyPath`. Hinweis: Den **allerersten** Upload verlangt Google von
+   Hand in der Play Console (AAB hochladen) – danach geht `eas submit`.
+
+### 10.2 Abo bei Google Play und RevenueCat
+
+- **Play Console → Monetarisieren → Abos:** Produkte `amtlos_pro_jahr` und `amtlos_pro_monat` (gleiche IDs wie bei
+  Apple), je ein Basis-Abo (jährlich bzw. monatlich, automatisch verlängernd) und ein **Angebot „kostenlose Testphase“**
+  (14 Tage, Berechtigung „Neukunden“). Preise mit Basisland Deutschland wie in §3 (E-156) – die App zeigt nur, was der
+  Store liefert.
+- **RevenueCat:** in demselben Projekt eine **Google-Play-App** (`de.amtlos.app`) anlegen, das Dienstkonto aus 10.1 mit
+  den Rechten für Finanzdaten und Abos verbinden (Anleitung von RevenueCat; Echtzeit-Benachrichtigungen über Google
+  Cloud Pub/Sub einschalten), beide Produkte der Berechtigung **`pro`** zuordnen und in das Offering **`default`**
+  legen (Jahr zuerst). Den öffentlichen Android-Schlüssel (beginnt mit `goog_`) als EAS-Variable setzen:
+
+  ```bash
+  cd apps/mobile
+  npx eas-cli env:create --environment production --name EXPO_PUBLIC_REVENUECAT_ANDROID_KEY --value goog_xxx --visibility sensitive
+  npx eas-cli env:exec production "node werkzeuge/store-check.mjs --android"
+  ```
+
+  Ohne diesen Schlüssel zeigt der Android-Build keinen Kaufknopf und keinen Einstieg in den Bezahlschirm (wie auf iOS).
+- **Lizenztests:** Play Console → Einstellungen → Lizenztests: deine Google-Konten und das der Prüfung eintragen – Käufe
+  laufen dann ohne Belastung, Abos verlängern sich im Minutentakt.
+- **Testphase in der App:** Android zeigt die kostenlose Phase, wenn Google sie im Standardangebot liefert (Google bietet
+  sie nur berechtigten Konten an); eine Berechtigungsabfrage wie bei Apple gibt es dort nicht (`src/pro/storeRegeln.ts`).
+
+### 10.3 Bauen, testen, einreichen
+
+```bash
+cd apps/mobile
+npx eas-cli build -p android --profile preview      # APK zum direkten Installieren (Testmodus für Pro an)
+npx eas-cli build -p android --profile production   # AAB für Google Play
+npx eas-cli submit -p android --profile production  # in den internen Test („internal“, als Entwurf)
+```
+
+Danach in der Play Console: **interner Test** an die eigenen Tester verteilen und auf echten Geräten prüfen (PRUEFLISTE
+T-180): Kauf und „Käufe wiederherstellen“ mit Lizenztester, Zurück-Taste/-Geste in Blättern und Abläufen, Tastatur
+über Feldern, Kalender, Kamera, PDF teilen und drucken, Benachrichtigungen (Android 13+ fragt), App-Sperre mit
+Fingerabdruck, automatische Sicherung in einen Google-Drive- und einen lokalen Ordner samt Wiederherstellen auf einem
+zweiten Gerät, Symbol (auch „Designfarben“/Monochrom ab Android 13), Startbild, randlose Darstellung mit Gesten- und
+Drei-Tasten-Navigation. Dann Release in „Produktion“ (gestaffelt, z. B. 20 %).
+
+### 10.4 Store-Eintrag
+
+- **Texte:** `apps/mobile/store/de-android.json` – Titel (≤ 30), Kurzbeschreibung (≤ 80), Beschreibung (≤ 4.000),
+  „Neu in dieser Version“ (≤ 500), Kategorie „Business“. Grenzen prüft `test/store-android.test.ts`;
+  `node werkzeuge/store-check.mjs --android` zeigt sie mit eingesetzter Marke. Positionierung wie im App Store (E-189:
+  Pflichten-Kompass vorn, Rechnungen/Belege/Kasse als Zugabe; E-188: Pflichten-Check kostenlos ausprobieren, alles
+  Weitere mit Pro und kostenloser Testphase, Pro-Funktionen gekennzeichnet).
+- **Bilder:** Smartphone-Screenshots 1080 × 1920 (Statusleiste im Android-Stil), Vorstellungsgrafik 1024 × 500,
+  Symbol 512 × 512 (32 Bit):
+  ```bash
+  cd apps/mobile && EXPO_PUBLIC_VORSCHAU_PLATTFORM=android CI=1 npx expo export --platform web --output-dir /tmp/expo-web-android
+  PLAY=1 node werkzeuge/store-bilder.mjs /tmp/expo-web-android /tmp/play-bilder
+  ```
+- **Datensicherheit:** Antworten in `docs/play-datensicherheit.md` (nur aus dem Code; Punkte mit „[prüfen]“ vorher
+  bestätigen, T-179). Danach in `store/de-android.json` → `konsole.datensicherheitAbgesendet: true`.
+- **Datenschutzerklärung:** Google verlangt eine öffentliche URL, die die Android-App beschreibt. Der Android-Teil ist
+  ein Entwurf (`DATENSCHUTZ_ANDROID`, `docs/datenschutz-android-entwurf.md`) – erst nach der Freigabe durch RA Dr. Weber
+  (T-177) erscheint er auf `datenschutz.html`. Nutzungsbedingungen mit Android-Teil: T-178.
+- **Inhaltseinstufung (IARC), Zielgruppe (18+), Werbung (keine), App-Zugriff (Hinweise für die Prüfung, Lizenztester),
+  Erklärung zu Finanzfunktionen:** Vorschläge in `store/de-android.json` und `docs/play-datensicherheit.md`; nach dem
+  Absenden die Häkchen in `store/de-android.json` → `konsole` setzen.
+- **Kontakt:** E-Mail und Website aus der Marke; die Adresse des Entwicklers zeigt Google bei Organisationskonten mit
+  Käufen öffentlich an (Angabe in der Play Console).
+
+### 10.5 Technik der Android-Fassung (zum Nachschlagen)
+
+- `app.json` → `android`: Paket `de.amtlos.app`, `versionCode` (EAS zählt im Profil `production` hoch), adaptives Symbol
+  mit Monochrom-Fassung (`assets/adaptive-icon-monochrome.png` für Designfarben), `allowBackup: false` (der Schlüssel im
+  Android-Schlüsselspeicher wandert nicht mit – eine zurückgespielte Gerätesicherung wäre unlesbar), nur nötige
+  Berechtigungen (Internet, Kamera, Biometrie, Benachrichtigungen, Neustart für Erinnerungen, Vibration); gesperrt:
+  Medien-/Speicherzugriff, Mikrofon, exakte Wecker, Überlagern, Bildschirmfoto-Erkennung – damit braucht es keine
+  Erklärungen zu Foto-/Video-Berechtigungen oder exakten Weckern. Randlos (edge-to-edge) ist ab SDK 54 immer an.
+- `expo-system-ui` setzt `userInterfaceStyle: light` auch auf Android durch (E-172: kein Dunkelmodus) – Rückfragen und Kalender bleiben hell.
+- Bei eingeschalteter App-Sperre setzt die App auf Android `FLAG_SECURE` (expo-screen-capture): keine Vorschau in der
+  App-Übersicht, keine Bildschirmfotos.
+- Teilen: Android meldet nicht, ob geteilt oder abgebrochen wurde. Eine Sicherungsdatei bzw. das offene Archiv zählt
+  deshalb erst nach „Ja, gespeichert“ als Sicherung. Rechnungen werden nach dem Teilen festgeschrieben (wie bisher –
+  lieber einmal zu früh festgeschrieben als eine geteilte Rechnung, die sich noch ändern ließe).

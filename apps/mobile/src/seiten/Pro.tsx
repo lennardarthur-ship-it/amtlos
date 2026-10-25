@@ -15,6 +15,7 @@ import { useAmtlos } from "../zustand";
 import { syncAngeboten } from "../konto/konfig";
 import { DatenschutzSeite } from "./Recht";
 import { CodeEinloesenKnopf, PartnerHinweis, usePartner } from "./Partner";
+import { ANDROID } from "../plattform";
 
 /** „Synchronisation“ nur zeigen, wenn dieser Build einen Server hat (E-134). */
 const VORTEILE = PRO_VORTEILE.filter((v) => v !== "sync" || syncAngeboten);
@@ -232,12 +233,13 @@ export function ProSeite({ grund, anlass, anzahl, entwurf, danach }: { grund?: P
 
       <T v="caption" leise stil={{ marginTop: 18 }}>{TEXT.pro_abo_text}</T>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16, marginTop: 4 }}>
-        <TextKnopf text={TEXT.nutzungsbedingungen} leise onPress={() => void Linking.openURL(nutzungsLink())} />
+        {/* E-190: auf Android kein Link auf Apples EULA – dort erst die eigenen Nutzungsbedingungen nach der Freigabe */}
+        {nutzungsLink() ? <TextKnopf text={TEXT.nutzungsbedingungen} leise onPress={() => void Linking.openURL(nutzungsLink())} /> : null}
         <TextKnopf text={TEXT.datenschutz} leise onPress={() => nav.oeffnen("datenschutz", () => <DatenschutzSeite />)} />
         {kaufAktiv ? <TextKnopf text={TEXT.pro_wiederherstellen} leise onPress={() => void zurueckholen()} /> : null}
       </View>
-      {/* Phase 2.3: Abo-Angebotscode (z. B. von einem Partner) über Apples Einlöseblatt */}
-      {!z.pro && !partner ? <CodeEinloesenKnopf leise danach={nachCode} /> : null}
+      {/* Phase 2.3: Abo-Angebotscode (z. B. von einem Partner) über Apples Einlöseblatt – Google Play hat keins (E-190) */}
+      {!z.pro && !partner && !ANDROID ? <CodeEinloesenKnopf leise danach={nachCode} /> : null}
     </BuehnenBlatt>
   );
 }

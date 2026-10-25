@@ -3,8 +3,9 @@
  * noch bevor die Sperrseite (bei „background“) gezeichnet ist. Ist die App-Sperre an, legt sich deshalb schon bei
  * „inactive“ eine Fläche über alles, damit IBAN, SV-Nummern oder Kundendaten nicht im Umschalter stehen.
  */
+import * as ScreenCapture from "expo-screen-capture";
 import { useEffect, useState } from "react";
-import { AppState, StyleSheet, View, type AppStateStatus } from "react-native";
+import { AppState, Platform, StyleSheet, View, type AppStateStatus } from "react-native";
 import { Kachel } from "../ui/bausteine";
 import { useFarben } from "../ui/thema";
 import { useAmtlos } from "../zustand";
@@ -29,6 +30,14 @@ export function Abdeckung() {
   const { bereit, stand } = useAmtlos();
   const verdeckt = useVerdeckt();
   const f = useFarben();
+  // Android (E-190): Android kennt kein „inactive“ – das Bild für die Übersicht der letzten Apps entsteht, bevor die
+  // Fläche gezeichnet ist. Bei eingeschalteter App-Sperre deshalb FLAG_SECURE (expo-screen-capture): keine Vorschau in
+  // der App-Übersicht, keine Bildschirmfotos. Auf dem iPhone bleibt es bei der Fläche (Bildschirmfotos bleiben möglich).
+  const sperre = bereit && stand.appSperre;
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    void (sperre ? ScreenCapture.preventScreenCaptureAsync("app-sperre") : ScreenCapture.allowScreenCaptureAsync("app-sperre")).catch(() => undefined);
+  }, [sperre]);
   if (!bereit || !stand.appSperre || !verdeckt) return null;
   return (
     <View style={[StyleSheet.absoluteFill, { backgroundColor: f.papier, alignItems: "center", justifyContent: "center", zIndex: 1000, elevation: 1000 }]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">

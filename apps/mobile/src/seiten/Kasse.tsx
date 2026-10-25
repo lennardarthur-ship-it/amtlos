@@ -8,7 +8,7 @@ import { ChipLeiste, DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, MehrfachWahl,
 import { bestaetigen } from "../ui/bestaetigen";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
-import { istIos, useFarben, weich } from "../ui/thema";
+import { istNativ, useFarben, weich } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
 import { belegFoto } from "../unterlagen/belegfoto";
 import { kassenMonat, kassenMonate, offeneLadenkasse, ruhetage } from "../unterlagen/kasse";
@@ -505,7 +505,7 @@ export function KassenTagSeite({ id }: { id?: string }) {
             <Feld label={TEXT.r12_bewegung_text} wert={b.text} aendern={(w) => setze({ bewegungen: form.bewegungen.map((x, j) => (j === i ? { ...x, text: w } : x)) })} editable={!nurLesen} />
             {b.datei ? <T v="klein" leise stil={{ marginTop: 6 }}>{TEXT.r12g_bewegung_foto_da}</T> : nurLesen ? null : (
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 6 }}>
-                {istIos ? <TextKnopf symbol="camera" text={TEXT.r12g_bewegung_foto} onPress={() => void foto(true, i)} /> : null}
+                {istNativ ? <TextKnopf symbol="camera" text={TEXT.r12g_bewegung_foto} onPress={() => void foto(true, i)} /> : null}
                 <TextKnopf symbol="doc" text={TEXT.r12g_bewegung_datei} onPress={() => void foto(false, i)} />
               </View>
             )}
@@ -521,7 +521,7 @@ export function KassenTagSeite({ id }: { id?: string }) {
       {/* Foto des Z-Bons als Beleg (verschlüsselt wie Belegdateien) – nur bei elektronischer Kasse, sonst des Kassenberichts */}
       {form.datei ? <Hinweis art="erfolg" text={TEXT.r12_foto_da} /> : nurLesen || form.kassenbericht ? null : (
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
-          {istIos ? <TextKnopf symbol="camera" text={TEXT.r12_foto} onPress={() => void foto(true)} /> : null}
+          {istNativ ? <TextKnopf symbol="camera" text={TEXT.r12_foto} onPress={() => void foto(true)} /> : null}
           <TextKnopf symbol="doc" text={TEXT.r12_foto_datei} onPress={() => void foto(false)} />
         </View>
       )}

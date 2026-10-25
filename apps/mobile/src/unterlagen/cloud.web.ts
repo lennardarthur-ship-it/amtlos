@@ -18,3 +18,13 @@ export async function cloudDateiLesen(_kennung: string, _name: string): Promise<
   return null;
 }
 export async function cloudBeiseitelegen(_text: string): Promise<void> {}
+/** Ordnerwahl (Android, E-190) – im Web nicht vorhanden. */
+export const ORDNER_WAHL = false;
+export type OrdnerStatus = { art: "ok"; name: string } | { art: "keiner" } | { art: "kein_zugriff"; name: string };
+export async function ordnerStatus(): Promise<OrdnerStatus> {
+  return { art: "keiner" };
+}
+export async function ordnerWaehlen(): Promise<OrdnerStatus | null> {
+  return null;
+}
+export async function ordnerVergessen(): Promise<void> {}

@@ -2,6 +2,8 @@
 
 **Status:** Code und Konfiguration sind vorbereitet. In Expo Go fehlt das native Modul, deshalb blendet die App die Funktion dort aus. Getestet werden kann sie erst mit einem eigenen Build.
 
+**Android (E-190):** Gegenstück ist „Automatisch in einen Ordner sichern“ – der Nutzer wählt einmal einen Ordner über die Ordnerauswahl von Android (auf dem Gerät, Google Drive, Nextcloud …), die App schreibt dort dieselben Dateien nach demselben Ablauf (aktuell, Tag, Woche, Belegordner; `src/unterlagen/cloudLogik.ts`, `cloud.android.ts`). Keine Einrichtung im Build nötig, funktioniert auch in Expo Go. Fehlt der Zugriff später, zeigen „Deine Daten“ und die Sicherungs-Erinnerung „Automatische Sicherung unterbrochen“ mit „Ordner neu wählen“.
+
 ## Was die App tut
 
 - Unter „Mein Betrieb → Deine Daten“ steht der Schalter „Automatisch in iCloud sichern“. Er erscheint nur, wenn iCloud verfügbar ist.

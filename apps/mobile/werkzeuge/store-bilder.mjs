@@ -21,6 +21,16 @@
  *
  *   cd apps/mobile && CI=1 npx expo export --platform web --output-dir /tmp/expo-web
  *   node werkzeuge/store-bilder.mjs /tmp/expo-web /tmp/store-bilder [website]   # DUNKEL=1 für dunkle Bildschirme
+ *
+ * Google Play (E-190, `PLAY=1`): Bildschirme mit den Android-Texten (Web-Export mit
+ * `EXPO_PUBLIC_VORSCHAU_PLATTFORM=android`), aufgenommen in Android-Breite (412 pt), gesetzt auf 1080 × 1920 (9:16,
+ * Seitenverhältnis höchstens 2:1 wie von Google Play verlangt) mit Statusleiste im Android-Stil (Uhrzeit links, WLAN,
+ * Netz und Akku rechts, Kamera-Loch) und schlankem, gleichmäßigem Rahmen ohne iPhone-Form; Bildzeilen aus
+ * store/de-android.json. Dazu die Vorstellungsgrafik 1024 × 500 (play-grafik.png) und das Symbol 512 × 512 mit Alpha
+ * (play-symbol.png). Die Website-Bilder bleiben unberührt.
+ *
+ *   EXPO_PUBLIC_VORSCHAU_PLATTFORM=android CI=1 npx expo export --platform web --output-dir /tmp/expo-web-android
+ *   PLAY=1 node werkzeuge/store-bilder.mjs /tmp/expo-web-android /tmp/play-bilder
  */
 /* global process, console, URL, localStorage */
 /* eslint-disable no-console -- Kommandozeilenwerkzeug */
@@ -37,7 +47,8 @@ const require = createRequire(path.resolve(APP, "../web/package.json"));
 const { chromium } = require("playwright-core");
 const [DIR, OUT, WEB_ARG] = process.argv.slice(2);
 if (!DIR || !OUT) throw new Error("Aufruf: node werkzeuge/store-bilder.mjs <web-export> <ausgabe> [website-bilder]");
-const WEB = process.env.DUNKEL || process.env.WEBSITE === "0" ? null : path.resolve(WEB_ARG ?? path.join(APP, "../website/bilder"));
+const PLAY = process.env.PLAY === "1";
+const WEB = PLAY || process.env.DUNKEL || process.env.WEBSITE === "0" ? null : path.resolve(WEB_ARG ?? path.join(APP, "../website/bilder"));
 fs.mkdirSync(OUT, { recursive: true });
 
 // Demo-Stand mit esbuild bauen und ausführen
@@ -50,7 +61,7 @@ execFileSync(path.join(esbuild, "bin/esbuild"), [path.join(HIER, "demo-stand.ts"
 const stand = execFileSync("node", [gebaut], { encoding: "utf8" }).trim();
 fs.rmSync(gebaut);
 // Marke aus packages/marke/marke.json in die Store-Texte einsetzen ({{MARKE}} …, docs/14-marke.md)
-const texte = markeEinsetzenTief(JSON.parse(fs.readFileSync(path.join(APP, "store/de.json"), "utf8")));
+const texte = markeEinsetzenTief(JSON.parse(fs.readFileSync(path.join(APP, PLAY ? "store/de-android.json" : "store/de.json"), "utf8")));
 
 const srv = http.createServer((req, res) => {
   let p = path.join(DIR, decodeURIComponent(req.url.split("?")[0]));
@@ -62,7 +73,9 @@ const srv = http.createServer((req, res) => {
 await new Promise((r) => srv.listen(4997, r));
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PFAD || "/opt/pw-browsers/chromium", headless: true, args: ["--no-sandbox"] });
 const schema = process.env.DUNKEL ? "dark" : "light";
-const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 3, colorScheme: schema, locale: "de-DE", timezoneId: "Europe/Berlin" });
+// Bildschirm in pt: iPhone 6,9″ (393 × 852) bzw. ein übliches Android-Smartphone (412 × 915, z. B. Pixel)
+const SCHIRM = PLAY ? { width: 412, height: 915 } : { width: 393, height: 852 };
+const ctx = await browser.newContext({ viewport: SCHIRM, deviceScaleFactor: 3, colorScheme: schema, locale: "de-DE", timezoneId: "Europe/Berlin" });
 await ctx.addInitScript((s) => {
   if (!localStorage.getItem("amtlos.unterlagen.v1")) localStorage.setItem("amtlos.unterlagen.v1", s);
 }, stand);
@@ -81,6 +94,8 @@ const foto = async (name) => {
 try {
   await p.goto("http://localhost:4997/");
   await warte(2500);
+  // Google Play: der Web-Export muss die Android-Texte tragen – sonst stünde „iPhone“ in den Bildern
+  if (PLAY && !(await p.evaluate(() => /Smartphone/.test(document.body.innerText) || !/iPhone/.test(document.body.innerText)))) throw new Error("Web-Export ohne Android-Texte (EXPO_PUBLIC_VORSCHAU_PLATTFORM=android beim Export setzen)");
   // Bild 2 „Hast du alles erledigt?“ (E-189): „Heute“ mit dem Pflichten-Kompass auf der Bühne
   if (!(await p.getByText(/Pflichten? (ist|sind) jetzt dran|Alles erledigt, was jetzt dran ist/).locator("visible=true").count())) throw new Error("„Heute“ zeigt den Pflichten-Kompass nicht");
   await foto("heute");
@@ -154,8 +169,8 @@ const lupeHtml = (name, l, oben) => {
   name = l.bildschirm ?? name;
   const breite = 1130;
   const faktor = breite / l.b; // Bildschirmbreite in px der Lupe
-  const hoehe = Math.round(faktor * l.h * (852 / 393));
-  return `<div class="lupe" style="top:${oben}px;width:${breite}px;height:${hoehe}px;background-image:url(${png(name)});background-size:${Math.round(faktor)}px auto;background-position:${Math.round(-l.x * faktor)}px ${Math.round(-l.y * faktor * (852 / 393))}px"></div>`;
+  const hoehe = Math.round(faktor * l.h * (SCHIRM.height / SCHIRM.width));
+  return `<div class="lupe" style="top:${oben}px;width:${breite}px;height:${hoehe}px;background-image:url(${png(name)});background-size:${Math.round(faktor)}px auto;background-position:${Math.round(-l.x * faktor)}px ${Math.round(-l.y * faktor * (SCHIRM.height / SCHIRM.width))}px"></div>`;
 };
 
 /**
@@ -176,8 +191,73 @@ const statusleiste = (breite) => {
 // Farbe der obersten Bildzeile → Grund der Statusleiste; Schrift hell oder dunkel je nach Helligkeit
 const statusFarbe = `<script>document.querySelectorAll(".schirm").forEach((s)=>{const i=s.querySelector("img");const los=()=>{const c=document.createElement("canvas");c.width=i.naturalWidth;c.height=4;const x=c.getContext("2d");x.drawImage(i,0,0);const [r,g,b]=x.getImageData(Math.round(i.naturalWidth/2),1,1,1).data;const st=s.querySelector(".status");st.style.background="rgb("+r+","+g+","+b+")";st.style.color=(0.299*r+0.587*g+0.114*b)>150?"#120e3a":"#fff"};i.complete?los():i.onload=los})</script>`;
 
-const satz = await browser.newPage({ viewport: { width: 1290, height: 2796 }, deviceScaleFactor: 1 });
-for (const [i, b] of texte.bilder.entries()) {
+/**
+ * Android-Statusleiste (E-190): Uhrzeit links, rechts WLAN, Netz (Dreieck) und Akku (stehend) wie bei Android 14/15,
+ * dazu das Loch der Frontkamera in der Mitte. Höhe 36 dp in Bildschirm-Pixeln der Aufnahme (3×), skaliert mit dem Bild.
+ */
+const statusleisteAndroid = (breite) => {
+  const f = breite / (SCHIRM.width * 3);
+  const px = (n) => Math.round(n * 3 * f);
+  return `<div class="status" style="height:${px(36)}px;padding:0 ${px(18)}px 0 ${px(22)}px;font-size:${px(14)}px;position:relative">
+    <span style="font-family:A;font-weight:600;letter-spacing:.2px">12:30</span>
+    <span style="position:absolute;left:50%;top:50%;width:${px(13)}px;height:${px(13)}px;margin:-${px(6.5)}px 0 0 -${px(6.5)}px;border-radius:50%;background:#05040f"></span>
+    <span style="display:flex;gap:${px(5)}px;align-items:center">
+      <svg width="${px(16)}" height="${px(13)}" viewBox="0 0 16 13"><path d="M8 12.5 0.2 3.4C2.3 1.6 5 .5 8 .5s5.7 1.1 7.8 2.9z" fill="currentColor"/></svg>
+      <svg width="${px(13)}" height="${px(13)}" viewBox="0 0 13 13"><path d="M12.5.5v12H.5z" fill="currentColor"/></svg>
+      <svg width="${px(8)}" height="${px(14)}" viewBox="0 0 8 14"><rect x="2.5" y="0" width="3" height="1.6" rx=".5" fill="currentColor"/><rect x=".5" y="1.5" width="7" height="12" rx="1.6" fill="currentColor"/></svg>
+    </span></div>`;
+};
+
+const satz = await browser.newPage(PLAY ? { viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 } : { viewport: { width: 1290, height: 2796 }, deviceScaleFactor: 1 });
+if (PLAY) {
+  // Google Play (E-190): 1080 × 1920, Überschrift oben, Bildschirm darunter in schlankem, gleichmäßigem Rahmen
+  for (const [i, b] of texte.bilder.entries()) {
+    if (!roh[b.bildschirm]) throw new Error(`Bildschirm fehlt: ${b.bildschirm}`);
+    const html = `<!doctype html><html><head><meta charset="utf-8"><style>${css}
+    html,body{margin:0;width:1080px;height:1920px;overflow:hidden}
+    body{background:#120E3A;font-family:A;color:#fff;position:relative}
+    .text{position:absolute;top:96px;left:84px;right:84px}
+    h1{font-family:S;font-weight:800;font-size:76px;line-height:1.06;margin:0;letter-spacing:-2px}
+    p{font-size:38px;line-height:1.3;margin:26px 0 0;color:#7cf5c8}
+    .geraet{position:absolute;left:150px;right:150px;top:${b.oben ?? 520}px;border-radius:56px;padding:12px;background:#05040f;box-shadow:0 0 0 2px rgba(255,255,255,.16),0 40px 120px rgba(0,0,0,.5)}
+    .schirm{border-radius:44px;overflow:hidden}
+    .status{display:flex;align-items:center;justify-content:space-between;box-sizing:border-box}
+    .geraet img{display:block;width:100%}
+    </style></head><body><div class="text"><h1>${b.titel}</h1><p>${b.text}</p></div>
+    <div class="geraet"><div class="schirm">${statusleisteAndroid(1080 - 300 - 24)}<img src="${png(b.bildschirm)}"></div></div>${statusFarbe}
+    <script>${b.oben ? "" : `{const t=document.querySelector(".text");document.querySelector(".geraet").style.top=(t.offsetTop+t.offsetHeight+72)+"px"}`}</script></body></html>`;
+    await satz.setContent(html, { waitUntil: "load" });
+    await satz.waitForTimeout(150);
+    await satz.screenshot({ path: path.join(OUT, `play-${i + 1}-${b.bildschirm}.png`) });
+  }
+  // Vorstellungsgrafik 1024 × 500: Zeichen und Name, Leitfrage, ein angeschnittener Bildschirm rechts (nichts Wichtiges am Rand)
+  const grafik = await browser.newPage({ viewport: { width: 1024, height: 500 }, deviceScaleFactor: 1 });
+  const ZEICHEN = fs.readFileSync(path.resolve(APP, "../../packages/marke/logo/svg/betriebsklar-zeichen-auf-dunkel.svg"), "utf8").replace(/<title>[^<]*<\/title>/, "").replace("<svg ", '<svg aria-hidden="true" ');
+  await grafik.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>${css}
+  html,body{margin:0;width:1024px;height:500px;overflow:hidden}
+  body{background:#120E3A;font-family:A;color:#fff;position:relative}
+  .text{position:absolute;left:64px;top:84px;width:560px}
+  .marke{display:flex;align-items:center;gap:14px;font-weight:600;font-size:32px}
+  .marke svg{width:56px;height:56px;flex:none}
+  h1{font-family:S;font-weight:800;font-size:56px;line-height:1.05;margin:26px 0 0;letter-spacing:-1.5px}
+  p{font-size:26px;line-height:1.35;margin:20px 0 0;color:#7cf5c8}
+  .geraet{position:absolute;left:690px;top:56px;width:270px;border-radius:34px;padding:7px;background:#05040f;box-shadow:0 0 0 2px rgba(255,255,255,.16),0 30px 80px rgba(0,0,0,.5)}
+  .geraet img{display:block;width:100%;border-radius:28px}
+  </style></head><body><div class="text"><div class="marke">${ZEICHEN}${MARKE.name}</div><h1>${texte.grafik.titel}</h1><p>${texte.grafik.text}</p></div>
+  <div class="geraet"><img src="${png(texte.bilder[0].bildschirm)}"></div></body></html>`, { waitUntil: "load" });
+  await grafik.screenshot({ path: path.join(OUT, "play-grafik.png") });
+  // Symbol 512 × 512, 32 Bit mit Alpha (Google Play rundet selbst ab) – aus dem App-Symbol
+  const symbol = await browser.newPage({ viewport: { width: 512, height: 512 }, deviceScaleFactor: 1 });
+  const icon = fs.readFileSync(path.join(APP, "assets/icon.png")).toString("base64");
+  await symbol.setContent(`<!doctype html><html><body style="margin:0;background:transparent"><img src="data:image/png;base64,${icon}" style="display:block;width:512px;height:512px"></body></html>`, { waitUntil: "load" });
+  // Chromium speichert ein deckendes Bild ohne Alphakanal – Google Play verlangt 32 Bit: mit pngjs als RGBA neu schreiben
+  const pngjsOrdner = fs.readdirSync(pnpm).filter((d) => d.startsWith("pngjs@")).sort().at(-1);
+  if (!pngjsOrdner) throw new Error("pngjs nicht gefunden (pnpm install)");
+  const { PNG } = createRequire(path.join(pnpm, pngjsOrdner, "node_modules/pngjs/package.json"))("pngjs");
+  const bild = PNG.sync.read(await symbol.screenshot({ omitBackground: true }));
+  fs.writeFileSync(path.join(OUT, "play-symbol.png"), PNG.sync.write(bild, { colorType: 6 }));
+}
+for (const [i, b] of PLAY ? [] : texte.bilder.entries()) {
   if (!roh[b.bildschirm]) throw new Error(`Bildschirm fehlt: ${b.bildschirm}`);
   if (b.lupe?.bildschirm && !roh[b.lupe.bildschirm]) throw new Error(`Bildschirm der Lupe fehlt: ${b.lupe.bildschirm}`);
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>${css}
@@ -223,9 +303,9 @@ if (WEB) {
   p{font-size:30px;line-height:1.35;margin:28px 0 0;color:#7cf5c8}
   .geraet{position:absolute;left:760px;top:70px;width:372px;border-radius:44px;padding:8px;background:linear-gradient(#f4f4f9,#d0cfe0);box-shadow:0 0 0 2px rgba(255,255,255,.18),0 30px 80px rgba(0,0,0,.45)}
   .geraet img{display:block;width:100%;border-radius:36px}
-  </style></head><body><div class="text"><div class="marke">${ZEICHEN}${MARKE.name}</div><h1>${titel}</h1><p>Pflichten-Check, Rechnungen und über 30 Vorlagen für kleine Betriebe – auf dem iPhone.</p></div>
+  </style></head><body><div class="text"><div class="marke">${ZEICHEN}${MARKE.name}</div><h1>${titel}</h1><p>Pflichten-Check, Rechnungen und über 30 Vorlagen für kleine Betriebe – für iPhone und Android.</p></div>
   <div class="geraet"><img src="${png(texte.bilder[0].bildschirm)}"></div></body></html>`, { waitUntil: "load" });
   await og.screenshot({ path: path.join(WEB, "og.jpg"), type: "jpeg", quality: 85 });
 }
 await browser.close();
-console.log(`✓ ${texte.bilder.length} Store-Bilder in ${OUT}${WEB ? `, Website-Bilder in ${WEB}` : ""}`);
+console.log(`✓ ${texte.bilder.length} ${PLAY ? "Play-Bilder, Vorstellungsgrafik und Symbol" : "Store-Bilder"} in ${OUT}${WEB ? `, Website-Bilder in ${WEB}` : ""}`);

@@ -1,0 +1,124 @@
+{
+  "_hinweis": "Store-Eintrag bei Google Play (E-190), Sprache Deutsch (de-DE). Marke nur über Platzhalter ({{MARKE}}, {{MARKE_PRO}}, {{EMAIL}}, {{WEBSITE}}). Grenzen prüft test/store-android.test.ts; Datensicherheit ausführlich in docs/play-datensicherheit.md – Antworten mit \"pruefen\" vor dem Absenden bestätigen.",
+  "konsole": {
+    "_hinweis": "Vom Gründer nach Erledigung in der Play Console eintragen – werkzeuge/store-check.mjs meldet offene Punkte (docs/11-store-start.md §10).",
+    "entwicklerkontoId": "",
+    "organisationskonto": false,
+    "datensicherheitAbgesendet": false,
+    "inhaltseinstufung": false,
+    "zielgruppe": false,
+    "finanzfunktionen": false,
+    "appZugriff": false
+  },
+  "titel": "{{MARKE}}: Pflichten-Check",
+  "kurzbeschreibung": "Welche Pflichten hat dein Betrieb? Mit Termin, Quelle und Erinnerung erledigen.",
+  "beschreibung": "Welche Pflichten hat dein Betrieb – und hast du alles erledigt? {{MARKE}} beantwortet beides: jede Pflicht mit Termin, Grund und offizieller Quelle, abhaken, Erinnerung vor jeder Frist. Alles auf deinem Smartphone, ohne Konto.\n\nDen Pflichten-Check probierst du kostenlos aus: Du siehst, wie viele Pflichten nach deinen Angaben in Frage kommen, und die ersten 3 mit Termin. Alles Weitere gibt es mit {{MARKE_PRO}} – mit kostenloser Testphase.\n\nFÜR WEN\nEinzelunternehmen, Salons, Cafés, Handwerk, Freelancer und kleine GmbHs in Deutschland.\n\nWELCHE PFLICHTEN HAT MEIN BETRIEB?\nEin paar Fragen zu Branche, Rechtsform, Team und Kasse – etwa drei Minuten. Danach siehst du, was nach deinen Angaben in Frage kommt: Steuern, Personal, Arbeitsschutz, Datenschutz, Hygiene, Gründung.\n• Pflichten-Check kostenlos: die Zahl der Pflichten und die ersten 3 mit Kurztext, Termin und Abhaken\n• Alle Pflichten mit Termin und Jahresblick (Pro)\n• Erinnerung drei Tage vor jedem Termin (Pro)\n• Jede Pflicht erklärt: warum sie in Frage kommt, Folgen, Rechtsgrundlage und offizielle Quelle (Pro)\n• Katalog und Vorlagen von Fachleuten geprüft – Rechtsanwalt, Steuerberater, Fachkraft für Arbeitssicherheit, Lebensmittelfachbeauftragter\n\nHABE ICH ALLES ERLEDIGT?\nAuf einen Blick: was jetzt dran ist, was schon erledigt ist und was bei einer Kontrolle noch fehlt.\n• Abhaken mit Fortschritt: „14 von 47 erledigt“ (Pro)\n• Kontrollmappe: deine Nachweise für eine Kontrolle in einem PDF, mit Deckblatt (Pro)\n\nDIE PASSENDE UNTERLAGE GLEICH DAZU\nZu vielen Pflichten gehört eine Unterlage. {{MARKE}} hat sie dabei – 43 Vorlagen, Schritt für Schritt ausgefüllt, mit Vorschlägen für deinen Betrieb: Hygieneplan, HACCP, Allergenliste, Gefährdungsbeurteilung, Unterweisung, Betriebsanweisung, Nachweis der Arbeitsbedingungen, Datenschutzerklärung, Impressum und mehr.\n• Alle Vorlagen ausfüllen, als PDF teilen und drucken (Pro)\n\nDAZU: RECHNUNGEN, BELEGE, KASSE\nAuch sie gehören zu den Pflichten, deshalb sind sie mit dabei:\n• Rechnungen mit GiroCode, fortlaufend nummeriert, Korrektur per Storno – auch als E-Rechnung (XRechnung) (Pro)\n• Belege per Foto oder Datei, E-Rechnungen empfangen (Pro)\n• Kasse und Kassenbuch mit Tagesabschluss (Pro)\n• Werte für Voranmeldung und EÜR per Tipp, Paket für die Steuerberatung im DATEV-Format (Pro)\n\nDEINE DATEN BLEIBEN BEI DIR\nVerschlüsselt auf deinem Smartphone. Kein Konto, kein {{MARKE}}-Server mit deinen Unterlagen, keine eigenen Analysen, keine Werbung. Für {{MARKE_PRO}} wertet der Dienstleister RevenueCat die Käufe für die Abo-Verwaltung aus. Sicherung als verschlüsselte Datei oder automatisch in einen Ordner deiner Wahl, z. B. Google Drive (Pro). Auf Wunsch mit Fingerabdruck oder Gesichtserkennung gesperrt.\n\nKOSTENLOS UND PRO\nKostenlos: den Pflichten-Check ausprobieren – die Zahl der Pflichten und die ersten 3 mit Termin und Abhaken. Immer, auch nach dem Abo: deine Daten ansehen, Geteiltes erneut teilen, Rechnungen stornieren, Belege und Kassenbuch exportieren, Sicherung, Datenexport, Löschen – nichts wird versteckt.\n{{MARKE_PRO}}: alles Weitere – alle Pflichten mit Erinnerung vor jeder Frist, jede Pflicht erklärt, Abhaken mit Fortschritt, Kontrollmappe, alle Vorlagen; dazu Rechnungen und E-Rechnung, Belege und Kasse, Paket für die Steuerberatung, Briefkopf mit Logo und Hausfarbe, automatische Sicherung in einen Ordner.\nPro gibt es als Monats- oder Jahresabo mit kostenloser Testphase. Den Preis siehst du in der App. Das Abo wird über dein Google-Konto bei Google Play abgerechnet und verlängert sich automatisch, bis du es kündigst. Kündigen kannst du in Google Play unter „Zahlungen und Abos“ › „Abos“. Käufe gelten für dein Google-Konto – ein Abo aus dem App Store gilt hier nicht.\n\nWICHTIG\n{{MARKE}} gibt allgemeine Informationen und Vorlagen und ersetzt keine Rechts- oder Steuerberatung im Einzelfall. Pflichten-Katalog und Vorlagen sind fachlich geprüft; ob eine Pflicht für dich gilt, hängt von deinen Angaben und deinem Einzelfall ab.",
+  "neu": "Die erste Version von {{MARKE}} für Android: Welche Pflichten hat dein Betrieb – und hast du alles erledigt? Mit Termin, Erinnerung, passender Unterlage und Kontrollmappe. Dazu Rechnungen, Belege und Kasse.",
+  "kategorie": "Business",
+  "tags": ["Business", "Produktivität"],
+  "kontakt": {
+    "email": "{{EMAIL}}",
+    "website": "{{WEBSITE}}",
+    "datenschutz": "{{WEBSITE}}/datenschutz.html"
+  },
+  "inhaltseinstufung": {
+    "_hinweis": "IARC-Fragebogen in der Play Console (Gründer). Antworten nach dem Code; erwartete Einstufung, nicht verbindlich.",
+    "kategorie": "Dienstprogramm, Produktivität, Kommunikation oder Sonstiges",
+    "gewalt_sexualitaet_sprache_drogen_gluecksspiel": "nein",
+    "nutzer_interagieren_miteinander": "nein (kein Austausch zwischen Nutzern in der App)",
+    "standort_teilen": "nein",
+    "digitale_kaeufe": "ja (Abo {{MARKE_PRO}} über Google Play)",
+    "erwartet": "USK ab 0 / PEGI 3 (wird vom Fragebogen vergeben)"
+  },
+  "zielgruppe": {
+    "altersgruppen": ["18 und älter"],
+    "fuer_kinder": false,
+    "begruendung": "Werkzeug für Selbstständige und kleine Betriebe; nicht für Kinder gestaltet, keine Inhalte, die Kinder ansprechen."
+  },
+  "werbung": false,
+  "app_zugriff": "Most features require the subscription ({{MARKE_PRO}}, Google Play Billing). Without a subscription the app is a free trial of the obligations check only (\"Pflichten-Check\": all questions, the number of obligations that may apply and the first 3 with due date). To review invoices, receipts, cash register, templates and reminders, please start the free trial on the paywall or use a license-testing account (Play Console → License testing). The paywall opens once after the first completed check (dismissible with \"Später\") and from tab \"Mein Betrieb\" → \"{{MARKE_PRO}}\". No login or account is needed; all data stays encrypted on the device. Always available without a subscription: viewing own data, sharing already issued documents again, cancelling an invoice, exporting receipts and the cash book, backup, restore, data export, deleting data.",
+  "datensicherheit": {
+    "_hinweis": "Antworten für das Formular „Datensicherheit“ in der Play Console, aus dem Code des Builds OHNE Synchronisation (EXPO_PUBLIC_API_URL leer). \"pruefen\": true heißt: vor dem Absenden fachlich bzw. mit RevenueCat bestätigen (PRUEFLISTE T-179). Begründungen: docs/play-datensicherheit.md.",
+    "erhebt_oder_teilt_daten": true,
+    "verschluesselung_bei_uebertragung": true,
+    "loeschung_auf_anfrage": true,
+    "loeschung_hinweis": "Kein Konto im Build ohne Synchronisation; die Kaufdaten bei RevenueCat löschen wir auf Anfrage (Kontakt im Datenschutzhinweis). Mit Synchronisation: „Konto löschen“ in der App – dann zusätzlich eine Lösch-URL im Web angeben.",
+    "unabhaengige_sicherheitspruefung": false,
+    "erhoben": [
+      {
+        "kategorie": "Finanzdaten",
+        "datentyp": "Kaufverlauf",
+        "geteilt": false,
+        "optional": false,
+        "zwecke": ["App-Funktionen", "Analysen"],
+        "wer": "RevenueCat, Inc. (Auftragsverarbeiter) – Kaufbelege von Google Play zur Prüfung des Abos",
+        "pruefen": false
+      },
+      {
+        "kategorie": "Geräte- oder andere IDs",
+        "datentyp": "Geräte- oder andere IDs",
+        "geteilt": false,
+        "optional": false,
+        "zwecke": ["App-Funktionen"],
+        "wer": "RevenueCat, Inc. – zufällige App-Kennung (anonyme App-User-ID), keine Werbe-ID",
+        "pruefen": true
+      }
+    ],
+    "nicht_erhoben": [
+      "Standort",
+      "Personenbezogene Daten (Name, E-Mail, Adresse, Telefon) – bleiben verschlüsselt auf dem Gerät",
+      "Finanzdaten außer Kaufverlauf (IBAN, Rechnungen, Belege bleiben auf dem Gerät)",
+      "Gesundheit und Fitness",
+      "Nachrichten",
+      "Fotos und Videos (Belegfotos bleiben verschlüsselt auf dem Gerät)",
+      "Audio",
+      "Dateien und Dokumente (bleiben auf dem Gerät; Sicherungen nur dorthin, wohin der Nutzer sie selbst legt)",
+      "Kalender",
+      "Kontakte",
+      "App-Aktivitäten",
+      "Web-Browsing",
+      "App-Informationen und -Leistung (keine Absturz- oder Diagnosedaten)"
+    ],
+    "nur_mit_synchronisation": [
+      "Personenbezogene Daten: E-Mail-Adresse, Name (Anmeldedienst) – App-Funktionen, Kontoverwaltung",
+      "Personenbezogene Daten: Nutzer-ID (Konto-Kennung) – App-Funktionen",
+      "Dateien und Dokumente: Ende-zu-Ende-verschlüsselte Inhalte auf dem Server – App-Funktionen (pruefen: ob verschlüsselte Inhalte, die der Anbieter nicht lesen kann, anzugeben sind)"
+    ]
+  },
+  "bilder": [
+    {
+      "bildschirm": "pflichten",
+      "titel": "Welche Pflichten hat dein Betrieb?",
+      "text": "Ein paar Fragen – dann siehst du, was in Frage kommt (kostenlos ausprobieren)"
+    },
+    {
+      "bildschirm": "heute",
+      "titel": "Hast du alles erledigt?",
+      "text": "Was jetzt dran ist, was erledigt ist – Erinnerung vor jeder Frist (Pro)"
+    },
+    {
+      "bildschirm": "pflicht",
+      "titel": "Mit Grund und Quelle",
+      "text": "Jede Pflicht erklärt, mit Gesetz und Link – fachlich geprüft (Pro)"
+    },
+    {
+      "bildschirm": "vorlagen",
+      "titel": "Gleich erledigen",
+      "text": "Die passende Unterlage zur Pflicht: 43 Vorlagen – als PDF mit Pro"
+    },
+    {
+      "bildschirm": "kontrollmappe",
+      "titel": "Bereit für die Kontrolle",
+      "text": "Die passenden Nachweise in einem PDF – mit Deckblatt (Pro)"
+    },
+    {
+      "bildschirm": "rechnung",
+      "titel": "Dazu: Rechnungen",
+      "text": "Rechnungen mit GiroCode, auch als E‑Rechnung – mit Pro"
+    }
+  ],
+  "grafik": {
+    "titel": "Welche Pflichten hat dein Betrieb?",
+    "text": "Pflichten-Check, Vorlagen und Erinnerungen für kleine Betriebe"
+  }
+}

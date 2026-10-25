@@ -1,5 +1,5 @@
 import { Linking, Share, View } from "react-native";
-import { ANBIETER, DATENSCHUTZ, LINKS, datenschutzAbschnitte, hilfeZiel, nutzungsLink } from "../rechtliches";
+import { ANBIETER, LINKS, datenschutzAbschnitte, datenschutzFreigegeben, hilfeZiel, nutzungsLink, storeLink } from "../rechtliches";
 import { syncAngeboten } from "../konto/konfig";
 import { T as TEXT } from "../texte";
 import { Hinweis, Karte, T, Zeile } from "../ui/bausteine";
@@ -56,7 +56,7 @@ export function DatenschutzSeite() {
             <T v="klein" stil={{ marginTop: 4 }}>{a.text}</T>
           </View>
         ))}
-        {!DATENSCHUTZ.freigegeben ? <T v="caption" leise>{TEXT.datenschutz_entwurf}</T> : null}
+        {!datenschutzFreigegeben() ? <T v="caption" leise>{TEXT.datenschutz_entwurf}</T> : null}
       </Inhalt>
     </Unterseite>
   );
@@ -67,7 +67,7 @@ export function UeberGruppe() {
   const nav = useNav();
   const partnerId = useStandWahl((s) => s.partnerId);
   const hilfe = hilfeZiel(LINKS.support, ANBIETER.email);
-  const teilen = () => void Share.share({ message: TEXT.empfehlen_text(LINKS.appStore || LINKS.website) }).catch(() => undefined);
+  const teilen = () => void Share.share({ message: TEXT.empfehlen_text(storeLink() || LINKS.website) }).catch(() => undefined);
   const zeilen = [
     { titel: TEXT.empfehlen, symbol: "square.and.arrow.up", onPress: teilen },
     // Phase 2.3: „Empfohlen von …“ – nur Anzeige, schaltet nichts frei
@@ -75,7 +75,8 @@ export function UeberGruppe() {
     ...(hilfe ? [{ titel: TEXT.hilfe_kontakt, symbol: "questionmark.circle", onPress: () => void Linking.openURL(hilfe) }] : []),
     { titel: TEXT.datenschutz, symbol: "hand.raised", onPress: () => nav.oeffnen("datenschutz", () => <DatenschutzSeite />) },
     { titel: TEXT.impressum, symbol: "info.circle", onPress: () => nav.oeffnen("impressum", () => <ImpressumSeite />) },
-    { titel: TEXT.nutzungsbedingungen, symbol: "doc.plaintext", onPress: () => void Linking.openURL(nutzungsLink()) },
+    // E-190: auf Android erst mit den eigenen, freigegebenen Nutzungsbedingungen (Apples EULA gilt dort nicht)
+    ...(nutzungsLink() ? [{ titel: TEXT.nutzungsbedingungen, symbol: "doc.plaintext", onPress: () => void Linking.openURL(nutzungsLink()) }] : []),
   ];
   return (
     <View>

@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FullWindowOverlay } from "react-native-screens";
 import { Symbol, T } from "./bausteine";
 import { FussKontext } from "./fussHoehe";
-import { RADIUS, RAND, istIos, useFarben, useWenigBewegung } from "./thema";
+import { RADIUS, RAND, istIos, istNativ, useFarben, useWenigBewegung } from "./thema";
 
 type Art = "erfolg" | "info";
 interface Meldung {
@@ -46,7 +46,7 @@ export function MeldungAnbieter({ children, imTab = () => false }: { children: R
   const imTabRef = useRef(imTab);
   imTabRef.current = imTab;
   const melden = useCallback((text: string, art: Art = "erfolg") => {
-    if (istIos) void Haptics.notificationAsync(art === "erfolg" ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning).catch(() => undefined);
+    if (istNativ) void Haptics.notificationAsync(art === "erfolg" ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning).catch(() => undefined);
     setAktuell({ text, art, nr: ++zaehler.current });
     // VoiceOver: Live-Regionen gibt es nur unter Android – auf dem iPhone ausdrücklich ansagen
     AccessibilityInfo.announceForAccessibility(text);

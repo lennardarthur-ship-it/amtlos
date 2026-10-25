@@ -59,7 +59,7 @@ fs.writeFileSync(`${p}/tsconfig.json`, JSON.stringify({
 }, null, 2) + "\n");
 JS
 cat > "$P/LIESMICH.txt" <<'TXT'
-{{MARKE}} – Testversion fürs iPhone (Expo Go)
+{{MARKE}} – Testversion für iPhone und Android (Expo Go)
 
 Stand: Commit STAND_COMMIT · Expo SDK 58 · Quellcode, Tests und Entscheidungen im Git-Repository
 (GitHub: lennardarthur-ship-it/amtlos). Dieser Ordner ist nur ein Testpaket zum Ausprobieren, nicht der Quellcode.
@@ -67,9 +67,10 @@ Stand: Commit STAND_COMMIT · Expo SDK 58 · Quellcode, Tests und Entscheidungen
 
 EINRICHTEN
 
-1. iPhone: „Expo Go“ aus dem App Store laden bzw. aktualisieren. Das Testpaket braucht die Expo-Go-Version für
-   SDK 58. Meldet Expo Go „Project is incompatible with this version of Expo Go“, ist entweder Expo Go oder das
-   Testpaket nicht aktuell.
+1. iPhone: „Expo Go“ aus dem App Store laden bzw. aktualisieren.
+   Android-Smartphone: „Expo Go“ aus Google Play laden bzw. aktualisieren.
+   Das Testpaket braucht die Expo-Go-Version für SDK 58. Meldet Expo Go „Project is incompatible with this version
+   of Expo Go“, ist entweder Expo Go oder das Testpaket nicht aktuell.
 2. Mac: Node.js installieren (https://nodejs.org, Knopf „LTS“, Installer öffnen, durchklicken).
 3. Mac: Programm „Terminal“ öffnen und eintippen (Ordnerpfad anpassen, falls woanders):
 
@@ -79,12 +80,16 @@ EINRICHTEN
 
    „npm install“ erst ganz durchlaufen lassen (bis „added … packages“ erscheint). Nach einem neuen Testpaket mit
    anderen Bibliotheken (z. B. neues Expo SDK) „npm install“ wieder ausführen; sonst reicht „npx expo start -c“.
-4. Es erscheint ein QR-Code. Mit der Kamera-App des iPhones scannen → „In Expo Go öffnen“.
-   iPhone und Mac müssen im selben WLAN sein. Fragt der Mac, ob „node“ Verbindungen annehmen darf: Erlauben.
+4. Es erscheint ein QR-Code.
+   iPhone: mit der Kamera-App scannen → „In Expo Go öffnen“.
+   Android: Expo Go öffnen → „Scan QR code“ und den Code scannen (die Kamera-App von Android öffnet ihn nicht immer
+   in Expo Go).
+   Smartphone und Mac müssen im selben WLAN sein. Fragt der Mac, ob „node“ Verbindungen annehmen darf: Erlauben.
+   Klappt die Verbindung nicht (z. B. Firmen- oder Gäste-WLAN): „npx expo start -c --tunnel“.
 5. Beenden: im Terminal Ctrl + C.
 
-Hakt etwas: Expo Go auf dem iPhone ganz schließen, im Terminal Ctrl + C, dann „npx expo start -c“ und den QR-Code
-neu scannen. Hilft das nicht: Ordner „node_modules“ löschen und „npm install“ wiederholen.
+Hakt etwas: Expo Go auf dem Smartphone ganz schließen, im Terminal Ctrl + C, dann „npx expo start -c“ und den
+QR-Code neu scannen. Hilft das nicht: Ordner „node_modules“ löschen und „npm install“ wiederholen.
 
 
 RUNDGANG DURCH DIE APP
@@ -109,8 +114,10 @@ Unten vier Tabs – Heute · Pflichten · Unterlagen · Mein Betrieb – und rec
 - Unterlagen: alles, was du angelegt hast – mit Summe der offenen Rechnungen, Filtern und Suche.
 - Mein Betrieb: Betrieb (Name, Adresse, Rechtsform, verantwortliche Person), Steuer und Bank, Briefkopf (Logo und
   Hausfarbe), Mitarbeiter, Kunden, Betriebsstätten; „Kontrollmappe“ bündelt die Nachweise für eine Kontrolle.
-- Deine Daten (Mein Betrieb): alles liegt verschlüsselt nur auf dem iPhone, auf Wunsch mit Face ID gesperrt.
-  „Daten sichern“ erstellt eine mit deinem Passwort verschlüsselte Datei, „Sicherung wiederherstellen“ spielt sie zurück.
+- Deine Daten (Mein Betrieb): alles liegt verschlüsselt nur auf dem Smartphone, auf Wunsch mit Face ID bzw.
+  Fingerabdruck gesperrt. „Daten sichern“ erstellt eine mit deinem Passwort verschlüsselte Datei, „Sicherung
+  wiederherstellen“ spielt sie zurück. Android: „Automatisch in einen Ordner sichern“ (Pro) – einmal einen Ordner
+  wählen (auf dem Smartphone, Google Drive, Nextcloud …), danach sichert die App nach jeder Änderung von selbst dorthin.
 
 
 KOSTENLOS UND PRO
@@ -120,7 +127,8 @@ in Frage kommen, und die ersten 3 mit Kurztext, Termin und Abhaken; die übrigen
 lassen sich die Vorlagen ansehen.
 {{MARKE_PRO}} (mit kostenloser Testphase): alles Weitere – Rechnungen und E-Rechnung, Belege (auch E-Rechnungen
 empfangen) und Kasse, alle Pflichten mit Erinnerungen, Paket für die Steuerberatung und Werte per Tipp, Vorlagen
-ausfüllen und als PDF, Kontrollmappe, Erklärung jeder Pflicht, Briefkopf, iCloud-Sicherung, Synchronisation.
+ausfüllen und als PDF, Kontrollmappe, Erklärung jeder Pflicht, Briefkopf, automatische Sicherung (iPhone: iCloud,
+Android: ein Ordner deiner Wahl), Synchronisation.
 Pro sperrt nie den Zugriff auf eigene Daten: Vorhandenes bleibt sichtbar, Geteiltes lässt sich immer wieder teilen und
 drucken, Rechnungen lassen sich immer stornieren, vorhandene Entwürfe bearbeiten, Belege und das Kassenbuch erfasster
 Tage ansehen und exportieren; Sicherung, Wiederherstellen, Datenexport und Löschen gehen immer.
@@ -141,16 +149,27 @@ Handelsregister-Vorlage ist für GmbH, OHG und KG geprüft. Rechtsberatung im Ei
 RECHTLICHES IN DER APP („Über {{MARKE}}“)
 
 - Impressum: Anbieter, Anschrift, Vertretung, E-Mail; Handelsregister und USt-IdNr. folgen nach der Eintragung der UG.
-- Datenschutzhinweis: vom Rechtsanwalt freigegeben (Fassung ohne Synchronisation).
+- Datenschutzhinweis: auf dem iPhone vom Rechtsanwalt freigegeben (Fassung ohne Synchronisation). Auf Android steht
+  eine eigene Fassung (Google Play, Sicherung in einen Ordner) – noch ein Entwurf, als solcher gekennzeichnet.
 - Nutzungsbedingungen: inhaltlich freigegeben, in Kraft erst nach der Eintragung der UG – bis dahin als Entwurf
-  gekennzeichnet; es gilt Apples Standard-Lizenzvertrag.
+  gekennzeichnet; auf dem iPhone gilt Apples Standard-Lizenzvertrag, Android zeigt bis dahin keinen Link.
 
 
 WAS IN DER TESTVERSION FEHLT
 
 - Kein Kauf (siehe oben), keine iCloud-Sicherung und keine Synchronisation: Die Synchronisation braucht einen
-  laufenden {{MARKE}}-Server und einen Anmeldedienst; ohne Server bleibt alles auf dem iPhone.
-- Expo Go ist eine Test-Umgebung: Aussehen und Tempo können leicht von der späteren App aus dem App Store abweichen.
+  laufenden {{MARKE}}-Server und einen Anmeldedienst; ohne Server bleibt alles auf dem Smartphone.
+- Expo Go ist eine Test-Umgebung: Aussehen und Tempo können leicht von der späteren App aus dem App Store bzw. von
+  Google Play abweichen.
+
+Android in Expo Go – was sich prüfen lässt und was nicht:
+- Prüfbar: alle Seiten und Abläufe, Zurück-Taste bzw. Zurück-Geste (schließt Unterseiten und Blätter), Tastatur über
+  Eingabefeldern, Kalender (Dialog von Android), Kamera und Fotoauswahl für Belege, PDF teilen und drucken, Erinnerungen
+  (Benachrichtigungen erlauben, ab Android 13 fragt das System), App-Sperre mit Fingerabdruck/Gesichtserkennung,
+  „Automatisch in einen Ordner sichern“ samt Wiederherstellen aus dem Ordner.
+- Nicht prüfbar: Kauf über Google Play (gibt es nur im eigenen Build mit RevenueCat-Schlüssel), App-Symbol und
+  Startbild, die gesperrten Berechtigungen und „keine Gerätesicherung“ (gelten erst im eigenen Build), Name der App
+  auf dem Startbildschirm.
 TXT
 STAND="$(git -C "$APP" rev-parse --short HEAD 2>/dev/null || echo unbekannt)"
 sed -i.bak "s/STAND_COMMIT/$STAND/" "$P/LIESMICH.txt" && rm -f "$P/LIESMICH.txt.bak"

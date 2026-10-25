@@ -1,7 +1,7 @@
-# Amtlos – iPhone-App (Expo)
+# Amtlos – App für iPhone und Android (Expo)
 
 **Welche Pflichten gelten für meinen Betrieb? Welche Unterlage brauche ich? → Schritt für Schritt ausfüllen → fertiges PDF.**
-Alles liegt verschlüsselt auf dem iPhone (E-121, E-129). Optional, nur in Builds mit Server: Konto und
+Alles liegt verschlüsselt auf dem Gerät (E-121, E-129). Seit E-190 gleichwertig für iPhone und Android (siehe unten). Optional, nur in Builds mit Server: Konto und
 Ende-zu-Ende-verschlüsselte Synchronisation zwischen Geräten (E-134).
 
 Vier Tabs (E-131):
@@ -47,10 +47,11 @@ node werkzeuge/katalog-buendel.mjs          # nach Katalogänderungen: Katalogau
 node werkzeuge/schriften.mjs                # nach Schriftänderungen: eingebettete Schriften neu schreiben
 ```
 
-**Auf dem iPhone testen:** `bash werkzeuge/testpaket.sh <ordner>` (vorher `pnpm build`) baut ein eigenständiges Paket
-mit Anleitung (`LIESMICH.txt`): Node installieren, `npm install`, `npx expo start`, QR-Code mit Expo Go öffnen.
+**Auf dem iPhone oder Android-Smartphone testen:** `bash werkzeuge/testpaket.sh <ordner>` (vorher `pnpm build`) baut ein
+eigenständiges Paket mit Anleitung (`LIESMICH.txt`): Node installieren, `npm install`, `npx expo start`, QR-Code mit
+Expo Go öffnen (iPhone: Kamera-App; Android: „Scan QR code“ in Expo Go aus Google Play).
 
-**Amtlos Pro (E-132):** `src/pro/` – Regeln (Freikontingent), Kauf über RevenueCat (nur mit `EXPO_PUBLIC_REVENUECAT_IOS_KEY`, sonst Testmodus), Bewertungsbitte; Bezahlschirm `seiten/Pro.tsx`, Rechtliches `src/rechtliches.ts` + `seiten/Recht.tsx`. Store: `store/de.json`, `werkzeuge/store-bilder.mjs`, `werkzeuge/store-check.mjs`, `eas.json`, Anleitung docs/11-store-start.md.
+**Amtlos Pro (E-132):** `src/pro/` – Regeln (Freikontingent), Kauf über RevenueCat (je Plattform ein Schlüssel: `EXPO_PUBLIC_REVENUECAT_IOS_KEY` bzw. `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY`, sonst Testmodus), Bewertungsbitte; Bezahlschirm `seiten/Pro.tsx`, Rechtliches `src/rechtliches.ts` + `seiten/Recht.tsx`. Store: `store/de.json` (App Store), `store/de-android.json` (Google Play), `werkzeuge/store-bilder.mjs` (`PLAY=1` für Google Play), `werkzeuge/store-check.mjs`, `eas.json`, Anleitung docs/11-store-start.md. Käufe gelten je Plattform (Apple-Account bzw. Google-Konto) – ohne Konto gibt es keinen Übertrag zwischen iPhone und Android.
 
 **Konto und Synchronisation (E-134):** `src/konto/` – `sync.ts` (Hülle, Verschlüsselung, Zusammenführen, Ablauf; rein und
 getestet), `api.ts` (`/v1/tresor`), `sitzung.ts` (OIDC/PKCE bzw. Entwicklungszugang, Schlüsselbund), `konto.tsx`
@@ -58,6 +59,21 @@ getestet), `api.ts` (`/v1/tresor`), `sitzung.ts` (OIDC/PKCE bzw. Entwicklungszug
 `EXPO_PUBLIC_OIDC_ISSUER`, `EXPO_PUBLIC_OIDC_CLIENT_ID` (optional `EXPO_PUBLIC_OIDC_AUDIENCE`, Weiterleitung
 `amtlos://anmeldung`). Rundgang mit zwei Geräten: `node e2e/sync-server.mjs &`, Web-Export mit
 `EXPO_PUBLIC_API_URL=http://localhost:3001`, dann `node e2e/sync.mjs <export> <bilder>`.
+
+**Android (E-190):** dieselbe App, keine eigene Codebasis. Plattformwörter (iPhone/Smartphone, Apple-Account/Google-Konto,
+Face ID/Fingerabdruck, App Store/Google Play) kommen aus `src/plattform.ts` (`process.env.EXPO_OS`, ohne react-native –
+Tests sehen die iPhone-Fassung; die Web-Vorschau mit `EXPO_PUBLIC_VORSCHAU_PLATTFORM=android` die Android-Fassung). Eigene
+Android-Module: `unterlagen/cloud.android.ts` (automatische Sicherung in einen gewählten Ordner über das
+Speicherzugriffs-Framework; Ablauf gemeinsam mit iCloud in `unterlagen/cloudLogik.ts`), `ui/datumwahl.android.tsx`
+(Kalender-Dialog). Symbole: SF Symbols auf iOS, Ionicons auf Android und Web (`FALLBACK` in `ui/bausteine.tsx`, jeder
+Name braucht einen Eintrag – `test/android.test.ts`). Benachrichtigungskanal „Fristen“, App-Sperre mit Biometrie bzw.
+Displaysperre, `FLAG_SECURE` bei eingeschalteter Sperre, Tastatur weicht randlos selbst aus. Datenschutzhinweis auf
+Android: Entwurf `DATENSCHUTZ_ANDROID` (nicht freigegeben, docs/datenschutz-android-entwurf.md).
+
+```bash
+cd apps/mobile && CI=1 npx expo export --platform android --output-dir /tmp/expo-android    # Android-Bündel prüfen
+npx eas-cli build -p android --profile preview                                              # APK für Testgeräte
+```
 
 **Version:** `src/version.ts`, `app.json` und `package.json` tragen dieselbe Nummer (ein Test prüft das).
 

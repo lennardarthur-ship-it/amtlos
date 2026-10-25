@@ -96,10 +96,10 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: MARKE.name,
-  operatingSystem: "iOS",
+  operatingSystem: "iOS, Android",
   applicationCategory: "BusinessApplication",
   inLanguage: "de",
-  description: "Welche Pflichten hat dein Betrieb – und hast du alles erledigt? Pflichten-Check mit Terminen, Erinnerung, 43 Vorlagen und Kontrollmappe für kleine Betriebe in Deutschland; dazu Rechnungen und Kasse. Daten verschlüsselt auf dem iPhone, ohne Konto.",
+  description: "Welche Pflichten hat dein Betrieb – und hast du alles erledigt? Pflichten-Check mit Terminen, Erinnerung, 43 Vorlagen und Kontrollmappe für kleine Betriebe in Deutschland; dazu Rechnungen und Kasse. Daten verschlüsselt auf dem Smartphone (iPhone und Android), ohne Konto.",
   ...(url ? { url: `${url}/`, image: `${url}/bilder/og.jpg` } : {}),
   ...(appStoreId ? { downloadUrl: appStoreUrl, offers: { "@type": "Offer", price: "0", priceCurrency: "EUR", url: appStoreUrl } } : {}),
 };
@@ -153,13 +153,16 @@ schreibe(
     `<h1>Impressum</h1>\n${anbieterFehlt ? `<p class="hinweis">Die Angaben zum Anbieter folgen vor der Veröffentlichung.</p>\n` : ""}<p>Angaben nach § 5 DDG</p>\n<dl>${zeile("Anbieter", A.name)}${zeile("Rechtsform", A.rechtsform, false)}${zeile("Anschrift", A.anschrift)}${zeile("Vertreten durch", A.vertretung)}${zeile("E-Mail", A.email)}${zeile("Telefon", A.telefon, false)}${zeile("Registergericht und Registernummer", A.register, Boolean(A.rechtsform))}${zeile("USt-IdNr.", A.ustIdNr, false)}</dl>`,
   ),
 );
-const abschnitte = recht.datenschutzAbschnitte(false);
+const abschnitte = recht.datenschutzAbschnitte(false, false);
+// E-190: Abschnitt zur Android-App erst nach der Freigabe (DATENSCHUTZ_ANDROID ist bis dahin ein Entwurf für RA Dr. Weber)
+const androidFrei = Boolean(recht.DATENSCHUTZ_ANDROID?.freigegeben);
+const androidTeil = androidFrei ? `\n<h2>Die Android-App {{MARKE}}</h2>\n${recht.datenschutzAbschnitte(false, true).map((a) => `<h3>${esc(a.titel)}</h3>\n<p>${esc(a.text)}</p>`).join("\n")}` : "";
 schreibe(
   "datenschutz.html",
   rechtsSeite(
     "Datenschutz",
     "Datenschutzhinweis der App {{MARKE}} und dieser Website",
-    `<h1>Datenschutz</h1>\n${recht.DATENSCHUTZ.freigegeben ? "" : `<p class="hinweis">Entwurf – fachlich noch nicht freigegeben.</p>\n`}<h2>Verantwortlich</h2>\n<p>${A.name ? `${esc([A.name, A.anschrift, A.email].filter(Boolean).join(", "))}${A.vertretung ? `<br>Vertreten durch ${esc(A.vertretung)}` : ""}` : `<span class="offen">Die Angaben zum Anbieter folgen vor der Veröffentlichung.</span>`}</p>\n<h2>Die App {{MARKE}}</h2>\n${abschnitte.map((a) => `<h3>${esc(a.titel)}</h3>\n<p>${esc(a.text)}</p>`).join("\n")}\n<h2>Diese Website</h2>\n<p>Diese Website setzt keine Cookies, nutzt kein Tracking und lädt keine Inhalte von fremden Servern.</p>\n<h3>Kurz-Check auf der Startseite</h3>\n<p>Der Kurz-Check rechnet nur in deinem Browser: Die Beispielzahlen sind in der Seite enthalten, deine Auswahl (Branche, Team) wird weder an einen Server gesendet noch gespeichert.</p>\n<h3>Schriftarten</h3>\n<p>Die Schrift Onest liegt auf diesem Server und wird nicht von einem fremden Anbieter (z. B. Google Fonts) geladen.</p>\n<h3>Hosting und Server-Protokolle</h3>\n<p><span class="offen">Angaben zum Hosting (Anbieter, Server-Protokolle, Speicherdauer, Auftragsverarbeitung) folgen, sobald der Hoster feststeht.</span></p>`,
+    `<h1>Datenschutz</h1>\n${recht.DATENSCHUTZ.freigegeben ? "" : `<p class="hinweis">Entwurf – fachlich noch nicht freigegeben.</p>\n`}<h2>Verantwortlich</h2>\n<p>${A.name ? `${esc([A.name, A.anschrift, A.email].filter(Boolean).join(", "))}${A.vertretung ? `<br>Vertreten durch ${esc(A.vertretung)}` : ""}` : `<span class="offen">Die Angaben zum Anbieter folgen vor der Veröffentlichung.</span>`}</p>\n<h2>Die App {{MARKE}}${androidFrei ? " für das iPhone" : ""}</h2>\n${abschnitte.map((a) => `<h3>${esc(a.titel)}</h3>\n<p>${esc(a.text)}</p>`).join("\n")}${androidTeil}\n<h2>Diese Website</h2>\n<p>Diese Website setzt keine Cookies, nutzt kein Tracking und lädt keine Inhalte von fremden Servern.</p>\n<h3>Kurz-Check auf der Startseite</h3>\n<p>Der Kurz-Check rechnet nur in deinem Browser: Die Beispielzahlen sind in der Seite enthalten, deine Auswahl (Branche, Team) wird weder an einen Server gesendet noch gespeichert.</p>\n<h3>Schriftarten</h3>\n<p>Die Schrift Onest liegt auf diesem Server und wird nicht von einem fremden Anbieter (z. B. Google Fonts) geladen.</p>\n<h3>Hosting und Server-Protokolle</h3>\n<p><span class="offen">Angaben zum Hosting (Anbieter, Server-Protokolle, Speicherdauer, Auftragsverarbeitung) folgen, sobald der Hoster feststeht.</span></p>`,
   ),
 );
 
@@ -197,7 +200,7 @@ schreibe(
       A.email
         ? `<p>Fragen zu {{MARKE}}? Schreib uns an <a href="mailto:${esc(A.email)}">${esc(A.email)}</a>.</p>${A.name ? `\n<p class="leise">${esc([A.name, A.anschrift].filter(Boolean).join(", "))}</p>` : ""}`
         : `<p class="hinweis">Die Kontaktadresse folgt vor der Veröffentlichung.</p>`
-    }\n<h2>Häufige Fragen</h2>\n<div>${fragen.trim()}</div>\n<h2>Abo verwalten</h2>\n<p>{{MARKE_PRO}} kündigst oder änderst du in den Einstellungen deines Apple-Accounts unter Abonnements. Einen Kauf auf einem neuen iPhone holst du in der App unter „Mein Betrieb“ → „{{MARKE_PRO}}“ → „Käufe wiederherstellen“ zurück.</p>\n<p>Endet {{MARKE_PRO}}, bleibt alles erhalten: Geteilte Rechnungen und Unterlagen teilst und druckst du weiter, Stornos gehen immer, Entwürfe bleiben, und deine erfassten Kassentage samt Kassenbuch kannst du weiter ansehen, teilen und drucken. Den Pflichten-Check (die Zahl deiner Pflichten und die ersten drei) kannst du ohne Abo weiter nutzen; neue Rechnungen, Belege, Kassentage und Unterlagen gibt es mit {{MARKE_PRO}}.</p>`,
+    }\n<h2>Häufige Fragen</h2>\n<div>${fragen.trim()}</div>\n<h2>Abo verwalten</h2>\n<p>{{MARKE_PRO}} kündigst oder änderst du auf dem iPhone in den Einstellungen deines Apple-Accounts unter Abonnements, auf Android in Google Play unter „Zahlungen und Abos“ › „Abos“. Einen Kauf auf einem neuen Gerät derselben Plattform holst du in der App unter „Mein Betrieb“ → „{{MARKE_PRO}}“ → „Käufe wiederherstellen“ zurück. Ein Abo gilt nur auf der Plattform, auf der du es abgeschlossen hast – ein Abo aus dem App Store gilt nicht bei Google Play und umgekehrt.</p>\n<p>Endet {{MARKE_PRO}}, bleibt alles erhalten: Geteilte Rechnungen und Unterlagen teilst und druckst du weiter, Stornos gehen immer, Entwürfe bleiben, und deine erfassten Kassentage samt Kassenbuch kannst du weiter ansehen, teilen und drucken. Den Pflichten-Check (die Zahl deiner Pflichten und die ersten drei) kannst du ohne Abo weiter nutzen; neue Rechnungen, Belege, Kassentage und Unterlagen gibt es mit {{MARKE_PRO}}.</p>`,
     { index: true, pfad: "hilfe.html" },
   ),
 );
@@ -223,6 +226,7 @@ fs.cpSync(path.join(HIER, "schriften"), path.join(OUT, "schriften"), { recursive
 for (const d of ["favicon.svg", "apple-touch-icon.png"]) fs.copyFileSync(path.join(HIER, d), path.join(OUT, d));
 if (anbieterFehlt) offen.push("Anbieterangaben für das Impressum (ANBIETER in apps/mobile/src/rechtliches.ts, § 5 DDG) – Impressum zeigt „folgt vor dem Start“");
 if (!recht.DATENSCHUTZ.freigegeben) offen.push("Datenschutz fachlich freigeben (DATENSCHUTZ.freigegeben) und Angaben zum Hosting ergänzen");
+if (!androidFrei) offen.push("Datenschutzhinweis der Android-App freigeben (DATENSCHUTZ_ANDROID.freigegeben, docs/datenschutz-android-entwurf.md) – datenschutz.html beschreibt bis dahin nur die iPhone-App; vor dem Start bei Google Play nötig");
 if (!NB.freigegeben) offen.push("Nutzungsbedingungen anwaltlich freigeben (NUTZUNGSBEDINGUNGEN.freigegeben) – nutzungsbedingungen.html zeigt „Entwurf – noch nicht in Kraft“");
 if (A.rechtsform && !A.register) offen.push("Registergericht und Registernummer (ANBIETER.register) nach der Eintragung – Impressum zeigt „folgt vor dem Start“");
 console.log(`✓ ${OUT}`);

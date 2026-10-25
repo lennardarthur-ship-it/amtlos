@@ -1,4 +1,5 @@
 import { MARKE } from "@amtlos/marke";
+import { ANDROID } from "./plattform";
 /**
  * Anbieterangaben und Rechtstexte der App (E-132). Vom Gründer auszufüllen – Amtlos erfindet keine Firmendaten.
  * Leere Angaben zeigt die App als „folgt“, und `werkzeuge/store-check.mjs` meldet sie vor dem Einreichen.
@@ -38,7 +39,12 @@ export const LINKS = {
   nutzung: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
   /** App-Store-Seite, sobald die App veröffentlicht ist (Weiterempfehlen) */
   appStore: "",
+  /** Seite bei Google Play, sobald die Android-App veröffentlicht ist (Weiterempfehlen auf Android, E-190) */
+  googlePlay: "",
 };
+
+/** Store-Seite der laufenden Plattform für „Weiterempfehlen“ – leer, solange nicht veröffentlicht. */
+export const storeLink = (android: boolean = ANDROID) => (android ? LINKS.googlePlay : LINKS.appStore);
 
 /**
  * Zuständige Datenschutz-Aufsichtsbehörde des Anbieters (Art. 13 Abs. 2 lit. d, Art. 77 DSGVO): richtet sich nach dem
@@ -107,11 +113,47 @@ export const DATENSCHUTZ_SYNC = {
   abschnitt: { titel: "Konto und Synchronisation", text: `Nur wenn du dich anmeldest: Für dein Konto verarbeiten wir deine E-Mail-Adresse, deinen Namen beim Anmeldedienst und eine Konto-Kennung (Art. 6 Abs. 1 lit. b DSGVO). Was synchronisiert wird (Betrieb, Unterlagen, Belege mit Fotos, Personen), verschlüsselt die App vor dem Senden mit einem Schlüssel, den nur dein Sync-Passwort öffnet; der Server speichert nur diesen verschlüsselten Inhalt, Dateinamen, Größe und Zeitpunkte. „Synchronisation beenden“ löscht alles auf dem Server, „Konto löschen“ zusätzlich dein Konto; aus den Sicherungskopien des Servers verschwinden gelöschte Daten nach [vor Veröffentlichung eintragen]. Mit ${MARKE.proName} ordnet RevenueCat deinen Kauf der Konto-Kennung zu.` },
 };
 
-/** Abschnitte des Datenschutzhinweises – mit Synchronisation ergänzt. */
-export function datenschutzAbschnitte(sync: boolean) {
-  if (!sync) return DATENSCHUTZ.abschnitte;
-  const ersatz: Record<string, { titel: string; text: string }> = { "Kurz gesagt": DATENSCHUTZ_SYNC.kurz, "Was du teilst": DATENSCHUTZ_SYNC.teilen, "Deine Rechte": DATENSCHUTZ_SYNC.rechte, "Empfänger und Drittland": DATENSCHUTZ_SYNC.empfaenger };
-  const l = DATENSCHUTZ.abschnitte.map((a) => ersatz[a.titel] ?? a);
+/**
+ * ENTWURF – NICHT FREIGEGEBEN (E-190, PRUEFLISTE T-177). Datenschutzhinweis der Android-App: gleicher Aufbau wie der von
+ * RA Dr. Weber freigegebene iPhone-Text (oben, unverändert), nur dort geändert, wo die Android-App technisch etwas anderes
+ * tut – Google Play statt App Store (Kauf über das Google-Konto, Kaufbelege von Google Play bei RevenueCat), automatische
+ * Sicherung in einen selbst gewählten Ordner (Speicherzugriffs-Framework von Android) statt iCloud, Android-Schlüsselspeicher
+ * statt Schlüsselbund, keine Gerätesicherung durch Android (`allowBackup: false`). Die rechtliche Einordnung (Google und
+ * der Anbieter des Cloud-Ordners als eigene Verantwortliche) ist aus dem iPhone-Text übertragen und von Dr. Weber zu
+ * prüfen – Gegenüberstellung in docs/datenschutz-android-entwurf.md. Die App zeigt ihn nur auf Android, mit dem Hinweis
+ * „Entwurf“; der Store-Check meldet ihn als offen; die Website zeigt ihn erst nach der Freigabe.
+ */
+export const DATENSCHUTZ_ANDROID = {
+  freigegeben: false,
+  abschnitte: [
+    { titel: "Kurz gesagt", text: `${MARKE.name} speichert deine Angaben nur auf deinem Smartphone – verschlüsselt, ohne Konto und ohne Server von ${MARKE.name}. Wir sehen deine Unterlagen, Kunden und Mitarbeiter nicht. ${MARKE.name} macht keine eigenen Analysen und zeigt keine Werbung; nur für ${MARKE.proName} wertet unser Dienstleister RevenueCat die Käufe für die Abo-Verwaltung aus.` },
+    { titel: "Was auf dem Smartphone liegt", text: `Betrieb, Unterlagen, Rechnungen, Belege mit Fotos und Dateien, Mitarbeiter- und Kundendaten sowie deine Antworten im Pflichten-Check. Die Daten sind mit AES-256 verschlüsselt; der Schlüssel liegt im Android-Schlüsselspeicher dieses Smartphones. Die Gerätesicherung von Android nimmt diese Daten nicht mit. Diese Daten verarbeitest du selbst – ${MARKE.name} erhält sie nicht. Wenn du die App löschst, sind die Daten weg – außer in einer Sicherung, die du selbst erstellt hast.` },
+    { titel: "Sicherungen", text: `Eine Sicherung ist eine Datei, die ${MARKE.name} mit deinem Passwort verschlüsselt. Du entscheidest, wo du sie ablegst. Die automatische Sicherung legt dieselbe verschlüsselte Datei in einem Ordner ab, den du einmal über die Ordnerauswahl von Android wählst (z. B. auf dem Smartphone, in Google Drive oder Nextcloud); ${MARKE.name} erhält dabei nur Zugriff auf diesen Ordner. Liegt der Ordner bei einem Cloud-Anbieter, ist dieser für die Speicherung eigener Verantwortlicher; es gelten seine Datenschutzbestimmungen.` },
+    { titel: "Erinnerungen", text: `Erinnerungen an Fristen plant das Smartphone selbst als lokale Benachrichtigungen. Dafür wird nichts an ${MARKE.name} gesendet; Push-Mitteilungen über einen Server nutzt die App nicht.` },
+    { titel: MARKE.proName, text: `Käufe laufen über dein Google-Konto bei Google Play; für Google Play und die Bezahlung ist Google eigener Verantwortlicher. Damit die App weiß, ob Pro aktiv ist, verarbeitet RevenueCat, Inc. (USA) als unser Auftragsverarbeiter eine zufällige App-Kennung und deine Kaufbelege von Google Play – keine Unterlagen, keine Namen. RevenueCat wertet die Käufe für die Abo-Verwaltung aus (z. B. Verlängerung, Kündigung, Probezeitraum); eigene Analysen macht ${MARKE.name} damit nicht.` },
+    { titel: "Rechtsgrundlagen", text: `Abo-Status prüfen und das Abo verwalten: Art. 6 Abs. 1 lit. b DSGVO (Vertrag über ${MARKE.proName}). Speichern und Lesen auf deinem Smartphone, soweit für die App nötig (Schlüsselspeicher, Einstellungen): § 25 Abs. 2 Nr. 2 TDDDG. Automatische Sicherung in einen Ordner nur, wenn du sie einschaltest.` },
+    { titel: "Empfänger und Drittland", text: `RevenueCat, Inc., USA (Auftragsverarbeiter nach Art. 28 DSGVO, nur Kennung und Kaufbelege). ${DRITTLAND_REVENUECAT} Google ist für Google Play und Käufe eigener Verantwortlicher, für einen Cloud-Ordner der Anbieter, den du wählst. Sonst erhält niemand Daten aus der App – außer dem, was du selbst teilst.` },
+    { titel: "Speicherdauer", text: "Auf dem Smartphone: bis du die Daten in der App löschst oder die App entfernst. Bei RevenueCat: solange dein Abo besteht. Spätestens vier Monate nach Ende deines Abos lassen wir die Daten zu deiner App-Kennung bei RevenueCat löschen – früher, wenn du die Löschung verlangst. Die Zeit danach brauchen wir für Erstattungen und Rückbuchungen über Google Play. Endet unser Vertrag, löscht RevenueCat die Daten oder gibt sie auf unsere Anforderung zurück; Sicherungskopien nach den Sicherungs- und Archivierungsroutinen von RevenueCat." },
+    { titel: "Musst du Daten angeben?", text: `Nein. Die App funktioniert ohne Angaben an ${MARKE.name}. Nur für ${MARKE.proName} ist die Prüfung des Kaufs über RevenueCat nötig – ohne sie lässt sich Pro nicht nutzen.` },
+    { titel: "Keine automatisierte Entscheidung", text: "Es gibt keine automatisierte Entscheidung und kein Profiling im Sinne von Art. 22 DSGVO. Der Pflichten-Check rechnet auf deinem Smartphone und zeigt, welche Pflichten nach deinen Angaben in Frage kommen – er entscheidet nichts über dich." },
+    { titel: "Was du teilst", text: "PDFs, E-Rechnungen, Pakete für die Steuerberatung und Sicherungen verlassen das Smartphone nur, wenn du sie selbst teilst – an wen, entscheidest du im Teilen-Menü, auch an eine Kanzlei deiner Wahl. Die Kanzlei verarbeitet, was du ihr sendest, als eigener Verantwortlicher." },
+    { titel: "Deine Rechte", text: `Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerspruch und Beschwerde bei einer Datenschutz-Aufsichtsbehörde (Art. 15 ff., 77 DSGVO). Da ${MARKE.name} deine Unterlagen nicht speichert, löschst du sie selbst unter „Mein Betrieb“. Für alles andere: Kontakt beim Verantwortlichen oben. ${RECHTE_BESCHWERDE}` },
+  ],
+};
+
+/** Sync-Zusatz in der Android-Fassung (Entwurf wie DATENSCHUTZ_ANDROID): nur die Gerätewörter und Google statt Apple. */
+const androidWorte = (a: { titel: string; text: string }) => ({ titel: a.titel, text: a.text.replace(/iPhone/g, "Smartphone").replace("Apple ist für App Store, Käufe und iCloud eigener Verantwortlicher.", "Google ist für Google Play und Käufe eigener Verantwortlicher.") });
+
+/** Gilt der Datenschutzhinweis der laufenden App als freigegeben? (Android: Entwurf bis zur Freigabe, E-190) */
+export const datenschutzFreigegeben = (android: boolean = ANDROID) => (android ? DATENSCHUTZ_ANDROID.freigegeben : DATENSCHUTZ.freigegeben);
+
+/** Abschnitte des Datenschutzhinweises – mit Synchronisation ergänzt; auf Android die Android-Fassung (E-190). */
+export function datenschutzAbschnitte(sync: boolean, android: boolean = ANDROID) {
+  const basis = android ? DATENSCHUTZ_ANDROID.abschnitte : DATENSCHUTZ.abschnitte;
+  if (!sync) return basis;
+  const z = android ? { kurz: androidWorte(DATENSCHUTZ_SYNC.kurz), teilen: androidWorte(DATENSCHUTZ_SYNC.teilen), rechte: DATENSCHUTZ_SYNC.rechte, empfaenger: androidWorte(DATENSCHUTZ_SYNC.empfaenger) } : DATENSCHUTZ_SYNC;
+  const ersatz: Record<string, { titel: string; text: string }> = { "Kurz gesagt": z.kurz, "Was du teilst": z.teilen, "Deine Rechte": z.rechte, "Empfänger und Drittland": z.empfaenger };
+  const l = basis.map((a) => ersatz[a.titel] ?? a);
   const i = l.findIndex((a) => a.titel === "Sicherungen");
   l.splice(i + 1, 0, DATENSCHUTZ_SYNC.abschnitt);
   return l;
@@ -137,8 +179,11 @@ export const NUTZUNGSBEDINGUNGEN = {
 };
 export type NutzungsbedingungenStand = { freigegeben: boolean; fassung: string; url: string };
 
-/** Link „Nutzungsbedingungen“ in der App: eigene erst nach Freigabe, bis dahin Apples Standard-EULA. */
-export const nutzungsLink = (nb: NutzungsbedingungenStand = NUTZUNGSBEDINGUNGEN) => (nb.freigegeben ? nb.url : LINKS.nutzung);
+/**
+ * Link „Nutzungsbedingungen“ in der App: eigene erst nach Freigabe, bis dahin Apples Standard-EULA. Android (E-190):
+ * Apples EULA gilt dort nicht und Google Play hat keine Standard-EULA – bis zur Freigabe kein Link (leer).
+ */
+export const nutzungsLink = (nb: NutzungsbedingungenStand = NUTZUNGSBEDINGUNGEN, android: boolean = ANDROID) => (nb.freigegeben ? nb.url : android ? "" : LINKS.nutzung);
 
 /** Gespeicherte Zustimmung zu den Nutzungsbedingungen (im Stand, nur auf dem Gerät und in der Sicherung). */
 export interface Zustimmung {

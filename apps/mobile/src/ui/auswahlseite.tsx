@@ -4,7 +4,7 @@ import * as Haptics from "expo-haptics";
 import { T as TEXT } from "../texte";
 import { FeldKopf, Karte, Suchfeld, Symbol, T, feldRahmen, useInKarte } from "./bausteine";
 import { Unterseite, useNav } from "./navigation";
-import { HAARLINIE, istIos, useFarben } from "./thema";
+import { HAARLINIE, istNativ, useFarben } from "./thema";
 import { Inhalt } from "../seiten/gemeinsam";
 
 interface Option<W extends string> {
@@ -41,7 +41,7 @@ export function AuswahlSeite<W extends string>({ titel, wert, optionen, aendern 
                   accessibilityState={{ checked: an }}
                   aria-checked={an}
                   onPress={() => {
-                    if (istIos) void Haptics.selectionAsync();
+                    if (istNativ) void Haptics.selectionAsync();
                     setGewaehlt(o.wert);
                     aendern(o.wert);
                     setTimeout(nav.zurueck, 120);

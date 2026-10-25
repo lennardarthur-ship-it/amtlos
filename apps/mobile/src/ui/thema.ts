@@ -104,6 +104,9 @@ export function schattenStil(f: Farben, staerke = 1) {
 }
 
 export const istIos = Platform.OS === "ios";
+/** Gerät (iPhone oder Android) – nicht die Web-Vorschau: Kamera, Haptik, native Dialoge (E-190). */
+export const istNativ = Platform.OS !== "web";
+export const istWeb = Platform.OS === "web";
 
 /** „Bewegung reduzieren“ (Bedienungshilfen): dann keine Feder- und Stempel-Animationen. */
 export function useWenigBewegung(): boolean {

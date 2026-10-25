@@ -11,7 +11,7 @@ import { schuetzen, trennen } from "./trennen";
 import { mehrfachUmschalten } from "./mehrfach";
 import { DatumWahl } from "./datumwahl";
 import { FussKontext } from "./fussHoehe";
-import { GROESSE, HAARLINIE, RADIUS, RAND, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, useFarben, useWenigBewegung, weich, type Farben } from "./thema";
+import { GROESSE, HAARLINIE, RADIUS, RAND, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, istNativ, istWeb, useFarben, useWenigBewegung, weich, type Farben } from "./thema";
 
 type Variante = "grossTitel" | "titel" | "gross" | "basis" | "klein" | "caption" | "mini";
 /** Textstile in Onest (E-142): Titel extrafett und eng gesetzt, Fließtext ruhig. */
@@ -58,8 +58,12 @@ export function Betrag({ children, v = "basis", farbe, stil }: { children: React
   );
 }
 
-/** SF Symbol auf iOS, sonst Ionicons. Immer dekorativ – der Text daneben trägt die Bedeutung. */
-const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
+/**
+ * SF Symbol auf iOS, sonst Ionicons (Android und Web – E-190: auf Android bewusst Ionicons statt der Material Symbols von
+ * expo-symbols, damit Android genau so aussieht wie die geprüfte Web-Vorschau und die Store-Bilder). Jeder SF-Name braucht
+ * einen Eintrag in FALLBACK (test/android.test.ts). Immer dekorativ – der Text daneben trägt die Bedeutung.
+ */
+export const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
   "calendar": "calendar-outline", "checklist": "list-outline", "clock": "time-outline", "doc.viewfinder": "camera-outline", "ellipsis.circle": "ellipsis-horizontal-circle-outline",
   "lock.open": "lock-open-outline", "key": "key-outline", "pause.circle": "pause-circle-outline", "checkmark.seal": "ribbon-outline", "number": "keypad-outline", "xmark.icloud": "cloud-offline-outline",
   "checkmark": "checkmark", "chevron.right": "chevron-forward", "bell": "notifications-outline", "person.2": "people-outline", "globe": "globe-outline", "rectangle.portrait.and.arrow.right": "log-out-outline",
@@ -75,7 +79,9 @@ const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
   "scissors": "cut-outline", "cross.case": "medkit-outline", "checkmark.square.fill": "checkbox", "square": "square-outline", "chevron.down": "chevron-down", "chevron.up": "chevron-up",
   "doc.richtext": "document-text-outline", "hammer": "hammer-outline", "info.circle.fill": "information-circle", "circle": "ellipse-outline", "arrow.uturn.backward": "arrow-undo-outline", "xmark.circle": "close-circle-outline",
   "person.crop.circle": "person-circle-outline", "eye": "eye-outline", "eye.slash": "eye-off-outline", "arrow.left": "arrow-back", "list.number": "list-outline", "checkmark.circle.fill": "checkmark-circle", "person.badge.clock": "person-outline",
-  "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline", "paintpalette": "color-palette-outline", "eurosign.circle": "logo-euro", "photo": "image-outline", "lock.fill": "lock-closed", "faceid": "scan-outline", "line.3.horizontal.decrease.circle": "funnel-outline", "icloud": "cloud-outline", "checkmark.seal.fill": "ribbon", "hand.raised": "hand-left-outline", "doc.plaintext": "document-outline", "square.grid.2x2": "grid-outline", "exclamationmark": "alert", "house": "home-outline", "house.fill": "home", "folder.fill": "folder", "building.2.fill": "business", "giftcard": "gift-outline", "rosette": "ribbon-outline",
+  "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline", "paintpalette": "color-palette-outline", "eurosign.circle": "logo-euro", "photo": "image-outline", "lock.fill": "lock-closed", "faceid": "finger-print-outline", "line.3.horizontal.decrease.circle": "funnel-outline", "icloud": "cloud-outline", "checkmark.seal.fill": "ribbon", "hand.raised": "hand-left-outline", "doc.plaintext": "document-outline", "square.grid.2x2": "grid-outline", "exclamationmark": "alert", "house": "home-outline", "house.fill": "home", "folder.fill": "folder", "building.2.fill": "business", "giftcard": "gift-outline", "rosette": "ribbon-outline",
+  // E-190: bisher ohne Ersatz (Android zeigte einen leeren Kreis) – test/android.test.ts prüft, dass jedes Symbol einen hat
+  "moon": "moon-outline", "doc": "document-outline", "shippingbox": "cube-outline", "folder.badge.plus": "folder-open-outline",
 };
 export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name: string; groesse?: number; farbe?: string; gewicht?: SymbolViewProps["weight"] }) {
   const f = useFarben();
@@ -242,7 +248,7 @@ export function StempelAuftritt({ jetzt, children, stil }: { jetzt: boolean; chi
   const los = useRef(new Animated.Value(jetzt ? 0 : 1)).current;
   useEffect(() => {
     if (!jetzt) return;
-    if (istIos) void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
+    if (istNativ) void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
     if (wenig) {
       los.setValue(1);
       return;
@@ -259,7 +265,7 @@ export function StempelAuftritt({ jetzt, children, stil }: { jetzt: boolean; chi
 }
 
 const tippen = () => {
-  if (istIos) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  if (istNativ) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 };
 
 /**
@@ -603,7 +609,7 @@ export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boole
   };
 }
 // Web-Vorschau: kein Browser-Fokusrahmen (der eigene Rahmen in Indigo zeigt den Fokus)
-const feldText = (f: Farben): TextStyle => ({ color: f.tinte, ...SCHRIFT.regular, fontSize: GROESSE.basis, ...(istIos ? null : ({ outlineStyle: "none" } as unknown as TextStyle)) });
+const feldText = (f: Farben): TextStyle => ({ color: f.tinte, ...SCHRIFT.regular, fontSize: GROESSE.basis, ...(istWeb ? ({ outlineStyle: "none" } as unknown as TextStyle) : null) });
 
 /** Beschriftetes Textfeld; die Beschriftung steht darüber und ist mit dem Feld verbunden. */
 export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, optional, ohneFehlerText, onFocus, onBlur, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean; optional?: boolean; /** Fehler nur am Rahmen (und für VoiceOver) – der Text steht dann außerhalb, z. B. unter einer Feldreihe */ ohneFehlerText?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
@@ -763,7 +769,7 @@ function Chip({ text, an, rolle, onPress, kaestchen }: { text: string; an: boole
       accessibilityLabel={text}
       hitSlop={4}
       onPress={() => {
-        if (istIos) void Haptics.selectionAsync();
+        if (istNativ) void Haptics.selectionAsync();
         onPress();
       }}
       style={({ pressed }) => ({ minHeight: 40, paddingLeft: kaestchen ? 9 : 16, paddingRight: 16, borderRadius: RADIUS.pille, flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: an ? f.haupt : pressed ? f.linie : inKarte ? f.flaeche : f.blatt, flexShrink: 1 })}
@@ -842,7 +848,7 @@ function AntwortKarte({ text, an, rolle, onPress, unter }: { text: string; an: b
       aria-checked={an}
       accessibilityLabel={unter ? `${text}, ${unter}` : text}
       onPress={() => {
-        if (istIos) void Haptics.selectionAsync();
+        if (istNativ) void Haptics.selectionAsync();
         onPress();
       }}
       style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, minHeight: 60, paddingHorizontal: 18, paddingVertical: 14, borderRadius: RADIUS.knopf, borderWidth: 2, borderColor: an ? f.amt : "transparent", backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
@@ -886,7 +892,7 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
               accessibilityState={{ checked: an }}
               aria-checked={an}
               onPress={() => {
-                if (istIos) void Haptics.selectionAsync();
+                if (istNativ) void Haptics.selectionAsync();
                 aendern(o.wert);
               }}
               style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 12, minHeight: 50, paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.linieLeise : "transparent" })}
@@ -994,7 +1000,7 @@ export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { labe
               aria-checked={an}
               accessibilityLabel={o.text}
               onPress={() => {
-                if (istIos) void Haptics.selectionAsync();
+                if (istNativ) void Haptics.selectionAsync();
                 aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert]);
               }}
               style={({ pressed }) => ({ flexDirection: "row", gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.linieLeise : "transparent" })}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
 import { partnerAusCode, partnerCodeAusLink, partnerFuer, type Partner } from "../partner/partner";
 import { codeEinloesen } from "../pro/kauf";
+import { ANDROID } from "../plattform";
 import { T as TEXT } from "../texte";
 import { Feld, Hinweis, Karte, Knopf, T, TextKnopf } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -54,6 +55,8 @@ export function useCodeEinloesen(danach?: () => void) {
 /** TextKnopf „Code einlösen“ samt Hinweis darunter (Bezahlschirm, Mein Betrieb). */
 export function CodeEinloesenKnopf({ text, danach, leise }: { text?: string; danach?: () => void; leise?: boolean }) {
   const c = useCodeEinloesen(danach);
+  // E-190: Google Play hat kein Einlöseblatt in der App – statt eines Knopfs, der nur einen Hinweis öffnet, gleich der Weg im Play Store
+  if (ANDROID) return text ? <Hinweis text={TEXT.code_nicht_verfuegbar} symbol="giftcard" /> : null;
   return (
     <View>
       <TextKnopf symbol="giftcard" leise={leise} text={text ?? TEXT.code_einloesen} label={TEXT.code_einloesen} onPress={() => void (c.laedt ? undefined : c.einloesen())} />

@@ -5,7 +5,7 @@ import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef,
 import { KeyboardAvoidingView, Platform, Pressable, View, useWindowDimensions } from "react-native";
 import { T as TEXT } from "../texte";
 import { BuehnenText, Symbol, T, useGrosseSchrift } from "./bausteine";
-import { MINZE, RADIUS, RAND, SCHRIFT, ZIEL, istIos, useFarben, type Farben } from "./thema";
+import { MINZE, RADIUS, RAND, SCHRIFT, ZIEL, istIos, istNativ, useFarben, type Farben } from "./thema";
 import { trennen } from "./trennen";
 import { useAktionen } from "../zustand";
 
@@ -218,7 +218,9 @@ export function TastaturRahmen({ children, grund }: { children: ReactNode; grund
   const [hoehe, setHoehe] = useState(0);
   return (
     <View style={{ flex: 1, backgroundColor: grund ?? f.papier }} onLayout={(e) => setHoehe(e.nativeEvent.layout.height)}>
-      <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} keyboardVerticalOffset={hoehe ? fenster - hoehe : 0} style={{ flex: 1 }}>
+      {/* Android (E-190): seit SDK 54 immer randlos (edge-to-edge) – das System verkleinert das Fenster nicht mehr für die
+          Tastatur, also weicht die Seite wie auf dem iPhone selbst aus („padding“). Web: kein Ausweichen. */}
+      <KeyboardAvoidingView behavior={istNativ ? "padding" : undefined} keyboardVerticalOffset={hoehe ? fenster - hoehe : 0} style={{ flex: 1 }}>
         {children}
       </KeyboardAvoidingView>
     </View>

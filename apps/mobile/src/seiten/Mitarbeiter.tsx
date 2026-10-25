@@ -10,7 +10,7 @@ import { Hinweis, Karte, Knopf, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { bestaetigen } from "../ui/bestaetigen";
 import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
-import { istIos, useFarben } from "../ui/thema";
+import { istNativ, useFarben } from "../ui/thema";
 import { belegFoto } from "../unterlagen/belegfoto";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { AUFENTHALT_VORLAUF_TAGE, aufenthaltLaeuftAb, heute } from "../unterlagen/speicher";
@@ -78,9 +78,9 @@ function AufenthaltKopie({ p, setze }: { p: Person; setze: (werte: Partial<Perso
       </View>
       {bild ? <Image source={{ uri: bild }} style={{ width: "100%", height: 200, borderRadius: 8, backgroundColor: f.papier }} resizeMode="contain" accessibilityLabel={TEXT.r12p_aufenthalt_kopie} /> : null}
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 4 }}>
-        {istIos ? <TextKnopf symbol="camera" text={TEXT.beleg_foto} onPress={() => foto(true)} /> : null}
+        {istNativ ? <TextKnopf symbol="camera" text={TEXT.beleg_foto} onPress={() => foto(true)} /> : null}
         <TextKnopf symbol="doc.text" text={datei ? TEXT.r12p_aufenthalt_ersetzen : TEXT.beleg_datei} onPress={waehlen} />
-        {istIos ? <TextKnopf symbol="photo" text={TEXT.beleg_aus_fotos} onPress={() => foto(false)} /> : null}
+        {istNativ ? <TextKnopf symbol="photo" text={TEXT.beleg_aus_fotos} onPress={() => foto(false)} /> : null}
         {datei ? <TextKnopf symbol="square.and.arrow.up" text={TEXT.beleg_teilen} onPress={() => void teilen()} /> : null}
       </View>
     </Karte>

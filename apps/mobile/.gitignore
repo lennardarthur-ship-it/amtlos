@@ -1,2 +1,7 @@
 .expo/
 web-export/
+# E-190: Schlüssel des Google-Play-Dienstkontos für `eas submit -p android` – nie einchecken
+geheim/
+# `npx expo prebuild` nur zum Prüfen – die nativen Ordner erzeugt EAS beim Bauen (Continuous Native Generation)
+android/
+ios/

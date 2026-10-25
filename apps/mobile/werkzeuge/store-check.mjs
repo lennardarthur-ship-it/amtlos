@@ -1,8 +1,10 @@
 /**
- * Vor dem Einreichen im App Store (E-132): listet alles, was noch fehlt – Anbieterangaben, Links, EAS, Abo-Schlüssel,
- * Store-Texte (Längen), Rechtstexte-Freigabe, Prüfliste. Exit 1, solange etwas offen ist.
+ * Vor dem Einreichen im App Store (E-132) und bei Google Play (E-190): listet alles, was noch fehlt – Anbieterangaben,
+ * Links, EAS, Abo-Schlüssel je Plattform, Store-Texte (Längen), Rechtstexte-Freigabe, Play Console, Prüfliste. Exit 1,
+ * solange etwas offen ist.
  *
- *   node werkzeuge/store-check.mjs                    # prüft das Profil „production“
+ *   node werkzeuge/store-check.mjs                    # prüft das Profil „production“, beide Stores
+ *   node werkzeuge/store-check.mjs --ios | --android  # nur einen Store
  *   node werkzeuge/store-check.mjs --profile preview  # anderes EAS-Profil (oder EAS_BUILD_PROFILE)
  *   node werkzeuge/store-check.mjs --texte            # nur die Store-Texte mit eingesetzter Marke ausgeben (für App Store Connect)
  *
@@ -140,7 +142,56 @@ pruefe(s.bilder.every((x) => fs.existsSync(path.join(webBilder, `${x.bildschirm}
 const pl =fs.readFileSync(path.join(APP, "../../PRUEFLISTE.md"), "utf8");
 pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche Freigabe der Vorlagen (PRUEFLISTE T-52 ff.) – vor dem Livegang durch Fachleute");
 
-for (const t of ok) console.log(`  ✓ ${t}`);
-for (const t of offen) console.log(`  ✗ ${t}`);
-console.log(offen.length ? `\n${offen.length} Punkte offen – noch nicht einreichen.` : "\nBereit zum Einreichen.");
-process.exitCode = offen.length ? 1 : 0;
+// ---------------------------------------------------------------------------------------------------------------------
+// Google Play (E-190): Android-App in gleicher Qualität. Was im Code geht, ist erledigt; offen bleibt, was das
+// Organisationskonto der UG, die Play Console oder eine fachliche Freigabe braucht (docs/11-store-start.md §10).
+const okA = [];
+const offenA = [];
+const pruefeA = (bed, text) => (bed ? okA : offenA).push(text);
+{
+  const play = markeEinsetzenTief(JSON.parse(lies("store/de-android.json")));
+  const k = play.konsole ?? {};
+  // Konto und Zugang
+  pruefeA(k.organisationskonto === true && /^\d{6,}$/.test(String(k.entwicklerkontoId ?? "")), "Google-Play-Entwicklerkonto als Organisation der UG (D-U-N-S-Nummer nötig, nach der Eintragung; store/de-android.json → konsole.organisationskonto, konsole.entwicklerkontoId) – PRUEFLISTE T-176");
+  const dienstkonto = eas.submit?.production?.android?.serviceAccountKeyPath;
+  pruefeA(dienstkonto && fs.existsSync(path.join(APP, dienstkonto)), `Dienstkonto-Schlüssel für eas submit (Play Console → API-Zugriff; Datei ${dienstkonto ?? "–"}, nicht einchecken)`);
+  pruefeA(eas.submit?.production?.android?.track === "internal" && eas.build?.production?.android?.buildType === "app-bundle", "EAS: App-Bundle (AAB) für Google Play, Einreichen in den internen Test (eas.json)");
+  const rcAndroid = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || eas.build?.[profil]?.env?.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || "";
+  if (profil === "production") {
+    pruefeA(rcAndroid, "RevenueCat-Schlüssel EXPO_PUBLIC_REVENUECAT_ANDROID_KEY für das Profil „production“ (RevenueCat: Google-Play-App mit Dienstkonto, Produkte amtlos_pro_jahr/amtlos_pro_monat, Berechtigung „pro“; eas env:create … --name EXPO_PUBLIC_REVENUECAT_ANDROID_KEY) – ohne ihn lässt sich Pro auf Android nicht kaufen");
+    if (rcAndroid) pruefeA(/^goog_/.test(rcAndroid), "RevenueCat-Schlüssel ist der öffentliche Google-Play-Schlüssel (beginnt mit „goog_“)");
+  }
+  // Rechtstexte
+  pruefeA(/export const DATENSCHUTZ_ANDROID = \{\s*freigegeben: true/.test(recht), "Datenschutzhinweis der Android-App freigegeben (DATENSCHUTZ_ANDROID.freigegeben, Entwurf docs/datenschutz-android-entwurf.md – RA Dr. Weber, PRUEFLISTE T-177)");
+  pruefeA(/export const NUTZUNGSBEDINGUNGEN = \{[^}]*?freigegeben: true/.test(recht), "Nutzungsbedingungen mit Android-Teil freigegeben (docs/nutzungsbedingungen-android-entwurf.md, PRUEFLISTE T-178) – bis dahin zeigt die Android-App keinen Link auf Nutzungsbedingungen");
+  // Play Console
+  const ds = play.datensicherheit ?? {};
+  const unsicher = [...(ds.erhoben ?? [])].filter((e) => e.pruefen).map((e) => e.datentyp);
+  pruefeA(k.datensicherheitAbgesendet === true && !unsicher.length, `Formular „Datensicherheit“ ausgefüllt (docs/play-datensicherheit.md${unsicher.length ? `; noch zu bestätigen: ${unsicher.join(", ")}` : ""}) – PRUEFLISTE T-179`);
+  pruefeA(k.inhaltseinstufung === true, "Inhaltseinstufung (IARC-Fragebogen) in der Play Console ausgefüllt (store/de-android.json → inhaltseinstufung)");
+  pruefeA(k.zielgruppe === true, "Zielgruppe und Inhalte (18 und älter, nicht für Kinder) in der Play Console angegeben");
+  pruefeA(k.finanzfunktionen === true, "Erklärung zu Finanzfunktionen in der Play Console abgegeben (Rechnungen/Kassenbuch – Einordnung prüfen, PRUEFLISTE T-179)");
+  pruefeA(k.appZugriff === true, "„App-Zugriff“ in der Play Console: Hinweise für die Prüfung (store/de-android.json → app_zugriff) und Lizenztester eingetragen");
+  // im Code erledigt – meldet nur, wenn etwas kaputtgeht
+  pruefeA(app.android?.package === MARKE.technisch.bundleId, `Android-Paket ${app.android?.package} = Marke (${MARKE.technisch.bundleId})`);
+  pruefeA(app.android?.allowBackup === false && app.android?.adaptiveIcon?.monochromeImage && fs.existsSync(path.join(APP, app.android.adaptiveIcon.monochromeImage)), "Android: keine Gerätesicherung (allowBackup false), adaptives Symbol mit Monochrom-Fassung");
+  pruefeA(["READ_MEDIA_IMAGES", "READ_EXTERNAL_STORAGE", "SCHEDULE_EXACT_ALARM", "RECORD_AUDIO"].every((x) => (app.android?.blockedPermissions ?? []).includes(`android.permission.${x}`)), "Android: Medien-, Speicher-, Wecker- und Mikrofon-Berechtigungen gesperrt (keine Play-Erklärungen nötig)");
+  pruefeA(play.titel.length <= 30 && play.kurzbeschreibung.length <= 80 && play.beschreibung.length <= 4000 && play.neu.length <= 500, `Play-Texte in den Grenzen (Titel ${play.titel.length}/30, Kurzbeschreibung ${play.kurzbeschreibung.length}/80, Beschreibung ${play.beschreibung.length}/4000)`);
+  pruefeA(!/iPhone|iCloud|Face ID|Apple-Account|stdeula/.test(JSON.stringify([play.titel, play.kurzbeschreibung, play.beschreibung, play.neu, play.bilder])), "Play-Texte ohne Apple-Wörter");
+}
+
+const nurAndroid = process.argv.includes("--android");
+const nurIos = process.argv.includes("--ios");
+if (!nurAndroid) {
+  console.log("App Store (iOS)");
+  for (const t of ok) console.log(`  ✓ ${t}`);
+  for (const t of offen) console.log(`  ✗ ${t}`);
+}
+if (!nurIos) {
+  console.log("\nGoogle Play (Android, E-190)");
+  for (const t of okA) console.log(`  ✓ ${t}`);
+  for (const t of offenA) console.log(`  ✗ ${t}`);
+}
+const zahl = (nurAndroid ? 0 : offen.length) + (nurIos ? 0 : offenA.length);
+console.log(zahl ? `\n${zahl} Punkte offen – noch nicht einreichen.${nurAndroid || nurIos ? "" : ` (App Store ${offen.length}, Google Play ${offenA.length})`}` : "\nBereit zum Einreichen.");
+process.exitCode = zahl ? 1 : 0;
