@@ -1252,6 +1252,11 @@ Umsetzung (eine Codebasis, keine Android-Sonderwelt):
 
 Nicht ohne echtes Android-Gerät prüfbar (PRUEFLISTE T-180): Kauf und Wiederherstellen über Google Play, Ordner-Sicherung bei Google Drive/Nextcloud (Namen, Ersetzen, Berechtigung nach Neustart und nach Entzug), Tastatur und Zurück-Geste, Kalender-Dialog, Benachrichtigungen, Biometrie, FLAG_SECURE, Symbol und Startbild, R8 im Release-Build (E-186).
 
+
+### E-191 · Katalogpflege nach dem Start: der Gründer pflegt, die Fachleute geben frei (2026-10-25)
+
+Der Gründer pflegt den Pflichten-Katalog und die Vorlagen nach dem Start selbst. Dabei gilt weiter die Regel, dass nichts Rechtliches erfunden wird: Der Gründer beobachtet Änderungen und schreibt Entwürfe, die fachliche Freigabe bleibt bei den Prüfern (RA, StB, Sifa, Lebensmittelhygiene). Technisch ist das schon so angelegt: Jede inhaltliche Änderung an einem Eintrag oder einer Vorlage nimmt ihm den Prüfvermerk (Freigaberegister `docs/freigabe-katalog/freigaben.yaml` je Version, `vorlagenPruefsumme` in `geprueft.ts`), bis die neue Fassung freigegeben ist. Zu planen: fester Rhythmus (feste Änderungstermine 1.1. und 1.7., Jahressteuergesetz im Dezember, Stufen der E-Rechnung 1.1.2027 und 1.1.2028, Mindestlohn- und Sachbezugswerte), monatliche Durchsicht der Quellen, jährliche Nachprüfung durch die Prüfer (die Nennung eines Prüfers gilt 12 Monate, `nennungMonate`), Budget für Prüferstunden. Werkzeug und Ablauf: PRUEFLISTE T-182.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
