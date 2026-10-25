@@ -2072,3 +2072,17 @@
       version: 3
       quelle: 2026-10-25-runde4-katalog-weber.xlsx
       stand: '2026-10-25'
+- pruefer: Thomas Koch (Fachkraft für Arbeitssicherheit)
+  umfang: alles
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Runde 3, zweiter Nachtrag unterschrieben (Mail 25.10.2026)
+  eintraege:
+    branche.gastro_schankanlage_fluessiggas:
+      version: 4
+      quelle: 2026-10-25-koch-mail.txt
+      stand: '2026-10-25'
+    arbeitsschutz.flucht_rettungsplan:
+      version: 5
+      quelle: 2026-10-25-koch-mail.txt
+      stand: '2026-10-25'

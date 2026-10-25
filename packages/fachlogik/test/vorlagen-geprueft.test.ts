@@ -15,7 +15,8 @@ const WEITERE = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung",
   "betriebsanweisung_maschine", "pruefprotokoll_elektro", "datenschutz_dokumentation", "datenschutzerklaerung_website", "avv", "datenschutzinformation", "datenpanne",
   "video_hinweisschild", "anamnese_einwilligung", "arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ki_kompetenz", "ausweis_hinweis", "schluesselquittung",
   "impressum", "gewerbeanmeldung", "transparenzregister",
-  "ust_voranmeldung", "oss_meldung", "zm_meldung", "steuererklaerung", "kassenbuch", "aufbewahrung", "sv_meldedaten"];
+  "ust_voranmeldung", "oss_meldung", "zm_meldung", "steuererklaerung", "kassenbuch", "aufbewahrung", "sv_meldedaten",
+  "betriebsanweisung", "expositionsverzeichnis", "hautschutzplan"];
 // RA Dr. Weber 25.10.2026: nur für GmbH, OHG und KG (Vermerk abhängig von der Rechtsform)
 const NUR_RECHTSFORM = ["handelsregister"];
 const ALLE = [...FUENF, ...WEITERE];

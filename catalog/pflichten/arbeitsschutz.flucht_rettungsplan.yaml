@@ -54,6 +54,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'Sifa T. Koch Nachprüfung 23.10.2026: v4 freigegeben, redaktionell die Doppelung geglättet (keine erneute Prüfung nötig laut seiner Anmerkung) – nur die Freigabe der neuen Fassung im Register nachtragen'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Thomas Koch (Fachkraft für Arbeitssicherheit)
+  geprueft_am: '2026-10-25'
+  geprueft_version: 5

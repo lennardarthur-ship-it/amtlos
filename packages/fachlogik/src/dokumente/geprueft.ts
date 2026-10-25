@@ -44,6 +44,7 @@ export interface VorlagenFreigabe {
 const BAUM = "Nachkontrolle T. Baum 23.10.2026";
 const BUSCH = "Durchsicht StB Busch 23.10.2026 (Bestätigung unterschrieben, docs/pruefberichte/2026-10-23-vorlagen-busch.xlsx)";
 const BUSCH2 = "Durchsicht StB Busch Runde 3 (Ergänzung der Bestätigung, docs/pruefberichte/2026-10-24-ergaenzung-bestaetigung-busch.pdf)";
+const KOCH2 = "Durchsicht T. Koch, Nachprüfung (Blatt vom 23.10.2026, docs/pruefberichte/2026-10-23-bestaetigung-vorlagen-koch-runde3.pdf; Mail 25.10.2026) – ohne arbeitsmedizinische Angaben";
 const KOCH = "Durchsicht T. Koch 23.10.2026 (docs/pruefberichte/2026-10-23-vorlagen-koch.xlsx)";
 const WEBER = "Durchsicht RA Dr. Weber 23.10.2026 (docs/pruefberichte/2026-10-23-vorlagen-weber.xlsx)";
 
@@ -90,6 +91,9 @@ export const VORLAGEN_GEPRUEFT: Readonly<Record<string, VorlagenFreigabe>> = {
   sv_meldedaten: { stand: "2026-10-23", bezug: BUSCH2, pruefsumme: "71ff4c2ff8209e9d1a6b23654ec65cd96df10370d78a54bad6f7e9660b040ba0" },
   // RA Dr. Weber 25.10.2026 (Mail Runde 5): nur GmbH, OHG und KG; Fassung mit § 106 Abs. 2 Nr. 3 HGB
   handelsregister: { stand: "2026-10-25", bezug: "Bestätigung RA Dr. Weber per Mail 25.10.2026 (docs/pruefberichte/2026-10-25-runde5-weber-mail.txt)", pruefsumme: "e2cd7a14a6c1574814a6725b12104ff0234d3e4d02a52025ec83e3d8f9917338", rechtsformen: ["GmbH", "OHG", "KG"] },
+  betriebsanweisung: { stand: "2026-10-23", bezug: KOCH2, pruefsumme: "f477c1d03df509acca567e7f562eace7d3a71b4da991d3c75d0b79e439c3eeec" },
+  expositionsverzeichnis: { stand: "2026-10-23", bezug: KOCH2, pruefsumme: "32867a852a9971b1cde4b4ce6582ec39db483c5f62027d23f7b76666ff629aba" },
+  hautschutzplan: { stand: "2026-10-23", bezug: KOCH2, pruefsumme: "ea45c72ec6fc7ca7918dfcfa40765d0ce1795626d25896389f1136245a943316" },
   hygieneschulung: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "1f3bb870b0decd354c4cee8a7ab39bc1465e926e11549c8028c222418549f50e" },
 };
 

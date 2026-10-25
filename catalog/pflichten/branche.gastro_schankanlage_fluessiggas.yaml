@@ -72,6 +72,8 @@ fachlich_zu_pruefen:
 - 'Sifa Runde 2 (23.10.2026) umgesetzt: Fristen über die Gefährdungsbeurteilung (§ 3 Abs. 6 BetrSichV, Wortlaut gesetze-im-internet.de 23.10.2026) mit DGUV Regel 110-007 und DGUV Vorschrift 79 als Anhaltspunkt (im Text, Frist bleibt „dauerhaft“ – es gibt kein Ereignis zur Inbetriebnahme der Anlage); Kurztext „befähigte Person (bei Flüssiggas Sachkundiger nach DGUV Vorschrift 79)“; Hinweis CO2-Warneinrichtung. „oder“ im Kurztext bleibt (Sifa: Pflicht gilt schon für eine der beiden Anlagen). Rückfrage an die Sifa: Die Publikationsseite der DGUV (abgerufen 23.10.2026) meldet, dass die DGUV die Zurückziehung der DGUV Vorschrift 79 empfohlen hat und die DGUV Regel 110-010 „Flüssiggas“ erschienen ist; Geltung beim Unfallversicherungsträger erfragen – im Text als Hinweis, bitte bestätigen oder Verweis auf DGUV Regel 110-010 umstellen'
 - 'Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis über die Branche (Amtlos fragt Schankanlage und Flüssiggas nicht ab); Prüffristen (Schankanlage, DGUV V79 Flüssiggas) und Fundstellen nicht abgerufen; Gefährdungsbausteine CO2 und Gas sind Sache der Vorlage'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - Thomas Koch (Fachkraft für Arbeitssicherheit)
+  geprueft_am: '2026-10-25'
+  geprueft_version: 4

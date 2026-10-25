@@ -33,7 +33,9 @@ texte = [("Datenschutzhinweis der App (Build ohne Sync)", "2026-10-23", "892aa88
          ("Nutzungsbedingungen, Fassung 23.10.2026 – inhaltlich; Inkraftsetzung erst nach Eintragung", "2026-10-24", "813eaae2978f"),
          ("Baustein B-276 (Betriebsanweisung Biostoffe), Abgleich mit AWMF 055-004", "2026-10-25", "fb9435f46ccf"),
          ("Baustein B-283 (Betriebsanweisung Biostoffe), nur rechtliche Seite", "2026-10-24", "eedd5b3ffeca"),
-         ("Zeile Grenzwerte im Prüfprotokoll elektrische Geräte, Quellenabgleich DIN EN 50678/50699", "2026-10-24", "88409edcac2d")]
+         ("Zeile Grenzwerte im Prüfprotokoll elektrische Geräte, Quellenabgleich DIN EN 50678/50699", "2026-10-24", "88409edcac2d"),
+         ("Baustein B-022 (Gefährdungsbeurteilung), Abgleich mit AWMF 055-004", "2026-10-25", "4ebe1832df64"),
+         ("Baustein B-105 (Gefährdungsbeurteilung), Abgleich mit AWMF 055-004 und § 11 Abs. 5 BioStoffV", "2026-10-25", "c716e2dc257b")]
 ka = "".join(f"<tr><td>{html.escape(str(a))}</td><td>{b}</td><td>v{c}</td><td>{html.escape(e)}</td><td>{dd}</td></tr>" for a, b, c, e, dd in rows)
 vo = "".join(f"<tr><td>{html.escape(a)}</td><td>{b}</td><td><code>{c}</code></td><td>{html.escape(e)}</td></tr>" for a, b, c, e in vorl)
 te = "".join(f"<tr><td>{html.escape(a)}</td><td>{b}</td><td><code>{c}</code></td></tr>" for a, b, c in texte)
