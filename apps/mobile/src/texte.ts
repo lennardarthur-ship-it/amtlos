@@ -255,7 +255,7 @@ export const T = {
   check_hinweis: `Wichtig: ${MARKE.name} zeigt allgemeine Informationen zu typischen Pflichten und Vorlagen – keine Rechts- oder Steuerberatung. Pflichten und Vorlagen sind noch nicht von Fachleuten geprüft. Prüfe Ergebnisse, bevor du dich darauf verlässt.`,
   // E-171: sobald Einträge fachlich geprüft sind (je nach Anteil)
   check_hinweis_teil: `Wichtig: ${MARKE.name} zeigt allgemeine Informationen zu typischen Pflichten und Vorlagen – keine Rechts- oder Steuerberatung. Ein Teil der Pflichten ist fachlich geprüft – das steht dann bei der Pflicht. Prüfe Ergebnisse, bevor du dich darauf verlässt.`,
-  check_hinweis_alle: `Wichtig: ${MARKE.name} zeigt allgemeine Informationen zu typischen Pflichten und Vorlagen – keine Rechts- oder Steuerberatung. Die Pflichten sind fachlich geprüft, nicht aber dein Einzelfall. Prüfe Ergebnisse, bevor du dich darauf verlässt.`,
+  check_hinweis_alle: `Wichtig: ${MARKE.name} zeigt allgemeine Informationen zu typischen Pflichten und Vorlagen – keine Rechts- oder Steuerberatung. Pflichten und Vorlagen sind fachlich geprüft, nicht aber dein Einzelfall. Prüfe Ergebnisse, bevor du dich darauf verlässt.`,
   // Phase 1 (RDG): ruhige Hinweise unter Pflichten, Vorlagen und „Rechtliches“ – zusammen mit dem Rechtsstand (src/rechtshinweis.ts)
   hinweis_pflichten: `Allgemeine Informationen zu typischen Pflichten für Betriebe wie deinen – keine Rechts- oder Steuerberatung. Aus dem ${MARKE.name}-Katalog, fachlich noch nicht geprüft.`,
   hinweis_pflichten_teil: `Allgemeine Informationen zu typischen Pflichten für Betriebe wie deinen – keine Rechts- oder Steuerberatung. Aus dem ${MARKE.name}-Katalog, teilweise fachlich geprüft (steht bei der Pflicht).`,
@@ -277,13 +277,13 @@ export const T = {
   pflichten_titel: "Deine Pflichten",
   pflichten_karte_titel: "Welche Pflichten kommen für dich in Frage?",
   pflichten_karte_text: "Ein paar Fragen, etwa drei Minuten.",
-  pflichten_einladung: `Ein paar Fragen zu deinem Betrieb, etwa drei Minuten. Danach zeigt ${MARKE.name}, welche Pflichten nach deinen Angaben in Frage kommen, was jetzt dran ist und wann die nächsten Termine sind.`,
+  pflichten_einladung: `Ein paar Fragen zu deinem Betrieb, etwa drei Minuten. Danach zeigt ${MARKE.name}, welche Pflichten nach deinen Angaben in Frage kommen, was jetzt dran ist – und mit welcher Unterlage du sie gleich erledigst.`,
   pflichten_tab_unter: "Was in Frage kommt, was jetzt dran ist.",
   start_so_hilft: `So hilft dir ${MARKE.name}`,
   start_punkte: [
-    { symbol: "checklist", titel: "Pflichten kennen", text: "Ein Check mit ein paar Fragen zeigt, welche Pflichten nach deinen Angaben in Frage kommen – mit Terminen, die du in der App siehst (Erinnerung per Mitteilung mit Pro)." },
-    { symbol: "doc.text", titel: "Unterlagen erstellen", text: "Über 30 Vorlagen, Schritt für Schritt ausgefüllt – vom Hygieneplan bis zur Datenschutzerklärung. Jeden Monat 1 Vorlage als PDF kostenlos, alle mit Pro." },
-    { symbol: "eurosign.circle", titel: "Rechnungen schreiben", text: "Fortlaufend nummeriert und nach dem Teilen unveränderbar. Als E-Rechnung (Pro) – und die Umsätze für deine Umsatzsteuer-Voranmeldung übernimmst du mit einem Tipp (Pro)." },
+    { symbol: "checklist", titel: "Wissen, was zu tun ist", text: "Ein Check mit ein paar Fragen zeigt, welche Pflichten nach deinen Angaben in Frage kommen – mit Terminen, die du in der App siehst (Erinnerung per Mitteilung mit Pro)." },
+    { symbol: "doc.text", titel: "Gleich erledigen", text: "Die passende Unterlage zur Pflicht: 43 Vorlagen, Schritt für Schritt ausgefüllt – vom Hygieneplan bis zur Datenschutzerklärung. Jeden Monat 1 Vorlage als PDF kostenlos, alle mit Pro." },
+    { symbol: "eurosign.circle", titel: "Der Alltag gleich mit", text: "Rechnungen kostenlos, fortlaufend nummeriert und nach dem Teilen unveränderbar. Als E-Rechnung (Pro) – und die Umsätze für deine Umsatzsteuer-Voranmeldung übernimmst du mit einem Tipp (Pro)." },
     { symbol: "lock.shield", titel: "Alles bleibt bei dir", text: "Verschlüsselt auf deinem iPhone – ein Konto brauchst du nicht." },
   ],
   start_rechnung: "Rechnung schreiben",

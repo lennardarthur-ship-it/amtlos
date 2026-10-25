@@ -48,7 +48,7 @@ describe("Store-Konfiguration (App-Review B3/R7)", () => {
 
 describe("Versprechen in der App (App-Review R6) und Kontakt (B1)", () => {
   it("Onboarding verspricht keine Abgabe der Voranmeldung und kennzeichnet Pro", () => {
-    const r = TEXT.start_punkte.find((p) => p.titel === "Rechnungen schreiben")!;
+    const r = TEXT.start_punkte.find((p) => p.symbol === "eurosign.circle")!;
     expect(r.text).not.toMatch(/Voranmeldung gleich mit/);
     expect(r.text).toMatch(/E-Rechnung \(Pro\)/);
     expect(r.text).toMatch(/Voranmeldung[^.]*\(Pro\)/);

@@ -99,7 +99,7 @@ const jsonLd = {
   operatingSystem: "iOS",
   applicationCategory: "BusinessApplication",
   inLanguage: "de",
-  description: "Pflichten-Check, Rechnungen mit E-Rechnung und über 30 Vorlagen für Selbstständige und kleine Betriebe in Deutschland. Daten verschlüsselt auf dem iPhone, ohne Konto.",
+  description: "Wissen, welche Pflichten dein Betrieb hat – und sie mit der passenden Unterlage gleich erledigen. Pflichten-Check, 43 Vorlagen, Rechnungen und Kasse für kleine Betriebe in Deutschland. Daten verschlüsselt auf dem iPhone, ohne Konto.",
   ...(url ? { url: `${url}/`, image: `${url}/bilder/og.jpg` } : {}),
   ...(appStoreId ? { downloadUrl: appStoreUrl, offers: { "@type": "Offer", price: "0", priceCurrency: "EUR", url: appStoreUrl } } : {}),
 };
