@@ -1,0 +1,28 @@
+Betreff: AW: Betriebsklar – letzte Punkte mit Beispielen für OHG, KG und Kosmetik
+
+Sehr geehrter Herr Lang,
+
+vielen Dank für die Beispiele. Ich habe alle fünf Positionen geprüft und kann alle bestätigen. Anbei die beiden Dateien ausgefüllt, ein unterschriebenes Bestätigungsblatt und der Entwurf der Vereinbarung zu Pflege und Widerruf.
+
+Teil A (Katalog):
+- Geschäftsbriefe (v2): bestätigt. § 7 Abs. 3 PartGG ist richtig; meine Angabe „Abs. 5“ war die Zählung vor dem MoPeG – danke für die Korrektur. Ihre Entscheidung zur eGbR trage ich mit, § 707b BGB verweist nicht auf § 37a oder § 125 HGB.
+- Gesellschaftsvertrag OHG/KG (v2): bestätigt. Eine redaktionelle Empfehlung: Der Satz „Ohne Vertrag gelten die gesetzlichen Regeln“ ist ungenau, weil OHG und KG immer auf einem – notfalls mündlichen – Vertrag beruhen. Besser: „Was ihr im Vertrag nicht regelt, bestimmt das Gesetz (§§ 105 ff., 161 ff. HGB).“ Ersetzen Sie den Satz an beiden Stellen wörtlich so, gilt meine Bestätigung auch für v3; eine erneute Vorlage ist nicht nötig.
+
+Teil B (Vorlagen):
+- Handelsregister: bestätigt für GmbH, OHG und KG. Eine Korrektur meinerseits: Die Vertretungsbefugnis steht in § 106 Abs. 2 Nr. 3 HGB, nicht in Nr. 4, wie ich zuletzt geschrieben hatte – bitte diese Angabe nirgends übernehmen. Nr. 4 betrifft die Versicherung, dass die Gesellschaft nicht bereits im Gesellschafts- oder Partnerschaftsregister eingetragen ist; ein Hinweis darauf in der Vorlage wäre sinnvoll, ist aber keine Bedingung. Beispiele für e. K., UG und GmbH & Co. KG lagen nicht vor; die Bestätigung ist darauf beschränkt. Für die GmbH & Co. KG nehme ich gern noch ein Beispiel entgegen (Komplementär-GmbH mit Registerangaben statt Geburtsdatum und Wohnort).
+- Hygieneplan beauty: bestätigt. Alle vier Änderungen sind umgesetzt, die Bayern- und die NRW-Fassung unterscheiden sich wie vorgesehen. Länderzusätze enthält der Plan nur für Bayern; die Verordnungen der übrigen Länder habe ich nicht im Einzelnen abgeglichen, das steht so auf dem Blatt. Drei Empfehlungen ohne Bedingung stehen in der Datei, darunter „nur mit ihrem Einverständnis an den Durchgangsarzt weitergeben“.
+- B-276: bestätigt; der PEP-Satz ist wörtlich übernommen und deckt sich mit dem Hygieneplan.
+
+Das Bestätigungsblatt habe ich selbst gefasst; es ersetzt Ihr Blatt, weil es die Beschränkungen beim Handelsregister und beim Hygieneplan sowie die Vorabfreigabe für B.14 v3 enthält.
+
+Zur Vereinbarung über Pflege und Widerruf: Den Entwurf erhalten Sie anbei. Die wichtigsten Punkte: Die Nennung ist nur in der App und nur im festgelegten Wortlaut erlaubt, außerhalb der App (App Store, Website, Werbung) nur mit meiner Zustimmung im Einzelfall. Ändert sich ein Eintrag oder eine Vorlage, entfällt die Nennung dort automatisch bis zur erneuten Bestätigung; dasselbe gilt nach zwölf Monaten. Die Pflege der Inhalte liegt bei Ihnen. Ich kann die Nennung jederzeit widerrufen; Sie entfernen sie dann binnen fünf Werktagen bzw. mit dem nächsten Update, spätestens nach 30 Tagen. Die Vergütung bleibt beim Zeithonorar und hängt nicht vom Erfolg der App ab. Bitte teilen Sie mir mit, ob die App Texte serverseitig steuern kann (§ 5 Abs. 2), und gleichen Sie Anlage 1 mit den unterschriebenen Blättern ab. Bis zur Unterzeichnung bleibt es bei der Anzeige ohne Namen.
+
+Mit freundlichen Grüßen
+Dr. Ulrich Weber
+Weber & Merz Rechtsanwälte
+
+Anlagen:
+Betriebsklar-Abgleich-Dr-Weber-Runde4-ausgefuellt.xlsx
+Betriebsklar-Freigabe-Vorlagen-Dr-Weber-Runde4-ausgefuellt.xlsx
+Betriebsklar-Bestaetigung-Runde4-Dr-Weber.pdf (unterschrieben)
+Vereinbarung zu Pflege und Widerruf – Betriebsklar (Entwurf)

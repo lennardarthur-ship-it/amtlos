@@ -2058,3 +2058,17 @@
       version: 2
       quelle: 2026-10-25-runde4-katalog-busch.xlsx
       stand: '2026-10-25'
+- pruefer: RA Dr. Ulrich Weber
+  umfang: alles
+  unterschrieben: true
+  felder_fehlen: []
+  hinweis: Runde 4 (25.10.2026), Bestätigungsblatt unterschrieben; B.14 v3 vorab freigegeben (nur Satz „Was ihr im Vertrag nicht regelt …“ ersetzt)
+  eintraege:
+    gesellschaft.geschaeftsbriefe_pflichtangaben:
+      version: 2
+      quelle: 2026-10-25-runde4-katalog-weber.xlsx
+      stand: '2026-10-25'
+    gesellschaft.gesellschaftsvertrag_ohg_kg:
+      version: 3
+      quelle: 2026-10-25-runde4-katalog-weber.xlsx
+      stand: '2026-10-25'

@@ -1,7 +1,7 @@
 /** Dokumentvorlagen (E-121): Verzeichnis und Hilfen für Formulare. */
 import { betriebsanweisung, elektroPruefung, expositionsverzeichnis, gefaehrdungsbeurteilung, gefahrstoffverzeichnis, unterweisung } from "./arbeitsschutz.js";
 import { betriebsanweisungBiostoffe, betriebsanweisungMaschine } from "./betriebsanweisungen.js";
-import { gewerbeanmeldung, handelsregister, transparenzregister } from "./betrieb.js";
+import { formImNamen, gewerbeanmeldung, handelsregister, rechtsformAus, transparenzregister } from "./betrieb.js";
 import { aufbewahrung, bilanzGuv, euer, kassenbuch, kassenmeldung, rechnung, steuererklaerung, ustVoranmeldung } from "./buchhaltung.js";
 import { arbeitszeitnachweis, lohnkonto, svMeldedaten } from "./lohn.js";
 import { auftragsverarbeitung, datenschutzerklaerungWebsite, impressum } from "./website.js";
@@ -448,12 +448,20 @@ export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, 
  * nur für eine Fassung – die Unterlage diese Fassung hat. Bei mehreren Freigaben (`weitere`) die erste, deren Fassung
  * zu den Daten passt und deren Prüfsumme stimmt. Sonst `undefined`.
  */
-export function vorlageGeprueft(v: Vorlage, d?: Daten, liste: Readonly<Record<string, VorlagenFreigabe>> = VORLAGEN_GEPRUEFT): Omit<VorlagenFreigabe, "weitere"> | undefined {
-  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && fassungPasst(f, d) && vorlagenPruefsumme(v, f) === f.pruefsumme);
+export function vorlageGeprueft(v: Vorlage, d?: Daten, liste: Readonly<Record<string, VorlagenFreigabe>> = VORLAGEN_GEPRUEFT, betrieb?: Betrieb): Omit<VorlagenFreigabe, "weitere"> | undefined {
+  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && fassungPasst(f, d) && rechtsformPasst(f, d, betrieb) && vorlagenPruefsumme(v, f) === f.pruefsumme);
+}
+
+/** Freigabe auf Rechtsformen beschränkt (RA Dr. Weber 25.10.2026, Handelsregister nur GmbH, OHG, KG)? */
+function rechtsformPasst(f: Pick<VorlagenFreigabe, "rechtsformen">, d?: Daten, betrieb?: Betrieb): boolean {
+  if (!f.rechtsformen?.length) return true;
+  const roh = (typeof d?.rechtsform === "string" && d.rechtsform) || betrieb?.rechtsform || (betrieb?.name ? formImNamen(betrieb.name) ?? "" : "");
+  const rf = rechtsformAus(roh, [...f.rechtsformen]);
+  return Boolean(rf) && f.rechtsformen.includes(rf);
 }
 
 /** Hinweis in der App unter einer Vorlage: „Vorlagen fachlich durchgesehen (Stand …)“ oder der allgemeine Prüfhinweis. */
-export function pruefHinweisFuer(v: Vorlage, d?: Daten): string {
-  const f = vorlageGeprueft(v, d);
+export function pruefHinweisFuer(v: Vorlage, d?: Daten, betrieb?: Betrieb): string {
+  const f = vorlageGeprueft(v, d, VORLAGEN_GEPRUEFT, betrieb);
   return f ? geprueftVermerk(f.stand) : PRUEFHINWEIS;
 }

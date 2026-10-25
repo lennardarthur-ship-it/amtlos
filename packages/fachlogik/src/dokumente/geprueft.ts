@@ -31,6 +31,12 @@ export interface VorlagenFreigabe {
   fassung?: { feld: string; wert: string };
   /** Nur Vorschläge dieser Gruppen gehören zur Freigabe (und zur Prüfsumme) – die übrigen hat der Prüfer nicht gesehen */
   gruppen?: string[];
+  /**
+   * Freigabe nur für diese Rechtsformen (Schreibweise wie in der Vorlage, z. B. „GmbH“, „OHG“, „KG“): Der Prüfer hat nur
+   * Beispiele dieser Rechtsformen gesehen. Rechtsform aus dem Feld „rechtsform“ der Unterlage, sonst aus „Mein Betrieb“;
+   * ohne erkennbare Rechtsform (Info-Seite) kein Vermerk. Gehört nicht zur Prüfsumme.
+   */
+  rechtsformen?: readonly string[];
   /** Freigaben weiterer Fassungen derselben Vorlage (je eigene Fassung, Gruppen und Prüfsumme) */
   weitere?: readonly Omit<VorlagenFreigabe, "weitere">[];
 }
@@ -44,7 +50,9 @@ const WEBER = "Durchsicht RA Dr. Weber 23.10.2026 (docs/pruefberichte/2026-10-23
 /** Zentrale Liste der fachlich durchgesehenen Vorlagen. */
 export const VORLAGEN_GEPRUEFT: Readonly<Record<string, VorlagenFreigabe>> = {
   haccp: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "bf971591cc3e7ab66b744bc12d6b6bfa75793eddb63eaea4b5b2bda5b423db0f" },
-  hygieneplan: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "941cde2f8ec04fc0ad7eb4ddcb08dc047d36416cadefbff5788f667da7133dd8", fassung: { feld: "art", wert: "lebensmittel" }, gruppen: ["Gastronomie / Café", "Bäckerei", "Foodtruck / mobiler Verkauf"] },
+  hygieneplan: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "941cde2f8ec04fc0ad7eb4ddcb08dc047d36416cadefbff5788f667da7133dd8", fassung: { feld: "art", wert: "lebensmittel" }, gruppen: ["Gastronomie / Café", "Bäckerei", "Foodtruck / mobiler Verkauf"],
+    // RA Dr. Weber Runde 4 (25.10.2026): Fassung Friseur/Kosmetik, Abgleich mit Rechtsgrundlagen und AWMF 055-004 (keine medizinische Begutachtung)
+    weitere: [{ stand: "2026-10-25", bezug: "Durchsicht RA Dr. Weber Runde 4 (docs/pruefberichte/2026-10-25-runde4-vorlagen-weber.xlsx)", pruefsumme: "101632b4de7a47f0ce0919fd225eaa82f0e327ac47b79750e2e4274598893c83", fassung: { feld: "art", wert: "beauty" }, gruppen: ["Alle Beauty-Betriebe"] }] },
   allergene: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "8d6b015f6491872e3ca492ee2c1b9245890e84428cacecfe914beb90ea85144c" },
   ifsg_belehrung: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "2e35d889d03764df32a310aeacc999e2b6151e83afd38520da0c6c36d541ebec" },
   rechnung: { stand: "2026-10-23", bezug: BUSCH, pruefsumme: "8c2e773d415398dea57ab58922035136df2317e273cb2e82db72f0f86a6cda9e" },

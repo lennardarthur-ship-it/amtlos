@@ -167,7 +167,7 @@ export const HR_KAPITAL_EURO = "Stammkapital und Geschäftsanteile in vollen Eur
 const HR_FORMEN = ["GmbH", "UG (haftungsbeschränkt)", "e. K.", "OHG", "KG", "GmbH & Co. KG"].map((r) => ({ wert: r, text: r }));
 /**
  * Nachprüfung RA Dr. Weber (23.10.2026): für OHG und KG Rechtsform-abhängige Abschnitte – Kommanditisten mit Hafteinlage
- * (§ 162 Abs. 1 HGB), Vertretungsregelung der Gesellschafter (§ 106 Abs. 2 Nr. 4 HGB) und der Hinweis, dass alle
+ * (§ 162 Abs. 1 HGB), Vertretungsregelung der Gesellschafter (§ 106 Abs. 2 Nr. 3 HGB) und der Hinweis, dass alle
  * Gesellschafter anmelden (§ 106 Abs. 7 HGB).
  */
 const HR_PERSONENGESELLSCHAFT = ["OHG", "KG", "GmbH & Co. KG"];
@@ -221,7 +221,7 @@ export const handelsregister: Vorlage = {
         },
       ],
     },
-    { titel: "Geschäftsführung bzw. Inhaber/in", felder: [{ id: "fuehrung", art: "liste", label: "Geschäftsführung", eintrag: "Person", titelFeld: "name", pflicht: true, felder: PERSON }, { id: "vertretung", art: "mehrzeilig", label: "Vertretungsregelung", hilfe: "z. B. vertritt allein; bei mehreren: gemeinsam oder einzeln. Bei OHG und KG: wie die Gesellschafter die Gesellschaft vertreten (§ 106 Abs. 2 Nr. 4 HGB)" }] },
+    { titel: "Geschäftsführung bzw. Inhaber/in", felder: [{ id: "fuehrung", art: "liste", label: "Geschäftsführung", eintrag: "Person", titelFeld: "name", pflicht: true, felder: PERSON }, { id: "vertretung", art: "mehrzeilig", label: "Vertretungsregelung", hilfe: "z. B. vertritt allein; bei mehreren: gemeinsam oder einzeln. Bei OHG und KG: wie die Gesellschafter die Gesellschaft vertreten (§ 106 Abs. 2 Nr. 3 HGB)" }] },
   ],
   // R12 (Recht #16): Stammkapital der GmbH mindestens 25.000 €, in vollen Euro (§ 5 Abs. 1, 2 GmbHG); UG ab 1 € (§ 5a Abs. 1 GmbHG)
   // OHG und KG: vertreten durch die Gesellschafter – eine eigene Geschäftsführung ist keine Pflichtangabe
@@ -283,7 +283,7 @@ export const handelsregister: Vorlage = {
         // OHG und KG: Geschäftsführung nur, wenn eingetragen (die Gesellschafter vertreten)
         (personengesellschaft && !gf.length ? "" : abschnitt(kapitalgesellschaft ? "Geschäftsführung" : "Geschäftsführung bzw. Inhaber/in", person(gf, false, 2))) +
         // GmbH/UG und OHG/KG: Vertretungsregelung gehört dazu – leer als Linien zum Ausfüllen
-        (text(d, "vertretung") || kapitalgesellschaft || personengesellschaft ? abschnitt(personengesellschaft ? "Vertretungsregelung der Gesellschafter" : "Vertretungsregelung", absatz(text(d, "vertretung")), personengesellschaft ? { rand: "§ 106 Abs. 2 Nr. 4 HGB" } : "") : "") +
+        (text(d, "vertretung") || kapitalgesellschaft || personengesellschaft ? abschnitt(personengesellschaft ? "Vertretungsregelung der Gesellschafter" : "Vertretungsregelung", absatz(text(d, "vertretung")), personengesellschaft ? { rand: "§ 106 Abs. 2 Nr. 3 HGB" } : "") : "") +
         uebertragung(["Notartermin am", "Notar/in", "Eingetragen am, Registernummer"]),
     });
   },

@@ -1,17 +1,18 @@
+# RA Dr. Weber Runde 4 (25.10.2026): Satz „Was ihr im Vertrag nicht regelt …“ an beiden Stellen wörtlich – Freigabe gilt laut Bestätigungsblatt auch für v3
 # RA Dr. Weber Runde 3 (24.10.2026): Einschränkung „kein Notar“ (Grundstück, GmbH-Anteil) in seinem Wortlaut; „Kein Bußgeld“ bestätigt
 # Neu nach RA Dr. Weber, Nachprüfung 23.10.2026 (zu B.15, Frage 2): kurzer Hinweis zum Gesellschaftsvertrag der OHG/KG – Text nach seinem Wortlaut
 # („formfrei (kein Notar), sollte aber schriftlich geschlossen werden; ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161 ff. HGB)“);
 # als eigener Hinweis im Gründungsablauf wie gesellschaft.gesellschaftsvertrag_notar für UG/GmbH – gesellschaft.handelsregister_anmeldung (v6, freigegeben) bleibt unverändert
 schema_version: 1
 id: gesellschaft.gesellschaftsvertrag_ohg_kg
-version: 2
+version: 3
 katalog_nr: B.14
 titel:
   de: Gesellschaftsvertrag der OHG oder KG schließen
 kurz:
   de: Den Gesellschaftsvertrag einer OHG oder KG schließt ihr in der Regel ohne Notar – am besten schriftlich.
 erklaerung:
-  de: Der Gesellschaftsvertrag der OHG und der KG ist grundsätzlich formfrei – ein Notar ist nur nötig, wenn zum Beispiel ein Grundstück oder ein GmbH-Anteil eingebracht wird (§ 311b Abs. 1 BGB, § 15 Abs. 3, 4 GmbHG). Er sollte aber schriftlich geschlossen werden. Ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161 ff. HGB).
+  de: Der Gesellschaftsvertrag der OHG und der KG ist grundsätzlich formfrei – ein Notar ist nur nötig, wenn zum Beispiel ein Grundstück oder ein GmbH-Anteil eingebracht wird (§ 311b Abs. 1 BGB, § 15 Abs. 3, 4 GmbHG). Er sollte aber schriftlich geschlossen werden. Was ihr im Vertrag nicht regelt, bestimmt das Gesetz (§§ 105 ff., 161 ff. HGB).
 rechtsgrundlage:
 - §§ 105 ff. HGB
 - §§ 161 ff. HGB
@@ -42,7 +43,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Kein Bußgeld. Ohne Vertrag gelten die gesetzlichen Regeln (§§ 105 ff., 161 ff. HGB).
+    de: Kein Bußgeld. Was ihr im Vertrag nicht regelt, bestimmt das Gesetz (§§ 105 ff., 161 ff. HGB).
   schwere: niedrig
 automatisierung: hinweis
 aktion:
@@ -57,6 +58,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'Neu nach RA Dr. Weber (Nachprüfung 23.10.2026, B.15 Frage 2) – Text nach seinem Wortlaut; „Kein Bußgeld“ und Schwere „niedrig“ von uns ergänzt, bitte bestätigen. Nur OHG und KG (nicht GmbH & Co. KG – dort zusätzlich der GmbH-Vertrag beim Notar), nur vor der Eintragung.'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-25'
+  geprueft_version: 3

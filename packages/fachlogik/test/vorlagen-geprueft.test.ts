@@ -55,7 +55,8 @@ describe("Vorlagen fachlich durchgesehen (Nachkontrolle T. Baum 23.10.2026)", ()
   it("Hygieneplan: nur in der Fassung für Lebensmittelbetriebe; ohne Unterlage (Info-Seite) der bisherige Hinweis", () => {
     const h = vorlageFuer("hygieneplan")!;
     expect(pruefHinweisFuer(h, { art: "lebensmittel" })).toBe(VERMERK);
-    expect(pruefHinweisFuer(h, { art: "beauty" })).toBe(PRUEFHINWEIS);
+    // Beauty-Fassung seit RA Dr. Weber Runde 4 (25.10.2026) eigene Freigabe
+    expect(pruefHinweisFuer(h, { art: "beauty" })).toBe(geprueftVermerk("2026-10-25"));
     expect(pruefHinweisFuer(h, {})).toBe(PRUEFHINWEIS);
     expect(pruefHinweisFuer(h)).toBe(PRUEFHINWEIS);
     // die übrigen gelten auch ohne Unterlage
@@ -117,11 +118,11 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
   const beautyFreigabe = { stand: "2026-11-02", bezug: "Test", pruefsumme: vorlagenPruefsumme(h, BEAUTY), ...BEAUTY };
   const mitBeauty: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, hygieneplan: { ...lm, weitere: [beautyFreigabe] } };
 
-  it("die bisherige Lebensmittel-Freigabe bleibt die einzige des Hygieneplans; noch keine Beauty-Freigabe", () => {
-    expect(freigabenFuer("hygieneplan")).toEqual([lm]);
-    expect(lm.weitere).toBeUndefined();
+  it("Hygieneplan: Lebensmittel-Freigabe plus Beauty-Freigabe (RA Dr. Weber 25.10.2026), sonst keine weiteren", () => {
+    expect(freigabenFuer("hygieneplan").length).toBe(2);
+    expect(lm.weitere?.map((f) => [f.fassung?.wert, f.stand])).toEqual([["beauty", "2026-10-25"]]);
     expect(freigabenFuer("bilanz_guv")).toEqual([]);
-    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
+    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan") expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
   });
 
   it("je Fassung eine eigene Prüfsumme: Beauty unterscheidet sich von der freigegebenen Lebensmittel-Fassung", () => {
@@ -136,8 +137,8 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
     expect(vorlageGeprueft(h, { art: "beauty" }, mitBeauty)).toBe(beautyFreigabe);
     expect(vorlageGeprueft(h, {}, mitBeauty)).toBeUndefined();
     expect(vorlageGeprueft(h, undefined, mitBeauty)).toBeUndefined();
-    // ohne die zusätzliche Freigabe (geprueft.ts): Beauty weiter ohne Vermerk
-    expect(vorlageGeprueft(h, { art: "beauty" })).toBeUndefined();
+    // geprueft.ts: Beauty-Freigabe RA Dr. Weber (nur Beauty-Vorschläge)
+    expect(vorlageGeprueft(h, { art: "beauty" })?.stand).toBe("2026-10-25");
     expect(vorlageGeprueft(h, { art: "lebensmittel" })).toBe(lm);
   });
 
@@ -153,7 +154,7 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
 
   it("Vermerk in der App: Stand der passenden Freigabe", () => {
     expect(pruefHinweisFuer(h, { art: "lebensmittel" })).toBe(VERMERK);
-    expect(pruefHinweisFuer(h, { art: "beauty" })).toBe(PRUEFHINWEIS);
+    expect(pruefHinweisFuer(h, { art: "beauty" })).toBe(geprueftVermerk("2026-10-25"));
     const f = vorlageGeprueft(h, { art: "beauty" }, mitBeauty)!;
     expect(geprueftVermerk(f.stand)).toBe("Vorlagen fachlich durchgesehen (Stand 02.11.2026)");
   });

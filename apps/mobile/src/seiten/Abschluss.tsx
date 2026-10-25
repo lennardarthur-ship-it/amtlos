@@ -330,7 +330,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         {mitVorlagenHinweis(v) ? <RechtsHinweis art="vorlage" oben={4} /> : null}
         {/* Nachkontrolle T. Baum (23.10.2026): „Vorlagen fachlich durchgesehen (Stand …)“, solange die Vorlage dem
             freigegebenen Stand entspricht (Prüfsumme) – beim Hygieneplan nur in der Fassung für Lebensmittelbetriebe */}
-        <T v="caption" leise stil={{ marginTop: 4 }}>{pruefHinweisFuer(v, d)}</T>
+        <T v="caption" leise stil={{ marginTop: 4 }}>{pruefHinweisFuer(v, d, z.stand.betrieb)}</T>
 
         <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11 }}>{TEXT.mehr}</T>
         {eFehlt.length ? <ERechnungFehlt v={v} fehlt={eFehlt} springen={springen} gesperrt={fest} /> : null}

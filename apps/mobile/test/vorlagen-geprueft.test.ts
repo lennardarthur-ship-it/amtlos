@@ -15,7 +15,7 @@ const VERMERK = "Vorlagen fachlich durchgesehen (Stand 23.10.2026)";
 
 describe("Vermerk je Vorlage in der App", () => {
   it("Abschluss (mit Daten der Unterlage) und Info-Seite nutzen pruefHinweisFuer statt des festen Hinweises", () => {
-    expect(quelle("src/seiten/Abschluss.tsx")).toContain("{pruefHinweisFuer(v, d)}");
+    expect(quelle("src/seiten/Abschluss.tsx")).toContain("{pruefHinweisFuer(v, d, z.stand.betrieb)}");
     expect(quelle("src/seiten/InfoSeite.tsx")).toContain("{pruefHinweisFuer(v)}");
     for (const d of ["src/seiten/Abschluss.tsx", "src/seiten/InfoSeite.tsx"]) expect(quelle(d), d).not.toMatch(/\{PRUEFHINWEIS\}/);
   });
@@ -23,7 +23,7 @@ describe("Vermerk je Vorlage in der App", () => {
   it("die fünf freigegebenen Vorlagen mit Vermerk, der Hygieneplan nur als Lebensmittelbetrieb", () => {
     for (const id of ["haccp", "allergene", "ifsg_belehrung", "hygieneschulung"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(VERMERK);
     expect(pruefHinweisFuer(vorlageFuer("hygieneplan")!, { art: "lebensmittel" })).toBe(VERMERK);
-    expect(pruefHinweisFuer(vorlageFuer("hygieneplan")!, { art: "beauty" })).toBe(PRUEFHINWEIS);
+    expect(pruefHinweisFuer(vorlageFuer("hygieneplan")!, { art: "beauty" })).toBe("Vorlagen fachlich durchgesehen (Stand 25.10.2026)");
     for (const id of ["rechnung", "unterweisung", "impressum"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(VERMERK);
     // Gefährdungsbeurteilung: Vermerk mit den Baustein-Korrekturen der Durchsicht vom 23.10.2026 entfallen
     for (const id of ["hautschutzplan", "handelsregister", "bilanz_guv", "gefaehrdungsbeurteilung"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(PRUEFHINWEIS);

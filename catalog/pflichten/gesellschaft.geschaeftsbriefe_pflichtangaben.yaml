@@ -119,6 +119,8 @@ fachlich_zu_pruefen:
 - 'v2 (RA Dr. Weber, 24.10.2026): Partnerschaftsgesellschaft ergänzt (Auslöser partg und partg_mbb ab Eintragung, Erklärung, Folgen, Rechtsgrundlage). Abweichung: § 7 Abs. 3 PartGG statt „§ 7 Abs. 5 PartGG“ – seit dem MoPeG (1.1.2024) steht die Verweisung auf § 125 Abs. 1 Satz 1 und Abs. 2 HGB in Abs. 3; „Name“ statt „Firma“ (die Partnerschaft führt einen Namen, § 2 Abs. 1 PartGG) und der Namenszusatz der PartG mbB nach dem Wortlaut von § 7 Abs. 3 PartGG. Folgen „entsprechend gegen die vertretungsberechtigten Partner“ über die Verweisung auf § 125 Abs. 2 HGB – bitte bestätigen. eGbR nicht aufgenommen: § 707b BGB verweist nicht auf § 125 oder § 37a HGB.'
 - 'Neu nach RA Dr. Weber (Nachprüfung 23.10.2026, B.15 Frage 1) – bitte ganz prüfen. Abweichungen von seiner Anmerkung: § 125 HGB statt § 125a HGB (aufgehoben seit 1.1.2024, MoPeG); Partnerschaftsgesellschaft und eGbR nicht aufgenommen; Schwere „niedrig“ (nur Zwangsgeld) von uns eingestuft. Gesellschaften erst ab Eintragung (Registerangaben), der e. K. per Rechtsform.'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-25'
+  geprueft_version: 2
