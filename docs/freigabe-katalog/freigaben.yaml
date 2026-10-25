@@ -2050,9 +2050,9 @@
       stand: '2026-10-23'
 - pruefer: StB Lutz Busch
   umfang: alles
-  unterschrieben: false
+  unterschrieben: true
   felder_fehlen: []
-  hinweis: Runde 4 per Mail 25.10.2026 freigegeben; Nachtragsblatt (mit Bilanz) folgt
+  hinweis: Runde 4 per Mail 25.10.2026 freigegeben; Nachtrag Jahresabschluss unterschrieben 25.10.2026
   eintraege:
     gesellschaft.jahresabschluss_personenhandel:
       version: 2
