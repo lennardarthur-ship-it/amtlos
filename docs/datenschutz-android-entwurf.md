@@ -54,7 +54,7 @@ wird auf Android nur in den Gerätewörtern und „Google statt Apple“ angepas
 3. **RevenueCat und Google-Kaufbelege**: Ändert sich am Auftragsverarbeitungsvertrag (DPA) und an den
    Standardvertragsklauseln etwas, wenn RevenueCat statt Apple-Belegen Kauf-Token von Google Play verarbeitet? (RevenueCat
    braucht dafür ein Dienstkonto in unserer Play Console.)
-4. **§ 25 TDDDG**: unverändert (Android-Schlüsselspeicher, SharedPreferences/AsyncStorage) – bitte bestätigen.
+4. **§ 25 TDDDG**: unverändert (Android-Schlüsselspeicher, SharedPreferences/AsyncStorage; seit E-194 liegt der Stand als verschlüsselte Dateien im App-Ordner) – bitte bestätigen.
 5. **Website**: Soll `datenschutz.html` beide Apps in einem Dokument beschreiben (so vorbereitet: Abschnitt „Die
    Android-App“ erscheint nach der Freigabe) oder je Store eine eigene Seite?
 6. **Nutzungsbedingungen**: siehe `docs/nutzungsbedingungen-android-entwurf.md` (T-178).

@@ -1,6 +1,6 @@
 /**
  * Verschlüsselte Ablage auf dem Gerät (E-129): Der gespeicherte Stand (Betrieb, Unterlagen, Mitarbeiter mit
- * SV-Nummer, Steuer-ID und IBAN, Kunden) liegt nur noch verschlüsselt in AsyncStorage – AES-256-GCM mit einem
+ * SV-Nummer, Steuer-ID und IBAN, Kunden) liegt nur verschlüsselt auf dem Gerät (seit E-194 in Teildateien) – AES-256-GCM mit einem
  * zufälligen Schlüssel, der im Schlüsselbund des iPhones liegt (expo-secure-store, nur dieses Gerät, nur entsperrt).
  * Reine Funktionen (Schlüssel und Nonce werden hineingereicht), damit sie ohne Gerät testbar sind.
  */

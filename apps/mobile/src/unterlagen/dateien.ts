@@ -33,7 +33,8 @@ export async function dateiAblegen(name: string, bytes: Uint8Array, schluessel: 
   const neu = datei(name, ".amtlos.neu");
   if (neu.exists) neu.delete();
   neu.create();
-  neu.write(tresorBytesSchliessen(bytes, schluessel, nonce(), kontext(name)));
+  // SDK 58: `write` ist asynchron – ohne `await` würde die Datei verschoben, bevor sie geschrieben ist (E-194)
+  await neu.write(tresorBytesSchliessen(bytes, schluessel, nonce(), kontext(name)));
   // überschreibt die bisherige Datei erst, wenn die neue vollständig geschrieben ist
   neu.moveSync(f, { overwrite: true });
 }
@@ -80,7 +81,7 @@ export async function dateiAnzeigen(name: string, schluessel: Uint8Array | null,
   const endung = name.split(".").pop() ?? "bin";
   const tmp = new File(Paths.cache, `ansicht-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.${endung}`);
   tmp.create({ overwrite: true });
-  tmp.write(bytes);
+  await tmp.write(bytes);
   return {
     uri: tmp.uri,
     entfernen: () => {

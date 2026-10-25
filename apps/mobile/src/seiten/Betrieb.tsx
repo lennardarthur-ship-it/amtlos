@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { standSpeicher } from "../unterlagen/standSpeicher";
 import { useEffect, useRef, useState } from "react";
 import { Image, Pressable, View } from "react-native";
 import { BUNDESLAENDER, HAUSFARBEN, PERSONEN_FELDER, VERSTEUERUNG, VORLAGEN, emailGueltig, ibanGueltig, plzGueltig, type Betrieb as BetriebDaten, type PersonenArt } from "@amtlos/fachlogik";
@@ -353,16 +353,14 @@ function BetriebKopf({ b, onPress }: { b: BetriebDaten; onPress: () => void }) {
 }
 
 /** Tab „Mein Betrieb“: Übersicht wie in den iOS-Einstellungen – jede Gruppe auf einer eigenen Seite. */
-/** Präfix der beiseitegelegten (unlesbaren) Stände – wie in zustand.tsx (`${SCHLUESSEL}.unlesbar.`) */
-const BEISEITE_PRAEFIX = "amtlos.unterlagen.v1.unlesbar.";
-
 /** Gibt es beiseitegelegte Stände (H4)? Nur dann steht „Beiseitegelegte Daten erneut öffnen“ da. */
 function useBeiseitegelegt(stand: unknown): boolean {
   const [da, setDa] = useState(false);
   useEffect(() => {
     let aktiv = true;
-    void AsyncStorage.getAllKeys()
-      .then((k) => aktiv && setDa(k.some((x) => x.startsWith(BEISEITE_PRAEFIX))))
+    void standSpeicher
+      .beiseitegelegtVorhanden()
+      .then((x) => aktiv && setDa(x))
       .catch(() => undefined);
     return () => {
       aktiv = false;

@@ -1,31 +1,30 @@
 import { nachweisAnhaengen, type SicherungsZiel } from "./unterlagen/sicherungNachweis";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import * as StoreReview from "expo-store-review";
 import { AppState } from "react-native";
 import { sollFragen } from "./pro/bewertung";
 import { kaufAktiv, proAktiv, proBeobachten, testmodus } from "./pro/kauf";
-import { archivLoeschen, archivierteSchluessel, autoSchluesselLoeschen, nonce, schluesselArchivieren, schluesselHolen, schluesselLoeschen, schluesselbundMoeglich } from "./unterlagen/schluesselbund";
+import { archivLoeschen, archivierteSchluessel, autoSchluesselLoeschen, schluesselArchivieren, schluesselHolen, schluesselLoeschen, schluesselbundMoeglich } from "./unterlagen/schluesselbund";
 import { allesAbsagen } from "./pflichten/erinnerungen";
 import { cacheLeeren } from "./unterlagen/aufraeumen";
-import { istTresor, tresorOeffnen, tresorSchliessen } from "./unterlagen/tresor";
+import { kompaktJson } from "./unterlagen/kompakt";
+import { LadeFehler } from "./unterlagen/standAblage";
+import { standSpeicher } from "./unterlagen/standSpeicher";
 import type { Beleg, Betrieb, Daten, KassenInhalt, Kassenabschluss, Kassensturz, Sachentnahme, Person, PersonAngaben, PersonenArt, Zahlung } from "@amtlos/fachlogik";
 import { alleDateienEntfernen, ansichtenAufraeumen, dateiAblegen, dateiAnzeigen, dateiEntfernen, dateiGroesse, dateiHolen, dateiVorhanden } from "./unterlagen/dateien";
-import { base64, ausBase64, type Dateien } from "./unterlagen/sicherung";
+import { type BelegQuelle } from "./unterlagen/sicherungContainer";
 import { kontoVergessen } from "./konto/sitzung";
 import { syncZusammenfuehren } from "./konto/sync";
 import { dateienImStand, doppeltePerson, korrigieren, personenZusammenfuehren, staetteLoeschen, staetteSetzen, unterlageStaette, type Betriebsstaette } from "./unterlagen/speicher";
 import { personenkontenVergeben } from "./unterlagen/steuerpaket";
 import { belegeFestschreiben, kassenbuchFestschreiben, kassensturzSpeichern, sachentnahmeLoeschen, sachentnahmeSpeichern } from "./unterlagen/speicher";
-import { LEERER_STAND, StandFehler, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
+import { LEERER_STAND, StandFehler, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
 
-/** Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund). */
-const SCHLUESSEL = "amtlos.unterlagen.v1";
-/** zuletzt erfolgreich geladene Fassung (G6) – je App-Start einmal; wird bei einem Ladefehler mit beiseitegelegt */
-const VORHER = `${SCHLUESSEL}.vorher`;
-const BEISEITE = `${SCHLUESSEL}.unlesbar.`;
-/** Zusatztext für beiseitegelegte, vorher unverschlüsselte Daten (G-6) */
-const BEISEITE_KONTEXT = "beiseite";
+/**
+ * Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund),
+ * seit E-194 in verschlüsselten Teildateien statt in einem AsyncStorage-Eintrag (`unterlagen/standAblage.ts`). Die beim
+ * Start geladene Fassung bleibt als „vorher“ liegen (G6) und wird bei einem Ladefehler mit beiseitegelegt.
+ */
 /** nach einem Schreibfehler so lange warten, dann erneut versuchen (H5) */
 const NEU_VERSUCHEN_MS = 5000;
 /**
@@ -52,8 +51,11 @@ interface Zustand {
   bereit: boolean;
   /** gespeicherte Daten ließen sich nicht lesen – dann wird nichts überschrieben */
   ladefehler: boolean;
-  /** Art des Ladefehlers: „version“ = Daten aus einer neueren App-Version (App aktualisieren), sonst „unlesbar“ */
-  ladefehlerArt: "unlesbar" | "version" | null;
+  /**
+   * Art des Ladefehlers: „version“ = Daten aus einer neueren App-Version (App aktualisieren); „zu_gross“ = der alte
+   * Speicher (Android, AsyncStorage) kann den Eintrag nicht mehr lesen (E-194) – er bleibt unangetastet; sonst „unlesbar“
+   */
+  ladefehlerArt: "unlesbar" | "version" | "zu_gross" | null;
   /** gespeicherte Daten liegen verschlüsselt (auf iPhone/Android; im Web nicht) */
   verschluesselt: boolean;
   /**
@@ -162,10 +164,11 @@ interface Zustand {
   /** Datei verschlüsselt ablegen; liefert den Dateinamen (mit Endung) */
   dateiSpeichern(bytes: Uint8Array, endung: string): Promise<string>;
   dateiLesen(name: string): Promise<Uint8Array | null>;
-  /** alle Belegdateien als Base64 – für die Sicherung; `fehlend`: Dateien, die sich nicht lesen ließen (H3) */
-  dateienFuerSicherung(s?: Stand, fortschritt?: (n: number, von: number) => void): Promise<{ dateien: Dateien; fehlend: string[] }>;
-  /** Belegdateien aus einer Sicherung ablegen (vorhandene bleiben); liefert die Zahl der Dateien, die sich nicht ablegen ließen (G4) */
-  dateienEinspielen(d: Dateien): Promise<number>;
+  /**
+   * Belegdateien aus einer Sicherung ablegen – eine nach der anderen, nie alle zugleich im Speicher (E-194); vorhandene,
+   * lesbare Dateien bleiben. Liefert die Zahl der Dateien, die sich nicht ablegen ließen (G4)
+   */
+  dateienEinspielen(q: BelegQuelle): Promise<number>;
   /** Synchronisation (E-134): aktueller Stand, zusammengeführten Stand übernehmen, Datei unter ihrem Namen ablegen */
   aktuellerStand(): Stand;
   syncUebernehmen(s: Stand): void;
@@ -235,7 +238,7 @@ export function useStandWahl<T>(waehlen: (s: Stand) => T): T {
 export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   const [bereit, setBereit] = useState(false);
   const [ladefehler, setLadefehler] = useState(false);
-  const [ladefehlerArt, setLadefehlerArt] = useState<"unlesbar" | "version" | null>(null);
+  const [ladefehlerArt, setLadefehlerArt] = useState<"unlesbar" | "version" | "zu_gross" | null>(null);
   const sperre = useRef(false);
   const [stand, setStandIntern] = useState<Stand>(LEERER_STAND);
   const [tab, tabWechseln] = useState<Tab>("heute");
@@ -289,29 +292,14 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
 
   const laden = useCallback(async () => {
     const lesen = async () => {
-      const json = await AsyncStorage.getItem(SCHLUESSEL);
-      if (istTresor(json)) {
-        // verschlüsselt: ohne Schlüssel (oder bei falschem) nichts überschreiben
-        const k = await schluesselHolen(false);
-        if (!k) throw new Error("Schlüssel fehlt");
-        schluessel.current = k;
-        setVerschluesselt(true);
-        const s = standAus(tresorOeffnen(json!, k));
-        // lesbar: diese Fassung als Vorversion merken (G6) – ein späterer Ladefehler hat dann etwas zum Zurückholen
-        await AsyncStorage.setItem(VORHER, json!).catch(() => undefined);
-        return s;
-      }
-      // Unlesbares nie mit einem leeren Stand überschreiben (Datenverlust)
-      if (!istLesbar(json)) throw new Error("unlesbar");
-      const s = standAus(json);
-      // ältere, unverschlüsselte Daten: Schlüssel anlegen und gleich verschlüsselt speichern
-      const k = await schluesselHolen(true).catch(() => null);
+      // verschlüsselt: ohne Schlüssel (oder bei falschem) wirft die Ablage – dann nichts überschreiben; ein alter
+      // AsyncStorage-Eintrag wird dabei geprüft in Teildateien umgezogen (E-194)
+      const { text, schluessel: k } = await standSpeicher.laden();
       if (k) {
         schluessel.current = k;
         setVerschluesselt(true);
-        if (json) await AsyncStorage.setItem(SCHLUESSEL, tresorSchliessen(JSON.stringify(s), k, nonce()));
       }
-      return s;
+      return standAus(text);
     };
     try {
       const s = await lesen();
@@ -323,7 +311,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     } catch (e) {
       sperre.current = true;
       setLadefehler(true);
-      setLadefehlerArt(e instanceof StandFehler && e.art === "version" ? "version" : "unlesbar");
+      setLadefehlerArt(e instanceof StandFehler && e.art === "version" ? "version" : e instanceof LadeFehler && e.art === "zu_gross" ? "zu_gross" : "unlesbar");
     } finally {
       setBereit(true);
     }
@@ -355,13 +343,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     }
     // unlesbare Daten und die letzte lesbare Fassung beiseitelegen – nie löschen, nie im Klartext (G-6)
     try {
-      const zeit = new Date().toISOString();
-      const ablegen = async (text: string | null, name: string) => {
-        if (!text) return;
-        await AsyncStorage.setItem(name, istTresor(text) || !k ? text : tresorSchliessen(text, k, nonce(), BEISEITE_KONTEXT));
-      };
-      await ablegen(await AsyncStorage.getItem(SCHLUESSEL), `${BEISEITE}${zeit}`);
-      await ablegen(await AsyncStorage.getItem(VORHER), `${BEISEITE}${zeit}-vorher`);
+      await standSpeicher.beiseitelegen(k);
     } catch {
       return false;
     }
@@ -382,9 +364,10 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     if (nochmal.current) clearTimeout(nochmal.current);
     nochmal.current = null;
     if (sperre.current) return;
-    const json = JSON.stringify(aktuell.current);
+    // große Texte (Logo in jedem Absender-Schnappschuss) nur einmal (E-194)
+    const json = kompaktJson(aktuell.current);
     const k = schluessel.current;
-    // Schreibfehler (Speicher voll, AsyncStorage gestört) nie verschlucken (H5): melden und es erneut versuchen
+    // Schreibfehler (Speicher voll, Dateisystem gestört) nie verschlucken (H5): melden und es erneut versuchen
     const ergebnis = (p: Promise<void>) =>
       void p
         .then(() => setSpeicherFehler(null))
@@ -393,12 +376,12 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
           if (!nochmal.current) nochmal.current = setTimeout(() => schreibenRef.current(), NEU_VERSUCHEN_MS);
         });
     if (k) {
-      ergebnis(AsyncStorage.setItem(SCHLUESSEL, tresorSchliessen(json, k, nonce())));
+      ergebnis(standSpeicher.speichern(json, k));
       return;
     }
     // nur die Web-Vorschau hat keinen Schlüsselbund – dort liegt alles im Browser
     if (!schluesselbundMoeglich) {
-      ergebnis(AsyncStorage.setItem(SCHLUESSEL, json));
+      ergebnis(standSpeicher.speichern(json, null));
       return;
     }
     // auf dem Gerät nie unverschlüsselt speichern (E-143): Schlüssel noch einmal holen, sonst Bescheid geben
@@ -408,7 +391,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         schluessel.current = neu;
         setVerschluesselt(true);
         setSpeicherFehler(null);
-        return AsyncStorage.setItem(SCHLUESSEL, tresorSchliessen(JSON.stringify(aktuell.current), neu, nonce())).catch(() => {
+        return standSpeicher.speichern(kompaktJson(aktuell.current), neu).catch(() => {
           setSpeicherFehler("schreiben");
           if (!nochmal.current) nochmal.current = setTimeout(() => schreibenRef.current(), NEU_VERSUCHEN_MS);
         });
@@ -469,26 +452,10 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   /** Beiseitegelegte Stände mit dem aktuellen und den archivierten Schlüsseln öffnen; Lesbares zusammenführen (H4). */
   const beiseitegelegteVersuchen = useCallback(async (): Promise<number> => {
     if (sperre.current) return 0;
-    const namen = (await AsyncStorage.getAllKeys().catch(() => [] as readonly string[])).filter((k) => k.startsWith(BEISEITE)).sort();
     const schluesselListe = [schluessel.current, ...(await archivierteSchluessel().catch(() => []))].filter((k): k is Uint8Array => Boolean(k));
-    const oeffnen = (text: string): string | null => {
-      if (!istTresor(text)) return text;
-      for (const k of schluesselListe) {
-        try {
-          return tresorOeffnen(text, k, BEISEITE_KONTEXT);
-        } catch {
-          /* nächster Schlüssel */
-        }
-      }
-      return null;
-    };
+    const texte = await standSpeicher.beiseitegelegteOeffnen(schluesselListe).catch(() => [] as string[]);
     let n = 0;
-    for (const name of namen) {
-      const text = await AsyncStorage.getItem(name).catch(() => null);
-      let klar = text ? oeffnen(text) : null;
-      // beiseitegelegter, vorher unverschlüsselter Stand liegt verschlüsselt in einer zweiten Hülle
-      if (klar && istTresor(klar)) klar = oeffnen(klar);
-      if (!klar) continue;
+    for (const klar of texte) {
       try {
         const s = standAus(klar);
         setzen(zusammenfuehren(aktuell.current, s).stand);
@@ -684,33 +651,13 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       dateiGroesse: (name) => dateiGroesse(name),
       dateiAnzeigen: (name, mime) => dateiAnzeigen(name, schluessel.current, mime).catch(() => null),
       sichern,
-      dateienFuerSicherung: async (s, fortschritt) => {
-        const d: Dateien = {};
-        const fehlend: string[] = [];
-        const st = s ?? aktuell.current;
-        // auch die Fotos der Z-Bons (R12) und die Kopien der Aufenthaltstitel (R12 Personal)
-        const alle = dateienImStand(st);
-        let i = 0;
-        for (const name of alle) {
-          i++;
-          if (d[name]) continue;
-          fortschritt?.(i, alle.length);
-          // eine fehlende oder unlesbare Datei nie still übergehen (H3) – die Sicherung wäre sonst unvollständig
-          const bytes = await dateiHolen(name, schluessel.current).catch(() => null);
-          if (bytes) d[name] = base64(bytes);
-          else fehlend.push(name);
-        }
-        return { dateien: d, fehlend };
-      },
-      dateienEinspielen: async (d) => {
-        let fehler = 0;
-        for (const [name, b64] of Object.entries(d)) {
-          if (await dateiHolen(name, schluessel.current).catch(() => null)) continue;
-          await dateiAblegen(name, ausBase64(b64), schluessel.current).catch(() => {
-            fehler++;
-          });
-        }
-        return fehler;
+      dateienEinspielen: async (q) => {
+        const r = await q.dateien(
+          // eine vorhandene, lesbare Datei bleibt (geprüft je Datei, erst wenn sie an der Reihe ist)
+          async (name) => !(dateiVorhanden(name) && (await dateiHolen(name, schluessel.current).catch(() => null))),
+          (name, bytes) => dateiAblegen(name, bytes, schluessel.current),
+        );
+        return r.fehler;
       },
       aktuellerStand: () => aktuell.current,
       syncUebernehmen: (entfernt) => {
@@ -751,10 +698,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         ausstehend.current = false;
         if (!nachLadefehler) {
           for (const name of dateienImStand(aktuell.current)) dateiEntfernen(name);
-          // auch Reste: verwaiste Belegdateien, beiseitegelegte unlesbare Stände, Vorversion (E-143)
+          // auch Reste: verwaiste Belegdateien (E-143)
           alleDateienEntfernen();
-          const reste = (await AsyncStorage.getAllKeys().catch(() => [] as readonly string[])).filter((k) => k.startsWith(`${SCHLUESSEL}.`));
-          if (reste.length) await AsyncStorage.multiRemove(reste).catch(() => undefined);
         }
         cacheLeeren();
         await autoSchluesselLoeschen().catch(() => undefined);
@@ -766,7 +711,9 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         setLadefehler(false);
         aktuell.current = LEERER_STAND;
         setStand(LEERER_STAND);
-        await AsyncStorage.removeItem(SCHLUESSEL);
+        // gespeicherter Stand; ohne Ladefehler auch beiseitegelegte Stände, Vorversion und Ersatzkopie vom Umzug (E-143,
+        // E-194) – nach einem Ladefehler bleibt das Beiseitegelegte (H4)
+        await standSpeicher.allesLoeschen(nachLadefehler).catch(() => undefined);
         if (nachLadefehler) {
           // der Schlüssel der beiseitegelegten Daten bleibt im Archiv
           await schluesselArchivieren().catch(() => undefined);

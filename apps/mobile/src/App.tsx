@@ -264,7 +264,7 @@ function LadefehlerSeite() {
     <View style={{ flex: 1, padding: 24, gap: 14, justifyContent: "center" }}>
       <Kachel symbol="exclamationmark.triangle" ton="frist" groesse={60} />
       <T v="titel" accessibilityRole="header">{TEXT.ladefehler_titel}</T>
-      <T>{z.ladefehlerArt === "version" ? TEXT.ladefehler_version : TEXT.ladefehler}</T>
+      <T>{z.ladefehlerArt === "version" ? TEXT.ladefehler_version : z.ladefehlerArt === "zu_gross" ? TEXT.ladefehler_zu_gross : TEXT.ladefehler}</T>
       <Knopf text={TEXT.ladefehler_nochmal} symbol="arrow.clockwise" laedt={laedt} onPress={() => { setLaedt(true); void z.neuLaden().finally(() => setLaedt(false)); }} />
       <Knopf ton text={TEXT.wiederherstellen} symbol="arrow.clockwise" onPress={() => nav.oeffnen("wiederherstellen", () => <WiederherstellenSeite />, true)} />
       {frage ? (

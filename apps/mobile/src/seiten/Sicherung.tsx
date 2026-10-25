@@ -1,16 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState, Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { Fuss, Hinweis, Karte, Knopf, PasswortFeld, Schalter, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useMeldung } from "../ui/meldung";
 import { RADIUS, useFarben } from "../ui/thema";
-import { PASSWORT_EMPFOHLEN, SicherungsFehler, fehlendeDateien, passwortSchwaeche, base64, schluesselAusPasswort, schluesselKennung, sicherungErstellen, sicherungLesenMitDateien, sicherungMitSchluessel, sicherungsDatei, sicherungsDateiLesen, sicherungsKdf, sicherungsName, type Dateien, type SicherungsSchluessel } from "../unterlagen/sicherung";
+import { PASSWORT_EMPFOHLEN, SicherungsFehler, passwortSchwaeche, schluesselAusPasswort, schluesselKennung, sicherungMitSchluessel, sicherungsDatei, sicherungsDateiLesen, sicherungsKdf, sicherungsName, type SicherungsSchluessel } from "../unterlagen/sicherung";
+import { belegeErgaenzt, containerOeffnen, containerSchreiben, textSicherungOeffnen, type GeoeffneteSicherung } from "../unterlagen/sicherungContainer";
 import { ORDNER_WAHL, cloudBeiseitelegen, cloudDateiLesen, cloudDateiSchreiben, cloudDateien, cloudLesen, cloudSchreiben, cloudVerfuegbar, ordnerStatus, ordnerVergessen, ordnerWaehlen, type OrdnerStatus } from "../unterlagen/cloud";
 import { bestaetigen } from "../ui/bestaetigen";
 import { ANDROID } from "../plattform";
 import { autoSchluesselHolen, autoSchluesselLoeschen, autoSchluesselSpeichern } from "../unterlagen/schluesselbund";
-import { dateiTeilen, dateiTeilenBytes, dateiWaehlen, zufall } from "../unterlagen/sicherungDatei";
+import { dateiTeilenBytes, sicherungTeilen, sicherungWaehlen, zufall, type GewaehlteSicherung } from "../unterlagen/sicherungDatei";
 import { dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
 import { offenesArchiv } from "../unterlagen/archiv";
 import { pdfBytes } from "../unterlagen/pdf";
@@ -25,7 +26,7 @@ import { useProSperre } from "./Pro";
 /** Kurz warten, damit der Ladezustand gezeichnet ist, bevor die Schlüsselableitung den Thread belegt. */
 const gleich = () => new Promise((r) => setTimeout(r, 30));
 
-/** Ab so vielen Belegdateien bzw. so vielen MB warnt die Sicherung als Datei (R9 Performance) */
+/** Ab so vielen Belegdateien bzw. so vielen MB weist die Sicherung als Datei auf Dauer und Größe hin (R9, E-194) */
 export const SICHERUNG_DATEIEN_WARNUNG = 50;
 export const SICHERUNG_MB_WARNUNG = 150;
 
@@ -70,14 +71,13 @@ export function SicherungSeite() {
   const [laedt, setLaedt] = useState(false);
   const [meldung, setMeldung] = useState<{ art: "erfolg" | "fehler"; text: string } | null>(null);
   const [fortschritt, setFortschritt] = useState<string | null>(null);
-  // große Sicherung (R9 Performance): Die Sicherungsdatei entsteht ganz im Arbeitsspeicher – ab etwa 50 Belegdateien
-  // oder 150 MB droht auf dem iPhone der Abbruch. Dann vorher warnen und die iCloud-Sicherung empfehlen.
+  // große Sicherung: Seit E-194 entsteht die Datei Stück für Stück (Container, Version 3) – kein Absturz mehr, aber sie
+  // dauert und ist groß. Dann vorher darauf hinweisen.
   const umfang = useMemo(() => {
     const namen = new Set(dateienImStand(z.stand));
     let bytes = 0;
     for (const n of namen) bytes += z.dateiGroesse(n);
-    // Base64 in der Sicherungsdatei: etwa ein Drittel mehr als die Datei selbst
-    return { dateien: namen.size, mb: Math.round((bytes * 1.37) / 1e6) };
+    return { dateien: namen.size, mb: Math.round(bytes / 1e6) };
   }, [z.stand.belege, z.stand.belegArchiv, z.stand.kasse, z.stand.mitarbeiter]);
   const gross = umfang.dateien > SICHERUNG_DATEIEN_WARNUNG || umfang.mb > SICHERUNG_MB_WARNUNG;
   const bereit = passwortBereit(pw, pw2);
@@ -88,12 +88,15 @@ export function SicherungSeite() {
     try {
       await gleich();
       const gesichert = z.stand;
-      const { dateien } = await z.dateienFuerSicherung(gesichert, (n, von) => setFortschritt(TEXT.sicherung_fortschritt(n, von)));
+      const k = schluesselAusPasswort(pw, zufall);
+      // E-194: Container Stück für Stück in eine Datei im Cache – je Belegdatei einzeln gelesen, nie alles im Speicher
+      const { geteilt, ergebnis } = await sicherungTeilen(sicherungsName(heute()), (ziel) =>
+        containerSchreiben(ziel, gesichert, k, zufall, { namen: dateienImStand(gesichert), lesen: z.dateiLesen }, new Date(), (n, von) => setFortschritt(TEXT.sicherung_fortschritt(n, von))),
+      );
       setFortschritt(null);
-      const fehlend = fehlendeDateien(gesichert, dateien);
-      const text = sicherungErstellen(gesichert, pw, zufall, new Date(), undefined, dateien);
+      const fehlend = ergebnis.fehlend;
       // abgebrochen: keine Sicherung – die Erinnerung bleibt und „Alle Daten löschen“ bleibt gesperrt
-      if (!(await dateiTeilen(sicherungsName(heute()), text))) return;
+      if (!geteilt) return;
       // Android (E-190) meldet einen Abbruch des Teilens nicht – erst nach ausdrücklichem „Ja“ zählt die Sicherung
       if (!(await geteiltBestaetigt())) return;
       // fehlen Belegdateien, ist die Sicherung nicht vollständig (H3): teilen ja, aber nicht als gesichert zählen
@@ -128,7 +131,7 @@ export function SicherungSeite() {
             {erledigt ? (
               <Knopf text={TEXT.fertig} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
             ) : (
-              <Knopf text={laedt ? TEXT.sicherung_laeuft : gross ? TEXT.sicherung_trotzdem : TEXT.sicherung_erstellen} symbol="lock" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
+              <Knopf text={laedt ? TEXT.sicherung_laeuft : TEXT.sicherung_erstellen} symbol="lock" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
             )}
           </Fuss>
       }
@@ -138,7 +141,7 @@ export function SicherungSeite() {
         <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
         {/* StB GoBD (D-11): Nachweis der letzten Vollsicherung außerhalb des Geräts */}
         <Hinweis text={`${TEXT.stb_letzte_vollsicherung(letzte ? nachweisText(letzte) : null)} ${z.stand.cloudSicherung ? TEXT.stb_vollsicherung_icloud : TEXT.stb_vollsicherung_hinweis}`} symbol="clock" />
-        {gross && !erledigt ? <Hinweis art="warnung" text={TEXT.sicherung_gross(umfang.dateien, umfang.mb)} symbol="icloud" /> : null}
+        {gross && !erledigt ? <Hinweis text={TEXT.sicherung_gross(umfang.dateien, umfang.mb)} symbol="clock" /> : null}
         {fortschritt ? <Hinweis text={fortschritt} /> : null}
         {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
       </View>
@@ -209,19 +212,28 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
   const z = useAmtlos();
   const nav = useNav();
   const melden = useMeldung();
-  const [datei, setDatei] = useState<{ name: string; text: string } | null>(null);
+  const [datei, setDateiIntern] = useState<GewaehlteSicherung | null>(null);
   const [hinweis, setHinweis] = useState<string | null>(null);
   const [pw, setPw] = useState("");
   const [laedt, setLaedt] = useState(false);
-  const [gelesen, setGelesen] = useState<Stand | null>(null);
-  const [dateien, setDateien] = useState<Dateien>({});
+  // geöffnete Sicherung: Stand zur Vorschau, Belegdateien werden erst beim Wiederherstellen einzeln gelesen (E-194)
+  const [geoeffnet, setGeoeffnet] = useState<GeoeffneteSicherung | null>(null);
+  const gelesen = geoeffnet?.stand ?? null;
   const [fehler, setFehler] = useState<string | null>(null);
   const cloud = useCloud();
+  // gewählte Datei: die vorige Kopie im Cache wegräumen, beim Verlassen der Seite auch die letzte
+  const zuletzt = useRef<GewaehlteSicherung | null>(null);
+  const setDatei = (d: GewaehlteSicherung | null) => {
+    if (zuletzt.current && zuletzt.current !== d) zuletzt.current.entfernen();
+    zuletzt.current = d;
+    setDateiIntern(d);
+  };
+  useEffect(() => () => zuletzt.current?.entfernen(), []);
   const waehlen = async () => {
     setFehler(null);
     setHinweis(null);
-    setGelesen(null);
-    const d = await dateiWaehlen().catch(() => null);
+    setGeoeffnet(null);
+    const d = await sicherungWaehlen().catch(() => null);
     if (d) setDatei(d);
   };
   const oeffnen = async () => {
@@ -230,10 +242,9 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
     setLaedt(true);
     try {
       await gleich();
-      const r = sicherungLesenMitDateien(datei.text, pw);
-      // Sicherungen der automatischen iCloud-Sicherung (auch über „Dateien“ gewählt): Belegfotos liegen einzeln daneben
-      setDateien(await belegeAusCloud(datei.text, r.stand, r.schluessel, r.dateien));
-      setGelesen(r.stand);
+      // Version 3 (Container) Stück für Stück; Version 1/2 als Text – dann können Belegfotos der automatischen
+      // Sicherung (auch über „Dateien“ gewählt) einzeln daneben liegen
+      setGeoeffnet(datei.leser ? await containerOeffnen(datei.leser, pw) : mitCloudBelegen(textSicherungOeffnen(datei.text ?? "", pw)));
     } catch (e) {
       setFehler(e instanceof SicherungsFehler && e.art === "format" ? TEXT.falsches_format : TEXT.falsches_passwort);
     } finally {
@@ -246,14 +257,14 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
       unter={TEXT.wiederherstellen_text}
       fuss={
           <Fuss>
-            {gelesen ? (
+            {geoeffnet ? (
               <Knopf
                 text={TEXT.jetzt_wiederherstellen}
                 onPress={() =>
                   void z
-                    .zusammenfuehren(gelesen)
+                    .zusammenfuehren(geoeffnet.stand)
                     .then(async (r) => {
-                      const fehler = await z.dateienEinspielen(dateien);
+                      const fehler = await z.dateienEinspielen(geoeffnet);
                       // Belegdateien, die sich nicht ablegen ließen, nicht als Erfolg verbuchen (G4)
                       melden(fehler ? `${TEXT.wiederhergestellt_text(r.neu, r.aktualisiert)} ${TEXT.wiederherstellen_dateien_fehler(fehler)}` : TEXT.wiederhergestellt_text(r.neu, r.aktualisiert), fehler ? "info" : undefined);
                       fertig?.();
@@ -284,8 +295,8 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
               // Android (E-190): ohne erreichbaren Ordner zuerst die Ordnerauswahl (z. B. auf einem neuen Smartphone)
               if (!cloud && ORDNER_WAHL && (await ordnerWaehlen())?.art !== "ok") return;
               const text = await cloudLesen();
-              setGelesen(null);
-              if (text) setDatei({ name: TEXT.icloud_sicherung_name, text });
+              setGeoeffnet(null);
+              if (text) setDatei({ name: TEXT.icloud_sicherung_name, text, leser: null, entfernen: () => undefined });
               else setHinweis(TEXT.icloud_leer);
             })()
           }
@@ -391,19 +402,20 @@ async function belegeHochladen(z: ReturnType<typeof useAmtlos>, k: SicherungsSch
   return fehlend;
 }
 
-/** Belegdateien einer iCloud-Sicherung holen, die nicht in der Sicherungsdatei selbst stecken. */
-async function belegeAusCloud(text: string, stand: Stand, schluessel: Uint8Array, vorhanden: Dateien): Promise<Dateien> {
-  const kdf = sicherungsKdf(text);
-  if (!kdf) return vorhanden;
-  const kennung = schluesselKennung(kdf.salz);
-  const d: Dateien = { ...vorhanden };
-  for (const datei of dateienImStand(stand)) {
-    if (d[datei]) continue;
-    const roh = await cloudDateiLesen(kennung, datei);
-    const bytes = roh ? sicherungsDateiLesen(roh, schluessel) : null;
-    if (bytes) d[datei] = base64(bytes);
-  }
-  return d;
+/**
+ * Belegdateien einer automatischen Sicherung, die nicht in der Sicherungsdatei selbst stecken (Belegordner in iCloud
+ * bzw. im gewählten Ordner) – je Datei einzeln nachgeladen, erst beim Einspielen (E-194; vorher alle auf einmal als
+ * Base64 im Speicher).
+ */
+function mitCloudBelegen(g: GeoeffneteSicherung): GeoeffneteSicherung {
+  const kennung = schluesselKennung(g.kdf.salz);
+  return {
+    ...g,
+    ...belegeErgaenzt(g, g.stand, async (name) => {
+      const roh = await cloudDateiLesen(kennung, name);
+      return roh ? sicherungsDateiLesen(roh, g.schluessel) : null;
+    }),
+  };
 }
 
 /**
@@ -548,11 +560,10 @@ function CloudSicherungSeite() {
       let k: SicherungsSchluessel | null = null;
       if (vorhanden) {
         try {
-          const r = sicherungLesenMitDateien(vorhanden, pw);
-          const kdf = sicherungsKdf(vorhanden)!;
-          k = { schluessel: r.schluessel, salz: kdf.salz, iterationen: kdf.iterationen };
+          const r = textSicherungOeffnen(vorhanden, pw);
+          k = { schluessel: r.schluessel, salz: r.kdf.salz, iterationen: r.kdf.iterationen };
           await z.zusammenfuehren(r.stand);
-          await z.dateienEinspielen(await belegeAusCloud(vorhanden, r.stand, r.schluessel, r.dateien));
+          await z.dateienEinspielen(mitCloudBelegen(r));
           melden(TEXT.icloud_uebernommen);
         } catch {
           await cloudBeiseitelegen(vorhanden);
