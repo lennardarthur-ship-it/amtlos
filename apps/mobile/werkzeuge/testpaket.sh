@@ -140,13 +140,13 @@ Im Store-Build gibt es diesen Knopf nicht.
 FACHLICHE PRÜFUNG
 
 Den Katalog und die Vorlagen haben Fachleute durchgesehen (Rechtsanwalt, Steuerberater, Fachkraft für
-Arbeitssicherheit, Lebensmittelfachbeauftragter). Die App zeigt einen Prüfvermerk nur, wo eine unterschriebene
-Freigabe genau diese Fassung abdeckt (Stand 25.10.2026: 209 der 228 Pflichten; die übrigen warten auf die
-Unterschrift bzw. sind neu) – mit der Rolle, nie mit Namen, z. B. „Inhalt fachlich geprüft von einem Rechtsanwalt,
-Stand …“; Einschränkungen stehen dabei („ohne arbeitsmedizinische Angaben“), offene Punkte als „teilweise geprüft“.
-Bei den Vorlagen zeigen zurzeit fünf einen Vermerk (Steuerberater, unterschrieben): EÜR, Verfahrensdokumentation,
-Kassenmeldung, Lohnkonto und Rechnung – die Rechnung nicht für GmbH & Co. KG / UG & Co. KG und nicht beim Storno
-einer Schlussrechnung mit Abschlägen (seit der Prüfung geändert). Die übrigen Vorlagen warten auf die Unterschrift.
+Arbeitssicherheit, Lebensmittelfachbeauftragter). Die App zeigt einen Prüfvermerk nur, wo eine schriftliche Bestätigung
+des Prüfers genau diese Fassung abdeckt (Stand 25.10.2026: 226 der 228 Pflichten; zwei neue Einträge warten
+auf die Prüfung) – mit der Rolle, nie mit Namen, z. B. „Inhalt fachlich geprüft von einem Rechtsanwalt, Stand …“;
+Einschränkungen stehen dabei („ohne arbeitsmedizinische Angaben“), offene Punkte als „teilweise geprüft“.
+Alle 43 Vorlagen sind schriftlich bestätigt. Keinen Vermerk zeigen zurzeit die Bilanz (Hilfetext seit der Prüfung
+geändert), die Rechnung für GmbH & Co. KG / UG & Co. KG und beim Storno einer Schlussrechnung mit Abschlägen (seit der
+Prüfung geändert) sowie die Handelsregister-Vorlage außer für GmbH, OHG und KG (nur diese geprüft).
 Der Vermerk gilt je Variante (Rechtsform, Land, Rechnungsart): Jede Änderung hebt ihn für die betroffene Variante auf,
 bis erneut geprüft ist. Rechtsberatung im Einzelfall ist die App nicht.
 

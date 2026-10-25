@@ -98,6 +98,9 @@ quellen:
 fachlich_zu_pruefen:
 - 'Auslöser: die Lieferschwelle (10.000 € EU-weit, § 3c Abs. 4 UStG) fragt der Check nicht ab – die Pflicht „kommt in Frage“ bei B2C-Kunden in der EU mit Online- bzw. Fernabsatz'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - steuern
+  geprueft_am: '2026-10-23'
+  geprueft_version: 3
+  bestaetigt_am: '2026-10-23'

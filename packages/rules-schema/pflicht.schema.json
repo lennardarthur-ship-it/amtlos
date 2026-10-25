@@ -486,13 +486,13 @@
           ],
           "description": "Version des Eintrags, die geprüft wurde. Weicht `version` davon ab, gilt der Eintrag als ungeprüft, bis er erneut geprüft ist (E-171)."
         },
-        "unterschrieben_am": {
+        "bestaetigt_am": {
           "type": [
             "string",
             "null"
           ],
           "format": "date",
-          "description": "Tag der Unterschrift unter der Freigabe (E-196); der Stand im Vermerk liegt nie danach."
+          "description": "Tag der schriftlichen Bestätigung der Freigabe durch den Prüfer (E-197: Mail, Freigabe-Datei oder entferntes unterschriebenes Blatt); der Stand im Vermerk liegt nie danach."
         },
         "einschraenkung": {
           "type": [

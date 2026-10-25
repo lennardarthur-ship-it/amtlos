@@ -68,6 +68,10 @@ fachlich_zu_pruefen:
 - 'Hinweis Lebensmittelfachbeauftragter (Nachkontrolle der Vorlagen, 23.10.2026, Hinweis 6) – zur Prüfung durch Rechtsanwalt: Die Sanktion nennt nur § 7 LMZDV; für Koffein und Chinin gelten die Straf- und Bußgeldvorschriften der FrSaftErfrischGetrV bzw. der AromenDV – Fundstelle und Höhe nicht geprüft, Text unverändert'
 - 'Rechtsanwalt Nachprüfung 23.10.2026 (ändern): Folgen nach seinem Wortlaut (LMZDV, Chinin als Straftat nach § 6 Abs. 2 AromenDV i. V. m. § 59 Abs. 1 Nr. 21 lit. a LFGB) umgesetzt. RÜCKFRAGE Koffein: Er bat, die Nummer in § 6 LMIDV am Wortlaut einzutragen. § 6 LMIDV (freirecht.de, lexmea.de, gelesen 23.10.2026) hat vier Absätze; Anhang III Nr. 4 LMIV ist nur über § 6 Abs. 4 Nr. 2 i. V. m. § 5 Abs. 1 Nr. 14 Buchst. a LMIDV erfasst, und § 5 Abs. 1 LMIDV betrifft nur vorverpackte Lebensmittel; § 6 Abs. 4 Nr. 3 (§ 5 Abs. 3 LMIDV) erfasst bei nicht vorverpackten Lebensmitteln nur die Angaben nach § 4 Abs. 2 LMIDV. Der Koffein-Satz ist deshalb nicht eingetragen – bitte sagen, ob „§ 6 Abs. 4 Nr. 2 LMIDV“ für lose Getränke passt oder eine andere Vorschrift gemeint ist. Quellen nur hier und im Kopfkommentar (Quellenliste unverändert, damit die Freigabe von Lebensmittelfachbeauftragter für den Inhalt ohne Folgen nicht entfällt)'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - hygiene
+    - recht
+  geprueft_am: '2026-10-23'
+  geprueft_version: 5
+  bestaetigt_am: '2026-10-24'

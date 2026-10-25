@@ -1,10 +1,11 @@
 """
-Eine Seite zum Unterschreiben je Prüfer (E-171): Prüfvermerk, Liste der freigegebenen Einträge mit Version, Wortlaut der
-Nennung, Unterschriftszeile. Die Einträge kommen aus dem Katalog (`pruefung.geprueft_von` enthält den Prüfer).
+Eine Bestätigungsseite je Prüfer (E-171): Prüfvermerk, Liste der freigegebenen Einträge mit Version, Wortlaut der
+Nennung. Die Einträge kommen aus dem Katalog (`pruefung.geprueft_von` enthält den Prüfer). Seit E-197 ohne
+Unterschriftszeile: Die Seite liegt der Mail bei, und der Prüfer bestätigt per E-Mail („Die Bestätigung vom … trifft zu“).
 
     python3 docs/freigabe-katalog/bestaetigung.py <ziel.pdf> "<Prüfer im Katalog>" "<Name, Funktion>" "<Stand TT.MM.JJJJ>" \
         "<Nennung: Text>" [--zusatz "<weiterer Satz>"] [--auch id1,id2]   # --auch: Einträge, die nach Durchsicht dazukommen
-        [--bereich] [--ids id1,id2] [--text "<Bestätigungstext, {n} = Anzahl>"] [--titel "<Überschrift>"] [--ohne-unterschrift]
+        [--bereich] [--ids id1,id2] [--text "<Bestätigungstext, {n} = Anzahl>"] [--titel "<Überschrift>"]
 
 --bereich: alle Einträge des Prüfbereichs (wie anwenden.py) in der aktuellen Version, ohne E.56 – für die Bestätigung
 zusammen mit der Abgleich-Datei („ausgenommen die dort mit ‚ändern‘ markierten“). --ids: genau diese Einträge.
@@ -65,7 +66,8 @@ STANDARD = ("Ich habe die unten aufgeführten {n} Einträge des Pflichtenkatalog
             "Bestätigung für ihn nicht mehr, bis er erneut geprüft ist.")
 haupttext = html.escape(opt.get("--text", STANDARD).replace("{n}", str(n)))
 titel = html.escape(opt.get("--titel", "Bestätigung der fachlichen Prüfung – Pflichtenkatalog Betriebsklar"))
-sig = "" if ohne_sig else f'<div class="sig"><div>Ort, Datum</div><div>Unterschrift – {html.escape(name)}</div></div>'
+# E-197: keine Unterschriftszeile – Bestätigung per E-Mail (`ohne_sig` bleibt als Schalter für alte Aufrufe ohne Wirkung)
+sig = '<div class="box"><b>Bestätigung:</b> Bitte bestätigen Sie per E-Mail, dass diese Seite zutrifft (Antwort auf unsere Mail genügt); eine Unterschrift ist nicht nötig.</div>'
 eintraege = "".join(f"<li><b>{html.escape(nr)}</b> {html.escape(i)} <i>v{v}</i></li>" for nr, i, v, _ in zeilen)
 seite = f"""<!doctype html><html lang="de"><head><meta charset="utf-8"><style>
 @page {{ size: A4; margin: 14mm 14mm 12mm; }}

@@ -71,6 +71,10 @@ fachlich_zu_pruefen:
 - 'Sanktion § 73 Abs. 1a IfSG, bis 25.000 € laut Rechtsprüfung R11 (Befund 20) „wahrscheinlich“ – Nummer und Höhe bestätigen (Bußgeldhöhen laut Prüfvermerk Lebensmittelfachbeauftragter durch Rechtsanwalt)'
 - 'Rechtsanwalt Runde 3 (23.10.2026) (ändern): Höhe bestätigt, Nummer in § 73 Abs. 1a IfSG eintragen; für die Inhaberin greife der Tatbestand „tätig ist“. NICHT umgesetzt – am amtlichen Wortlaut nicht belegt: § 73 Abs. 1a IfSG (gesetze-im-internet.de, 23.10.2026) nennt § 43 nur in Nr. 16a (Mitteilung, Abs. 2), Nr. 16b (Belehrung, Abs. 4 Satz 1), Nr. 20 („entgegen § 43 Abs. 1 Satz 1 … eine Person beschäftigt“) und Nr. 21 (Vorlage, Abs. 5 Satz 2); eine Nummer für das eigene Tätigsein ohne Bescheinigung gibt es nicht, Nr. 20 erfasst nur das Beschäftigen. Text unverändert („§ 73 IfSG“) – Fundstelle für die eigene Tätigkeit mit Rechtsanwalt klären'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - hygiene
+    - recht
+  geprueft_am: '2026-10-23'
+  geprueft_version: 3
+  bestaetigt_am: '2026-10-23'

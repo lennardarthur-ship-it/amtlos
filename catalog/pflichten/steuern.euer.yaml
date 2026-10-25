@@ -168,6 +168,9 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen: []
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - steuern
+  geprueft_am: '2026-10-24'
+  geprueft_version: 6
+  bestaetigt_am: '2026-10-24'

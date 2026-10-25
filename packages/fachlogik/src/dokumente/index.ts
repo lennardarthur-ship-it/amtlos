@@ -16,7 +16,7 @@ import { GESTALT_MARKE, GRUNDLAGE_MARKE, RAENDER, RAENDER_MARKE, SEITE_MARKE, ce
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Option, Vorlage, Vorschlag } from "./typen.js";
 import { KURZ } from "./ablauf.js";
 import { PRUEFHINWEIS } from "./html.js";
-import { VORLAGEN_GEPRUEFT, fassungPasst, freigabeUnterschrieben, freigabenFuer, geprueftVermerk, kanonisch, sha256, sichtbarerText, type VorlagenFreigabe } from "./geprueft.js";
+import { VORLAGEN_GEPRUEFT, fassungPasst, freigabeBestaetigt, freigabenFuer, geprueftVermerk, kanonisch, sha256, sichtbarerText, type VorlagenFreigabe } from "./geprueft.js";
 import { PRUEFSTAENDE } from "./pruefstaende.js";
 import { LEERER_BETRIEB } from "./typen.js";
 import { EIGENE_GRUPPEN, PRUEF_LAENDER, PRUEF_RECHTSFORMEN, pruefAuspraegungenFuer, pruefstandBerechnen, type Auspraegung, type PruefstandErgebnis } from "./pruefvarianten.js";
@@ -50,7 +50,7 @@ export { RECHTSFORMEN } from "./bausteine.js";
 export { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN, arbeitsminuten, arbeitszeitPruefung, monatAus, monatSchluessel, stunden } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent, fassungText, zahl } from "./html.js";
-export { PRUEF_ROLLEN, VORLAGEN_GEPRUEFT, freigabeUnterschrieben, freigabenFuer, geprueftVermerk, sha256, type PruefRolle, type VorlagenFreigabe } from "./geprueft.js";
+export { PRUEF_ROLLEN, VORLAGEN_GEPRUEFT, freigabeBestaetigt, freigabenFuer, geprueftVermerk, sha256, type PruefRolle, type VorlagenFreigabe } from "./geprueft.js";
 export { PRUEFSTAENDE } from "./pruefstaende.js";
 // StB-Prüfung Steuerberatungskanzlei (21.10.2026): Rechnungen, Voranmeldung, OSS und ZM
 export { GUTSCHRIFT_PRAEFIX, KUNDEN_ARTEN, NULLSATZ_HINWEIS as NULLSATZ_TEXT, RECHNUNG_EINHEIT_CODE, RECHNUNG_GUTSCHRIFT_NUMMER, RECHNUNG_LEITWEG_FEHLT, RECHNUNG_LEITWEG_FORMAT, RECHNUNG_NULLSATZ_GEMISCHT, RECHNUNG_OSS_LAND, RECHNUNG_OSS_SATZ, RECHNUNG_OSS_VORSCHLAG, RECHNUNG_SCHLUSS_HOCH, RECHNUNG_SCHLUSS_LEER, RECHNUNG_SCHLUSS_SATZ, SATZ_NULLSATZ, abschlaegeAus, euPrivatLand, istGutschriftNummer, leitwegFormatOk, mitGrundstueckHinweis, ossSatz, satzZahl, vollEuro } from "./buchhaltung.js";
@@ -452,7 +452,7 @@ export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, 
  * zu den Daten passt und deren Prüfsumme stimmt. Sonst `undefined`.
  */
 export function vorlageGeprueft(v: Vorlage, d?: Daten, liste: Readonly<Record<string, VorlagenFreigabe>> = VORLAGEN_GEPRUEFT, betrieb?: Betrieb): Omit<VorlagenFreigabe, "weitere"> | undefined {
-  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && freigabeUnterschrieben(f) && fassungPasst(f, d) && rechtsformPasst(f, d, betrieb) && variantenPassen(v, f, liste, d, betrieb));
+  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && freigabeBestaetigt(f) && fassungPasst(f, d) && rechtsformPasst(f, d, betrieb) && variantenPassen(v, f, liste, d, betrieb));
 }
 
 /**

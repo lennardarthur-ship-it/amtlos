@@ -141,25 +141,27 @@ pruefe(s.bilder.every((x) => fs.existsSync(path.join(webBilder, `${x.bildschirm}
 // Fachliche Freigabe
 const pl =fs.readFileSync(path.join(APP, "../../PRUEFLISTE.md"), "utf8");
 pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche Freigabe der Vorlagen (PRUEFLISTE T-52 ff.) – vor dem Livegang durch Fachleute");
-// E-196: Prüfvermerk nur aus unterschriebenen Freigaben – was noch auf Unterschrift oder Nachprüfung wartet
+// E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben (Mail des Prüfers) – was noch auf Bestätigung oder Nachprüfung wartet
 {
   const katalog = JSON.parse(lies("src/pflichten/katalog.json"));
   const wartend = katalog.pflichten.filter((p) => p.pruefung?.status === "in_pruefung").map((p) => p.id);
-  pruefe(!wartend.length, `Katalog: alle freigegebenen Einträge mit Unterschrift (E-196)${wartend.length ? ` – ${wartend.length} warten auf Unterschrift bzw. Nachprüfung (docs/freigabe-katalog/versand-2026-10-25-nachpruefung, PRUEFLISTE T-200)` : ""}`);
+  pruefe(!wartend.length, `Katalog: alle freigegebenen Einträge schriftlich bestätigt (E-197)${wartend.length ? ` – ${wartend.length} warten auf die Bestätigung per E-Mail bzw. Nachprüfung (docs/freigabe-katalog/versand-2026-10-25-nachpruefung, PRUEFLISTE T-200)` : ""}`);
+  const entwurf = katalog.pflichten.filter((p) => p.pruefung?.status === "entwurf").map((p) => p.id);
+  pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; docs/freigabe-katalog/versand-2026-10-25-neue-eintraege)` : ""}`);
   const geprueft = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/geprueft.ts"), "utf8");
   const staende = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/pruefstaende.ts"), "utf8");
   const teilsummen = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/geprueft-teilsummen.ts"), "utf8");
   // heutige und freigegebene Teilsumme je Variantengruppe (Rechtsform, Land, Rechnungsart …)
   const heute = Object.fromEntries([...staende.matchAll(/^ {2}"([\w#]+)": \{ summe: "[0-9a-f]{64}", offen: \d+, teile: (\{[^\n]*\}) \},$/gm)].map((m) => [m[1], JSON.parse(m[2])]));
   const frei = Object.fromEntries([...teilsummen.matchAll(/^ {2}"([\w#]+)": (\{[^\n]*\}),$/gm)].map((m) => [m[1], JSON.parse(m[2])]));
-  // Freigaben (weitere Fassungen als „#1“ usw.) mit Unterschriftsdatum
+  // Freigaben (weitere Fassungen als „#1“ usw.) mit Tag der schriftlichen Bestätigung
   const freigaben = [];
-  for (const m of geprueft.matchAll(/^ {2}(\w+): \{ stand: "[\d-]+", rolle: "\w+", unterschrieben_am: ("[\d-]+"|null)/gm)) freigaben.push([m[1], m[2]]);
-  for (const m of geprueft.matchAll(/^ {2}(\w+): \{[^\n]*\n(?: {4}[^\n]*\n)*? {4}weitere: \[\{ stand: "[\d-]+", rolle: "\w+", unterschrieben_am: ("[\d-]+"|null)/gm)) freigaben.push([`${m[1]}#1`, m[2]]);
-  const ohneUnterschrift = freigaben.filter(([, u]) => u === "null").map(([k]) => k);
+  for (const m of geprueft.matchAll(/^ {2}(\w+): \{ stand: "[\d-]+", rolle: "\w+", bestaetigt_am: ("[\d-]+"|null)/gm)) freigaben.push([m[1], m[2]]);
+  for (const m of geprueft.matchAll(/^ {2}(\w+): \{[^\n]*\n(?: {4}[^\n]*\n)*? {4}weitere: \[\{ stand: "[\d-]+", rolle: "\w+", bestaetigt_am: ("[\d-]+"|null)/gm)) freigaben.push([`${m[1]}#1`, m[2]]);
+  const ohneBestaetigung = freigaben.filter(([, u]) => u === "null").map(([k]) => k);
   const geaendert = freigaben.filter(([k, u]) => u !== "null" && (!frei[k] || !heute[k] || Object.keys(frei[k]).some((g) => frei[k][g] !== heute[k][g])));
-  const gruppen = [...new Set(geaendert.flatMap(([k]) => Object.keys(frei[k] ?? {}).filter((g) => frei[k][g] !== heute[k]?.[g])))].sort();
-  pruefe(freigaben.length > 0 && !ohneUnterschrift.length && !geaendert.length, `Vorlagen: heutige Fassung mit Unterschrift bestätigt (E-196)${ohneUnterschrift.length || geaendert.length ? ` – ${ohneUnterschrift.length} von ${freigaben.length} Freigaben ohne Unterschrift; ${geaendert.length} unterschriebene ohne Vermerk in geänderten Varianten (${gruppen.join(", ") || "–"}) (Nachprüfliste, PRUEFLISTE T-204)` : ""}`);
+  const gruppen = [...new Set(geaendert.flatMap(([k]) => Object.keys(frei[k] ?? {}).filter((g) => frei[k][g] !== heute[k]?.[g]).map((g) => `${k}: ${g}`)))].sort();
+  pruefe(freigaben.length > 0 && !ohneBestaetigung.length && !geaendert.length, `Vorlagen: heutige Fassung schriftlich bestätigt (E-197)${ohneBestaetigung.length || geaendert.length ? ` – ${ohneBestaetigung.length} von ${freigaben.length} Freigaben ohne Bestätigung; ${geaendert.length} ohne Vermerk in seit der Bestätigung geänderten Varianten (${gruppen.join(", ") || "–"}) (Nachprüfliste, PRUEFLISTE T-204)` : ""}`);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

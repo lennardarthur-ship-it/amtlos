@@ -2,18 +2,18 @@ import { describe, expect, it } from "vitest";
 import { ROLLEN, VERMERK_NEUTRAL, istGanzGeprueft, istGeprueft, nennungGilt, pruefVermerk } from "../src/pflichten/pruefer";
 import { katalogGeprueft } from "../src/rechtshinweis";
 
-const frei = { status: "freigegeben", geprueft_von: ["recht"], geprueft_am: "2026-10-22", geprueft_version: 3, unterschrieben_am: "2026-10-23" };
+const frei = { status: "freigegeben", geprueft_von: ["recht"], geprueft_am: "2026-10-22", geprueft_version: 3, bestaetigt_am: "2026-10-23" };
 const AM = new Date(2026, 10, 1);
 
 describe("E-171 Prüfvermerk je Katalogeintrag", () => {
-  it("gilt nur für die geprüfte Version und nur mit Unterschrift (E-196)", () => {
+  it("gilt nur für die geprüfte Version und nur mit schriftlicher Bestätigung (E-196, E-197)", () => {
     expect(istGeprueft(3, frei)).toBe(true);
     expect(istGeprueft(4, frei)).toBe(false); // inhaltlich geändert ⇒ Kennzeichnung entfällt
     expect(istGeprueft(3, { ...frei, status: "entwurf" })).toBe(false);
     expect(istGeprueft(3, { ...frei, geprueft_version: null })).toBe(false);
     expect(istGeprueft(3, undefined)).toBe(false);
-    // E-196: ohne Unterschrift kein Vermerk, und der Stand liegt nie nach der Unterschrift
-    expect(istGeprueft(3, { ...frei, unterschrieben_am: null })).toBe(false);
+    // E-197: ohne schriftliche Bestätigung kein Vermerk, und der Stand liegt nie nach der Bestätigung
+    expect(istGeprueft(3, { ...frei, bestaetigt_am: null })).toBe(false);
     expect(istGeprueft(3, { ...frei, geprueft_am: "2026-10-25" })).toBe(false);
   });
 
@@ -71,7 +71,7 @@ describe("Rolle höchstens zwölf Monate nach dem Prüfdatum (Vereinbarung mit d
 
 describe("Geteilte Prüfung (Lebensmittel): beide Rollen mit ihrem Umfang", () => {
   it("Inhalt vom Lebensmittelfachbeauftragten, Folgen vom Rechtsanwalt", () => {
-    const geteilt = { status: "freigegeben", geprueft_von: ["hygiene", "recht"], geprueft_am: "2026-10-23", geprueft_version: 2, unterschrieben_am: "2026-10-23" };
+    const geteilt = { status: "freigegeben", geprueft_von: ["hygiene", "recht"], geprueft_am: "2026-10-23", geprueft_version: 2, bestaetigt_am: "2026-10-23" };
     expect(pruefVermerk(2, geteilt, AM)).toBe("Inhalt fachlich geprüft von einem Lebensmittelfachbeauftragten, die Folgen bei Verstoß von einem Rechtsanwalt, Stand 23.10.2026. Die Prüfung betrifft die allgemeinen Inhalte, nicht deinen Einzelfall.");
     // nach zwölf Monaten (Rechtsanwalt) ohne Rollen
     expect(pruefVermerk(2, geteilt, new Date(2027, 11, 1))).toBe(VERMERK_NEUTRAL.replace("{stand}", "23.10.2026"));

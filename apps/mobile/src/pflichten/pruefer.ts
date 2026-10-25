@@ -3,11 +3,11 @@
  * die geprüfte Version (`pruefung.geprueft_version`) der aktuellen entspricht – jede inhaltliche Änderung (neue Version)
  * hebt die Kennzeichnung auf, bis erneut geprüft ist (Bedingung (2) im Prüfvermerk des Rechtsanwalts vom 22.10.2026).
  *
- * E-196: Der Vermerk nennt nie eine Person, nur die Rolle („von einem Rechtsanwalt“). `pruefung` entsteht nur aus
- * unterschriebenen Freigaben (docs/freigabe-katalog/anwenden.py, `unterschrieben_am`); der Stand liegt nie nach der
- * Unterschrift. Eine Einschränkung des Prüfers steht im Vermerk („ohne arbeitsmedizinische Angaben“), offene Prüfpunkte
- * machen ihn zu „teilweise geprüft“ mit dem offenen Punkt. Nie „rechtssicher“, „garantiert“ oder „freigegeben“
- * (Bedingung (3)).
+ * E-196: Der Vermerk nennt nie eine Person, nur die Rolle („von einem Rechtsanwalt“). E-197: `pruefung` entsteht nur aus
+ * schriftlich bestätigten Freigaben (Mail des Prüfers, ausgefüllte Freigabe-Datei oder ein inzwischen entferntes
+ * unterschriebenes Blatt; docs/freigabe-katalog/anwenden.py, `bestaetigt_am`); der Stand liegt nie nach der Bestätigung.
+ * Eine Einschränkung des Prüfers steht im Vermerk („ohne arbeitsmedizinische Angaben“), offene Prüfpunkte machen ihn
+ * zu „teilweise geprüft“ mit dem offenen Punkt. Nie „rechtssicher“, „garantiert“ oder „freigegeben“ (Bedingung (3)).
  */
 const datumDe = (iso: string) => iso.split("-").reverse().join(".");
 
@@ -52,20 +52,20 @@ export interface PruefungRoh {
   geprueft_von?: string[] | null;
   geprueft_am?: string | null;
   geprueft_version?: number | null;
-  unterschrieben_am?: string | null;
+  bestaetigt_am?: string | null;
   einschraenkung?: string | null;
   offen?: string[] | null;
 }
 
-/** Gilt der Eintrag in seiner aktuellen Version als fachlich geprüft (unterschrieben, Stand nicht nach der Unterschrift)? */
+/** Gilt der Eintrag in seiner aktuellen Version als fachlich geprüft (schriftlich bestätigt, Stand nicht nach der Bestätigung)? */
 export function istGeprueft(version: number, pruefung: PruefungRoh | undefined | null): boolean {
   return (
     pruefung?.status === "freigegeben" &&
     typeof pruefung.geprueft_version === "number" &&
     pruefung.geprueft_version === version &&
     Boolean(pruefung.geprueft_am) &&
-    Boolean(pruefung.unterschrieben_am) &&
-    pruefung.geprueft_am! <= pruefung.unterschrieben_am!
+    Boolean(pruefung.bestaetigt_am) &&
+    pruefung.geprueft_am! <= pruefung.bestaetigt_am!
   );
 }
 

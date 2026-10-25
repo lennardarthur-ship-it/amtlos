@@ -1,18 +1,22 @@
-Betreff: Betriebsklar – Nachprüfliste Steuerberater: bitte prüfen und bestätigen
+Betreff: Betriebsklar – Nachprüfliste Steuerberater: bitte per E-Mail bestätigen
 
 Sehr geehrter Herr [Name],
 
-wir haben unsere Freigaben noch einmal genau mit den unterschriebenen Blättern abgeglichen. Dabei haben wir festgestellt, dass die App den Prüfvermerk an einigen Stellen gezeigt hat, für die uns kein unterschriebenes Blatt vorliegt oder deren Inhalt sich seit Ihrer Freigabe geändert hat. Das haben wir korrigiert: Der Vermerk erscheint jetzt nur noch, wenn eine unterschriebene Freigabe genau diese Fassung abdeckt, und nie mit einem späteren Datum als dem Ihrer Unterschrift.
+wir haben die Prüfvermerke in der App noch einmal mit Ihren schriftlichen Freigaben abgeglichen. Der Vermerk erscheint nur für die Fassung, die Sie bestätigt haben, und nie mit einem späteren Datum als dem Ihrer Bestätigung. Für die folgenden Punkte brauchen wir noch Ihre Prüfung bzw. Bestätigung:
 
-Bitte prüfen und bestätigen Sie die Positionen in den beiliegenden Listen (Betriebsklar-Nachpruefliste-Steuerberater.xlsx und Betriebsklar-Konten-13b-Steuerberater.xlsx):
-
-- 6 Katalogeinträge, die Sie freigegeben haben, zu denen uns aber kein unterschriebenes Blatt vorliegt. Bis zu Ihrer Unterschrift zeigt die App dort keinen Prüfvermerk.
 - 2 offene Punkte aus unseren Prüfnotizen; bis zur Klärung heißt der Vermerk dort „teilweise geprüft“.
-- 9 Vorlagen: Uns fehlt das unterschriebene Blatt und/oder eine Variante hat sich seit Ihrer Freigabe geändert. Wir prüfen den Inhalt jetzt je Variante (Rechtsform, Land, Rechnungsart …) über alle gedruckten Fassungen; der Vermerk entfällt nur für eine geänderte Variante. Geändert: Rechnung (GmbH & Co. KG, UG (haftungsbeschränkt) & Co. KG, Storno einer Schlussrechnung mit Abschlägen); Bilanz und Gewinn- und Verlustrechnung (Hilfetext im Formular) – die PDFs dieser Varianten liegen bei; alle übrigen Vorlagen sind seit Ihrer Freigabe unverändert.
-- in einem eigenen kurzen Blatt (Betriebsklar-Konten-13b-Steuerberater.xlsx): die vier Konten für § 13b-Eingangsleistungen (SKR03 3120/3123/3140/3143, SKR04 5920/5923/5940/5943). Ihr Prüfbericht vom 21./22.10.2026 bezeichnet sie als richtig; eine unterschriebene Bestätigung fehlt.
-- die Nennung im Vermerk: Die App nennt keine Personen mehr, nur noch die Rolle (z. B. „von einem Steuerberater“). Bitte bestätigen Sie, dass das so in Ordnung ist.
+- 2 Vorlagen. Ihre Freigaben liegen uns schriftlich vor; der Vermerk gilt je Variante (Rechtsform, Land, Rechnungsart …) nur für die Fassung, die Sie gesehen haben. Seit Ihrer Freigabe geändert: Rechnung (GmbH & Co. KG, UG (haftungsbeschränkt) & Co. KG, Storno einer Schlussrechnung mit Abschlägen); Bilanz und Gewinn- und Verlustrechnung (Hilfetext im Formular) – nur dort fehlt der Vermerk; die PDFs dieser Varianten liegen bei.
+- die Nennung im Vermerk: Die App nennt keine Personen mehr, nur noch die Rolle (z. B. „von einem Steuerberater“).
 
-Je Zeile genügt die Auswahl in der Spalte „Entscheidung“; am Ende bitte das Blatt „Unterschrift“ ausfüllen und unterschreiben (Scan genügt).
+Die Einzelheiten stehen in der beiliegenden Liste (Betriebsklar-Nachpruefliste-Steuerberater.xlsx). Bitte bestätigen Sie per E-Mail, welche dieser Positionen zutreffen:
+
+  1. Offener Punkt: C.30 steuern.e_rechnung_versand_2027 (v3) – E-Rechnungen versenden (ab 2027)
+  2. Offener Punkt: C.30 steuern.e_rechnung_versand_2028 (v3) – E-Rechnungen versenden (ab 2028)
+  3. Vorlage: rechnung (b1bf4530cee8) – Rechnung
+  4. Vorlage: bilanz_guv (a266993aadfd) – Bilanz und Gewinn- und Verlustrechnung
+  5. Nennung im Vermerk: alle (–) – Rolle statt Name
+
+Eine kurze Antwort genügt, zum Beispiel: „Die Positionen 1 bis 5 der Nachprüfliste vom 25.10.2026 sind bestätigt“ – Positionen, die Sie ändern möchten, nennen Sie bitte mit der Änderung. Sie können auch die Spalte „Entscheidung“ ausfüllen und die Datei mit Ihrer Antwort zurückschicken. Eine Unterschrift ist nicht nötig.
 
 Mit freundlichen Grüßen
 
@@ -20,7 +24,6 @@ Mit freundlichen Grüßen
 
 Anlagen:
 - Betriebsklar-Nachpruefliste-Steuerberater.xlsx
-- Betriebsklar-Konten-13b-Steuerberater.xlsx
 - vorlagen/bilanz_guv-gemeinsamer-teil.pdf
 - vorlagen/rechnung-gmbh-co-kg.pdf
 - vorlagen/rechnung-storno-schlussrechnung.pdf

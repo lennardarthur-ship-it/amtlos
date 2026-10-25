@@ -1,23 +1,29 @@
 """
-Freigaben aus dem Register (docs/freigabe-katalog/freigaben.yaml) in den Katalog schreiben (E-173, E-196).
+Freigaben aus dem Register (docs/freigabe-katalog/freigaben.yaml) in den Katalog schreiben (E-173, E-196, E-197).
 
     python3 docs/freigabe-katalog/anwenden.py            # schreibt pruefung-Blöcke, druckt Übersicht
     python3 docs/freigabe-katalog/anwenden.py --pruefen  # schreibt nichts, Exit 1 wenn der Katalog vom Register abweicht
-    python3 docs/freigabe-katalog/anwenden.py --bericht  # zusätzlich: je Rolle, was ohne Unterschrift freigegeben ist
+    python3 docs/freigabe-katalog/anwenden.py --bericht  # zusätzlich: je Eintrag, was ohne schriftliche Bestätigung freigegeben ist
 
 Regel: Eine Freigabe gilt nur für die Fassung (Version), die der Prüfer gesehen hat. Ein Eintrag ist freigegeben, wenn
-für seinen Bereich alle nötigen Freigaben zur aktuellen Version passen UND unterschrieben sind:
+für seinen Bereich alle nötigen Freigaben zur aktuellen Version passen UND schriftlich bestätigt sind:
 - Recht → `recht` (Rechtsanwalt); Steuern → `steuern` (Steuerberater); Arbeitsschutz → `arbeitsschutz` (Sifa);
 - Lebensmittel → `hygiene` (Lebensmittelfachbeauftragter, Inhalt ohne Folgen) UND `recht` (nur Folgen bei Verstoß).
-Unterschrieben (E-196) heißt: Der Block hat `unterschrieben_am` und `unterschrift` (Datei mit der Unterschrift unter
-docs/pruefberichte). Freigaben per Mail oder auf Blättern, deren unterschriebenes Exemplar nicht vorliegt, zählen nicht –
-sie stehen mit `--bericht` in der Liste „Unterschrift fehlt“ (Nachprüfliste). Das Datum im Vermerk (`geprueft_am`) ist
-der Stand der Freigabe und liegt nie nach dem Tag der Unterschrift.
+Schriftlich bestätigt (E-197, ersetzt die Unterschriftsregel aus E-196) heißt: Der Block hat einen `nachweis`:
+- `art: mail` – Bestätigung des Prüfers per E-Mail (Textform), `mail` = Datei unter docs/pruefberichte; mit `blatt` (die
+  ausgefüllte Datei, auf die die Mail verweist) muss jeder Eintrag dort mit dieser Version „freigegeben“ sein, sonst
+  braucht er ein `zitat`, das wörtlich in der Mail steht;
+- `art: unterschrift_entfernt` – das unterschriebene Blatt lag vor und wurde auf Wunsch des Gründers am 25.10.2026 aus dem
+  Projekt entfernt (E-197); `text` sagt, was es bestätigte, `mail`/`blatt` nennen die Mail und die Datei, soweit vorhanden;
+- `art: blatt` – vom Prüfer ausgefüllte Freigabe-Datei (`blatt`, Spalte Entscheidung);
+- `art: ersetzt` oder `offen` zählt nicht.
+`am` ist der Tag der Bestätigung. Das Datum im Vermerk (`geprueft_am`) liegt nie danach; bei `art: mail` ist es das
+Datum der Mail. Der pruefung-Block trägt `bestaetigt_am`.
 Bei Teil-Umfängen („ohne_sanktion“ / „sanktion“) bleibt eine Freigabe gültig, wenn sich seit der freigegebenen Version
 nur Felder außerhalb ihres Umfangs geändert haben (Vergleich mit der Fassung aus der git-Historie).
 Einschränkungen des Prüfers je Eintrag (`einschraenkung`, z. B. „ohne arbeitsmedizinische Angaben“) und offene
 Prüfpunkte (docs/freigabe-katalog/offene-punkte.yaml) kommen in den pruefung-Block; die App zeigt sie im Vermerk.
-Alles andere wird `in_pruefung` (zuvor oder ohne Unterschrift freigegeben) bzw. bleibt `entwurf`. Die App zeigt
+Alles andere wird `in_pruefung` (zuvor oder ohne schriftliche Bestätigung freigegeben) bzw. bleibt `entwurf`. Die App zeigt
 „geprüft“ nur bei `geprueft_version == version` (apps/mobile/src/pflichten/pruefer.ts).
 """
 import glob
@@ -78,24 +84,73 @@ BENOETIGT = {"recht": [(RECHT, "alles")], "steuer": [(STEUERN, "alles")], "arbei
 register = yaml.safe_load(open(os.path.join(ROOT, "docs/freigabe-katalog/freigaben.yaml"), encoding="utf-8"))
 
 
-def unterschrieben(r):
-    """Datum der Unterschrift, wenn der Block unterschrieben ist und das unterschriebene Blatt vorliegt – sonst None."""
-    am, beleg = r.get("unterschrieben_am"), r.get("unterschrift")
-    if not am or not beleg:
+ZAEHLT = {"mail", "unterschrift_entfernt", "blatt"}
+_blaetter = {}
+
+
+def _blatt(pfad):
+    """Einträge einer ausgefüllten Datei: ID → (Version, Entscheidung)."""
+    if pfad not in _blaetter:
+        import openpyxl
+        wb = openpyxl.load_workbook(os.path.join(ROOT, pfad), data_only=True)
+        out = {}
+        for ws in wb.worksheets:
+            zeilen = list(ws.iter_rows(values_only=True))
+            if not zeilen:
+                continue
+            kopf = [str(c) if c else "" for c in zeilen[0]]
+            if "ID" not in kopf or "Entscheidung" not in kopf or not ({"Aktuell", "Version"} & set(kopf)):
+                continue
+            i, e = kopf.index("ID"), kopf.index("Entscheidung")
+            v = kopf.index("Aktuell") if "Aktuell" in kopf else kopf.index("Version")
+            for z in zeilen[1:]:
+                if z[i]:
+                    out[str(z[i])] = (str(z[v]).lstrip("v"), str(z[e] or "").strip())
+        _blaetter[pfad] = out
+    return _blaetter[pfad]
+
+
+def bestaetigt(r):
+    """Tag der schriftlichen Bestätigung, wenn der Block einen gültigen Nachweis hat (E-197) – sonst None."""
+    n = r.get("nachweis") or {}
+    if n.get("art") not in ZAEHLT:
         return None
-    if not os.path.isfile(os.path.join(ROOT, beleg)):
-        raise SystemExit(f"freigaben.yaml: Beleg der Unterschrift fehlt: {beleg}")
-    return str(am)
+    for k in ("mail", "blatt"):
+        if n.get(k) and not os.path.isfile(os.path.join(ROOT, n[k])):
+            raise SystemExit(f"freigaben.yaml: Nachweis fehlt: {n[k]}")
+    if n["art"] == "mail" and not n.get("mail"):
+        raise SystemExit(f"freigaben.yaml: Block {r['pruefer']}/{r['umfang']} mit art: mail ohne Mail")
+    if n["art"] == "blatt" and not n.get("blatt"):
+        raise SystemExit(f"freigaben.yaml: Block {r['pruefer']}/{r['umfang']} mit art: blatt ohne Datei")
+    return str(n["am"])
+
+
+def nachweis_pruefen(r):
+    """Jeder Eintrag eines bestätigten Blocks steht in der Datei (Version, „freigegeben“) oder wörtlich in der Mail."""
+    n = r.get("nachweis") or {}
+    am = bestaetigt(r)
+    if not am:
+        return
+    mail = " ".join(open(os.path.join(ROOT, n["mail"]), encoding="utf-8").read().split()) if n.get("mail") else ""
+    for i, f in r["eintraege"].items():
+        assert str(f["stand"]) <= am, f"freigaben.yaml: {i} Stand {f['stand']} nach der Bestätigung {am}"
+        if n["art"] == "mail":
+            assert str(f["stand"]) == am, f"freigaben.yaml: {i} Stand {f['stand']} ist nicht das Datum der Mail {am}"
+        if f.get("zitat"):
+            assert " ".join(f["zitat"].split()) in mail, f"freigaben.yaml: Zitat zu {i} steht nicht in {n.get('mail')}"
+        elif n.get("blatt"):
+            v, e = _blatt(n["blatt"]).get(i, (None, None))
+            assert v == str(f["version"]) and e == "freigegeben", f"freigaben.yaml: {i} v{f['version']} in {n['blatt']} nicht freigegeben ({v}, {e})"
+        elif n["art"] == "mail":
+            raise AssertionError(f"freigaben.yaml: {i} – Mail ohne Datei und ohne Zitat")
 
 
 # mehrere Blöcke je Prüfer/Umfang möglich (z. B. Nachtrag, der Erklärung und Stelle bestätigt)
-BLOECKE = [(r["pruefer"], r["umfang"], set(r.get("felder_fehlen") or []), r["eintraege"], unterschrieben(r)) for r in register]
+BLOECKE = [(r["pruefer"], r["umfang"], set(r.get("felder_fehlen") or []), r["eintraege"], bestaetigt(r)) for r in register]
 for _r in register:
     assert _r["pruefer"] in ROLLEN, f"freigaben.yaml: unbekannte Rolle {_r['pruefer']}"
-    _am = unterschrieben(_r)
-    for _i, _f in _r["eintraege"].items():
-        # Der Stand im Vermerk liegt nie nach der Unterschrift
-        assert not _am or str(_f["stand"]) <= _am, f"freigaben.yaml: {_i} Stand {_f['stand']} nach der Unterschrift {_am}"
+    assert "unterschrift" not in _r and "unterschrieben_am" not in _r, "freigaben.yaml: Unterschriftsfelder durch `nachweis` ersetzt (E-197)"
+    nachweis_pruefen(_r)
 frei = {}
 for _p, _u, _fehl, _e, _am in BLOECKE:
     for _i, _f in _e.items():
@@ -145,28 +200,28 @@ def gueltig(pfad, d, f, umfang):
     return all(alt.get(k) == d.get(k) for k in felder)
 
 
-def deckung(pfad, d, p, u, nur_unterschrieben):
-    """(abgedeckt, Stand, Unterschrift, Einschränkungen) für Prüfer p mit Umfang u in der aktuellen Version."""
+def deckung(pfad, d, p, u, nur_bestaetigt):
+    """(abgedeckt, Stand, Tag der Bestätigung, Einschränkungen) für Prüfer p mit Umfang u in der aktuellen Version."""
     noetig = {"rest"} if u == "sanktion" else {"rest"} | SONDERFELDER
-    gedeckt, staende, unterschriften, einschr = set(), [], [], []
+    gedeckt, staende, bestaetigungen, einschr = set(), [], [], []
     for bp, bu, fehl, e, am in BLOECKE:
-        if (bp, bu) != (p, u) or (nur_unterschrieben and not am):
+        if (bp, bu) != (p, u) or (nur_bestaetigt and not am):
             continue
         f = e.get(d["id"])
         if gueltig(pfad, d, f, u):
             gedeckt |= ({"rest"} | SONDERFELDER) - fehl
             staende.append(str(f["stand"]))
             if am:
-                unterschriften.append(am)
+                bestaetigungen.append(am)
             if f.get("einschraenkung"):
                 einschr.append(f["einschraenkung"])
     ok = noetig <= gedeckt
-    return ok, (max(staende) if ok else None), (max(unterschriften) if ok and unterschriften else None), sorted(set(einschr))
+    return ok, (max(staende) if ok else None), (max(bestaetigungen) if ok and bestaetigungen else None), sorted(set(einschr))
 
 
-def abgedeckt(pfad, d, p, u, nur_unterschrieben=False):
+def abgedeckt(pfad, d, p, u, nur_bestaetigt=False):
     """Sind alle Felder im Umfang für die aktuelle Version freigegeben (inkl. Erklärung und Stelle)?"""
-    return deckung(pfad, d, p, u, nur_unterschrieben)[0]
+    return deckung(pfad, d, p, u, nur_bestaetigt)[0]
 
 
 def offene_punkte(d):
@@ -191,17 +246,18 @@ def auswerten(pfad, d):
     signiert = [(p, u) + deckung(pfad, d, p, u, True)[1:] + (deckung(pfad, d, p, u, True)[0],) for p, u in noetig]
     themen, fehlend = offene_punkte(d)
     info = {"id": d["id"], "version": d["version"], "rollen": [p for p, _ in noetig], "offen": themen, "nicht_eingeordnet": fehlend,
-            "ohne_unterschrift": [], "einschraenkung": []}
+            "ohne_nachweis": [], "einschraenkung": []}
     for p, u in noetig:
         if not abgedeckt(pfad, d, p, u, True) and abgedeckt(pfad, d, p, u, False):
-            info["ohne_unterschrift"].append({"rolle": p, "umfang": u})
+            info["ohne_nachweis"].append({"rolle": p, "umfang": u})
     if all(s[-1] for s in signiert):
-        stand = max(s[2] for s in signiert)
+        # geteilte Prüfung: Stand nie nach der Bestätigung einer der beteiligten Rollen (E-197)
+        stand = min(s[2] for s in signiert)
         am = max(s[3] for s in signiert)
         einschr = sorted({e for s in signiert for e in s[4]})
         info["einschraenkung"] = einschr
         block = ("pruefung:\n  status: freigegeben\n  geprueft_von:\n" + "".join(f"    - {p}\n" for p, _ in noetig)
-                 + f"  geprueft_am: '{stand}'\n  geprueft_version: {d['version']}\n  unterschrieben_am: '{am}'\n")
+                 + f"  geprueft_am: '{stand}'\n  geprueft_version: {d['version']}\n  bestaetigt_am: '{am}'\n")
         if einschr:
             block += f"  einschraenkung: {json.dumps('; '.join(einschr), ensure_ascii=False)}\n"
         if themen:
@@ -213,6 +269,39 @@ def auswerten(pfad, d):
         block = f"pruefung:\n  status: {status}\n  geprueft_von: null\n  geprueft_am: null\n"
     info["status"] = status
     return status, block, info
+
+
+def vorlagen_nachweis_pruefen():
+    """E-197: Jede Vorlagen-Freigabe in geprueft.ts hat einen Nachweis; nennt er eine ausgefüllte Datei (`blatt`), steht dort
+    die bestätigte Prüfsumme (`pruefsumme_alt`, 12 Zeichen) mit „freigegeben“ (bzw. im PDF des Blatts)."""
+    import openpyxl
+    ts = open(os.path.join(ROOT, "packages/fachlogik/src/dokumente/geprueft.ts"), encoding="utf-8").read()
+    fehler = []
+    for m in re.finditer(r'stand: "([\d-]+)", rolle: "(\w+)", bestaetigt_am: ("[\d-]+"|null), nachweis: ("[^"]*"|null), (?:blatt: "([^"]*)", )?[^\n]*?pruefsumme_alt: "([0-9a-f]{12})', ts):
+        stand, _rolle, am, nachweis, blatt, kurz = m.groups()
+        if am == "null" or nachweis == "null" or not os.path.isfile(os.path.join(ROOT, nachweis.strip('"'))):
+            fehler.append(f"{kurz}: ohne Nachweis")
+            continue
+        if stand > am.strip('"'):
+            fehler.append(f"{kurz}: Stand {stand} nach der Bestätigung {am}")
+        if not blatt:
+            continue
+        if blatt.endswith(".pdf"):
+            text = subprocess.run(["pdftotext", os.path.join(ROOT, blatt), "-"], capture_output=True, text=True).stdout
+            if kurz not in text:
+                fehler.append(f"{kurz}: nicht in {blatt}")
+            continue
+        wb = openpyxl.load_workbook(os.path.join(ROOT, blatt), data_only=True)
+        ok = False
+        for ws in wb.worksheets:
+            zeilen = list(ws.iter_rows(values_only=True))
+            kopf = [str(c) if c else "" for c in (zeilen[0] if zeilen else [])]
+            if "Prüfsumme (Kurz)" in kopf and "Entscheidung" in kopf:
+                ps, en = kopf.index("Prüfsumme (Kurz)"), kopf.index("Entscheidung")
+                ok |= any(str(z[ps]) == kurz and str(z[en]).strip() == "freigegeben" for z in zeilen[1:])
+        if not ok:
+            fehler.append(f"{kurz}: in {blatt} nicht mit „freigegeben“")
+    return fehler
 
 
 def alle():
@@ -239,10 +328,14 @@ if __name__ == "__main__":
     print(uebersicht, f"geändert: {len(abweichung)}", "je Rolle:", je_rolle)
     if BERICHT:
         for b in berichte:
-            if b["ohne_unterschrift"] or b["offen"] or b["einschraenkung"]:
+            if b["ohne_nachweis"] or b["offen"] or b["einschraenkung"]:
                 print(json.dumps(b, ensure_ascii=False))
     if ungeordnet:
         print("Prüfpunkte ohne Einordnung in offene-punkte.yaml:", *ungeordnet, sep="\n  ")
+        sys.exit(1)
+    vfehler = vorlagen_nachweis_pruefen()
+    if vfehler:
+        print("Vorlagen-Freigaben ohne passenden Nachweis (geprueft.ts):", *vfehler, sep="\n  ")
         sys.exit(1)
     if PRUEFEN and abweichung:
         print("Katalog weicht vom Freigabe-Register ab:", ", ".join(abweichung[:20]))

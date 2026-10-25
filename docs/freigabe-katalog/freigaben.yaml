@@ -1,8 +1,10 @@
 - pruefer: recht
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Freigabe-Dateien vom 22./23.10.2026 ohne eigene Unterschrift; ersetzt durch den Abgleich vom 23.10.2026 (unterschriebene Bestätigung)
+  nachweis:
+    art: ersetzt
+    am: '2026-10-23'
+    text: Frühere Freigabe ohne Erklärung und Zuständige Stelle (felder_fehlen); ersetzt durch den Abgleich vom 23.10.2026 (Block mit Nachweis
+      weiter unten) – zählt nicht allein
   hinweis: Freigabe-Dateien 22./23.10.2026; Bestätigungsseite mit geänderter Formulierung (a)/(b) steht aus
   eintraege:
     branche.beauty_kosmetikverordnung:
@@ -644,9 +646,11 @@
     Felder sind noch zu bestätigen.
 - pruefer: recht
   umfang: sanktion
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Freigabe-Dateien vom 22./23.10.2026 ohne eigene Unterschrift; ersetzt durch den Abgleich vom 23.10.2026 (unterschriebene Bestätigung)
+  nachweis:
+    art: blatt
+    am: '2026-10-23'
+    text: Vom Prüfer ausgefüllte Freigabe-Datei Runde 3 vom 23.10.2026 (Spalte Entscheidung; nur Folgen bei Verstoß)
+    blatt: docs/pruefberichte/2026-10-23-freigabe-recht-runde3.xlsx
   hinweis: Freigabe-Dateien 22./23.10.2026; Bestätigungsseite mit geänderter Formulierung (a)/(b) steht aus
   eintraege:
     branche.gastro_acrylamid:
@@ -703,9 +707,11 @@
     Felder sind noch zu bestätigen.
 - pruefer: arbeitsschutz
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Freigabe-Dateien vom 22./23.10.2026 ohne eigene Unterschrift; ersetzt durch den Abgleich vom 23.10.2026 (unterschriebene Bestätigung)
+  nachweis:
+    art: ersetzt
+    am: '2026-10-23'
+    text: Frühere Freigabe ohne Erklärung und Zuständige Stelle (felder_fehlen); ersetzt durch den Abgleich vom 23.10.2026 (Block mit Nachweis
+      weiter unten) – zählt nicht allein
   hinweis: Freigabe-Dateien 22./23.10.2026; Bestätigungsblatt nach Abgleich
   eintraege:
     arbeitsschutz.arbeitsmedizinische_vorsorge:
@@ -830,9 +836,11 @@
     Felder sind noch zu bestätigen.
 - pruefer: steuern
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Bestätigung Teil A vom 22.10.2026 liegt nicht im Repository; ersetzt durch die unterschriebene Bestätigung vom 23.10.2026
+  nachweis:
+    art: ersetzt
+    am: '2026-10-22'
+    text: Frühere Freigabe ohne Erklärung und Zuständige Stelle (felder_fehlen); ersetzt durch den Abgleich vom 23.10.2026 (Block mit Nachweis
+      weiter unten) – zählt nicht allein
   hinweis: Bestätigung Teil A unterschrieben 23.10.2026; Teil B (14) offen
   eintraege:
     gruendung.fragebogen_steuerliche_erfassung:
@@ -952,9 +960,11 @@
     Felder sind noch zu bestätigen.
 - pruefer: hygiene
   umfang: ohne_sanktion
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: ersetzt durch die unterschriebene Bestätigung vom 23.10.2026 (Abgleich)
+  nachweis:
+    art: ersetzt
+    am: '2026-10-23'
+    text: Frühere Freigabe ohne Erklärung und Zuständige Stelle (felder_fehlen); ersetzt durch den Abgleich vom 23.10.2026 (Block mit Nachweis
+      weiter unten) – zählt nicht allein
   hinweis: Bestätigung unterschrieben 23.10.2026; Kennzeichnung vorverpackt nach Umsetzung Runde 2
   eintraege:
     branche.gastro_acrylamid:
@@ -1036,10 +1046,15 @@
     Felder sind noch zu bestätigen.
 - pruefer: recht
   umfang: alles
-  unterschrieben_am: '2026-10-23'
-  unterschrift: docs/pruefberichte/2026-10-23-bestaetigung-recht-unterschrieben.jpg
+  nachweis:
+    art: unterschrift_entfernt
+    am: '2026-10-23'
+    text: 'Schriftliche Bestätigung lag vor (unterschriebenes Blatt vom 23.10.2026, auf Wunsch des Gründers am 25.10.2026 aus dem Projekt entfernt);
+      per Mail bestätigt: „154 Einträge in der aktuellen Fassung freigegeben“ mit der ausgefüllten Abgleich-Datei'
+    mail: docs/pruefberichte/2026-10-23-abgleich-recht-mail.txt
+    blatt: docs/pruefberichte/2026-10-23-abgleich-recht.xlsx
   felder_fehlen: []
-  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (2026-10-23-bestaetigung-recht-unterschrieben.jpg)
+  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (Scan am 25.10.2026 auf Wunsch des Gründers aus dem Projekt entfernt, E-197)
   eintraege:
     arbeitsschutz.arbeitsmedizinische_vorsorge:
       version: 5
@@ -1636,10 +1651,15 @@
       stand: '2026-10-23'
 - pruefer: recht
   umfang: sanktion
-  unterschrieben_am: '2026-10-23'
-  unterschrift: docs/pruefberichte/2026-10-23-bestaetigung-recht-unterschrieben.jpg
+  nachweis:
+    art: unterschrift_entfernt
+    am: '2026-10-23'
+    text: Schriftliche Bestätigung lag vor (unterschriebenes Blatt vom 23.10.2026, auf Wunsch des Gründers am 25.10.2026 aus dem Projekt entfernt);
+      per Mail bestätigt (Abgleich-Datei, nur Folgen bei Verstoß)
+    mail: docs/pruefberichte/2026-10-23-abgleich-recht-mail.txt
+    blatt: docs/pruefberichte/2026-10-23-abgleich-recht.xlsx
   felder_fehlen: []
-  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (2026-10-23-bestaetigung-recht-unterschrieben.jpg)
+  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (Scan am 25.10.2026 auf Wunsch des Gründers aus dem Projekt entfernt, E-197)
   eintraege:
     branche.gastro_haccp:
       version: 7
@@ -1667,10 +1687,15 @@
       stand: '2026-10-23'
 - pruefer: steuern
   umfang: alles
-  unterschrieben_am: '2026-10-23'
-  unterschrift: docs/pruefberichte/2026-10-23-bestaetigung-steuern-unterschrieben.jpg
+  nachweis:
+    art: unterschrift_entfernt
+    am: '2026-10-23'
+    text: 'Schriftliche Bestätigung lag vor (unterschriebenes Blatt vom 23.10.2026, auf Wunsch des Gründers am 25.10.2026 aus dem Projekt entfernt);
+      per Mail bestätigt: „30 Einträge sind freigegeben“ mit der ausgefüllten Abgleich-Datei'
+    mail: docs/pruefberichte/2026-10-23-abgleich-steuern-mail.txt
+    blatt: docs/pruefberichte/2026-10-23-abgleich-steuern.xlsx
   felder_fehlen: []
-  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (2026-10-23-bestaetigung-steuern-unterschrieben.jpg)
+  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (Scan am 25.10.2026 auf Wunsch des Gründers aus dem Projekt entfernt, E-197)
   eintraege:
     gruendung.fragebogen_steuerliche_erfassung:
       version: 5
@@ -1794,10 +1819,15 @@
       stand: '2026-10-23'
 - pruefer: arbeitsschutz
   umfang: alles
-  unterschrieben_am: '2026-10-23'
-  unterschrift: docs/pruefberichte/2026-10-23-bestaetigung-arbeitsschutz-unterschrieben.jpg
+  nachweis:
+    art: unterschrift_entfernt
+    am: '2026-10-23'
+    text: 'Schriftliche Bestätigung lag vor (unterschriebenes Blatt vom 23.10.2026, auf Wunsch des Gründers am 25.10.2026 aus dem Projekt entfernt);
+      per Mail bestätigt: „24 Einträge sind in der aktuellen Fassung freigegeben“ mit der ausgefüllten Abgleich-Datei'
+    mail: docs/pruefberichte/2026-10-23-abgleich-arbeitsschutz-mail.txt
+    blatt: docs/pruefberichte/2026-10-23-abgleich-arbeitsschutz.xlsx
   felder_fehlen: []
-  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (2026-10-23-bestaetigung-arbeitsschutz-unterschrieben.jpg)
+  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (Scan am 25.10.2026 auf Wunsch des Gründers aus dem Projekt entfernt, E-197)
   eintraege:
     arbeitsschutz.arbeitsmittel_pruefen:
       version: 5
@@ -1899,10 +1929,15 @@
       stand: '2026-10-23'
 - pruefer: hygiene
   umfang: ohne_sanktion
-  unterschrieben_am: '2026-10-23'
-  unterschrift: docs/pruefberichte/2026-10-23-bestaetigung-hygiene-unterschrieben.jpg
+  nachweis:
+    art: unterschrift_entfernt
+    am: '2026-10-23'
+    text: 'Schriftliche Bestätigung lag vor (unterschriebenes Blatt vom 23.10.2026, auf Wunsch des Gründers am 25.10.2026 aus dem Projekt entfernt);
+      per Mail bestätigt: „12 Einträge sind in der aktuellen Fassung freigegeben“ mit der ausgefüllten Abgleich-Datei'
+    mail: docs/pruefberichte/2026-10-23-abgleich-hygiene-mail.txt
+    blatt: docs/pruefberichte/2026-10-23-abgleich-hygiene.xlsx
   felder_fehlen: []
-  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (2026-10-23-bestaetigung-hygiene-unterschrieben.jpg)
+  hinweis: Abgleich 23.10.2026 (alle Felder einschließlich Erklärung und Zuständige Stelle); Bestätigungsblatt unterschrieben 23.10.2026 (Scan am 25.10.2026 auf Wunsch des Gründers aus dem Projekt entfernt, E-197)
   eintraege:
     branche.gastro_acrylamid:
       version: 3
@@ -1954,9 +1989,12 @@
       stand: '2026-10-23'
 - pruefer: recht
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Mail 23.10.2026 (2026-10-23-nachpruefung-vorlagen-recht-mail.txt) kündigt das unterschriebene Nachtragsblatt an; es liegt nicht im Repository
+  nachweis:
+    art: mail
+    am: '2026-10-23'
+    text: 'Mail: „Teil A (Katalog): fünf Einträge freigegeben, einer zu ändern“ mit der ausgefüllten Abgleich-Datei der Nachprüfung'
+    mail: docs/pruefberichte/2026-10-23-nachpruefung-vorlagen-recht-mail.txt
+    blatt: docs/pruefberichte/2026-10-23-nachpruefung-recht.xlsx
   felder_fehlen: []
   hinweis: Nachprüfung 23.10.2026 freigegeben (Mail); unterschriebenes Blatt liegt beim Gründer vor (Scan, 23.10.2026)
   eintraege:
@@ -1979,9 +2017,13 @@
       stand: '2026-10-23'
 - pruefer: recht
   umfang: sanktion
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Mail 23.10.2026 (2026-10-23-nachpruefung-vorlagen-recht-mail.txt) kündigt das unterschriebene Nachtragsblatt an; es liegt nicht im Repository
+  nachweis:
+    art: mail
+    am: '2026-10-23'
+    text: 'Mail: „Teil A (Katalog): fünf Einträge freigegeben, einer zu ändern“ mit der ausgefüllten Abgleich-Datei der Nachprüfung (nur Folgen
+      bei Verstoß)'
+    mail: docs/pruefberichte/2026-10-23-nachpruefung-vorlagen-recht-mail.txt
+    blatt: docs/pruefberichte/2026-10-23-nachpruefung-recht.xlsx
   felder_fehlen: []
   hinweis: Nachprüfung 23.10.2026 (nur Folgen); unterschriebenes Blatt liegt beim Gründer vor (Scan, 23.10.2026)
   eintraege:
@@ -1991,9 +2033,11 @@
       stand: '2026-10-23'
 - pruefer: steuern
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Freigabe per Mail 23.10.2026; die Ergänzung der Bestätigung im Repository (2026-10-24-ergaenzung-bestaetigung-steuern.pdf) trägt keine Unterschrift
+  nachweis:
+    art: mail
+    am: '2026-10-23'
+    text: 'Mail: „Buchführungspflicht (v7), E-Bilanz (v6) und OSS (v3) sind freigegeben.“'
+    mail: docs/pruefberichte/2026-10-23-nachpruefung-vorlagen-steuern-mail.txt
   felder_fehlen: []
   hinweis: Freigabe per Mail 23.10.2026; in der Ergänzung der Bestätigung (Runde 3) unterschrieben
   eintraege:
@@ -2001,19 +2045,25 @@
       version: 7
       quelle: 2026-10-23-nachpruefung-vorlagen-steuern-mail.txt
       stand: '2026-10-23'
+      zitat: Buchführungspflicht (v7), E-Bilanz (v6) und OSS (v3) sind freigegeben
     steuern.e_bilanz:
       version: 6
       quelle: 2026-10-23-nachpruefung-vorlagen-steuern-mail.txt
       stand: '2026-10-23'
+      zitat: Buchführungspflicht (v7), E-Bilanz (v6) und OSS (v3) sind freigegeben
     steuern.oss_erklaerung:
       version: 3
       quelle: 2026-10-23-nachpruefung-vorlagen-steuern-mail.txt
       stand: '2026-10-23'
+      zitat: Buchführungspflicht (v7), E-Bilanz (v6) und OSS (v3) sind freigegeben
 - pruefer: arbeitsschutz
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Mail 23.10.2026 (2026-10-23-nachpruefung-vorlagen-arbeitsschutz-mail.txt) nennt einen unterschriebenen Nachtrag als Scan; er liegt nicht im Repository
+  nachweis:
+    art: mail
+    am: '2026-10-23'
+    text: 'Mail: „DGUV V3 und Flucht- und Rettungsplan: freigegeben.“ mit der ausgefüllten Abgleich-Datei der Nachprüfung (Version je Eintrag)'
+    mail: docs/pruefberichte/2026-10-23-nachpruefung-vorlagen-arbeitsschutz-mail.txt
+    blatt: docs/pruefberichte/2026-10-23-nachpruefung-arbeitsschutz.xlsx
   felder_fehlen: []
   hinweis: Nachprüfung 23.10.2026; unterschriebenes Blatt liegt beim Gründer vor (Scan, 23.10.2026)
   eintraege:
@@ -2027,10 +2077,15 @@
       stand: '2026-10-23'
 - pruefer: hygiene
   umfang: ohne_sanktion
-  unterschrieben_am: '2026-10-23'
-  unterschrift: docs/pruefberichte/2026-10-23-nachtrag-hygiene-unterschrieben.jpg
+  nachweis:
+    art: unterschrift_entfernt
+    am: '2026-10-23'
+    text: 'Schriftliche Bestätigung lag vor (unterschriebenes Blatt vom 23.10.2026, auf Wunsch des Gründers am 25.10.2026 aus dem Projekt entfernt);
+      per Mail bestätigt: „Allergene (v5)“ und „Kontaktmaterialien (v3)“ freigegeben'
+    mail: docs/pruefberichte/2026-10-23-nachpruefung-hygiene-mail.txt
+    blatt: docs/pruefberichte/2026-10-23-nachpruefung-hygiene.xlsx
   felder_fehlen: []
-  hinweis: Nachtrag unterschrieben 23.10.2026 (2026-10-23-nachtrag-hygiene-unterschrieben.jpg)
+  hinweis: Nachtrag unterschrieben 23.10.2026 (Scan am 25.10.2026 auf Wunsch des Gründers aus dem Projekt entfernt, E-197)
   eintraege:
     branche.gastro_allergene:
       version: 5
@@ -2042,53 +2097,65 @@
       stand: '2026-10-23'
 - pruefer: steuern
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Die Ergänzung der Bestätigung im Repository (2026-10-24-ergaenzung-bestaetigung-steuern.pdf) trägt keine Unterschrift
+  nachweis:
+    art: mail
+    am: '2026-10-24'
+    text: 'Mail: „EÜR (v6) und Feststellungserklärung (v4) sind freigegeben.“'
+    mail: docs/pruefberichte/2026-10-24-runde3-steuern-mail.txt
+    blatt: docs/pruefberichte/2026-10-24-runde3-katalog-steuern.xlsx
   felder_fehlen: []
   hinweis: Runde 3; Ergänzung der Bestätigung (A1, 5 Einträge inkl. Buchführung, E-Bilanz, OSS) unterschrieben
   eintraege:
     steuern.euer:
       version: 6
       quelle: 2026-10-24-runde3-katalog-steuern.xlsx
-      stand: '2026-10-23'
+      stand: '2026-10-24'
     steuern.feststellungserklaerung:
       version: 4
       quelle: 2026-10-24-runde3-katalog-steuern.xlsx
-      stand: '2026-10-23'
+      stand: '2026-10-24'
 - pruefer: recht
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Mail 24.10.2026 (2026-10-24-runde3-recht-mail.txt) nennt ein unterschriebenes Bestätigungsblatt Runde 3 als Anlage; es liegt nicht im Repository
+  nachweis:
+    art: mail
+    am: '2026-10-24'
+    text: 'Mail: „Teil A (Katalog): drei Einträge bestätigt, einer zu ändern“ mit der ausgefüllten Abgleich-Datei Runde 3'
+    mail: docs/pruefberichte/2026-10-24-runde3-recht-mail.txt
+    blatt: docs/pruefberichte/2026-10-24-runde3-katalog-recht.xlsx
   felder_fehlen: []
   hinweis: Runde 3; Bestätigungsblatt Runde 3 unterschrieben (Mail 24.10.2026)
   eintraege:
     gesellschaft.transparenzregister:
       version: 7
       quelle: 2026-10-24-runde3-recht-mail.txt
-      stand: '2026-10-23'
+      stand: '2026-10-24'
     gesellschaft.geschaeftsbriefe_pflichtangaben:
       version: 1
       quelle: 2026-10-24-runde3-recht-mail.txt
-      stand: '2026-10-23'
+      stand: '2026-10-24'
 - pruefer: recht
   umfang: sanktion
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Mail 24.10.2026 (2026-10-24-runde3-recht-mail.txt) nennt ein unterschriebenes Bestätigungsblatt Runde 3 als Anlage; es liegt nicht im Repository
+  nachweis:
+    art: mail
+    am: '2026-10-24'
+    text: 'Mail: „Zusatzstoffe: bestätigt ohne Koffein-Satz.“ (Abgleich-Datei Runde 3: v5 freigegeben, nur Folgen bei Verstoß)'
+    mail: docs/pruefberichte/2026-10-24-runde3-recht-mail.txt
+    blatt: docs/pruefberichte/2026-10-24-runde3-katalog-recht.xlsx
   felder_fehlen: []
   hinweis: Runde 3, ohne Koffein-Satz bestätigt
   eintraege:
     branche.gastro_zusatzstoffe:
       version: 5
       quelle: 2026-10-24-runde3-recht-mail.txt
-      stand: '2026-10-23'
+      stand: '2026-10-24'
 - pruefer: steuern
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Mail 25.10.2026 (2026-10-25-steuern-bilanz-mail.txt) nennt den unterschriebenen Nachtrag als Anlage; er liegt nicht im Repository
+  nachweis:
+    art: mail
+    am: '2026-10-25'
+    text: 'Mail: „Jahresabschluss (OHG, KG, e. K.), v2: freigegeben.“'
+    mail: docs/pruefberichte/2026-10-25-runde4-steuern-mail.txt
+    blatt: docs/pruefberichte/2026-10-25-runde4-katalog-steuern.xlsx
   felder_fehlen: []
   hinweis: Runde 4 per Mail 25.10.2026 freigegeben; Nachtrag Jahresabschluss unterschrieben 25.10.2026
   eintraege:
@@ -2098,9 +2165,12 @@
       stand: '2026-10-25'
 - pruefer: recht
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Mail 25.10.2026 (2026-10-25-runde4-recht-mail.txt) nennt ein unterschriebenes Bestätigungsblatt Runde 4 als Anlage; es liegt nicht im Repository
+  nachweis:
+    art: mail
+    am: '2026-10-25'
+    text: 'Mail: „Geschäftsbriefe (v2): bestätigt.“; Gesellschaftsvertrag OHG/KG v2 bestätigt, v3 vorab („Ersetzen Sie den Satz an beiden Stellen
+      wörtlich so, gilt meine Bestätigung auch für v3“ – v3 unterscheidet sich von v2 nur durch diesen Satz in Erklärung und Folgen)'
+    mail: docs/pruefberichte/2026-10-25-runde4-recht-mail.txt
   felder_fehlen: []
   hinweis: Runde 4 (25.10.2026), Bestätigungsblatt unterschrieben; B.14 v3 vorab freigegeben (nur Satz „Was ihr im Vertrag nicht regelt …“ ersetzt)
   eintraege:
@@ -2108,15 +2178,19 @@
       version: 2
       quelle: 2026-10-25-runde4-katalog-recht.xlsx
       stand: '2026-10-25'
+      zitat: 'Geschäftsbriefe (v2): bestätigt'
     gesellschaft.gesellschaftsvertrag_ohg_kg:
       version: 3
       quelle: 2026-10-25-runde4-katalog-recht.xlsx
       stand: '2026-10-25'
+      zitat: Ersetzen Sie den Satz an beiden Stellen wörtlich so, gilt meine Bestätigung auch für v3
 - pruefer: arbeitsschutz
   umfang: alles
-  unterschrieben_am: null
-  unterschrift: null
-  unterschrift_offen: Mail 25.10.2026 (2026-10-25-arbeitsschutz-mail.txt) nennt den unterschriebenen zweiten Nachtrag als Scan; er liegt nicht im Repository
+  nachweis:
+    art: mail
+    am: '2026-10-25'
+    text: 'Mail: „Schankanlage v4 und Fluchtplan v5, beide freigegeben“'
+    mail: docs/pruefberichte/2026-10-25-arbeitsschutz-mail.txt
   felder_fehlen: []
   hinweis: Runde 3, zweiter Nachtrag unterschrieben (Mail 25.10.2026)
   eintraege:
@@ -2124,17 +2198,24 @@
       version: 4
       quelle: 2026-10-25-arbeitsschutz-mail.txt
       stand: '2026-10-25'
+      zitat: Schankanlage v4 und Fluchtplan v5, beide freigegeben
     arbeitsschutz.flucht_rettungsplan:
       version: 5
       quelle: 2026-10-25-arbeitsschutz-mail.txt
       stand: '2026-10-25'
+      zitat: Schankanlage v4 und Fluchtplan v5, beide freigegeben
 - pruefer: recht
   umfang: sanktion
-  unterschrieben_am: '2026-10-23'
-  unterschrift: docs/pruefberichte/2026-10-23-bestaetigung-recht-unterschrieben.jpg
+  nachweis:
+    art: unterschrift_entfernt
+    am: '2026-10-23'
+    text: Schriftliche Bestätigung lag vor (unterschriebenes Blatt vom 23.10.2026, auf Wunsch des Gründers am 25.10.2026 aus dem Projekt entfernt)
+      – das Blatt nannte diese sechs Lebensmittel-Einträge mit Version (nur Folgen bei Verstoß); freigegeben in der vom Prüfer ausgefüllten Freigabe-Datei
+      Runde 3 (Spalte Entscheidung). Keine Mail im Projekt, die sie einzeln nennt.
+    blatt: docs/pruefberichte/2026-10-23-freigabe-recht-runde3.xlsx
   felder_fehlen: []
-  hinweis: 'E-196: Folgen bei Verstoß der Lebensmittel-Einträge, die auf dem unterschriebenen Blatt vom 23.10.2026 mit dieser Version stehen
-    (Freigabe-Datei Runde 3 vom 23.10.2026); ohne die im Abgleich mit „ändern“ markierten (IfSG-Bescheinigung für die Inhaberin, Zusatzstoffe)'
+  hinweis: 'E-196: Folgen bei Verstoß der Lebensmittel-Einträge, die auf dem unterschriebenen Blatt vom 23.10.2026 mit dieser Version stehen (Freigabe-Datei
+    Runde 3 vom 23.10.2026); ohne die im Abgleich mit „ändern“ markierten (IfSG-Bescheinigung für die Inhaberin, Zusatzstoffe)'
   eintraege:
     branche.gastro_acrylamid:
       version: 3

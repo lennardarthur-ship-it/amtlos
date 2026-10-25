@@ -22,7 +22,7 @@ for row in ws.iter_rows(min_row=4,max_row=7,max_col=5):
     for c in row: c.alignment=Alignment(wrap_text=True,vertical="top"); c.border=Border(top=thin,bottom=thin,left=thin,right=thin)
 for col,w in zip("ABCDE",[5,45,60,22,45]): ws.column_dimensions[col].width=w
 for r in (5,6,7): ws.row_dimensions[r].height=150
-ws["A10"]="Bestätigt (Name, Datum):"; ws["A10"].font=Font(bold=True)
-ws["A12"]="Unterschrift:"; ws["A12"].font=Font(bold=True)
+# E-197: keine Unterschrift – Bestätigung per E-Mail
+ws["A10"]="Bitte bestätigen Sie Ihre Antworten per E-Mail (Antwort auf unsere Mail, mit dieser Datei im Anhang); eine Unterschrift ist nicht nötig."; ws["A10"].font=Font(bold=True)
 ws.print_options.gridLines=False; ws.page_setup.orientation="landscape"; ws.page_setup.fitToWidth=1; ws.sheet_properties.pageSetUpPr.fitToPage=True; ws.page_setup.fitToHeight=0
 wb.save("Betriebsklar-Fachfragen-GoBD-Zugriff-ohne-Abo-Steuerberater.xlsx")

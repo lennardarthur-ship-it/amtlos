@@ -69,6 +69,6 @@ pruefung:
     - recht
   geprueft_am: '2026-10-23'
   geprueft_version: 3
-  unterschrieben_am: '2026-10-23'
+  bestaetigt_am: '2026-10-23'
   offen:
     - "vor dem Start und nach dem Kabinettsbeschluss erneut vorzulegen"
