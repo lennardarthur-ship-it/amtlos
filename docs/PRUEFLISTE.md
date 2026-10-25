@@ -13,4 +13,4 @@
 - **T-171** Betriebsarzt: Bausteine B-276, B-283 (PEP-Zeitfenster, Impfangebot) und Satz im Hygieneplan Beauty; Elektrofachkraft: Grenzwerte im Prüfprotokoll.
 - **T-172** Dr. Weber: Darf der Hygieneplan Beauty den Infektionsstatus der Kundschaft erfragen (Datenschutz)? Empfehlungen avv/gewerbeanmeldung/schluesselquittung/ausweis_hinweis für eine spätere Runde.
 - **T-173** GmbH & Co. KG: Unterzeichner der Bilanz und Angaben zur Komplementär-GmbH in der Handelsregister-Vorlage (kein Prüfer hat es verlangt).
-- **T-174** Baustein B-022 (Gefährdungsbeurteilung): gleiche PEP-Obergrenze (24 Stunden) wie B-276 – nach Koch-Rückmeldung zur Gefährdungsbeurteilung umsetzen und erneut vorlegen.
+- **T-174** ~~B-022 PEP-Obergrenze~~ umgesetzt 25.10.2026 (Wortlaut wie B-276); Abgleich durch Dr. Weber, Bestätigung T. Koch für neue Prüfsumme der Gefährdungsbeurteilung angefragt.

@@ -215,7 +215,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Infektionsgefahr (z. B. Hepatitis, HIV) durch Blutkontakt sowie Stich- und Schnittverletzungen.",
-   "massnahme": "Einweglanzetten bzw. Instrumente mit Sicherheitssystem und durchstichsichere Entsorgungsbehälter verwenden.\nInstrumente nach jedem Hautkontakt desinfizieren bzw. aufbereiten; Hygieneplan nach der Hygieneverordnung des Landes aufstellen; Verletzungen im Verbandbuch dokumentieren.\nEinmalhandschuhe tragen und beschädigte sofort wechseln.\nNach einer Stich- oder Schnittverletzung sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen; eine HIV-Postexpositionsprophylaxe (PEP) sollte möglichst innerhalb von 2 Stunden beginnen."
+   "massnahme": "Einweglanzetten bzw. Instrumente mit Sicherheitssystem und durchstichsichere Entsorgungsbehälter verwenden.\nInstrumente nach jedem Hautkontakt desinfizieren bzw. aufbereiten; Hygieneplan nach der Hygieneverordnung des Landes aufstellen; Verletzungen im Verbandbuch dokumentieren.\nEinmalhandschuhe tragen und beschädigte sofort wechseln.\nNach einer Stich- oder Schnittverletzung sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen; eine HIV-Postexpositionsprophylaxe (PEP) sollte möglichst innerhalb von 2 Stunden beginnen, nach einer Stich- oder Schnittverletzung spätestens bis 24 Stunden; auch später noch ärztlich abklären lassen."
   },
   "quelle": "§ 11 BioStoffV; TRBA 250 (sinngemäß); BGW"
  },
