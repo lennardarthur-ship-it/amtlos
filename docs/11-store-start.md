@@ -67,7 +67,7 @@ Für Tests auf echten Geräten: `--profile preview` (interne Verteilung) oder Te
   node werkzeuge/store-bilder.mjs /tmp/expo-web /tmp/store-bilder            # schreibt auch apps/website/bilder (WEBSITE=0: nicht)
   DUNKEL=1 node werkzeuge/store-bilder.mjs /tmp/expo-web /tmp/store-bilder   # dunkle Fassung
   ```
-  Die endgültigen Bilder erst nach der fachlichen Freigabe (T-52) erzeugen: Bis dahin zeigt Bild 1 den echten Hinweis „fachlich noch nicht geprüft“.
+  Die fachliche Freigabe (T-52) ist erledigt (25.10.2026) – die endgültigen Bilder jetzt neu erzeugen, damit Bild 1 den Prüfvermerk statt des alten Hinweises zeigt.
 - **Pro kennzeichnen:** Was nur mit Pro geht (seit E-156: alle Vorlagen als PDF über die eine kostenlose im Monat hinaus, Erinnerungen per Mitteilung, Kontrollmappe, Pflicht-Details, E-Rechnung erstellen, Paket für die Steuerberatung, Übernahme per Tipp, iCloud-Sicherung, Briefkopf, Synchronisation), steht in Beschreibung, Bildtexten und Website mit „Pro“ (Richtlinie 2.3.2). Preise und Testzeitraum nennt kein Text – sie kommen aus dem Store.
 - **„Neu in dieser Version“:** Für 1.0.0 der Text in `neu`; ab dem ersten Update die Änderungen.
 - **Synchronisation:** Wird ein Build mit `EXPO_PUBLIC_API_URL` eingereicht, stimmen „ohne Konto, ohne Server“ in Store-Texten, Bild 6 und Website nicht mehr – vorher anpassen.

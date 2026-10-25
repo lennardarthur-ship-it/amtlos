@@ -105,10 +105,12 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
    - „{{MARKE_PRO}}“ (oben unter „Mein Betrieb“): In dieser Testversion gibt es keinen Kauf – „Pro testweise einschalten“
      zeigt alle Funktionen (im späteren Store-Build gibt es diesen Knopf nicht). Ohne Pro: Rechnungen ohne Limit, 1 Vorlage im Monat als PDF, Pflichten im Überblick (Details, Erinnerungen und Kontrollmappe mit Pro), kein Logo/keine Hausfarbe, keine E-Rechnung.
    - „Über {{MARKE}}“: Impressum (Anbieter, Anschrift, Vertretung, E-Mail; Handelsregister und USt-IdNr. folgen nach
-     der Eintragung der UG), Datenschutzerklärung und Nutzungsbedingungen (fertig, Freigabe durch den Anwalt nach der
-     Eintragung – bis dahin als Entwurf gekennzeichnet), „{{MARKE}} weiterempfehlen“.
-   - Pflichten und Vorlagen tragen den Hinweis „fachlich noch nicht geprüft“: Der Katalog (215 Einträge) ist noch
-     nicht Eintrag für Eintrag freigegeben, bei 116 Einträgen sind die Folgen (Bußgeld usw.) noch nicht erfasst.
+     der Eintragung der UG), Datenschutzhinweis (vom Anwalt freigegeben) und Nutzungsbedingungen (inhaltlich
+     freigegeben, in Kraft erst nach der Eintragung – bis dahin als Entwurf gekennzeichnet), „{{MARKE}} weiterempfehlen“.
+   - Fachlich geprüft: Alle Pflichten des Katalogs und alle Vorlagen sind von Fachleuten freigegeben (Rechtsanwalt,
+     Steuerberater, Fachkraft für Arbeitssicherheit, Lebensmittelfachbeauftragter). Die App zeigt das je Pflicht bzw.
+     Vorlage mit „Inhalt fachlich geprüft“ bzw. „Vorlagen fachlich durchgesehen (Stand …)“ – nur solange der Inhalt
+     der geprüften Fassung entspricht. Rechtsberatung im Einzelfall ist die App weiterhin nicht.
    - Synchronisation zwischen Geräten (Konto, Ende-zu-Ende-verschlüsselt) ist eingebaut, in diesem Testpaket aber
      aus: Sie braucht einen laufenden {{MARKE}}-Server und einen Anmeldedienst. Ohne Server bleibt alles auf dem iPhone.
 
