@@ -97,6 +97,7 @@ export const VORLAGEN_GEPRUEFT: Readonly<Record<string, VorlagenFreigabe>> = {
   hautschutzplan: { stand: "2026-10-23", bezug: KOCH2, pruefsumme: "ea45c72ec6fc7ca7918dfcfa40765d0ce1795626d25896389f1136245a943316" },
   gefaehrdungsbeurteilung: { stand: "2026-10-25", bezug: KOCH3, pruefsumme: "1063d59082d4887bbaed62d7f126a2c11e89b0aa5320df61cba0cb7e3bd78b2d" },
   betriebsanweisung_biostoffe: { stand: "2026-10-25", bezug: KOCH3, pruefsumme: "70fe591f5a3e7e207540c518d96bec16896c92cddd9979ce34abf6f92a636d75" },
+  bilanz_guv: { stand: "2026-10-25", bezug: "Nachtrag StB Busch 25.10.2026 (docs/pruefberichte/2026-10-25-nachtrag-bilanz-busch.pdf)", pruefsumme: "5d2246459fe66ccea599cbc1b7cc0845f4b4b35af164b91b617e91cfd8432986" },
   hygieneschulung: { stand: "2026-10-23", bezug: BAUM, pruefsumme: "1f3bb870b0decd354c4cee8a7ab39bc1465e926e11549c8028c222418549f50e" },
 };
 

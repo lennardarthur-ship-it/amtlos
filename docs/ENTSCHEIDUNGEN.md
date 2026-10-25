@@ -31,3 +31,6 @@ Alle 226 Katalogeinträge freigegeben (T. Koch: Schankanlage v4, Fluchtplan v5).
 
 ## E-184 – Kochs Teil abgeschlossen (25.10.2026)
 Gefährdungsbeurteilung (1063d59082d4) und Betriebsanweisung Biostoffe (70fe591f5a3e) nach Abgleich der aktuellen PDFs durch T. Koch freigegeben, arbeitsmedizinische Stellen ausgenommen (Abgleich Dr. Weber). Vorlagen: 42 von 43 freigegeben; offen nur Bilanz/GuV (Unterschrift StB Busch).
+
+## E-185 – Alle Vorlagen freigegeben (25.10.2026)
+Bilanz/GuV (5d2246459fe6) von StB Busch freigegeben (Nachtrag unterschrieben). Damit sind alle 226 Katalogeinträge und alle 43 Vorlagen fachlich freigegeben (Handelsregister nur für GmbH, OHG, KG; arbeitsmedizinische Bausteine durch Abgleich Dr. Weber). PRUEFLISTE T-52 erledigt.

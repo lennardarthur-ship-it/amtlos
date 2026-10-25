@@ -26,7 +26,7 @@ describe("Vermerk je Vorlage in der App", () => {
     expect(pruefHinweisFuer(vorlageFuer("hygieneplan")!, { art: "beauty" })).toBe("Vorlagen fachlich durchgesehen (Stand 25.10.2026)");
     for (const id of ["rechnung", "unterweisung", "impressum", "hautschutzplan"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(VERMERK);
     // Gefährdungsbeurteilung: Vermerk mit den Baustein-Korrekturen der Durchsicht vom 23.10.2026 entfallen
-    for (const id of ["handelsregister", "bilanz_guv"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(PRUEFHINWEIS);
+    for (const id of ["handelsregister"]) expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(PRUEFHINWEIS); // ohne Rechtsform kein Vermerk
   });
 
   it("nie im PDF", () => {

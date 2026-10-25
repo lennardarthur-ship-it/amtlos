@@ -66,9 +66,9 @@ const DRITTLAND_REVENUECAT = `Übermittlung in die USA auf Grundlage der ${SCC_F
  * in eckigen Klammern trägt der Gründer vor der Veröffentlichung ein – die App erfindet keine Angaben, der Store-Check
  * meldet sie. Fachlich zu prüfen (T-77): bis zur Freigabe `freigegeben: false`.
  */
+// Freigegeben von RA Dr. Weber 23.10.2026 für den Build ohne Sync (docs/pruefberichte/2026-10-23-vorlagen-weber.xlsx, Prüfsumme
+// 892aa8818e0e der Fassung aus docs/pruefmappe-anwalt). Bei Textänderung erneut vorlegen; der Sync-Zusatz ist nicht freigegeben.
 export const DATENSCHUTZ = {
-  // Freigegeben von RA Dr. Weber 23.10.2026 für den Build ohne Sync (docs/pruefberichte/2026-10-23-vorlagen-weber.xlsx, Prüfsumme
-  // 892aa8818e0e der Fassung aus docs/pruefmappe-anwalt). Bei Textänderung erneut vorlegen; der Sync-Zusatz ist nicht freigegeben.
   freigegeben: true,
   abschnitte: [
     { titel: "Kurz gesagt", text: `${MARKE.name} speichert deine Angaben nur auf deinem iPhone – verschlüsselt, ohne Konto und ohne Server von ${MARKE.name}. Wir sehen deine Unterlagen, Kunden und Mitarbeiter nicht. ${MARKE.name} macht keine eigenen Analysen und zeigt keine Werbung; nur für ${MARKE.proName} wertet unser Dienstleister RevenueCat die Käufe für die Abo-Verwaltung aus.` },

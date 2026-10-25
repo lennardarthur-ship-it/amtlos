@@ -16,7 +16,7 @@ const WEITERE = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung",
   "video_hinweisschild", "anamnese_einwilligung", "arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ki_kompetenz", "ausweis_hinweis", "schluesselquittung",
   "impressum", "gewerbeanmeldung", "transparenzregister",
   "ust_voranmeldung", "oss_meldung", "zm_meldung", "steuererklaerung", "kassenbuch", "aufbewahrung", "sv_meldedaten",
-  "betriebsanweisung", "expositionsverzeichnis", "hautschutzplan", "gefaehrdungsbeurteilung", "betriebsanweisung_biostoffe"];
+  "betriebsanweisung", "expositionsverzeichnis", "hautschutzplan", "gefaehrdungsbeurteilung", "betriebsanweisung_biostoffe", "bilanz_guv"];
 // RA Dr. Weber 25.10.2026: nur für GmbH, OHG und KG (Vermerk abhängig von der Rechtsform)
 const NUR_RECHTSFORM = ["handelsregister"];
 const ALLE = [...FUENF, ...WEITERE];
@@ -126,7 +126,8 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
   it("Hygieneplan: Lebensmittel-Freigabe plus Beauty-Freigabe (RA Dr. Weber 25.10.2026), sonst keine weiteren", () => {
     expect(freigabenFuer("hygieneplan").length).toBe(2);
     expect(lm.weitere?.map((f) => [f.fassung?.wert, f.stand])).toEqual([["beauty", "2026-10-25"]]);
-    expect(freigabenFuer("bilanz_guv")).toEqual([]);
+    expect(freigabenFuer("bilanz_guv")).toHaveLength(1);
+    expect(freigabenFuer("gibt_es_nicht")).toEqual([]);
     for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan") expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
   });
 
