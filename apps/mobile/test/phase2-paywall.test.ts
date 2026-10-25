@@ -180,7 +180,7 @@ describe("Kontrollmappe und E-Rechnung", () => {
 
 describe("Bezahlschirm (E-188)", () => {
   it("der wiederkehrende Nutzen zuerst: Rechnungen, E-Rechnung, Belege, Kasse, alle Pflichten – Texte für jeden Anlass", () => {
-    expect(PRO_VORTEILE).toEqual(["rechnungen", "e_rechnung", "belege", "kasse", "pflichten", "erinnerungen", "steuerberater", "pdf", "kontrollmappe", "pflicht_details", "briefkopf", "icloud", "sync"]);
+    expect(PRO_VORTEILE).toEqual(["pflichten", "erinnerungen", "pflicht_details", "kontrollmappe", "pdf", "rechnungen", "e_rechnung", "belege", "kasse", "steuerberater", "briefkopf", "icloud", "sync"]);
     const alle: ProFunktion[] = [...PRO_VORTEILE, "ust_uebernahme"];
     for (const f of alle) {
       expect(TEXT.pro_grund[f](3).length).toBeGreaterThan(20);

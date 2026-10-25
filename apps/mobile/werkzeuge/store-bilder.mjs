@@ -81,6 +81,9 @@ const foto = async (name) => {
 try {
   await p.goto("http://localhost:4997/");
   await warte(2500);
+  // Bild 2 „Hast du alles erledigt?“ (E-189): „Heute“ mit dem Pflichten-Kompass auf der Bühne
+  if (!(await p.getByText(/Pflichten? (ist|sind) jetzt dran|Alles erledigt, was jetzt dran ist/).locator("visible=true").count())) throw new Error("„Heute“ zeigt den Pflichten-Kompass nicht");
+  await foto("heute");
   // Bild 1 „Welche Pflichten gelten für dich?“: der Tab „Pflichten“ (nicht „Heute“)
   await tab("Pflichten");
   if (await p.getByText(/Pflichten-Check (nicht|fast) fertig/).locator("visible=true").count()) throw new Error("Bild 1 zeigt einen unfertigen Check (Demo-Stand ergänzen)");
@@ -201,7 +204,7 @@ if (WEB) {
   fs.mkdirSync(WEB, { recursive: true });
   const web = await browser.newPage({ viewport: { width: 464, height: 1006 }, deviceScaleFactor: 2 });
   // Datei der Website → Aufnahme; „pflicht“ zeigt auf der Website Rechtsgrundlage und Quellen (Bildunterschrift „Mit Grund und Quelle“)
-  const WEB_BILDER = { pflichten: "pflichten", rechnung: "rechnung", vorlagen: "vorlagen", pflicht: "pflicht-quellen", ablage: "ablage", kontrollmappe: "kontrollmappe" };
+  const WEB_BILDER = { pflichten: "pflichten", heute: "heute", rechnung: "rechnung", vorlagen: "vorlagen", pflicht: "pflicht-quellen", ablage: "ablage", kontrollmappe: "kontrollmappe" };
   for (const [datei, name] of Object.entries(WEB_BILDER)) {
     await web.setContent(`<!doctype html><html><body style="margin:0"><img src="${png(name)}" style="display:block;width:464px;height:1006px"></body></html>`, { waitUntil: "load" });
     await web.screenshot({ path: path.join(WEB, `${datei}.jpg`), type: "jpeg", quality: 82 });

@@ -1219,6 +1219,19 @@ Ersetzt E-156. Grund: Pro verkaufte vor allem selten Gebrauchtes (einmalige Unte
 
 Umgesetzt in `apps/mobile/src/pro/regeln.ts` (`PFLICHTEN_FREI = 3`, `freiePflichten`, `pflichtSichtbar`, `erstellenErlaubt`, `ausgabeErlaubt`, `ausgabeGrund`, `kasseErfassenErlaubt`, `bezahlschirmNachCheck`), Check-Ergebnis, Pflichten-Tab und Pflicht-Detail, Heute, Anlegen (`starten.tsx`), Kopie, Beleg erfassen, Kasse, Bezahlschirm, Texten, Store-Texten und Prüfhinweisen (Apple braucht zum Prüfen die Testphase bzw. einen Sandbox-Kauf), `store-check.mjs`, Website, LIESMICH des Testpakets, Rundgang und Tests; die Jahres-Szenarien laufen als Pro-Nutzer.
 
+
+### E-189 · Positionierung umgedreht: der Pflichten-Kompass ist das Produkt, Rechnungen, Belege und Kasse sind Zugabe (2026-10-25)
+
+Kritik: Die App verkaufe sich noch wie „noch ein Rechnungsprogramm“; was niemand sonst hat, ist der Pflichten-Kompass – „Welche Pflichten hat mein Betrieb, und habe ich alles erledigt?“. Entscheidung des Gründers: Store-Text, Store-Bilder, Bezahlschirm und den ersten Bildschirm darauf ausrichten; keine Funktion entfällt. Ergänzt E-187 (Darstellung) und E-188 (Preismodell bleibt).
+
+- **„Heute“:** Auf der Bühne steht der Kompass – „N Pflichten sind jetzt dran“ (bzw. „Alles erledigt, was jetzt dran ist“), Plaketten „x von y erledigt“ und „Kontrolle: x von y Nachweisen“, Tipp öffnet den Pflichten-Tab. Vor dem Check die Einladung („Welche Pflichten kommen für dich in Frage?“) mit „Pflichten-Check starten“ als Hauptknopf. Rechnung und Beleg bleiben als zurückhaltende Knöpfe darunter; „Offen bei Kunden“ steht nicht mehr groß auf der Bühne, sondern als Karte auf dem Blatt (bei nichts Offenem „Alles bezahlt“ mit dem Umsatz des Monats). „Als Nächstes“: Pflichten zuerst, dann überfällige Rechnungen.
+- **Bezahlschirm:** Reihenfolge `PRO_VORTEILE` ersetzt die aus E-188 – Alle Pflichten, Erinnerung vor jeder Frist, Jede Pflicht erklärt, Kontrollmappe (die vier großen Kacheln), Vorlagen, dann Rechnungen, E-Rechnung, Belege, Kasse, Steuerberatung, Briefkopf, iCloud, Sync. Titel „Alle Pflichten im Griff“; nach dem ersten Check „N Pflichten kommen für dich in Frage“ (Zahl aus dem Check; ohne Zahl weiter „Damit du keine Frist verpasst“), Text nennt Rechnungen, Belege und Kasse als „gleich mit dabei“.
+- **Store:** Untertitel „Alle Pflichten, alles erledigt“, Werbetext und Beschreibung mit der Leitfrage; Abschnitte „Welche Pflichten hat mein Betrieb?“, „Habe ich alles erledigt?“, „Die passende Unterlage gleich dazu“, „Dazu: Rechnungen, Belege, Kasse“ (gekürzt). Schlüsselwörter ohne Rechnungsbegriffe (Fristen, Gewerbe, Gründung, Hygieneplan, HACCP, Gefährdungsbeurteilung, Arbeitsschutz). Store-Bilder: 1 Pflichten („Welche Pflichten hat dein Betrieb?“), 2 Heute („Hast du alles erledigt?“, neu), 3 Pflicht mit Quelle, 4 Vorlagen, 5 Kontrollmappe, 6 Rechnung („Dazu: Rechnungen“); „Offene Rechnungen“ entfällt. Prüfhinweise beschreiben den Kompass als Kern.
+- **Website:** Titel und Hero „Welche Pflichten hat dein Betrieb – und hast du alles erledigt?“, Punkte „Welche Pflichten? / Alles erledigt? / Dazu“, Galerie wie die Store-Bilder, E-Rechnungs-Abschnitt als „Auch eine Pflicht: die E-Rechnung“.
+- **App-Texte:** „So hilft dir …“ mit denselben Stufen.
+
+Umgesetzt in `Heute.tsx`, `pro/regeln.ts`, `Pro.tsx`, `Check.tsx`, `texte.ts`, `store/de.json`, `store-bilder.mjs` (neues Bild „heute“), Website (`seite.html`, `bauen.mjs`, Bilder), LIESMICH, `docs/11-store-start.md`, Tests und Rundgang. Store-Bilder sind damit neu erzeugt (T-175 erledigt diesen Teil).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

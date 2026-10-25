@@ -99,7 +99,7 @@ const jsonLd = {
   operatingSystem: "iOS",
   applicationCategory: "BusinessApplication",
   inLanguage: "de",
-  description: "Wissen, welche Pflichten dein Betrieb hat – und sie mit der passenden Unterlage gleich erledigen. Pflichten-Check, 43 Vorlagen, Rechnungen und Kasse für kleine Betriebe in Deutschland. Daten verschlüsselt auf dem iPhone, ohne Konto.",
+  description: "Welche Pflichten hat dein Betrieb – und hast du alles erledigt? Pflichten-Check mit Terminen, Erinnerung, 43 Vorlagen und Kontrollmappe für kleine Betriebe in Deutschland; dazu Rechnungen und Kasse. Daten verschlüsselt auf dem iPhone, ohne Konto.",
   ...(url ? { url: `${url}/`, image: `${url}/bilder/og.jpg` } : {}),
   ...(appStoreId ? { downloadUrl: appStoreUrl, offers: { "@type": "Offer", price: "0", priceCurrency: "EUR", url: appStoreUrl } } : {}),
 };

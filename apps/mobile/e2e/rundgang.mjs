@@ -205,11 +205,11 @@ try {
   // E-188: nach dem ersten Check kurz das Ergebnis, dann einmal von selbst der Bezahlschirm darüber – „Später“
   // schließt ihn, das kostenlose Ergebnis bleibt
   await warte(2000);
-  pruefe((await sichtbar("Damit du keine Frist verpasst")) && (await sichtbar("Immer kostenlos")) && (await sichtbar("verlängert sich automatisch")) && (await knopf("Später").count()) > 0, "Bezahlschirm nach dem ersten Pflichten-Check (mit „Später“) fehlt");
+  pruefe((await sichtbar(/^\d+ Pflichten kommen für dich in Frage$/)) && (await sichtbar("Immer kostenlos")) && (await sichtbar("verlängert sich automatisch")) && (await knopf("Später").count()) > 0, "Bezahlschirm nach dem ersten Pflichten-Check (mit „Später“) fehlt");
   await foto("pro-nach-check");
   await knopf("Später").click();
   await warte(1800);
-  pruefe(!(await sichtbar("Damit du keine Frist verpasst")), "Bezahlschirm nach „Später“ nicht geschlossen oder kommt wieder");
+  pruefe(!(await sichtbar(/^\d+ Pflichten kommen für dich in Frage$/)), "Bezahlschirm nach „Später“ nicht geschlossen oder kommt wieder");
   pruefe((await ergebnis()) && (await sichtbar(/^Insgesamt \d+ Pflichten/)), "Ergebnis des Checks fehlt (eine Hauptzahl groß, Gesamtzahl klein)");
   // R11 (Berater d): was Lohnbüro bzw. Steuerberatung macht, steht nicht unter „Mit diesen 3 fängst du an“
   pruefe(!(await sichtbar("Macht dein Lohnbüro")), "Aufgabe des Lohnbüros im Einstieg des Ergebnisses");
@@ -220,7 +220,7 @@ try {
   await warte(1200);
   pruefe(befunde.length === 0, `Fehler nach dem Check (vom Check auf „Heute“): ${befunde.join(" | ")}`);
   pruefe((await p.getByRole("tab", { name: "Pflichten", selected: true }).count()) === 1, "nach dem Check nicht im Tab „Pflichten“ gelandet");
-  pruefe(!(await sichtbar("Damit du keine Frist verpasst")), "Bezahlschirm nach dem Check kam ein zweites Mal");
+  pruefe(!(await sichtbar(/^\d+ Pflichten kommen für dich in Frage$/)), "Bezahlschirm nach dem Check kam ein zweites Mal");
   // E-188: „Deine Pflichten“ ohne Pro – 3 Pflichten, der Rest als Zahl, kein Jahresraster; eine gesperrte öffnet den Bezahlschirm
   pruefe((await sichtbar("Deine ersten 3 Pflichten")) && (await sichtbar(/^… und \d+ weitere Pflichten$/)) && (await sichtbar("Dein Jahr mit allen Terminen – mit Pro")) && !(await sichtbar("Alle ansehen:")), "Pflichten-Tab ohne Pro zeigt mehr als die ersten 3 oder keinen Hinweis auf die übrigen");
   await foto("pflichten-frei");
@@ -368,7 +368,7 @@ try {
   await p.getByRole("tab", { name: "Heute" }).click();
   await warte(800);
   pruefe(await sichtbar("2026-001 · "), "Rechnung fehlt unter „Zuletzt bearbeitet“");
-  // die einzige Rechnung ist bezahlt: statt „0,00 € offen“ steht der Umsatz des Monats groß da (B2)
+  // die einzige Rechnung ist bezahlt: auf der Karte „Alles bezahlt“ mit dem Umsatz des Monats statt „0,00 € offen“ (B2, E-189)
   pruefe((await sichtbar("Alles bezahlt")) && (await sichtbar("Umsatz im ")), "„Alles bezahlt“ mit Monatsumsatz fehlt auf „Heute“");
   await foto("heute");
 

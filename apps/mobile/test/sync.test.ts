@@ -29,7 +29,7 @@ describe("Sync-Schlüssel in der Hülle (E-134)", () => {
     expect(h).not.toContain(Buffer.from(k).toString("base64"));
     expect(huelleOeffnen(h, "richtig-langes-passwort")).toEqual(k);
     expect(await fehlerArt(() => huelleOeffnen(h, "falsches-langes-passwort"))).toBe("passwort");
-    expect(await fehlerArt(() => huelleOeffnen(h.replace(/"daten":"./, '"daten":"A'), "richtig-langes-passwort"))).toBe("passwort");
+    expect(await fehlerArt(() => huelleOeffnen(h.replace(/"daten":"(.)/, (_, c: string) => `"daten":"${c === "A" ? "B" : "A"}`), "richtig-langes-passwort"))).toBe("passwort");
     expect(await fehlerArt(() => huelleOeffnen("kein json", "x"))).toBe("format");
     expect(await fehlerArt(() => huelleErstellen(k, "kurz", zufall, IT))).toBe("passwort");
   });

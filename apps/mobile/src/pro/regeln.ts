@@ -28,11 +28,12 @@ export const PFLICHTEN_FREI = 3;
 export type ProFunktion = "rechnungen" | "e_rechnung" | "belege" | "kasse" | "pflichten" | "erinnerungen" | "steuerberater" | "ust_uebernahme" | "pdf" | "kontrollmappe" | "pflicht_details" | "briefkopf" | "icloud" | "sync";
 
 /**
- * Reihenfolge der Vorteile auf dem Bezahlschirm (E-188): der wiederkehrende Nutzen zuerst – Rechnungen und E-Rechnung,
- * Belege und Kasse, alle Pflichten mit Erinnerungen, Paket für die Steuerberatung –, dann Vorlagen, Kontrollmappe,
- * Pflicht-Details, Komfort zuletzt. Die Werte per Tipp (`ust_uebernahme`) stehen beim Paket für die Steuerberatung mit dabei.
+ * Reihenfolge der Vorteile auf dem Bezahlschirm (E-189, ersetzt die Reihenfolge aus E-188): der Pflichten-Kompass
+ * zuerst – alle Pflichten, Erinnerung vor jeder Frist, jede Pflicht erklärt, Kontrollmappe (die vier großen Kacheln) –,
+ * dann die Vorlagen zum Erledigen, danach als Zugabe Rechnungen, E-Rechnung, Belege, Kasse und das Paket für die
+ * Steuerberatung, Komfort zuletzt. Die Werte per Tipp (`ust_uebernahme`) stehen beim Paket für die Steuerberatung mit dabei.
  */
-export const PRO_VORTEILE: ProFunktion[] = ["rechnungen", "e_rechnung", "belege", "kasse", "pflichten", "erinnerungen", "steuerberater", "pdf", "kontrollmappe", "pflicht_details", "briefkopf", "icloud", "sync"];
+export const PRO_VORTEILE: ProFunktion[] = ["pflichten", "erinnerungen", "pflicht_details", "kontrollmappe", "pdf", "rechnungen", "e_rechnung", "belege", "kasse", "steuerberater", "briefkopf", "icloud", "sync"];
 
 /** Vorlagen, deren PDF ohne Pro immer geht: das Kassenbuch – es entsteht nur lesbar aus schon erfassten Tagen (GoBD). */
 const IMMER_FREI = new Set(["kassenbuch"]);

@@ -98,16 +98,17 @@ describe("Bezahlschirm nach dem ersten Pflichten-Check (E-188)", () => {
     expect(block).toMatch(/voll && Boolean\(a\) && !schon/);
     expect(block).toMatch(/bezahlschirmNachCheck\(\{ pro: z\.pro, proBekannt: z\.proBekannt, verfuegbar: paywallVerfuegbar, gezeigt: z\.stand\.bezahlschirmNachCheck \}\)/);
     expect(block.indexOf("bezahlschirmNachCheckVermerken()")).toBeLessThan(block.indexOf("nav.oeffnen"));
-    expect(block).toMatch(/<ProSeite anlass="check" \/>/);
+    expect(block).toMatch(/<ProSeite anlass="check" anzahl=\{zahl\.pflichten\} \/>/);
     expect(block).not.toMatch(/nav\.zurueck|tabWechseln/);
   });
 
-  it("„Später“ ist deutlich sichtbar und schließt nur den Bezahlschirm; Grund „Damit du keine Frist verpasst“", () => {
+  it("„Später“ ist deutlich sichtbar und schließt nur den Bezahlschirm; Überschrift mit der Zahl der Pflichten (E-189)", () => {
     const q = lies("seiten/Pro.tsx");
     expect(q).toMatch(/\{spaeter \? <Knopf ton text=\{TEXT\.pro_spaeter\} onPress=\{nav\.zurueck\} \/> : null\}/);
     expect(q).toMatch(/const spaeter = anlass === "check" && !z\.pro/);
     expect(TEXT.pro_spaeter).toBe("Später");
-    expect(TEXT.pro_check_titel).toBe("Damit du keine Frist verpasst");
+    expect(TEXT.pro_check_titel(41)).toBe("41 Pflichten kommen für dich in Frage");
+    expect(TEXT.pro_check_titel(0)).toBe("Damit du keine Frist verpasst");
     expect(TEXT.pro_check_text).toMatch(/kostenlos/);
   });
 

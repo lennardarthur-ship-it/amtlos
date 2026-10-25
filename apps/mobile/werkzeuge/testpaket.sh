@@ -95,7 +95,7 @@ Unten vier Tabs – Heute · Pflichten · Unterlagen · Mein Betrieb – und rec
   Beschäftigte, Kasse, Website … –, dann zeigt die App, welche Pflichten nach deinen Angaben in Frage kommen,
   mit Termin, Kurztext und Abhaken. „Erinnerungen“ einschalten (Mitteilungen erlauben): Die App erinnert 3 Tage vor
   jedem Termin, ganz ohne Server.
-- Heute: was als Nächstes dran ist, offene Rechnungen, die Kasse des Tages, Belege.
+- Heute: der Pflichten-Kompass – wie viele Pflichten jetzt dran sind und wie viele schon erledigt; darunter was als Nächstes dran ist, die Kontrollmappe, offene Rechnungen, die Kasse des Tages, Belege.
 - „+“: „Rechnung“, „Beleg“ oder unter „Wofür brauchst du eine Unterlage?“ den Anlass wählen (z. B. „Ich stelle
   jemanden ein“). Schritt für Schritt ausfüllen, unten „Weiter“; am Ende das Dokument ansehen und „PDF teilen“.
   Jede Unterlage hat ihren eigenen Aufbau (Brief, Vertrag, Aushang, Nachweis, Vordruck, Handbuch).

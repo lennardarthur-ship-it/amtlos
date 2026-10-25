@@ -18,7 +18,7 @@ import { CodeEinloesenKnopf, PartnerHinweis, usePartner } from "./Partner";
 
 /** „Synchronisation“ nur zeigen, wenn dieser Build einen Server hat (E-134). */
 const VORTEILE = PRO_VORTEILE.filter((v) => v !== "sync" || syncAngeboten);
-/** Reihenfolge nach Nutzen (E-188): der wiederkehrende Nutzen zuerst – Rechnungen und E-Rechnung, Belege und Kasse, alle Pflichten. */
+/** Reihenfolge nach Nutzen (E-189): der Pflichten-Kompass zuerst, Rechnungen, Belege und Kasse als Zugabe danach. */
 const NACH_NUTZEN: ProFunktion[] = PRO_VORTEILE;
 const VORTEIL_SYMBOL: Record<ProFunktion, string> = { rechnungen: "eurosign.circle", belege: "doc.viewfinder", kasse: "banknote", pflichten: "calendar", pdf: "square.and.arrow.up", erinnerungen: "bell", kontrollmappe: "folder", pflicht_details: "checklist", e_rechnung: "doc.text", ust_uebernahme: "percent", steuerberater: "briefcase", sync: "arrow.triangle.2.circlepath", icloud: "icloud", briefkopf: "paintpalette" };
 
@@ -42,10 +42,10 @@ function VorteilKachel({ v }: { v: ProFunktion }) {
  * zeigt keinen Kaufknopf (App-Review B2). Der Preis nach dem Testzeitraum steht gleich groß direkt über dem Knopf (R3).
  * Pflichtangaben für Abos (Verlängerung, Kündigung, Nutzungsbedingungen, Datenschutz) stehen unter dem Knopf.
  *
- * E-188: `anlass="check"` – einmal von selbst nach dem ersten Pflichten-Check („Damit du keine Frist verpasst“), mit
+ * E-188/E-189: `anlass="check"` – einmal von selbst nach dem ersten Pflichten-Check („N Pflichten kommen für dich in Frage“), mit
  * deutlich sichtbarem „Später“ unter dem Kaufknopf; das Ergebnis des Checks liegt darunter und bleibt kostenlos.
  */
-export function ProSeite({ grund, anlass, entwurf, danach }: { grund?: ProFunktion; /** E-188: Bezahlschirm nach dem ersten Pflichten-Check */ anlass?: "check"; /** aus einem vorhandenen Entwurf heraus (Ausweg „Als Entwurf behalten“) */ entwurf?: boolean; /** nach erfolgreichem Kauf bzw. Einschalten (z. B. Erinnerungen einschalten) */ danach?: () => void }) {
+export function ProSeite({ grund, anlass, anzahl, entwurf, danach }: { grund?: ProFunktion; /** E-188: Bezahlschirm nach dem ersten Pflichten-Check */ anlass?: "check"; /** E-189: Zahl der Pflichten aus dem Check (Überschrift nach dem Check) */ anzahl?: number; /** aus einem vorhandenen Entwurf heraus (Ausweg „Als Entwurf behalten“) */ entwurf?: boolean; /** nach erfolgreichem Kauf bzw. Einschalten (z. B. Erinnerungen einschalten) */ danach?: () => void }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
@@ -116,8 +116,8 @@ export function ProSeite({ grund, anlass, entwurf, danach }: { grund?: ProFunkti
   const gewaehlt = liste?.find((a) => a.id === wahl);
   const knopf = knopfText({ kaufAktiv, testmodus, gewaehlt });
   const reihe = NACH_NUTZEN.filter((x) => VORTEILE.includes(x));
-  // E-188: nach dem ersten Pflichten-Check stehen die Erinnerungen vorn („Damit du keine Frist verpasst“)
-  const vorn = grund ?? (anlass === "check" ? "erinnerungen" : undefined);
+  // E-189: nach dem ersten Pflichten-Check stehen „Alle Pflichten“ vorn (die Reihenfolge beginnt ohnehin damit)
+  const vorn = grund ?? (anlass === "check" ? "pflichten" : undefined);
   const sortiert = vorn ? [vorn, ...reihe.filter((x) => x !== vorn)] : reihe;
   const haupt = sortiert.slice(0, 4);
   const weitere = sortiert.slice(4);
@@ -164,7 +164,7 @@ export function ProSeite({ grund, anlass, entwurf, danach }: { grund?: ProFunkti
       // zuerst der Nutzen (E-188): der Betriebsalltag – nicht Logo und Hausfarbe
       ueber={TEXT.pro_marke}
       // R12 (UX #12): Überschrift aus dem Anlass („Rechnung 4 diesen Monat – mit Pro ohne Limit“)
-      titel={grund ? TEXT.r12_pro_anlass[grund](PFLICHTEN_FREI) : anlass === "check" ? TEXT.pro_check_titel : TEXT.pro_wert_titel}
+      titel={grund ? TEXT.r12_pro_anlass[grund](PFLICHTEN_FREI) : anlass === "check" ? TEXT.pro_check_titel(anzahl ?? 0) : TEXT.pro_wert_titel}
       unter={grund ? TEXT.pro_grund[grund](PFLICHTEN_FREI) : anlass === "check" ? TEXT.pro_check_text : TEXT.pro_wert_text}
     >
       {partner ? (

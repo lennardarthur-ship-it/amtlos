@@ -224,7 +224,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const schonListe = useMemo(() => (a && langBestehend(z.stand.profil, heute()) ? schonDaKandidaten(a, { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb }, heute()) : []), [a, z.stand.profil, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb]);
   // E-188: „Was hast du schon?“ nennt viele Pflichten beim Namen – ohne Pro entfällt der Schritt
   const schon = Boolean(a) && z.pro && !schonFertig && schonListe.length > 0;
-  // E-188: nach dem ersten ganzen Pflichten-Check einmal von selbst der Bezahlschirm („Damit du keine Frist verpasst“) –
+  // E-188: nach dem ersten ganzen Pflichten-Check einmal von selbst der Bezahlschirm („N Pflichten kommen für dich in Frage“, E-189) –
   // als Blatt über dem Ergebnis, das darunter stehen bleibt; „Später“ schließt. Danach nur über die üblichen Anlässe.
   const ergebnisDa = voll && Boolean(a) && !schon;
   const nachCheck = bezahlschirmNachCheck({ pro: z.pro, proBekannt: z.proBekannt, verfuegbar: paywallVerfuegbar, gezeigt: z.stand.bezahlschirmNachCheck });
@@ -233,7 +233,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
     // kurz warten, damit man das Ergebnis zuerst sieht
     const t = setTimeout(() => {
       z.bezahlschirmNachCheckVermerken();
-      nav.oeffnen("pro", () => <ProSeite anlass="check" />, true);
+      nav.oeffnen("pro", () => <ProSeite anlass="check" anzahl={zahl.pflichten} />, true);
     }, 900);
     return () => clearTimeout(t);
   }, [ergebnisDa, nachCheck]);
