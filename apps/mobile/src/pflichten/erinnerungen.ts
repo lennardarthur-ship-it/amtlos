@@ -1,10 +1,11 @@
 /**
- * Lokale Erinnerungen (E-128): Benachrichtigungen auf dem Gerät, ohne Server und ohne Push-Konto. Bei jeder Änderung
- * wird der ganze Plan neu gesetzt (eigene Benachrichtigungen löschen, nächste Termine eintragen).
+ * Lokale Erinnerungen (E-128, E-192): Benachrichtigungen auf dem Gerät, ohne Server und ohne Push-Konto. Bei jeder
+ * Änderung, bei jedem Start und jeder Rückkehr in die App wird der ganze Plan neu gesetzt (eigene Benachrichtigungen
+ * löschen, die Mitteilungen aus `erinnerungsplan.ts` eintragen – höchstens 60, unter der iOS-Grenze von 64).
  */
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import type { Erinnerung } from "./check";
+import type { Mitteilung } from "./erinnerungsplan";
 import { MARKE } from "@amtlos/marke";
 
 /**
@@ -33,9 +34,7 @@ export async function erlaubnisAnfragen(): Promise<boolean> {
   return (await Notifications.requestPermissionsAsync()).granted;
 }
 
-const datumDe = (iso: string) => iso.split("-").reverse().join(".");
-
-export async function planen(plan: Erinnerung[]): Promise<void> {
+export async function planen(plan: Mitteilung[]): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
   await kanalAnlegen().catch(() => undefined);
   const jetzt = Date.now();
@@ -44,7 +43,7 @@ export async function planen(plan: Erinnerung[]): Promise<void> {
     const date = new Date(j, m - 1, t, 9, 0, 0);
     if (date.getTime() <= jetzt) continue;
     await Notifications.scheduleNotificationAsync({
-      content: { title: e.titel, body: `Fällig am ${datumDe(e.termin)} – in ${MARKE.name} ansehen.`, data: { pflichtId: e.pflichtId } },
+      content: { title: e.titel, body: e.text, data: { pflichtIds: e.erinnerungen.map((x) => x.pflichtId) } },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date, ...(Platform.OS === "android" ? { channelId: KANAL } : null) },
     });
   }

@@ -4,7 +4,8 @@
  */
 import { describe, expect, it } from "vitest";
 import { LEERER_STAND, erledigtSetzen } from "../src/unterlagen/speicher";
-import { auswertung, dringlichkeit, erinnerungsPlan, gueltigBis, istErledigt, offeneFragenNachWirkung, profilMitStand, zaehlung, type Profil } from "../src/pflichten/check";
+import { auswertung, dringlichkeit, gueltigBis, istErledigt, offeneFragenNachWirkung, profilMitStand, zaehlung, type Profil } from "../src/pflichten/check";
+import { erinnerungen } from "../src/pflichten/erinnerungsplan";
 
 const betrieb = { ...LEERER_STAND.betrieb, name: "Café Morgenrot", strasse: "Venloer Str. 1", plz: "50823", ort: "Köln", verantwortlich: "Mehmet Yıldız" };
 const cafe: Profil = { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "NW", "beschaeftigte.gesamt": 6, "beschaeftigte.minijob": 6, "kasse.elektronisch": true, "online.website": true, "ust.kleinunternehmer": false, gruendungsdatum: "2019-03-01" };
@@ -59,7 +60,7 @@ describe("R10 Pflichten-Check", () => {
     expect(nachweis.lohnbuero).toBe(true);
     const leer = { erledigt: {}, unterlagen: [], betrieb };
     expect(dringlichkeit(a, leer, heute).jetzt.map((p) => p.id)).not.toContain("personal.beitragsnachweis");
-    expect(erinnerungsPlan(a, leer, heute).map((e) => e.pflichtId)).not.toContain("personal.beitragsnachweis");
+    expect(erinnerungen(a, leer, heute).map((e) => e.pflichtId)).not.toContain("personal.beitragsnachweis");
     expect(auswertung(salon, heute).gilt.find((p) => p.id === "personal.beitragsnachweis")!.lohnbuero).toBe(false);
   });
 

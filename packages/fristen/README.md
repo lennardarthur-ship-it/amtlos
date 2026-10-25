@@ -6,8 +6,10 @@ Teil der Amtlos-Fachbibliothek (Phase 2.3, E-156); die App, der Server und `@amt
 ## Zweck
 
 - Datumsrechnung auf ISO-Daten (`"2026-10-21"`) ohne Zeitzonen-Fallen: Tage/Monate addieren, Wochentag, Vergleich.
-- Gesetzliche Feiertage je Bundesland (inkl. Ostern-abhängiger Tage), Bankschließtage (TARGET2), Zusatzfeiertage
-  (kommunal, einmalig) über `StandardKalender`.
+- Gesetzliche Feiertage je Bundesland (inkl. Ostern-abhängiger Tage), Zusatzfeiertage (kommunal, einmalig) über
+  `StandardKalender`; Bankarbeitstage im Sinne von § 23 Abs. 1 SGB IV (E-192): Montag bis Freitag ohne gesetzliche
+  Feiertage (bundesweit oder in einem Land – der Sitz der Krankenkasse ist unbekannt, also der früheste Termin) und ohne
+  24./31. Dezember (`keineBankarbeitstage`); der TARGET-Kalender (`bankSchliesstage`) dient nur noch zur Information.
 - Perioden (monatlich, quartalsweise, halbjährlich, jährlich) und Fälligkeiten wie „10. des Folgemonats“ oder
   „n-letzter Bankarbeitstag“, Verschiebung auf den nächsten/vorherigen Werk- bzw. Bankarbeitstag (§ 108 Abs. 3 AO,
   § 193 BGB), Fristverlängerungen (z. B. Dauerfristverlängerung `P1M`).
@@ -31,7 +33,7 @@ Nur ESM (`import`), getestet mit Node 22; läuft auch im Browser und in React Na
 | --- | --- |
 | Datum (`datum.ts`) | `Datum` (ISO-Text), `datum`, `zerlege`, `istGueltig`, `plusTage`, `plusMonate`, `wochentag`, `vergleiche`, `differenzTage`, `letzterTagImMonat`, `jahrVon` |
 | Dauer (`dauer.ts`) | `parseDauer("P1M")`, `plusDauer`, `minusDauer` (ISO-8601-Dauern) |
-| Feiertage (`feiertage.ts`) | `BUNDESLAENDER`, `Ort` (`bundesland`, `ags`), `ostersonntag`, `gesetzlicheFeiertage(jahr)`, `bankSchliesstage(jahr)` |
+| Feiertage (`feiertage.ts`) | `BUNDESLAENDER`, `Ort` (`bundesland`, `ags`), `ostersonntag`, `gesetzlicheFeiertage(jahr)`, `keineBankarbeitstage(jahr)`, `bankSchliesstage(jahr)` (TARGET, nur Information) |
 | Kalender (`kalender.ts`) | `Kalender` (Schnittstelle), `StandardKalender(zusatz?)`, `Verschiebung`, `pruefeWerktag`, `verschiebe` |
 | Perioden (`perioden.ts`) | `Rhythmus`, `perioden`, `FaelligkeitsRegel`, `rohtermin`, `wiederkehrendeTermine`, `relativerTermin`, `Termin` |
 

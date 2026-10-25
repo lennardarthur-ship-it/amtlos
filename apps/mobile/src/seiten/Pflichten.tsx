@@ -1,13 +1,14 @@
 import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useMemo, useState } from "react";
-import { Linking, View } from "react-native";
+import { AppState, Linking, View } from "react-native";
 import { vorlageFuer } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
 import { BausteinListe, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, SCHRIFT, useFarben, weich } from "../ui/thema";
-import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringendOhneTermin, dringlichkeit, erinnerungsPlan, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, zaehlung, type PflichtInfo } from "../pflichten/check";
+import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringendOhneTermin, dringlichkeit, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, hakenOhne, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, terminStand, zaehlung, type PflichtInfo } from "../pflichten/check";
+import { erinnerungsPlan } from "../pflichten/erinnerungsplan";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { LEERER_STAND, heute } from "../unterlagen/speicher";
 import { umsatzFakten } from "../unterlagen/kuUmsatz";
@@ -21,15 +22,28 @@ import { Jahresraster } from "./Jahresraster";
 import { useProSperre } from "./Pro";
 import { kanzleienSichtbar } from "./Kanzleien";
 import { SteuerberatungSeite } from "./Steuerberatung";
-import { erinnerungenAbgleichen, erinnerungenAktiv, freiePflichten, pflichtAnsicht } from "../pro/regeln";
+import { erinnerungenAbgleichen, erinnerungenAktiv, freiePflichten, pflichtAnsicht, weiterePflichten } from "../pro/regeln";
 import { GEWERBE_PFLICHT } from "../gewerbe/felder";
 import { GewerbeOnlineSeite } from "./GewerbeOnline";
 
 const datumDe = (iso: string) => datumKurz(`${iso}T12:00:00Z`);
 const TAG_LANG = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
-/** Auswertung des Katalogs für das gespeicherte Profil (und Ereignisse aus den Unterlagen) – nur neu, wenn sich Antworten, Unterlagen oder der Tag ändern. */
+/**
+ * Auswertung des Katalogs für das gespeicherte Profil (und Ereignisse aus den Unterlagen) – nur neu, wenn sich Antworten,
+ * Unterlagen oder der Tag ändern. E-192: danach (billig) der Stand der Haken – versäumte Termine bleiben sichtbar.
+ */
 export function useAuswertung() {
+  const roh = useAuswertungOhneHaken();
+  const erledigt = useStandWahl((s) => s.erledigt);
+  const zeiten = useStandWahl((s) => s.zeiten);
+  const tag = heute();
+  // nur die Zeitpunkte der Antworten zählen (ab wann die App eine Pflicht begleitet), nicht jede andere Änderung
+  const antworten = Object.entries(zeiten).filter(([k]) => k.startsWith("profil:")).sort().join("|");
+  return useMemo(() => terminStand(roh, { erledigt, zeiten }, tag), [roh, erledigt, antworten, tag]);
+}
+
+function useAuswertungOhneHaken() {
   const profil = useStandWahl((s) => s.profil);
   const unterlagen = useStandWahl((s) => s.unterlagen);
   const mitarbeiter = useStandWahl((s) => s.mitarbeiter);
@@ -105,7 +119,7 @@ export function PflichtDetail({ id }: { id: string }) {
   const frei = useFreiePflichten();
   if (!roh) return <Unterseite titel="">{null}</Unterseite>;
   // E-188: ohne Pro nur die ersten 3 Pflichten – eine andere (z. B. über einen Verweis geöffnet) bleibt gesperrt
-  if (frei && !frei.has(id)) return <Unterseite titel={TEXT.pflicht_titel}><Inhalt><Hinweis text={TEXT.pflicht_gesperrt} symbol="lock" /><GesperrtePflichten anzahl={Math.max(1, a.gilt.length - frei.size)} /></Inhalt></Unterseite>;
+  if (frei && !frei.has(id)) return <Unterseite titel={TEXT.pflicht_titel}><Inhalt><Hinweis text={TEXT.pflicht_gesperrt} symbol="lock" /><GesperrtePflichten anzahl={Math.max(1, weiterePflichten(a, frei))} /></Inhalt></Unterseite>;
   // E-156: ohne Pro der Überblick (Titel, Kurztext, Termin, Abhaken) – die Details als kurzer Hinweis auf Pro
   const p = pflichtAnsicht(roh, z.pro);
   // schon angefangen? Dann die vorhandene Unterlage öffnen statt mit „Ausfüllen“ eine zweite anzulegen
@@ -117,7 +131,10 @@ export function PflichtDetail({ id }: { id: string }) {
   const vorher = abgehakt ? [] : offeneVoraussetzungen(p, a, z.stand);
   const abhaken = () => {
     if (vorher.length) return melden(TEXT.r11_erst_erledigen(vorher.map((x) => x.titel)));
-    z.erledigtSetzen(p.id, abgehakt ? null : heute(), abgehakt ? null : p.wiederkehrend ? p.naechsterTermin : null);
+    // E-192: der Haken einer wiederkehrenden Pflicht gilt für ihren ältesten offenen Termin; entfernt man ihn, gilt der Termin davor als erledigt
+    const ohne = abgehakt ? hakenOhne(p, z.stand.erledigt[p.id]) : null;
+    if (abgehakt) z.erledigtSetzen(p.id, ohne?.datum ?? null, ohne?.termin ?? null);
+    else z.erledigtSetzen(p.id, heute(), p.wiederkehrend ? p.naechsterTermin : null);
     melden(abgehakt ? TEXT.haken_entfernt : TEXT.als_erledigt_vermerkt);
   };
   // R10: laufende Pflicht – welche Unterlage erledigt sie gerade und bis wann; „bestaetigen“: nur der Haken erledigt
@@ -367,7 +384,7 @@ function PflichtenFrei({ frei }: { frei: ReadonlySet<string> }) {
             ))}
           </Karte>
         ) : null}
-        <GesperrtePflichten anzahl={a.gilt.length - reihe.length} />
+        <GesperrtePflichten anzahl={weiterePflichten(a, frei)} />
       </Gruppe>
       <ErinnerungsSchalter />
       <KurzKlaeren offen={offen} />
@@ -701,6 +718,7 @@ function ErinnerungsSchalter() {
   const z = useAmtlos();
   const sperre = useProSperre();
   const [fehler, setFehler] = useState(false);
+  const plan = useErinnerungsPlan();
   if (!erinnerungenMoeglich && z.pro) return null;
   const einschalten = () => void erlaubnisAnfragen().then((ok) => (ok ? z.erinnerungenSetzen(true) : setFehler(true)));
   return (
@@ -716,6 +734,8 @@ function ErinnerungsSchalter() {
           einschalten();
         }}
       />
+      {/* E-192: ehrlich sagen, wenn die geplanten Mitteilungen (Grenze des Systems) vor dem letzten Termin enden */}
+      {erinnerungenAktiv(z.stand.erinnerungen, z.pro) && plan.geplantBis ? <Hinweis text={TEXT.erinnern_geplant_bis(datumDe(plan.geplantBis))} /> : null}
       {/* bleibt stehen, bis man es erneut versucht – mit dem Weg in die Einstellungen */}
       {fehler ? (
         <View>
@@ -727,21 +747,40 @@ function ErinnerungsSchalter() {
   );
 }
 
-/** Setzt die lokalen Erinnerungen neu, wenn sich Antworten, Haken oder Unterlagen ändern (rendert nichts). */
-export function ErinnerungsPlaner() {
+/** E-192: der Plan der Mitteilungen (alle Termine der nächsten zwölf Monate, höchstens 60 Tage) – leer ohne Pro bzw. Schalter. */
+function useErinnerungsPlan() {
   const z = useAmtlos();
   const a = useAuswertung();
   // E-156: Mitteilungen nur mit Pro – endet Pro, werden die geplanten abgesagt; kommt Pro (wieder), neu geplant
   const aktiv = erinnerungenAktiv(z.stand.erinnerungen, z.pro);
-  const plan = useMemo(() => (aktiv ? erinnerungsPlan(a, z.stand, heute()) : []), [a, z.stand, aktiv]);
-  const schluessel = JSON.stringify(plan);
+  const { erledigt, unterlagen, betrieb } = z.stand;
+  const tag = heute();
+  return useMemo(() => (aktiv ? erinnerungsPlan(a, { erledigt, unterlagen, betrieb }, tag) : { mitteilungen: [], geplantBis: null }), [a, erledigt, unterlagen, betrieb, aktiv, tag]);
+}
+
+/**
+ * Setzt die lokalen Erinnerungen neu, wenn sich Antworten, Haken oder Unterlagen ändern – und (E-192) bei jedem Start und
+ * jeder Rückkehr in die App, auch ohne geöffnete Pflichten-Seite (in App.tsx ganz oben eingehängt). Rendert nichts.
+ */
+export function ErinnerungsPlaner() {
+  const z = useAmtlos();
+  // Rückkehr in den Vordergrund: neu zeichnen (neuer Tag ⇒ neuer Plan) und den Plan in jedem Fall neu setzen
+  const [wach, setWach] = useState(0);
+  useEffect(() => {
+    const abo = AppState.addEventListener("change", (s) => {
+      if (s === "active") setWach((n) => n + 1);
+    });
+    return () => abo.remove();
+  }, []);
+  const plan = useErinnerungsPlan();
+  const schluessel = JSON.stringify(plan.mitteilungen);
   useEffect(() => {
     // erst absagen, wenn feststeht, dass Pro fehlt (Store-Antwort beim Start) – sonst verschwänden Mitteilungen kurz
     if (!erinnerungenMoeglich || !z.bereit || !z.proBekannt) return;
-    const zeit = setTimeout(() => void erinnerungenAbgleichen(z.stand.erinnerungen, z.pro, plan, { planen, allesAbsagen }).catch(() => undefined), 800);
+    const zeit = setTimeout(() => void erinnerungenAbgleichen(z.stand.erinnerungen, z.pro, plan.mitteilungen, { planen, allesAbsagen }).catch(() => undefined), 800);
     return () => clearTimeout(zeit);
-    // nur bei geändertem Plan oder Pro-Stand neu setzen (der Plan steckt im Schlüssel)
-  }, [schluessel, z.stand.erinnerungen, z.pro, z.proBekannt, z.bereit]);
+    // bei geändertem Plan oder Pro-Stand und bei jeder Rückkehr in die App neu setzen (der Plan steckt im Schlüssel)
+  }, [schluessel, z.stand.erinnerungen, z.pro, z.proBekannt, z.bereit, wach]);
   return null;
 }
 

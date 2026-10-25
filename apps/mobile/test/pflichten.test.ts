@@ -5,7 +5,8 @@ import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import { VORLAGEN } from "@amtlos/fachlogik";
 import { LEERER_STAND, anlegen, erledigtSetzen, profilSetzen, standAus } from "../src/unterlagen/speicher";
-import { CHECK_FELDER, KATALOG, auswertung, checkFragen, ereignisseAusStand, dringlichkeit, erinnerungsPlan, folgeAntworten, fortschritt, frageZu, gruendungsSchritte, istErledigt, offeneFragenNachWirkung, offeneKernFragen, selten, zusatzFragen, type PflichtInfo, type Profil } from "../src/pflichten/check";
+import { erinnerungen, erinnerungsPlan } from "../src/pflichten/erinnerungsplan";
+import { CHECK_FELDER, KATALOG, auswertung, checkFragen, ereignisseAusStand, dringlichkeit, folgeAntworten, fortschritt, frageZu, gruendungsSchritte, istErledigt, offeneFragenNachWirkung, offeneKernFragen, selten, zusatzFragen, type PflichtInfo, type Profil } from "../src/pflichten/check";
 
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/fixtures");
 const salon: Profil = { "taetigkeit.branchen": ["beauty_kosmetik"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "BY", "beschaeftigte.gesamt": 3, "kasse.elektronisch": true, "online.website": false, "ust.kleinunternehmer": false, gruendungsdatum: "2024-03-01" };
@@ -167,21 +168,20 @@ describe("Pflichten-Check", () => {
     expect(new Set([...d.jetzt, ...d.naechsteWochen, ...d.imBlick].map((p) => p.id)).size).toBe(a.gilt.length);
     for (const p of d.jetzt) expect(p.naechsterTermin ? p.naechsterTermin <= "2026-10-26" : p.schwere === "hoch" || p.dringendOhneTermin === true, p.id).toBe(true);
     for (const p of d.naechsteWochen) expect(p.naechsterTermin! > "2026-10-26" && p.naechsterTermin! <= "2026-11-26", p.id).toBe(true);
-    // Erinnerungen: nur mit Termin, nie vor heute, höchstens 3 Tage vorher, sortiert und begrenzt
-    const plan = erinnerungsPlan(a, leer, heute);
-    expect(plan.length).toBeGreaterThan(0);
-    expect(plan.length).toBeLessThanOrEqual(30);
-    for (const e of plan) {
+    // Erinnerungen (E-192): nur mit Termin, nie vor heute, 3 Tage vorher bzw. am Tag selbst, sortiert; der Plan begrenzt die Tage
+    const liste = erinnerungen(a, leer, heute);
+    expect(liste.length).toBeGreaterThan(0);
+    for (const e of liste) {
       expect(e.am >= heute && e.am <= e.termin, e.pflichtId).toBe(true);
-      expect(e.am === heute || e.am === new Date(Date.parse(e.termin + "T00:00:00Z") - 3 * 864e5).toISOString().slice(0, 10)).toBe(true);
+      expect(e.am === heute || e.am === e.termin || e.am === new Date(Date.parse(e.termin + "T00:00:00Z") - 3 * 864e5).toISOString().slice(0, 10)).toBe(true);
     }
-    expect([...plan].map((e) => e.am)).toEqual([...plan].map((e) => e.am).sort());
-    expect(erinnerungsPlan(a, leer, heute, 3, 2)).toHaveLength(Math.min(2, plan.length));
-    // abgehakte Pflicht verschwindet aus „Jetzt dran“ und aus den Erinnerungen
-    const erste = plan[0]!;
+    expect(liste.map((e) => e.am)).toEqual(liste.map((e) => e.am).sort());
+    expect(erinnerungsPlan(a, leer, heute, { max: 2 }).mitteilungen).toHaveLength(2);
+    // abgehakte Pflicht: ihr aktueller Termin verschwindet aus „Jetzt dran“ und aus den Erinnerungen (spätere Termine bleiben)
+    const erste = liste[0]!;
     const p = a.gilt.find((x) => x.id === erste.pflichtId)!;
     const s = { ...erledigtSetzen(LEERER_STAND, p.id, heute, p.naechsterTermin), unterlagen: [] };
-    expect(erinnerungsPlan(a, s, heute).some((e) => e.pflichtId === p.id)).toBe(false);
+    expect(erinnerungen(a, s, heute).some((e) => e.pflichtId === p.id && e.termin === p.naechsterTermin)).toBe(false);
     expect(dringlichkeit(a, s, heute).jetzt.some((x) => x.id === p.id)).toBe(false);
   });
 

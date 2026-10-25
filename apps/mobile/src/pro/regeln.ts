@@ -64,14 +64,25 @@ export const ausgabeGrund = (u: Pick<Unterlage, "vorlage">): ProFunktion => (u.v
  * Die Pflichten, die ohne Pro sichtbar sind (E-188): die ersten 3 nach Dringlichkeit wie im Überblick – „Jetzt dran“,
  * dann „In den nächsten Wochen“, dann die übrigen Pflichten. Gerechnet ohne Haken und ohne Unterlagen: Abhaken
  * verschiebt die Auswahl nicht (sonst rückte mit jedem Haken eine weitere Pflicht nach); sie hängt nur von den
- * Antworten im Check und vom Tag ab.
+ * Antworten im Check und vom Tag ab. E-192: nur echte Pflichten (Katalog `einordnung: pflicht`, wie `zaehlung`) – so
+ * gehen „3 frei + N weitere“ in der Gesamtzahl auf; mit `a` aus `terminStand` steht ein überfälliger Termin als
+ * dringendster vorn (bis er abgehakt ist – das ist die einzige Stelle, an der ein Haken die Auswahl ändert).
  */
 export function freiePflichten(a: Auswertung, betrieb: Betrieb, tag: string): Set<string> {
   const d = dringlichkeit(a, { erledigt: {}, unterlagen: [], betrieb }, tag);
-  const reihe = [...d.jetzt, ...d.naechsteWochen, ...d.imBlick.filter((p) => p.einordnung === "pflicht")];
+  const reihe = [...d.jetzt, ...d.naechsteWochen, ...d.imBlick].filter((p) => p.einordnung === "pflicht");
   const ids: string[] = [];
   for (const p of reihe) if (!ids.includes(p.id) && ids.length < PFLICHTEN_FREI) ids.push(p.id);
   return new Set(ids);
+}
+
+/**
+ * E-192: „… und N weitere Pflichten“ – dieselbe Zählung wie überall (`zaehlung`: nur `einordnung: pflicht`), abzüglich
+ * der freien. Hinweise und Optionen zählen nicht mit.
+ */
+export function weiterePflichten(a: Pick<Auswertung, "gilt">, frei: ReadonlySet<string>): number {
+  const pflichten = a.gilt.filter((p) => p.einordnung === "pflicht");
+  return pflichten.length - pflichten.filter((p) => frei.has(p.id)).length;
 }
 
 /** Pflicht sichtbar? Mit Pro jede, ohne Pro nur die freien (`frei` aus `freiePflichten`). */
