@@ -1205,7 +1205,7 @@ export const bilanzGuv: Vorlage = {
       felder: [
         posten("ertraege", "Erträge", "Ertrag", "z. B. Umsatzerlöse"),
         posten("aufwendungen", "Aufwendungen", "Aufwand", "z. B. Materialaufwand, Personalaufwand"),
-        { id: "ertragsteuern", art: "betrag", label: "Steuern vom Einkommen und vom Ertrag (€)", hilfe: "Körperschaft- und Gewerbesteuer des Jahres laut Kanzlei – steht vor dem Jahresüberschuss (§ 275 HGB)" },
+        { id: "ertragsteuern", art: "betrag", label: "Steuern vom Einkommen und vom Ertrag (€)", hilfe: "Steuern des Jahres laut Kanzlei – steht vor dem Jahresüberschuss (§ 275 HGB). Kapitalgesellschaften: Körperschaft- und Gewerbesteuer; e. K., OHG, KG und GmbH & Co. KG: nur Gewerbesteuer (die Einkommensteuer der Inhaber ist kein Aufwand des Unternehmens; StB Busch 25.10.2026)" },
       ],
     },
     { titel: "Bilanz", felder: [posten("aktiva", "Aktiva", "Aktivposten", "z. B. Betriebs- und Geschäftsausstattung, Bank"), posten("passiva", "Passiva", "Passivposten", "z. B. Eigenkapital, Verbindlichkeiten")] },
@@ -1303,7 +1303,7 @@ export const bilanzGuv: Vorlage = {
             ...(mitSteuern
               ? [
                   { text: "Ergebnis vor Steuern vom Einkommen und vom Ertrag", betrag: guvLeer ? "&nbsp;" : euro(vorSteuern) },
-                  { text: "Steuern vom Einkommen und vom Ertrag", hinweis: "Körperschaft- und Gewerbesteuer", betrag: guvLeer && !text(d, "ertragsteuern") ? "&nbsp;" : euro(st) },
+                  { text: "Steuern vom Einkommen und vom Ertrag", hinweis: kapital ? "Körperschaft- und Gewerbesteuer" : "Gewerbesteuer", betrag: guvLeer && !text(d, "ertragsteuern") ? "&nbsp;" : euro(st) },
                 ]
               : []),
             { text: guvLeer ? "Jahresüberschuss bzw. Jahresfehlbetrag" : j >= 0 ? "Jahresüberschuss" : "Jahresfehlbetrag", betrag: guvLeer ? "&nbsp;" : euro(Math.abs(j)), fett: true },

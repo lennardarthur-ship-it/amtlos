@@ -2048,3 +2048,13 @@
       version: 5
       quelle: 2026-10-24-runde3-weber-mail.txt
       stand: '2026-10-23'
+- pruefer: StB Lutz Busch
+  umfang: alles
+  unterschrieben: false
+  felder_fehlen: []
+  hinweis: Runde 4 per Mail 25.10.2026 freigegeben; Nachtragsblatt (mit Bilanz) folgt
+  eintraege:
+    gesellschaft.jahresabschluss_personenhandel:
+      version: 2
+      quelle: 2026-10-25-runde4-katalog-busch.xlsx
+      stand: '2026-10-25'

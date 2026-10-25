@@ -123,6 +123,8 @@ fachlich_zu_pruefen:
 - 'v2 (StB Busch, 24.10.2026): nur die Wiederholung geändert – jährlich wiederkehrend statt einmalig; ohne festen Termin, erledigt jeweils für ein Kalenderjahr. Alle anderen Felder unverändert gegenüber v1.'
 - 'Neu nach StB Busch (Mail 23.10.2026) – bitte ganz prüfen. Erklärung nach seinen drei Punkten (Aufstellung § 243 Abs. 3, Unterschrift § 245, Offenlegung) und § 242 HGB; Folgen bei Verstoß aus gesellschaft.jahresabschluss (freigegeben von RA Dr. Weber, v5) übernommen und auf alle Kaufleute verallgemeinert („wenn später die Zahlungen eingestellt werden“ wie in steuern.buchfuehrungspflicht) – § 283b StGB rechtlich ggf. durch RA Dr. Weber gegenlesen. Stelle „in der Regel mit deiner Steuerberatung“ nach steuern.buchfuehrungspflicht.'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - StB Lutz Busch
+  geprueft_am: '2026-10-25'
+  geprueft_version: 2
