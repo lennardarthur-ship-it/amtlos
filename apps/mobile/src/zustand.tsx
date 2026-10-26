@@ -18,7 +18,7 @@ import { syncZusammenfuehren } from "./konto/sync";
 import { dateienImStand, doppeltePerson, korrigieren, personenZusammenfuehren, staetteLoeschen, staetteSetzen, unterlageStaette, type Betriebsstaette } from "./unterlagen/speicher";
 import { personenkontenVergeben } from "./unterlagen/steuerpaket";
 import { belegeFestschreiben, kassenbuchFestschreiben, kassensturzSpeichern, sachentnahmeLoeschen, sachentnahmeSpeichern } from "./unterlagen/speicher";
-import { LEERER_STAND, StandFehler, geteilteFassungFestschreiben, teilenOffenVermerken, type GeteilteFassung, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
+import { LEERER_STAND, StandFehler, geteilteFassungFestschreiben, teilenOffenVermerken, type GeteilteFassung, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, type EuStornoGrund, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /**
  * Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund),
@@ -93,7 +93,8 @@ interface Zustand {
    */
   geteiltFestschreiben(id: string, am?: string): boolean;
   erinnerungenSetzen(an: boolean): void;
-  stornieren(id: string): Unterlage | null;
+  /** E-214: `euGrund` bei Rechnungen mit EU-Umsatz (Fehler in der Rechnung bzw. Betrag geändert) */
+  stornieren(id: string, euGrund?: EuStornoGrund): Unterlage | null;
   kopieren(id: string): Unterlage | null;
   /** Entwurf löschen; E-200: ein geteilter, nicht bestätigter Entwurf nur mit Grund (protokolliert, Nummer bleibt vergeben) */
   loeschen(id: string, grund?: string): void;
@@ -559,8 +560,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         return true;
       },
       erinnerungenSetzen: (an) => setzen({ ...aktuell.current, erinnerungen: an }),
-      stornieren: (id) => {
-        const [s, u] = stornieren(aktuell.current, id, new Date());
+      stornieren: (id, euGrund) => {
+        const [s, u] = stornieren(aktuell.current, id, new Date(), undefined, euGrund);
         setzen(s);
         return u;
       },

@@ -252,7 +252,7 @@ export function pruefexport(s: Stand, dateien: Record<string, Uint8Array>, jetzt
     ...(s.kasse.length ? [{ name: PRUEFEXPORT.kasse, zweck: `${anzahl(s.kasse.length, "Tagesabschluss", "Tagesabschlüsse")} (Z-Bons) mit Umsatz je Steuersatz, Zahlungsarten, Bewegungen, Bargeldbestand und Korrekturen; Summe am Ende.`, spalten: KASSEN_SPALTEN }] : []),
     ...(s.kassenstuerze.length ? [{ name: PRUEFEXPORT.kassenstuerze, zweck: `${anzahl(s.kassenstuerze.length, "Kassensturz", "Kassenstürze")} (Zählprotokolle des Bargeldbestands) mit gezähltem Bestand, Stückelung und Anwesenden, nach Zeitpunkt.`, spalten: KASSENSTURZ_SPALTEN }] : []),
     ...(s.sachentnahmen.length ? [{ name: PRUEFEXPORT.sachentnahmen, zweck: `${anzahl(s.sachentnahmen.length, "Sachentnahme", "Sachentnahmen")} (unentgeltliche Wertabgaben, z. B. nach den Pauschbeträgen) mit Bemessungsgrundlage und Umsatzsteuer je Steuersatz, nach Datum; Summe am Ende.`, spalten: SACHENTNAHME_SPALTEN }] : []),
-    { name: PRUEFEXPORT.protokoll, zweck: "Änderungen nach der Festschreibung, Korrekturen, Löschungen, ungültig markierte Belege, Nacherfassungen und nach dem Teilen gelöschte Rechnungsentwürfe (deren Nummer vergeben bleibt), nach Zeitpunkt.", spalten: PROTOKOLL_SPALTEN },
+    { name: PRUEFEXPORT.protokoll, zweck: "Änderungen nach der Festschreibung, Korrekturen, Löschungen, ungültig markierte Belege, Nacherfassungen, nach dem Teilen gelöschte Rechnungsentwürfe (deren Nummer vergeben bleibt) und Korrekturen, die beim Zusammenführen zweier Geräte (Synchronisation, Wiederherstellen) nicht übernommen wurden – mit Gerät und Eingang beim Server –, nach Zeitpunkt.", spalten: PROTOKOLL_SPALTEN },
     { name: PRUEFEXPORT.feldbeschreibung, zweck: "diese Beschreibung." },
   ];
   const ordner = [

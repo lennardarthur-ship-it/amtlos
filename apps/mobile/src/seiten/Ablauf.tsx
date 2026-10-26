@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { VORSTEUER_AUFTEILEN, fehlendeAngaben, istPrivatperson, personAus, personIn, profilStartwerte, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Betrag, Fuss, Hinweis, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
+import { Betrag, Fuss, Hinweis, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf, textAus } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { RADIUS, RAND,  useFarben } from "../ui/thema";
 import { HAUPT_STAETTE, PERSONEN_LISTE, STAETTEN_VORLAGEN, betriebFehlt, personenSortiert } from "../unterlagen/speicher";
 import { FassungenKarte, KorrekturSeite } from "./Fassungen";
 import { StaettenWahl } from "./BetriebStaetten";
 import { fehltFuer } from "../unterlagen/pruefung";
-import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
+import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type EuBerichtigung, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
 import { ossFuer, ossQuartale, zmFuer, zmPerioden } from "../unterlagen/euMeldungen";
 import { useAmtlos } from "../zustand";
 import { mitVorlagenHinweis } from "../rechtshinweis";
@@ -99,6 +99,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           r.ersatz ? TEXT.aus_rechnungen_ersatz(r.ersatz) : "",
           r.ersatzNummern.length ? TEXT.stb_ersatz_nummern(r.ersatzNummern) : "",
           r.oss ? TEXT.stb_oss_nicht_va(r.oss) : "",
+          r.berichtigungen.length ? TEXT.e214_va_berichtigung(r.berichtigungen.map((b) => b.stornoNr)) : "",
+          ...anderswoTexte(r.berichtigungenAnderswo),
           r.offen ? TEXT.aus_rechnungen_offen(r.offen) : "",
           r.vorsteuerBelege || r.ohneVorsteuer ? TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer) : "",
           r.vorsteuerPruefen ? VORSTEUER_AUFTEILEN : "",
@@ -137,6 +139,9 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           {/* StB-Prüfung (5.2): welche Rechnungen nach dem Rechnungsdatum zählen; OSS gehört nicht in die Voranmeldung */}
           {r.ersatzNummern.length ? <T v="caption" farbe={f.bald}>{TEXT.stb_ersatz_nummern(r.ersatzNummern)}</T> : null}
           {r.oss ? <T v="caption" farbe={f.bald}>{TEXT.stb_oss_nicht_va(r.oss)}</T> : null}
+          {/* E-214: Stornos „Fehler in der Rechnung“ berichtigen den ursprünglichen Zeitraum */}
+          {r.berichtigungen.length ? <Hinweis art="warnung" text={TEXT.e214_va_berichtigung(r.berichtigungen.map((b) => b.stornoNr))} /> : null}
+          {anderswoTexte(r.berichtigungenAnderswo).map((t) => <T key={t} v="caption" farbe={f.bald}>{t}</T>)}
           {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
           {r.vorsteuerBelege || r.ohneVorsteuer ? <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer)}</T> : null}
           {r.vorsteuerPruefen ? <T v="caption" farbe={f.bald}>{VORSTEUER_AUFTEILEN}</T> : null}
@@ -150,6 +155,16 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   );
 }
 
+/** E-214: je ursprünglichem Zeitraum ein Satz „Storno … zählt als Berichtigung in …“ */
+function anderswoTexte(l: EuBerichtigung[]): string[] {
+  const je = new Map<string, string[]>();
+  for (const b of l) {
+    const z = `${periodeText(b.monat)} bzw. ${periodeText(b.quartal)}`;
+    je.set(z, [...(je.get(z) ?? []), b.stornoNr]);
+  }
+  return [...je].map(([z, nr]) => TEXT.e214_va_anderswo(nr, z));
+}
+
 /**
  * StB-Prüfung (5.2, C-9): OSS-Erklärung bzw. Zusammenfassende Meldung aus den geteilten Rechnungen übernehmen – je
  * Quartal (OSS) bzw. Monat oder Quartal (ZM).
@@ -159,7 +174,7 @@ function EuAusRechnungen({ id, art }: { id: string; art: "oss" | "zm" }) {
   const f = useFarben();
   const sperre = useProSperre();
   const v: Versteuerung = z.stand.betrieb.versteuerung === "ist" ? "ist" : "soll";
-  const [ergebnis, setErgebnis] = useState<{ periode: string; anzahl: number; zeilen: number } | null>(null);
+  const [ergebnis, setErgebnis] = useState<{ periode: string; anzahl: number; zeilen: number; berichtigungen?: EuBerichtigung[]; anderswo?: EuBerichtigung[]; minderungen?: number } | null>(null);
   const liste = art === "oss" ? ossQuartale(z.stand.unterlagen, z.stand.betrieb, v) : zmPerioden(z.stand.unterlagen, z.stand.betrieb);
   useAnsage(ergebnis ? TEXT.stb_eu_ok(ergebnis.anzahl, ergebnis.zeilen) : null);
   if (!liste.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.stb_eu_leer[art]}</T>;
@@ -175,12 +190,16 @@ function EuAusRechnungen({ id, art }: { id: string; art: "oss" | "zm" }) {
             const erg = art === "oss" ? ossFuer(z.stand.unterlagen, p, z.stand.betrieb, v) : zmFuer(z.stand.unterlagen, p, z.stand.betrieb);
             if (!erg) return;
             z.setzen(id, erg.werte as Daten);
-            setErgebnis({ periode: p, anzahl: erg.anzahl, zeilen: erg.zeilen.length });
+            setErgebnis({ periode: p, anzahl: erg.anzahl, zeilen: erg.zeilen.length, ...("berichtigungen" in erg ? { berichtigungen: erg.berichtigungen, anderswo: erg.berichtigungenAnderswo, minderungen: erg.minderungen } : {}) });
           }}
           optionen={liste.map((p) => ({ wert: p, text: periodeText(p) }))}
         />
       </ScrollView>
       {ergebnis ? <T v="caption" farbe={f.amtTief} stil={{ marginTop: 8 }}>{TEXT.stb_eu_ok(ergebnis.anzahl, ergebnis.zeilen)}</T> : null}
+      {/* E-214: Berichtigung (Fehler in der Rechnung), Stornos, die anderswo zählen, und Skonti im Zeitraum der Zahlung */}
+      {ergebnis?.berichtigungen?.length ? <View style={{ marginTop: 6 }}><Hinweis art="warnung" text={`${TEXT.e214_va_berichtigung(ergebnis.berichtigungen.map((b) => b.stornoNr))} ${TEXT.e214_zm_berichtigung(textAus(ergebnis.berichtigungen.map((b) => b.zmFrist).sort()[0]!))}`} /></View> : null}
+      {anderswoTexte(ergebnis?.anderswo ?? []).map((t) => <T key={t} v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{t}</T>)}
+      {ergebnis?.minderungen ? <T v="caption" farbe={f.amtTief} stil={{ marginTop: 4 }}>{TEXT.e214_zm_minderung(ergebnis.minderungen)}</T> : null}
       <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{art === "oss" ? TEXT.stb_oss_frist : TEXT.stb_zm_frist}</T>
     </View>
   );

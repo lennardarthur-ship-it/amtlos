@@ -11,7 +11,7 @@ import { istNativ, useFarben, weich } from "../ui/thema";
 import { belegFoto } from "../unterlagen/belegfoto";
 import { ausUtf8 } from "../unterlagen/sicherung";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
-import { belegEndgueltigLoeschbar, leererBeleg, neueId } from "../unterlagen/speicher";
+import { BELEG_KONFLIKT_GRUND, belegEndgueltigLoeschbar, leererBeleg, neueId } from "../unterlagen/speicher";
 import { istKleinunternehmer } from "../unterlagen/steuerpaket";
 import { gemischteUmsaetze, nurSteuerfreieUmsaetze, vorsteuerquoteAus } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
@@ -329,7 +329,8 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         {b.historie?.length ? (
           <View style={{ marginTop: 18, gap: 4 }}>
             <T v="klein" fett accessibilityRole="header">{TEXT.r12g_beleg_protokoll}</T>
-            {[...b.historie].reverse().map((h) => <T key={h.bis} v="caption" leise>{TEXT.r12g_beleg_fassung(zeitDe(h.bis), `${h.lieferant || "ohne Lieferant"}, ${euro(h.steuer.reduce((a, x) => a + x.brutto_cent, 0))}, ${kategorieFuer(h.kategorie).titel}`, h.grund ?? null)}</T>)}
+            {/* E-214: nicht übernommene Korrektur mit Regel, Gerät und ihrem eigenen Grund */}
+            {[...b.historie].reverse().map((h, i) => <T key={`${h.bis}-${i}`} v="caption" leise>{TEXT.r12g_beleg_fassung(zeitDe(h.bis), `${h.lieferant || "ohne Lieferant"}, ${euro(h.steuer.reduce((a, x) => a + x.brutto_cent, 0))}, ${kategorieFuer(h.kategorie).titel}`, h.grund === BELEG_KONFLIKT_GRUND ? TEXT.e214_konflikt_grund(h.grund, h.vorrang === "eingang", h.geraet ?? null, h.korrektur_grund ?? null) : (h.grund ?? null))}</T>)}
           </View>
         ) : null}
         {entwurf || belegEndgueltigLoeschbar(b) ? null : <Feld label={TEXT.r12g_beleg_ungueltig_grund} hilfe={TEXT.r12g_beleg_ungueltig_grund_hilfe} wert={ungueltigGrund} aendern={setUngueltigGrund} optional />}

@@ -11,6 +11,9 @@ const Chiffre = (max: number) => z.string().min(20).max(max).regex(/^\{"format":
 const Schluessel = z.string().min(20).max(4000).regex(/^\{"format":"amtlos-schluessel"/, "Kein verschlüsselter Schlüssel");
 const DATEINAME = /^[A-Za-z0-9_-]{4,64}\.[a-z0-9]{1,8}$/;
 
+/** Zeitpunkt aus der Datenbank (Date oder Text) als ISO-Text in UTC */
+const isoZeit = (w: string | Date) => new Date(w).toISOString();
+
 const voll = () => new PayloadTooLargeException({ statusCode: 413, meldung: "Der Speicher für die Synchronisation ist voll." });
 
 /** HTTP 402: Synchronisation gehört zu Amtlos Pro (nur geprüft, wenn REVENUECAT_SECRET_KEY gesetzt ist). */
@@ -68,11 +71,15 @@ export class TresorController {
     return { stand_bytes: Number(t.stand_bytes), anzahl: Number(d?.anzahl ?? 0), dateien_bytes: Number(d?.bytes ?? 0) };
   }
 
+  /**
+   * E-214: mit `seit` (Einrichtung des Tresors) – die App vermerkt damit, mit welcher Version eine Korrektur beim Server
+   * einging (ein neu eingerichteter Tresor zählt wieder ab 1); `geaendert_am` ist die Serverzeit der aktuellen Version.
+   */
   @Get("tresor")
   async holen(@Kontext() k: Anfragekontext) {
-    const t = await this.db.imKontext({ kontoId: k.kontoId }, (tx) => tx.eine<{ version: string; schluessel: string; daten: string | null; geaendert_am: string }>("select version, schluessel, daten, geaendert_am from app.tresor where konto_id = $1", [k.kontoId]));
+    const t = await this.db.imKontext({ kontoId: k.kontoId }, (tx) => tx.eine<{ version: string; schluessel: string; daten: string | null; geaendert_am: string | Date; erstellt_am: string | Date }>("select version, schluessel, daten, geaendert_am, erstellt_am from app.tresor where konto_id = $1", [k.kontoId]));
     if (!t) throw new NotFoundException("Noch keine Synchronisation eingerichtet");
-    return { version: Number(t.version), schluessel: t.schluessel, daten: t.daten, geaendert_am: t.geaendert_am, konto_id: k.kontoId };
+    return { version: Number(t.version), schluessel: t.schluessel, daten: t.daten, geaendert_am: isoZeit(t.geaendert_am), seit: isoZeit(t.erstellt_am), konto_id: k.kontoId };
   }
 
   /** Synchronisation einrichten: verschlüsselter Sync-Schlüssel, noch ohne Daten. */
@@ -94,8 +101,10 @@ export class TresorController {
       // Der Stand zählt zum Speicher (M-4): Dateien plus neuer Stand höchstens TRESOR_MAX_MB
       const s = await this.belegung(tx, k.kontoId);
       if (s && s.dateien_bytes + Buffer.byteLength(d.daten) > this.k.TRESOR_MAX_MB * 1024 * 1024) throw voll();
-      const r = await tx.eine<{ version: string }>("update app.tresor set daten = $3, version = version + 1, geaendert_am = now() where konto_id = $1 and version = $2 returning version", [k.kontoId, d.version, d.daten]);
-      if (r) return { version: Number(r.version) };
+      // E-214: Serverzeit des Eingangs und Einrichtung des Tresors zurück – die App vermerkt sie an den Korrekturen dieser
+      // Version (GoBD: „zuletzt“ nach dem Eingang beim Server, nicht nach der Uhr des Geräts)
+      const r = await tx.eine<{ version: string; geaendert_am: string | Date; erstellt_am: string | Date }>("update app.tresor set daten = $3, version = version + 1, geaendert_am = now() where konto_id = $1 and version = $2 returning version, geaendert_am, erstellt_am", [k.kontoId, d.version, d.daten]);
+      if (r) return { version: Number(r.version), empfangen: isoZeit(r.geaendert_am), seit: isoZeit(r.erstellt_am) };
       const aktuell = await tx.eine<{ version: string }>("select version from app.tresor where konto_id = $1", [k.kontoId]);
       if (!aktuell) throw new NotFoundException("Noch keine Synchronisation eingerichtet");
       throw new ConflictException({ statusCode: 409, meldung: "Auf einem anderen Gerät wurde inzwischen etwas geändert.", version: Number(aktuell.version) });

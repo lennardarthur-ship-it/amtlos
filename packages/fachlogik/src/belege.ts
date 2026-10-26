@@ -87,7 +87,49 @@ export interface Beleg {
   /** E-165 (Personenkonten): USt-IdNr. und Anschrift des Lieferanten, soweit bekannt (aus der E-Rechnung) */
   lieferant_ust_idnr?: string | null;
   lieferant_anschrift?: string | null;
+  /**
+   * E-214 (Steuerberater 26.10.2026, GoBD): Kennung des Geräts, auf dem der geltende Inhalt festgeschrieben bzw.
+   * zuletzt nach der Festschreibung korrigiert wurde – gehört nicht zum Inhalt.
+   */
+  geraet?: string | null;
+  /**
+   * E-214: Eingang des geltenden Inhalts beim Synchronisationsserver (`BelegEingang`) – entscheidet bei zwei
+   * verschiedenen Korrekturen desselben festgeschriebenen Belegs, welche zuletzt kam. Gehört nicht zum Inhalt.
+   */
+  eingang?: BelegEingang | null;
 }
+
+/**
+ * E-214: Eingang beim Synchronisationsserver. Der Server sieht nur Chiffretext; er zählt jeden gespeicherten Stand
+ * (Versionszähler, nur die nächste Version wird angenommen) und vermerkt den Zeitpunkt. `seit`: Einrichtung der
+ * Synchronisation auf dem Server (ein neu eingerichteter Tresor zählt wieder ab 1), `version`: Version, mit der der
+ * Inhalt zuerst beim Server einging, `zeit`: Serverzeit dieser Version (wird nach dem Hochladen ergänzt),
+ * `spaetestens`: nur bekannt, dass der Inhalt spätestens mit dieser Version da war (von einer älteren App hochgeladen).
+ */
+export interface BelegEingang {
+  seit: string;
+  version: number;
+  zeit?: string;
+  spaetestens?: boolean;
+}
+
+/** E-214: Eingang lesen – Unlesbares fällt weg. */
+export function belegEingangAus(w: unknown): BelegEingang | null {
+  if (!w || typeof w !== "object") return null;
+  const r = w as Record<string, unknown>;
+  if (typeof r.seit !== "string" || !/^\d{4}-\d{2}-\d{2}T/.test(r.seit) || typeof r.version !== "number" || !Number.isSafeInteger(r.version) || r.version < 0) return null;
+  return { seit: r.seit, version: r.version, ...(typeof r.zeit === "string" && /^\d{4}-\d{2}-\d{2}T/.test(r.zeit) ? { zeit: r.zeit } : {}), ...(r.spaetestens === true ? { spaetestens: true } : {}) };
+}
+
+/** E-214: Reihenfolge zweier Eingänge beim Server (negativ: a früher), null wenn einer fehlt. */
+export function eingangVergleich(a: BelegEingang | null | undefined, b: BelegEingang | null | undefined): number | null {
+  if (!a || !b) return null;
+  if (a.seit !== b.seit) return a.seit < b.seit ? -1 : 1;
+  return a.version - b.version;
+}
+
+/** E-214: Geräte-Kennung lesen (wie die App sie vergibt: Buchstaben, Ziffern, Bindestrich) */
+export const geraetAus = (w: unknown): string | null => (typeof w === "string" && /^[A-Za-z0-9_-]{4,64}$/.test(w) ? w : null);
 
 /** StB-Prüfung (B-10): Arten von Anlagegütern mit eigenem Anlagenkonto */
 export type AnlageArt = "maschinen" | "bga" | "kfz" | "software";
@@ -126,6 +168,20 @@ export interface BelegFassung {
   vorsteuer_betrag_cent?: number | null;
   /** R12 GoBD: Grund, mit dem diese Fassung nach der Festschreibung ersetzt wurde */
   grund?: string | null;
+  /** E-214: Gerät und Eingang beim Server dieser Fassung (wie am Beleg) */
+  geraet?: string | null;
+  eingang?: BelegEingang | null;
+  /**
+   * E-214: bei der Zusammenführung nicht übernommene Korrektur (`grund` = Konfliktgrund): nach welcher Regel die andere
+   * gilt – „eingang“: später beim Server eingegangen; „geraetezeit“: ohne Eingang beim Server (Sicherung, Datei), nach
+   * der Uhr der Geräte zuletzt geändert –, Zeitpunkt, Gerät und Eingang der geltenden Fassung und der Grund, mit dem
+   * diese (nicht übernommene) Korrektur gemacht wurde.
+   */
+  vorrang?: "eingang" | "geraetezeit";
+  gegen_geaendert?: string;
+  gegen_geraet?: string | null;
+  gegen_eingang?: BelegEingang | null;
+  korrektur_grund?: string | null;
 }
 
 /**
@@ -539,6 +595,13 @@ function fassungAus(roh: unknown): BelegFassung | null {
     ...(anlageArtAus(r.anlage_art) ? { anlage_art: anlageArtAus(r.anlage_art) } : {}),
     ...teilabzugAus(r),
     ...(s("grund") ? { grund: s("grund").slice(0, 300) } : {}),
+    ...(geraetAus(r.geraet) ? { geraet: geraetAus(r.geraet) } : {}),
+    ...(belegEingangAus(r.eingang) ? { eingang: belegEingangAus(r.eingang) } : {}),
+    ...(r.vorrang === "eingang" || r.vorrang === "geraetezeit" ? { vorrang: r.vorrang } : {}),
+    ...(/^\d{4}-\d{2}-\d{2}T/.test(s("gegen_geaendert")) ? { gegen_geaendert: s("gegen_geaendert") } : {}),
+    ...(geraetAus(r.gegen_geraet) ? { gegen_geraet: geraetAus(r.gegen_geraet) } : {}),
+    ...(belegEingangAus(r.gegen_eingang) ? { gegen_eingang: belegEingangAus(r.gegen_eingang) } : {}),
+    ...(s("korrektur_grund") ? { korrektur_grund: s("korrektur_grund").slice(0, 300) } : {}),
   };
 }
 
@@ -600,6 +663,8 @@ export function belegAus(roh: unknown): Beleg | null {
     ...teilabzugAus(r),
     ...(textAus(r.lieferant_ust_idnr, 20) ? { lieferant_ust_idnr: textAus(r.lieferant_ust_idnr, 20) } : {}),
     ...(textAus(r.lieferant_anschrift, 300) ? { lieferant_anschrift: textAus(r.lieferant_anschrift, 300) } : {}),
+    ...(geraetAus(r.geraet) ? { geraet: geraetAus(r.geraet) } : {}),
+    ...(belegEingangAus(r.eingang) ? { eingang: belegEingangAus(r.eingang) } : {}),
   };
 }
 

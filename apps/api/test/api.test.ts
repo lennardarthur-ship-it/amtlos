@@ -1131,13 +1131,17 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       await als(http().post("/v1/tresor")).send({ schluessel }).expect(201).expect((r) => expect(r.body).toMatchObject({ version: 0, konto_id: expect.any(String) }));
       await als(http().post("/v1/tresor")).send({ schluessel }).expect(409);
       await als(http().put("/v1/tresor")).send({ version: 0, daten: "{\"betrieb\":\"Klartext\"}" }).expect(422);
-      expect((await als(http().put("/v1/tresor")).send({ version: 0, daten: chiffre("eins") }).expect(200)).body).toEqual({ version: 1 });
+      const v1 = (await als(http().put("/v1/tresor")).send({ version: 0, daten: chiffre("eins") }).expect(200)).body;
+      // E-214: Serverzeit des Eingangs und Einrichtung des Tresors – „zuletzt“ nach dem Eingang beim Server, nicht nach der Uhr des Geräts
+      expect(v1).toEqual({ version: 1, empfangen: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T.*Z$/), seit: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T.*Z$/) });
       // ein zweites Gerät mit veralteter Version: 409 mit der aktuellen Version
       const konflikt = (await als(http().put("/v1/tresor")).send({ version: 0, daten: chiffre("zwei") }).expect(409)).body;
       expect(konflikt.version).toBe(1);
-      expect((await als(http().put("/v1/tresor")).send({ version: 1, daten: chiffre("zwei") }).expect(200)).body).toEqual({ version: 2 });
+      const v2 = (await als(http().put("/v1/tresor")).send({ version: 1, daten: chiffre("zwei") }).expect(200)).body;
+      expect(v2).toMatchObject({ version: 2, seit: v1.seit });
+      expect(v2.empfangen >= v1.empfangen).toBe(true);
       const t = (await als(http().get("/v1/tresor")).expect(200)).body;
-      expect(t).toMatchObject({ version: 2, schluessel, daten: chiffre("zwei") });
+      expect(t).toMatchObject({ version: 2, schluessel, daten: chiffre("zwei"), seit: v1.seit, geaendert_am: v2.empfangen });
       // anderes Konto sieht nichts und kann nichts überschreiben
       await fremd(http().get("/v1/tresor")).expect(404);
       await fremd(http().put("/v1/tresor")).send({ version: 2, daten: chiffre("fremd") }).expect(404);
@@ -1155,7 +1159,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       await http().put("/v1/tresor").send({ version: 0, daten: chiffre("x") }).expect(401);
       await fremd(http().get("/v1/tresor/dateien/abc123.jpg")).expect(404);
       // große Stände gehen (Limit 40 MB statt 256 kB)
-      expect((await als(http().put("/v1/tresor")).send({ version: 2, daten: chiffre("A".repeat(2_000_000)) }).expect(200)).body).toEqual({ version: 3 });
+      expect((await als(http().put("/v1/tresor")).send({ version: 2, daten: chiffre("A".repeat(2_000_000)) }).expect(200)).body).toMatchObject({ version: 3 });
       // Passwort geändert: neuer Schlüssel, Daten bleiben
       const neu = schluessel.replace("AAAA", "DDDD");
       await als(http().put("/v1/tresor/schluessel")).send({ schluessel: neu }).expect(204);
@@ -1163,6 +1167,12 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       await als(http().delete("/v1/tresor")).expect(204);
       await als(http().get("/v1/tresor")).expect(404);
       expect((await als(http().get("/v1/tresor/dateien")).expect(200)).body).toEqual([]);
+      // E-214: neu eingerichtet – Zähler beginnt wieder bei 1, `seit` ist neu (die App ordnet Eingänge danach)
+      await als(http().post("/v1/tresor")).send({ schluessel }).expect(201);
+      const n1 = (await als(http().put("/v1/tresor")).send({ version: 0, daten: chiffre("neu") }).expect(200)).body;
+      expect(n1.version).toBe(1);
+      expect(n1.seit > v1.seit).toBe(true);
+      await als(http().delete("/v1/tresor")).expect(204);
     });
   });
 

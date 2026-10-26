@@ -8,13 +8,21 @@
  *   und Belege werden nie durch eine andere Fassung ersetzt, ihre Historie nur ergänzt (E-209); Löschvermerke verhindern, dass Gelöschtes zurückkommt; Betrieb, Pflichten-Check, Haken und
  *   Steuerberatung gehen nach dem Zeitpunkt ihrer letzten Änderung. Gerätegebundenes (Face ID, Erinnerungen, iCloud,
  *   Bewertungsbitte, Testmodus) bleibt auf jedem Gerät, wie es ist.
+ * - E-214 (Steuerberater 26.10.2026): Bei zwei verschiedenen Korrekturen desselben festgeschriebenen Belegs gilt die,
+ *   die zuletzt beim Server einging – nicht die mit der späteren Uhrzeit des Geräts. Der Server sieht nur Chiffretext,
+ *   nimmt aber nur die nächste Version an (Versionszähler, 409 sonst). Vor dem Zusammenführen bekommen deshalb die
+ *   festgeschriebenen Belege dieses Geräts ohne Eingang die Version, die dieses Hochladen erhält (`eingangVormerken`;
+ *   scheitert es, beginnt alles mit dem unveränderten Stand von vorn), die vom Server geholten ohne Eingang „spätestens
+ *   mit“ der geholten Version; der Server liefert dazu die Einrichtung des Tresors (`seit`, ein neu eingerichteter
+ *   Tresor zählt wieder ab 1) und nach dem Hochladen seine Zeit (`empfangen`, `eingangZeitSetzen`). Nicht übernommene
+ *   Korrekturen stehen mit Inhalt, Zeitpunkt, Gerät, Eingang und Grund in der Historie und im Änderungsprotokoll.
  */
 import { gcm } from "@noble/ciphers/aes";
 import { pbkdf2 } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha2";
 import { kassenVereinen, kassenstuerzeVereinen, type Person } from "@amtlos/fachlogik";
 import { ITERATIONEN_HOECHSTENS, PASSWORT_MINDESTLAENGE, SICHERUNG_ITERATIONEN, ausBase64, base64, utf8 } from "../unterlagen/sicherung";
-import { belegNummernSichern, protokollVereinen, sachentnahmenVereinen, belegeVereinen, dateienImStand, staettenVereinen, fremdVereinen, mehrfachStorniert, nummernKonflikteVon, standAus, stornoVerweisePruefen, unterlagenZusammenfuehren, type Stand, type Unterlage } from "../unterlagen/speicher";
+import { belegNummernSichern, eingangVormerken, eingangZeitSetzen, konfliktEintraege, type NichtUebernommen, protokollVereinen, sachentnahmenVereinen, belegeVereinen, dateienImStand, staettenVereinen, fremdVereinen, mehrfachStorniert, nummernKonflikteVon, standAus, stornoVerweisePruefen, unterlagenZusammenfuehren, type Stand, type Unterlage } from "../unterlagen/speicher";
 import { tresorOeffnen, tresorSchliessen, tresorVersion } from "../unterlagen/tresor";
 
 export const SCHLUESSEL_FORMAT = "amtlos-schluessel";
@@ -67,7 +75,7 @@ export function huelleOeffnen(text: string, passwort: string): Uint8Array {
 
 /** Was synchronisiert wird: alles außer gerätegebundenen Einstellungen (dazu die Partner-ID, Phase 2.3 – sie bleibt auf dem Gerät). */
 export function syncInhalt(s: Stand): Stand {
-  const { appSperre: _a, cloudSicherung: _c, erinnerungen: _e, proTest: _p, bewertung: _b, letzteSicherung: _l, sicherungsNachweis: _n, partnerId: _pa, bezahlschirmNachCheck: _bz, ...rest } = s;
+  const { appSperre: _a, cloudSicherung: _c, erinnerungen: _e, proTest: _p, bewertung: _b, letzteSicherung: _l, sicherungsNachweis: _n, partnerId: _pa, bezahlschirmNachCheck: _bz, geraet: _g, ...rest } = s;
   return { ...rest, appSperre: false, cloudSicherung: false, erinnerungen: false, proTest: false, bewertung: { erfolge: 0 } } as Stand;
 }
 
@@ -156,7 +164,7 @@ function schluesselweise<T>(lokal: Record<string, T>, entfernt: Record<string, T
 }
 
 /** Lokalen Stand mit dem Stand vom Server zusammenführen (siehe Kopf). Gerätegebundenes bleibt lokal. */
-export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammenfuehrung {
+export function syncZusammenfuehren(lokal: Stand, entfernt: Stand, jetzt = new Date()): SyncZusammenfuehrung {
   const geloescht: Record<string, string> = { ...entfernt.geloescht };
   for (const [k, v] of Object.entries(lokal.geloescht)) if (!geloescht[k] || v > geloescht[k]!) geloescht[k] = v;
   const zeiten: Record<string, string> = { ...entfernt.zeiten };
@@ -174,7 +182,8 @@ export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammen
   // ungültig markierte bleiben immer (Aufbewahrungspflicht), gültige weichen einem neueren Löschvermerk
   // E-209: festgeschriebene Belege werden nie ersetzt oder gelöscht, ihre Historie wird nur ergänzt (`belegZweiVereinen`)
   const belegKonflikte = new Set<string>();
-  const belege = [...belegeVereinen([...lokal.belege, ...lokal.belegArchiv], [...entfernt.belege, ...entfernt.belegArchiv], belegKonflikte).values()].filter((b) => b.ungueltig || b.festgeschrieben || !geloescht[`b:${b.id}`] || b.geaendert > geloescht[`b:${b.id}`]!);
+  const nichtUebernommen: NichtUebernommen[] = [];
+  const belege = [...belegeVereinen([...lokal.belege, ...lokal.belegArchiv], [...entfernt.belege, ...entfernt.belegArchiv], belegKonflikte, nichtUebernommen).values()].filter((b) => b.ungueltig || b.festgeschrieben || !geloescht[`b:${b.id}`] || b.geaendert > geloescht[`b:${b.id}`]!);
   const stand: Stand = {
     ...lokal,
     betrieb: lokalNeuer("betrieb") ? lokal.betrieb : entfernt.betrieb,
@@ -199,14 +208,26 @@ export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammen
     geloescht,
     zeiten,
   };
+  // E-214: Konflikte (nicht übernommene Korrekturen, Konfliktkopien) auch ins Änderungsprotokoll
+  const konfliktNeu = konfliktEintraege(stand.protokoll, unterlagen, nichtUebernommen, jetzt);
+  if (konfliktNeu.length) stand.protokoll = protokollVereinen(stand.protokoll, konfliktNeu);
   const gesichert = belegNummernSichern(stand);
   return { stand: gesichert, nummernKonflikte: nummernKonflikteVon(gesichert), festKonflikte: u.konflikte, belegKonflikte: [...belegKonflikte].sort(), mehrfachStorniert: mehrfachStorniert(gesichert.unterlagen) };
 }
 
 /** Schnittstelle zum Server – im Test ein Speicher im Arbeitsspeicher. */
+/** E-214: Antwort des Servers auf das Speichern – neue Version, Serverzeit des Eingangs, Einrichtung des Tresors. */
+export interface SpeicherAntwort {
+  version: number;
+  empfangen?: string;
+  seit?: string;
+}
+
 export interface TresorApi {
-  holen(): Promise<{ version: number; schluessel: string; daten: string | null } | null>;
-  speichern(version: number, daten: string): Promise<number>;
+  /** E-214: `seit` – Einrichtung des Tresors auf dem Server (ISO), `geaendert_am` – Serverzeit der aktuellen Version */
+  holen(): Promise<{ version: number; schluessel: string; daten: string | null; seit?: string; geaendert_am?: string } | null>;
+  /** neue Version; E-214: mit Serverzeit des Eingangs (ältere Server und Tests: nur die Zahl) */
+  speichern(version: number, daten: string): Promise<number | SpeicherAntwort>;
   dateien(): Promise<string[]>;
   dateiSpeichern(name: string, daten: string): Promise<void>;
   dateiHolen(name: string): Promise<string | null>;
@@ -258,7 +279,12 @@ export async function synchronisieren(u: SyncUmgebung): Promise<SyncErgebnis> {
     if (!t) throw new SyncFehler("format");
     const gesehen = (await u.zaehlerLesen?.()) ?? 0;
     const entfernt = t.daten ? standEntschluesselnMitZaehler(t.daten, u.sync, u.konto, gesehen) : null;
-    const z: SyncZusammenfuehrung = entfernt ? syncZusammenfuehren(u.lokal(), entfernt.stand) : { stand: u.lokal(), nummernKonflikte: [], festKonflikte: [], belegKonflikte: [], mehrfachStorniert: [] };
+    // E-214: Eingang beim Server vormerken – lokal die Version dieses Hochladens, vom Server Geholtes „spätestens“ mit der
+    // geholten Version (nur wenn der Server die Einrichtung des Tresors nennt)
+    const seit = eingangSeit(t.seit);
+    const lokal = seit ? eingangVormerken(u.lokal(), { seit, version: t.version + 1 }) : u.lokal();
+    const vomServer = entfernt && seit ? eingangVormerken(entfernt.stand, { seit, version: t.version, spaetestens: true }) : entfernt?.stand;
+    const z: SyncZusammenfuehrung = vomServer ? syncZusammenfuehren(lokal, vomServer) : { stand: lokal, nummernKonflikte: [], festKonflikte: [], belegKonflikte: [], mehrfachStorniert: [] };
     // Dateien: was dem Server fehlt, hoch; was dem Gerät fehlt, herunter – auch die ungültig markierter Belege
     const aufServer = new Set(await u.api.dateien());
     let hoch = 0;
@@ -295,9 +321,12 @@ export async function synchronisieren(u: SyncUmgebung): Promise<SyncErgebnis> {
     }
     try {
       const zaehler = Math.max(gesehen, entfernt?.zaehler ?? 0) + 1;
-      const version = await u.api.speichern(t.version, standVerschluesseln(z.stand, u.sync, u.zufall(12), u.konto, zaehler));
+      const antwort = await u.api.speichern(t.version, standVerschluesseln(z.stand, u.sync, u.zufall(12), u.konto, zaehler));
+      const version = typeof antwort === "number" ? antwort : antwort.version;
       await u.zaehlerMerken?.(zaehler);
-      u.uebernehmen(z.stand);
+      // E-214: Serverzeit an die Eingänge dieser Version (geht mit der nächsten Synchronisation hinaus)
+      const empfangen = typeof antwort === "number" ? undefined : eingangSeit(antwort.empfangen);
+      u.uebernehmen(seit && empfangen && version === t.version + 1 ? eingangZeitSetzen(z.stand, seit, version, empfangen) : z.stand);
       return { version, hochgeladen: hoch, heruntergeladen: runter, nummernKonflikte: z.nummernKonflikte, festKonflikte: z.festKonflikte, belegKonflikte: z.belegKonflikte, mehrfachStorniert: z.mehrfachStorniert, defekteDateien: defekt, fehlendeDateien: fehlend };
     } catch (e) {
       if (e instanceof SyncFehler && e.art === "konflikt") continue;
@@ -305,6 +334,13 @@ export async function synchronisieren(u: SyncUmgebung): Promise<SyncErgebnis> {
     }
   }
   throw new SyncFehler("konflikt");
+}
+
+/** E-214: Zeitpunkt vom Server als ISO-Text (UTC) – null, wenn keiner oder unlesbar */
+function eingangSeit(w: unknown): string | null {
+  if (typeof w !== "string" || !w) return null;
+  const t = Date.parse(w);
+  return Number.isFinite(t) ? new Date(t).toISOString() : null;
 }
 
 export const zufallsSchluessel = (zufall: (n: number) => Uint8Array) => zufall(32);

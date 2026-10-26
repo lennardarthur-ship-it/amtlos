@@ -85,8 +85,8 @@ import {
 import { APP_VERSION } from "../version";
 import { T as TEXT } from "../texte";
 import { utf8 } from "./sicherung";
-import { GUTSCHRIFT_HINWEIS, istGutschrift, kuImZeitraum, zuordnungsTage } from "./ustAusRechnungen";
-import { absenderFuer, neueId, nichtZaehlend, type ProtokollEintrag, type Stand, type Unterlage } from "./speicher";
+import { GUTSCHRIFT_HINWEIS, euBerichtigungen, euMeldeArtVon, istGutschrift, kuImZeitraum, periodeText, zuordnungsTage } from "./ustAusRechnungen";
+import { BELEG_KONFLIKT_GRUND, absenderFuer, neueId, nichtZaehlend, type ProtokollEintrag, type Stand, type Unterlage } from "./speicher";
 import { kassenAbdeckung } from "./kasse";
 import { MARKE } from "@amtlos/marke";
 
@@ -664,9 +664,15 @@ export const PROTOKOLL_SPALTEN: readonly Spalte[] = [
   { name: "Zeitpunkt", beschreibung: "Zeitpunkt des Vorgangs (TT.MM.JJJJ, HH:MM, deutsche Zeit)" },
   { name: "Bereich", beschreibung: "Beleg, Kasse, Sachentnahme oder Rechnung" },
   { name: "Beleg/Tag", beschreibung: "Belegnummer, Lieferant und Datum, Geschäftstag bzw. Rechnungsnummer" },
-  { name: "Vorgang", beschreibung: "Art des Vorgangs (geändert, korrigiert, gelöscht, als ungültig markiert, nacherfasst, Entwurf nach dem Teilen gelöscht)" },
-  { name: "Grund bzw. Inhalt", beschreibung: "Grund und die Werte bis zur Änderung" },
+  { name: "Vorgang", beschreibung: "Art des Vorgangs (geändert, korrigiert, gelöscht, als ungültig markiert, nacherfasst, Entwurf nach dem Teilen gelöscht, Korrektur bei der Zusammenführung nicht übernommen)" },
+  { name: "Grund bzw. Inhalt", beschreibung: "Grund und die Werte bis zur Änderung; bei einer nicht übernommenen Korrektur deren Zeitpunkt (Uhr des Geräts), Gerät, Eingang beim Server und Grund, welche Fassung stattdessen gilt und warum, und der nicht übernommene Inhalt (vollständig auch in der Historie des Belegs bzw. als Konfliktkopie)" },
+  // E-214 (Steuerberater 26.10.2026): Gerät und Eingang beim Server – bisher nur bei nicht übernommenen Korrekturen gefüllt
+  { name: "Gerät", beschreibung: "Kennung des Geräts (letzte 8 Zeichen), auf dem die nicht übernommene Fassung entstand – zufällig je Gerät vergeben, ohne Bezug zu Person oder Gerätenummer; sonst leer" },
+  { name: "Eingang beim Server", beschreibung: "Eingang der nicht übernommenen Fassung beim Synchronisationsserver: Version (Zähler des Servers, nimmt nur die jeweils nächste an) und Serverzeit (TT.MM.JJJJ, HH:MM, deutsche Zeit); „spätestens mit“: nur die obere Grenze bekannt; „ohne Eingang beim Server“: nicht über den Server synchronisiert (z. B. Sicherung oder Datei) – dann entschied die Uhr der Geräte. Sonst leer" },
 ];
+
+/** E-214: Eingang beim Server für das Änderungsprotokoll */
+const eingangDe = (e: ProtokollEintrag["eingang"]) => (e ? `${e.spaetestens ? "spätestens mit " : ""}Version ${e.version}${e.zeit ? `, ${zeitDe(e.zeit)}` : ""}` : "ohne Eingang beim Server");
 
 /**
  * E-202 (Steuerberater, 26.10.2026): Kassenstürze (Zählprotokolle) als eigene Liste im Export für die Betriebsprüfung –
@@ -974,24 +980,34 @@ export function aenderungsprotokoll(s: Stand, z: Zeitraum): string[][] {
   const nummern = belegNummern([...s.belege, ...s.belegArchiv]);
   const zeilen: { t: string; z: string[] }[] = [];
   const bez = (b: Beleg) => `${nummern.get(b.id) ?? ""} ${b.lieferant.trim()} ${datumDe(b.datum)}`.trim();
+  // E-214: nicht übernommene Korrekturen stehen mit eigenem Eintrag (Zeitpunkt der Zusammenführung) unten
+  const imProtokoll = new Set(s.protokoll.filter((p) => p.art === "korrektur_nicht_uebernommen" && p.fassung_bis).map((p) => `${p.bezug}|${p.fassung_bis}`));
   for (const b of [...s.belege, ...s.belegArchiv]) {
     if (!imZeitraum(b.datum, z) && !(b.historie ?? []).some((h) => imZeitraum(h.datum, z))) continue;
-    for (const h of b.historie ?? []) zeilen.push({ t: h.bis, z: [zeitDe(h.bis), "Beleg", bez(b), h.grund ? "nach der Festschreibung geändert" : "geändert (frühere Fassung)", `${h.grund ? `Grund: ${h.grund} · ` : ""}bis dahin: ${datumDe(h.datum)}, ${h.lieferant}, ${betrag(h.steuer.reduce((a, x) => a + x.brutto_cent, 0))} € brutto, ${h.kategorie}`] });
+    for (const h of b.historie ?? []) {
+      if (h.grund === BELEG_KONFLIKT_GRUND) {
+        if (imProtokoll.has(`${b.id}|${h.bis}`)) continue;
+        zeilen.push({ t: h.bis, z: [zeitDe(h.bis), "Beleg", bez(b), "Korrektur bei der Zusammenführung nicht übernommen", `${h.korrektur_grund ? `Grund der Korrektur: ${h.korrektur_grund} · ` : ""}${h.vorrang === "eingang" ? "die geltende Korrektur ging später beim Server ein" : "nach der Uhr der Geräte"} · nicht übernommen: ${datumDe(h.datum)}, ${h.lieferant}, ${betrag(h.steuer.reduce((a, x) => a + x.brutto_cent, 0))} € brutto, ${h.kategorie}`, h.geraet ? h.geraet.slice(-8) : "", eingangDe(h.eingang ?? undefined)] });
+        continue;
+      }
+      zeilen.push({ t: h.bis, z: [zeitDe(h.bis), "Beleg", bez(b), h.grund ? "nach der Festschreibung geändert" : "geändert (frühere Fassung)", `${h.grund ? `Grund: ${h.grund} · ` : ""}bis dahin: ${datumDe(h.datum)}, ${h.lieferant}, ${betrag(h.steuer.reduce((a, x) => a + x.brutto_cent, 0))} € brutto, ${h.kategorie}`, "", ""] });
+    }
   }
   for (const k of s.kasse) {
     if (!imZeitraum(k.datum, z)) continue;
-    for (const h of k.historie ?? []) zeilen.push({ t: h.bis, z: [zeitDe(h.bis), "Kasse", `${datumDe(k.datum)}${k.zbon ? ` Z ${k.zbon}` : ""}`, "Tagesabschluss korrigiert", `Grund: ${h.grund} · bis dahin Umsatz ${betrag(kassenSummen(h).brutto)} €, Karte ${betrag(kassenSummen(h).karte)} €`] });
+    for (const h of k.historie ?? []) zeilen.push({ t: h.bis, z: [zeitDe(h.bis), "Kasse", `${datumDe(k.datum)}${k.zbon ? ` Z ${k.zbon}` : ""}`, "Tagesabschluss korrigiert", `Grund: ${h.grund} · bis dahin Umsatz ${betrag(kassenSummen(h).brutto)} €, Karte ${betrag(kassenSummen(h).karte)} €`, "", ""] });
     const n = nacherfasstTage(k.datum, k.erstellt);
-    if (n) zeilen.push({ t: k.erstellt, z: [zeitDe(k.erstellt), "Kasse", `${datumDe(k.datum)}${k.zbon ? ` Z ${k.zbon}` : ""}`, `nacherfasst (${n} Tage nach dem Geschäftstag)`, k.nacherfasst_grund ?? ""] });
+    if (n) zeilen.push({ t: k.erstellt, z: [zeitDe(k.erstellt), "Kasse", `${datumDe(k.datum)}${k.zbon ? ` Z ${k.zbon}` : ""}`, `nacherfasst (${n} Tage nach dem Geschäftstag)`, k.nacherfasst_grund ?? "", "", ""] });
   }
   // E-200: nach dem Teilen gelöschter, nicht als verschickt bestätigter Entwurf – Nummer bleibt vergeben (Lücke)
-  const artText: Record<ProtokollEintrag["art"], [string, string]> = { beleg_geloescht: ["Beleg", "endgültig gelöscht"], beleg_ungueltig: ["Beleg", "als ungültig markiert"], beleg_korrigiert: ["Beleg", "Korrektur nach der Festschreibung"], sachentnahme_geloescht: ["Sachentnahme", "gelöscht"], entwurf_geloescht: ["Rechnung", "Entwurf nach dem Teilen gelöscht (Nummer bleibt vergeben)"] };
+  const artText: Record<ProtokollEintrag["art"], [string, string]> = { beleg_geloescht: ["Beleg", "endgültig gelöscht"], beleg_ungueltig: ["Beleg", "als ungültig markiert"], beleg_korrigiert: ["Beleg", "Korrektur nach der Festschreibung"], sachentnahme_geloescht: ["Sachentnahme", "gelöscht"], entwurf_geloescht: ["Rechnung", "Entwurf nach dem Teilen gelöscht (Nummer bleibt vergeben)"], korrektur_nicht_uebernommen: ["Beleg", "Korrektur bei der Zusammenführung nicht übernommen"] };
   for (const p of s.protokoll) {
     if (p.zeitpunkt.slice(0, 10) < z.von || p.zeitpunkt.slice(0, 10) > tagNach(z.bis, 400)) continue;
     // Korrekturen stehen schon mit der früheren Fassung oben
     if (p.art === "beleg_korrigiert") continue;
-    const bereich = p.art === "entwurf_geloescht" && p.vorlage && p.vorlage !== "rechnung" ? (vorlageFuer(p.vorlage)?.titel ?? p.vorlage) : artText[p.art][0];
-    zeilen.push({ t: p.zeitpunkt, z: [zeitDe(p.zeitpunkt), bereich, p.nr ?? p.bezug, artText[p.art][1], p.text] });
+    const bereich = (p.art === "entwurf_geloescht" || p.art === "korrektur_nicht_uebernommen") && p.vorlage && p.vorlage !== "rechnung" ? (vorlageFuer(p.vorlage)?.titel ?? p.vorlage) : p.art === "korrektur_nicht_uebernommen" && p.vorlage === "rechnung" ? "Rechnung" : artText[p.art][0];
+    const nu = p.art === "korrektur_nicht_uebernommen";
+    zeilen.push({ t: p.zeitpunkt, z: [zeitDe(p.zeitpunkt), bereich, p.nr ?? p.bezug, artText[p.art][1], p.text, nu && p.geraet ? p.geraet.slice(-8) : "", nu && !p.vorlage ? eingangDe(p.eingang) : ""] });
   }
   return zeilen.sort((a, b) => a.t.localeCompare(b.t)).map((x) => x.z);
 }
@@ -1166,6 +1182,7 @@ export function kontenvorgabenText(v: Kontenvorgaben | undefined, k: ReturnType<
       case "erloesNullsatz": return k.erloese.nullsatz;
       case "erloesOss": return k.erloese.oss;
       case "erloesAusfuhr": return k.erloese.ausfuhr;
+      case "erloesKz43": return k.erloese.befreit43;
       case "anlageMaschinen": return k.anlagen.maschinen;
       case "anlageBga": return k.anlagen.bga;
       case "anlageKfz": return k.anlagen.kfz;
@@ -1249,7 +1266,9 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
       const anteile = zahlungsAnteile(restGruppen(r), u.zahlungen!).filter((a) => imZeitraum(a.zahlung.datum, z));
       const minderungen = anteile.filter((a) => a.zahlung.minderung_cent).map((a) => ({ id: a.zahlung.id, datum: a.zahlung.datum, brutto_cent: a.minderung.reduce((x, m) => x + m.brutto_cent, 0) }));
       // Ist: Erlös je Zahlung mit erhaltenem Betrag plus Skonto, zum Zahltag; Soll: der Erlös steht schon mit der Rechnung
-      const erloese = jeZahlung(u) ? buchungenAusRechnungen(anteile.map((a) => ({ ...r, datum: a.zahlung.datum, steuerperiode: a.zahlung.datum, guid_zusatz: a.zahlung.id, anteil: a.erhalten.map((e, i) => ({ satz: e.satz, brutto_cent: e.brutto_cent + a.minderung[i]!.brutto_cent, netto_cent: e.netto_cent + a.minderung[i]!.netto_cent, ust_cent: e.ust_cent + a.minderung[i]!.ust_cent })) })), sb.kontenrahmen, bo) : [];
+      // E-214: EU-Umsätze (ZM) – gebucht zum Zahltag, Feld 116 trägt den Tag nach § 18b UStG (Steuerberater 26.10.2026)
+      const eu116 = euMeldeArtVon(u, s.betrieb) ? r.steuerperiode : null;
+      const erloese = jeZahlung(u) ? buchungenAusRechnungen(anteile.map((a) => ({ ...r, datum: a.zahlung.datum, steuerperiode: eu116 ?? a.zahlung.datum, guid_zusatz: a.zahlung.id, anteil: a.erhalten.map((e, i) => ({ satz: e.satz, brutto_cent: e.brutto_cent + a.minderung[i]!.brutto_cent, netto_cent: e.netto_cent + a.minderung[i]!.netto_cent, ust_cent: e.ust_cent + a.minderung[i]!.ust_cent })) })), sb.kontenrahmen, bo) : [];
       return [...erloese, ...skontoBuchungenRechnung(r, minderungen, sb.kontenrahmen, bo)];
     });
   // StB-Prüfung (A-4): bilanzierende Betriebe – Zahlungseingänge Bank an Forderungen nur mit der Kontenvorgabe
@@ -1373,6 +1392,9 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const ungueltig = s.belegArchiv.filter((b) => imZeitraum(b.datum, z));
   if (ungueltig.length) inhalt[`Belege_ungueltig_${z.name}.csv`] = utf8(csv(kopfAus(UNGUELTIG_SPALTEN), ungueltig.map((b) => [nummern.get(b.id) ?? "", datumDe(b.datum), b.lieferant, betrag(belegSummen(b).brutto_cent), b.ungueltig ? zeitDe(b.ungueltig) : "", b.ungueltig_grund ?? "", b.datei ? "ja (beim Betrieb)" : "nein"])));
   const se = sachentnahmenFuer(s.sachentnahmen, z.von, z.bis);
+  // E-214: Stornos „Fehler in der Rechnung“ bei EU-Umsätzen – Storno bzw. Datum im Zeitraum; Anzahlungen auf EU-Umsätze
+  const berichtigungen = euBerichtigungen(s.unterlagen, s.betrieb).filter((b) => imZeitraum(b.stornoDatum, z) || imZeitraum(b.tag, z));
+  const euAbschlaege = gestellteRechnungen(s).filter((u) => u.daten.abschlag === true && euMeldeArtVon(u, s.betrieb) && ((u.bezahlt && imZeitraum(u.bezahlt, z)) || imZeitraum(String(u.daten.datum), z) || (u.zahlungen ?? []).some((x) => imZeitraum(x.datum, z))));
   const skontoZm = gestellteRechnungen(s).filter((u) => (u.zahlungen ?? []).some((x) => x.minderung_cent && imZeitraum(x.datum, z)) && zmBetroffen(rechnungFuerBuchung(u, s.betrieb)));
   // „Wichtig“: an fester Stelle direkt nach den Mandantendaten, jeder Punkt nur einmal (R10)
   const wichtig = [
@@ -1409,7 +1431,9 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
       : []),
     ...(kasseImZeitraum.some((k) => k.gutscheine?.some((g) => g.art === "mehrzweck")) ? [`Mehrzweck-Gutscheine (§ 3 Abs. 15 UStG): Verkauf an „sonstige Verbindlichkeiten“ (${k.gutscheinVerbindlichkeit}), Einlösung Verbindlichkeit an Erlöse${vorgaben?.konten?.gutscheinVerbindlichkeit ? "" : " – Konto bitte mit der Kanzlei abstimmen (z. B. eigenes Unterkonto, Kontenvorgaben)"}. Einzweck-Gutscheine sind beim Verkauf als Erlös gebucht, ihre Einlösung nicht noch einmal.`] : []),
     ...(se.anzahl ? [ku ? `Sachentnahmen (unentgeltliche Wertabgaben, netto ${betrag(se.netto7 + se.netto19)} €): als Kleinunternehmer nicht im Stapel – bitte mit der Kanzlei klären.` : `Sachentnahmen (unentgeltliche Wertabgaben, § 3 Abs. 1b UStG): 7 % netto ${betrag(se.netto7)} €, 19 % netto ${betrag(se.netto19)} € – im Stapel ${kapital ? "Verrechnungskonto Gesellschafter" : "Privatentnahme"} an ${k.sachentnahme[7]}/${k.sachentnahme[19]} (brutto, Konten bitte prüfen). Die Werte hat der Betrieb aus den BMF-Pauschbeträgen selbst eingetragen.`] : []),
-    ...(skontoZm.length ? [`Skonto auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland (${skontoZm.map((u) => String(u.daten.nummer ?? "")).join(", ")}): Die Bemessungsgrundlage hat sich geändert – Zusammenfassende Meldung berichtigen (§ 18a Abs. 10 UStG). Im Stapel auf eigenen Skontokonten (${k.skontiGewaehrtIgl}/${k.skontiGewaehrtRc}, bitte prüfen) mit USt-IdNr.`] : []),
+    ...berichtigungen.map((b) => `Storno ${b.stornoNr} zu Rechnung ${b.rechnungNr}${b.ersatzNr ? ` (Ersatzrechnung ${b.ersatzNr})` : ""}: Fehler in der Rechnung mit EU-Umsatz – Zusammenfassende Meldung und Voranmeldung für ${periodeText(b.monat)} bzw. ${periodeText(b.quartal)}${b.ersatzTag && b.ersatzTag.slice(0, 7) !== b.monat && b.ersatzTag.slice(0, 7) < b.stornoDatum.slice(0, 7) ? ` (Ersatzrechnung: ${periodeText(b.ersatzTag.slice(0, 7))})` : ""} berichtigen (ZM innerhalb eines Monats, § 18a Abs. 10 UStG). Im Stapel zum Datum des Stornos gebucht, Feld „Datum Zuord. Steuerperiode“ = ${datumDe(b.tag)} (ursprünglicher Zeitraum).`),
+    ...(euAbschlaege.length ? [`Anzahlungen bzw. Abschläge auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland (${euAbschlaege.map((u) => String(u.daten.nummer ?? "")).join(", ")}): Sie gehören nicht in Kz 41/21 und nicht in die Zusammenfassende Meldung – gemeldet wird erst die Lieferung bzw. Leistung mit dem vollen Entgelt (Schlussrechnung, § 18b Satz 2 und 3 UStG). Im Stapel stehen sie wie andere Abschläge zum Zahltag auf dem Erlöskonto – bitte umbuchen bzw. das Konto mit der Kanzlei abstimmen.`] : []),
+    ...(skontoZm.length ? [`Skonto auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland (${skontoZm.map((u) => String(u.daten.nummer ?? "")).join(", ")}): Die Bemessungsgrundlage hat sich geändert (§ 17, § 18b Satz 4 UStG) – Kz 41 bzw. 21 und die Zusammenfassende Meldung des Zeitraums, in dem das Skonto abgezogen wurde (Zahltag), sind gemindert; die ursprüngliche Meldung bleibt. Im Stapel auf eigenen Skontokonten (${k.skontiGewaehrtIgl}/${k.skontiGewaehrtRc}, bitte prüfen) mit USt-IdNr.`] : []),
     ...(xmlNeu.length ? [`${xmlNeu.length} ${xmlNeu.length === 1 ? "E-Rechnung wurde" : "E-Rechnungen wurden"} vor der Speicherung des Originals festgeschrieben (${xmlNeu.slice(0, 10).join(", ")}) – die XML-Datei ist aus den festgeschriebenen Daten neu erzeugt, nicht die versandte Datei.`] : []),
     ...(protokollZeilen.length || ungueltig.length ? [`Änderungen nach der Festschreibung, Löschungen und ungültig markierte Belege stehen in ${[protokollZeilen.length ? `Aenderungsprotokoll_${z.name}.csv` : "", ungueltig.length ? `Belege_ungueltig_${z.name}.csv` : ""].filter(Boolean).join(" und ")} – so erklären sich Lücken in den ${MARKE.name}-Belegnummern.`] : []),
     // StB-Prüfung (B-2): Nullsteuersatz auf eigenem Erlöskonto mit Kz 87 (nicht 8100/4100 = Kz 48)
