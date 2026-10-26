@@ -294,794 +294,374 @@ Stand: 2026-10-11 (Bauabschnitt 2)
 
 ## Aus dem Katalog (automatisch aus `fachlich_zu_pruefen`)
 
-Erzeugt mit `scripts/pruefliste.py`; 787 Punkte.
+Erzeugt mit `scripts/pruefliste.py`; 367 Punkte.
 
 | Nr. | Objekt | Katalog-Nr. | Punkt |
 |---|---|---|---|
-| K-001 | `arbeitsschutz.arbeitsmedizinische_vorsorge` | E.56 | Prüfergebnis Sifa 22.10.2026 (bestätigt): Fristen je Vorsorgeart nach AMR 2.1 und Bewertung Kosmetik mit Blutkontakt durch einen Betriebsarzt bestätigen lassen (Frage 15); Auslöser für alle Betriebe mit Beschäftigten – Anlässe je Branche nicht als Bedingung |
-| K-002 | `arbeitsschutz.arbeitsmedizinische_vorsorge` | E.56 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-003 | `arbeitsschutz.arbeitsmittel_pruefen` | E.53 | Prüfergebnis Sifa 22.10.2026 (offen): Schwellen (Druck × Volumen) nach Anhang 2 Abschnitt 4 BetrSichV, ab denen eine zugelassene Überwachungsstelle prüft, durch einen Sachverständigen bestätigen lassen; Prüfprotokoll mit Prüfbuch als Vorlage fehlt |
-| K-004 | `arbeitsschutz.arbeitsmittel_pruefen` | E.53 | Lärm (LärmVibrationsArbSchV) als eigene Pflicht arbeitsschutz.laerm (Prüfergebnis Sifa 22.10.2026) |
-| K-005 | `arbeitsschutz.arbeitsmittel_pruefen` | E.53 | Prüffristen kommen aus der Gefährdungsbeurteilung – als „laufend je Jahr“ abgebildet; Prüfprotokoll-Vorlage fehlt |
-| K-006 | `arbeitsschutz.betriebsanweisung_arbeitsmittel` | E.53 | Neu nach Prüfergebnis Sifa 22.10.2026 – Auslöser über Branchen mit Maschinen (Büro, Onlinehandel, IT ausgenommen); Vorlage „Betriebsanweisung Maschinen“ (vorlage.betriebsanweisung_maschine) verknüpft |
-| K-007 | `arbeitsschutz.biostoffe` | E.55 | Neu nach Prüfergebnis Sifa 22.10.2026 – Auslöser über Branchen (Praxis, Kosmetik, Gebäudereinigung); Vorlage „Betriebsanweisung Biostoffe“ (vorlage.betriebsanweisung_biostoffe) verknüpft; Unterweisung mit Unterschrift in der Unterweisungsvorlage prüfen; Nummern in § 20 BioStoffV gegen den Wortlaut prüfen |
-| K-008 | `arbeitsschutz.brandschutzhelfer` | E.54 | Neu nach Prüfergebnis Sifa 22.10.2026 – Auffrischung alle drei bis fünf Jahre nur Empfehlung (DGUV Information 205-023, nicht abgerufen); Sanktion fachlich ergänzen (§ 22 DGUV Vorschrift 1 steht nicht in § 32) |
-| K-009 | `arbeitsschutz.dguv_v3` | E.54 | Prüfergebnis Sifa 22.10.2026: Prüffristen kommen aus der Gefährdungsbeurteilung, Richtwerte Tabellen 1A/1B bestätigt; § 9 DGUV Vorschrift 3 (Verstöße gegen §§ 3, 5 Abs. 1 bis 3, 6, 7) über die VBG-Fassung gelesen |
-| K-010 | `arbeitsschutz.erste_hilfe` | E.53 | Prüfergebnis Sifa 22.10.2026: „Versicherte“ – Inhaber zählt nur, wenn selbst versichert; konservativ alle Anwesenden gezählt, Auslöser deshalb ab einer beschäftigten Person (Regelwert arbeitsschutz.ersthelfer.schwelle_versicherte = 2 bleibt Rechtsstand, wird im Auslöser nicht mehr verglichen) |
-| K-011 | `arbeitsschutz.erste_hilfe` | E.53 | Anzahl der Ersthelfer über 20 Anwesende (5 % bzw. 10 % je Betriebsart) als Regelwerte |
-| K-012 | `arbeitsschutz.erste_hilfe_organisation` | E.53 | Neu nach Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten) – Anzahl der Verbandkästen je Beschäftigtenzahl und Betriebsart (ASR A4.3 Tabelle) als Regelwerte; Vorlage Verbandbuch fehlt |
-| K-013 | `arbeitsschutz.erstunterweisung` | E.51 | Prüfergebnis Sifa 22.10.2026: Spezialnormen gegengeprüft (§ 22 Abs. 1 Nr. 25 GefStoffV, § 20 Abs. 1 Nr. 23 BioStoffV, § 22 Abs. 1 Nr. 26 BetrSichV, § 25 Abs. 1 Nr. 2 Buchst. a ArbSchG) – Schwere „hoch“ trotz nur mittelbarer Bußgeldbewehrung nach ArbSchG fachlich bestätigen |
-| K-014 | `arbeitsschutz.expositionsverzeichnis` | E.55 | Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis über Branche und Gefahrstoff-Angabe (Amtlos fragt Kategorie 1A/1B nicht ab); Vorlage vorlage.expositionsverzeichnis verknüpft; Verzicht nach TRGS 410 (z. B. bei Einhaltung der Akzeptanzkonzentration) nicht abgebildet |
-| K-015 | `arbeitsschutz.fahrer_unterweisung` | E.52 | Prüfergebnis Sifa 22.10.2026 (frei): § 35 DGUV Vorschrift 70 verlangt die Bestimmung durch den Unternehmer, Schriftform empfohlen, nicht vorgeschrieben – Unterweisungsthemen Fahrzeug in der Vorlage fehlen; Sanktion fachlich ergänzen |
-| K-016 | `arbeitsschutz.fahrzeuge_pruefen` | E.53 | Prüfergebnis Sifa 22.10.2026 (frei): § 57 DGUV Vorschrift 70 „bei Bedarf, mindestens jährlich“ bestätigt; Aufbewahrungsdauer der Prüfergebnisse und Sanktion fachlich ergänzen; Prüfprotokoll-Vorlage fehlt |
-| K-017 | `arbeitsschutz.fasi_betriebsarzt` | E.52 | Prüfergebnis Sifa 22.10.2026: Paragraf der Bußgeldvorschrift je BG prüfen – in der abgerufenen Fassung der UKBW keine eigene Bußgeldvorschrift gefunden; Höchstbetrag nach § 209 Abs. 3 SGB VII |
-| K-018 | `arbeitsschutz.fasi_betriebsarzt` | E.52 | Grenzen für das Unternehmermodell je BG als Daten ergänzen |
-| K-019 | `arbeitsschutz.feuerloescher` | E.54 | Folgen bei Nichterfüllung – Sanktion fachlich ergänzen |
-| K-020 | `arbeitsschutz.feuerloescher` | E.54 | Prüfabstand „spätestens alle zwei Jahre“ laut Prüfergebnis Sifa 22.10.2026 bestätigt – die Erledigung gilt in Amtlos weiter nur für das Kalenderjahr (laufend je Jahr); Abstand aus einem Prüfnachweis übernehmen, sobald es eine Vorlage gibt (Technik) |
-| K-021 | `arbeitsschutz.flucht_rettungsplan` | E.54 | Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis (nur wenn Lage, Ausdehnung oder Art der Arbeitsstätte es erfordern); Kriterien und Übungsabstand nach ASR A2.3 nicht abgerufen; Sanktion fachlich ergänzen |
-| K-022 | `arbeitsschutz.fremdfirmen_abstimmung` | E.51 | Neu nach Prüfergebnis Sifa 22.10.2026 – § 8 ArbSchG und §§ 5, 6 DGUV Vorschrift 1 nicht unmittelbar bußgeldbewehrt (§§ 5, 6 nicht in § 32 DGUV V1); Unterweisungsthema „Arbeit beim Kunden“ in der Vorlage |
-| K-023 | `arbeitsschutz.gefaehrdungsbeurteilung` | E.50 | Frist: 'vor Arbeitsbeginn' als Auslegung bestätigen |
-| K-024 | `arbeitsschutz.gefaehrdungsbeurteilung` | E.50 | Prüfergebnis Sifa 22.10.2026 (B-117, plausibel): Anlässe im Text ergänzt; als Auslöser nur die Ereignisse, die Amtlos kennt (neuer Arbeitsplatz, neue Tätigkeit, Arbeitsunfall, Mitteilung einer Schwangerschaft) – Fundstellen § 3 Abs. 7 BetrSichV, § 6 Abs. 9 GefStoffV im Wortlaut prüfen |
-| K-025 | `arbeitsschutz.gefaehrdungsbeurteilung` | E.50 | gueltig_ab 1996-08-21 aus Spezifikation übernommen |
-| K-026 | `arbeitsschutz.gefaehrdungsbeurteilung` | E.50 | Prüfergebnis Sifa 22.10.2026 (plausibel, Nummern gegenprüfen): § 22 Abs. 1 Nr. 1, 6 BetrSichV und § 22 Abs. 1 Nr. 1a GefStoffV gelesen – GefStoffV verweist auf § 26 ChemG (bis 50.000 €), nicht auf das ArbSchG; § 9 Abs. 1 Nr. 1 ArbStättV nicht erneut abgerufen |
-| K-027 | `arbeitsschutz.gefaehrdungsbeurteilung` | E.50 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-028 | `arbeitsschutz.gefahrstoffe` | E.55 | Prüfergebnis Sifa 22.10.2026: Unterschrift der Unterwiesenen nach § 14 Abs. 2 GefStoffV – die Unterweisungsvorlage bestätigt bisher mit eingetipptem Namen (Vorlage, T-13); Höchstbetrag 50.000 € über § 26 Abs. 3 ChemG statt 5.000 € nach ArbSchG – rechtlich bestätigen |
-| K-029 | `arbeitsschutz.laerm` | E.53 | Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis über die Branche (Amtlos fragt die Lärmbelastung nicht ab); einzelne Nummern in § 16 Abs. 1 nicht abgerufen; Gehörschutz-Unterweisung und Lärmbereiche als Bausteine der Gefährdungsbeurteilung |
-| K-030 | `arbeitsschutz.sicherheitsbeauftragte` | E.52 | Neu nach Prüfergebnis Sifa 22.10.2026 – Inkrafttreten (anzuwenden ab 29.5.2026, BGBl. 2026 I Nr. 140) und Wortlaut „regelmäßig 50 oder mehr“ am amtlichen Text prüfen; Zählweise der Beschäftigten (G-05); 21–49 nur bei besonderer Gefährdung – Amtlos zeigt die Pflicht ab 21 an; Sanktion fachlich ergänzen |
-| K-031 | `arbeitsschutz.unfallanzeige` | E.57 | Prüfergebnis Sifa 22.10.2026 (bestätigt): Auslöser Tod oder mehr als drei Tage AU – Amtlos kennt die AU-Tage beim Melden nicht (Ereignis ohne Payload auswertbar), deshalb Aufgabe bei jedem Unfall mit „trifft nicht zu“; Bedingung auf au_tage > 3 oder tödlich umstellen, sobald das Meldeformular die Angaben erfasst und die Engine Payload auswertet (Technik) |
-| K-032 | `arbeitsschutz.unterweisung_jugendliche` | E.51 | Prüfergebnis Sifa 22.10.2026 (offen, Technik): Frist je Jugendlichem ab dessen letzter Unterweisung führen – Amtlos rechnet ab der letzten erfassten Unterweisung im Betrieb, ohne Personen zu unterscheiden |
-| K-033 | `arbeitsschutz.unterweisung_jugendliche` | E.51 | Folgen bei Nichterfüllung (§ 58 JArbSchG) – Sanktion fachlich ergänzen |
-| K-034 | `arbeitsschutz.unterweisung_wiederholen` | E.51 | Kürzere Frist für Jugendliche als eigene Pflicht arbeitsschutz.unterweisung_jugendliche (R11) |
-| K-035 | `arbeitsschutz.unterweisung_wiederholen` | E.51 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-036 | `arbeitsschutz.verbandbuch` | E.57 | Neu nach Prüfergebnis Sifa 22.10.2026 – Termin am Unfalltag ist Erinnerung von Amtlos, keine Rechtsfrist; Erste-Hilfe-Leistungen ohne gemeldeten Arbeitsunfall erfasst Amtlos nicht; Vorlage Verbandbuch fehlt |
-| K-037 | `branche.bau_baustellenverordnung` | H.4 | Prüfergebnis Sifa 22.10.2026 umgesetzt (Bauherrenpflichten §§ 2, 3; Auftragnehmer § 5 BaustellV) – Bußgeld nach § 7 BaustellV betrifft nur Vorankündigung und SiGe-Plan (Bauherr); Folgen für ausführende Firmen fachlich ergänzen |
-| K-038 | `branche.bau_soka` | H.4 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-039 | `branche.bau_soka` | H.4 | Erfassung nach überwiegender Tätigkeit – Prüfhinweis ergänzen |
-| K-040 | `branche.bau_soka` | H.4 | Meldefristen nicht in der Spezifikation |
-| K-041 | `branche.bau_soka` | H.4 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-042 | `branche.bau_soka` | H.4 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-043 | `branche.bau_soka` | H.4 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-044 | `branche.beauty_hautschutzplan` | H.3 | Prüfergebnis Sifa 22.10.2026: Auslöser auf Gastronomie, Gebäudereinigung, Praxis, Kfz/Handwerk, Bäckerei und Bau ausgeweitet – Handwerk und Bau nur mit Gefahrstoffen; TRGS 530 gilt nur für das Friseurhandwerk; ID bleibt branche.beauty_hautschutzplan |
-| K-045 | `branche.beauty_hautschutzplan` | H.3 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-046 | `branche.beauty_hautschutzplan` | H.3 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-047 | `branche.beauty_hygieneplan` | H.3 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-048 | `branche.beauty_hygieneplan` | H.3 | Rechtsgrundlage je Land ergänzen |
-| K-049 | `branche.beauty_hygieneplan` | H.3 | Vorlage Hygieneplan nach Prüfung (6.4) |
-| K-050 | `branche.beauty_hygieneplan` | H.3 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-051 | `branche.beauty_hygieneplan` | H.3 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-052 | `branche.beauty_kosmetikverordnung` | H.3 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-053 | `branche.beauty_kosmetikverordnung` | H.3 | CPNP (Art. 13), Kennzeichnung (Art. 19), GMP (Art. 8), ernste unerwünschte Wirkungen (Art. 23), Herstellerbegriff (Art. 2 Abs. 1 lit. d) und verantwortliche Person (Art. 4) im Text (R11, Nutzertest Kosmetik) – Frist „vor dem ersten Inverkehrbringen“ ohne Termin; bestätigen |
-| K-054 | `branche.beauty_kosmetikverordnung` | H.3 | Auslöser an die Frage „eigene Produkte, Eigenmarke oder Import von außerhalb der EU“ gekoppelt (R10) – Abgrenzung Herstellung ↔ Weiterverkauf bestätigen |
-| K-055 | `branche.beauty_kosmetikverordnung` | H.3 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-056 | `branche.beauty_kosmetikverordnung` | H.3 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-057 | `branche.gastro_allergene` | H.1 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-058 | `branche.gastro_allergene` | H.1 | Liste der 14 Allergene (Anhang II LMIV) im Werkzeug prüfen |
-| K-059 | `branche.gastro_allergene` | H.1 | Form der Information bei loser Ware (LMIDV) erläutern |
-| K-060 | `branche.gastro_allergene` | H.1 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-061 | `branche.gastro_allergene` | H.1 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-062 | `branche.gastro_allergene` | H.1 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-063 | `branche.gastro_haccp` | H.1 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-064 | `branche.gastro_haccp` | H.1 | Grenzwerte (z. B. Kühltemperaturen) und Kontrollhäufigkeit nicht in der Spezifikation – Betrieb legt sie fest; Vorschläge fachlich ergänzen |
-| K-065 | `branche.gastro_haccp` | H.1 | Leitlinien für gute Hygienepraxis je Branche verlinken |
-| K-066 | `branche.gastro_haccp` | H.1 | E-166: Vorlage um Gefahrenanalyse, CCP-Entscheidung (Entscheidungsbaum nach Codex CXC 1-1969, Fassung 2023), Verifizierung und Dokumentation ergänzt – Umfang für kleine Betriebe im Rahmen der Flexibilität (Bekanntmachung 2022/C 355/01, Anhang II nur auszugsweise gelesen) fachlich bestätigen |
-| K-067 | `branche.gastro_haccp` | H.1 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-068 | `branche.gastro_haccp` | H.1 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-069 | `branche.gastro_haccp` | H.1 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-070 | `branche.gastro_hygieneschulung` | H.1 | Neu nach Rechtsprüfung R11 (T-114) – Wiederholungsabstand und Nachweisform fachlich festlegen; Abgrenzung zur IfSG-Belehrung |
-| K-071 | `branche.gastro_hygieneschulung` | H.1 | Folgen bei Nichterfüllung – Sanktion fachlich ergänzen |
-| K-072 | `branche.gastro_ifsg_belehrung` | H.1 | „Nach Aufnahme der Tätigkeit“ als spätestens am ersten Arbeitstag umgesetzt (R10) – Frist fachlich bestätigen |
-| K-073 | `branche.gastro_ifsg_belehrung` | H.1 | Höhe und Nummer der Bußgeldvorschrift in § 73 IfSG unsicher – Sanktion fachlich ergänzen |
-| K-074 | `branche.gastro_ifsg_belehrung` | H.1 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 73 Abs. 1a Nr. 16b (§ 43 Abs. 4 Satz 1) und Abs. 2 gelesen |
-| K-075 | `branche.gastro_ifsg_bescheinigung` | H.1 | Nur erstmalige Tätigkeit (§ 43 Abs. 1 IfSG, Rechtsprüfung R11 Befund 7) – Auslöser über die Frage „Arbeiten Beschäftigte mit Lebensmitteln?“ (erstmals / schon mit Bescheinigung / niemand); je Person nicht abbildbar |
-| K-076 | `branche.gastro_ifsg_bescheinigung` | H.1 | Sanktion § 73 Abs. 1a IfSG, bis 25.000 € laut Rechtsprüfung R11 (Befund 20) „wahrscheinlich“ – Nummer und Höhe bestätigen |
-| K-077 | `branche.gastro_ifsg_bescheinigung_selbst` | H.1 | Gilt nach § 43 Abs. 1 IfSG für jede Person, die erstmalig gewerbsmäßig mit Lebensmitteln nach § 42 arbeitet, auch für Inhaber (Nutzertest R11, K-062) – bestätigen |
-| K-078 | `branche.gastro_ifsg_bescheinigung_selbst` | H.1 | Sanktion § 73 Abs. 1a IfSG, bis 25.000 € laut Rechtsprüfung R11 (Befund 20) „wahrscheinlich“ – Nummer und Höhe bestätigen |
-| K-079 | `branche.gastro_ifsg_folgebelehrung` | H.1 | Abstand „alle zwei Jahre“ ab der letzten erfassten Belehrung (Ereignis ifsg_belehrung_durchgefuehrt) umgesetzt (R10, Rechtsprüfung § 43 Abs. 4 IfSG) |
-| K-080 | `branche.gastro_ifsg_folgebelehrung` | H.1 | Höhe und Nummer der Bußgeldvorschrift in § 73 IfSG unsicher – Sanktion fachlich ergänzen |
-| K-081 | `branche.gastro_lebensmittelregistrierung` | H.1 | R12 (Nutzertest Bäckerei #5): je Betrieb; neue Betriebsstätte über die Zahl der Betriebsstätten (neu_ausloesen_bei) – Filialen als eigene Objekte fehlen in der App |
-| K-082 | `branche.gastro_lebensmittelregistrierung` | H.1 | Frist „vor Beginn“ nach Rechtsprüfung R11 (Befund 13); laut Nutzertest nennt Art. 6 keinen Zeitpunkt – Termin vor dem Start bestätigen; Zuständigkeit beim Foodtruck (Wohnsitz oder Standort)? |
-| K-083 | `branche.gastro_lebensmittelregistrierung` | H.1 | Zulassung nach Art. 4 VO (EG) Nr. 853/2004 nur als Hinweis (Eigenherstellung tierischer Erzeugnisse) |
-| K-084 | `branche.gastro_lebensmittelregistrierung` | H.1 | Zuständigkeit je Land |
-| K-085 | `branche.gastro_lebensmittelregistrierung` | H.1 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-086 | `branche.gastro_lebensmittelregistrierung` | H.1 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-087 | `branche.gastro_lebensmittelregistrierung` | H.1 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-088 | `branche.gastro_mehrweg` | G.73 | Rechtsstand 21.10.2026: Fundstellen von §§ 33, 34 VerpackG auf §§ 60, 61 VerpackDG umgestellt (VerpackDG seit 12.8.2026); Inhalt laut Gesetzestext gleich – Teilzeitzählung (0,5 bis 20 Std., 0,75 bis 30 Std.) und Lager-/Versandflächen bei Lieferung (§ 61 Abs. 1) ggf. als Hinweis ergänzen |
-| K-089 | `branche.gastro_mehrweg` | G.73 | Neu nach Rechtsprüfung R11 (T-114): Ausnahme nur bei höchstens 5 Beschäftigten UND höchstens 80 m² – Zählweise der Beschäftigten und Verkaufsfläche beim Foodtruck prüfen |
-| K-090 | `branche.gastro_mehrweg` | G.73 | LUCID-Registrierung für Serviceverpackungen (§ 6 VerpackDG) und Herstellereigenschaft nach EWKFondsG offen (Nutzertest Gründerin) |
-| K-091 | `branche.gastro_mehrweg` | G.73 | Folgen bei Nichterfüllung (§ 66 VerpackDG) – Sanktion fachlich ergänzen |
-| K-092 | `branche.gastro_ppwr_radar` | H.1 | Rechtsstand 21.10.2026: Termine und Inhalt von Art. 32/33 aus der Textwiedergabe (lxgesetze) übernommen – gegen das Amtsblatt (EUR-Lex) lesen; frühere Angabe „Informationspflicht seit 12.8.2026“ (WKO) nicht bestätigt und entfernt |
-| K-093 | `branche.gastro_ppwr_radar` | H.1 | Kleinstunternehmen-Ausnahme steht nur in Art. 33 Abs. 4; für Art. 32 keine Ausnahme im Text – Kleinbetriebe müssen nach § 61 VerpackDG ohnehin mitgebrachte Behälter befüllen |
-| K-094 | `branche.gastro_ppwr_radar` | H.1 | Sanktion: Bußgeldvorschriften zur PPWR nach § 66 Abs. 2 VerpackDG ab 12.2.2027 (IHK Karlsruhe) – Tatbestand und Rahmen ergänzen; EWKFondsG (Gastronom als Hersteller?) offen |
-| K-095 | `branche.gastro_preisverzeichnis` | G.70 | Neu nach Rechtsprüfung R11 (T-114) – Wortlaut § 7 PAngV (Tisch, Vorlage, Aushang, Eingang) bestätigen |
-| K-096 | `branche.gastro_preisverzeichnis` | G.70 | Folgen bei Nichterfüllung (§ 20 PAngV) – Sanktion fachlich ergänzen |
-| K-097 | `branche.gastro_rueckverfolgbarkeit` | H.1 | Neu (E-166): Art. 18 Abs. 2 und 3 am Wortlaut geprüft (gesetze.legal); Geltung ab 1.1.2005 (Art. 65 VO (EG) Nr. 178/2002) an EUR-Lex gegenlesen |
-| K-098 | `branche.gastro_rueckverfolgbarkeit` | H.1 | Durchführungsverordnung (EU) Nr. 931/2011 (Lebensmittel tierischen Ursprungs): Anwendungsbereich für Einzelhandel und Gastronomie nicht geprüft – nur als Hinweis genannt |
-| K-099 | `branche.gastro_rueckverfolgbarkeit` | H.1 | Auslöser wie die übrigen Gastro-Pflichten nur über die Branche – Händler mit Lebensmitteln ohne diese Branche (z. B. Onlineshop mit Feinkost) sehen den Eintrag nicht; ob er auch über profil.produkte.arten ausgelöst werden soll, fachlich entscheiden |
-| K-100 | `branche.gastro_rueckverfolgbarkeit` | H.1 | Folgen bei Nichterfüllung (Bußgeld nach LFGB bzw. Lebensmittelrechtlicher Straf- und Bußgeldverordnung) nicht geprüft – Sanktion fachlich ergänzen |
-| K-101 | `branche.gastro_schankanlage_fluessiggas` | H.1 | Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis über die Branche (Amtlos fragt Schankanlage und Flüssiggas nicht ab); Prüffristen (Schankanlage, DGUV V79 Flüssiggas) und Fundstellen nicht abgerufen; Gefährdungsbausteine CO2 und Gas sind Sache der Vorlage |
-| K-102 | `branche.gastro_trinkwasser_mobil` | H.1 | Neu (E-166): § 2 Nr. 2 Buchst. d, f und § 11 Abs. 2 TrinkwV am Wortlaut geprüft (gesetze-im-internet.de, 22.10.2026) |
-| K-103 | `branche.gastro_trinkwasser_mobil` | H.1 | Unklar: Stellt ein Foodtruck „im Rahmen einer gewerblichen Tätigkeit Trinkwasser bereit“, wenn er das Tankwasser nur zum Zubereiten und Händewaschen nutzt? Merkblätter der Gesundheitsämter (Dortmund) gehen davon aus – fachlich bzw. rechtlich bestätigen |
-| K-104 | `branche.gastro_trinkwasser_mobil` | H.1 | Untersuchungspflichten (Umfang, Häufigkeit) und Fundstelle in der TrinkwV nicht geprüft – nur Merkblatt Dortmund (jährlich, zugelassene Untersuchungsstelle) |
-| K-105 | `branche.gastro_trinkwasser_mobil` | H.1 | Auslöser: Der Check fragt den Wassertank nicht ab – die Pflicht „kommt in Frage“ bei Lebensmitteln mit Reisegewerbe oder Marktstand; Frist vier Wochen vor dem Start bezieht sich auf das Gründungsdatum, nicht auf die Inbetriebnahme des Tanks |
-| K-106 | `branche.gastro_trinkwasser_mobil` | H.1 | Gültig ab: Inkrafttreten der TrinkwV 2023 (24.6.2023) laut Verordnung gegenlesen |
-| K-107 | `branche.gastro_trinkwasser_mobil` | H.1 | Folgen bei Nichterfüllung (Ordnungswidrigkeit nach TrinkwV) nicht geprüft – Sanktion fachlich ergänzen |
-| K-108 | `branche.gastro_zusatzstoffe` | H.1 | Neu nach Rechtsprüfung R12 (Befund 12) – Fundstelle § 5 LMZDV vom 2.6.2021 (BGBl. I S. 1362) laut Text der LMZDV (Lebensmittelüberwachung Bremen), im BGBl. gegenlesen |
-| K-109 | `branche.gastro_zusatzstoffe` | H.1 | „koffeinhaltig“ und „geschwefelt“ stehen nicht in § 5 LMZDV – Fundstelle offen; Höhe des Bußgelds fachlich ergänzen |
-| K-110 | `branche.gesundheit_erlaubnisse` | H.7 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-111 | `branche.gesundheit_erlaubnisse` | H.7 | Liste der Berufe und zuständigen Stellen ergänzen |
-| K-112 | `branche.gesundheit_erlaubnisse` | H.7 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-113 | `branche.gesundheit_erlaubnisse` | H.7 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-114 | `branche.gesundheit_erlaubnisse` | H.7 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-115 | `branche.handwerk_gefaehrdung_gewerk` | H.2 | R12 (Nutzertest Kfz #12): als Hinweis zur Gefährdungsbeurteilung zusammengelegt statt doppelter Pflicht; Text nicht nur für Baustellen |
-| K-116 | `branche.handwerk_gefaehrdung_gewerk` | H.2 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-117 | `branche.handwerk_gefaehrdung_gewerk` | H.2 | Vorlagen je Gewerk (BG-Handlungshilfen) – T-20 |
-| K-118 | `branche.handwerk_gefaehrdung_gewerk` | H.2 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-119 | `branche.handwerk_gewaehrleistung` | H.2 | R12 (Nutzertest Bäckerei #13): Kaufrecht bei Herstellung und Lieferung beweglicher Sachen (§ 650 BGB) ergänzt |
-| K-120 | `branche.handwerk_gewaehrleistung` | H.2 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-121 | `branche.handwerk_gewaehrleistung` | H.2 | Verjährungsfristen je Werkart nicht in der Spezifikation – als Regelwerte ergänzen |
-| K-122 | `branche.handwerk_gewaehrleistung` | H.2 | Ist das eine Pflicht oder ein Hinweis? Darstellung bestätigen |
-| K-123 | `branche.immo_gwg` | H.8 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-124 | `branche.immo_gwg` | H.8 | Welche Tätigkeiten genau (Makler, Vermittler) – Auslöser verfeinern |
-| K-125 | `branche.immo_gwg` | H.8 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-126 | `branche.immo_gwg` | H.8 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-127 | `branche.immo_weiterbildung` | H.8 | R12 (Rechtsprüfung Befund 6): Stunden ergänzt (§ 34c Abs. 2a: 20 Std. in 3 Jahren, § 34d Abs. 9: 15 Std. je Jahr); § 34f im Auslöser – eine gesetzliche Weiterbildungspflicht nach § 34f ist der Rechtsprüfung nicht bekannt, prüfen |
-| K-128 | `branche.immo_weiterbildung` | H.8 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-129 | `branche.immo_weiterbildung` | H.8 | „nur wo noch geltend“ – aktuellen Stand je Vorschrift prüfen |
-| K-130 | `branche.immo_weiterbildung` | H.8 | Umfang (Stunden) und Zeitraum als Regelwerte |
-| K-131 | `branche.immo_weiterbildung` | H.8 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-132 | `branche.immo_weiterbildung` | H.8 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-133 | `branche.it_haftung` | H.6 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-134 | `branche.it_haftung` | H.6 | Hinweis statt Pflicht – Darstellung bestätigen |
-| K-135 | `branche.it_haftung` | H.6 | Rechtsgrundlagen ergänzt |
-| K-136 | `branche.it_haftung` | H.6 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-137 | `branche.it_scheinselbststaendigkeit` | H.6 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-138 | `branche.it_scheinselbststaendigkeit` | H.6 | Auslöser: auch Auftraggeber-Seite (Einsatz von Freelancern) abbilden? |
-| K-139 | `branche.it_scheinselbststaendigkeit` | H.6 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-140 | `branche.it_scheinselbststaendigkeit` | H.6 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-141 | `branche.it_scheinselbststaendigkeit` | H.6 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-142 | `branche.jugendschutz_abgabe` | H.1 | Neu nach Rechtsprüfung R12 (Befund 3) – Nummern in § 28 Abs. 1 (Nr. 10 Alkohol, Nr. 12 Tabak) und Bußgeldrahmen über lxgesetze geprüft |
-| K-143 | `branche.jugendschutz_abgabe` | H.1 | Stand des „begleiteten Trinkens“ (§ 9 Abs. 2 JuSchG, Abschaffung politisch angekündigt) unsicher – nicht erwähnt |
-| K-144 | `branche.jugendschutz_abgabe` | H.1 | Rückverfolgbarkeit Tabak (Economic-Operator- und Facility-ID, DVO (EU) 2018/574) für Kioske – prüfen |
-| K-145 | `branche.jugendschutz_abgabe` | H.1 | Vorprüfung 21.10.2026: Primärquelle § 28 JuSchG (gesetze-im-internet) ergänzt, nicht abgerufen |
-| K-146 | `branche.jugendschutz_aushang` | H.1 | Neu nach Rechtsprüfung R12 (Befund 3) – Bußgeldrahmen § 28 Abs. 5 JuSchG über lxgesetze geprüft; Aushang auch für Verkaufsstellen ohne Alkohol und Tabak (§§ 11–13 JuSchG) nicht abgebildet |
-| K-147 | `branche.mobiler_verkauf_standplatz` | A.3 | Neu nach Rechtsprüfung R12 (Befund 17) – Preisangabe beim Foodtruck (§ 3 statt § 7 PAngV) zu klären; Zuständigkeit je Land |
-| K-148 | `branche.oeffentliche_wiedergabe` | H.10 | Neu nach Rechtsprüfung R12 (Befund 4) und Nutzertest Coach (#12) – Zuschlag bei Nutzung ohne Lizenz (Kontrollzuschlag) Höhe und Grundlage bestätigen |
-| K-149 | `branche.oeffentliche_wiedergabe` | H.10 | Lizenz bei Kursen in gemieteten Räumen und bei Live-Kursen per Videokonferenz – Tarif unsicher |
-| K-150 | `branche.preisverzeichnis_dienstleistung` | G.70 | Neu nach Nutzertest R11 (Kosmetik) – Wortlaut § 12 PAngV und Grundpreis nach § 4 PAngV bestätigen; Ausnahmen (z. B. schriftliche Angebote) prüfen |
-| K-151 | `branche.preisverzeichnis_dienstleistung` | G.70 | Folgen bei Nichterfüllung (§ 20 PAngV) – Sanktion fachlich ergänzen |
-| K-152 | `branche.transport_erlaubnis` | H.5 | R12 (Nutzertest Kurier #3): Erlaubnis über 3,5 t (§§ 1, 3 GüKG), Gemeinschaftslizenz über 2,5 t grenzüberschreitend seit 21.5.2022 (IHK Berlin) – Ausnahmen nach § 2 GüKG nicht abgebildet |
-| K-153 | `branche.transport_erlaubnis` | H.5 | Personenbeförderung (Taxi, Mietwagen, PBefG) nur im Text – eigener Auslöser fehlt |
-| K-154 | `branche.transport_erlaubnis` | H.5 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-155 | `branche.transport_erlaubnis` | H.5 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-156 | `branche.transport_erlaubnis` | H.5 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-157 | `branche.transport_erlaubnis` | H.5 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-158 | `branche.transport_lenkzeiten` | H.5 | R12 (Nutzertest Kurier #2): Auslöser nach zulässiger Gesamtmasse und grenzüberschreitenden Fahrten (seit 1.7.2026 ab 2,5 t, IHK München) – Ausnahmen (Werkverkehr Art. 3 Buchst. ha, Handwerkerregelung) sowie Auslese- und Aufbewahrungsfristen fachlich ergänzen |
-| K-159 | `branche.transport_lenkzeiten` | H.5 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-160 | `branche.transport_lenkzeiten` | H.5 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-161 | `branche.transport_lenkzeiten` | H.5 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-162 | `branche.transport_lenkzeiten_national` | H.5 | Fundstelle § 1 Abs. 1 Nr. 1, Abs. 6 FPersV am 22.10.2026 gelesen (Prüfergebnis Sifa: offen, nicht Kern der sicherheitstechnischen Prüfung) – Ausnahmen für Werkverkehr bestätigen |
-| K-163 | `branche.transport_lenkzeiten_national` | H.5 | § 21a ArbZG für Fahrer zwischen 2,8 und 3,5 t im Inlandsverkehr unsicher; Folgen fachlich ergänzen |
-| K-164 | `branche.transport_lenkzeiten_national` | H.5 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-165 | `branche.widerruf_ausserhalb_geschaeftsraeume` | G.68 | Neu nach Rechtsprüfung R11 (Befund 10) – Muster-Widerrufsbelehrung und Muster-Widerrufsformular für Verträge außerhalb von Geschäftsräumen erst nach Prüfung |
-| K-166 | `branche.widerruf_ausserhalb_geschaeftsraeume` | G.68 | Ausnahmen als Hinweis ergänzen: dringende Reparaturen auf Wunsch des Kunden (§ 312g Abs. 2 Nr. 11 BGB), kleine sofort erbrachte und bezahlte Leistungen (§ 312 Abs. 2 Nr. 12 BGB) – bestätigen |
-| K-167 | `branche.widerruf_ausserhalb_geschaeftsraeume` | G.68 | Form der Abschrift und Belehrung (Papier bzw. dauerhafter Datenträger, Art. 246a § 4 Abs. 2 EGBGB) bestätigen |
-| K-168 | `branche.widerruf_ausserhalb_geschaeftsraeume` | G.68 | Auslöser über die Frage „Schließt du Verträge mit Privatkunden bei ihnen zu Hause oder unterwegs ab?“ |
-| K-169 | `branche.widerruf_ausserhalb_geschaeftsraeume` | G.68 | Vorprüfung 21.10.2026: Fundstelle der Höchstfrist (zwölf Monate und 14 Tage) seit 19.6.2026 in § 356 Abs. 4 Satz 1 BGB (BGBl. 2026 I Nr. 28, buzer.de) – Zitat auf „Abs. 3, 4“ angepasst (3 Stellen) |
-| K-170 | `branche.widerruf_fernabsatz` | G.68 | Neu nach Rechtsprüfung R12 (Befund 2) – Abgrenzung „für den Fernabsatz organisiertes Vertriebs- oder Dienstleistungssystem“ im Einzelfall unsicher |
-| K-171 | `branche.widerruf_fernabsatz` | G.68 | Muster-Widerrufsbelehrung und -formular für Dienstleistungen erst nach Prüfung |
-| K-172 | `branche.widerruf_fernabsatz` | G.68 | Ausnahme für Freizeitbetätigungen mit festem Termin (§ 312g Abs. 2 Nr. 9 BGB) bei Kursen unsicher |
-| K-173 | `branche.widerruf_fernabsatz` | G.68 | Vorprüfung 21.10.2026: Fundstelle der Höchstfrist (zwölf Monate und 14 Tage) seit 19.6.2026 in § 356 Abs. 4 Satz 1 BGB (BGBl. 2026 I Nr. 28, buzer.de) – Zitat auf „Abs. 3, 4“ angepasst (3 Stellen) |
-| K-174 | `branche.widerruf_fernabsatz` | G.68 | Vorprüfung 21.10.2026: Erlöschen bei Dienstleistungen seit 19.6.2026 in § 356 Abs. 5 Nr. 2 BGB (vorher Abs. 4, buzer.de) – Zitat angepasst |
-| K-175 | `datenschutz.avv` | F.58 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-176 | `datenschutz.avv` | F.58 | Abgrenzung Auftragsverarbeitung ↔ eigene Verantwortung (z. B. Steuerberatung) als Hinweis ergänzen |
-| K-177 | `datenschutz.avv` | F.58 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-178 | `datenschutz.beschaeftigtendaten` | F.62 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-179 | `datenschutz.beschaeftigtendaten` | F.62 | § 26 BDSG nach EuGH C-34/21 nicht mehr als eigene Grundlage genannt (R10, Rechtsprüfung); Art. 9 DSGVO für Gesundheitsdaten von Beschäftigten (z. B. eAU) gesondert prüfen |
-| K-180 | `datenschutz.beschaeftigtendaten` | F.62 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-181 | `datenschutz.beschaeftigtendaten` | F.62 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-182 | `datenschutz.betroffenenanfrage` | F.59 | Verlängerung um zwei Monate bei komplexen Anfragen (Art. 12 Abs. 3 Satz 2) abbilden? |
-| K-183 | `datenschutz.betroffenenanfrage` | F.59 | Mehrere Anfragen am selben Tag ergeben eine Instanz (T-15) |
-| K-184 | `datenschutz.betroffenenanfrage` | F.59 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-185 | `datenschutz.betroffenenanfrage` | F.59 | Vorprüfung 21.10.2026: Sanktion ergänzt – Art. 83 Abs. 5 Buchst. b (Betroffenenrechte Art. 12 bis 22); Wortlaut über gdpr-text.com gelesen |
-| K-186 | `datenschutz.datenpanne_meldung` | F.60 | 72 Stunden tagesgenau als 3 Tage ab dem Tag der Entdeckung umgesetzt; der Countdown in der App rechnet stundengenau – bestätigen |
-| K-187 | `datenschutz.datenpanne_meldung` | F.60 | Benachrichtigung der Betroffenen bei hohem Risiko (Art. 34) als eigene Pflicht? |
-| K-188 | `datenschutz.datenpanne_meldung` | F.60 | Zuständige Aufsichtsbehörde je Land |
-| K-189 | `datenschutz.dsb` | F.61 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-190 | `datenschutz.dsb` | F.61 | Vorprüfung 21.10.2026: Sanktion ergänzt – Art. 83 Abs. 4 Buchst. a nennt Art. 25 bis 39 (Art. 37); Wortlaut über gdpr-text.com gelesen, EUR-Lex für das Werkzeug gesperrt |
-| K-191 | `datenschutz.dsb` | F.61 | Vorprüfung 21.10.2026 (F.61): Auslöser um Art. 37 Abs. 1 Buchst. b, c DSGVO und § 38 Abs. 1 Satz 2 BDSG ergänzt (neue Angabe profil.datenschutz.dsb_gruende; gefragt wird bei Gesundheitsdaten, Videoüberwachung oder Ortung – Website-Tracking allein löst die Frage nicht aus) – Wortlaut beider Normen gelesen; Abgrenzung „Kerntätigkeit“ und „umfangreich“ fachlich bestätigen |
-| K-192 | `datenschutz.dsb` | F.61 | Vorprüfung 21.10.2026 (G-05): Zählweise § 38 Abs. 1 Satz 1 BDSG – „Personen“ (Köpfe, auch Teilzeit, Azubis; freie Mitarbeitende nach herrschender Ansicht ebenfalls) – bestätigen |
-| K-193 | `datenschutz.dsb_streichung` | F.61 | Rechtsstand 21.10.2026: nur Ankündigung (Modernisierungsagenda, Koalitionsausschuss 2.7.2026), kein Referentenentwurf gefunden – vor Launch und zum Jahreswechsel erneut prüfen; erwartet_ab bewusst leer (Zusage betrifft nur das Einbringen bis 31.12.2026) |
-| K-194 | `datenschutz.dsb_streichung` | F.61 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-195 | `datenschutz.dsb_streichung` | F.61 | Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“) |
-| K-196 | `datenschutz.dsb_streichung` | F.61 | Vorbereitungs-Checkliste fachlich prüfen |
-| K-197 | `datenschutz.dsfa` | F.62 | R12 (Nutzertest Coach #13): Hinweis für einzelne Selbstständige nach Erwägungsgrund 91 S. 4 (dort: Ärzte, Gesundheitsberufe, Rechtsanwälte) – Übertragung auf Trainer und Coaches unsicher |
-| K-198 | `datenschutz.dsfa` | F.62 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-199 | `datenschutz.dsfa` | F.62 | Auslöser (Gesundheitsdaten, Video) sind eine Vorauswahl – Liste der Aufsichtsbehörden (Muss-Liste) einbeziehen |
-| K-200 | `datenschutz.dsfa` | F.62 | Vorprüfung 21.10.2026: Sanktion ergänzt – Art. 83 Abs. 4 Buchst. a nennt Art. 25 bis 39 (Art. 35); Wortlaut über gdpr-text.com gelesen, EUR-Lex für das Werkzeug gesperrt |
-| K-201 | `datenschutz.informationspflichten` | F.58 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-202 | `datenschutz.informationspflichten` | F.58 | Pflichtinhalte als Checkliste fachlich ergänzen |
-| K-203 | `datenschutz.informationspflichten` | F.58 | Vorlage Datenschutzerklärung (6.4) erst nach Prüfung |
-| K-204 | `datenschutz.informationspflichten` | F.58 | Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen |
-| K-205 | `datenschutz.loeschkonzept` | F.58 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-206 | `datenschutz.loeschkonzept` | F.58 | Zusammenspiel mit Aufbewahrungsfristen (C.32, G-21) erläutern |
-| K-207 | `datenschutz.loeschkonzept` | F.58 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-208 | `datenschutz.loeschkonzept` | F.58 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-209 | `datenschutz.ortung` | F.63 | Neu nach Nutzertest R12 (Kurier #8) – Rechtsgrundlage (§ 26 BDSG nach EuGH C-34/21 zweifelhaft) und DSFA (Muss-Liste der Datenschutzkonferenz, Ortung von Beschäftigten) unsicher |
-| K-210 | `datenschutz.ortung` | F.63 | Ohne Betriebsrat keine Betriebsvereinbarung – Rechtsgrundlage muss trotzdem tragen; Zustelldaten (Empfänger, Unterschrift, Foto) nicht abgebildet |
-| K-211 | `datenschutz.tom` | F.58 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-212 | `datenschutz.tom` | F.58 | Gliederung nach Art. 32 Abs. 1 DSGVO – Wortlaut prüfen |
-| K-213 | `datenschutz.tom` | F.58 | Vorschlagsliste typischer Maßnahmen für Kleinbetriebe fachlich erstellen |
-| K-214 | `datenschutz.tom` | F.58 | Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen |
-| K-215 | `datenschutz.videoueberwachung` | F.62 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-216 | `datenschutz.videoueberwachung` | F.62 | Speicherdauer der Aufnahmen fachlich ergänzen |
-| K-217 | `datenschutz.videoueberwachung` | F.62 | Beschäftigte: Mitbestimmung/Information |
-| K-218 | `datenschutz.videoueberwachung` | F.62 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-219 | `datenschutz.videoueberwachung` | F.62 | Rechtsgrundlage nach Rechtsprüfung R11 (Befund 16): Art. 6 Abs. 1 lit. f DSGVO statt § 4 BDSG (für Private nicht anwendbar, BVerwG 6 C 2.18), Hinweisschild nach Art. 13 (EDSA-Leitlinien 3/2019) |
-| K-220 | `datenschutz.vvt` | F.58 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-221 | `datenschutz.vvt` | F.58 | Ausnahme nach Art. 30 Abs. 5 DSGVO (unter 250 Beschäftigte) – wann greift sie? Darstellung prüfen |
-| K-222 | `datenschutz.vvt` | F.58 | Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen |
-| K-223 | `gesellschaft.awv_meldung` | B.21 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-224 | `gesellschaft.awv_meldung` | B.21 | Meldegrenze als Regelwert erfassen (nicht in der Spezifikation) |
-| K-225 | `gesellschaft.awv_meldung` | B.21 | Meldefrist ergänzen |
-| K-226 | `gesellschaft.awv_meldung` | B.21 | Auch ohne Investoren bei Auslandszahlungen über der Grenze – weiterer Auslöser? |
-| K-227 | `gesellschaft.awv_meldung` | B.21 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-228 | `gesellschaft.egbr_hinweis` | B.16 | Neu nach Rechtsprüfung R12 (Befund 18) – Fälle, in denen die Eintragung faktisch nötig ist (Grundbuch, Gesellschafterliste § 40 GmbHG, Beteiligungen), bestätigen; Rechtsform „eGbR“ fehlt im Fragebogen |
-| K-229 | `gesellschaft.foerderprogramme` | B.22 | Option, keine Pflicht |
-| K-230 | `gesellschaft.foerderprogramme` | B.22 | Matching-Kriterien und Fristen je Programm fachlich hinterlegen |
-| K-231 | `gesellschaft.foerderprogramme` | B.22 | Nur noch bei Gründung, im Gründungs- und im Folgejahr (R11, Nutzertests Gründerin und Tischlerei) – Programme für Solo-Gründungen (Gründungszuschuss, Förderbanken der Länder, IHK-Beratung) je Land hinterlegen |
-| K-232 | `gesellschaft.gesellschafterliste_aktualisieren` | B.15 | Frist für die Einreichung ergänzen |
-| K-233 | `gesellschaft.gesellschafterliste_aktualisieren` | B.15 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-234 | `gesellschaft.gesellschafterliste_aktualisieren` | B.15 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-235 | `gesellschaft.gesellschaftsvertrag_notar` | B.14 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-236 | `gesellschaft.gesellschaftsvertrag_notar` | B.14 | Einzelne Vorschriften (z. B. § 2 GmbHG Form, § 5 Stammkapital, § 7 Einzahlung) zuordnen |
-| K-237 | `gesellschaft.gesellschaftsvertrag_notar` | B.14 | Online-Beurkundung: Voraussetzungen und Grenzen ergänzen |
-| K-238 | `gesellschaft.gesellschaftsvertrag_notar` | B.14 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-239 | `gesellschaft.gesellschaftsvertrag_notar` | B.14 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-240 | `gesellschaft.gesellschaftsvertrag_notar` | B.14 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-241 | `gesellschaft.gf_pflichten_haftung` | B.17 | R12 (Rechtsprüfung Befunde 1 und 10): Kapitalerhaltung (§§ 30, 31, 43 Abs. 3 GmbHG) ergänzt; GmbH & Co. KG einbezogen – Übertragung auf die KG (Auszahlungen an Kommanditisten, § 30 GmbHG entsprechend) bestätigen |
-| K-242 | `gesellschaft.gf_pflichten_haftung` | B.17 | Normen aus dem Nutzertest Tischlerei (R11) ergänzt – Auswahl und Rechtsgrundlage § 43 GmbHG bestätigen |
-| K-243 | `gesellschaft.gf_pflichten_haftung` | B.17 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-244 | `gesellschaft.gf_pflichten_haftung` | B.17 | Inhalt der Erklärung (welche Pflichten, § 43 GmbHG) fachlich festlegen – Spezifikation nennt nur „Pflichten und Haftung erklären“ |
-| K-245 | `gesellschaft.gf_pflichten_haftung` | B.17 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-246 | `gesellschaft.gf_pflichten_haftung` | B.17 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-247 | `gesellschaft.gf_sozialversicherungsstatus` | B.17 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-248 | `gesellschaft.gf_sozialversicherungsstatus` | B.17 | Kriterien (Beteiligung, Sperrminorität) nicht in der Spezifikation – nur als Hinweis auf die Statusfeststellung darstellen |
-| K-249 | `gesellschaft.gf_sozialversicherungsstatus` | B.17 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-250 | `gesellschaft.gf_sozialversicherungsstatus` | B.17 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-251 | `gesellschaft.handelsregister_anmeldung` | B.15 | R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG (§ 106 HGB i. V. m. § 161 Abs. 2 HGB) und Partnerschaftsgesellschaft (§ 4 PartGG) – Voraussetzung Stammkapital gilt nur für GmbH und UG; Form der Anmeldung (§ 12 HGB, § 5 PartGG) bestätigen |
-| K-252 | `gesellschaft.handelsregister_anmeldung` | B.15 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-253 | `gesellschaft.handelsregister_anmeldung` | B.15 | Haftung vor Eintragung (Vorgesellschaft) als Hinweis ergänzen? |
-| K-254 | `gesellschaft.handelsregister_anmeldung` | B.15 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-255 | `gesellschaft.handelsregister_anmeldung` | B.15 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-256 | `gesellschaft.insolvenzantragspflicht` | B.17 | R12 (Rechtsprüfung Befunde 1 und 9): GmbH & Co. KG (§ 15a Abs. 1 S. 3 InsO); Sanktion § 15a Abs. 4, 5 InsO und Haftung § 15b InsO – bestätigen |
-| K-257 | `gesellschaft.insolvenzantragspflicht` | B.17 | Fristen drei bzw. sechs Wochen (§ 15a Abs. 1 InsO) im Text ergänzt (R11, Nutzertest Tischlerei) – bestätigen |
-| K-258 | `gesellschaft.insolvenzantragspflicht` | B.17 | Fristen nach § 15a InsO als Regelwerte erfassen (Spezifikation: „Fristen aus Regeldaten“, Werte nicht genannt) |
-| K-259 | `gesellschaft.insolvenzantragspflicht` | B.17 | Darstellung: allgemeine Information, keine Prüfung des Einzelfalls (RDG) |
-| K-260 | `gesellschaft.investitionspruefung_hinweis` | B.21 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-261 | `gesellschaft.investitionspruefung_hinweis` | B.21 | Hinweis laut Spezifikation – sensible Sektoren und Schwellen fachlich ergänzen |
-| K-262 | `gesellschaft.investitionspruefung_hinweis` | B.21 | Zuständiges Ministerium (Bezeichnung) aktuell? |
-| K-263 | `gesellschaft.istkaufmann_pruefen` | B.15 | Neu nach Rechtsprüfung R12 (Befund 5) – Auslöser für jedes Gewerbe als Einzelunternehmen oder GbR (Hinweis); Signale wie Umsatz, Beschäftigte oder Lager ohne feste Schwellen |
-| K-264 | `gesellschaft.jahresabschluss` | B.18 | R12 (Rechtsprüfung Befund 1): GmbH & Co. KG nach § 264a HGB einbezogen – Feststellung bei der KG nach Gesellschaftsvertrag (kein § 42a GmbHG) |
-| K-265 | `gesellschaft.jahresabschluss` | B.18 | Fristen Aufstellung (3 bzw. 6 Monate, § 264 Abs. 1 HGB) und Feststellung (8 bzw. 11 Monate, § 42a Abs. 2 GmbHG) im Text (R11, Nutzertest Tischlerei) – als Termine abbilden, Größenklasse abfragen |
-| K-266 | `gesellschaft.jahresabschluss` | B.18 | Fristen für Aufstellung und Feststellung als Regeldaten ergänzen |
-| K-267 | `gesellschaft.jahresabschluss` | B.18 | Jährliche Wiederholung abbilden, sobald Fristen feststehen |
-| K-268 | `gesellschaft.jahresabschluss` | B.18 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-269 | `gesellschaft.jahresabschluss` | B.18 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-270 | `gesellschaft.jahresabschluss` | B.18 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-271 | `gesellschaft.mitarbeiterbeteiligung` | B.20 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-272 | `gesellschaft.mitarbeiterbeteiligung` | B.20 | Option, keine Pflicht – Darstellung bestätigen |
-| K-273 | `gesellschaft.mitarbeiterbeteiligung` | B.20 | Inhalt der Erklärung zu § 19a EStG und VSOP fachlich festlegen |
-| K-274 | `gesellschaft.offenlegung` | B.18 | R12 (Rechtsprüfung Befunde 1 und 9): GmbH & Co. KG (§ 264a HGB); Sanktion § 335 Abs. 1 und 4 HGB – Beträge bestätigen |
-| K-275 | `gesellschaft.offenlegung` | B.18 | Ohne Angabe zum Geschäftsjahr gilt die Pflicht mit Terminen nach dem Kalenderjahr (R11, Nutzertest Tischlerei) – Rückfrage zum Geschäftsjahr bleibt in der App |
-| K-276 | `gesellschaft.offenlegung` | B.18 | Frist „binnen 12 Monaten“ als 31.12. des Folgejahres umgesetzt (Kalenderjahr) – bestätigen |
-| K-277 | `gesellschaft.offenlegung` | B.18 | Verschiebung bei Fristende am Wochenende/Feiertag festlegen |
-| K-278 | `gesellschaft.offenlegung` | B.18 | Kleinstkapitalgesellschaft: Merkmale nicht in der Spezifikation – nur Hinweis auf Hinterlegung |
-| K-279 | `gesellschaft.offenlegung` | B.18 | Erstes Rumpfgeschäftsjahr nach Gründung: Periodenbeginn prüfen |
-| K-280 | `gesellschaft.offenlegung_abweichendes_gj` | B.18 | R12 (Rechtsprüfung Befund 1): GmbH & Co. KG (§ 264a HGB) einbezogen |
-| K-281 | `gesellschaft.offenlegung_abweichendes_gj` | B.18 | Frist: Termin für abweichendes Geschäftsjahr berechnen (Angabe des Geschäftsjahresendes im Profil nötig) |
-| K-282 | `gesellschaft.offenlegung_abweichendes_gj` | B.18 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-283 | `gesellschaft.offenlegung_abweichendes_gj` | B.18 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-284 | `gesellschaft.offenlegung_abweichendes_gj` | B.18 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-285 | `gesellschaft.partg_mbb_haftpflicht` | B.15 | Neu nach Rechtsprüfung R12 (Befund 1) – Mindestsummen je Berufsrecht nicht abgebildet; Namenszusatz (§ 8 Abs. 4 S. 3 PartGG) bestätigen |
-| K-286 | `gesellschaft.stammkapital_einzahlen` | B.14 | R12 (Rechtsprüfung Befund 16): ein Viertel je Geschäftsanteil, insgesamt mindestens 12.500 € (§ 7 Abs. 2 GmbHG), UG voll und bar (§ 5a Abs. 2), Versicherung in der Anmeldung (§ 8 Abs. 2) – Plausibilitätsprüfung im Handelsregister-Datenblatt (Mindestkapital, volle Euro) offen |
-| K-287 | `gesellschaft.stammkapital_einzahlen` | B.14 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-288 | `gesellschaft.stammkapital_einzahlen` | B.14 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-289 | `gesellschaft.stammkapital_einzahlen` | B.14 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-290 | `gesellschaft.transparenzregister` | B.16 | R12 (Rechtsprüfung Befund 1, K-205): Auslöser auf GmbH & Co. KG, PartG und PartG mbB erweitert (§ 20 Abs. 1 GwG, eingetragene Personengesellschaften); eGbR nur im Text – eigene Rechtsform „eGbR“ fehlt im Fragebogen |
-| K-291 | `gesellschaft.transparenzregister` | B.16 | Einzelvorschriften §§ 19, 20 GwG zugeordnet (R11); Nachmeldepflicht für Gesellschaften vor 1.8.2021 (§ 59 Abs. 8 GwG) nur im Kommentar – Fristen bestätigen |
-| K-292 | `gesellschaft.transparenzregister` | B.16 | Frist nach Gründung und bei Änderung ergänzen |
-| K-293 | `gesellschaft.transparenzregister` | B.16 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 56 Abs. 1 Nr. 55 (Mitteilung nach § 20 Abs. 1), Beträge Abs. 1 und 3 über gesetze.legal gelesen (gesetze-im-internet für das Werkzeug gesperrt); Staffelung nach dem Bußgeldkatalog des Bundesverwaltungsamts nicht abgebildet |
-| K-294 | `gesellschaft.ug_ruecklage` | B.14 | R12 (Rechtsprüfung, UG-Rücklage): Verlustvortrag (§ 5a Abs. 3 S. 1), Ende nur durch Kapitalerhöhung (§ 5a Abs. 5), Nichtigkeit (§ 256 AktG analog, herrschende Meinung) – bestätigen |
-| K-295 | `gesellschaft.ug_ruecklage` | B.14 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-296 | `gruendung.berufsgenossenschaft` | A.8 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (früherer Text war nicht belegt) |
-| K-297 | `gruendung.berufsgenossenschaft` | A.8 | Auslöser 'immer': gilt das für alle Rechtsformen und Freiberufler ohne Beschäftigte? Ausnahmen (z. B. andere Unfallversicherungsträger) erfassen |
-| K-298 | `gruendung.berufsgenossenschaft` | A.8 | Fristbeginn: Gründungsdatum vs. Aufnahme der Tätigkeit |
-| K-299 | `gruendung.elster_konto` | A.5 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-300 | `gruendung.elster_konto` | A.5 | Vorbereitender Schritt ohne eigene Rechtspflicht – Darstellung bestätigen |
-| K-301 | `gruendung.elster_konto` | A.5 | Gilt für alle oder nur ohne Steuerberatung? |
-| K-302 | `gruendung.erlaubnis_pruefen` | A.3 | Gaststättenrecht je Land: Erlaubnis oder nur Anzeige (Rechtsprüfung R11: mehrere Länder nur Anzeige, Sachsen vermutlich anzeigepflichtig; Gründerin: gilt in BW das Bundes-GastG?) – Text länderneutral, je Land prüfen |
-| K-303 | `gruendung.erlaubnis_pruefen` | A.3 | Erlaubnis nur bei Alkoholausschank (§ 2 GastG, alkoholfreie Getränke nach § 2 Abs. 2 Nr. 1 erlaubnisfrei) – bestätigen |
-| K-304 | `gruendung.erlaubnis_pruefen` | A.3 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-305 | `gruendung.erlaubnis_pruefen` | A.3 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-306 | `gruendung.erlaubnis_pruefen` | A.3 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-307 | `gruendung.fragebogen_steuerliche_erfassung` | A.5 | Fristbeginn: Aufnahme der Tätigkeit = Gründungsdatum im Profil? bestätigen |
-| K-308 | `gruendung.fragebogen_steuerliche_erfassung` | A.5 | Verschiebung bei Fristende am Wochenende/Feiertag festlegen |
-| K-309 | `gruendung.fragebogen_steuerliche_erfassung` | A.5 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-310 | `gruendung.fragebogen_steuerliche_erfassung` | A.5 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-311 | `gruendung.gewerbeanzeige` | A.2 | R12 (Rechtsprüfung Befund 15): Ummeldung bei Wechsel oder Ausdehnung (§ 14 Abs. 1 S. 2 Nr. 2 GewO) über das Ereignis neue_taetigkeit; § 55c GewO nur im Text |
-| K-312 | `gruendung.gewerbeanzeige` | A.2 | Sanktion aus der Rechtsprüfung R11 (Befund 20): § 146 Abs. 2 GewO bis 1.000 € – Nummer bestätigen |
-| K-313 | `gruendung.gewerbeanzeige` | A.2 | Frist „bei Beginn“: als spätestens am Tag des Beginns umgesetzt – bestätigen |
-| K-314 | `gruendung.gewerbeanzeige` | A.2 | Ummeldung und Abmeldung: Fristen ergänzen |
-| K-315 | `gruendung.gewo38_zuverlaessigkeit` | A.3 | Neu nach Rechtsprüfung R12 (Befund 6) – Liste nach § 38 Abs. 1 GewO (lxgesetze) zusammengefasst; Second-Hand-Shops mit nicht hochwertiger Ware abgrenzen |
-| K-316 | `gruendung.gruendungsbeschleunigung_radar` | A.0 | Rechtsstand 21.10.2026: nur Eckpunkte der Länder und Zusage „Beschluss des Gesetzentwurfs bis 31.12.2026“, kein Bundesentwurf gefunden – vor Launch erneut prüfen |
-| K-317 | `gruendung.gruendungsbeschleunigung_radar` | A.0 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-318 | `gruendung.gruendungsbeschleunigung_radar` | A.0 | Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „niedrig“) |
-| K-319 | `gruendung.gruendungsbeschleunigung_radar` | A.0 | Vorprüfung 21.10.2026 (A.0): bleibt Radar (status_recht geplant, radar), ausdrücklich als Hinweis eingeordnet – keine Pflicht, solange kein Gesetzentwurf vorliegt |
-| K-320 | `gruendung.gruendungszuschuss` | A.13 | Weitere Förderungen (Spezifikation A.13) als eigene Einträge? |
-| K-321 | `gruendung.gruendungszuschuss` | A.13 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-322 | `gruendung.handwerk_verzeichnis` | A.4 | Gebäudereinigung als Anlage B1 (Nr. 33) automatisch ausgelöst (R11) – Nummer der Anlage bestätigen |
-| K-323 | `gruendung.handwerk_verzeichnis` | A.4 | Anzeige „bei Beginn“ (§ 18 HwO, gleichzeitig mit der Gewerbeanzeige) als „spätestens am Tag des Beginns“ umgesetzt (R10, Rechtsprüfung) – bestätigen |
-| K-324 | `gruendung.handwerk_verzeichnis` | A.4 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-325 | `gruendung.handwerksrolle` | A.4 | Sanktion aus der Rechtsprüfung R11 (Befund 20): § 117 HwO bis 10.000 €, § 8 SchwarzArbG bei erheblichem Umfang – Fundstelle bestätigen |
-| K-326 | `gruendung.handwerksrolle` | A.4 | Frist „vor Beginn“ nach § 1 HwO (Betrieb erst nach Eintragung) umgesetzt (R10, Rechtsprüfung) – Paragrafen der Eintragung bestätigen |
-| K-327 | `gruendung.ihk_hwk_mitgliedschaft` | A.7 | R12 (Rechtsprüfung Befund 18): Beitragsfreistellung bis 5.200 € Gewerbeertrag (§ 3 Abs. 3 IHKG) – Betrag, Satz und Sonderregeln für Existenzgründer bestätigen; Handwerkskammern regeln Beiträge eigenständig |
-| K-328 | `gruendung.ihk_hwk_mitgliedschaft` | A.7 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-329 | `gruendung.ihk_hwk_mitgliedschaft` | A.7 | Information ohne Handlung – als Hinweis darstellen? |
-| K-330 | `gruendung.ihk_hwk_mitgliedschaft` | A.7 | Beitragstermine für den Jahreskalender (I) ergänzen |
-| K-331 | `gruendung.krankenversicherung` | A.10 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-332 | `gruendung.krankenversicherung` | A.10 | Für welche Rechtsformen und Rollen (z. B. GmbH-Geschäftsführer) gilt das? |
-| K-333 | `gruendung.krankenversicherung` | A.10 | Nebenerwerb: was genau ist zu melden? |
-| K-334 | `gruendung.krankenversicherung` | A.10 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-335 | `gruendung.krankenversicherung` | A.10 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-336 | `gruendung.reisegewerbekarte` | A.3 | R12 (Rechtsprüfung Befund 15): Anzeigepflicht nach § 55c GewO für reisegewerbekartenfreie Tätigkeiten – welche Fälle, bestätigen |
-| K-337 | `gruendung.reisegewerbekarte` | A.3 | Dauer des Verfahrens (Nutzertest R11: 4–6 Wochen, je Behörde verschieden) – Erinnerung sechs und zwei Wochen vorher als Vorlauf, bestätigen |
-| K-338 | `gruendung.reisegewerbekarte` | A.3 | Ausnahmen für festgesetzte Märkte, Messen und Volksfeste (Titel IV GewO, § 55a) nur als Prüfhinweis – wann die Karte trotzdem nötig ist; Reisegewerbe neben stehendem Gewerbe (Gewerbeanzeige und Karte) |
-| K-339 | `gruendung.reisegewerbekarte` | A.3 | Unterlagen (Führungszeugnis, Auskunft aus dem Gewerbezentralregister) je Behörde bestätigen |
-| K-340 | `gruendung.reisegewerbekarte` | A.3 | Folgen bei Nichterfüllung – Sanktion fachlich ergänzen |
-| K-341 | `gruendung.reisegewerbekarte` | A.3 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-342 | `gruendung.reisegewerbekarte` | A.3 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-343 | `gruendung.rentenversicherungspflicht` | A.11 | R12 (Nutzertest Coach #1, #2): laufende Pflicht statt Gründungsschritt; Sanktion § 25 Abs. 1 SGB IV, Geringfügigkeitsgrenze 603 € (2027: 633 €) und Bedingung „kein versicherungspflichtiger Arbeitnehmer“ ergänzt – bestätigen |
-| K-344 | `gruendung.rentenversicherungspflicht` | A.11 | Gelten Yoga-, Fitness- und Personal Trainer generell als Lehrende (auch reines 1:1-Training)? „In der Regel“ laut Nutzertest – unsicher |
-| K-345 | `gruendung.rentenversicherungspflicht` | A.11 | Merkmal „keine versicherungspflichtigen Beschäftigten“ nur über die Frage im Check (Einzelperson ohne Beschäftigte oder nur mit Minijobs) – ob Minijobs als versicherungspflichtige Arbeitnehmer zählen, bestätigen |
-| K-346 | `gruendung.rentenversicherungspflicht` | A.11 | Liste der Gruppen vollständig (§ 2 SGB VI)? |
-| K-347 | `gruendung.rentenversicherungspflicht` | A.11 | Fristbeginn: Aufnahme der Tätigkeit = Gründungsdatum? |
-| K-348 | `gruendung.rundfunkbeitrag` | A.9 | R12 (Rechtsprüfung Befund 7, T-101): Wohnung frei (§ 5 Abs. 5 Nr. 3), Kfz (§ 5 Abs. 2 Nr. 2), Staffel (§ 5 Abs. 1) – Wortlaut über Bayern.Recht geprüft; laufende Pflicht je Betriebsstätte statt Gründungsschritt |
-| K-349 | `gruendung.rundfunkbeitrag` | A.9 | Anzeigepflichten nach § 8 RBStV (Frist, jährliche Meldung geänderter Beschäftigtenzahlen?) bestätigen; Hotel- und Gästezimmer (§ 5 Abs. 2 Nr. 1) nicht abgebildet |
-| K-350 | `gruendung.rundfunkbeitrag` | A.9 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-351 | `gruendung.rundfunkbeitrag` | A.9 | Höhe nach Zahl der Beschäftigten – Staffel als Regelwert? |
-| K-352 | `gruendung.rundfunkbeitrag` | A.9 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-353 | `gruendung.statusfeststellung` | A.12 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-354 | `gruendung.statusfeststellung` | A.12 | Option mit Risiko-Check (Spezifikation): Kriterien des Risiko-Checks fachlich festlegen |
-| K-355 | `gruendung.statusfeststellung` | A.12 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-356 | `gruendung.taetigkeit_einordnen` | A.1 | R12 (Nutzertest Coach #3, #4): unterrichtende Tätigkeit, Personal Training (Einzelfall, unsicher) und Freibetrag 24.500 € ergänzt; bei „Weiß ich nicht“ als offener Punkt „jetzt dran“ |
-| K-357 | `gruendung.taetigkeit_einordnen` | A.1 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-358 | `gruendung.taetigkeit_einordnen` | A.1 | Ist das eine Pflicht oder ein vorbereitender Schritt? Darstellung als Aufgabe bestätigen |
-| K-359 | `gruendung.ust_idnr` | A.6 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-360 | `gruendung.ust_idnr` | A.6 | Nur bei B2B-Geschäft oder bei jedem EU-Geschäft? |
-| K-361 | `gruendung.ust_idnr` | A.6 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-362 | `gruendung.ust_idnr` | A.6 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-363 | `gruendung.vermittlerregister` | A.3 | Neu nach Rechtsprüfung R12 (Befund 6) – § 11a Abs. 1 GewO nennt § 34d Abs. 10, § 34f Abs. 5, § 34h Abs. 1 S. 4 und § 34i Abs. 8; Versicherungsberater (§ 34e) bestätigen |
-| K-364 | `gruendung.vermittlerregister` | A.3 | Frist „unverzüglich nach Aufnahme der Tätigkeit“ je Vorschrift bestätigen; Folgen fachlich ergänzen |
-| K-365 | `gruendung.vermittlerregister` | A.3 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-366 | `it_sicherheit.nis2_meldepflichten` | F.64 | Rechtsstand 21.10.2026: Meldestufen 24 Std./72 Std./1 Monat und § 32 BSIG laut Kanzleibeitrag ADVANT Beiten – Wortlaut von § 32 BSIG (Fristbeginn: Kenntnis) gegenlesen |
-| K-367 | `it_sicherheit.nis2_meldepflichten` | F.64 | Haftung und Schulungspflicht der Geschäftsleitung als eigene Pflicht? |
-| K-368 | `it_sicherheit.nis2_meldepflichten` | F.64 | Vorprüfung 21.10.2026 (F.64): § 65 Abs. 5 Satz 1 Nr. 1 Buchst. a/b BSIG (10 Mio. €/7 Mio. €), Prozentgrenzen nach Abs. 6, 7 nur bei mehr als 500 Mio. € Gesamtumsatz; für Kleinstbetriebe (unter 10 Beschäftigte, nicht IT) ausgeblendet (T-105) – Umsatz- und Bilanzschwelle nicht abgebildet |
-| K-369 | `it_sicherheit.nis2_pruefen` | F.64 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-370 | `it_sicherheit.nis2_pruefen` | F.64 | Sektoren und Größenschwellen stehen nicht in der Spezifikation – als Betroffenheitscheck fachlich ergänzen |
-| K-371 | `it_sicherheit.nis2_pruefen` | F.64 | Vorbereitender Schritt – Darstellung bestätigen |
-| K-372 | `it_sicherheit.nis2_pruefen` | F.64 | Ausgeblendet bei unter 50 Beschäftigten außer IT/Andere (R11) – Umsatz- und Bilanzschwelle (über 10 Mio. €) und größenunabhängige Sektoren (z. B. DNS, Vertrauensdienste, Telekommunikation) nicht abgebildet; bestätigen |
-| K-373 | `it_sicherheit.nis2_pruefen` | F.64 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-374 | `it_sicherheit.nis2_registrierung` | F.64 | Rechtsstand 21.10.2026: § 33 BSIG (drei Monate nach Betroffenheit), gesetzliche Frist für Bestandsunternehmen 6.3.2026, BSI-Kulanz bis 31.7.2026 (Quelle Dienstleister-Blog, BSI-Mitteilung nicht direkt gefunden) – bestätigen |
-| K-375 | `it_sicherheit.nis2_registrierung` | F.64 | Frist bleibt als festes Datum 31.7.2026 – für später betroffene Unternehmen gilt „drei Monate ab Betroffenheit“; dafür fehlt ein Ereignis (z. B. „NIS2 betroffen seit“) |
-| K-376 | `it_sicherheit.nis2_registrierung` | F.64 | Vorprüfung 21.10.2026 (F.64): Registrierung nach § 33 BSIG ist nach § 65 Abs. 2 Nr. 6, Abs. 5 Satz 1 Nr. 5 mit bis 500.000 € bedroht – der Rahmen 10 Mio. €/2 % gilt hier nicht; für Kleinstbetriebe (unter 10 Beschäftigte, nicht IT) ausgeblendet (T-105) – Umsatz- und Bilanzschwelle nicht abgebildet |
-| K-377 | `ki.hochrisiko` | F.65 | Rechtsstand 21.10.2026: Termine (Anhang III 2.12.2027, Anhang I 2.8.2028, Art. 113 Buchst. c) laut Otto Schmidt und FGS – Amtsblatttext (EUR-Lex) nicht direkt abgerufen, gegenlesen |
-| K-378 | `ki.hochrisiko` | F.65 | Status bleibt „beschlossen“ bis 2.12.2027; Anhang-I-Fälle (2.8.2028) und Bestandssysteme (Art. 111: bis 2.8.2030) nicht als eigene Regel abgebildet |
-| K-379 | `ki.hochrisiko` | F.65 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-380 | `ki.hochrisiko` | F.65 | Vorbereitungs-Checkliste fachlich prüfen |
-| K-381 | `ki.kompetenz` | F.65 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-382 | `ki.kompetenz` | F.65 | Inhalt und Umfang einer ausreichenden Schulung fachlich festlegen |
-| K-383 | `ki.kompetenz` | F.65 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-384 | `ki.kompetenz` | F.65 | Vorprüfung 21.10.2026 (F.65): Titel und Kurztext auf „fördern“ umgestellt, Schwere niedrig, Änderung als aenderungsnotiz (gültig_ab bleibt 2.2.2025, weil Art. 4 seitdem gilt). Neuer Wortlaut von Art. 4 nur sinngemäß belegt (IHK Lüneburg-Wolfsburg: „Maßnahmen ergreifen, um die KI-Kompetenz … zu fördern“; Opsio: „unterstützen“) – EUR-Lex war für das Recherchewerkzeug nicht abrufbar, Wortlaut im Amtsblatt gegenlesen; Einordnung als Hinweis statt Pflicht prüfen |
-| K-385 | `ki.transparenz` | F.65 | R12 (Rechtsprüfung Befund 14): Anbieter (Art. 50 Abs. 2) und Betreiber (Abs. 4) getrennt dargestellt – Abgrenzung bei redaktionell geprüften Texten bestätigen |
-| K-386 | `ki.transparenz` | F.65 | Termine nach Digital-Omnibus VO (EU) 2026/1744 (in Kraft 27.7.2026) laut Rechtsprüfung R11 (Befund 8) und Kanzlei-Blog FGS: Art. 50 Abs. 1 seit 2.8.2026, Übergangsfrist Abs. 2 bis 2.12.2026 – im Amtsblatt gegenlesen |
-| K-387 | `ki.transparenz` | F.65 | Bußgeldrahmen Art. 99 KI-VO laut FGS unverändert – Absatz und KMU-Regel bestätigen |
-| K-388 | `ki.transparenz` | F.65 | Welche Fälle des Art. 50 treffen auf Kleinbetriebe zu (Chatbot, Deepfake, generierte Texte)? |
-| K-389 | `ki.transparenz` | F.65 | Vorbereitungs-Checkliste fachlich prüfen |
-| K-390 | `online.barrierefreiheit` | G.70 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-391 | `online.barrierefreiheit` | G.70 | Bilanzsumme als Alternative zum Umsatz fehlt im Profil |
-| K-392 | `online.barrierefreiheit` | G.70 | Zählweise (G-05) |
-| K-393 | `online.barrierefreiheit` | G.70 | Welche Dienstleistungen genau (Buchungstools, Bankdienste …) – Liste ergänzen |
-| K-394 | `online.barrierefreiheit` | G.70 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-395 | `online.barrierefreiheit` | G.70 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-396 | `online.button_loesung` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-397 | `online.button_loesung` | G.68 | Zulässige Beschriftungen als Beispiele ergänzen |
-| K-398 | `online.button_loesung` | G.68 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 312j Abs. 4 BGB gelesen |
-| K-399 | `online.cookie_einwilligung` | F.63 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-400 | `online.cookie_einwilligung` | F.63 | URL des Gesetzes nach Umbenennung (TTDSG → TDDDG) prüfen |
-| K-401 | `online.cookie_einwilligung` | F.63 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 28 Abs. 1 Nr. 13 (Speichern/Zugreifen entgegen § 25 Abs. 1 Satz 1) und Abs. 2 über gesetze.legal gelesen |
-| K-402 | `online.dac7` | G.74 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-403 | `online.dac7` | G.74 | Meldeschwellen der Plattformen nicht in der Spezifikation |
-| K-404 | `online.dac7` | G.74 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-405 | `online.datenschutzerklaerung` | G.66 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-406 | `online.datenschutzerklaerung` | G.66 | Vorlage erst nach fachlicher Prüfung (6.4) |
-| K-407 | `online.datenschutzerklaerung` | G.66 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-408 | `online.datenschutzerklaerung` | G.66 | Vorprüfung 21.10.2026: Sanktion ergänzt – Art. 83 Abs. 5 Buchst. b (Betroffenenrechte Art. 13); Wortlaut über gdpr-text.com gelesen |
-| K-409 | `online.impressum` | G.66 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-410 | `online.impressum` | G.66 | Pflichtangaben je Rechtsform als Checkliste fachlich ergänzen |
-| K-411 | `online.kuendigungsbutton` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-412 | `online.kuendigungsbutton` | G.68 | Vorgeschriebene Beschriftung und Ablauf (Bestätigungsseite) fachlich ergänzen |
-| K-413 | `online.kuendigungsbutton` | G.68 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 312k Abs. 6 BGB gelesen |
-| K-414 | `online.marktplatz_angaben` | G.74 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-415 | `online.marktplatz_angaben` | G.74 | Rechtsgrundlagen ergänzt – prüfen |
-| K-416 | `online.marktplatz_angaben` | G.74 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-417 | `online.marktplatz_angaben` | G.74 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-418 | `online.os_link` | G.69 | Aufhebung zum 20.07.2025 durch VO (EU) 2024/3228 (R10, Rechtsprüfung) – Fundstelle der Quelle eintragen; ob ein noch vorhandener Link selbst ein Wettbewerbsrisiko ist, offen |
-| K-419 | `online.os_link` | G.69 | Vorprüfung 21.10.2026 (G.69): Link entfernen bestätigt (VO (EU) 2024/3228, Abschaltung und Wegfall der Linkpflicht 20.7.2025 laut IHK Fulda); Hinweistext im Online-Check (i18n os_link) angepasst |
-| K-420 | `online.preisangaben` | G.67 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-421 | `online.preisangaben` | G.67 | Ausnahmen und Einzelheiten (z. B. Grundpreis-Einheiten) fachlich ergänzen |
-| K-422 | `online.preisangaben` | G.67 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-423 | `online.vsbg_hinweis` | G.69 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-424 | `online.vsbg_hinweis` | G.69 | Zählweise (G-05) |
-| K-425 | `online.vsbg_hinweis` | G.69 | Auslöser „Website oder AGB“ – AGB sind nicht im Profil |
-| K-426 | `online.vsbg_hinweis` | G.69 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-427 | `online.vsbg_hinweis` | G.69 | Vorprüfung 21.10.2026 (G-05): § 36 Abs. 3 VSBG gelesen (Stichtag 31.12. des Vorjahres, zehn oder weniger Personen) – Stichtag ist im Auslöser nicht abgebildet |
-| K-428 | `online.vsbg_streitfall` | G.69 | Neu nach Rechtsprüfung R11 (T-112) – ob das VSBG 2025/26 geändert wurde, ist laut Prüferin unsicher; Wortlaut bestätigen |
-| K-429 | `online.vsbg_streitfall` | G.69 | Als Hinweis geführt, weil die Pflicht erst mit einer Streitigkeit entsteht |
-| K-430 | `online.widerrufsbelehrung` | G.68 | R12 (Nutzertest Coach #11): Dienstleistungs-Hinweise (§ 356 Abs. 4, § 357a Abs. 2 BGB) ergänzt; § 312g Abs. 2 Nr. 9 BGB bei Kursen mit festem Termin (auch online) unsicher; Fernabsatz per Telefon, E-Mail oder Messenger als eigene Pflicht (branche.widerruf_fernabsatz) |
-| K-431 | `online.widerrufsbelehrung` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-432 | `online.widerrufsbelehrung` | G.68 | Muster-Widerrufsbelehrung erst nach Prüfung |
-| K-433 | `online.widerrufsbelehrung` | G.68 | Ausnahmen vom Widerrufsrecht als Hinweis |
-| K-434 | `online.widerrufsbelehrung` | G.68 | Muster nach Gestaltungshinweis 3 (Widerrufsbutton, Anlage 1 zu Art. 246a § 1 Abs. 2 S. 2 EGBGB) anpassen (Rechtsprüfung R11 Befund 9) |
-| K-435 | `online.widerrufsbelehrung` | G.68 | Verträge außerhalb von Geschäftsräumen als eigene Pflicht (branche.widerruf_ausserhalb_geschaeftsraeume) |
-| K-436 | `online.widerrufsbelehrung` | G.68 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-437 | `online.widerrufsbelehrung` | G.68 | Vorprüfung 21.10.2026: Sanktion ergänzt – seit 19.6.2026 steht die Höchstfrist von zwölf Monaten und 14 Tagen in § 356 Abs. 4 Satz 1 BGB (BGBl. 2026 I Nr. 28), der Fristbeginn in Abs. 3 |
-| K-438 | `online.widerrufsbelehrung` | G.68 | Vorprüfung 21.10.2026: Erlöschen bei Dienstleistungen seit 19.6.2026 in § 356 Abs. 5 Nr. 2 BGB (vorher Abs. 4, buzer.de) – Zitat angepasst |
-| K-439 | `online.widerrufsbutton` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-440 | `online.widerrufsbutton` | G.68 | Auslöser „Marktplatz“: verantwortlich bleibt der Unternehmer, Umsetzung durch den Plattformbetreiber – Hinweis prüfen |
-| K-441 | `online.widerrufsbutton` | G.68 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-442 | `online.widerrufsbutton` | G.68 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (§ 356a BGB (gelesen) regelt keine eigene Rechtsfolge bei fehlender Widerrufsfunktion; Folgen (Fristbeginn? UWG?) fachlich klären) – nach Ergänzung wieder „hoch“ |
-| K-443 | `online.widerrufsbutton` | G.68 | Vorprüfung 21.10.2026 (G.68, T-29): Beschriftungen „Vertrag widerrufen“ / „Widerruf bestätigen“ (oder gleichbedeutend eindeutig) und Eingangsbestätigung auf dauerhaftem Datenträger mit Inhalt, Datum und Uhrzeit nach § 356a Abs. 1, 3, 4 BGB gelesen |
-| K-444 | `personal.anmeldezeitraum_angeben` | D.40 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-445 | `personal.anmeldezeitraum_angeben` | D.40 | Vorbereitender Schritt – Darstellung bestätigen |
-| K-446 | `personal.anmeldezeitraum_angeben` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-447 | `personal.arbeitszeit_aufzeichnung` | D.42 | R12 (Nutzertest Bäckerei #9): § 16 Abs. 2 ArbZG ergänzt – Aufzeichnung der Sonn- und Feiertagsarbeit bestätigen |
-| K-448 | `personal.arbeitszeit_aufzeichnung` | D.42 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-449 | `personal.arbeitszeit_aufzeichnung` | D.42 | Anforderungen an die Form (bis zur Neuregelung) fachlich formulieren |
-| K-450 | `personal.arbeitszeit_aufzeichnung` | D.42 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (Prüfergebnis Sifa 22.10.2026 – offen, Rechtsanwalt) |
-| K-451 | `personal.arbeitszeit_milog` | D.42 | Fristen (7. Tag, zwei Jahre Aufbewahrung) im Text ergänzt (R10, Rechtsprüfung bestätigt) – als Termin nicht abgebildet; laufend je Kalendermonat |
-| K-452 | `personal.arbeitszeit_milog` | D.42 | § 2a SchwarzArbG nach SchwarzArbMoDiG (R11, Rechtsprüfung T-99; TK, HWK Chemnitz, CMS): Friseur, Kosmetik, Lieferdienste neu, Forstwirtschaft und Fleischerhandwerk gestrichen – Liste im BGBl. gegenlesen |
-| K-453 | `personal.arbeitszeit_milog` | D.42 | Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen |
-| K-454 | `personal.arbeitszeit_neuregelung` | D.42 | Rechtsstand 21.10.2026: Referentenentwurf vom Juni 2026 in der Ressortabstimmung, kein Kabinettsbeschluss – Inkrafttreten 1.1.2027 laut Entwurf, nach Fachpresse unrealistisch; erwartet_ab und gueltig_ab nach Kabinettsbeschluss anpassen |
-| K-455 | `personal.arbeitszeit_neuregelung` | D.42 | Übergangsfristen laut Handwerksblatt (unter 250: zwei Jahre, unter 50: fünf Jahre; 1.10.2026 zusätzlich „ab 250 mindestens ein Jahr“) – gegen den Entwurfstext prüfen |
-| K-456 | `personal.arbeitszeit_neuregelung` | D.42 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-457 | `personal.arbeitszeit_neuregelung` | D.42 | Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“) |
-| K-458 | `personal.arbeitszeit_neuregelung` | D.42 | Schwelle 10 als Regelwert führen, sobald beschlossen |
-| K-459 | `personal.arbeitszeit_neuregelung` | D.42 | Vorbereitungs-Checkliste fachlich prüfen |
-| K-460 | `personal.aufenthaltstitel` | D.38 | Neu nach Nutzertest R11 (Gebäudereinigung): Prüfung vor Beginn und Kopie für die Dauer der Beschäftigung (§ 4a Abs. 5 S. 3 AufenthG) – Wortlaut bestätigen |
-| K-461 | `personal.aufenthaltstitel` | D.38 | Erinnerung zum Ablauf des Titels (Feld „gültig bis“ bei Mitarbeitern) noch nicht abgebildet |
-| K-462 | `personal.aufenthaltstitel` | D.38 | Folgen bei Nichterfüllung (§ 404 SGB III) – Sanktion fachlich ergänzen |
-| K-463 | `personal.aufenthaltstitel` | D.38 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 404 Abs. 2 Nr. 3 (Beschäftigung entgegen § 4a Abs. 5 AufenthG) und Abs. 3 über lxgesetze gelesen |
-| K-464 | `personal.aufenthaltstitel_laufend` | D.38 | Neu nach Nutzertest R12 (Kurier #7) – laufende Pflicht für die Dauer der Beschäftigung (§ 4a Abs. 5 AufenthG); Mitteilung bei vorzeitigem Ende binnen vier Wochen (§ 4a Abs. 5 S. 3 Nr. 3) unsicher |
-| K-465 | `personal.aufenthaltstitel_laufend` | D.38 | Sanktion § 404 Abs. 2 Nr. 3, Abs. 3 SGB III laut Zoll-Prüfung – bestätigen; Bußgeld für die fehlende Kopie (§ 98 AufenthG?) offen |
-| K-466 | `personal.ausbildungsverguetung` | D.39 | Neu nach Nutzertest R11 (Tischlerei) – Beträge je Ausbildungsjahr 2026/2027 als Regelwert ergänzen |
-| K-467 | `personal.aushangpflichtige_gesetze` | D.48 | Prüfergebnis Sifa 22.10.2026 umgesetzt (Liste je Belegschaft); abweichend vom Prüfergebnis gilt § 48 JArbSchG erst ab drei Jugendlichen (Wortlaut geprüft); Amtlos zeigt die Liste für alle, ohne nach Zahl der Frauen und Jugendlichen zu filtern |
-| K-468 | `personal.aushangpflichtige_gesetze` | D.48 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-469 | `personal.aushangpflichtige_gesetze` | D.48 | Folgen der übrigen Aushänge (AGG, MuSchG, JArbSchG) fachlich ergänzen |
-| K-470 | `personal.ausweis_hinweis` | D.38 | R12 (Rechtsprüfung Befund 13): Termin „spätestens bei Arbeitsbeginn“ statt Vortag; Mitführungspflicht auch für Inhaber und Selbstständige nach Zoll-Praxis („tätige Personen“, § 2a Abs. 1) – bestätigen; eigener Auslöser für Inhaber ohne Beschäftigte fehlt |
-| K-471 | `personal.ausweis_hinweis` | D.38 | Wortlaut § 2a Abs. 2 SchwarzArbG n. F. im BGBl. gegenlesen: „nachweislich und schriftlich“ und Aufbewahrung laut HWK Chemnitz; „vor Erbringung der Dienst- oder Werkleistung“ laut CMS (neu); Hinweispflicht bestand schon vor dem SchwarzArbMoDiG |
-| K-472 | `personal.ausweis_hinweis` | D.38 | Ob ein Satz im Arbeitsvertrag als Hinweis genügt – bestätigen |
-| K-473 | `personal.ausweis_hinweis` | D.38 | Bußgeld (§ 8 SchwarzArbG) – Nummer und Höhe fachlich ergänzen |
-| K-474 | `personal.azubi_ausbildungsnachweis` | D.45 | Neu nach Nutzertest R12 (Kfz #10) – „regelmäßig“ ohne festen Abstand; Folgen fachlich ergänzen |
-| K-475 | `personal.azubi_eintragung` | D.45 | Neu nach Nutzertest R12 (Kfz #10) – Termin „unverzüglich nach Vertragsschluss“ als spätestens Ausbildungsbeginn abgebildet; Bußgeld (§ 101 BBiG) fachlich ergänzen |
-| K-476 | `personal.beitragsnachweis` | D.40 | „Arbeitstage“ als Bankarbeitstage umgesetzt – bestätigen (G-13) |
-| K-477 | `personal.beitragsnachweis` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-478 | `personal.beitragsnachweis` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-479 | `personal.beitragsnachweis` | D.40 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (§ 111 Abs. 1 SGB IV (gelesen) nennt § 28f Abs. 3 nicht; Folgen (Schätzung durch die Einzugsstelle, Säumniszuschläge) fachlich klären) – nach Ergänzung wieder „hoch“ |
-| K-480 | `personal.betriebsnummer` | D.37 | „vor der ersten Einstellung“ als spätestens am Tag vor Arbeitsbeginn umgesetzt – bestätigen |
-| K-481 | `personal.betriebsnummer` | D.37 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-482 | `personal.betriebsnummer` | D.37 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-483 | `personal.betriebsnummer` | D.37 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-484 | `personal.bewacherregister` | A.3 | Neu nach Rechtsprüfung R12 (Befund 6) – § 11b GewO und § 16 BewachV geprüft; Folgen bei Nichterfüllung fachlich ergänzen |
-| K-485 | `personal.bewacherregister` | A.3 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-486 | `personal.entgelttransparenz_bericht` | D.47 | Rechtsstand 21.10.2026: kein deutsches Umsetzungsgesetz, kein veröffentlichter Referentenentwurf (BT-Drs. 21/7026: Vorbereitungen laufen) – nationale Stichtage und Schwellen nach Verkündung übernehmen |
-| K-487 | `personal.entgelttransparenz_bericht` | D.47 | Schwelle auf „mindestens 150“ (≥) korrigiert: Art. 9 Abs. 1 lit. b RL „150 bis 249 Arbeitnehmer“ (laut AfA und weiteren Quellen; Richtlinientext in EUR-Lex gegenlesen); Gruppe 100–149 (ab 2031) nicht als eigene Regel abgebildet |
-| K-488 | `personal.entgelttransparenz_bericht` | D.47 | Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie) |
-| K-489 | `personal.entgelttransparenz_bericht` | D.47 | Zählweise und Inhalt des Berichts nach Umsetzungsgesetz |
-| K-490 | `personal.entgelttransparenz_bericht` | D.47 | Vorbereitungs-Checkliste fachlich prüfen |
-| K-491 | `personal.fuehrerscheinkontrolle` | D.46 | Prüfergebnis Sifa 22.10.2026 (frei): halbjährlicher Rhythmus ist Praxis, keine Rechtsfrist (so im Text) – Vorlage „Führerscheinkontrolle je Fahrer“ mit Termin fehlt |
-| K-492 | `personal.hinweisgeber_meldestelle` | D.46 | Sanktion aus der Rechtsprüfung R11 (Befund 20): § 40 Abs. 2 Nr. 2, Abs. 6 HinSchG bis 20.000 € – bestätigen |
-| K-493 | `personal.hinweisgeber_meldestelle` | D.46 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-494 | `personal.hinweisgeber_meldestelle` | D.46 | Zählweise (G-05) |
-| K-495 | `personal.hinweisgeber_meldestelle` | D.46 | Übergangsregeln für 50–249 Beschäftigte noch relevant? |
-| K-496 | `personal.hinweisgeber_meldestelle` | D.46 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-497 | `personal.hinweisgeber_meldestelle` | D.46 | Vorprüfung 21.10.2026 (G-05): § 12 Abs. 2 HinSchG gelesen („in der Regel mindestens 50 Beschäftigten“); Begriff § 3 Abs. 8 HinSchG nicht abgerufen – Zählung nach Köpfen bestätigen |
-| K-498 | `personal.jugend_erstuntersuchung` | D.44 | Neu nach Prüfergebnis Sifa 22.10.2026 – Amtlos unterscheidet Jugendliche bei der Einstellung nicht (Aufgabe je Einstellung); Nummer in § 58 Abs. 1 JArbSchG für § 32 nicht einzeln geprüft; BR-Drs. 735/25 (NRW) will §§ 32, 33 ändern – nicht in Kraft, beobachten |
-| K-499 | `personal.jugend_nachuntersuchung` | D.44 | Prüfergebnis Sifa 22.10.2026: Bezug ist die Aufnahme der ersten Beschäftigung – Amtlos kennt nur die Einstellung und unterscheidet Jugendliche dabei nicht (Termin je Einstellung, Erinnerung drei Monate vorher = nach neun Monaten) |
-| K-500 | `personal.jugend_nachuntersuchung` | D.44 | Bußgeld (§ 58 JArbSchG) für § 33 nicht einzeln geprüft |
-| K-501 | `personal.jugendarbeitsschutz` | D.44 | R12 (Nutzertest Bäckerei #8): Bäckerei-Ausnahme § 14 Abs. 2 Nr. 4 und Abs. 3 JArbSchG (Wortlaut geprüft; der Nutzertest nannte Nr. 3); weitere Ausnahmen (Gaststätten, mehrschichtige Betriebe) nicht abgebildet |
-| K-502 | `personal.jugendarbeitsschutz` | D.44 | Erstuntersuchung als eigene Pflicht personal.jugend_erstuntersuchung (Prüfergebnis Sifa 22.10.2026) |
-| K-503 | `personal.jugendarbeitsschutz` | D.44 | § 22 und § 28a JArbSchG als Hinweis ergänzt (R11, Nutzertest Tischlerei) – Ausnahmen für Auszubildende (§ 22 Abs. 2) bestätigen |
-| K-504 | `personal.jugendarbeitsschutz` | D.44 | Arbeitszeitgrenzen als Regelwerte |
-| K-505 | `personal.jugendarbeitsschutz` | D.44 | Aushang § 47 und Arbeitszeitaushang § 48 JArbSchG nach Prüfergebnis Sifa 22.10.2026 ergänzt (§ 48 erst ab drei Jugendlichen, Wortlaut geprüft) |
-| K-506 | `personal.jugendarbeitsschutz` | D.44 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 58 Abs. 4 JArbSchG über gesetze.legal gelesen |
-| K-507 | `personal.lohnabrechnung` | D.49 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-508 | `personal.lohnabrechnung` | D.49 | Partner noch nicht gewählt (Abschnitt 5, Integration offen) |
-| K-509 | `personal.lohnabrechnung` | D.49 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-510 | `personal.lohnnachweis_bg` | D.40 | Neu nach Nutzertest R11 (Tischlerei; der Bericht nennt § 99 SGB IV, richtig SGB VII) – Termin 16.02. des Folgejahres aus dem DGUV-Verfahren, bestätigen; Abgrenzung zur UV-Jahresmeldung (§ 28a Abs. 2a SGB IV) |
-| K-511 | `personal.lohnsteuer_anmeldung` | D.40 | Grenzen nach § 41a Abs. 2 EStG (über 5.000 € monatlich, über 1.080 € vierteljährlich) aus der Steuerprüfung R11 (Befund 18) im Text – weiter als Angabe des Nutzers; Hochrechnung im ersten Jahr bestätigen |
-| K-512 | `personal.lohnsteuer_anmeldung` | D.40 | Verschiebung bei Fristende am Wochenende/Feiertag bestätigen |
-| K-513 | `personal.lohnsteuer_anmeldung` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-514 | `personal.lohnsteuer_anmeldung` | D.40 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-515 | `personal.mindestlohn` | D.39 | Rechtsstand 21.10.2026: 13,90 € ab 1.1.2026 und 14,60 € ab 1.1.2027 nach § 1 MiLoV5 vom 5.11.2025 bestätigt |
-| K-516 | `personal.mindestlohn` | D.39 | Sanktion nach Zoll-Prüfung R12 (Befund 17): § 21 Abs. 1 Nr. 9, Abs. 3 MiLoG |
-| K-517 | `personal.mindestlohn` | D.39 | Branchenmindestlöhne (AEntG, allgemeinverbindliche Tarifverträge) nur als Hinweis ohne Beträge (R11, Nutzertest Gebäudereinigung) – Branchen, Lohngruppen und Beträge 2026/2027 sowie Aufzeichnungspflicht nach § 19 AEntG fachlich ergänzen |
-| K-518 | `personal.mindestlohn` | D.39 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-519 | `personal.mindestlohn` | D.39 | Ausnahmen (z. B. Azubis, Praktika) als Hinweis ergänzen? |
-| K-520 | `personal.mindestlohn` | D.39 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-521 | `personal.minijob_grenze` | D.39 | Rechtsstand 21.10.2026: 633 € ab 1.1.2027 folgt aus § 8 Abs. 1a SGB IV (14,60 € × 130 / 3, aufgerundet); Bekanntmachung des BMAS im Bundesanzeiger für 2027 steht noch aus – nach Veröffentlichung Quelle ergänzen; Übergangsbereich 2027: 633,01 € bis 2.000 € |
-| K-522 | `personal.minijob_grenze` | D.39 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-523 | `personal.minijob_grenze` | D.39 | Folgen bei Überschreiten (gelegentliches Überschreiten) ergänzen |
-| K-524 | `personal.minijob_grenze` | D.39 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-525 | `personal.minijob_grenze` | D.39 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-526 | `personal.mutterschutz_gefaehrdungsbeurteilung` | D.43 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-527 | `personal.nachtarbeit` | D.42 | Neu nach Nutzertest R12 (Bäckerei #2) – Folgen fachlich ergänzen (§ 6 Abs. 3 ArbZG steht nicht in § 22 Abs. 1 ArbZG); Gefährdungsbaustein Nachtarbeit fehlt |
-| K-528 | `personal.nachtarbeit` | D.42 | Prüfergebnis Sifa 22.10.2026: Untersuchung nach § 6 Abs. 3 ArbZG ist keine Vorsorge nach ArbMedVV; Auslöser über die Frage „regelmäßig nachts“ mit Hilfetext nach § 2 Abs. 5 ArbZG – eigene Angabe „Nachtarbeitnehmer“ wäre genauer |
-| K-529 | `personal.nachunternehmerhaftung` | D.39 | Neu nach Nutzertests R12 (Kurier #5, Zoll #13) – § 28e Abs. 3a ff. SGB IV (Bau, Auftragswert) und Abs. 3f/3g (Paketboten-Schutz-Gesetz: Pakete bis 32 kg, Fahrzeuge bis 3,5 t?) fachlich prüfen; Apotheken-Botenfahrten als Pakete? |
-| K-530 | `personal.nachunternehmerhaftung` | D.39 | Unfallversicherung (§ 150 Abs. 3 SGB VII) unsicher; Präqualifikation als Entlastung; Branchenmindestlöhne (AEntG) nicht abgebildet |
-| K-531 | `personal.nachweisgesetz` | D.41 | Zulässige Form (Schriftform/elektronisch) aktuell? |
-| K-532 | `personal.nachweisgesetz` | D.41 | Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen |
-| K-533 | `personal.nachweisgesetz` | D.41 | Vorprüfung 21.10.2026 (T-50): Auslöser auch bei geplanter Einstellung (Ereignis „einstellung“ mit künftigem Arbeitsbeginn); Fristen nach § 2 Abs. 1 Satz 9 NachwG gelesen (Nr. 1, 7, 8 erster Arbeitstag; Nr. 2–6, 9, 10 siebter Kalendertag; übrige ein Monat) – Termin bleibt der erste Arbeitstag für alle Angaben |
-| K-534 | `personal.schwangerschaft_mitteilung` | D.43 | Zuständige Behörde je Land |
-| K-535 | `personal.schwangerschaft_mitteilung` | D.43 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 32 Abs. 1 Nr. 11 (§ 27 Abs. 1 Satz 1) und Abs. 2 über gesetze.legal gelesen |
-| K-536 | `personal.schwerbehinderte_anzeige` | D.45 | Quote und Höhe der Abgabe als Regelwerte |
-| K-537 | `personal.schwerbehinderte_anzeige` | D.45 | Verschiebung bei 31.3. am Wochenende |
-| K-538 | `personal.schwerbehinderte_anzeige` | D.45 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-539 | `personal.schwerbehinderte_anzeige` | D.45 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-540 | `personal.schwerbehinderte_anzeige` | D.45 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-541 | `personal.schwerbehinderte_anzeige` | D.45 | Vorprüfung 21.10.2026 (G-05/T-16): Zählweise nach § 156 Abs. 1, 3 SGB IX (gelesen) – unter 18 Wochenstunden und bis acht Wochen zählen nicht; Teilzeit ab 18 Std. voll, nicht anteilig (der Prüfbericht nennt „Teilzeit anteilig“ – das gilt für § 23 KSchG, nicht für das SGB IX). Ausbildungsstellen nach § 157 Abs. 1 SGB IX nicht abgerufen. Die App zählt keine Arbeitsplätze (abgeleitet.beschaeftigte.arbeitsplaetze_sgb9 bleibt unbekannt), die Zahl der Beschäftigten dient nur als Obergrenze – bestätigen; Einzelvorschriften §§ 154, 163 SGB IX ohne Abruf zugeordnet |
-| K-542 | `personal.sofortmeldung` | D.38 | „Bei Arbeitsbeginn“ als spätestens am Tag des Beginns umgesetzt – bestätigen |
-| K-543 | `personal.sofortmeldung` | D.38 | Branchenliste nach SchwarzArbMoDiG (R11, Rechtsprüfung; bestätigt durch TK, HWK Chemnitz, CMS): neu Friseur, Kosmetik, plattformbasierte Lieferdienste; Forstwirtschaft und Fleischerhandwerk gestrichen (laut HWK „befristet“) – Wortlaut im BGBl. gegenlesen; Inkrafttreten 30.12.2025 (HWK) bzw. 1.1.2026 (TK, CMS); Nagelstudios dem Kosmetikgewerbe zugeordnet; Zuordnung von Elektro- und Ausbaugewerken zum Baugewerbe offen |
-| K-544 | `personal.sofortmeldung` | D.38 | Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen |
-| K-545 | `personal.statusfeststellung_auftraggeber` | A.12 | Neu nach Nutzertest R12 (Kurier #6) – Folgen (§ 28e, § 25 SGB IV, § 266a StGB) bestätigen |
-| K-546 | `personal.sv_abmeldung` | D.38 | Frist nach Rechtsprüfung R11 (Befund 4): mit der nächsten Entgeltabrechnung, spätestens sechs Wochen nach Ende (§ 8 DEÜV) – als sechs Wochen nach dem Austritt abgebildet; bestätigen |
-| K-547 | `personal.sv_abmeldung` | D.38 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-548 | `personal.sv_abmeldung` | D.38 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 111 Abs. 1 Nr. 2 (Meldungen nach § 28a) und Abs. 4 gelesen |
-| K-549 | `personal.sv_anmeldung` | D.38 | Frist nach § 6 DEÜV (erste Entgeltabrechnung, spätestens sechs Wochen) als „spätestens sechs Wochen nach Beginn“ umgesetzt (R10, Rechtsprüfung) – die frühere Abrechnung als Termin ist nicht abgebildet |
-| K-550 | `personal.sv_anmeldung` | D.38 | Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen |
-| K-551 | `personal.sv_anmeldung` | D.38 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-552 | `personal.sv_beitraege` | D.40 | Minijobs: Fälligkeit bei der Minijob-Zentrale gleich? |
-| K-553 | `personal.sv_beitraege` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-554 | `personal.sv_beitraege` | D.40 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 24 Abs. 1 SGB IV gelesen; § 266a StGB nicht abgerufen (wie in personal.statusfeststellung_auftraggeber) |
-| K-555 | `personal.sv_jahresmeldung` | D.38 | Termin 15.02. des Folgejahres nach Rechtsprüfung R11 (Befund 5, § 10 DEÜV) – Verschiebung bei Wochenende bestätigen |
-| K-556 | `personal.sv_jahresmeldung` | D.38 | UV-Jahresmeldung (§ 28a Abs. 2a SGB IV) gesondert – Termin unsicher, prüfen |
-| K-557 | `personal.sv_jahresmeldung` | D.38 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-558 | `personal.sv_jahresmeldung` | D.38 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-559 | `personal.umlagen_eau` | D.40 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-560 | `personal.umlagen_eau` | D.40 | Welche Umlage gilt für wen (z. B. U1 nach Betriebsgröße) – fachlich ergänzen |
-| K-561 | `personal.umlagen_eau` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-562 | `personal.umlagen_eau` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-563 | `produkte.barrierefreiheit` | G.70 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-564 | `produkte.barrierefreiheit` | G.70 | Produktliste (§ 1 BFSG) als Auswahl ergänzen |
-| K-565 | `produkte.barrierefreiheit` | G.70 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-566 | `produkte.batterien` | G.72 | Rückfrage „selbst erstmals in Deutschland in Verkehr (Herstellung, Eigenmarke, Import)“ vor dem Auslösen (R10, K-430) – Installateur mit Einkauf im inländischen Großhandel als Nicht-Hersteller bestätigen; Pflichten als Vertreiber (Rücknahme) nicht abgebildet |
-| K-567 | `produkte.batterien` | G.72 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-568 | `produkte.batterien` | G.72 | Zuständige Stelle und Registrierungsweg ergänzen |
-| K-569 | `produkte.batterien` | G.72 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-570 | `produkte.batterien` | G.72 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-571 | `produkte.elektrogeraete` | G.72 | Rückfrage „selbst erstmals in Deutschland in Verkehr (Herstellung, Eigenmarke, Import)“ vor dem Auslösen (R10, K-430) – Installateur mit Einkauf im inländischen Großhandel als Nicht-Hersteller bestätigen; Pflichten als Vertreiber (Rücknahme) nicht abgebildet |
-| K-572 | `produkte.elektrogeraete` | G.72 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-573 | `produkte.elektrogeraete` | G.72 | Wer gilt als Hersteller (Import, Eigenmarke)? |
-| K-574 | `produkte.elektrogeraete` | G.72 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-575 | `produkte.elektrogeraete` | G.72 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-576 | `produkte.geldwaesche_gueterhaendler` | G.75 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-577 | `produkte.geldwaesche_gueterhaendler` | G.75 | Bargeldobergrenze 10.000 € ab 10.07.2027 nach AMLR (VO (EU) 2024/1624) – unsicher, als Radar prüfen |
-| K-578 | `produkte.geldwaesche_gueterhaendler` | G.75 | Immobilien- und Finanzbranche als Branchenmodul (H) |
-| K-579 | `produkte.geldwaesche_gueterhaendler` | G.75 | Vorprüfung 21.10.2026 (G.75): Schwellen § 10 Abs. 6a Nr. 1 Buchst. a–c GwG über gesetze.legal gelesen (10.000 € bar, 2.000 € bei hochwertigen Gütern nach § 1 Abs. 10 Satz 2 Nr. 1, 10.000 € Kunst) – dass Nr. 1 die Edelmetalle meint, noch gegen § 1 Abs. 10 GwG lesen |
-| K-580 | `produkte.geldwaesche_gueterhaendler` | G.75 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 56 Abs. 1 Nr. 15 (Identifizierung), Abs. 1 und 3 über gesetze.legal gelesen |
-| K-581 | `produkte.gpsr` | G.73 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-582 | `produkte.gpsr` | G.73 | Pflichten für Händler vs. Hersteller trennen |
-| K-583 | `produkte.gpsr` | G.73 | Lebensmittel als Auslöser entfernt (Art. 2 Abs. 3 GPSR, R10); Abgrenzung zur Kosmetikverordnung offen – bei Kosmetik geht die Kosmetikverordnung vor, GPSR nur ergänzend (Art. 2 Abs. 1); Umfang nach Art. 19 GPSR prüfen (Nutzertest Kosmetik R11) |
-| K-584 | `produkte.gpsr` | G.73 | Händlerin fremder Markenware im Laden ohne Fernabsatz: nur Sorgfaltspflichten nach Art. 12 – Auslöser auf Hersteller/Importeur/Fernabsatz einschränken? Schwere „hoch“ für Händler angemessen? |
-| K-585 | `produkte.gpsr` | G.73 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-586 | `produkte.gpsr` | G.73 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-587 | `produkte.starterbatterien_ruecknahme` | G.72 | Neu nach Nutzertest R12 (Kfz #7) – Rücknahme nach § 18 BattDG geprüft; Pfand auf Starterbatterien (früher § 10 BattG) unter dem BattDG unsicher; Händlerpflichten für Gerätebatterien nicht abgebildet |
-| K-588 | `produkte.verpackung` | G.71 | Rechtsstand 21.10.2026: Rechtsgrundlage von VerpackG auf §§ 6, 7 VerpackDG umgestellt (Inhaltsübersicht VerpackDG, IHK Karlsruhe); Wortlaut von §§ 6, 7 nicht abgerufen – Zeitpunkt „vor dem ersten Inverkehrbringen“ und Abgrenzung systembeteiligungspflichtig gegen den Gesetzestext lesen |
-| K-589 | `produkte.verpackung` | G.71 | Neue Herstellerpflichten aus der PPWR (z. B. Herstellerregister nach Art. 44, Kennzeichnung) und B2B-Verpackungen (§ 68 Abs. 9 VerpackDG, Übergang bis 31.12.2027) nicht abgebildet |
-| K-590 | `produkte.verpackung` | G.71 | „Vor dem ersten Inverkehrbringen“ als Frist mit Ereignis abbilden? |
-| K-591 | `produkte.verpackung` | G.71 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 66 Abs. 1 Nr. 1 (Registrierung, § 6) und Nr. 3 (Systembeteiligung, § 7), Abs. 3 gelesen |
-| K-592 | `steuern.aufbewahrung` | C.32 | Fristbeginn (Ende des Kalenderjahres) und Aufbewahrungsdauern als Regelwerte führen |
-| K-593 | `steuern.aufbewahrung` | C.32 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-594 | `steuern.aufbewahrung` | C.32 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-595 | `steuern.bauabzugsteuer_freistellung` | C.35 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-596 | `steuern.bauabzugsteuer_freistellung` | C.35 | Auch Handwerksbetriebe mit Bauleistungen erfassen (Branche handwerk)? |
-| K-597 | `steuern.bauabzugsteuer_freistellung` | C.35 | Gültigkeitsdauer der Bescheinigung und Erneuerung ergänzen |
-| K-598 | `steuern.bauabzugsteuer_freistellung` | C.35 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-599 | `steuern.buchfuehrungspflicht` | C.28 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-600 | `steuern.buchfuehrungspflicht` | C.28 | e. K. nach § 241a HGB (R10, Steuerprüfung): Zwei-Jahres-Betrachtung vereinfacht über das Vorjahr bzw. im Gründungsjahr über die Schätzung; Jahresüberschuss = angegebener Gewinn |
-| K-601 | `steuern.buchfuehrungspflicht` | C.28 | Im Gründungsjahr und vor dem Start gibt es keine Vorjahreswerte – § 141-Grenzen dann als nicht überschritten behandelt |
-| K-602 | `steuern.buchfuehrungspflicht` | C.28 | § 141 AO erst nach Mitteilung des Finanzamts (§ 141 Abs. 2 AO) über die Frage „Mitteilung erhalten?“ umgesetzt (R10, Steuerprüfung) |
-| K-603 | `steuern.buchfuehrungspflicht` | C.28 | Grenze inklusive/exklusive |
-| K-604 | `steuern.buchfuehrungspflicht` | C.28 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-605 | `steuern.buchfuehrungspflicht` | C.28 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-606 | `steuern.buchfuehrungspflicht` | C.28 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-607 | `steuern.e_bilanz` | B.18 | Frist (gekoppelt an die Steuererklärung) als Regeldaten ergänzen |
-| K-608 | `steuern.e_bilanz` | B.18 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-609 | `steuern.e_bilanz` | B.18 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-610 | `steuern.e_rechnung_empfang` | C.30 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-611 | `steuern.e_rechnung_empfang` | C.30 | Gilt für alle Unternehmen, auch Kleinunternehmer – bestätigen |
-| K-612 | `steuern.e_rechnung_empfang` | C.30 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-613 | `steuern.e_rechnung_empfang` | C.30 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-614 | `steuern.e_rechnung_versand_2027` | C.30 | Maßgeblich ist der Umsatz 2026: bis 2026 wird auch die Prognose herangezogen – bestätigen |
-| K-615 | `steuern.e_rechnung_versand_2027` | C.30 | Rechtsstatus und gueltig_ab festlegen |
-| K-616 | `steuern.e_rechnung_versand_2027` | C.30 | Vorprüfung 21.10.2026: Sanktion ergänzt – § 26a UStG ohne Tatbestand zur Form der E-Rechnung; § 15 Abs. 1 Satz 1 Nr. 1 Satz 2 UStG über lxgesetze gelesen. Ob eine Papierrechnung im Pflichtbereich als „nicht ausgestellt“ im Sinne von § 26a Abs. 2 Nr. 1 gilt, offen |
-| K-617 | `steuern.e_rechnung_versand_2027` | C.30 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-618 | `steuern.e_rechnung_versand_2028` | C.30 | Rechtsstatus und gueltig_ab festlegen |
-| K-619 | `steuern.e_rechnung_versand_2028` | C.30 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-620 | `steuern.est_erklaerung` | C.27 | Fristen nach § 149 Abs. 2 und 3 AO ergänzt (E-129, Quelle Recherche 13.10.2026 über dejure.org und Finanzamt BW) – gegen amtliche Fassung prüfen |
-| K-621 | `steuern.est_erklaerung` | C.27 | Übergangsfristen Art. 97 § 36 EGAO (Veranlagungszeiträume bis 2024) sind nicht abgebildet – ab Veranlagungszeitraum 2025 gilt § 149 AO regulär |
-| K-622 | `steuern.est_erklaerung` | C.27 | Vorabanforderung nach § 149 Abs. 4 AO (frühere Frist im Einzelfall) und Fristverlängerung auf Antrag nicht abgebildet |
-| K-623 | `steuern.est_erklaerung` | C.27 | Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO – Feiertagskalender des Bundeslands prüfen |
-| K-624 | `steuern.est_erklaerung` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-625 | `steuern.est_erklaerung` | C.27 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-626 | `steuern.euer` | C.27 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-627 | `steuern.euer` | C.27 | Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender I) |
-| K-628 | `steuern.euer` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-629 | `steuern.euer` | C.27 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-630 | `steuern.feststellungserklaerung` | C.27 | Neu nach Steuerprüfung R10 (§ 180 AO, eindeutig); Fristen wie bei der Einkommensteuer (§ 149 AO über § 181 Abs. 1 AO) übernommen – bestätigen |
-| K-631 | `steuern.feststellungserklaerung` | C.27 | Ausnahme für Gesellschaften mit nur einem Beteiligten bzw. Fälle ohne Feststellung (§ 180 Abs. 3 AO) nicht abgebildet |
-| K-632 | `steuern.feststellungserklaerung` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-633 | `steuern.gewst_erklaerung` | C.27 | Einzelunternehmen und Personengesellschaften nur bei Gewerbeertrag über 24.500 € (§ 25 Abs. 1 Nr. 1 GewStDV), sonst auf Aufforderung des Finanzamts oder zur Feststellung eines Verlusts – Gewinn als Näherung für den Gewerbeertrag (Hinzurechnungen nicht berücksichtigt); Nutzertests R11 Kosmetik und Gründerin, bestätigen |
-| K-634 | `steuern.gewst_erklaerung` | C.27 | Fristen nach § 149 Abs. 2 und 3 AO ergänzt (E-129, Quelle Recherche 13.10.2026 über dejure.org und Finanzamt BW) – gegen amtliche Fassung prüfen |
-| K-635 | `steuern.gewst_erklaerung` | C.27 | Übergangsfristen Art. 97 § 36 EGAO (Veranlagungszeiträume bis 2024) sind nicht abgebildet – ab Veranlagungszeitraum 2025 gilt § 149 AO regulär |
-| K-636 | `steuern.gewst_erklaerung` | C.27 | Vorabanforderung nach § 149 Abs. 4 AO (frühere Frist im Einzelfall) und Fristverlängerung auf Antrag nicht abgebildet |
-| K-637 | `steuern.gewst_erklaerung` | C.27 | Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO – Feiertagskalender des Bundeslands prüfen |
-| K-638 | `steuern.gewst_erklaerung` | C.27 | Freibetrag (C.34) als Regelwert führen |
-| K-639 | `steuern.gewst_erklaerung` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-640 | `steuern.gewst_erklaerung` | C.27 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-641 | `steuern.gobd_verfahrensdokumentation` | C.31 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-642 | `steuern.gobd_verfahrensdokumentation` | C.31 | Fundstelle des aktuellen GoBD-Schreibens ergänzen |
-| K-643 | `steuern.gobd_verfahrensdokumentation` | C.31 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-644 | `steuern.gobd_verfahrensdokumentation` | C.31 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-645 | `steuern.kasse_tse_belegausgabe` | C.33 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-646 | `steuern.kasse_tse_belegausgabe` | C.33 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-647 | `steuern.kasse_tse_belegausgabe` | C.33 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-648 | `steuern.kassenmeldung` | C.33 | Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO (Steuerprüfung R11 Befund 19, „dürfte greifen“, unsicher) – bestätigen |
-| K-649 | `steuern.kassenmeldung` | C.33 | Bestandskassen (Meldefrist 31.7.2025): Pflicht für Kassen ohne gemeldetes Anschaffungsdatum abbilden |
-| K-650 | `steuern.kassenmeldung` | C.33 | Verschiebung bei Fristende am Wochenende festlegen |
-| K-651 | `steuern.kassenmeldung` | C.33 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-652 | `steuern.kassenmeldung` | C.33 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (§ 379 Abs. 1 Satz 1 AO (gelesen auf gesetze-im-internet) nennt § 146a nur mit Abs. 1 (Nr. 4–6: Verwendung, Schutz, Vertrieb); Nr. 7 betrifft die Aufbewahrung nach § 147 AO. Eine Bußgeldnorm für die Mitteilung nach § 146a Abs. 4 AO wurde nicht gefunden – der Vorschlag „§ 379 Abs. 1 Nr. 7 AO, bis 25.000 €“ aus dem Prüfbericht trifft nicht zu) – nach Ergänzung wieder „hoch“ |
-| K-653 | `steuern.kassenmeldung_ausserbetriebnahme` | C.33 | Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO (Steuerprüfung R11 Befund 19, „dürfte greifen“, unsicher) – bestätigen |
-| K-654 | `steuern.kassenmeldung_ausserbetriebnahme` | C.33 | Mehrere Kassen: je Ereignis eine Meldung (derzeit Bezug auf die erste Außerbetriebnahme) |
-| K-655 | `steuern.kassenmeldung_ausserbetriebnahme` | C.33 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-656 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-657 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Vor dem Start gibt es keinen Vorjahresumsatz – Vorjahresgrenze dann nicht geprüft |
-| K-658 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Prognose statt tatsächlicher Umsatz: bis Abschnitt 4 nur Profilangaben – Formulierung „nach deinen Angaben“ bestätigen |
-| K-659 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Grenze inklusive/exklusive (K-18) |
-| K-660 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-661 | `steuern.kleinunternehmer_naechstes_jahr` | C.23 | Neu (R10): Folgen der Regelbesteuerung ab 1.1. (Rechnungen mit USt, Voranmeldung, Vorsteuerabzug) – Formulierung und Vollständigkeit bestätigen, z. B. Rhythmus der Voranmeldung im Folgejahr |
-| K-662 | `steuern.kleinunternehmer_naechstes_jahr` | C.23 | Prognose statt tatsächlicher Umsatz – Formulierung „nach deinen Angaben“ bestätigen |
-| K-663 | `steuern.kleinunternehmer_naechstes_jahr` | C.23 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-664 | `steuern.kleinunternehmer_warnung_80` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-665 | `steuern.kleinunternehmer_warnung_80` | C.23 | Umsatzbegriff für die Grenze (G-06): Summe der gestellten Rechnungen (netto, abzüglich Stornos) im Kalenderjahr nach Rechnungsdatum – bestätigen |
-| K-666 | `steuern.kleinunternehmer_warnung_80` | C.23 | Warnstufen 80 % und 95 % aus der Spezifikation |
-| K-667 | `steuern.kleinunternehmer_warnung_80` | C.23 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-668 | `steuern.kleinunternehmer_warnung_95` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-669 | `steuern.kleinunternehmer_warnung_95` | C.23 | Umsatzbegriff für die Grenze (G-06): Summe der gestellten Rechnungen (netto, abzüglich Stornos) im Kalenderjahr nach Rechnungsdatum – bestätigen |
-| K-670 | `steuern.kleinunternehmer_warnung_95` | C.23 | Warnstufen 80 % und 95 % aus der Spezifikation |
-| K-671 | `steuern.kleinunternehmer_warnung_95` | C.23 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
-| K-672 | `steuern.kleinunternehmerregelung` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-673 | `steuern.kleinunternehmerregelung` | C.23 | Echtzeit-Warnungen bei 80 % und 95 % (Spezifikation C.23) folgen in Abschnitt 4 mit Finanzdaten |
-| K-674 | `steuern.kst_erklaerung` | B.19 | Fristen nach § 149 Abs. 2 und 3 AO ergänzt (E-129, Quelle Recherche 13.10.2026 über dejure.org und Finanzamt BW) – gegen amtliche Fassung prüfen |
-| K-675 | `steuern.kst_erklaerung` | B.19 | Übergangsfristen Art. 97 § 36 EGAO (Veranlagungszeiträume bis 2024) sind nicht abgebildet – ab Veranlagungszeitraum 2025 gilt § 149 AO regulär |
-| K-676 | `steuern.kst_erklaerung` | B.19 | Vorabanforderung nach § 149 Abs. 4 AO (frühere Frist im Einzelfall) und Fristverlängerung auf Antrag nicht abgebildet |
-| K-677 | `steuern.kst_erklaerung` | B.19 | Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO – Feiertagskalender des Bundeslands prüfen |
-| K-678 | `steuern.kst_erklaerung` | B.19 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-679 | `steuern.kst_erklaerung` | B.19 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-680 | `steuern.kst_erklaerung` | B.19 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-681 | `steuern.oss_erklaerung` | C.36 | Auslöser: die Lieferschwelle (10.000 € EU-weit, § 3c Abs. 4 UStG) fragt der Check nicht ab – die Pflicht „kommt in Frage“ bei B2C-Kunden in der EU mit Online- bzw. Fernabsatz; Kleinunternehmer ausgenommen |
-| K-682 | `steuern.oss_erklaerung` | C.36 | Frist: letzter Tag des Folgemonats (§ 18j Abs. 4 UStG), keine Verschiebung nach § 108 Abs. 3 AO (EU-einheitlich, BZSt) – bestätigen |
-| K-683 | `steuern.oss_erklaerung` | C.36 | Folgen bei Verspätung (Erinnerung, Ausschluss nach Art. 58b MwSt-DVO 282/2011) fachlich bestätigen |
-| K-684 | `steuern.rechnungen_pflichtangaben` | C.29 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-685 | `steuern.rechnungen_pflichtangaben` | C.29 | Liste der Pflichtangaben und Kleinbetragsgrenze als Inhalt ergänzen |
-| K-686 | `steuern.rechnungen_pflichtangaben` | C.29 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-687 | `steuern.ust_jahreserklaerung` | C.27 | Fristen nach § 149 Abs. 2 und 3 AO ergänzt (E-129, Quelle Recherche 13.10.2026 über dejure.org und Finanzamt BW) – gegen amtliche Fassung prüfen |
-| K-688 | `steuern.ust_jahreserklaerung` | C.27 | Übergangsfristen Art. 97 § 36 EGAO (Veranlagungszeiträume bis 2024) sind nicht abgebildet – ab Veranlagungszeitraum 2025 gilt § 149 AO regulär |
-| K-689 | `steuern.ust_jahreserklaerung` | C.27 | Vorabanforderung nach § 149 Abs. 4 AO (frühere Frist im Einzelfall) und Fristverlängerung auf Antrag nicht abgebildet |
-| K-690 | `steuern.ust_jahreserklaerung` | C.27 | Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO – Feiertagskalender des Bundeslands prüfen |
-| K-691 | `steuern.ust_jahreserklaerung` | C.27 | Kleinunternehmer: Erklärungspflicht prüfen |
-| K-692 | `steuern.ust_jahreserklaerung` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-693 | `steuern.ust_sondervorauszahlung` | C.24 | Termin 10.02. und 1/11 der Vorjahres-Vorauszahlungen ergänzt (R10, Steuerprüfung) – Verschiebung auf den nächsten Werktag bestätigen |
-| K-694 | `steuern.ust_sondervorauszahlung` | C.24 | Nur Monatszahler (§§ 46–48 UStDV, Steuerprüfung R11 Befund 17) – Auslöser über Rhythmus „monatlich“ oder Vorjahressteuer; Text zu Kz 39 in der App beim Steuer-Agenten |
-| K-695 | `steuern.ust_sondervorauszahlung` | C.24 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-696 | `steuern.ust_va_neugruender_radar` | C.21 | Rechtsstand 21.10.2026: Satz 6 im Gesetzestext weiter „2021 bis 2026“, keine Verlängerung gefunden; Status auf „beschlossen“ (Rückkehr zu Satz 4 ergibt sich aus dem geltenden Gesetz) – bis Jahresende auf Verlängerung im Jahressteuergesetz achten |
-| K-697 | `steuern.ust_va_neugruender_radar` | C.21 | Gründung 2026: ob 2027 als „folgendes Kalenderjahr“ monatlich anzumelden ist, ohne Verwaltungsanweisung – mit BMF/Finanzamt klären |
-| K-698 | `steuern.ust_va_neugruender_radar` | C.21 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-699 | `steuern.ust_va_neugruender_radar` | C.21 | Wahrscheinlichkeit „hoch“ gesetzt (geltendes Recht, Verlängerung offen) – bestätigen |
-| K-700 | `steuern.ust_va_neugruender_radar` | C.21 | Vorbereitungs-Checkliste fachlich prüfen |
-| K-701 | `steuern.ust_voranmeldung` | C.24 | R10: Pflicht gilt bei Umsatz über der Kleinunternehmergrenze ohne Regelung nach § 19 auch ohne bekannte Vorjahres-Zahllast (Hinweis Nutzertest) – Sonderfälle (Befreiung bis 2.000 €) bestätigen |
-| K-702 | `steuern.ust_voranmeldung` | C.24 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (früherer Text war nicht belegt) |
-| K-703 | `steuern.ust_voranmeldung` | C.24 | Befreiung bis Grenze ist laut Spezifikation 'möglich' (Ermessen Finanzamt?) – Auslöser bildet das als 'gilt nicht' ab; Formulierung prüfen |
-| K-704 | `steuern.ust_voranmeldung` | C.24 | Neugründer: Aussetzung der monatlichen Pflicht 2021–2026 (Radar) – Rhythmus im Gründungs- und Folgejahr festlegen |
-| K-705 | `steuern.ust_voranmeldung` | C.24 | R12 (UX #3): Rhythmus „weiß ich nicht“ ohne Vorjahressteuer ⇒ vorläufig vierteljährlich (Produktentscheidung) – Rechtsfolge durch die Steuerprüfung bestätigen |
-| K-706 | `steuern.ust_voranmeldung` | C.24 | Sondervorauszahlung 1/11 bei monatlicher Dauerfristverlängerung als eigene Pflicht anlegen |
-| K-707 | `steuern.ust_voranmeldung` | C.24 | Verschiebung auf nächsten Werktag und Feiertagskalender (Bundesland) bestätigen |
-| K-708 | `steuern.ust_voranmeldung` | C.24 | gueltig_ab: Datum der heutigen Fassung der Grenzen eintragen |
-| K-709 | `steuern.vorauszahlung_est_kst` | C.26 | Verschiebung auf den nächsten Werktag bei Zahlungsterminen bestätigen |
-| K-710 | `steuern.vorauszahlung_est_kst` | C.26 | Schonfrist bei Überweisung erwähnen? |
-| K-711 | `steuern.vorauszahlung_est_kst` | C.26 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-712 | `steuern.vorauszahlung_est_kst` | C.26 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-713 | `steuern.vorauszahlung_gewst` | C.26 | Verschiebung und Kalender (Gemeinde) bestätigen |
-| K-714 | `steuern.vorauszahlung_gewst` | C.26 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-715 | `steuern.vorauszahlung_gewst` | C.26 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-716 | `steuern.zusammenfassende_meldung` | C.25 | Termine nach Steuerprüfung R11 (Befund 16): 25. nach Ablauf des Meldezeitraums; nur sonstige Leistungen vierteljährlich, mit Warenlieferungen monatlich (Wahl vierteljährlich bis 50.000 € je Quartal nicht abgefragt); Verschiebung nach § 108 Abs. 3 AO bestätigen |
-| K-717 | `steuern.zusammenfassende_meldung` | C.25 | Kleinunternehmer ausgenommen (§ 18a Abs. 4 UStG, Steuerprüfung R11 „eindeutig“) |
-| K-718 | `steuern.zusammenfassende_meldung` | C.25 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-719 | `steuern.zusammenfassende_meldung` | C.25 | Steuerliche Prüfung 21.10.2026 (C-9): Pflicht mit Frist bestätigt; Zuordnung in der Vorlage – Lieferungen nach Rechnungsdatum (spätestens Monat nach der Lieferung, § 18a Abs. 8 UStG), sonstige Leistungen nach Ausführung – bestätigen |
-| K-720 | `umwelt.altoel_ruecknahme` | U.3 | Neu nach Nutzertest R12 (Kfz #1) – § 8 Abs. 1 AltölV geprüft; Annahme bis zur Menge des gekauften Öls (§ 8 Abs. 2) und Folgen fachlich ergänzen |
-| K-721 | `umwelt.gefaehrliche_abfaelle` | U.2 | Neu nach Nutzertest R12 (Kfz #1) – § 9a KrWG (Vermischungsverbot) bestätigen; Kleinmengen unter 2 t im Jahr (§ 2 Abs. 2 NachwV): Nachweisführung entfällt, Übernahmescheine und Register bleiben? unsicher |
-| K-722 | `umwelt.gefaehrliche_abfaelle` | U.2 | Folgen bei Nichterfüllung fachlich ergänzen |
-| K-723 | `umwelt.gefaehrliche_abfaelle` | U.2 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
-| K-724 | `umwelt.gewerbeabfall` | U.1 | Neu nach Nutzertest R12 (Kfz #1, § 3 GewAbfV) – Auslöser über eine Betriebsstätte außerhalb der Wohnung; Kleinstbetriebe, die nur Behälter der Gemeinde nutzen, abgrenzen |
-| K-725 | `umwelt.gewerbeabfall` | U.1 | Ausnahmen (§ 3 Abs. 2) und Dokumentationsform (§ 3 Abs. 3) bestätigen; Folgen (§ 13 GewAbfV) fachlich ergänzen |
-| K-726 | `umwelt.klima_sachkunde` | U.5 | Neu nach Nutzertest R12 (Kfz #2) – genaue Artikel der VO (EU) 2024/573 und § 5 ChemKlimaschutzV, Übergangsregeln für ältere Bescheinigungen unsicher; Folgen fachlich ergänzen |
-| K-727 | `umwelt.oelabscheider` | U.4 | Neu nach Nutzertest R12 (Kfz #1) nur als Hinweis – Anhang 49 AbwV, Generalinspektion alle 5 Jahre nach DIN 1999-100 und Eigenkontrolle unsicher |
-| K-728 | `umwelt.oelabscheider` | U.4 | AwSV für die Lagerung von Frisch- und Altöl (Schwellen) unsicher |
-| K-729 | `datenschutz.dsb.schwelle_personen@1` | F.61 | gueltig_ab ist Platzhalter |
-| K-730 | `datenschutz.dsb.schwelle_personen@1` | F.61 | Geplante Streichung bis Ende 2026 (Radar F.61) – gueltig_bis setzen, sobald beschlossen |
-| K-731 | `gesellschaft.gmbh.stammkapital_mindest@1` | B.14 | gueltig_ab ist Platzhalter |
-| K-732 | `gesellschaft.gmbh.stammkapital_mindest@1` | B.14 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-733 | `gesellschaft.gmbh.mindesteinzahlung_anteil@1` | B.14 | Spezifikation: „mindestens Hälfte einzuzahlen“ – Bezug (Mindeststammkapital oder Summe der Anteile) und Einzahlung je Geschäftsanteil prüfen |
-| K-734 | `gesellschaft.gmbh.mindesteinzahlung_anteil@1` | B.14 | Rechtsgrundlage ergänzt |
-| K-735 | `gesellschaft.ug.stammkapital_mindest@1` | B.14 | gueltig_ab ist Platzhalter |
-| K-736 | `gesellschaft.ug.stammkapital_mindest@1` | B.14 | Rechtsgrundlage ergänzt |
-| K-737 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | gueltig_ab ist Platzhalter |
-| K-738 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | Rechtsgrundlage ergänzt |
-| K-739 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | Berechnungsbasis (Jahresüberschuss abzüglich Verlustvortrag) prüfen |
-| K-740 | `online.vsbg.schwelle_beschaeftigte@1` | G.69 | gueltig_ab ist Platzhalter |
-| K-741 | `online.vsbg.schwelle_beschaeftigte@1` | G.69 | „mehr als 10“: Vergleich > 10 in den Regeln |
-| K-742 | `online.bfsg.kleinst_beschaeftigte@1` | G.70 | Rechtsgrundlage ergänzt |
-| K-743 | `online.bfsg.kleinst_umsatz@1` | G.70 | Alternative Bilanzsumme fehlt im Profil |
-| K-744 | `online.bfsg.kleinst_umsatz@1` | G.70 | Rechtsgrundlage ergänzt |
-| K-745 | `personal.mindestlohn.stunde@1` | D.39 | Rechtsgrundlage (aktuelle Anpassungsverordnung) ergänzen |
-| K-746 | `personal.mindestlohn.stunde@2` | D.39 | Status „beschlossen“ – Verordnung prüfen |
-| K-747 | `personal.minijob.grenze_monat@1` | D.39 | Rechtsgrundlage ergänzt |
-| K-748 | `personal.minijob.grenze_monat@2` | D.39 | Dynamische Kopplung an den Mindestlohn – Wert für 2027 bestätigen |
-| K-749 | `personal.schwerbehinderte.schwelle_arbeitsplaetze@1` | D.45 | gueltig_ab ist Platzhalter |
-| K-750 | `personal.schwerbehinderte.schwelle_arbeitsplaetze@1` | D.45 | Rechtsgrundlage ergänzt |
-| K-751 | `personal.hinschg.schwelle@1` | D.46 | gueltig_ab ist Platzhalter |
-| K-752 | `personal.hinschg.schwelle@1` | D.46 | Rechtsgrundlage ergänzt |
-| K-753 | `personal.entgelttransparenz.berichtspflicht_schwelle@1` | D.47 | Spezifikation: „über 150 Beschäftigte“ – Vergleich > umgesetzt |
-| K-754 | `personal.entgelttransparenz.berichtspflicht_schwelle@1` | D.47 | Deutsches Umsetzungsgesetz abwarten |
-| K-755 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | gueltig_ab ist Platzhalter |
-| K-756 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | Rechtsgrundlage ergänzt |
-| K-757 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | Versicherte vs. Beschäftigte |
-| K-758 | `steuern.ust_va.grenze_befreiung@1` | C.24 | gueltig_ab ist Platzhalter (Beginn Betrachtungszeitraum), tatsächliches Inkrafttreten der Grenze eintragen |
-| K-759 | `steuern.ust_va.grenze_monatlich@1` | C.24 | gueltig_ab ist Platzhalter |
-| K-760 | `steuern.ust_va.grenze_monatlich@1` | C.24 | Spezifikation: 'über 9.000 € monatlich' – Vergleich '>' bestätigen |
-| K-761 | `steuern.ustg19.grenze_vorjahr@1` | C.23 | gueltig_ab ist Platzhalter |
-| K-762 | `steuern.ustg19.grenze_vorjahr@1` | C.23 | Grenze inklusive oder exklusive ('max. 25.000 €')? |
-| K-763 | `steuern.ustg19.grenze_laufendes_jahr@1` | C.23 | gueltig_ab ist Platzhalter |
-| K-764 | `steuern.ustg19.grenze_laufendes_jahr@1` | C.23 | Gründungsjahr: abweichende Grenze 25.000 € als eigener Regelwert |
-| K-765 | `steuern.ustg19.grenze_gruendungsjahr@1` | C.23 | gueltig_ab ist Platzhalter |
-| K-766 | `steuern.ustg19.grenze_gruendungsjahr@1` | C.23 | Grenze inklusive oder exklusive? |
-| K-767 | `steuern.ao141.grenze_umsatz@1` | C.28 | gueltig_ab ist Platzhalter |
-| K-768 | `steuern.ao141.grenze_umsatz@1` | C.28 | Bezugsjahr und Vergleich (> oder ≥) bestätigen |
-| K-769 | `steuern.ao141.grenze_gewinn@1` | C.28 | gueltig_ab ist Platzhalter |
-| K-770 | `steuern.ao141.grenze_gewinn@1` | C.28 | Bezugsjahr und Vergleich (> oder ≥) bestätigen |
-| K-771 | `steuern.hgb241a.grenze_umsatz@1` | C.28 | gueltig_ab ist Platzhalter (R10, Steuerprüfung: 800.000 € Umsatzerlöse) |
-| K-772 | `steuern.hgb241a.grenze_gewinn@1` | C.28 | gueltig_ab ist Platzhalter (R10, Steuerprüfung: 80.000 € Jahresüberschuss) |
-| K-773 | `steuern.hgb241a.grenze_gewinn@1` | C.28 | Jahresüberschuss mit dem angegebenen Gewinn gleichgesetzt |
-| K-774 | `steuern.e_rechnung.grenze_vorjahresumsatz_2027@1` | C.30 | Übergangsregel-Fundstelle (§ 27 Abs. 38 UStG) ergänzt, nicht aus Spezifikation |
-| K-775 | `steuern.e_rechnung.grenze_vorjahresumsatz_2027@1` | C.30 | gueltig_ab/gueltig_bis als Übergangszeitraum bestätigen |
-| K-776 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
-| K-777 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
-| K-778 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | Fristbeginn (Ende des Kalenderjahres) als Regel ergänzen |
-| K-779 | `steuern.aufbewahrung.buecher_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
-| K-780 | `steuern.aufbewahrung.buecher_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
-| K-781 | `steuern.aufbewahrung.geschaeftsbriefe_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
-| K-782 | `steuern.aufbewahrung.geschaeftsbriefe_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
-| K-783 | `steuern.ust.satz_regel@1` |  | [FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen |
-| K-784 | `steuern.ust.satz_regel@1` |  | gueltig_ab ist Platzhalter |
-| K-785 | `steuern.ust.satz_ermaessigt@1` |  | [FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen |
-| K-786 | `steuern.ust.satz_ermaessigt@1` |  | Welche Leistungen ermäßigt sind, entscheidet der Nutzer – Hinweis/Hilfe fachlich formulieren |
-| K-787 | `steuern.ust.satz_ermaessigt@1` |  | gueltig_ab ist Platzhalter |
+| K-001 | `arbeitsschutz.arbeitsmedizinische_vorsorge` | E.56 | Fristen je Vorsorgeart nach AMR 2.1 und Bewertung Kosmetik mit Blutkontakt durch einen Betriebsarzt bestätigen lassen (laut Freigabe Sifa 22.10.2026 weiterhin offen; Auslöser für alle Betriebe mit Beschäftigten bestätigt) |
+| K-002 | `arbeitsschutz.arbeitsmittel_pruefen` | E.53 | Prüfprotokoll-Vorlage (mit Prüfbuch) fehlt; Prüffristen kommen aus der Gefährdungsbeurteilung – als „laufend je Jahr“ abgebildet (Technik) |
+| K-003 | `arbeitsschutz.erste_hilfe_organisation` | E.53 | Anzahl der Verbandkästen nach ASR A4.3 Tabelle 1 (Betriebsart × Beschäftigtenzahl) als Regelwerte – laut Freigabe Sifa 22.10.2026 sinnvoll; Vorlage Verbandbuch empfohlen (Technik) |
+| K-004 | `arbeitsschutz.fahrer_unterweisung` | E.52 | Unterweisungsthemen Fahrzeug (Abfahrtkontrolle, Pannen, Ladungssicherung) fehlen in der Unterweisungsvorlage (Technik) |
+| K-005 | `arbeitsschutz.fahrzeuge_pruefen` | E.53 | Prüfprotokoll-Vorlage fehlt (Technik) |
+| K-006 | `arbeitsschutz.fasi_betriebsarzt` | E.52 | Grenzen für das Unternehmermodell je BG als Daten ergänzen (laut Freigabe Sifa 22.10.2026 richtig, da BG-spezifisch, z. B. BGN > 10 bis 50 Beschäftigte; Technik) |
+| K-007 | `arbeitsschutz.feuerloescher` | E.54 | Prüfabstand „spätestens alle zwei Jahre“ laut Prüfergebnis Sifa 22.10.2026 bestätigt – die Erledigung gilt in Amtlos weiter nur für das Kalenderjahr (laufend je Jahr); Abstand aus einem Prüfnachweis übernehmen (laut Freigabe Sifa 22.10.2026 fachlich richtig), sobald es eine Vorlage gibt (Technik) |
+| K-008 | `arbeitsschutz.flucht_rettungsplan` | E.54 | Sifa Nachprüfung 23.10.2026: v4 freigegeben, redaktionell die Doppelung geglättet (keine erneute Prüfung nötig laut seiner Anmerkung) – nur die Freigabe der neuen Fassung im Register nachtragen |
+| K-009 | `arbeitsschutz.fremdfirmen_abstimmung` | E.51 | Unterweisungsthema „Arbeit beim Kunden“ in der Unterweisungsvorlage (Technik) |
+| K-010 | `arbeitsschutz.gefaehrdungsbeurteilung` | E.50 | RDG-Prüfpunkt (Vorprüfung 21.10.2026, Abschnitt 7) erledigt – Rechtsanwalt (Antwort auf die Rechtsfrage aus der Sifa-Prüfung, Rückmeldung Runde 2): Formulierung als Information statt Vorwegnahme in Ordnung; die Pflicht (§§ 5, 6 ArbSchG) darf als geltendes Recht benannt werden, nur die konkreten Gefährdungen und Maßnahmen für den einzelnen Betrieb bleiben Vorschlag („typisch für Betriebe wie deinen“); arbeitsschutzfachliche Hinweise sind keine Rechtsdienstleistung (§ 2 RDG). Erklärung entsprechend gefasst (Vorlage als Vorschlag statt „passend zu deiner Branche“) |
+| K-011 | `arbeitsschutz.sicherheitsbeauftragte` | E.52 | Sifa Runde 2 (23.10.2026): § 22 Abs. 1 Satz 4 SGB VII n. F. am Wortlaut (lxgesetze, Stand 12.5.2026, abgerufen 23.10.2026) ergänzt: „In Unternehmen mit regelmäßig weniger als 250 Beschäftigten und keiner besonderen Gefährdung für Leben und Gesundheit erfüllt der Unternehmer die Voraussetzungen nach Satz 1, wenn er einen Sicherheitsbeauftragten bestellt.“ Eine Anpassung der Anlage 2 zur DGUV Vorschrift 1 an die Neuregelung ist nicht belegt (DGUV Vorschrift 1 laut Handwerksblatt 13.5.2026 in Überarbeitung) – deshalb Verweis auf die Neuregelung |
+| K-012 | `arbeitsschutz.sicherheitsbeauftragte` | E.52 | Zählweise (G-05) laut Rechtsanwalt (Antwort auf die Rechtsfrage aus der Sifa-Prüfung, Rückmeldung Runde 2): Schwelle „regelmäßig mehr als 20 Beschäftigte“ (§ 22 SGB VII, § 20 DGUV Vorschrift 1) nach Köpfen – Teilzeit voll, Auszubildende und Leiharbeitnehmer beim Entleiher, keine anteilige Umrechnung wie in § 23 KSchG (DGUV Regel 100-001, Abschnitt 4.2); Zahl der Sicherheitsbeauftragten nach Anlage 2 DGUV Vorschrift 1 – im Text. Der Auslöser zählt so: profil.beschaeftigte.gesamt ist die Kopfzahl aus der Frage „Wie viele Menschen arbeiten für dich?“ (Hilfe: Vollzeit, Teilzeit, Minijob, Azubis), ohne Umrechnung; die Engine leitet daraus keine eigene Zählung ab (packages/rules-engine/src/fakten.ts). Leiharbeitnehmer nennt die Hilfe nicht ausdrücklich – die Angabe gilt für alle Personal-Pflichten (z. B. Sozialversicherung), deshalb nicht erweitert |
+| K-013 | `arbeitsschutz.unfallanzeige` | E.57 | Amtlos kennt die AU-Tage beim Melden nicht (Ereignis ohne Payload auswertbar), deshalb Aufgabe bei jedem Unfall mit „trifft nicht zu“ (laut Freigabe Sifa 22.10.2026 als Übergang vertretbar, solange der Kurztext die Schwelle nennt); Bedingung auf au_tage > 3 oder tödlich umstellen, sobald das Meldeformular die Angaben erfasst und die Engine Payload auswertet (Technik) |
+| K-014 | `arbeitsschutz.unterweisung_jugendliche` | E.51 | Frist je Jugendlichem ab dessen letzter Unterweisung führen (laut Freigabe Sifa 22.10.2026 fachlich gewünscht, Technik) – Amtlos rechnet ab der letzten erfassten Unterweisung im Betrieb, ohne Personen zu unterscheiden; bis dahin Hinweis im Text |
+| K-015 | `arbeitsschutz.verbandbuch` | E.57 | Erste-Hilfe-Leistungen ohne gemeldeten Arbeitsunfall erfasst Amtlos nicht; Vorlage Verbandbuch fehlt (Technik) |
+| K-016 | `branche.bau_soka` | H.4 | Prüfvermerk Rechtsanwalt 22.10.2026: Folgen, Prüfhinweis (§ 1 Abs. 2 VTV), monatliche Meldung bis zum 15. des Folgemonats und Schwere „hoch“ übernommen. Verschiebung bei Wochenende/Feiertag nicht angegeben – „keine“; ob der Termin für alle Baubetriebe mit Beschäftigten gilt, hängt von der Erfassung nach VTV ab (nur als Prüfhinweis) |
+| K-017 | `branche.beauty_hygieneplan` | H.3 | Vorlage Hygieneplan nach Prüfung (6.4) |
+| K-018 | `branche.beauty_hygieneplan` | H.3 | Prüfvermerk Rechtsanwalt 22.10.2026 (Nummer am Wortlaut prüfen): § 73 Abs. 1a Nr. 24 IfSG am 22.10.2026 gelesen – erfasst Rechtsverordnungen nach § 17 Abs. 4 Satz 1, „soweit die Rechtsverordnung für einen bestimmten Tatbestand auf diese Bußgeldvorschrift verweist“; Abs. 2: bis 25.000 €. Landesverordnungen (BW HygieneVO, BY HygV, NRW HygVO) nicht einzeln gelesen |
+| K-019 | `branche.beauty_hygieneplan` | H.3 | Frist „vor Aufnahme der Tätigkeit, laufend aktualisieren“ (Prüfvermerk Rechtsanwalt 22.10.2026) nur im Text – Frist bleibt dauerhaft |
+| K-020 | `branche.beauty_kosmetikverordnung` | H.3 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-021 | `branche.beauty_kosmetikverordnung` | H.3 | Prüfvermerk Rechtsanwalt 22.10.2026: Pflichten (Art. 4, 8, 10, 11, 13, 19, 23), Abgrenzung zum Weiterverkauf (Art. 6), Auslöser und Sanktion § 9 KosmetikV i. V. m. § 60 LFGB (50.000 €) bestätigt; Schwere wieder „hoch“ |
+| K-022 | `branche.gastro_acrylamid` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): Teil A/B bestätigt (Art. 2 Abs. 2 mit Anhang II Teil A; Teil B nach Art. 2 Abs. 3 nur zusätzlich für zentral gesteuerte Filial- und Franchisebetriebe), Satz zu Teil-A-Betrieben und Folgen bei Verstoß übernommen – § 2 LMRStV (nur Art. 4 Abs. 1, 2 mit Anhang I/II VO (EG) Nr. 852/2004), § 39 LFGB und Art. 138 VO (EU) 2017/625 am 22.10.2026 am Wortlaut gelesen (lxgesetze, gesetze.legal) |
+| K-023 | `branche.gastro_acrylamid` | H.1 | Auslöser jetzt mit der Frage „Backst du selbst oder frittierst du?“ (profil.gastro.backen_frittieren), wie von Lebensmittelfachbeauftragter vorgeschlagen |
+| K-024 | `branche.gastro_acrylamid` | H.1 | Schwere „mittel“ belassen – keine eigene Bußgeldvorschrift; Lebensmittelfachbeauftragter hat zur Schwere nichts angegeben |
+| K-025 | `branche.gastro_acrylamid` | H.1 | Frittierfett höchstens 175 °C laut Prüfbericht (L-075: DGF, BGN-Leitlinie 2018) und Rückmeldung Lebensmittelfachbeauftragter |
+| K-026 | `branche.gastro_acrylamid` | H.1 | Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: VO (EU) 2017/2158 in der LMRStV nicht als Bußgeldtatbestand gelistet; Anordnung nach § 39 LFGB, Art. 138 VO (EU) 2017/625 richtig. Sein Vorbehalt (aktuelle LMRStV gegenlesen) am 23.10.2026 erledigt: Die LMRStV in der Fassung gesetze-im-internet.de (zuletzt geändert durch Art. 1 V v. 19.4.2023 I Nr. 114) nennt die VO (EU) 2017/2158 nicht; § 2 nennt von der VO (EG) Nr. 852/2004 nur Art. 4 Abs. 1 und 2 |
+| K-027 | `branche.gastro_allergene` | H.1 | Liste der 14 Allergene (Anhang II LMIV) im Werkzeug prüfen |
+| K-028 | `branche.gastro_allergene` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, freigegeben): Auslöser, Frist laufend und Kurztext fachlich richtig; Form bei loser Ware in der Allergenliste-Vorlage umgesetzt (Art. 44 LMIV, § 4 LMIDV); Folgen aus dem Wortlaut nachvollziehbar; Schwere wieder „hoch“ (umgesetzt) |
+| K-029 | `branche.gastro_allergene` | H.1 | Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: § 6 Abs. 4 Nr. 1, 2 LMIDV i. V. m. § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB, bis 50.000 € – Fundstelle und Höhe bestätigt |
+| K-030 | `branche.gastro_einwegkunststofffonds` | G.73 | Neu am 23.10.2026 auf Verlangen von Rechtsanwalt (Runde 3, zu branche.gastro_mehrweg), Prüfung der Fassung durch Rechtsanwalt ausstehend. Titel und Kurztext nach seiner Vorgabe; Schwere „mittel“ wie vorgegeben; Zahlen zu Inkrafttreten (seit 2024) und erster Meldung (für 2024 bis 15.5.2025) aus seiner Rückmeldung |
+| K-031 | `branche.gastro_einwegkunststofffonds` | G.73 | Bußgeld: Rechtsanwalt nennt „§ 24 EWKFondsG (Höhe am Wortlaut prüfen)“ – § 24 EWKFondsG regelt aber „Besetzung und Benennung“ der Einwegkunststoffkommission (gesetze-im-internet.de, 23.10.2026). Die Bußgeldvorschriften stehen in § 26: Abs. 1 Nr. 1 „entgegen § 7 Absatz 1 Satz 1 sich nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig registrieren lässt“, Nr. 9 „entgegen § 11 Absatz 1 Satz 1 eine Meldung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig macht“; Abs. 2: bis 100.000 € in den Fällen des Abs. 1 Nr. 1, 2 Buchst. a und Nr. 3 bis 6, sonst bis 10.000 € (gesetze-im-internet.de und gesetze.legal, 23.10.2026). Auf § 12 (Abgabe) verweist § 26 Abs. 1 nicht. Fundstelle § 26 mit dem Prüfer bestätigen |
+| K-032 | `branche.gastro_einwegkunststofffonds` | G.73 | § 7 Abs. 1 Satz 1 am Wortlaut gelesen („Hersteller haben sich vor der Aufnahme ihrer Tätigkeit … beim Umweltbundesamt registrieren zu lassen“, gesetze.legal); § 11 (jährlich bis 15. Mai, Plattform DIVID) und § 12 nicht selbst am Wortlaut gelesen – § 11 nur über IHK Wiesbaden („jährlich bis zum 15. Mai“), § 12 nur über die Inhaltsübersicht („Abgabepflicht“); gesetze-im-internet.de war für §§ 11, 27 am 23.10.2026 nicht erreichbar |
+| K-033 | `branche.gastro_einwegkunststofffonds` | G.73 | Jährliche Meldung bis 15. Mai nicht als Termin abgebildet (Hinweis-Eintrag nach Vorgabe, Frist dauerhaft); Auslöser wie branche.gastro_mehrweg (Frage „Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen?“ – unterscheidet nicht nach Kunststoff) |
+| K-034 | `branche.gastro_haccp` | H.1 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-035 | `branche.gastro_haccp` | H.1 | Grenzwerte (z. B. Kühltemperaturen) und Kontrollhäufigkeit nicht in der Spezifikation – Betrieb legt sie fest; Vorschläge fachlich ergänzen |
+| K-036 | `branche.gastro_haccp` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): Folgen bei Verstoß übernommen und Schwere wieder „hoch“ – § 2 LMRStV (Art. 4 Abs. 1, 2 mit Anhang I Teil A und einzelnen Nummern aus Anhang II VO (EG) Nr. 852/2004; kein Art. 5), § 60 Abs. 4 Nr. 2 Buchst. a, Abs. 5 LFGB, § 39 LFGB und Art. 138 VO (EU) 2017/625 am 22.10.2026 am Wortlaut gelesen; Umfang der Vorlage im Rahmen der Flexibilität bestätigt (Bekanntmachung 2022/C 355/01, Abschnitt 4.2 und Anhang I Nr. 5); DEHOGA- und Bäckerhandwerk-Leitlinie mit Titel und Bezugsquelle genügen; Fettabscheider, Wartung und Eichung als Hinweis ohne Fundstelle genügen |
+| K-037 | `branche.gastro_haccp` | H.1 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-038 | `branche.gastro_haccp` | H.1 | Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: Art. 5 VO (EG) Nr. 852/2004 in § 2 LMRStV nicht bewehrt; Hygienemängel nach Anhang II über § 2 LMRStV, § 60 Abs. 4 Nr. 2 Buchst. a LFGB, bis 50.000 € (Abs. 5) – Höhe auf Verlangen in den Text aufgenommen. Sein Vorbehalt (aktuelle LMRStV gegenlesen) am 23.10.2026 erledigt: § 2 LMRStV in der Fassung gesetze-im-internet.de (zuletzt geändert durch Art. 1 V v. 19.4.2023 I Nr. 114) nennt von der VO (EG) Nr. 852/2004 nur Art. 4 Abs. 1 (Nr. 1) und Art. 4 Abs. 2 (Nr. 2–8); § 60 Abs. 5 LFGB (50.000 € für Abs. 4 Nr. 2 Buchst. a) am Wortlaut gelesen |
+| K-039 | `branche.gastro_hygieneschulung` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): DIN 10514 aus der Rechtsgrundlage genommen und als Quelle geführt; jährliche Wiederholung als Empfehlung, keine gesetzliche Frist; Folgen bestätigt (Bußgeld knüpft an das Arbeiten ohne Fachkenntnisse an, § 10 Nr. 3 LMHV, nicht an den fehlenden Nachweis); Ausnahme § 4 Abs. 2 LMHV und Abgrenzung zur IfSG-Belehrung bestätigt |
+| K-040 | `branche.gastro_hygieneschulung` | H.1 | Erledigung bleibt laufend je Kalenderjahr (erledigung laufend/jahr) – bildet die empfohlene jährliche Wiederholung ab, keine gesetzliche Frist; Lebensmittelfachbeauftragter hat dazu nichts angegeben |
+| K-041 | `branche.gastro_hygieneschulung` | H.1 | Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: § 10 Nr. 3 i. V. m. § 4 Abs. 1 LMHV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB, bis 50.000 € – bestätigt; das Bußgeld setzt am Arbeiten ohne Fachkenntnisse an, nicht am fehlenden Nachweis |
+| K-042 | `branche.gastro_ifsg_belehrung` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, freigegeben): Frist „spätestens am ersten Arbeitstag“ fachlich bestätigt (Praxis der Gesundheitsämter); Sanktion § 73 Abs. 1a Nr. 16b, Abs. 2 IfSG |
+| K-043 | `branche.gastro_ifsg_belehrung` | H.1 | Rechtsanwalt Runde 3 (23.10.2026): Höhe 25.000 € (§ 73 Abs. 2 IfSG) bestätigt; Nummer am amtlichen Wortlaut geprüft (gesetze-im-internet.de, 23.10.2026): § 73 Abs. 1a Nr. 16b lautet „entgegen § 34 Absatz 5a Satz 1 oder § 43 Absatz 4 Satz 1 eine Belehrung nicht, nicht richtig, nicht vollständig …“ – „Nr. 16b“ ist richtig und steht bereits im Eintrag, Text unverändert |
+| K-044 | `branche.gastro_ifsg_bescheinigung` | H.1 | Nur erstmalige Tätigkeit (§ 43 Abs. 1 IfSG, Rechtsprüfung R11 Befund 7) – Auslöser über die Frage „Arbeiten Beschäftigte mit Lebensmitteln?“ (erstmals / schon mit Bescheinigung / niemand); je Person nicht abbildbar |
+| K-045 | `branche.gastro_ifsg_bescheinigung` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): Kurztext um „nicht älter als drei Monate“ ergänzt (§ 43 Abs. 1 Satz 1 IfSG: „eine nicht mehr als drei Monate alte Bescheinigung“, am 22.10.2026 gelesen); Auslöser und Folgen fachlich in Ordnung |
+| K-046 | `branche.gastro_ifsg_bescheinigung` | H.1 | Rechtsanwalt Runde 3 (23.10.2026): Höhe 25.000 € bestätigt; Fundstelle auf Verlangen präzisiert – § 73 Abs. 1a Nr. 20 IfSG „entgegen § 43 Abs. 1 Satz 1, auch in Verbindung mit einer Rechtsverordnung nach Abs. 7, eine Person beschäftigt“, Abs. 2 (bis 25.000 €; nicht unter den Nummern mit 2.500 €), am 23.10.2026 auf gesetze-im-internet.de gelesen |
+| K-047 | `branche.gastro_ifsg_bescheinigung_selbst` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, freigegeben): bestätigt, dass § 43 Abs. 1 IfSG für jede Person gilt, die erstmals gewerbsmäßig mit Lebensmitteln nach § 42 Abs. 2 arbeitet, auch für Inhaberinnen und Inhaber; Zusatz „nicht älter als drei Monate“ im Kurztext ergänzt |
+| K-048 | `branche.gastro_ifsg_bescheinigung_selbst` | H.1 | Sanktion § 73 Abs. 1a IfSG, bis 25.000 € laut Rechtsprüfung R11 (Befund 20) „wahrscheinlich“ – Nummer und Höhe bestätigen (Bußgeldhöhen laut Prüfvermerk Lebensmittelfachbeauftragter durch Rechtsanwalt) |
+| K-049 | `branche.gastro_ifsg_bescheinigung_selbst` | H.1 | Rechtsanwalt Runde 3 (23.10.2026) (ändern): Höhe bestätigt, Nummer in § 73 Abs. 1a IfSG eintragen; für die Inhaberin greife der Tatbestand „tätig ist“. NICHT umgesetzt – am amtlichen Wortlaut nicht belegt: § 73 Abs. 1a IfSG (gesetze-im-internet.de, 23.10.2026) nennt § 43 nur in Nr. 16a (Mitteilung, Abs. 2), Nr. 16b (Belehrung, Abs. 4 Satz 1), Nr. 20 („entgegen § 43 Abs. 1 Satz 1 … eine Person beschäftigt“) und Nr. 21 (Vorlage, Abs. 5 Satz 2); eine Nummer für das eigene Tätigsein ohne Bescheinigung gibt es nicht, Nr. 20 erfasst nur das Beschäftigen. Text unverändert („§ 73 IfSG“) – Fundstelle für die eigene Tätigkeit mit Rechtsanwalt klären |
+| K-050 | `branche.gastro_ifsg_folgebelehrung` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, freigegeben): „Alle zwei Jahre ab der letzten Belehrung“ fachlich richtig umgesetzt |
+| K-051 | `branche.gastro_ifsg_folgebelehrung` | H.1 | Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 73 Abs. 1a Nr. 16b (§ 43 Abs. 4 Satz 1: „im Weiteren alle zwei Jahre“) und Abs. 2 IfSG gelesen – Bußgeldhöhe laut Prüfvermerk Lebensmittelfachbeauftragter durch Rechtsanwalt zu bestätigen |
+| K-052 | `branche.gastro_ifsg_folgebelehrung` | H.1 | Rechtsanwalt Runde 3 (23.10.2026): Höhe 25.000 € bestätigt; Nummer am amtlichen Wortlaut geprüft (gesetze-im-internet.de, 23.10.2026): § 73 Abs. 1a Nr. 16b erfasst „entgegen … § 43 Absatz 4 Satz 1 eine Belehrung nicht, nicht richtig, nicht vollständig …“ (§ 43 Abs. 4 Satz 1: „nach Aufnahme ihrer Tätigkeit und im Weiteren alle zwei Jahre“) – „Nr. 16b“ ist richtig, Text unverändert |
+| K-053 | `branche.gastro_kennzeichnung_vorverpackt` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): Abgrenzung zu loser Ware (Art. 44 Abs. 1 LMIV) wie vorgegeben erklärt, Hinweis Nährwerttabelle (Anhang V Nr. 19 LMIV) war schon im Text; Onlinehändler mit eigenen Lebensmitteln sehen den Eintrag jetzt (Branche Onlinehandel und „Was verkaufst du?“ Lebensmittel, dazu die Frage „Verkaufst du selbst abgepackte Lebensmittel?“); Fundstellen der Folgen plausibel, Straftatbestand und Höhe prüft Rechtsanwalt |
+| K-054 | `branche.gastro_kennzeichnung_vorverpackt` | H.1 | Zusatz ohne Prüfervorgabe, von Lebensmittelfachbeauftragter in Runde 2 (23.10.2026) bestätigt: Satz zur Selbstbedienung – am 22.10.2026 am Wortlaut gelesen: Art. 44 Abs. 1 LMIV (gesetze.legal) nennt „im Hinblick auf ihren unmittelbaren Verkauf vorverpackt“, § 4 Abs. 1 LMIDV verlangt für solche Ware „zur Selbstbedienung“ die Angaben nach Art. 9 Abs. 1 Buchst. a bis d und f bis k und Art. 10 Abs. 1 LMIV, außer für Dauerbackwaren und Süßwaren, die in der Verkaufsstätte vorverpackt werden, sofern die Unterrichtung auf andere Weise gewährleistet ist (Satz 3 Nr. 1); nur § 4 Abs. 2 LMIDV (nicht zur Selbstbedienung) beschränkt die Pflicht auf das Zutatenverzeichnis. „Am selben Tag“ steht so nicht im Wortlaut (Art. 44: „unmittelbarer Verkauf“) – Formulierung von Lebensmittelfachbeauftragter |
+| K-055 | `branche.gastro_kennzeichnung_vorverpackt` | H.1 | Anhang V Nr. 19 LMIV nicht am Wortlaut gelesen – inhaltlich von Lebensmittelfachbeauftragter (Runde 2, 23.10.2026) als richtig wiedergegeben bestätigt |
+| K-056 | `branche.gastro_kennzeichnung_vorverpackt` | H.1 | Vorprüfung 22.10.2026: die Nettofüllmenge (Art. 9 Abs. 1 Buchst. e LMIV) ist in § 5 Abs. 1 LMIDV nicht genannt; Höhe der Strafe nach § 59 LFGB nicht gelesen – Straftatbestand und Höhe prüft Rechtsanwalt |
+| K-057 | `branche.gastro_kennzeichnung_vorverpackt` | H.1 | Rückmeldung Lebensmittelfachbeauftragter Runde 2 (23.10.2026, ändern, danach freigegeben): „am selben Tag“ durch „zum unmittelbaren Verkauf“ ersetzt (Wortlaut Art. 44 Abs. 1 LMIV) und sein Beispiel zu Brot/Brötchen im SB-Regal und Dauerbackwaren wörtlich ergänzt |
+| K-058 | `branche.gastro_kennzeichnung_vorverpackt` | H.1 | Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: Bußgeld § 6 Abs. 4 Nr. 2 LMIDV i. V. m. § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB (50.000 €) bestätigt; Straftat § 6 Abs. 1 LMIDV i. V. m. § 59 Abs. 1 Nr. 21 Buchst. a LFGB (Freiheitsstrafe bis zu einem Jahr oder Geldstrafe) betrifft nach seiner Einordnung irreführende bzw. täuschende Angaben – auf Verlangen als „einzelne Verstöße (Täuschung) sind Straftaten“ präzisiert. Am 23.10.2026 gelesen: § 59 Abs. 1 LFGB (Strafrahmen, gesetze-im-internet.de), § 6 Abs. 1 LMIDV (verweist auf § 5 Abs. 1 Nr. 1 Buchst. b – Bezeichnung nach Art. 9 Abs. 1 Buchst. a i. V. m. Anhang VI Teil A Nr. 2 LMIV –, Nr. 14 Buchst. b Doppelbuchst. aa und Nr. 18 LMIDV; lexmea, gesetze-im-internet.de) |
+| K-059 | `branche.gastro_kontaktmaterialien` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): Folgen bei Verstoß übernommen (§ 39 LFGB am 22.10.2026 gelesen), Schwere „niedrig“; Kurztext bleibt – „außer Einzelhandel“ in Art. 16 VO (EG) Nr. 1935/2004 meint den Verkauf von Bedarfsgegenständen an Verbraucher, nicht den Gastronomiebetrieb als Abnehmer |
+| K-060 | `branche.gastro_kontaktmaterialien` | H.1 | Als Hinweis über die Branche – Amtlos fragt nicht ab, welche Verpackungen und Behälter der Betrieb nutzt |
+| K-061 | `branche.gastro_kontaktmaterialien` | H.1 | Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: Konformitätserklärung ist Pflicht des Inverkehrbringers (Art. 16 VO (EG) Nr. 1935/2004); für den Gastronomiebetrieb keine Bußgeldnorm, Anordnung nach § 39 LFGB; Schwere „niedrig“ passt |
+| K-062 | `branche.gastro_lebensmittelregistrierung` | H.1 | R12 (Nutzertest Bäckerei #5): je Betrieb; neue Betriebsstätte über die Zahl der Betriebsstätten (neu_ausloesen_bei) – Filialen als eigene Objekte fehlen in der App |
+| K-063 | `branche.gastro_lebensmittelregistrierung` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): Folgen bei Verstoß übernommen (§ 2 LMRStV ohne Art. 6 VO (EG) Nr. 852/2004 und § 39 LFGB am 22.10.2026 gelesen); Frist „vor Beginn“ fachlich bestätigt (Art. 6 Abs. 2: Meldung jedes Betriebs vor Aufnahme der Tätigkeit); Zuständigkeit als „Lebensmittelüberwachung bzw. Veterinäramt deines Kreises oder deiner Stadt“ |
+| K-064 | `branche.gastro_lebensmittelregistrierung` | H.1 | Schwere „mittel“ belassen – keine eigene Bußgeldvorschrift; Lebensmittelfachbeauftragter hat zur Schwere nichts angegeben |
+| K-065 | `branche.gastro_lebensmittelregistrierung` | H.1 | Zulassung nach Art. 4 VO (EG) Nr. 853/2004 nur als Hinweis (Eigenherstellung tierischer Erzeugnisse) |
+| K-066 | `branche.gastro_lebensmittelregistrierung` | H.1 | Rechtsanwalt Runde 3 (23.10.2026) (ändern): „Keine eigene Bußgeldvorschrift“ nicht bestätigt – nach seiner Kenntnis sei die unterlassene Meldung nach Art. 6 Abs. 2 VO (EG) Nr. 852/2004 in § 2 LMRStV erfasst; § 2 LMRStV auf „Artikel 6 Absatz 2 Unterabsatz 1“ durchsuchen. Ergebnis 23.10.2026: NICHT enthalten – § 2 LMRStV in der Fassung gesetze-im-internet.de (lmrstv_2006, neugefasst durch Bek. v. 9.5.2017 I 1170, zuletzt geändert durch Art. 1 V v. 19.4.2023 I Nr. 114) nennt von der VO (EG) Nr. 852/2004 nur Art. 4 Abs. 1 (Nr. 1) und Art. 4 Abs. 2 (Nr. 2–8); „Artikel 6“ kommt in der ganzen Verordnung nur in § 8 vor (Art. 6 Unterabs. 2 VO (EG) Nr. 669/2009); gegengelesen auf gesetze.legal und lxgesetze.de (gleicher Befund). Folgen und Schwere „mittel“ deshalb unverändert – Ergebnis an Rechtsanwalt zurückmelden |
+| K-067 | `branche.gastro_mehrweg` | G.73 | Prüfvermerk Rechtsanwalt 22.10.2026: Ausnahme (höchstens fünf Beschäftigte UND höchstens 80 m²), Teilzeitzählung, Foodtruck- und Lieferflächen sowie Sanktion bestätigt und im Text |
+| K-068 | `branche.gastro_mehrweg` | G.73 | Freigabe Rechtsanwalt Runde 2 (23.10.2026) (ändern): § 7 Abs. 2 VerpackDG – nur die Systembeteiligung geht auf den Vorvertreiber über, die Registrierung nach § 6 bleibt eigene Pflicht – bestätigt und in seiner Formulierung in die Erklärung übernommen. Verlangter eigener Hinweis „Herstellereigenschaft nach EWKFondsG: Abgabepflicht für Einwegkunststoff-Serviceverpackungen ab 1.1.2024 (§ 3 Nr. 3, § 7 EWKFondsG)“ NICHT angelegt: § 3 Nr. 3 EWKFondsG (Hersteller, ausdrücklich auch Befüller) am Wortlaut bestätigt (gesetze-im-internet.de, lxgesetze.de, 22.10.2026); § 7 EWKFondsG regelt aber die Registrierung der Hersteller beim Umweltbundesamt vor Aufnahme der Tätigkeit (gesetze.legal, 22.10.2026), die Abgabepflicht steht in § 12 („Abgabepflicht“, Inhaltsübersicht gesetze-im-internet.de), das Datum 1.1.2024 nicht in § 7 – Fundstelle mit dem Prüfer klären |
+| K-069 | `branche.gastro_mehrweg` | G.73 | Rechtsanwalt Runde 3 (23.10.2026), ändern: Fundstellen wie gelesen – § 3 Nr. 3 EWKFondsG (Hersteller, auch Befüller), § 7 (Registrierung beim Umweltbundesamt), § 12 (Abgabepflicht); 1.1.2024 ist das Inkrafttreten der Registrierungs- und Abgabepflicht, als Jahresangabe statt Paragrafenzitat. Umgesetzt: ein Satz mit diesen Fundstellen und „seit 2024“ in der Erklärung, Verweis auf den neuen Hinweis-Eintrag branche.gastro_einwegkunststofffonds |
+| K-070 | `branche.gastro_ppwr_radar` | H.1 | Rechtsstand 21.10.2026: Termine und Inhalt von Art. 32/33 aus der Textwiedergabe (lxgesetze) übernommen – gegen das Amtsblatt (EUR-Lex) lesen; frühere Angabe „Informationspflicht seit 12.8.2026“ (WKO) nicht bestätigt und entfernt. Prüfvermerk Rechtsanwalt 22.10.2026: Termine (12.2.2027/12.2.2028) und Sanktionen vor Freigabe am Amtsblatt belegen – am 22.10.2026 nicht gelungen (EUR-Lex-Seite der VO (EU) 2025/40 nach den Erwägungsgründen abgeschnitten, Art. 32/33 nicht erreicht); Kleinstunternehmen-Ausnahme nur in Art. 33 Abs. 4 bestätigt. Zweiter Versuch 22.10.2026 mit anderen Quellen: EUR-Lex-HTML endet bei 101.794 Zeichen (Erwägungsgrund 56), auch mit Lesestart weiter hinten; die Amtsblatt-Kopie der WKO (PDF, ABl. L 2025/40 vom 22.1.2025) endet in Erwägungsgrund 70; umwelt-online nur mit Abonnement; Bird & Bird nennt keine Termine. Erneut gelesen nur auf lxgesetze.de: Art. 32 Abs. 1 „Bis zum 12. Februar 2027“, Art. 33 Abs. 1 „Bis zum 12. Februar 2028“, Art. 33 Abs. 4 Kleinstunternehmen (Empfehlung 2003/361/EG, Stand 11.2.2025) – am Amtsblatt weiterhin nicht belegt, Eintrag deshalb unverändert |
+| K-071 | `branche.gastro_ppwr_radar` | H.1 | Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 66 Abs. 2 Nr. 29 (Art. 32 Abs. 1), Nr. 30 (Art. 32 Abs. 2 UAbs. 1, Art. 33 Abs. 3), Nr. 31 (Art. 32 Abs. 2 UAbs. 2, Art. 33 Abs. 2), Nr. 32 (Art. 33 Abs. 1) und Abs. 3 VerpackDG gelesen; ab wann Abs. 2 gilt, steht nicht im Paragraphen (laut IHK Karlsruhe ab 12.2.2027); EWKFondsG (Gastronom als Hersteller?) offen – fachlich zu bestätigen |
+| K-072 | `branche.gastro_ppwr_radar` | H.1 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): als Radar freigegeben, Termine nach Art. 32/33 VO (EU) 2025/40 über Sekundärquelle belegt. Auflage: Vor der Aktivierung des Termins 12.2.2027 das Amtsblatt (ABl. L 2025/40, deutsche PDF-Fassung) gegenlesen; bis dahin Sanktionstext ohne Beträge – Beträge (bis 200.000 € bzw. 10.000 €, § 66 Abs. 3 VerpackDG) entfernt |
+| K-073 | `branche.gastro_preisverzeichnis` | G.70 | Prüfvermerk Rechtsanwalt 22.10.2026: Rechtsgrundlage auf § 13 PAngV korrigiert, Inhalt und Sanktion § 20 Nr. 1, 4 PAngV i. V. m. WiStrG (25.000 €) bestätigt. Zusatz „künftig bis 100.000 € nach PAngG (G. v. 19.10.2026, BGBl. 2026 I Nr. 314)“ nach Prüfvermerk Rechtsanwalt 22.10.2026 gestrichen, bis die Fundstelle mit Inkrafttretensdatum vorliegt und geprüft ist (am 22.10.2026 nicht geprüft); Quellen BT-Drs. 21/5873 und BR-Drs. 499/26 dafür entfernt |
+| K-074 | `branche.gastro_rueckverfolgbarkeit` | H.1 | Neu (E-166): Art. 18 Abs. 2 und 3 am Wortlaut geprüft (gesetze.legal); Geltung ab 1.1.2005 (Art. 65 VO (EG) Nr. 178/2002) an EUR-Lex gegenlesen |
+| K-075 | `branche.gastro_rueckverfolgbarkeit` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, freigegeben): fachlich richtig; Fundstellen der Folgen plausibel |
+| K-076 | `branche.gastro_rueckverfolgbarkeit` | H.1 | Lebensmittel ohne Branche Gastronomie oder Onlinehandel (z. B. Kiosk mit „Sonstige“) lösen den Eintrag weiter nicht aus – laut Lebensmittelfachbeauftragter hinnehmbar; besser wäre ein Auslöser „Was verkaufst du? Lebensmittel“ unabhängig von der Branche (die Frage wird nicht im Kern-Check gestellt, als alleiniger Auslöser stünde der Eintrag bei allen Betrieben ohne diese Angabe offen – nicht umgesetzt) |
+| K-077 | `branche.gastro_rueckverfolgbarkeit` | H.1 | DVO (EU) Nr. 931/2011 zusätzlich nach § 9 LMRStV bußgeldbewehrt (Tatbestände nicht gelesen) |
+| K-078 | `branche.gastro_rueckverfolgbarkeit` | H.1 | Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: § 60 Abs. 3 Nr. 1 Buchst. b, c (Art. 18) und Buchst. d–g (Art. 19) i. V. m. Abs. 5 LFGB, bis 50.000 € – bestätigt |
+| K-079 | `branche.gastro_schankanlage_fluessiggas` | H.1 | Sifa Nachprüfung 23.10.2026 (ändern) umgesetzt: Zuständige Stelle wörtlich nach seinem Vorschlag, Link zur DGUV Regel 110-010 ergänzt; übrige Felder hat er freigegeben |
+| K-080 | `branche.gastro_schankanlage_fluessiggas` | H.1 | Sifa Runde 2 (23.10.2026) umgesetzt: Fristen über die Gefährdungsbeurteilung (§ 3 Abs. 6 BetrSichV, Wortlaut gesetze-im-internet.de 23.10.2026) mit DGUV Regel 110-007 und DGUV Vorschrift 79 als Anhaltspunkt (im Text, Frist bleibt „dauerhaft“ – es gibt kein Ereignis zur Inbetriebnahme der Anlage); Kurztext „befähigte Person (bei Flüssiggas Sachkundiger nach DGUV Vorschrift 79)“; Hinweis CO2-Warneinrichtung. „oder“ im Kurztext bleibt (Sifa: Pflicht gilt schon für eine der beiden Anlagen). Rückfrage an die Sifa: Die Publikationsseite der DGUV (abgerufen 23.10.2026) meldet, dass die DGUV die Zurückziehung der DGUV Vorschrift 79 empfohlen hat und die DGUV Regel 110-010 „Flüssiggas“ erschienen ist; Geltung beim Unfallversicherungsträger erfragen – im Text als Hinweis, bitte bestätigen oder Verweis auf DGUV Regel 110-010 umstellen |
+| K-081 | `branche.gastro_schankanlage_fluessiggas` | H.1 | Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis über die Branche (Amtlos fragt Schankanlage und Flüssiggas nicht ab); Prüffristen (Schankanlage, DGUV V79 Flüssiggas) und Fundstellen nicht abgerufen; Gefährdungsbausteine CO2 und Gas sind Sache der Vorlage |
+| K-082 | `branche.gastro_trinkwasser_mobil` | H.1 | Neu (E-166): § 2 Nr. 1 Buchst. b, Nr. 2 Buchst. d, f und § 11 Abs. 2 TrinkwV am Wortlaut geprüft (gesetze-im-internet.de, 22.10.2026) |
+| K-083 | `branche.gastro_trinkwasser_mobil` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern): Wiederinbetriebnahme (vier Wochen vorher, § 11 Abs. 2 Satz 1 Nr. 1, Satz 2 TrinkwV) und Stilllegung (drei Tage danach, Nr. 4) im Kurztext ergänzt, ohne eigene Frist – am 22.10.2026 am Wortlaut gelesen; Untersuchung „nach Festlegung des Gesundheitsamts, üblich einmal jährlich“ bleibt; Fundstelle der Folgen plausibel |
+| K-084 | `branche.gastro_trinkwasser_mobil` | H.1 | Gültig ab: Inkrafttreten der TrinkwV 2023 (24.6.2023) laut Verordnung gegenlesen |
+| K-085 | `branche.gastro_trinkwasser_mobil` | H.1 | Folgen bei Mängeln der Wasserqualität nicht ergänzt |
+| K-086 | `branche.gastro_trinkwasser_mobil` | H.1 | Rechtsanwalt Runde 3 (23.10.2026), Folgen freigegeben: § 72 Nr. 1 TrinkwV i. V. m. § 73 Abs. 1a Nr. 24, Abs. 2 IfSG, bis 25.000 € – bestätigt |
+| K-087 | `branche.gastro_zusatzstoffe` | H.1 | Neu nach Rechtsprüfung R12 (Befund 12) – Fundstelle § 5 LMZDV vom 2.6.2021 (BGBl. I S. 1362) laut Text der LMZDV (Lebensmittelüberwachung Bremen), im BGBl. gegenlesen |
+| K-088 | `branche.gastro_zusatzstoffe` | H.1 | Rückmeldung Lebensmittel (Lebensmittelfachbeauftragter, 22.10.2026, ändern, zu v2): Korrekturen der Fundstellen („chininhaltig“ nach § 5 Abs. 1 AromenDV, Koffeinhinweis nach § 6 FrSaftErfrischGetrV i. V. m. Anhang III Nr. 4.1 LMIV ohne „§ 2 LMIDV“, Azofarbstoff-Warnhinweis nach Art. 24 i. V. m. Anhang V VO (EG) Nr. 1333/2008 im Text) sind in v3 bereits umgesetzt (berichtigter Prüfbericht); § 5 LMZDV und § 7 Abs. 2 Nr. 1 LMZDV bestätigt; Anhang III Nr. 4.1 LMIV nur über Sekundärquelle gelesen |
+| K-089 | `branche.gastro_zusatzstoffe` | H.1 | Rechtsanwalt Runde 3 (23.10.2026), ändern: § 7 Abs. 2 Nr. 1 LMZDV bestätigt, Höhe bis 50.000 € (§ 60 Abs. 2 Nr. 26 lit. a, Abs. 5 LFGB) in seinem Wortlaut übernommen; § 7 Abs. 2 LMZDV (Einleitung „Ordnungswidrig im Sinne des § 60 Absatz 2 Nummer 26 Buchstabe a …“, lxgesetze) und § 60 Abs. 5 LFGB (gesetze-im-internet.de) am 23.10.2026 gelesen |
+| K-090 | `branche.gastro_zusatzstoffe` | H.1 | Hinweis Lebensmittelfachbeauftragter (Nachkontrolle der Vorlagen, 23.10.2026, Hinweis 6) – zur Prüfung durch Rechtsanwalt: Die Sanktion nennt nur § 7 LMZDV; für Koffein und Chinin gelten die Straf- und Bußgeldvorschriften der FrSaftErfrischGetrV bzw. der AromenDV – Fundstelle und Höhe nicht geprüft, Text unverändert |
+| K-091 | `branche.gastro_zusatzstoffe` | H.1 | Rechtsanwalt Nachprüfung 23.10.2026 (ändern): Folgen nach seinem Wortlaut (LMZDV, Chinin als Straftat nach § 6 Abs. 2 AromenDV i. V. m. § 59 Abs. 1 Nr. 21 lit. a LFGB) umgesetzt. RÜCKFRAGE Koffein: Er bat, die Nummer in § 6 LMIDV am Wortlaut einzutragen. § 6 LMIDV (freirecht.de, lexmea.de, gelesen 23.10.2026) hat vier Absätze; Anhang III Nr. 4 LMIV ist nur über § 6 Abs. 4 Nr. 2 i. V. m. § 5 Abs. 1 Nr. 14 Buchst. a LMIDV erfasst, und § 5 Abs. 1 LMIDV betrifft nur vorverpackte Lebensmittel; § 6 Abs. 4 Nr. 3 (§ 5 Abs. 3 LMIDV) erfasst bei nicht vorverpackten Lebensmitteln nur die Angaben nach § 4 Abs. 2 LMIDV. Der Koffein-Satz ist deshalb nicht eingetragen – bitte sagen, ob „§ 6 Abs. 4 Nr. 2 LMIDV“ für lose Getränke passt oder eine andere Vorschrift gemeint ist. Quellen nur hier und im Kopfkommentar (Quellenliste unverändert, damit die Freigabe von Lebensmittelfachbeauftragter für den Inhalt ohne Folgen nicht entfällt) |
+| K-092 | `branche.gesundheit_erlaubnisse` | H.7 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-093 | `branche.gesundheit_erlaubnisse` | H.7 | Prüfvermerk Rechtsanwalt 22.10.2026: Folgen, Liste der Berufe und Schwere „hoch“ übernommen; zuständige Stellen je Beruf nicht ergänzt |
+| K-094 | `branche.handwerk_gefaehrdung_gewerk` | H.2 | Vorlagen je Gewerk (BG-Handlungshilfen) – T-20 (Technik) |
+| K-095 | `branche.handwerk_gewaehrleistung` | H.2 | R12 (Nutzertest Bäckerei #13): Kaufrecht bei Herstellung und Lieferung beweglicher Sachen (§ 650 BGB) ergänzt |
+| K-096 | `branche.handwerk_gewaehrleistung` | H.2 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-097 | `branche.handwerk_gewaehrleistung` | H.2 | Hinweis bestätigt; Fristen als Regelwerte (catalog/regelwerte/branche.yaml) und im Text nach Prüfvermerk Rechtsanwalt 22.10.2026 |
+| K-098 | `branche.immo_gwg` | H.8 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-099 | `branche.immo_gwg` | H.8 | Prüfvermerk Rechtsanwalt 22.10.2026: § 2 Abs. 1 Nr. 14, Nr. 6 ff. GwG und Sanktion § 56 bestätigt; Auslöser auf Makler und Vermittler verfeinert (Erlaubnis nach § 34c, § 34d, § 34f, § 34i GewO) – § 34c umfasst auch Wohnimmobilienverwalter, § 34d alle Versicherungsvermittler (GwG nur bei Lebensversicherungen): der Auslöser ist dort weiter als die Pflicht |
+| K-100 | `branche.immo_gwg` | H.8 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
+| K-101 | `branche.immo_weiterbildung` | H.8 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-102 | `branche.immo_weiterbildung` | H.8 | Umfang (Stunden) und Zeitraum als Regelwerte |
+| K-103 | `branche.immo_weiterbildung` | H.8 | Prüfvermerk Rechtsanwalt 22.10.2026: § 34c Abs. 2a, § 34d Abs. 9 GewO und Sanktion § 144 bestätigt; § 15b FinVermV (15 Std./Jahr) für § 34f/§ 34h ergänzt, § 34h in den Auslöser aufgenommen; „nur wo sie noch gilt“ gestrichen. § 15b, § 26 FinVermV nicht am Wortlaut gelesen, Höhe des Bußgelds nach § 26 FinVermV nicht genannt |
+| K-104 | `branche.it_haftung` | H.6 | Hinweis, §§ 276, 309 Nr. 7 BGB und „keine Frist“ bestätigt (Prüfvermerk Rechtsanwalt 22.10.2026) |
+| K-105 | `branche.it_scheinselbststaendigkeit` | H.6 | Prüfvermerk Rechtsanwalt 22.10.2026: Folgen (Freelancer-Seite) eingetragen, Frist „keine“; Auslöser „beschäftigt mindestens eine Person“ entfernt (Auftraggeber-Seite in personal.statusfeststellung_auftraggeber, Doppelung vermeiden) |
+| K-106 | `branche.it_scheinselbststaendigkeit` | H.6 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-107 | `branche.it_scheinselbststaendigkeit` | H.6 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
+| K-108 | `branche.jugendschutz_abgabe` | H.1 | Prüfvermerk Rechtsanwalt 22.10.2026: § 9 Abs. 1, § 10 JuSchG und Sanktion § 28 Abs. 1 Nr. 10, 12, Abs. 5 bestätigt; begleitetes Trinken (§ 9 Abs. 2) nicht erwähnen ist richtig (Abschaffung nicht in Kraft); Tabak-Rückverfolgbarkeit als Hinweis ergänzt (Sanktion dafür nicht erfasst) |
+| K-109 | `branche.jugendschutz_aushang` | H.1 | Prüfvermerk Rechtsanwalt 22.10.2026: § 3 Abs. 1 JuSchG und Sanktion § 28 Abs. 1 Nr. 1, Abs. 5 bestätigt. Aushang auch in Verkaufsstellen für Filme und Spiele (§§ 11–13 JuSchG) – Auslöser „bei Bedarf erweitern“, nicht umgesetzt (keine Angabe dazu im Profil) |
+| K-110 | `branche.oeffentliche_wiedergabe` | H.10 | Prüfvermerk Rechtsanwalt 22.10.2026: §§ 15, 19, 21, 22 UrhG und „in der Regel mit Zuschlag“ (100 % Kontrollzuschlag, von der Rechtsprechung gebilligt) bestätigt; Kurse per Video: Tarif VR-OD/Online-Kurse – Hinweis „GEMA fragen“ steht im Text |
+| K-111 | `branche.personenbefoerderung_genehmigung` | H.5 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): §§ 1, 2 PBefG und § 61 Abs. 1 Nr. 1, Abs. 2 (20.000 €) bestätigt. Ergänzt: Fahrerlaubnis zur Fahrgastbeförderung (§ 48 Abs. 1, 7 FeV, Wortlaut gelesen) und zuständige Stelle (Genehmigungsbehörde des Landes, meist Landkreis/kreisfreie Stadt) |
+| K-112 | `branche.personenbefoerderung_genehmigung` | H.5 | Hinweis „Freistellungen § 1 Abs. 2 PBefG (Gesamtentgelt deckt nur Betriebskosten; Werkverkehr mit eigenen Beschäftigten)“ nicht wie angegeben übernommen: § 1 Abs. 2 PBefG (gesetze-im-internet.de, 22.10.2026) nennt Pkw-Fahrten, die unentgeltlich sind oder deren Gesamtentgelt je Kilometer den Betrag nach § 5 Abs. 2 Satz 1 BRKG nicht übersteigt (steht schon im Text), und Krankenkraftwagen – weder Betriebskosten noch Werkverkehr. Stattdessen ergänzt: Freistellung nach § 1 Nr. 4 Buchst. h FrStllgV (unentgeltliche Beförderung von Arbeitnehmern durch den Arbeitgeber zu betrieblichen Zwecken zwischen Arbeitsstätten desselben Betriebes, Wortlaut gelesen) – vom Prüfer bestätigen lassen |
+| K-113 | `branche.personenbefoerderung_genehmigung` | H.5 | Auslöser: Angabe profil.fahrzeuge.befoerderung („Personen gegen Entgelt“), gefragt bei Transport und Logistik mit Firmenfahrzeugen |
+| K-114 | `branche.preisverzeichnis_dienstleistung` | G.70 | Prüfvermerk Rechtsanwalt 22.10.2026: § 12 PAngV, Grundpreis nach § 4 und Sanktion bestätigt. Zusatz „künftig bis 100.000 € nach PAngG (G. v. 19.10.2026, BGBl. 2026 I Nr. 314)“ nach Prüfvermerk Rechtsanwalt 22.10.2026 gestrichen, bis die Fundstelle mit Inkrafttretensdatum vorliegt und geprüft ist (am 22.10.2026 nicht geprüft); Quellen BT-Drs. 21/5873 und BR-Drs. 499/26 dafür entfernt |
+| K-115 | `branche.preisverzeichnis_dienstleistung` | G.70 | Ausnahmen (z. B. schriftliche Angebote) nicht geprüft |
+| K-116 | `branche.transport_erlaubnis` | H.5 | R12 (Nutzertest Kurier #3): Erlaubnis über 3,5 t (§§ 1, 3 GüKG), Gemeinschaftslizenz über 2,5 t grenzüberschreitend seit 21.5.2022 (IHK Berlin) – Ausnahmen nach § 2 GüKG nicht abgebildet |
+| K-117 | `branche.transport_erlaubnis` | H.5 | Prüfvermerk Rechtsanwalt 22.10.2026: Personenbeförderung (PBefG) als eigener Auslöser – umgesetzt als eigener Eintrag branche.personenbefoerderung_genehmigung mit der neuen Angabe profil.fahrzeuge.befoerderung („Personen gegen Entgelt“); hier nur noch ein Satz im Text, PBefG aus der Rechtsgrundlage genommen |
+| K-118 | `branche.transport_erlaubnis` | H.5 | Prüfvermerk Rechtsanwalt 22.10.2026: Werkverkehr als Ausnahme „in Auslöser/Text“ – umgesetzt: Auslöser verlangt „Güter für andere gegen Entgelt“ (profil.fahrzeuge.befoerderung, gefragt bei Transport und Logistik mit Firmenfahrzeugen); wer nur eigene Güter fährt, bekommt den Eintrag nicht; ohne Angabe „unklar“. Werkverkehr außerhalb der Branche Transport und Logistik (Handwerk, Bäckerei, Handel) löst den Eintrag ohnehin nicht aus. Freigabe Rechtsanwalt Runde 2 (23.10.2026): Werkverkehr-Ausnahme und Personenbeförderung sauber getrennt, Rechtsgrundlagen und Sanktion bestätigt; Werkverkehr außerhalb der Branche ohne Eintrag richtig (erlaubnisfrei, § 1 Abs. 2 GüKG). Hinweis auf die Anzeige zur Werkverkehrsdatei (§ 15a GüKG) „erwägen“ – nicht umgesetzt: bräuchte eine neue Angabe (zulässige Gesamtmasse und Beförderungsart fragt der Check nur bei Transport und Logistik), Werkverkehr anderer Branchen erreicht der Katalog nicht |
+| K-119 | `branche.transport_erlaubnis` | H.5 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-120 | `branche.transport_erlaubnis` | H.5 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
+| K-121 | `branche.transport_erlaubnis` | H.5 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
+| K-122 | `branche.transport_lenkzeiten` | H.5 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-123 | `branche.transport_lenkzeiten` | H.5 | Prüfvermerk Rechtsanwalt 22.10.2026: Geltungsbereich (ab 3,5 t, grenzüberschreitend ab 2,5 t seit 1.7.2026), Ausnahmen (Werkverkehr, Art. 3 Buchst. aa), Auslese- und Aufbewahrungsfristen (§ 2a FPersV), Sanktion § 8a FPersG und Hinweis § 8 FPersG/FPersV übernommen; Ausnahmen nicht im Auslöser |
+| K-124 | `branche.transport_lenkzeiten` | H.5 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
+| K-125 | `branche.transport_lenkzeiten_national` | H.5 | Prüfvermerk Rechtsanwalt 22.10.2026: § 1 Abs. 1 Nr. 1, Abs. 6 FPersV und Sanktion bestätigt, Handwerkerausnahme § 1 Abs. 2 Nr. 3 FPersV ergänzt (nicht im Auslöser); § 21a ArbZG gilt erst ab 3,5 t – für diese Klasse nicht |
+| K-126 | `branche.transport_lenkzeiten_national` | H.5 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
+| K-127 | `branche.widerruf_ausserhalb_geschaeftsraeume` | G.68 | Neu nach Rechtsprüfung R11 (Befund 10) – Muster-Widerrufsbelehrung und Muster-Widerrufsformular für Verträge außerhalb von Geschäftsräumen erst nach Prüfung |
+| K-128 | `branche.widerruf_ausserhalb_geschaeftsraeume` | G.68 | Auslöser über die Frage „Schließt du Verträge mit Privatkunden bei ihnen zu Hause oder unterwegs ab?“ |
+| K-129 | `branche.widerruf_ausserhalb_geschaeftsraeume` | G.68 | Prüfvermerk Rechtsanwalt 22.10.2026: Ausnahmen (§ 312g Abs. 2 Nr. 11, § 312 Abs. 2 Nr. 12), Form (Art. 246a § 4 Abs. 2 EGBGB) und Höchstfrist § 356 Abs. 4 Satz 1 n. F. bestätigt |
+| K-130 | `branche.widerruf_fernabsatz` | G.68 | Muster-Widerrufsbelehrung und -formular für Dienstleistungen erst nach Prüfung |
+| K-131 | `branche.widerruf_fernabsatz` | G.68 | Prüfvermerk Rechtsanwalt 22.10.2026: „meist“ als Vorsicht richtig (BGH: regelmäßige Aufträge per Telefon/E-Mail genügen); § 312g Abs. 2 Nr. 9 erfasst Kurse mit festem Datum, auch online (EuGH C-96/21); Zitate n. F. bestätigt. BGH-Aktenzeichen nicht genannt |
+| K-132 | `datenschutz.avv` | F.58 | Frist „vor Beginn der Verarbeitung“ (Prüfvermerk Rechtsanwalt 22.10.2026) nur im Text – kein Ereignis „Dienstleister beauftragt“ |
+| K-133 | `datenschutz.beschaeftigtendaten` | F.62 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-134 | `datenschutz.beschaeftigtendaten` | F.62 | § 26 BDSG könnte laut Prüfvermerk Rechtsanwalt 22.10.2026 als Konkretisierung erwähnt werden (freigestellt) – nicht aufgenommen |
+| K-135 | `datenschutz.betroffenenanfrage` | F.59 | Mehrere Anfragen am selben Tag ergeben eine Instanz (T-15) |
+| K-136 | `datenschutz.betroffenenanfrage` | F.59 | Verlängerung um zwei Monate (Art. 12 Abs. 3 Satz 2) nur als Hinweis im Text (Prüfvermerk Rechtsanwalt 22.10.2026); die Frist rechnet immer mit einem Monat |
+| K-137 | `datenschutz.datenpanne_benachrichtigung` | F.60 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): Art. 34 Abs. 1 DSGVO („unverzüglich“) und Sanktion Art. 83 Abs. 4 Buchst. a bestätigt; die verlangten Ergänzungen – Ausnahmen nach Art. 34 Abs. 3 (Verschlüsselung, nachträgliche Maßnahmen, unverhältnismäßiger Aufwand mit öffentlicher Bekanntmachung) und Inhalt nach Art. 34 Abs. 2 i. V. m. Art. 33 Abs. 3 Buchst. b–d – stehen schon in der Erklärung. Auslöser über das Datenpanne-Formular in Ordnung, wenn die Risikobewertung dort steht: Das Formular (packages/fachlogik/src/dokumente/datenschutz.ts) erfasst die Bewertung (kein Risiko, Risiko, hohes Risiko) und die Benachrichtigung der Betroffenen; Frist „unverzüglich“ nur im Text, kein Termin |
+| K-138 | `datenschutz.datenpanne_meldung` | F.60 | Prüfvermerk Rechtsanwalt 22.10.2026: Katalogfrist auf PT72H (stundengenau ab Kenntnis) – Schema (dauer ohne Uhrzeit) und Fristen-Engine kennen keine Stunden; ohne neue Engine-Funktion konservativ P2D statt P3D: Das Ereignis trägt nur das Datum der Entdeckung, bei P3D läge der Kalendertermin (ganzer Tag) bis zu 24 Stunden hinter dem Fristende; P2D endet bei jeder Uhrzeit der Entdeckung spätestens mit Ablauf der 72 Stunden. Kurztext „binnen 72 Stunden“ belassen, Erklärung um „unverzüglich und möglichst binnen 72 Stunden“ und die Begründungspflicht (Art. 33 Abs. 1 Satz 2) ergänzt (Wortlaut gelesen 22.10.2026, gesetze.legal); der Countdown der App rechnet weiter stundengenau |
+| K-139 | `datenschutz.datenpanne_meldung` | F.60 | Prüfvermerk Rechtsanwalt 22.10.2026: Benachrichtigung der Betroffenen bei hohem Risiko (Art. 34 DSGVO) als eigene Pflicht – neuer Eintrag datenschutz.datenpanne_benachrichtigung |
+| K-140 | `datenschutz.datenpanne_meldung` | F.60 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): P2D als konservative Abbildung der 72 Stunden vertretbar; Text nach Art. 33 Abs. 1 richtig |
+| K-141 | `datenschutz.dsb` | F.61 | Frist „unverzüglich nach Eintritt der Voraussetzung“ (Prüfvermerk Rechtsanwalt 22.10.2026) nur im Text – kein Ereignis dafür |
+| K-142 | `datenschutz.dsb_streichung` | F.61 | Rechtsstand 21.10.2026: nur Ankündigung (Modernisierungsagenda, Koalitionsausschuss 2.7.2026), kein Referentenentwurf gefunden – vor Launch und zum Jahreswechsel erneut prüfen (Prüfvermerk Rechtsanwalt 22.10.2026: „Vor Launch prüfen“; Stand 22.10.2026 weiterhin kein Entwurf gefunden); erwartet_ab bewusst leer (Zusage betrifft nur das Einbringen bis 31.12.2026) |
+| K-143 | `datenschutz.dsb_streichung` | F.61 | Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“) |
+| K-144 | `datenschutz.dsb_streichung` | F.61 | Vorbereitungs-Checkliste fachlich prüfen |
+| K-145 | `datenschutz.dsfa` | F.62 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-146 | `datenschutz.dsfa` | F.62 | Muss-Liste der DSK als Verweis im Text (Prüfvermerk Rechtsanwalt 22.10.2026); Ortung nicht als Auslöser ergänzt (vom Prüfvermerk nicht verlangt; die DSFA-Pflicht bei Ortung steht in datenschutz.ortung) – als Auslöser vorschlagen; Link zur Muss-Liste nicht geprüft |
+| K-147 | `datenschutz.informationspflichten` | F.58 | Vorlage Datenschutzerklärung (6.4) erst nach Prüfung |
+| K-148 | `datenschutz.loeschkonzept` | F.58 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-149 | `datenschutz.ortung` | F.63 | Prüfvermerk Rechtsanwalt 22.10.2026: Rechtsgrundlage Art. 6 Abs. 1 lit. f (§ 26 BDSG nur ergänzend, nicht genannt), DSFA nach Muss-Liste, Zustelldaten als Hinweis – umgesetzt; Zustelldaten nicht als eigene Pflicht abgebildet |
+| K-150 | `datenschutz.tom` | F.58 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-151 | `datenschutz.tom` | F.58 | Vorschlagsliste typischer Maßnahmen für Kleinbetriebe fachlich erstellen |
+| K-152 | `datenschutz.videoueberwachung` | F.62 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-153 | `datenschutz.videoueberwachung` | F.62 | Speicherdauer 48–72 Stunden als Regelwert laut Prüfvermerk Rechtsanwalt 22.10.2026 (DSK-Orientierungshilfe, Fundstelle nicht verlinkt) |
+| K-154 | `datenschutz.vvt` | F.58 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-155 | `gesellschaft.awv_meldung` | B.21 | Freigabe Rechtsanwalt 22.10.2026: Meldegrenze und Auslöser umgesetzt. Freigabe Rechtsanwalt Runde 2 (23.10.2026): Frist „bis zum siebten Werktag des folgenden Monats“ (§ 71 Abs. 6 AWV) bestätigt, „7. Kalendertag, Abs. 8“ verworfen – in Erklärung und Rechtsgrundlage eingetragen. „Wiederkehrend je Monat mit Zahlung“ NICHT als Termin abgebildet: Es gibt kein Ereignis für eine meldepflichtige Auslandszahlung und keine Fälligkeit „n-ter Werktag des Folgemonats“ (Fristtypen: Tag nach Periodenende, feste Termine, n-letzter Bankarbeitstag); die Frist bleibt „dauerhaft“, der Termin steht nur im Text |
+| K-156 | `gesellschaft.awv_meldung` | B.21 | Rechtsanwalt Runde 3 (23.10.2026), freigegeben: Frist nur im Text genügt (Meldepflicht ereignisbezogen, ohne Erfassung der Zahlung nicht terminierbar); seine Formulierung „bis zum 7. Werktag des Monats, der auf die Zahlung folgt (§ 71 Abs. 6 AWV)“ in die Erklärung übernommen |
+| K-157 | `gesellschaft.egbr_hinweis` | B.16 | Freigabe Rechtsanwalt 22.10.2026: „Rechtsform ‚eGbR‘ im Fragebogen ergänzen“ – umgesetzt als Unterart der GbR, nicht als neue Rechtsform: die Registerfrage (profil.gesellschaft.handelsregister) wird auch der GbR gestellt (Gesellschaftsregister), „eingetragen“ = eGbR. abgeleitet.ist_eingetragene_gesellschaft gilt dann auch für die eGbR (Transparenzregister nur für die eingetragene GbR, § 20 Abs. 1 GwG); die GbR-Auslöser (Istkaufmann, Feststellungserklärung) gelten für GbR und eGbR unverändert; dieser Hinweis entfällt für die eingetragene GbR. Kein Auslöser eines freigegebenen Eintrags geändert |
+| K-158 | `gesellschaft.egbr_hinweis` | B.16 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): Umsetzung als Registerfrage für die GbR sachgerecht; Rechtsfolgen (Transparenzregister nur eGbR, keine Handelsregisteranmeldung) bestätigt |
+| K-159 | `gesellschaft.geschaeftsbriefe_pflichtangaben` | B.23 | v2 (Rechtsanwalt, 24.10.2026): Partnerschaftsgesellschaft ergänzt (Auslöser partg und partg_mbb ab Eintragung, Erklärung, Folgen, Rechtsgrundlage). Abweichung: § 7 Abs. 3 PartGG statt „§ 7 Abs. 5 PartGG“ – seit dem MoPeG (1.1.2024) steht die Verweisung auf § 125 Abs. 1 Satz 1 und Abs. 2 HGB in Abs. 3; „Name“ statt „Firma“ (die Partnerschaft führt einen Namen, § 2 Abs. 1 PartGG) und der Namenszusatz der PartG mbB nach dem Wortlaut von § 7 Abs. 3 PartGG. Folgen „entsprechend gegen die vertretungsberechtigten Partner“ über die Verweisung auf § 125 Abs. 2 HGB – bitte bestätigen. eGbR nicht aufgenommen: § 707b BGB verweist nicht auf § 125 oder § 37a HGB. |
+| K-160 | `gesellschaft.geschaeftsbriefe_pflichtangaben` | B.23 | Neu nach Rechtsanwalt (Nachprüfung 23.10.2026, B.15 Frage 1) – bitte ganz prüfen. Abweichungen von seiner Anmerkung: § 125 HGB statt § 125a HGB (aufgehoben seit 1.1.2024, MoPeG); Partnerschaftsgesellschaft und eGbR nicht aufgenommen; Schwere „niedrig“ (nur Zwangsgeld) von uns eingestuft. Gesellschaften erst ab Eintragung (Registerangaben), der e. K. per Rechtsform. |
+| K-161 | `gesellschaft.gesellschaftsvertrag_ohg_kg` | B.14 | Neu nach Rechtsanwalt (Nachprüfung 23.10.2026, B.15 Frage 2) – Text nach seinem Wortlaut; „Kein Bußgeld“ und Schwere „niedrig“ von uns ergänzt, bitte bestätigen. Nur OHG und KG (nicht GmbH & Co. KG – dort zusätzlich der GmbH-Vertrag beim Notar), nur vor der Eintragung. |
+| K-162 | `gesellschaft.jahresabschluss_personenhandel` | B.18 | v2 (Steuerberater, 24.10.2026): nur die Wiederholung geändert – jährlich wiederkehrend statt einmalig; ohne festen Termin, erledigt jeweils für ein Kalenderjahr. Alle anderen Felder unverändert gegenüber v1. |
+| K-163 | `gesellschaft.jahresabschluss_personenhandel` | B.18 | Neu nach Steuerberater (Mail 23.10.2026) – bitte ganz prüfen. Erklärung nach seinen drei Punkten (Aufstellung § 243 Abs. 3, Unterschrift § 245, Offenlegung) und § 242 HGB; Folgen bei Verstoß aus gesellschaft.jahresabschluss (freigegeben von Rechtsanwalt, v5) übernommen und auf alle Kaufleute verallgemeinert („wenn später die Zahlungen eingestellt werden“ wie in steuern.buchfuehrungspflicht) – § 283b StGB rechtlich ggf. durch Rechtsanwalt gegenlesen. Stelle „in der Regel mit deiner Steuerberatung“ nach steuern.buchfuehrungspflicht. |
+| K-164 | `it_sicherheit.nis2_meldepflichten` | F.64 | Prüfvermerk Rechtsanwalt 22.10.2026: Meldestufen nach § 32 BSIG, Sanktionsrahmen § 65 BSIG und Ausblendung der Geschäftsleitungspflichten (§ 38 BSIG) bestätigt. Offen: für Kleinstbetriebe (unter 10 Beschäftigte, nicht IT) ausgeblendet (T-105) – Umsatz- und Bilanzschwelle nicht abgebildet |
+| K-165 | `it_sicherheit.nis2_pruefen` | F.64 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-166 | `it_sicherheit.nis2_pruefen` | F.64 | Prüfvermerk Rechtsanwalt 22.10.2026: größenunabhängige Sektoren (§ 28 Abs. 3 BSIG) als Liste im Text, Umsatzschwelle 10 Mio. € im Auslöser (Vorjahresumsatz; Bilanzsumme nicht im Profil, ohne Umsatzangabe als klein gewertet); vollständige Sektorenliste nicht hinterlegt; § 28 Abs. 3 BSIG nicht im Wortlaut gelesen |
+| K-167 | `it_sicherheit.nis2_registrierung` | F.64 | Prüfvermerk Rechtsanwalt 22.10.2026: Frist als „drei Monate ab Betroffenheit“ über die neue Angabe profil.nis2.betroffen_seit (Check-Frage nur bei NIS2 „ja“); BSI-Kulanz bis 31.7.2026 aus dem Kurztext gestrichen; Sanktion § 65 Abs. 2 Nr. 6, Abs. 5 Satz 1 Nr. 5 BSIG bestätigt |
+| K-168 | `it_sicherheit.nis2_registrierung` | F.64 | Offen: für Kleinstbetriebe (unter 10 Beschäftigte, nicht IT) ausgeblendet (T-105) – Umsatz- und Bilanzschwelle nicht abgebildet |
+| K-169 | `ki.hochrisiko` | F.65 | Prüfvermerk Rechtsanwalt 22.10.2026 (Amtsblatt gegenlesen): am 22.10.2026 im Amtsblatt gelesen – Erwägungsgrund 40 nennt 2.12.2027 (Anhang III) und 2.8.2028 (Anhang I), Erwägungsgrund 46 und ELI-Daten das Inkrafttreten am 27.7.2026 (ABl. L vom 24.7.2026); den verfügenden Text der Änderung von Art. 113 konnte das Werkzeug auf EUR-Lex nicht abrufen (Seite nach 96.975 Zeichen abgeschnitten, auch mit Lesestart weiter hinten; ELI-Seite für das Werkzeug gesperrt). Am 22.10.2026 über die Konsolidierung von buzer.de gelesen (Gegenüberstellung alte/neue Fassung, Änderung durch Art. 1 VO (EU) 2026/1744, ABl. L, 2026/1744, 24.7.2026): Art. 113 Buchst. c n. F. – Kapitel III Abschnitte 1 bis 3 (außer Art. 6 Abs. 5) gelten für Hochrisiko-KI nach Art. 6 Abs. 2 und Anhang III ab 2.12.2027 (Ziff. i), nach Art. 6 Abs. 1 und Anhang I ab 2.8.2028 (Ziff. ii); neuer Buchst. d: Art. 102 bis 110 ab 27.7.2026 – Termine im Eintrag bestätigt. gesetze.legal zeigt noch die alte Fassung (Buchst. c: 2.8.2027). Freigabe Rechtsanwalt Runde 2 (23.10.2026): Termine über die konsolidierte Fassung von Art. 113 belegt – ausreichend |
+| K-170 | `ki.hochrisiko` | F.65 | Status bleibt „beschlossen“ bis 2.12.2027; Anhang-I-Fälle (2.8.2028) und Bestandssysteme (Art. 111: bis 2.8.2030) nicht als eigene Regel abgebildet |
+| K-171 | `ki.hochrisiko` | F.65 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-172 | `ki.hochrisiko` | F.65 | Vorbereitungs-Checkliste fachlich prüfen |
+| K-173 | `ki.kompetenz` | F.65 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-174 | `ki.kompetenz` | F.65 | Inhalt und Umfang einer ausreichenden Schulung fachlich festlegen |
+| K-175 | `ki.kompetenz` | F.65 | Prüfvermerk Rechtsanwalt 22.10.2026: Titel, Kurztext, Schwere niedrig bestätigt, Folgen übernommen; Einordnung als Hinweis „vertretbar“ – nicht umgestellt (bleibt Pflicht). Neuer Art. 4 am 22.10.2026 im Amtsblatt (VO (EU) 2026/1744) gelesen: Anbieter und Betreiber „ergreifen Maßnahmen, um die Entwicklung der KI-Kompetenz ihres Personals“ zu fördern, ein bestimmtes Niveau ist nicht garantiert |
+| K-176 | `ki.transparenz` | F.65 | Prüfvermerk Rechtsanwalt 22.10.2026: Art. 50 Abs. 1, 2 (Übergang bis 2.12.2026), Abs. 4 mit Ausnahme bei redaktioneller Kontrolle und Art. 99 Abs. 4, 6 bestätigt; Fälle für Kleinbetriebe im Text. Offen: Auslöser nur „eigene KI-Produkte“ – Betreiber, die nur KI-Bilder in der Werbung nutzen (Abs. 4), sehen den Eintrag nicht |
+| K-177 | `ki.transparenz` | F.65 | Vorbereitungs-Checkliste fachlich prüfen |
+| K-178 | `online.barrierefreiheit` | G.70 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-179 | `online.barrierefreiheit` | G.70 | Prüfvermerk Rechtsanwalt 22.10.2026: „Bilanzsumme als Alternative ergänzen“ – nur im Text umgesetzt; der Auslöser kennt nur den Vorjahresumsatz (keine Frage nach der Bilanzsumme, bei Einnahmenüberschussrechnung gibt es keine Bilanz – Abbildung offen) |
+| K-180 | `online.barrierefreiheit` | G.70 | Zählweise (G-05) |
+| K-181 | `online.barrierefreiheit` | G.70 | Prüfvermerk Rechtsanwalt 22.10.2026: § 1 Abs. 3, § 3 Abs. 3 BFSG, Sanktion § 37 Abs. 1 Nr. 8, Abs. 2 (100.000 €) bestätigt, Schwere „hoch“, Liste der Dienstleistungen im Text |
+| K-182 | `online.button_loesung` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-183 | `online.button_loesung` | G.68 | Beispiele zulässiger und unzulässiger Beschriftungen nach Prüfvermerk Rechtsanwalt 22.10.2026 |
+| K-184 | `online.cookie_einwilligung` | F.63 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-185 | `online.cookie_einwilligung` | F.63 | URL gesetze-im-internet.de/ttdsg bleibt gültig (Pfad nicht umbenannt), Sanktion bestätigt (Prüfvermerk Rechtsanwalt 22.10.2026) |
+| K-186 | `online.dac7` | G.74 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-187 | `online.dac7` | G.74 | Hinweis und Meldeschwelle (§ 4 Abs. 5 Nr. 4 PStTG) nach Prüfvermerk Rechtsanwalt 22.10.2026 |
+| K-188 | `online.datenschutzerklaerung` | G.66 | Vorlage erst nach fachlicher Prüfung (6.4) |
+| K-189 | `online.datenschutzerklaerung` | G.66 | Frist „ab Live-Schaltung“ (Prüfvermerk Rechtsanwalt 22.10.2026) nur im Text – kein Ereignis dafür |
+| K-190 | `online.impressum` | G.66 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-191 | `online.impressum` | G.66 | Checkliste je Rechtsform: Verweis auf die Vorlage Impressum (Prüfvermerk Rechtsanwalt 22.10.2026) |
+| K-192 | `online.kuendigungsbutton` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-193 | `online.kuendigungsbutton` | G.68 | Beschriftung, Bestätigungsseite (Abs. 2), Eingangsbestätigung (Abs. 4) und Folge (Abs. 6) nach Prüfvermerk Rechtsanwalt 22.10.2026 |
+| K-194 | `online.marktplatz_angaben` | G.74 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-195 | `online.marktplatz_angaben` | G.74 | § 5 DDG für den Händler, Art. 30 DSA für den Plattformbetreiber und Sanktion § 33 Abs. 2 Nr. 1, Abs. 6 DDG bestätigt (Prüfvermerk Rechtsanwalt 22.10.2026) |
+| K-196 | `online.os_link` | G.69 | Aufhebung zum 20.07.2025 durch VO (EU) 2024/3228 bestätigt, Abmahnrisiko eines veralteten Links nach Prüfvermerk Rechtsanwalt 22.10.2026 – Fundstelle (ABl.) der Quelle noch eintragen |
+| K-197 | `online.preisangaben` | G.67 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-198 | `online.preisangaben` | G.67 | Prüfvermerk Rechtsanwalt 22.10.2026: Sanktion § 20 PAngV i. V. m. § 3 Abs. 2 WiStrG (25.000 €) bestätigt. Zusatz „künftig bis 100.000 € nach PAngG (G. v. 19.10.2026, BGBl. 2026 I Nr. 314)“ gestrichen, bis die Fundstelle mit Inkrafttretensdatum vorliegt und geprüft ist – am 22.10.2026 nicht geprüft (buzer nennt das Gesetz, aber kein Inkrafttretensdatum; BGBl. nicht abgerufen). Quellen BT-Drs. 21/5873 und BR-Drs. 499/26 dafür entfernt |
+| K-199 | `online.vsbg_hinweis` | G.69 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-200 | `online.vsbg_hinweis` | G.69 | Prüfvermerk Rechtsanwalt 22.10.2026: § 36 Abs. 1, 3 VSBG und Zählweise nach Köpfen bestätigt, Folge UWG-Abmahnung (§ 3a UWG) eingetragen, Auslöser Website (oder Onlineshop/App) statt AGB. Offen: Stichtag 31.12. des Vorjahres ist im Auslöser nicht abgebildet |
+| K-201 | `online.vsbg_streitfall` | G.69 | Prüfvermerk Rechtsanwalt 22.10.2026 (am Wortlaut gegenlesen): § 37 Abs. 1, 2 VSBG am 22.10.2026 auf gesetze-im-internet.de gelesen – Hinweis in Textform auf eine zuständige Verbraucherschlichtungsstelle mit Anschrift und Webseite, Angabe der Bereitschaft oder Pflicht zur Teilnahme; Text stimmt. Als Hinweis richtig, Folge UWG-Abmahnung eingetragen |
+| K-202 | `online.widerrufsbelehrung` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-203 | `online.widerrufsbelehrung` | G.68 | Muster-Widerrufsbelehrung erst nach Prüfung |
+| K-204 | `online.widerrufsbelehrung` | G.68 | Muster nach Gestaltungshinweis 3 (Widerrufsbutton, Anlage 1 zu Art. 246a § 1 Abs. 2 S. 2 EGBGB) anpassen (Rechtsprüfung R11 Befund 9) |
+| K-205 | `online.widerrufsbelehrung` | G.68 | Verträge außerhalb von Geschäftsräumen als eigene Pflicht (branche.widerruf_ausserhalb_geschaeftsraeume) |
+| K-206 | `online.widerrufsbelehrung` | G.68 | Prüfvermerk Rechtsanwalt 22.10.2026: § 312d, Art. 246a EGBGB, § 355, § 356 Abs. 3–5 n. F., § 357a Abs. 2 bestätigt; Muster nach Anlage 1 EGBGB mit Gestaltungshinweis (Stand 19.6.2026) und Ausnahmen § 312g Abs. 2 als Hinweis im Text |
+| K-207 | `online.widerrufsbutton` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-208 | `online.widerrufsbutton` | G.68 | Vorprüfung 21.10.2026 (G.68, T-29): Beschriftungen „Vertrag widerrufen“ / „Widerruf bestätigen“ (oder gleichbedeutend eindeutig) und Eingangsbestätigung auf dauerhaftem Datenträger mit Inhalt, Datum und Uhrzeit nach § 356a Abs. 1, 3, 4 BGB gelesen |
+| K-209 | `personal.arbeitszeit_neuregelung` | D.42 | Übergangsfristen laut Handwerksblatt (unter 250: zwei Jahre, unter 50: fünf Jahre; 1.10.2026 zusätzlich „ab 250 mindestens ein Jahr“) – gegen den Entwurfstext prüfen; laut Freigabe Rechtsanwalt 22.10.2026 sind Angaben zu Fristen nicht bestätigbar, solange kein Kabinettsbeschluss vorliegt |
+| K-210 | `personal.arbeitszeit_neuregelung` | D.42 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): als Radar ohne Fristangaben freigegeben; vor dem Launch und nach dem Kabinettsbeschluss erneut vorlegen |
+| K-211 | `personal.aufenthaltstitel` | D.38 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): § 98 Abs. 2a Nr. 2, Abs. 5 AufenthG (30.000 €) nur für die unterlassene Mitteilung bestätigt; für die fehlende Kopie besteht kein eigener Bußgeldtatbestand, Nr. 1 betrifft die Beauftragung nach § 4a Abs. 5 S. 1. Folgentext in dieser Fassung in Ordnung |
+| K-212 | `personal.aufenthaltstitel_laufend` | D.38 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): § 98 Abs. 2a Nr. 2, Abs. 5 AufenthG (30.000 €) nur für die unterlassene Mitteilung bestätigt; für die fehlende Kopie besteht kein eigener Bußgeldtatbestand, Nr. 1 betrifft die Beauftragung nach § 4a Abs. 5 S. 1. Folgentext in dieser Fassung in Ordnung |
+| K-213 | `personal.ausbildungsverguetung` | D.39 | Freigabe Rechtsanwalt Runde 2 (23.10.2026) (ändern): Beträge je Jahr des Ausbildungsbeginns (§ 17 Abs. 2 BBiG) in den Text übernommen – Beginn 2026: 724/854/977/1.014 €, Beginn 2027: 764/902/1.031/1.070 € (BGBl. 2026 I Nr. 287); Hinweis „gelten für die gesamte Ausbildung nach dem Beginnjahr, tarifliche Vergütung geht vor (§ 17 Abs. 3, 4 BBiG)“ im Text. Beträge nur im Text, kein Regelwert – für einen Ausbildungsbeginn 2028 nach der nächsten Bekanntmachung ergänzen |
+| K-214 | `personal.aushangpflichtige_gesetze` | D.48 | Prüfergebnis Sifa 22.10.2026 umgesetzt (Liste je Belegschaft); abweichend vom Prüfergebnis gilt § 48 JArbSchG erst ab drei Jugendlichen (Wortlaut geprüft); Liste für alle anzuzeigen laut Prüfvermerk Rechtsanwalt 22.10.2026 vertretbar |
+| K-215 | `personal.aushangpflichtige_gesetze` | D.48 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-216 | `personal.aushangpflichtige_gesetze` | D.48 | Prüfvermerk Rechtsanwalt 22.10.2026: ArbZG, JArbSchG, MuSchG bestätigt; AGG-Folge (§ 15 AGG) übernommen. Freigabe Rechtsanwalt Runde 2 (23.10.2026): § 32 DGUV Vorschrift 1 verweist nur auf § 12 Abs. 2, für das Zugänglichmachen nach Abs. 1 kein Bußgeld – Folge „keine“ eingetragen. Seinen Zusatz „Aufsicht kann Anordnung nach § 17 SGB VII treffen“ nicht übernommen: § 17 SGB VII regelt Überwachung und Beratung; die Anordnung im Einzelfall zur Erfüllung der Pflichten aus Unfallverhütungsvorschriften steht in § 19 Abs. 1 Satz 1 Nr. 1 SGB VII (lxgesetze.de, 22.10.2026) – bei Bedarf mit dieser Fundstelle ergänzen |
+| K-217 | `personal.bewacherregister` | A.3 | Freigabe Rechtsanwalt 22.10.2026: Schwere „hoch“ umgesetzt. Freigabe Rechtsanwalt Runde 2 (23.10.2026): Abmeldung nach § 11b Abs. 6 GewO (sechs Wochen nach Beendigung über das Bewacherregister) bestätigt; die Fundstelle der ersten Rückmeldung (§ 11b Abs. 3 GewO, § 16 Abs. 3 BewachV) war unzutreffend. Text und Schwere „hoch“ in Ordnung |
+| K-218 | `personal.entgelttransparenz_bericht` | D.47 | Rechtsstand 21.10.2026: kein deutsches Umsetzungsgesetz, kein veröffentlichter Referentenentwurf (BT-Drs. 21/7026: Vorbereitungen laufen) – nationale Stichtage und Schwellen nach Verkündung übernehmen |
+| K-219 | `personal.entgelttransparenz_bericht` | D.47 | Gruppe 100–149 Beschäftigte (ab 7.6.2031, Art. 9 Abs. 1 lit. c RL) nicht als eigene Regel abgebildet; Schwelle ≥ 150 und Termine bestätigt (Prüfvermerk Rechtsanwalt 22.10.2026) |
+| K-220 | `personal.entgelttransparenz_bericht` | D.47 | Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie) |
+| K-221 | `personal.entgelttransparenz_bericht` | D.47 | Zählweise und Inhalt des Berichts nach Umsetzungsgesetz |
+| K-222 | `personal.entgelttransparenz_bericht` | D.47 | Vorbereitungs-Checkliste fachlich prüfen |
+| K-223 | `personal.fuehrerscheinkontrolle` | D.46 | Prüfergebnis Sifa 22.10.2026 (frei): halbjährlicher Rhythmus ist Praxis, keine Rechtsfrist (so im Text) – Vorlage „Führerscheinkontrolle je Fahrer“ mit Termin fehlt |
+| K-224 | `personal.hinweisgeber_meldestelle` | D.46 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-225 | `personal.jugend_erstuntersuchung` | D.44 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): § 58 Abs. 1 Nr. 22, Abs. 4 JArbSchG bestätigt (am Wortlaut gegengelesen; Nr. 20 aus der ersten Rückmeldung war falsch) – Nummer in den Sanktionstext übernommen |
+| K-226 | `personal.jugend_nachuntersuchung` | D.44 | Freigabe Rechtsanwalt Runde 2 (23.10.2026) (zu personal.jugend_erstuntersuchung): Bußgeld § 58 Abs. 1 Nr. 23 JArbSchG („entgegen § 33 Abs. 3 einen Jugendlichen ohne ärztliche Bescheinigung über die erste Nachuntersuchung weiterbeschäftigt“), Abs. 4 bis 30.000 € eingetragen – Wortlaut am 22.10.2026 gelesen (gesetze-im-internet.de) |
+| K-227 | `personal.kuenstlersozialabgabe` | D.51 | Auslöser: Es gibt keine Frage nach Aufträgen an selbstständige Kreative. Vorläufig erscheint der Hinweis bei eigener Website oder Social-Media-Profil (typischer Anlass für Eigenwerbung, § 24 Abs. 2 KSVG) – vertretbar, oder zu breit? Vorschlag einer eigenen Frage für den Gründer: PRUEFLISTE T-197. Bis dahin Einordnung „Hinweis“ ohne Termin; mit eigener Frage als Pflicht mit Termin 31.3. (§ 27 Abs. 1 KSVG). |
+| K-228 | `personal.kuenstlersozialabgabe` | D.51 | Gliederung von § 24 KSVG: Eigenwerbung und Nutzung für Einnahmen sind als § 24 Abs. 2 (Satz 1 Nr. 1 und 2), die 1.000-€-Grenze als Teil von Abs. 2 zitiert; Abs. 3 ist weggefallen. Die Vorgabe der externen Prüfung („§ 24 Abs. 1 Satz 2 Generalklausel“, „§ 24 Abs. 3, 450 €“) entspricht nicht der aktuellen Fassung – Satz-Zitate bitte bestätigen. |
+| K-229 | `personal.kuenstlersozialabgabe` | D.51 | Geringfügigkeitsgrenze: Gesetzestext nennt 1.000 € im Kalenderjahr; laut KSK (Info 25) 450 € bis 2024, 700 € für 2025, 1.000 € ab 2026. Übergangsregel für 2025 nur aus der KSK-Schrift, nicht im Text genannt. |
+| K-230 | `personal.kuenstlersozialabgabe` | D.51 | Abgabesatz ändert sich jährlich: 4,9 % gilt nur für 2026; für 2027 ist laut Fachpresse 5,0 % angekündigt – nach Verkündung der Künstlersozialabgabe-Verordnung 2027 Text und Version anpassen (oder Satz als Regelwert pflegen). |
+| K-231 | `personal.kuenstlersozialabgabe` | D.51 | Beispiele „Grafik, Fotos oder Texte“ in der Kurzfassung: ob ein Auftrag (z. B. Webdesign mit technischem Schwerpunkt) künstlerisch oder publizistisch ist, entscheidet der Einzelfall – Formulierung in Ordnung? |
+| K-232 | `personal.kuenstlersozialabgabe` | D.51 | Zahlungen an juristische Personen und an OHG/KG zählen laut KSK nicht zur Bemessungsgrundlage (Info 25) – nicht in die Erklärung aufgenommen, weil nicht aus § 25 KSVG selbst; aufnehmen? |
+| K-233 | `personal.kuenstlersozialabgabe` | D.51 | Ausnahmen in § 24 Abs. 2 KSVG (höchstens drei Veranstaltungen im Jahr; Musikvereine mit Chorleitern/Dirigenten) nicht erwähnt – nötig? |
+| K-234 | `personal.kuenstlersozialabgabe` | D.51 | Kanal „post“ nach dem Wortlaut „Vordruck“ (§ 27 Abs. 1 KSVG); ob die KSK eine Online-Meldung anbietet, nicht geprüft. Erstmalige Erfassung bei der KSK (Anmeldung als Abgabepflichtiger) nicht eigens beschrieben. |
+| K-235 | `personal.kuenstlersozialabgabe` | D.51 | Prüfer: Rechtsanwalt (Sozialversicherungsrecht wie die übrigen Personal-Einträge); alternativ Steuerberater – siehe E-195. |
+| K-236 | `personal.kuenstlersozialabgabe` | D.51 | Rechtsanwalt 26.10.2026 (E-201, beim Gründer): Fragen beantwortet – Auslöser als Hinweis ohne Termin vertretbar, mit eigener Frage Pflicht mit Termin 31.3. (T-197); Zitate zu § 24 Abs. 2 bestätigt; Übergangswerte 450/700 € und die Ausnahmen nach Abs. 2 Satz 3 nicht in den Text; Erstanmeldung muss nicht beschrieben werden; Abgabesatz nicht als Zahl in den Text. v2 übernimmt seine Änderungen wörtlich. |
+| K-237 | `personal.lohnabrechnung` | D.49 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-238 | `personal.lohnabrechnung` | D.49 | Partner noch nicht gewählt (Abschnitt 5, Integration offen) |
+| K-239 | `personal.lohnabrechnung` | D.49 | Prüfvermerk Rechtsanwalt 22.10.2026: als Hinweis in Ordnung (§§ 95 ff. SGB IV). „Amtlos durch Markennamen ersetzen“: erledigt das Katalog-Bündel (werkzeuge/katalog-buendel.mjs ersetzt „Amtlos“ durch MARKE.name, docs/14-marke.md) – im Katalogtext bleibt „Amtlos“ |
+| K-240 | `personal.lohnnachweis_bg` | D.40 | Freigabe Rechtsanwalt Runde 2 (23.10.2026) (ändern): beide Normen genannt – § 111 Abs. 1 Nr. 5, Abs. 4 SGB IV (bis 25.000 €) ist die Bußgeldnorm mit dem höheren Rahmen und bei Tateinheit maßgeblich (§ 19 Abs. 1, 2 OWiG), § 209 Abs. 1 Nr. 5 Buchst. a, Abs. 3 SGB VII (bis 2.500 €) daneben; Sanktionstext in seiner Formulierung, Schwere „mittel“ |
+| K-241 | `personal.lohnsteuerbescheinigung` | D.50 | Frist bei Ende des Dienstverhältnisses im laufenden Jahr: Das Lohnkonto wird beim Ausscheiden abgeschlossen (§ 41b Abs. 1 Satz 1 EStG); als Übermittlungsfrist ist der letzte Februartag des Folgejahres angenommen (§ 93c Abs. 1 Nr. 1 AO) – keine frühere Pflicht? Die App zeigt nur den Jahrestermin. |
+| K-242 | `personal.lohnsteuerbescheinigung` | D.50 | Auslöser wie bei der Lohnsteuer-Anmeldung (Anmeldezeitraum nicht „keine“; seit E-206 auch ohne Angabe des Anmeldezeitraums): Betriebe, die nur Minijobs mit Pauschsteuer von 20 % nach § 40a Abs. 2a EStG beim Finanzamt anmelden, sehen den Eintrag, obwohl § 41b Abs. 6 EStG pauschal besteuerten Lohn ausnimmt – Hinweis im Text genügt, oder eigene Frage? |
+| K-243 | `personal.lohnsteuerbescheinigung` | D.50 | Folgen: keine eigene Bußgeldvorschrift gefunden (§ 41b Abs. 2a EStG ist weggefallen, § 379 AO nennt § 93c AO nicht) – genannt sind nur die Haftung nach § 72a Abs. 4 AO und § 42d Abs. 1 Nr. 3 EStG. Vollständig? Zwangsgeld (§§ 328, 329 AO) erwähnen? Schwere „mittel“ angemessen? |
+| K-244 | `personal.lohnsteuerbescheinigung` | D.50 | Verschiebung auf den nächsten Werktag (§ 108 Abs. 3 AO) auch für die Frist des § 93c Abs. 1 Nr. 1 AO? Kalender bundesland wie bei der Lohnsteuer-Anmeldung. |
+| K-245 | `personal.lohnsteuerbescheinigung` | D.50 | Ausnahme Privathaushalt ohne maschinelle Lohnabrechnung mit nur geringfügig Beschäftigten (§ 41b Abs. 3 EStG, Papierbescheinigung) nicht erwähnt, weil die App Betriebe anspricht – in Ordnung? |
+| K-246 | `personal.lohnsteuerbescheinigung` | D.50 | Doppelung geprüft: personal.lohnsteuer_anmeldung (§ 41a EStG) und personal.lohnabrechnung (Meldungen SV) decken § 41b EStG nicht ab. Ein Querverweis in personal.lohnsteuer_anmeldung wäre eine Änderung am freigegebenen Eintrag (PRUEFLISTE T-198). |
+| K-247 | `produkte.bargeldobergrenze_radar` | G.75 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): Art. 80 Abs. 1 (10.000 €, auch Teilbeträge) und Art. 90 Abs. 1 (Geltung ab 10.7.2027) VO (EU) 2024/1624 bestätigt; Status „beschlossen“ richtig; Sanktionen national (Art. 80 Abs. 5) noch offen |
+| K-248 | `produkte.bargeldobergrenze_radar` | G.75 | Auslöser wie produkte.geldwaesche_gueterhaendler (Warenverkauf mit hohen Barzahlungen) – Art. 80 erfasst auch Dienstleistungen und das Leisten von Barzahlungen; das Profil fragt hohe Barzahlungen nur für Waren ab. Laut Prüfer auf Dienstleistungen erweitern, sobald das Profil das hergibt – braucht eine neue Angabe (die Frage profil.handel.hohe_bargeschaefte fragt nur nach Waren), noch nicht umgesetzt |
+| K-249 | `produkte.bargeldobergrenze_radar` | G.75 | Sanktion: Art. 80 Abs. 5 verlangt Sanktionen der Mitgliedstaaten; deutsche Bußgeldnorm am 22.10.2026 nicht gesucht – ergänzen, sobald geregelt. Amtsblatt-Text (EUR-Lex) nicht abgerufen, Wortlaut aus Haufe-Normtext und Springlex |
+| K-250 | `produkte.barrierefreiheit` | G.70 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-251 | `produkte.barrierefreiheit` | G.70 | Prüfvermerk Rechtsanwalt 22.10.2026: Produktliste § 1 Abs. 2 BFSG als Auswahlfrage profil.produkte.bfsg_produkte (Nr. 1 bis 5) umgesetzt; Auslöser Elektrogeräte und mindestens ein Produkt der Liste, ohne Angabe „unklar“; Sanktion bestätigt. Freigabe Rechtsanwalt Runde 2 (23.10.2026): Auswahlfrage und Beispiele bestätigt (Notebook, Tablet, Smartphone: Nr. 1 Hardwaresysteme; Router: Nr. 3; Smart-TV: Nr. 4; E-Book-Reader: Nr. 5) – Antworttexte der Frage entsprechend geordnet (Smartphones bei Nr. 1) |
+| K-252 | `produkte.batterien` | G.72 | Prüfvermerk Rechtsanwalt 22.10.2026: Herstellerbegriff und Installateur mit Inlandseinkauf als Vertreiber bestätigt; Vertreiberpflichten (Rücknahme von Gerätebatterien) als eigener Hinweis – Eintrag fehlt noch |
+| K-253 | `produkte.batterien` | G.72 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-254 | `produkte.batterien` | G.72 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
+| K-255 | `produkte.elektrogeraete` | G.72 | Prüfvermerk Rechtsanwalt 22.10.2026: Herstellerbegriff § 3 Nr. 9 ElektroG und Inlandsgroßhandel = Vertreiber bestätigt; Pflichten als Vertreiber (Rücknahme) nicht abgebildet |
+| K-256 | `produkte.elektrogeraete` | G.72 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-257 | `produkte.elektrogeraete` | G.72 | Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“ |
+| K-258 | `produkte.geldwaesche_gueterhaendler` | G.75 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-259 | `produkte.geldwaesche_gueterhaendler` | G.75 | Bargeldobergrenze 10.000 € ab 10.7.2027 nach Art. 80 AMLR (VO (EU) 2024/1624) – laut Prüfvermerk Rechtsanwalt 22.10.2026 als Radar richtig; Radar-Eintrag fehlt noch |
+| K-260 | `produkte.geldwaesche_gueterhaendler` | G.75 | Immobilien- und Finanzbranche als Branchenmodul (H) |
+| K-261 | `produkte.geldwaesche_gueterhaendler` | G.75 | Schwellen § 10 Abs. 6a GwG (2.000 € bei hochwertigen Gütern einschließlich Edelmetallen, § 1 Abs. 10 Satz 2 Nr. 1 GwG) und Sanktion § 56 GwG bestätigt (Prüfvermerk Rechtsanwalt 22.10.2026) |
+| K-262 | `produkte.geraetebatterien_ruecknahme` | G.72 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): § 14 BattDG (Rücknahmepflicht des Händlers für Geräte- und LV-Altbatterien, unentgeltlich, ohne Kaufzwang), Art. 62 VO (EU) 2023/1542 und Sanktionsstaffel (§ 60 Abs. 1 Nr. 1 Buchst. b, Nr. 6, Abs. 2 Nr. 26, Abs. 3 BattDG) bestätigt; Hinweis „Rücknahme auf haushaltsübliche Mengen des eigenen Sortiments beschränkt (§ 14 Abs. 1 S. 2 BattDG)“ im Text (Wortlaut gesetze.legal, 22.10.2026: „die Menge an Altbatterien, derer sich private Endnutzer üblicherweise entledigen“; Abs. 1 hat drei Sätze – Verweis „Satz 2 bis 4“ berichtigt) |
+| K-263 | `produkte.geraetebatterien_ruecknahme` | G.72 | Auslöser „Batterien“ im Sortiment (profil.produkte.arten) – das Profil unterscheidet nicht nach Batteriekategorie; wer nur Geräte mit eingebauten Batterien oder nur Starterbatterien verkauft, fällt nicht unter § 14 BattDG (Starterbatterien: produkte.starterbatterien_ruecknahme) |
+| K-264 | `produkte.gpsr` | G.73 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-265 | `produkte.gpsr` | G.73 | Prüfvermerk Rechtsanwalt 22.10.2026: Auslöser getrennt – Händler (Art. 12, Schwere „mittel“) hier, Herstellerpflichten (Art. 9, 11) in produkte.gpsr_hersteller (Auslöser profil.produkte.hersteller), Fernabsatzangaben (Art. 19) in produkte.gpsr_fernabsatz (Onlineshop, Marktplatz, App); Kosmetik: Kosmetikverordnung geht vor (Art. 2 Abs. 1). „Dringend ohne Termin“ entfernt, weil Folgen erfasst und Schwere bewusst „mittel“; Online-Check-Link in den Fernabsatz-Eintrag verschoben |
+| K-266 | `produkte.gpsr` | G.73 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): Händlertext nach Art. 12 Abs. 1–3 GPSR (Prüfung von Kennzeichnung, Angaben, Anweisungen; keine Bereitstellung bei Kenntnis der Nichtkonformität), Sanktion § 28 Abs. 2 Nr. 21 ProdSG (verweist auf Art. 12 Abs. 3 GPSR) und Schwere „mittel“ bestätigt |
+| K-267 | `produkte.gpsr_fernabsatz` | G.73 | Neu nach Prüfvermerk Rechtsanwalt 22.10.2026 zu produkte.gpsr („Auslöser trennen“). Freigabe Rechtsanwalt Runde 2 (23.10.2026): Art. 19 Buchst. a–d GPSR (Name/Anschrift des Herstellers, der verantwortlichen Person, Produktkennung, Warnhinweise), Sanktion § 28 Abs. 2 Nr. 26 ProdSG und Schwere „mittel“ bestätigt |
+| K-268 | `produkte.gpsr_fernabsatz` | G.73 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-269 | `produkte.gpsr_hersteller` | G.73 | Neu nach Prüfvermerk Rechtsanwalt 22.10.2026 zu produkte.gpsr („Auslöser trennen“). Freigabe Rechtsanwalt Runde 2 (23.10.2026) (ändern): Sanktionen § 28 Abs. 2 Nr. 1–6 ProdSG bestätigt; ergänzt: verantwortliche Person in der EU (Art. 16 GPSR), Rückruf- und Meldepflichten (Art. 9 Abs. 8, Art. 20 Safety-Business-Gateway) als Hinweis, Schwere „hoch“ (Marktüberwachung, Rücknahmeanordnungen nach § 26 ProdSG). Art. 9, 16, 20 GPSR am 22.10.2026 gelesen (gesetze.legal), § 26 ProdSG über freirecht.de (Abs. 2 Nr. 7, Abs. 4: Rücknahme/Rückruf) |
+| K-270 | `produkte.gpsr_hersteller` | G.73 | Frist nicht in der Spezifikation genannt – Frist „vor dem Inverkehrbringen“ ohne Termin |
+| K-271 | `produkte.starterbatterien_ruecknahme` | G.72 | Prüfvermerk Rechtsanwalt 22.10.2026: § 18 BattDG und Sanktion über § 4 Abs. 2 bestätigt. Pfand auf Starterbatterien unter dem BattDG prüfen (früher § 10 BattG, 7,50 €) – bis dahin nicht nennen (wird nicht genannt); Händlerpflichten für Gerätebatterien nicht abgebildet |
+| K-272 | `produkte.verpackung` | G.71 | Prüfvermerk Rechtsanwalt 22.10.2026 (Fundstelle belegen): VerpackDG vom 13.7.2026, BGBl. 2026 I Nr. 207, in Kraft 12.8.2026 (Art. 8 Abs. 7) am 22.10.2026 auf gesetze-im-internet.de belegt; § 6 Abs. 1 Satz 1 „vor dem erstmaligen Bereitstellen“, § 7 Abs. 1 Satz 1 „vor der Bereitstellung“ gelesen. Abgrenzung systembeteiligungspflichtig nicht weiter geprüft |
+| K-273 | `produkte.verpackung` | G.71 | Neue Herstellerpflichten aus der PPWR (z. B. Herstellerregister nach Art. 44, Kennzeichnung) und B2B-Verpackungen (§ 68 Abs. 9 VerpackDG, Übergang bis 31.12.2027) nicht abgebildet |
+| K-274 | `produkte.verpackung` | G.71 | Prüfvermerk Rechtsanwalt 22.10.2026: Frist mit Ereignis „erstes Inverkehrbringen“ – umgesetzt als relative Frist (vor Beginn) zur neuen Angabe profil.produkte.verpackung_ab („Ab wann bringst du zum ersten Mal verpackte Waren in Verkehr?“, nur bei verpackter Ware, ausdrücklich nur für Betriebe, die noch nicht begonnen haben); ohne Datum kein Termin – Bestandsbetriebe bekommen keine überfällige Frist; Sanktionen plausibel |
+| K-275 | `produkte.verpackung` | G.71 | Freigabe Rechtsanwalt Runde 2 (23.10.2026): VerpackDG belegt, Frist mit Ereignis umgesetzt – freigegeben; Schwere „hoch“ bleibt |
+| K-276 | `steuern.buchfuehrungspflicht` | C.28 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
+| K-277 | `steuern.e_rechnung_empfang` | C.30 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
+| K-278 | `steuern.e_rechnung_versand_2027` | C.30 | Steuerberater 22.10.2026: Übergangsfristen am 22.10.2026 unverändert – vor dem Start und vor dem 01.01.2027 erneut prüfen |
+| K-279 | `steuern.e_rechnung_versand_2027` | C.30 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
+| K-280 | `steuern.e_rechnung_versand_2028` | C.30 | Steuerberater 22.10.2026: Übergangsfristen am 22.10.2026 unverändert („sonst wie 2027“, siehe steuern.e_rechnung_versand_2027) – vor dem Start erneut prüfen |
+| K-281 | `steuern.kasse_tse_belegausgabe` | C.33 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
+| K-282 | `steuern.kleinunternehmer_grenze_offene_rechnungen` | C.23 | neu am 22.10.2026, Prüfung durch Steuerberater ausstehend (Steuer-Eintrag; Anlass: seine Rückmeldung Runde 2 zu steuern.kleinunternehmer_grenze_ueberschritten und …_naechstes_jahr) |
+| K-283 | `steuern.kleinunternehmer_grenze_offene_rechnungen` | C.23 | Auslöser: Zählung mit Ersatzregel (finanzen.umsatz.vereinnahmt_*, offene Rechnungen ab Rechnungsdatum) über einer Grenze, Zählung nur aus Zahlungseingängen (finanzen.umsatz.bezahlt_*) nicht – Gründungsjahr 25.000 €, laufendes Jahr 100.000 € und 25.000 € (ab 1. Januar), Vorjahr 25.000 €. Auf dem Server fehlen die Zahlungsfakten (dort keine Zahlungseingänge): Er zeigt den Hinweis, sobald seine Rechnungen nach Rechnungsdatum über einer Grenze liegen – fachlich prüfen, ob der Text dafür passt |
+| K-284 | `steuern.kleinunternehmer_grenze_offene_rechnungen` | C.23 | Formulierung „weist keine Umsatzsteuer aus, solange …“ nach Steuerberater (§ 14c Abs. 2 UStG); RDG: als Information formuliert – prüfen. Wortlaut § 19 UStG n. F. am 22.10.2026 nicht abrufbar (Allowlist), Inhalt nach Steuerberater |
+| K-285 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Steuerberater 22.10.2026, Runde 2 – umgesetzt (v6): Umsatzbegriff vereinnahmte Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.). Auslöser über finanzen.umsatz.bezahlt_laufendes_jahr und …_vorjahr: nur tatsächliche Zahlungseingänge auf Rechnungen, Kasse und Sachentnahmen (§ 3 Abs. 1b UStG, bestätigt); offene Rechnungen zählen nicht (§ 14c Abs. 2 UStG) – liegt die Grenze nur mit ihnen darüber, zeigt Amtlos steuern.kleinunternehmer_grenze_offene_rechnungen. Steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App heraus; Anlagenverkäufe kann sie nicht erkennen (Hinweis im Text). Zu prüfen: Wortlaut der Erklärung und Abgrenzung „steuerfrei“ nur mit Hinweis auf die Steuerbefreiung; der Server kennt keine Zahlungseingänge – dort gelten nur die Zweige aus den Profilangaben |
+| K-286 | `steuern.kleinunternehmer_naechstes_jahr` | C.23 | Steuerberater 22.10.2026, Runde 2 – umgesetzt (v5): Umsatzbegriff vereinnahmte Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.). Auslöser über finanzen.umsatz.bezahlt_laufendes_jahr: nur tatsächliche Zahlungseingänge auf Rechnungen, Kasse und Sachentnahmen (§ 3 Abs. 1b UStG, bestätigt); offene Rechnungen zählen nicht (§ 14c Abs. 2 UStG) – liegt die Grenze nur mit ihnen darüber, zeigt Amtlos steuern.kleinunternehmer_grenze_offene_rechnungen; liegt finanzen.umsatz.bezahlt_vorjahr über 25.000 €, entfällt der Eintrag (dann gilt „Grenze überschritten“). Steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App heraus; Anlagenverkäufe kann sie nicht erkennen (Hinweis im Text). Zu prüfen: Wortlaut der Erklärung; der Server kennt keine Zahlungseingänge – dort gilt nur der Zweig aus den Profilangaben |
+| K-287 | `steuern.kleinunternehmer_naechstes_jahr` | C.23 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
+| K-288 | `steuern.kleinunternehmer_warnung_80` | C.23 | Steuerberater 22.10.2026, Runde 2 (freigegeben, v5): vorsichtige Zählung für eine Warnung vertretbar – offene Rechnungen ab Rechnungsdatum (Ersatzregel) und Sachentnahmen (§ 3 Abs. 1b UStG) bestätigt. Umgesetzt (v6) nach seiner Empfehlung: Text zu steuerfreien Umsätzen und Anlagenverkäufen; steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App jetzt heraus. Zu prüfen: nur der neue Textteil (Versionssprung hebt die Freigabe in der App auf). Server: kennt keine Zahlungseingänge und zählt alle Rechnungen nach Rechnungsdatum (wie die Ersatzregel) |
+| K-289 | `steuern.kleinunternehmer_warnung_80` | C.23 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
+| K-290 | `steuern.kleinunternehmer_warnung_95` | C.23 | Steuerberater 22.10.2026, Runde 2 (freigegeben, v5): vorsichtige Zählung für eine Warnung vertretbar – offene Rechnungen ab Rechnungsdatum (Ersatzregel) und Sachentnahmen (§ 3 Abs. 1b UStG) bestätigt. Umgesetzt (v6) nach seiner Empfehlung: Text zu steuerfreien Umsätzen und Anlagenverkäufen; steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App jetzt heraus. Zu prüfen: nur der neue Textteil (Versionssprung hebt die Freigabe in der App auf). Server: kennt keine Zahlungseingänge und zählt alle Rechnungen nach Rechnungsdatum (wie die Ersatzregel) |
+| K-291 | `steuern.kleinunternehmer_warnung_95` | C.23 | Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md) |
+| K-292 | `steuern.oss_erklaerung` | C.36 | Auslöser: die Lieferschwelle (10.000 € EU-weit, § 3c Abs. 4 UStG) fragt der Check nicht ab – die Pflicht „kommt in Frage“ bei B2C-Kunden in der EU mit Online- bzw. Fernabsatz |
+| K-293 | `steuern.rechnungen_pflichtangaben` | C.29 | Liste der Pflichtangaben (§ 14 Abs. 4 UStG) als Inhalt ergänzen |
+| K-294 | `steuern.rechnungen_pflichtangaben` | C.29 | Steuerberater Runde 3 (23.10.2026) nennt für die Sechsmonatsfrist § 14 Abs. 2 Satz 1 Nr. 1 und 2 UStG. Laut Wortlaut der geltenden Fassung (lexmea.de, lxgesetze.de, 23.10.2026) steht die Frist in § 14 Abs. 2 Satz 2 (Nr. 1 andere Unternehmer, Nr. 2 juristische Personen, Nr. 3 Grundstücksleistungen auch an Privatkunden; nicht bei Umsätzen nach § 4 Nr. 8 bis 29 UStG) – so übernommen, vom Prüfer zu bestätigen. Als Text, nicht als Frist: es gibt kein Ereignis „Leistung ausgeführt“ (packages/rules-schema/ereignisse.json) |
+| K-295 | `steuern.ust_va_neugruender_radar` | C.21 | Steuerberater 22.10.2026: Stand 22.10.2026 keine Verlängerung von § 18 Abs. 2 Satz 6 UStG über 2026 hinaus bekannt – bis zum Start und noch einmal zum Jahreswechsel prüfen (Jahressteuergesetz) |
+| K-296 | `steuern.ust_voranmeldung` | C.24 | Steuerberater 22.10.2026: Neugründer ab 2027 im Gründungs- und Folgejahr monatlich (§ 18 Abs. 2 Satz 4 UStG) – nur als Hinweis im Text; der Rhythmus bei „weiß ich nicht“ bzw. ohne Angabe rechnet dann weiter vierteljährlich, weil die Regeln das Kalenderjahr des Stichtags nicht abfragen können (technische Grenze mit E-206 behoben: Rhythmus je Kalenderjahr) |
+| K-297 | `steuern.ust_voranmeldung` | C.24 | E-206 (externer Prüfer): „Weiß ich nicht“ ohne Steuer des Vorjahres rechnet jetzt vorläufig monatlich (früherer Termin) statt vierteljährlich – deckt Neugründer ab 2027 ab. Neugründer ab 2027: Gründungs- und Folgejahr jetzt je Kalenderjahr monatlich, auch gegen die Angabe „vierteljährlich“ und eine Vorjahressteuer bis 9.000 € (Regelwert steuern.ust_va.neugruender_monatlich_ab, Wert aus C.21); bei der Angabe „vierteljährlich“ zeigt die App den Satz aus der Erklärung als Hinweis. bitte mit v7 prüfen (PRUEFLISTE T-237) |
+| K-298 | `umwelt.altoel_ruecknahme` | U.3 | Prüfvermerk Rechtsanwalt 22.10.2026: § 8 Abs. 1, 2 AltölV (Annahmestelle, Hinweis, Menge bis zur verkauften Menge) und Sanktion bestätigt |
+| K-299 | `umwelt.gefaehrliche_abfaelle` | U.2 | Prüfvermerk Rechtsanwalt 22.10.2026: § 9a KrWG, § 49 KrWG, NachwV und Sanktionen bestätigt; Kleinmengen bis 2 t/Jahr (§ 2 Abs. 2, §§ 12, 24 NachwV) im Text; Schwere „hoch“ vertretbar – gesetzt. Ob das Register nach § 49 KrWG bei Kleinmengen bleibt, nicht ausdrücklich beantwortet |
+| K-300 | `umwelt.gewerbeabfall` | U.1 | Prüfvermerk Rechtsanwalt 22.10.2026: § 3 Abs. 1–3 GewAbfV und Sanktionen bestätigt; Kleinstbetriebe mit kommunalen Behältern unterliegen der Trennpflicht trotzdem (im Text). Auslöser über eine Betriebsstätte außerhalb der Wohnung |
+| K-301 | `umwelt.klima_sachkunde` | U.5 | Prüfvermerk Rechtsanwalt 22.10.2026: Art. 10 VO (EU) 2024/573 i. V. m. ChemKlimaschutzV und Sanktion § 26 ChemG bestätigt; Zusatz zu alten Bescheinigungen mit Fundstelle Art. 10 Abs. 9 (nicht Abs. 7) übernommen. Freigabe Rechtsanwalt Runde 2 (23.10.2026): Art. 10 Abs. 9 bestätigt; Abs. 9 erfasst Zertifikate und Ausbildungsbescheinigungen nach VO (EU) Nr. 517/2014 – die Kfz-Ausbildungsbescheinigungen nach VO (EG) Nr. 307/2008 wurden unter diesem Regime erteilt und bleiben gültig, die erste Auffrischung bis 12.3.2029 (Abs. 9 S. 3) gilt auch dafür; § 17 Abs. 2 ChemKlimaschutzV insoweit deckungsgleich – in die Erklärung übernommen |
+| K-302 | `umwelt.klima_sachkunde` | U.5 | Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 5 Abs. 1 und § 16 Abs. 2 Nr. 3 ChemKlimaschutzV 2026, § 26 Abs. 1 Nr. 7 Buchst. a, Abs. 3 ChemG; Zuordnung der Kfz-Klimaanlagen zu Art. 10 Abs. 1 UAbs. 2 VO (EU) 2024/573 laut UBA-Übersicht gelesen; Rechtsgrundlage auf ChemKlimaschutzV 2026 (§§ 5, 6) präzisieren – fachlich zu bestätigen |
+| K-303 | `umwelt.oelabscheider` | U.4 | Prüfvermerk Rechtsanwalt 22.10.2026: Folgen (§ 103 Abs. 1 Nr. 1, Abs. 2 WHG), Eigenkontrolle monatlich, Wartung halbjährlich, Generalinspektion alle fünf Jahre (DIN 1999-100/DIN EN 858-2, Anhang 49 AbwV) und AwSV als Hinweis übernommen; § 103 WHG und Anhang 49 AbwV nicht am Wortlaut gelesen, AwSV-Schwellen nicht beziffert |
+| K-304 | `branche.gewaehrleistung.werk_jahre@1` | H.2 | Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft |
+| K-305 | `branche.gewaehrleistung.bauwerk_jahre@1` | H.2 | Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft |
+| K-306 | `branche.gewaehrleistung.kauf_jahre@1` | H.2 | Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft |
+| K-307 | `branche.gewaehrleistung.beweislastumkehr_jahre@1` | H.2 | Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab (Umsetzung der Warenkaufrichtlinie) nicht geprüft |
+| K-308 | `datenschutz.dsb.schwelle_personen@1` | F.61 | gueltig_ab ist Platzhalter |
+| K-309 | `datenschutz.dsb.schwelle_personen@1` | F.61 | Geplante Streichung bis Ende 2026 (Radar F.61) – gueltig_bis setzen, sobald beschlossen |
+| K-310 | `gesellschaft.gmbh.stammkapital_mindest@1` | B.14 | gueltig_ab ist Platzhalter |
+| K-311 | `gesellschaft.gmbh.stammkapital_mindest@1` | B.14 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-312 | `gesellschaft.gmbh.mindesteinzahlung_anteil@1` | B.14 | Spezifikation: „mindestens Hälfte einzuzahlen“ – Bezug (Mindeststammkapital oder Summe der Anteile) und Einzahlung je Geschäftsanteil prüfen |
+| K-313 | `gesellschaft.gmbh.mindesteinzahlung_anteil@1` | B.14 | Rechtsgrundlage ergänzt |
+| K-314 | `gesellschaft.ug.stammkapital_mindest@1` | B.14 | gueltig_ab ist Platzhalter |
+| K-315 | `gesellschaft.ug.stammkapital_mindest@1` | B.14 | Rechtsgrundlage ergänzt |
+| K-316 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | gueltig_ab ist Platzhalter |
+| K-317 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | Rechtsgrundlage ergänzt |
+| K-318 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | Berechnungsbasis (Jahresüberschuss abzüglich Verlustvortrag) prüfen |
+| K-319 | `online.vsbg.schwelle_beschaeftigte@1` | G.69 | gueltig_ab ist Platzhalter |
+| K-320 | `online.vsbg.schwelle_beschaeftigte@1` | G.69 | „mehr als 10“: Vergleich > 10 in den Regeln |
+| K-321 | `online.bfsg.kleinst_beschaeftigte@1` | G.70 | Rechtsgrundlage ergänzt |
+| K-322 | `online.bfsg.kleinst_umsatz@1` | G.70 | Alternative Bilanzsumme fehlt im Profil |
+| K-323 | `online.bfsg.kleinst_umsatz@1` | G.70 | Rechtsgrundlage ergänzt |
+| K-324 | `personal.mindestlohn.stunde@1` | D.39 | Rechtsgrundlage (aktuelle Anpassungsverordnung) ergänzen |
+| K-325 | `personal.mindestlohn.stunde@2` | D.39 | Status „beschlossen“ – Verordnung prüfen |
+| K-326 | `personal.minijob.grenze_monat@1` | D.39 | Rechtsgrundlage ergänzt |
+| K-327 | `personal.minijob.grenze_monat@2` | D.39 | Dynamische Kopplung an den Mindestlohn – Wert für 2027 bestätigen |
+| K-328 | `personal.schwerbehinderte.schwelle_arbeitsplaetze@1` | D.45 | gueltig_ab ist Platzhalter |
+| K-329 | `personal.schwerbehinderte.schwelle_arbeitsplaetze@1` | D.45 | Rechtsgrundlage ergänzt |
+| K-330 | `personal.hinschg.schwelle@1` | D.46 | gueltig_ab ist Platzhalter |
+| K-331 | `personal.hinschg.schwelle@1` | D.46 | Rechtsgrundlage ergänzt |
+| K-332 | `personal.entgelttransparenz.berichtspflicht_schwelle@1` | D.47 | Spezifikation: „über 150 Beschäftigte“ – Vergleich > umgesetzt |
+| K-333 | `personal.entgelttransparenz.berichtspflicht_schwelle@1` | D.47 | Deutsches Umsetzungsgesetz abwarten |
+| K-334 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | gueltig_ab ist Platzhalter |
+| K-335 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | Rechtsgrundlage ergänzt |
+| K-336 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | Versicherte vs. Beschäftigte |
+| K-337 | `steuern.ust_va.grenze_befreiung@1` | C.24 | gueltig_ab ist Platzhalter (Beginn Betrachtungszeitraum), tatsächliches Inkrafttreten der Grenze eintragen |
+| K-338 | `steuern.ust_va.grenze_monatlich@1` | C.24 | gueltig_ab ist Platzhalter |
+| K-339 | `steuern.ust_va.grenze_monatlich@1` | C.24 | Spezifikation: 'über 9.000 € monatlich' – Vergleich '>' bestätigen |
+| K-340 | `steuern.ust_va.neugruender_monatlich_ab@1` | C.21 | E-206: Wert aus C.21 (Steuerberater 22.10.2026: keine Verlängerung von Satz 6 über 2026 hinaus bekannt) – bei einer Verlängerung durch das Jahressteuergesetz neue Version mit dem späteren Jahr |
+| K-341 | `steuern.ustg19.grenze_vorjahr@1` | C.23 | gueltig_ab ist Platzhalter |
+| K-342 | `steuern.ustg19.grenze_vorjahr@1` | C.23 | Grenze inklusive oder exklusive ('max. 25.000 €')? |
+| K-343 | `steuern.ustg19.grenze_laufendes_jahr@1` | C.23 | gueltig_ab ist Platzhalter |
+| K-344 | `steuern.ustg19.grenze_laufendes_jahr@1` | C.23 | Gründungsjahr: abweichende Grenze 25.000 € als eigener Regelwert |
+| K-345 | `steuern.ustg19.grenze_gruendungsjahr@1` | C.23 | gueltig_ab ist Platzhalter |
+| K-346 | `steuern.ustg19.grenze_gruendungsjahr@1` | C.23 | Grenze inklusive oder exklusive? |
+| K-347 | `steuern.ao141.grenze_umsatz@1` | C.28 | gueltig_ab ist Platzhalter |
+| K-348 | `steuern.ao141.grenze_umsatz@1` | C.28 | Bezugsjahr und Vergleich (> oder ≥) bestätigen |
+| K-349 | `steuern.ao141.grenze_gewinn@1` | C.28 | gueltig_ab ist Platzhalter |
+| K-350 | `steuern.ao141.grenze_gewinn@1` | C.28 | Bezugsjahr und Vergleich (> oder ≥) bestätigen |
+| K-351 | `steuern.hgb241a.grenze_umsatz@1` | C.28 | gueltig_ab ist Platzhalter (R10, Steuerprüfung: 800.000 € Umsatzerlöse) |
+| K-352 | `steuern.hgb241a.grenze_gewinn@1` | C.28 | gueltig_ab ist Platzhalter (R10, Steuerprüfung: 80.000 € Jahresüberschuss) |
+| K-353 | `steuern.hgb241a.grenze_gewinn@1` | C.28 | Jahresüberschuss mit dem angegebenen Gewinn gleichgesetzt |
+| K-354 | `steuern.e_rechnung.grenze_vorjahresumsatz_2027@1` | C.30 | Übergangsregel-Fundstelle (§ 27 Abs. 38 UStG) ergänzt, nicht aus Spezifikation |
+| K-355 | `steuern.e_rechnung.grenze_vorjahresumsatz_2027@1` | C.30 | gueltig_ab/gueltig_bis als Übergangszeitraum bestätigen |
+| K-356 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
+| K-357 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
+| K-358 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | Fristbeginn (Ende des Kalenderjahres) als Regel ergänzen |
+| K-359 | `steuern.aufbewahrung.buecher_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
+| K-360 | `steuern.aufbewahrung.buecher_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
+| K-361 | `steuern.aufbewahrung.geschaeftsbriefe_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
+| K-362 | `steuern.aufbewahrung.geschaeftsbriefe_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
+| K-363 | `steuern.ust.satz_regel@1` |  | [FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen |
+| K-364 | `steuern.ust.satz_regel@1` |  | gueltig_ab ist Platzhalter |
+| K-365 | `steuern.ust.satz_ermaessigt@1` |  | [FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen |
+| K-366 | `steuern.ust.satz_ermaessigt@1` |  | Welche Leistungen ermäßigt sind, entscheidet der Nutzer – Hinweis/Hilfe fachlich formulieren |
+| K-367 | `steuern.ust.satz_ermaessigt@1` |  | gueltig_ab ist Platzhalter |
