@@ -7,19 +7,18 @@
  * - ZM (§ 18a UStG): innergemeinschaftliche Lieferungen („L“) im Zeitraum der Rechnung, spätestens im Monat nach der
  *   Lieferung (§ 18a Abs. 8 UStG); sonstige Leistungen an Unternehmen im EU-Ausland mit Steuerschuldnerschaft des
  *   Empfängers („S“) im Zeitraum der Ausführung. Je USt-IdNr. und Art, in vollen Euro. Kleinunternehmer melden nicht.
+ *   E-208: Der Tag kommt aus derselben Zuordnung wie die Voranmeldung (`zuordnungsTage`, § 18b UStG), damit Kz 41/21
+ *   und ZM im selben Zeitraum stehen.
  *
  * Gutschriften (der Betrieb ist Leistungsempfänger) zählen nicht. Fachlich zu prüfen: Zuordnung der ZM bei Teil- und
  * Anzahlungen.
  */
-import { eRechnungAus, istEuAusland, restGruppen, ustZeitraum, type Betrieb, type RechnungsDaten } from "@amtlos/fachlogik";
+import { eRechnungAus, restGruppen, ustZeitraum, type Betrieb, type RechnungsDaten } from "@amtlos/fachlogik";
 import type { Unterlage } from "./speicher";
-import { istGutschrift, periodeText, zuordnungsTage, type Versteuerung } from "./ustAusRechnungen";
+import { euMeldeArt, istGutschrift, periodeText, zuordnungsTage, type Versteuerung } from "./ustAusRechnungen";
 
 const betragText = (cent: number) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cent / 100);
 const quartal = (tag: string) => `${tag.slice(0, 4)}-Q${Math.floor((Number(tag.slice(5, 7)) - 1) / 3) + 1}`;
-const istStorno = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";
-/** letzter Tag des Monats nach dem Tag (ISO) */
-const endeFolgemonat = (tag: string) => new Date(Date.UTC(Number(tag.slice(0, 4)), Number(tag.slice(5, 7)) + 1, 0)).toISOString().slice(0, 10);
 
 interface Posten {
   u: Unterlage;
@@ -86,15 +85,11 @@ export interface ZmZeile {
 /** ZM-relevante Rechnungen mit dem Tag des Meldezeitraums */
 function zmPosten(unterlagen: Unterlage[], betrieb: Betrieb): (Posten & { art: "L" | "S" })[] {
   const aus: (Posten & { art: "L" | "S" })[] = [];
+  // E-208: Lieferung im Zeitraum der Rechnung, spätestens im Monat nach der Lieferung, Storno im eigenen Zeitraum; sonstige
+  // Leistung im Zeitraum der Ausführung – beides berechnet `zuordnungsTage` (wie in der Voranmeldung, § 18b UStG)
   for (const p of posten(unterlagen, betrieb, "soll")) {
-    const land = (p.daten.kunde.land ?? "DE").toUpperCase();
-    if (!p.daten.kunde.ust_idnr || !istEuAusland(land)) continue;
-    if (p.daten.steuerart === "igl") {
-      // Lieferung: Zeitraum der Rechnung, spätestens der Monat nach der Lieferung (§ 18a Abs. 8 UStG); Storno im eigenen Zeitraum
-      const lieferung = p.daten.leistungsdatum ?? p.daten.leistungszeitraum?.bis ?? p.daten.rechnungsdatum;
-      const tag = istStorno(p.u) ? p.daten.rechnungsdatum : [p.daten.rechnungsdatum, endeFolgemonat(lieferung)].sort()[0]!;
-      aus.push({ ...p, tag, art: "L" });
-    } else if (p.daten.steuerart === "reverse_charge" && p.tag) aus.push({ ...p, art: "S" });
+    const art = euMeldeArt(p.daten);
+    if (art && p.tag) aus.push({ ...p, art });
   }
   return aus;
 }

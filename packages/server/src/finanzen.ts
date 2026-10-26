@@ -14,7 +14,7 @@ import { PDFDocument, rgb, type PDFFont, type PDFPage } from "@cantoo/pdf-lib";
 import { InvoiceService, type Invoice } from "@e-invoice-eu/core";
 import { XMLParser } from "fast-xml-parser";
 import type { Tx } from "./datenbank.js";
-import { eRechnungsDokument, summen, type Einheit, type RechnungsDaten } from "@amtlos/fachlogik";
+import { eRechnungsDokument, nettoEinzelpreis, summen, type Einheit, type RechnungsDaten } from "@amtlos/fachlogik";
 import { MARKE } from "@amtlos/marke";
 export { EINHEIT_CODE, fehlendFuerERechnung, rundeCent, summen, type Einheit, type KundeDaten, type Position, type RechnungsDaten, type Steller, type Summen } from "@amtlos/fachlogik";
 
@@ -101,6 +101,12 @@ export async function zugferdPdf(r: RechnungsDaten, kuHinweis: string, pdf: Buff
 
 const SCHRIFTEN = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../schriften");
 const euro = (cent: number) => `${new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cent / 100)} €`;
+/** E-208: Einzelpreis netto wie in der XRechnung (`nettoEinzelpreis`) – ganze Cent wie `euro`, sonst mit bis zu vier (brutto: mehr) Stellen */
+function einzelpreis(p: RechnungsDaten["positionen"][number], zeile: number): string {
+  const t = nettoEinzelpreis(p, zeile);
+  const stellen = Math.max(2, t.split(".")[1]?.length ?? 0);
+  return `${new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: stellen }).format(Number(t) * (p.preis_cent < 0 ? -1 : 1))} €`;
+}
 const datumDe = (d?: string | null) => (d ? d.split("-").reverse().join(".") : "");
 const EINHEIT_TEXT: Record<Einheit, string> = { stueck: "Stück", stunde: "Std.", tag: "Tag", monat: "Monat", pauschal: "pauschal", kilogramm: "kg" };
 
@@ -170,7 +176,8 @@ export async function rechnungPdf(r: RechnungsDaten, kuHinweis: string): Promise
     }
     text(zeilenText[0] ?? "", 80, 9);
     text(`${new Intl.NumberFormat("de-DE").format(vz * p.menge)} ${EINHEIT_TEXT[p.einheit]}`, 330, 9, normal, true);
-    text(euro(p.preis_cent), 410, 9, normal, true);
+    // E-208: Nettopreis wie in der XRechnung – bis vier Nachkommastellen, bei Bruttopreisen passend zum Zeilenbetrag
+    text(einzelpreis(r.kleinunternehmer ? { ...p, ust_satz: null } : p, s.zeilen[i]!), 410, 9, normal, true);
     text(euro(vz * s.zeilen[i]!), 545, 9, normal, true);
     if (!r.kleinunternehmer && p.ust_satz !== null) text(`${p.ust_satz} %`, 428, 9, normal);
     for (const weitere of zeilenText.slice(1)) {

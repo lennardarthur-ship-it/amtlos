@@ -126,6 +126,8 @@ export interface AusgangsRechnungFuerBuchung {
   steuerart?: Steuerart;
   /** Land des Empfängers (ISO 3166-1 alpha-2) – Inland, übriges Gemeinschaftsgebiet oder Drittland */
   kunde_land?: string | null;
+  /** E-208: Hinweis auf die Steuerbefreiung (bei Steuerart „befreit“) – Ausfuhrlieferung (§ 4 Nr. 1 Buchst. a) hat ein eigenes Erlöskonto */
+  befreiungsgrund?: string | null;
   kunde_ust_idnr?: string | null;
   /** Leistungsdatum bzw. Ende des Leistungszeitraums (ISO) */
   leistungsdatum?: string | null;
@@ -241,7 +243,14 @@ export const BUCHUNGSKONTEN: Record<
      * Standard SKR03 8290 / SKR04 4290 („Erlöse 0 % USt“, Steuerschlüssel S0 – Herstellerangaben microdat/Lexware),
      * UNSICHER: über die Kontenvorgaben der Kanzlei festlegen.
      */
-    erloese: { 19: string; 7: string; 0: string; ku: string; igl: string; rc13b: string; eu: string; drittland: string; nullsatz: string; oss: string };
+    erloese: { 19: string; 7: string; 0: string; ku: string; igl: string; rc13b: string; eu: string; drittland: string; nullsatz: string; oss: string; ausfuhr: string };
+    /*
+     * E-208: `erloese.ausfuhr` – steuerfreie Ausfuhrlieferungen (§ 4 Nr. 1 Buchst. a UStG, Kz 43, mit Vorsteuerabzug).
+     * Vorher fielen sie auf `0` (8100/4100, steuerfreie Umsätze § 4 Nr. 8 ff. ohne Vorsteuerabzug, Kz 48) – die
+     * Voranmeldung der App meldet sie aber in Kz 43 (`kennzahlBefreiung`). Standard SKR03 8120 / SKR04 4120
+     * („Steuerfreie Umsätze § 4 Nr. 1a UStG“ im DATEV-Standardkontenrahmen) – UNSICHER, im DATEV-Testimport von der
+     * Steuerberatung zu bestätigen (PRUEFLISTE T-244); über die Kontenvorgaben änderbar.
+     */
     /*
      * Koordination Rechnungen (OSS, § 18j UStG): `erloese.oss` – „Erlöse aus im anderen EU-Land steuerpflichtigen
      * Lieferungen“ SKR03 8320 / SKR04 4320 (DATEV-Bereich 8320–8329 bzw. 4320–4329), Kontenbereich von die Steuerberatungskanzlei
@@ -280,9 +289,9 @@ export const BUCHUNGSKONTEN: Record<
   }
 > = {
   // Forderungen/Verbindlichkeiten ohne Kontokorrent (1410/1610 bzw. 1210/3310), damit beim Bankabruf kein OPOS nötig ist
-  SKR03: { bank: "1200", verrechnungGesellschafter: "0731", homeoffice: "4288", anlagen: { maschinen: "0400", bga: "0420", kfz: "0320", software: "0027" }, forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338", nullsatz: "8290", oss: "8320" }, gutschrift: "3100", gutscheinVerbindlichkeit: "1700", kassendifferenzAufwand: "4900", kassendifferenzErtrag: "", sachentnahme: { 19: "8910", 7: "8915" }, skontiGewaehrtIgl: "8743", skontiGewaehrtRc: "8741" },
+  SKR03: { bank: "1200", verrechnungGesellschafter: "0731", homeoffice: "4288", anlagen: { maschinen: "0400", bga: "0420", kfz: "0320", software: "0027" }, forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338", nullsatz: "8290", oss: "8320", ausfuhr: "8120" }, gutschrift: "3100", gutscheinVerbindlichkeit: "1700", kassendifferenzAufwand: "4900", kassendifferenzErtrag: "", sachentnahme: { 19: "8910", 7: "8915" }, skontiGewaehrtIgl: "8743", skontiGewaehrtRc: "8741" },
   // UNSICHER: verrechnungGesellschafter 3560 – SKR04-Gegenstück zu 0731 laut Kanzlei folgt
-  SKR04: { bank: "1800", verrechnungGesellschafter: "3560", homeoffice: "6348", anlagen: { maschinen: "0440", bga: "0650", kfz: "0520", software: "0135" }, forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", privatentnahmen: "2100", geldtransit: "1460", skontiGewaehrt: { 19: "4736", 7: "4731", 0: "4730" }, skontiErhalten: { 19: "5736", 7: "5731", 0: "5730" }, erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338", nullsatz: "4290", oss: "4320" }, gutschrift: "5900", gutscheinVerbindlichkeit: "3500", kassendifferenzAufwand: "6300", kassendifferenzErtrag: "", sachentnahme: { 19: "4620", 7: "4610" }, skontiGewaehrtIgl: "4743", skontiGewaehrtRc: "4741" },
+  SKR04: { bank: "1800", verrechnungGesellschafter: "3560", homeoffice: "6348", anlagen: { maschinen: "0440", bga: "0650", kfz: "0520", software: "0135" }, forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", privatentnahmen: "2100", geldtransit: "1460", skontiGewaehrt: { 19: "4736", 7: "4731", 0: "4730" }, skontiErhalten: { 19: "5736", 7: "5731", 0: "5730" }, erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338", nullsatz: "4290", oss: "4320", ausfuhr: "4120" }, gutschrift: "5900", gutscheinVerbindlichkeit: "3500", kassendifferenzAufwand: "6300", kassendifferenzErtrag: "", sachentnahme: { 19: "4620", 7: "4610" }, skontiGewaehrtIgl: "4743", skontiGewaehrtRc: "4741" },
 };
 
 /** Wirksame Konten eines Stapels: Kontenrahmen plus Kontenvorgaben der Kanzlei. */
@@ -311,7 +320,7 @@ export function kontenFuer(kontenrahmen: Kontenrahmen, vorgaben?: Kontenvorgaben
     // ein Überschuss auf dem Erlöskonto 19 % gilt wie „ohne Vorgabe“ (mit Umsatzsteuer)
     kassendifferenzErtrag: v.kassendifferenzErtrag && /^\d{4}$/.test(v.kassendifferenzErtrag) && v.kassendifferenzErtrag !== k.erloese[19] ? v.kassendifferenzErtrag : "",
     homeoffice: w(v.homeoffice, k.homeoffice),
-    erloese: { ...k.erloese, nullsatz: w(v.erloesNullsatz, k.erloese.nullsatz), oss: w(v.erloesOss, k.erloese.oss) },
+    erloese: { ...k.erloese, nullsatz: w(v.erloesNullsatz, k.erloese.nullsatz), oss: w(v.erloesOss, k.erloese.oss), ausfuhr: w(v.erloesAusfuhr, k.erloese.ausfuhr) },
     anlagen: { maschinen: w(v.anlageMaschinen, k.anlagen.maschinen), bga: w(v.anlageBga, k.anlagen.bga), kfz: w(v.anlageKfz, k.anlagen.kfz), software: w(v.anlageSoftware, k.anlagen.software) },
   };
 }
@@ -375,7 +384,10 @@ export function buchungsGuid(quelle_id: string, satz: number | null): string {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20, 32)}`;
 }
 
-export function erloeskonto(k: Konten, satz: number | null, r?: Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land"> & { oss?: AusgangsRechnungFuerBuchung["oss"] }): string {
+/** E-208: Ausfuhrlieferung (§ 4 Nr. 1 Buchst. a UStG) im Befreiungshinweis – wie in der XRechnung (Kategorie G) und Kz 43 */
+const AUSFUHR_HINWEIS = /§\s*4\s+Nr\.\s*1\s*(?:Buchst\.\s*)?a(?![a-zäöü])/i;
+
+export function erloeskonto(k: Konten, satz: number | null, r?: Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land"> & { oss?: AusgangsRechnungFuerBuchung["oss"]; befreiungsgrund?: string | null }): string {
   const land = (r?.kunde_land ?? "DE").toUpperCase();
   // OSS: Steuer des Bestimmungslands – eigenes Erlöskonto (8320/4320, Kontenbereich von der Kanzlei bestätigt), nicht 8400/8300
   if (r?.oss && satz !== null && satz > 0) return k.erloese.oss;
@@ -385,6 +397,8 @@ export function erloeskonto(k: Konten, satz: number | null, r?: Pick<AusgangsRec
   if (satz === null) return k.erloese.ku;
   if (satz === 7) return k.erloese[7];
   // StB-Prüfung (B-2): Nullsteuersatz (§ 12 Abs. 3 UStG) auf das Konto mit Kz 87, nicht auf das steuerfreie Konto (Kz 48)
+  // E-208: Ausfuhrlieferung (§ 4 Nr. 1 Buchst. a UStG, Kz 43) auf das eigene Konto, nicht auf 8100/4100 (§ 4 Nr. 8 ff., Kz 48)
+  if (satz === 0 && r?.steuerart === "befreit" && AUSFUHR_HINWEIS.test(r.befreiungsgrund ?? "")) return k.erloese.ausfuhr;
   if (satz === 0) return r?.steuerart === "igl" ? k.erloese.igl : r?.steuerart === STEUERART_NULLSATZ ? k.erloese.nullsatz : k.erloese[0];
   // Regelsatz; ein unbekannter Satz landet ebenfalls hier (die App kennt nur 19, 7 und 0)
   return k.erloese[19];
@@ -993,6 +1007,7 @@ export function pruefpunkteBuchungen(): string[] {
   return [
     "Sachkonten: Forderungen aus L+L ohne Kontokorrent (SKR03 1410, SKR04 1210), Verbindlichkeiten aus L+L ohne Kontokorrent (1610/3310), Kasse (1000/1600), Privateinlagen (1890/2180) und Erlöskonten 19 % (8400/4400), 7 % (8300/4300), Kleinunternehmer § 19 UStG (8195/4185) gegen den aktuellen DATEV-Kontenrahmen prüfen.",
     "Erlöskonten nach Steuerart: igL 8125/4125 (mit „EU-Land u. UStID“), § 13b im Inland 8337/4337, sonstige Leistung an Unternehmen im übrigen Gemeinschaftsgebiet (Empfänger schuldet die Steuer, Kz 21) 8336/4336, im Drittland steuerbare Leistung 8338/4338 – die Steuerberatung nannte 8338 für die EU-Leistung; nach unserem Stand ist 8338 das Drittlandkonto und 8336 das EU-Konto. Bitte prüfen. StB-Prüfung (B-1): bestätigt. Nullsteuersatz (§ 12 Abs. 3 UStG, Kz 87, B-2): eigene Steuerart und eigenes Erlöskonto mit Kz-87-Automatik, Standard SKR03 8290 / SKR04 4290 – der Bericht nennt keine Nummer („in Rewe nach Nullsteuersatz bzw. § 12 Abs. 3 suchen“); über die Kontenvorgaben der Kanzlei festlegen.",
+    "E-208: Steuerfreie Ausfuhrlieferungen (§ 4 Nr. 1 Buchst. a UStG, Kz 43) auf SKR03 8120 / SKR04 4120 statt wie bisher 8100/4100 (§ 4 Nr. 8 ff., Kz 48) – Kontonummern UNSICHER, im DATEV-Testimport bestätigen; über die Kontenvorgaben änderbar.",
     "Automatikkonten: nur SKR03 3400/3300 (Wareneingang 19/7 %), 3120/3123 (§ 13b) und SKR04 5400/5300 gelten als Automatikkonten (kein BU, ohne Vorsteuerabzug BU 40). Alle anderen Kategorie-Konten (z. B. 4930, 4600, 4210, 3100, 0420) gelten als Konten ohne Automatik und bekommen bei Vorsteuer BU 9 (19 %) bzw. 8 (7 %). Für die Sätze 16 % und 5 % (2. Halbjahr 2020) setzt der Export keinen BU-Schlüssel.",
     "BU-Schlüssel 40 („keine Steuer“ bei Automatikkonten) wird nur auf Automatikkonten gesetzt, wenn ein Beleg keinen Vorsteuerabzug erlaubt. StB-Prüfung (A-2): Kleinunternehmer buchen Wareneingang auf SKR03 3200 / SKR04 5200 ohne Schlüssel statt 3400/5400 mit BU 40.",
     "StB-Prüfung (A-1): Belegbuchungen (Eingangsbelege, Gutschriften, Kassenfehlbeträge) mit dem Zahlungskonto (Verbindlichkeiten, Kasse, Bank, Privat bzw. Verrechnungskonto) in Feld 7 „Konto“ im Haben und dem Sachkonto mit BU-Schlüssel in Feld 8 „Gegenkonto“ – im Testimport prüfen, ob Rewe den Schlüssel so annimmt.",

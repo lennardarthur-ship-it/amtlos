@@ -127,9 +127,10 @@ describe("E-201: Fachkraft für Arbeitssicherheit – Vorlagen", () => {
       expect(pruefHinweisFuer(vorlageFuer(id)!, {}, cafe), id).toMatch(/von einer Fachkraft für Arbeitssicherheit.*\(Stand 26\.10\.2026\)/);
     }
     expect(Object.keys(VORLAGEN_GEPRUEFT).filter((id) => freigabenFuer(id).some((f) => f.vermerk_ausgesetzt))).toEqual([]);
-    // ein Café sieht den Vermerk auf 42 von 43 Vorlagen (nicht Handelsregister, das nur für GmbH, OHG, KG bestätigt ist)
+    // ein Café sieht den Vermerk auf 41 von 43 Vorlagen (nicht Handelsregister, das nur für GmbH, OHG, KG bestätigt ist;
+    // E-208: nicht die Rechnung, bis der Steuerberater die geänderte Fassung bestätigt – PRUEFLISTE T-245)
     expect(VORLAGEN.length).toBe(43);
-    expect(VORLAGEN.filter((v) => pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}, cafe) !== PRUEFHINWEIS).length).toBe(42);
+    expect(VORLAGEN.filter((v) => pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}, cafe) !== PRUEFHINWEIS).length).toBe(41);
   });
   it("Einschränkung nur bei Prüfprotokoll, Gefährdungsbeurteilung und Betriebsanweisung Biostoffe", () => {
     expect(VORLAGEN_GEPRUEFT.pruefprotokoll_elektro!.einschraenkung).toBe("ohne die elektrotechnischen Grenzwerte");

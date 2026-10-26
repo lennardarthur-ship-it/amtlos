@@ -102,8 +102,11 @@ describe("E-202: XRechnung des Stornos einer Schlussrechnung (Steuerberater, vor
   });
 
   it("die Änderungen betreffen nur die XML – die Prüfsumme der Rechnung bleibt (Gesamtsumme 75a201030d66 wie bei der Nachprüfung)", () => {
-    expect(PRUEFSTAENDE.rechnung!.summe.slice(0, 12)).toBe("75a201030d66");
+    // E-208: seitdem hat sich nur der gemeinsame Teil (`basis`, Einzelpreis bei Bruttopreisen) geändert – alle übrigen
+    // Teilsummen sind die der Nachprüfung vom 26.10.2026 (Gesamtsumme damals 75a201030d66)
     const storno = freigabenFuer("rechnung")[2]!;
+    expect(storno.pruefsumme.slice(0, 12)).toBe("75a201030d66");
+    expect(Object.keys(storno.teilsummen!).filter((g) => PRUEFSTAENDE.rechnung!.teile[g] !== storno.teilsummen![g])).toEqual(["basis"]);
     expect([storno.stand, storno.rolle, storno.nachweis!.datum]).toEqual(["2026-10-26", "steuern", "2026-10-26"]);
   });
 });

@@ -24,6 +24,7 @@ export type KontenvorgabeKonto =
   | "kassendifferenzErtrag"
   | "erloesNullsatz"
   | "erloesOss"
+  | "erloesAusfuhr"
   | "homeoffice"
   | "anlageMaschinen"
   | "anlageBga"
@@ -67,6 +68,7 @@ export const KONTENVORGABE_FELDER: readonly { id: KontenvorgabeKonto; titel: str
   { id: "kassendifferenzErtrag", titel: "Kassendifferenz: Überschuss", hilfe: "Leer: Erlöse 19 %. Ein anderes Konto (z. B. 2700/4830 „Sonstige Erträge“) wird ohne Umsatzsteuer gebucht." },
   { id: "erloesNullsatz", titel: "Erlöse Nullsteuersatz (§ 12 Abs. 3 UStG, Kz 87)", hilfe: "Konto mit Kz-87-Funktion im Kontenrahmen der Kanzlei (in Rewe nach „Nullsteuersatz“ bzw. „§ 12 Abs. 3“ suchen)." },
   { id: "erloesOss", titel: "Erlöse OSS (Steuer des Bestimmungslands)", hilfe: "Fernverkäufe und Leistungen an Privatpersonen im EU-Ausland (§ 18j UStG), z. B. 8320/4320 „Erlöse aus im anderen EU-Land steuerpflichtigen Lieferungen“." },
+  { id: "erloesAusfuhr", titel: "Erlöse Ausfuhrlieferungen (§ 4 Nr. 1 Buchst. a UStG, Kz 43)", hilfe: "Steuerfreie Ausfuhrlieferungen in ein Drittland – Konto mit Kz-43-Funktion im Kontenrahmen der Kanzlei. Standard SKR03 8120 / SKR04 4120 (bitte bestätigen)." },
   { id: "homeoffice", titel: "Homeoffice-Pauschale / Arbeitszimmer" },
   { id: "anlageMaschinen", titel: "Anlagen: Maschinen" },
   { id: "anlageBga", titel: "Anlagen: Betriebs- und Geschäftsausstattung" },

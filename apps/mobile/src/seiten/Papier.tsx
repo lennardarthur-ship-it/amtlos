@@ -1,6 +1,6 @@
 import { Pressable, View, type ViewStyle } from "react-native";
 import type { ReactNode } from "react";
-import { cent, ohneVerdeckte, sichtbar, zahl, type Daten, type Eintrag, type Feld, type Vorlage } from "@amtlos/fachlogik";
+import { cent, euroPreis, ohneVerdeckte, preisCent, sichtbar, zahl, type Daten, type Eintrag, type Feld, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Symbol, T, textAus, useGrosseSchrift } from "../ui/bausteine";
 import { isoliert } from "../ui/trennen";
@@ -52,11 +52,14 @@ function eintragZeile(f: Extract<Feld, { art: "liste" }>, e: Eintrag): Zeile | n
   const zeit = istDatum && typeof e.beginn === "string" && typeof e.ende === "string" && e.beginn && e.ende ? ` · ${e.beginn}–${e.ende}` : "";
   const titel = istDatum ? `${textAus(roh)}${zeit}` : roh;
   const preisFeld = f.felder.find((x) => x.art === "betrag");
-  const preis = preisFeld && typeof e[preisFeld.id] === "string" ? cent(e[preisFeld.id] as string) : null;
+  // E-208: Einzelpreis einer Rechnungsposition mit bis zu vier Nachkommastellen (0,3456 €), andere Beträge in Cent
+  const istPreis = preisFeld?.id === "preis";
+  const preis = preisFeld && typeof e[preisFeld.id] === "string" ? (istPreis ? preisCent : cent)(e[preisFeld.id] as string) : null;
+  const preisText = (c: number) => (istPreis && !Number.isInteger(c) ? euroPreis(c) : euroText(c));
   const mengeFeld = f.felder.find((x) => x.art === "zahl");
   const menge = mengeFeld && typeof e[mengeFeld.id] === "string" ? zahl(e[mengeFeld.id] as string) : null;
   if (!titel && preis === null) return null;
-  const rechts = preis === null ? undefined : menge !== null && menge !== 1 ? `${String(menge).replace(".", ",")} × ${euroText(preis)}` : euroText(preis);
+  const rechts = preis === null ? undefined : menge !== null && menge !== 1 ? `${String(menge).replace(".", ",")} × ${preisText(preis)}` : preisText(preis);
   return { links: titel || f.eintrag, rechts };
 }
 
