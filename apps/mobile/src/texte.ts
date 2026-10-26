@@ -526,6 +526,16 @@ export const T = {
   aus_icloud: ANDROID ? "Letzte Sicherung aus dem Ordner laden" : "Letzte Sicherung aus iCloud laden",
   icloud_uebernommen: ANDROID ? "Die vorhandene Sicherung im Ordner wurde übernommen." : "Die vorhandene iCloud-Sicherung wurde übernommen.",
   icloud_sicherung_name: ANDROID ? "Letzte Sicherung im Ordner" : "Letzte iCloud-Sicherung",
+  // E-209: vorhandene Sicherung beim Einrichten nicht lesbar – nie überschreiben
+  sicherung_unlesbar: ANDROID
+    ? `Im Ordner liegt schon eine ${MARKE.name}-Sicherung, die sich gerade nicht lesen lässt – vielleicht ist sie beim Cloud-Anbieter noch nicht heruntergeladen. Sie wurde nicht überschrieben. Warte einen Moment und versuche es erneut; danach kannst du sie übernehmen (oder unter „Wiederherstellen“ einspielen).`
+    : `In iCloud liegt schon eine ${MARKE.name}-Sicherung, die sich gerade nicht lesen lässt – auf einem neuen iPhone ist sie oft noch nicht aus iCloud geladen. Sie wurde nicht überschrieben. Warte einen Moment (WLAN, App geöffnet lassen) und versuche es erneut; danach kannst du sie übernehmen (oder unter „Wiederherstellen“ einspielen).`,
+  sicherung_unlesbar_erneut: "Erneut versuchen",
+  sicherung_noch_nicht_lesbar: ANDROID ? `Im Ordner liegt eine ${MARKE.name}-Sicherung, die sich gerade nicht lesen lässt – vielleicht ist sie beim Cloud-Anbieter noch nicht heruntergeladen. Versuche es gleich noch einmal.` : `In iCloud liegt eine ${MARKE.name}-Sicherung, die noch nicht auf dieses iPhone geladen ist. Das Laden wurde angestoßen – versuche es gleich noch einmal.`,
+  sicherung_unlesbar_ersetzen: "Trotzdem einschalten und vorhandene Sicherung ersetzen",
+  sicherung_unlesbar_ersetzen_wirklich: "Vorhandene Sicherung ersetzen?",
+  sicherung_unlesbar_ersetzen_text: "Die vorhandene Sicherung konnte nicht gelesen werden. Wenn du fortfährst, wird sie durch die Daten auf diesem Gerät ersetzt. Was nur in der alten Sicherung steht (z. B. Rechnungen und Belege vom alten Gerät), ist dann dort nicht mehr enthalten. Tages- und Wochen-Sicherungen aus früheren Tagen und Wochen bleiben erhalten.",
+  sicherung_unlesbar_ersetzen_ja: "Ersetzen",
   icloud_leer: ANDROID ? `Im Ordner liegt noch keine ${MARKE.name}-Sicherung.` : `In iCloud liegt noch keine ${MARKE.name}-Sicherung.`,
   // E-190: automatische Sicherung in einen Ordner (Android, Speicherzugriffs-Framework)
   ordner_waehlen: "Ordner wählen",
@@ -892,6 +902,8 @@ export const T = {
   wiederherstellen_dateien_fehler: (n: number) => `${n === 1 ? "1 Belegdatei ließ" : `${n} Belegdateien ließen`} sich nicht ablegen – bitte noch einmal wiederherstellen.`,
   wiederherstellen_fehler: "Wiederherstellen hat nicht geklappt. Deine Daten sind unverändert. Bitte noch einmal versuchen.",
   fest_konflikt: (n: string[]) => `Achtung: ${n.length === 1 ? `Die Rechnung ${n[0]} wurde` : `Die Rechnungen ${n.join(", ")} wurden`} auf zwei Geräten mit verschiedenem Inhalt geteilt. Gültig bleibt die zuerst geteilte Fassung; die andere ist als Konfliktkopie aufbewahrt und zählt nirgends mit. Prüfe, welche Fassung beim Kunden ist, und kläre das mit deiner Steuerberatung.`,
+  // E-209: festgeschriebener Beleg, abweichende Fassung nicht übernommen (Synchronisation bzw. Wiederherstellen)
+  beleg_konflikt: (n: string[], quelle: "sync" | "sicherung") => `Achtung: ${n.length === 1 ? `Der Beleg ${n[0]} ist` : `Die Belege ${n.join(", ")} sind`} festgeschrieben, ${quelle === "sync" ? "auf einem anderen Gerät" : "in der Sicherung"} gibt es aber eine abweichende Fassung. Die festgeschriebene Fassung bleibt unverändert; die abweichende wurde nicht übernommen${quelle === "sync" ? " (zwei verschiedene Korrekturen stehen beide in der Änderungshistorie)" : ""}. Prüfe den Beleg und korrigiere ihn bei Bedarf mit Grund.`,
   mehrfach_storniert: (n: string[]) => `Achtung: ${n.length === 1 ? `Die Rechnung ${n[0]} ist` : `Die Rechnungen ${n.join(", ")} sind`} mehrfach storniert (auf zwei Geräten gleichzeitig). Gezählt wird nur ein Storno; die weiteren Stornorechnungen zählen nicht mit. Kläre das mit deiner Steuerberatung.`,
   beleg_ungueltig_knopf: "Als ungültig markieren",
   beleg_ungueltig_wirklich: "Beleg als ungültig markieren?",

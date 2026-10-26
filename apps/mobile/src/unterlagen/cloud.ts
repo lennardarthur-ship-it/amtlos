@@ -13,7 +13,7 @@ import { MARKE } from "@amtlos/marke";
 import * as logik from "./cloudLogik";
 import type { Ablage, SicherungsOrt } from "./cloudLogik";
 
-export { kalenderwoche, zuLoeschen, WOCHEN_BEHALTEN, TAGE_BEHALTEN, VORHER_BEHALTEN } from "./cloudLogik";
+export { kalenderwoche, zuLoeschen, WOCHEN_BEHALTEN, TAGE_BEHALTEN, VORHER_BEHALTEN, SicherungUnlesbar, type VorhandeneSicherung } from "./cloudLogik";
 
 type Lib = typeof Bibliothek;
 let geladen: Lib | null | undefined;
@@ -48,6 +48,8 @@ function ort(): SicherungsOrt {
     writeFile: (p, t) => CloudStorage.writeFile(p, t, d),
     unlink: (p) => CloudStorage.unlink(p, d),
     rmdir: (p) => CloudStorage.rmdir(p, { recursive: true }, d),
+    // E-209: Datei, die nur in iCloud liegt (neues iPhone), herunterladen lassen
+    herunterladen: (p) => CloudStorage.triggerSync(p, d),
   };
   return { ablage, ordner: ORDNER };
 }
@@ -61,8 +63,15 @@ export async function cloudVerfuegbar(): Promise<boolean> {
   }
 }
 
-export async function cloudSchreiben(text: string, jetzt = new Date()): Promise<void> {
-  await logik.schreiben(ort(), text, jetzt);
+/** Sichern; wirft `SicherungUnlesbar`, wenn die vorhandene Sicherung nicht lesbar ist (E-209) – außer mit `ersetzen`. */
+export async function cloudSchreiben(text: string, jetzt = new Date(), opt: { ersetzen?: boolean } = {}): Promise<void> {
+  await logik.schreiben(ort(), text, jetzt, opt);
+}
+
+/** E-209: vorhandene Sicherung in iCloud prüfen (lädt sie bei Bedarf herunter und wartet kurz). */
+export async function cloudVorhanden(): Promise<logik.VorhandeneSicherung> {
+  if (!lib()) return { art: "keine" };
+  return logik.vorhandeneSicherung(ort());
 }
 
 /** Letzte Sicherung aus iCloud (oder null). */

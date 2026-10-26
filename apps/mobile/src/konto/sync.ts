@@ -5,7 +5,7 @@
  *   Schlüssel aus dem Sync-Passwort (PBKDF2-SHA256, AES-256-GCM). Ein neues Gerät öffnet die Hülle mit dem Passwort.
  * - Stand und Belegdateien gehen nur mit dem Sync-Schlüssel verschlüsselt an den Server (Format amtlos-tresor).
  * - Zusammenführen: je Unterlage, Beleg und Person gewinnt die zuletzt geänderte Fassung; festgeschriebene Unterlagen
- *   werden nie ersetzt; Löschvermerke verhindern, dass Gelöschtes zurückkommt; Betrieb, Pflichten-Check, Haken und
+ *   und Belege werden nie durch eine andere Fassung ersetzt, ihre Historie nur ergänzt (E-209); Löschvermerke verhindern, dass Gelöschtes zurückkommt; Betrieb, Pflichten-Check, Haken und
  *   Steuerberatung gehen nach dem Zeitpunkt ihrer letzten Änderung. Gerätegebundenes (Face ID, Erinnerungen, iCloud,
  *   Bewertungsbitte, Testmodus) bleibt auf jedem Gerät, wie es ist.
  */
@@ -132,6 +132,8 @@ export interface SyncZusammenfuehrung {
   nummernKonflikte: string[];
   /** auf zwei Geräten verschieden festgeschrieben (K1) – die zuerst festgeschriebene gilt, die andere ist Konfliktkopie */
   festKonflikte: string[];
+  /** E-209: festgeschriebene Belege, deren abweichende Fassung vom anderen Gerät nicht übernommen wurde (Belegnummern) */
+  belegKonflikte: string[];
   /** Rechnungen mit mehr als einer festgeschriebenen Stornorechnung (K2) */
   mehrfachStorniert: string[];
 }
@@ -170,7 +172,9 @@ export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammen
   const unterlagen = stornoVerweisePruefen([...u.liste.values()].filter((x) => fest(x) || !geloescht[`u:${x.id}`] || zuletzt(x) > geloescht[`u:${x.id}`]!));
   // Belege: gültige und ungültig markierte gemeinsam (die neuere Fassung gewinnt, auch beim Ungültig-Vermerk);
   // ungültig markierte bleiben immer (Aufbewahrungspflicht), gültige weichen einem neueren Löschvermerk
-  const belege = [...belegeVereinen([...lokal.belege, ...lokal.belegArchiv], [...entfernt.belege, ...entfernt.belegArchiv]).values()].filter((b) => b.ungueltig || !geloescht[`b:${b.id}`] || b.geaendert > geloescht[`b:${b.id}`]!);
+  // E-209: festgeschriebene Belege werden nie ersetzt oder gelöscht, ihre Historie wird nur ergänzt (`belegZweiVereinen`)
+  const belegKonflikte = new Set<string>();
+  const belege = [...belegeVereinen([...lokal.belege, ...lokal.belegArchiv], [...entfernt.belege, ...entfernt.belegArchiv], belegKonflikte).values()].filter((b) => b.ungueltig || b.festgeschrieben || !geloescht[`b:${b.id}`] || b.geaendert > geloescht[`b:${b.id}`]!);
   const stand: Stand = {
     ...lokal,
     betrieb: lokalNeuer("betrieb") ? lokal.betrieb : entfernt.betrieb,
@@ -196,7 +200,7 @@ export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammen
     zeiten,
   };
   const gesichert = belegNummernSichern(stand);
-  return { stand: gesichert, nummernKonflikte: nummernKonflikteVon(gesichert), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(gesichert.unterlagen) };
+  return { stand: gesichert, nummernKonflikte: nummernKonflikteVon(gesichert), festKonflikte: u.konflikte, belegKonflikte: [...belegKonflikte].sort(), mehrfachStorniert: mehrfachStorniert(gesichert.unterlagen) };
 }
 
 /** Schnittstelle zum Server – im Test ein Speicher im Arbeitsspeicher. */
@@ -236,6 +240,7 @@ export interface SyncErgebnis {
   heruntergeladen: number;
   nummernKonflikte: string[];
   festKonflikte: string[];
+  belegKonflikte: string[];
   mehrfachStorniert: string[];
   /** Belegdateien auf dem Server, die sich nicht entschlüsseln ließen (M5) – übersprungen, nicht abgelegt */
   defekteDateien: string[];
@@ -253,7 +258,7 @@ export async function synchronisieren(u: SyncUmgebung): Promise<SyncErgebnis> {
     if (!t) throw new SyncFehler("format");
     const gesehen = (await u.zaehlerLesen?.()) ?? 0;
     const entfernt = t.daten ? standEntschluesselnMitZaehler(t.daten, u.sync, u.konto, gesehen) : null;
-    const z: SyncZusammenfuehrung = entfernt ? syncZusammenfuehren(u.lokal(), entfernt.stand) : { stand: u.lokal(), nummernKonflikte: [], festKonflikte: [], mehrfachStorniert: [] };
+    const z: SyncZusammenfuehrung = entfernt ? syncZusammenfuehren(u.lokal(), entfernt.stand) : { stand: u.lokal(), nummernKonflikte: [], festKonflikte: [], belegKonflikte: [], mehrfachStorniert: [] };
     // Dateien: was dem Server fehlt, hoch; was dem Gerät fehlt, herunter – auch die ungültig markierter Belege
     const aufServer = new Set(await u.api.dateien());
     let hoch = 0;
@@ -293,7 +298,7 @@ export async function synchronisieren(u: SyncUmgebung): Promise<SyncErgebnis> {
       const version = await u.api.speichern(t.version, standVerschluesseln(z.stand, u.sync, u.zufall(12), u.konto, zaehler));
       await u.zaehlerMerken?.(zaehler);
       u.uebernehmen(z.stand);
-      return { version, hochgeladen: hoch, heruntergeladen: runter, nummernKonflikte: z.nummernKonflikte, festKonflikte: z.festKonflikte, mehrfachStorniert: z.mehrfachStorniert, defekteDateien: defekt, fehlendeDateien: fehlend };
+      return { version, hochgeladen: hoch, heruntergeladen: runter, nummernKonflikte: z.nummernKonflikte, festKonflikte: z.festKonflikte, belegKonflikte: z.belegKonflikte, mehrfachStorniert: z.mehrfachStorniert, defekteDateien: defekt, fehlendeDateien: fehlend };
     } catch (e) {
       if (e instanceof SyncFehler && e.art === "konflikt") continue;
       throw e;

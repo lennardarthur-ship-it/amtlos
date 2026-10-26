@@ -6,7 +6,11 @@ export async function cloudVerfuegbar(): Promise<boolean> {
 export function kalenderwoche(_d: Date): string {
   return "";
 }
-export async function cloudSchreiben(_text: string): Promise<void> {}
+export async function cloudSchreiben(_text: string, _jetzt?: Date, _opt?: { ersetzen?: boolean }): Promise<void> {}
+export { SicherungUnlesbar, type VorhandeneSicherung } from "./cloudLogik";
+export async function cloudVorhanden(): Promise<import("./cloudLogik").VorhandeneSicherung> {
+  return { art: "keine" };
+}
 export async function cloudLesen(): Promise<string | null> {
   return null;
 }

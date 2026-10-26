@@ -30,6 +30,8 @@ interface Konto {
   nummernKonflikte: string[];
   /** letzte Synchronisation: verschieden festgeschriebene Unterlagen (K1), mehrfach stornierte Rechnungen (K2) */
   festKonflikte: string[];
+  /** E-209: festgeschriebene Belege, deren abweichende Fassung vom anderen Gerät nicht übernommen wurde */
+  belegKonflikte: string[];
   mehrfachStorniert: string[];
   /** letzte Synchronisation: Belegdateien, die auf dem Server beschädigt sind bzw. nirgends mehr liegen (M5) */
   defekteDateien: string[];
@@ -82,6 +84,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
   const [fehlerBeiHandlung, setFehlerBeiHandlung] = useState(false);
   const [nummernKonflikte, setNummernKonflikte] = useState<string[]>([]);
   const [festKonflikte, setFestKonflikte] = useState<string[]>([]);
+  const [belegKonflikte, setBelegKonflikte] = useState<string[]>([]);
   const [mehrfachStorniert, setMehrfachStorniert] = useState<string[]>([]);
   const [defekteDateien, setDefekteDateien] = useState<string[]>([]);
   const [fehlendeDateien, setFehlendeDateien] = useState<string[]>([]);
@@ -167,6 +170,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
       void AsyncStorage.setItem(ZULETZT, wann).catch(() => undefined);
       setNummernKonflikte(r.nummernKonflikte);
       setFestKonflikte(r.festKonflikte);
+      setBelegKonflikte(r.belegKonflikte);
       setMehrfachStorniert(r.mehrfachStorniert);
       setDefekteDateien(r.defekteDateien);
       setFehlendeDateien(r.fehlendeDateien);
@@ -239,6 +243,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
       fehlerBeiHandlung,
       nummernKonflikte,
       festKonflikte,
+      belegKonflikte,
       mehrfachStorniert,
       defekteDateien,
       fehlendeDateien,
@@ -350,7 +355,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
         zuletzt.current = undefined;
       },
     }),
-    [status, name, laeuft, letzte, fehler, fehlerBeiHandlung, nummernKonflikte, festKonflikte, mehrfachStorniert, defekteDateien, fehlendeDateien, serverEingerichtet, server, neuLesen, kontoPruefen, fehlerMerken, jetzt],
+    [status, name, laeuft, letzte, fehler, fehlerBeiHandlung, nummernKonflikte, festKonflikte, belegKonflikte, mehrfachStorniert, defekteDateien, fehlendeDateien, serverEingerichtet, server, neuLesen, kontoPruefen, fehlerMerken, jetzt],
   );
   return <Kontext.Provider value={wert}>{children}</Kontext.Provider>;
 }

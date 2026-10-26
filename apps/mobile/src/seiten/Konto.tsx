@@ -177,6 +177,7 @@ export function KontoSeite() {
         {k.nummernKonflikte.length ? <Hinweis text={TEXT.konto_nummern(k.nummernKonflikte)} symbol="number" /> : null}
         {/* nach dem Zusammenführen (K1, K2, Belegdateien): was geklärt werden muss */}
         {k.festKonflikte.length ? <Hinweis art="warnung" text={TEXT.fest_konflikt(k.festKonflikte)} /> : null}
+        {k.belegKonflikte.length ? <Hinweis art="warnung" text={TEXT.beleg_konflikt(k.belegKonflikte, "sync")} /> : null}
         {k.mehrfachStorniert.length ? <Hinweis art="warnung" text={TEXT.mehrfach_storniert(k.mehrfachStorniert)} /> : null}
         {k.defekteDateien.length ? <Hinweis art="warnung" text={TEXT.konto_dateien_defekt(k.defekteDateien.length)} /> : null}
         {k.fehlendeDateien.length ? <Hinweis art="warnung" text={TEXT.konto_dateien_fehlen(k.fehlendeDateien.length)} /> : null}

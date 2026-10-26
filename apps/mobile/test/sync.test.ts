@@ -99,8 +99,9 @@ describe("Zusammenführen zweier Geräte (E-134)", () => {
     s = stornieren(s, "r1", t("2026-10-04"), "st")[0];
     const server = s;
     // auf dem Gerät: Storno-Entwurf verwerfen, Zahlung entfernen
-    let lokal = loeschen(s, "st");
-    lokal = bezahltSetzen(lokal, "r1", null, new Date(Date.now() + 1000));
+    // feste Zeitpunkte statt der Uhr (E-209: deterministisch)
+    let lokal = loeschen(s, "st", t("2026-10-05"));
+    lokal = bezahltSetzen(lokal, "r1", null, t("2026-10-06"));
     for (const z of [syncZusammenfuehren(lokal, server).stand, syncZusammenfuehren(server, lokal).stand]) {
       const r = z.unterlagen.find((u) => u.id === "r1")!;
       expect(r.bezahlt).toBeUndefined();

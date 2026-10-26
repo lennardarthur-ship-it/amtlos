@@ -21,7 +21,7 @@ import * as logik from "./cloudLogik";
 import { ordnerAnzeigeName as anzeigeName } from "./cloudLogik";
 import type { Ablage, SicherungsOrt } from "./cloudLogik";
 
-export { kalenderwoche, zuLoeschen, WOCHEN_BEHALTEN, TAGE_BEHALTEN, VORHER_BEHALTEN } from "./cloudLogik";
+export { kalenderwoche, zuLoeschen, WOCHEN_BEHALTEN, TAGE_BEHALTEN, VORHER_BEHALTEN, SicherungUnlesbar, type VorhandeneSicherung } from "./cloudLogik";
 
 /** Dateien liegen direkt im gewählten Ordner – der Nutzer legt dafür am besten einen eigenen an. */
 const ORDNER = "";
@@ -162,8 +162,14 @@ export async function cloudVerfuegbar(): Promise<boolean> {
   return (await ordnerStatus()).art === "ok";
 }
 
-export async function cloudSchreiben(text: string, jetzt = new Date()): Promise<void> {
-  await logik.schreiben(await ort(), text, jetzt);
+/** Sichern; wirft `SicherungUnlesbar`, wenn die vorhandene Sicherung nicht lesbar ist (E-209) – außer mit `ersetzen`. */
+export async function cloudSchreiben(text: string, jetzt = new Date(), opt: { ersetzen?: boolean } = {}): Promise<void> {
+  await logik.schreiben(await ort(), text, jetzt, opt);
+}
+
+/** E-209: vorhandene Sicherung im Ordner prüfen (Cloud-Anbieter laden beim Lesen; mehrere Versuche mit Pause). */
+export async function cloudVorhanden(): Promise<logik.VorhandeneSicherung> {
+  return logik.vorhandeneSicherung(await ort());
 }
 
 export async function cloudLesen(): Promise<string | null> {

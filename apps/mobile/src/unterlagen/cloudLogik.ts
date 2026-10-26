@@ -18,6 +18,11 @@ export interface Ablage {
   writeFile(pfad: string, text: string): Promise<void>;
   unlink(pfad: string): Promise<void>;
   rmdir(pfad: string): Promise<void>;
+  /**
+   * E-209: Herunterladen einer Datei anstoßen, die nur in der Cloud liegt (iCloud: Platzhalter „.<Name>.icloud“, z. B.
+   * auf einem neuen iPhone). Ohne diese Funktion (Android-Ordner) lädt der Anbieter beim Lesen selbst.
+   */
+  herunterladen?(pfad: string): Promise<void>;
 }
 
 export interface SicherungsOrt {
@@ -82,6 +87,81 @@ export async function aktuellerPfad(o: SicherungsOrt): Promise<string | null> {
   return woche ? `${ordner}/${woche}` : null;
 }
 
+/** E-209: iCloud-Platzhalter einer noch nicht geladenen Datei („.<Name>.icloud“) */
+export const platzhalterName = (name: string) => `.${name}.icloud`;
+const basisname = (pfad: string) => pfad.slice(pfad.lastIndexOf("/") + 1);
+const ordnerVon = (pfad: string) => pfad.slice(0, pfad.lastIndexOf("/"));
+
+/**
+ * E-209: Eine vorhandene Sicherung ließ sich nicht lesen (noch nicht aus der Cloud geladen, Lesefehler, 0 Byte) – sie
+ * wird dann nie überschrieben. Erst wenn sie lesbar ist oder der Nutzer das Ersetzen ausdrücklich gewählt hat.
+ */
+export class SicherungUnlesbar extends Error {
+  constructor(
+    public pfad: string,
+    public grund: "platzhalter" | "leer" | "fehler",
+  ) {
+    super(`Vorhandene Sicherung nicht lesbar (${grund}): ${pfad}`);
+  }
+}
+
+export type VorhandeneSicherung = { art: "keine" } | { art: "lesbar"; pfad: string; text: string } | { art: "unlesbar"; pfad: string; grund: "platzhalter" | "leer" | "fehler" };
+
+/** Pfad der aktuellen Sicherung – auch, wenn sie nur als iCloud-Platzhalter da ist (E-209). */
+async function aktuellOderPlatzhalter(o: SicherungsOrt): Promise<{ pfad: string; platzhalter: boolean } | null> {
+  const pfad = await aktuellerPfad(o);
+  if (pfad) {
+    const namen = await o.ablage.readdir(ordnerVon(pfad) || o.ordner).catch(() => [] as string[]);
+    return { pfad, platzhalter: namen.includes(platzhalterName(basisname(pfad))) && !namen.includes(basisname(pfad)) };
+  }
+  if (!(await o.ablage.exists(o.ordner))) return null;
+  const namen = await o.ablage.readdir(o.ordner);
+  const p = namen.map((n) => /^\.(.+)\.icloud$/.exec(n)?.[1] ?? "").filter((n) => SICHERUNG.exec(n)?.[1] === "aktuell").sort()[0];
+  return p ? { pfad: `${o.ordner}/${p}`, platzhalter: true } : null;
+}
+
+/** Datei lesen; null bei Lesefehler, "" bei leerer Datei (0 Byte bzw. nur Leerraum). */
+async function versuchen(a: Ablage, pfad: string): Promise<string | null> {
+  try {
+    const t = await a.readFile(pfad);
+    return t.trim() ? t : "";
+  } catch {
+    return null;
+  }
+}
+
+const pause = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+/**
+ * E-209: Liegt schon eine Sicherung im Ziel, und lässt sie sich lesen? Für das Einrichten (neues Gerät) und die Wahl eines
+ * neuen Ordners. Ein iCloud-Platzhalter oder eine nicht lesbare/leere Datei: Herunterladen anstoßen und einige Male
+ * warten (`versuche` × `wartenMs`); bleibt sie unlesbar, „unlesbar“ – dann darf nichts geschrieben werden.
+ */
+export async function vorhandeneSicherung(o: SicherungsOrt, opt: { versuche?: number; wartenMs?: number; warten?: (ms: number) => Promise<void> } = {}): Promise<VorhandeneSicherung> {
+  const versuche = opt.versuche ?? 5;
+  const warten = opt.warten ?? pause;
+  let ziel: { pfad: string; platzhalter: boolean } | null;
+  try {
+    ziel = await aktuellOderPlatzhalter(o);
+  } catch {
+    // Ordner nicht lesbar: im Zweifel als unlesbar behandeln, nichts überschreiben
+    return { art: "unlesbar", pfad: aktuellName(o.ordner), grund: "fehler" };
+  }
+  if (!ziel) return { art: "keine" };
+  let grund: "platzhalter" | "leer" | "fehler" = ziel.platzhalter ? "platzhalter" : "fehler";
+  for (let i = 0; i < versuche; i++) {
+    if (i > 0 || ziel.platzhalter) {
+      await o.ablage.herunterladen?.(ziel.pfad).catch(() => undefined);
+      await warten(opt.wartenMs ?? 1500);
+    }
+    const t = await versuchen(o.ablage, ziel.pfad);
+    if (t) return { art: "lesbar", pfad: ziel.pfad, text: t };
+    if (t === "") grund = "leer";
+    else if (!ziel.platzhalter) grund = "fehler";
+  }
+  return { art: "unlesbar", pfad: ziel.pfad, grund };
+}
+
 async function ordnerAnlegen(a: Ablage, ordner: string): Promise<void> {
   // der gewählte Ordner selbst („“) existiert immer
   if (ordner && !(await a.exists(ordner))) await a.mkdir(ordner);
@@ -92,19 +172,46 @@ async function ordnerAnlegen(a: Ablage, ordner: string): Promise<void> {
  * kommt je Tag eine Sicherung, die nur einmal geschrieben wird – mit dem Stand vom Tagesbeginn (M8): Wer heute
  * versehentlich etwas löscht, findet es in der Sicherung von heute früh bzw. gestern noch.
  */
-export async function schreiben(o: SicherungsOrt, text: string, jetzt = new Date()): Promise<void> {
+export async function schreiben(o: SicherungsOrt, text: string, jetzt = new Date(), opt: { ersetzen?: boolean } = {}): Promise<void> {
   const { ablage: a, ordner } = o;
   await ordnerAnlegen(a, ordner);
   const tagesDatei = datei(ordner, `Tag-${tag(jetzt)}`);
+  const wochenDatei = datei(ordner, kalenderwoche(jetzt));
+  // E-209: Nie eine Sicherung überschreiben, die sich nicht lesen ließ (iCloud-Platzhalter auf einem neuen iPhone,
+  // Lesefehler, 0 Byte) – außer der Nutzer hat das Ersetzen ausdrücklich gewählt. Herunterladen wird angestoßen.
+  const namen = await a.readdir(ordner).catch(() => [] as string[]);
+  const bisher = await aktuellerPfad(o);
+  if (!opt.ersetzen) {
+    for (const z of [aktuellName(ordner), tagesDatei, wochenDatei, ...(bisher ? [bisher] : [])]) {
+      if (namen.includes(platzhalterName(basisname(z))) && !namen.includes(basisname(z))) {
+        await a.herunterladen?.(z).catch(() => undefined);
+        throw new SicherungUnlesbar(z, "platzhalter");
+      }
+    }
+  }
+  const vorher = bisher ? await versuchen(a, bisher) : null;
+  if (bisher && !vorher && !opt.ersetzen) {
+    await a.herunterladen?.(bisher).catch(() => undefined);
+    throw new SicherungUnlesbar(bisher, vorher === "" ? "leer" : "fehler");
+  }
+  // E-209: eine Sicherung mit anderem Schlüssel (anderes Gerät, anderes Passwort, unbekannter Inhalt) nicht still
+  // ersetzen, sondern zuerst beiseitelegen (die letzten VORHER_BEHALTEN bleiben)
+  if (vorher && fremdeSicherung(vorher, text)) await beiseitelegen(o, vorher, jetzt);
   if (!(await a.exists(tagesDatei))) {
     // Stand vom Tagesbeginn: die bisherige aktuelle Sicherung, sonst die neue
-    const bisher = await aktuellerPfad(o);
-    const vorher = bisher ? await a.readFile(bisher).catch(() => null) : null;
-    await a.writeFile(tagesDatei, vorher ?? text);
+    await a.writeFile(tagesDatei, vorher || text);
   }
   await a.writeFile(aktuellName(ordner), text);
-  await a.writeFile(datei(ordner, kalenderwoche(jetzt)), text);
+  await a.writeFile(wochenDatei, text);
   await aufraeumen(o).catch(() => undefined);
+}
+
+/** Stammt `alt` von einem anderen Sicherungsschlüssel als `neu` (oder ist es gar keine lesbare Sicherung)? */
+function fremdeSicherung(alt: string, neu: string): boolean {
+  const ka = sicherungsKdf(alt);
+  const kn = sicherungsKdf(neu);
+  if (!kn) return false;
+  return !ka || schluesselKennung(ka.salz) !== schluesselKennung(kn.salz);
 }
 
 /**
@@ -177,7 +284,12 @@ export async function dateiLesen(o: SicherungsOrt, kennung: string, name: string
 
 /** Vorhandene Sicherung nicht überschreiben, sondern unter neuem Namen beiseitelegen (z. B. beim Einrichten auf einem neuen Gerät). */
 export async function beiseitelegen(o: SicherungsOrt, text: string, jetzt = new Date()): Promise<void> {
-  await o.ablage.writeFile(datei(o.ordner, `vorher-${jetzt.toISOString().slice(0, 16).replace(":", "-")}`), text);
+  await ordnerAnlegen(o.ablage, o.ordner);
+  // E-209: eine schon beiseitegelegte Datei derselben Minute nicht überschreiben – eigener Name mit Zähler
+  const basis = `vorher-${jetzt.toISOString().slice(0, 16).replace(":", "-")}`;
+  let pfad = datei(o.ordner, basis);
+  for (let i = 2; (await o.ablage.exists(pfad)) && i < 100; i++) pfad = datei(o.ordner, `${basis}-${i}`);
+  await o.ablage.writeFile(pfad, text);
 }
 
 /** Bekannte Anbieter der Ordnerauswahl – deren Dokument-IDs sind keine lesbaren Pfade. */
