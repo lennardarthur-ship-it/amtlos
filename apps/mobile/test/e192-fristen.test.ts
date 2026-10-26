@@ -188,10 +188,12 @@ describe("Erinnerungen vor jeder Frist (E-192)", () => {
     const plan = erinnerungsPlan(a, e, heute);
     expect(plan.mitteilungen.length).toBeLessThanOrEqual(MAX_MITTEILUNGEN);
     expect(MAX_MITTEILUNGEN).toBeLessThan(64);
-    if (alle.mitteilungen.length > MAX_MITTEILUNGEN) expect(plan.geplantBis).toBe(plan.mitteilungen[MAX_MITTEILUNGEN - 1]!.am);
+    // E-207: die letzte der 60 ist der Hinweis „App öffnen“ – geplant bis zur letzten Erinnerung davor
+    if (alle.mitteilungen.length > MAX_MITTEILUNGEN) expect(plan.geplantBis).toBe(plan.mitteilungen[MAX_MITTEILUNGEN - 2]!.am);
     const knapp = erinnerungsPlan(a, e, heute, { max: 5 });
     expect(knapp.mitteilungen).toHaveLength(5);
-    expect(knapp.geplantBis).toBe(knapp.mitteilungen[4]!.am);
+    expect(knapp.geplantBis).toBe(knapp.mitteilungen[3]!.am);
+    expect(knapp.mitteilungen[4]!.weiterplanen).toBe(true);
     // nichts in der Vergangenheit, nichts nach dem letzten Termin des Jahres
     expect(tage.every((t) => t >= heute)).toBe(true);
   });

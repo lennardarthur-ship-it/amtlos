@@ -8,8 +8,16 @@
  * App, Android begrenzt Wecker je App ebenfalls – geplant werden die ersten `MAX_MITTEILUNGEN` Tage nach Datum. Endet der
  * Plan dadurch vor dem letzten Termin, sagt die App das („geplant bis …“); bei jedem Start, jeder Rückkehr in die App
  * und jeder Änderung plant sie neu (`ErinnerungsPlaner`).
+ *
+ * E-207: Erinnert wird an jede Frist mit Datum, die die App zeigt – auch an die Termine der Einträge, die noch von Angaben
+ * abhängen („Hängt von deinen Angaben ab“, z. B. Vorauszahlungen, EÜR, Gewerbesteuererklärung, solange Gewinn bzw.
+ * Vorauszahlungen nicht angegeben sind): drei Tage vorher, mit „falls es für dich gilt“, ohne „heute“ und „überfällig“.
+ * Weil lokale Mitteilungen nur geplant werden, wenn die App läuft, ist die letzte Mitteilung immer der Hinweis
+ * „Öffne die App, damit sie die nächsten Fristen plant“ (`weiterplanen`): am Tag nach der letzten geplanten Erinnerung,
+ * wenn die Höchstzahl den Plan kürzt, sonst elf Monate nach heute (der Plan reicht zwölf Monate weit). Wer die App
+ * danach monatelang nicht öffnet, bekommt keine weiteren Erinnerungen – das kann eine App ohne Server nicht verhindern.
  */
-import { differenzTage, plusTage } from "@amtlos/fristen";
+import { differenzTage, plusMonate, plusTage } from "@amtlos/fristen";
 import { T as TEXT } from "../texte";
 import { istErledigt, type Auswertung, type Erledigt } from "./check";
 
@@ -32,6 +40,8 @@ export interface Erinnerung {
   art: ErinnerungsArt;
   /** E-200: letzter Tag zum Übermitteln (Eingang um 0 Uhr am Tag danach) – Text „Spätestens am … übermitteln“ */
   uebermitteln?: boolean;
+  /** E-207: Eintrag hängt noch von Angaben ab – Text „…, falls es für dich gilt“ */
+  vielleicht?: boolean;
 }
 
 /** Eine Mitteilung auf dem Gerät: alle Erinnerungen eines Tages. */
@@ -40,6 +50,8 @@ export interface Mitteilung {
   titel: string;
   text: string;
   erinnerungen: Erinnerung[];
+  /** E-207: Hinweis „App öffnen, damit die nächsten Fristen geplant werden“ (letzte Mitteilung des Plans, ohne Erinnerungen) */
+  weiterplanen?: boolean;
 }
 
 export interface ErinnerungsPlan {
@@ -76,6 +88,16 @@ export function erinnerungen(a: Auswertung, e: Erledigt, heute: string, o: { vor
     else if (offen) fuer(aktuell);
     for (const t of p.termine) if (t > aktuell) fuer(t);
   }
+  // E-207: Termine der Einträge, die noch von Angaben abhängen – die Pflicht-Seite zeigt sie mit Datum. Nur vorher.
+  const gilt = new Set(a.gilt.map((p) => p.id));
+  for (const p of a.unbekannt) {
+    if (gilt.has(p.id) || p.lohnbuero) continue;
+    for (const t of p.termine) {
+      if (t <= heute) continue;
+      const frueh = plusTage(t, -vorlauf);
+      aus.push({ pflichtId: p.id, titel: p.titel, termin: t, am: frueh > heute ? frueh : heute, art: "vorher", vielleicht: true });
+    }
+  }
   // je Termin und Tag nur eine Erinnerung (z. B. Termin heute: „vorher“ und „heute“ fielen zusammen)
   const gesehen = new Set<string>();
   return aus
@@ -93,6 +115,7 @@ const datumDe = (iso: string) => iso.split("-").reverse().join(".");
 /** Text einer Erinnerung am Tag der Mitteilung („Fällig am …“, „Heute fällig“, „Seit 3 Tagen überfällig“). */
 export function erinnerungsText(x: Erinnerung): string {
   if (x.art === "ueberfaellig") return TEXT.frist_ueber(differenzTage(x.termin, x.am));
+  if (x.vielleicht) return TEXT.mitteilung_vielleicht(datumDe(x.termin));
   // E-200: Beitragsnachweis – der Termin ist der letzte Tag zum Übermitteln
   if (x.uebermitteln) return x.am === x.termin ? TEXT.e200_heute_uebermitteln : TEXT.e200_uebermitteln_bis(datumDe(x.termin));
   if (x.am === x.termin) return TEXT.frist_heute;
@@ -105,12 +128,33 @@ export function mitteilung(am: string, l: Erinnerung[]): Mitteilung {
   return { am, titel: TEXT.mitteilung_mehrere(l.length), text: l.map((x) => `${x.titel}: ${erinnerungsText(x)}`).join("\n"), erinnerungen: l };
 }
 
-/** Der Plan für das Gerät: eine Mitteilung je Tag, nach Datum, höchstens `max`. */
+/** E-207: Monate bis zum Hinweis „weiterplanen“, wenn der Plan nicht gekürzt ist (der Plan reicht zwölf Monate weit). */
+export const WEITERPLANEN_NACH_MONATEN = 11;
+
+/** E-207: der Hinweis am Ende des Plans – lokale Mitteilungen plant nur die laufende App. */
+const weiter = (am: string): Mitteilung => ({ am, titel: TEXT.mitteilung_weiterplanen_titel, text: TEXT.mitteilung_weiterplanen, erinnerungen: [], weiterplanen: true });
+
+/**
+ * Der Plan für das Gerät: eine Mitteilung je Tag, nach Datum, höchstens `max` – die letzte davon ist der Hinweis
+ * „weiterplanen“ (E-207). `geplantBis`: letzter Tag mit geplanter Erinnerung, wenn die Höchstzahl den Plan kürzt.
+ */
 export function erinnerungsPlan(a: Auswertung, e: Erledigt, heute: string, o: { vorlauf?: number; amTag?: boolean; max?: number } = {}): ErinnerungsPlan {
   const max = o.max ?? MAX_MITTEILUNGEN;
   const tage = new Map<string, Erinnerung[]>();
   for (const x of erinnerungen(a, e, heute, o)) tage.set(x.am, [...(tage.get(x.am) ?? []), x]);
   const alle = [...tage.entries()].map(([am, l]) => mitteilung(am, l));
-  const mitteilungen = alle.slice(0, max);
-  return { mitteilungen, geplantBis: alle.length > max && mitteilungen.length ? mitteilungen[mitteilungen.length - 1]!.am : null };
+  if (!alle.length) return { mitteilungen: [], geplantBis: null };
+  if (alle.length < max) {
+    // alles passt: der Hinweis elf Monate nach heute – nach der letzten Erinnerung, falls die später liegt
+    const am = plusMonate(heute, WEITERPLANEN_NACH_MONATEN);
+    const vorher = alle.filter((m) => m.am < am);
+    const nachher = alle.filter((m) => m.am > am);
+    const gleich = alle.find((m) => m.am === am);
+    // eine Mitteilung je Tag: am selben Tag wie Erinnerungen steht der Hinweis in derselben Mitteilung
+    const hinweis = gleich ? { ...gleich, text: `${gleich.text}\n${TEXT.mitteilung_weiterplanen}`, weiterplanen: true } : weiter(am);
+    return { mitteilungen: nachher.length ? [...alle, weiter(plusTage(nachher[nachher.length - 1]!.am, 1))] : [...vorher, hinweis], geplantBis: null };
+  }
+  const mitteilungen = alle.slice(0, max - 1);
+  const bis = mitteilungen[mitteilungen.length - 1]?.am ?? heute;
+  return { mitteilungen: [...mitteilungen, weiter(plusTage(bis, 1))], geplantBis: bis };
 }

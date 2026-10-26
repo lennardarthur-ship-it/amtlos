@@ -354,13 +354,18 @@ export const T = {
   alle_nach_bereich: "Pflichten nach Bereich",
   erinnern: "An Fristen erinnern",
   // E-192: drei Tage vorher und am Tag selbst, Versäumtes weiter, bis es abgehakt ist – auch wenn die App zu bleibt
-  erinnern_hilfe: `Dein ${W.geraet} erinnert dich drei Tage vor jeder Frist und am Tag selbst, jeweils um 9 Uhr – an Versäumtes, bis du es abhakst. Auch wenn ${MARKE.name} geschlossen bleibt.`,
+  // E-207: ehrlich – geplant wird beim Öffnen; die letzte Mitteilung bittet darum, die App wieder zu öffnen
+  erinnern_hilfe: `Dein ${W.geraet} erinnert dich drei Tage vor jeder Frist und am Tag selbst, jeweils um 9 Uhr – an Versäumtes, bis du es abhakst, und an Fristen, die noch von deinen Angaben abhängen. Auch wenn ${MARKE.name} geschlossen bleibt: Geplant wird beim Öffnen für die nächsten Monate, und bevor der Plan endet, meldet sich dein ${W.geraet}.`,
   erinnern_hilfe_frei: `Mit Pro erinnert dich dein ${W.geraet} drei Tage vor jeder Frist und am Tag selbst, jeweils um 9 Uhr.`,
   /** E-192: Ehrlichkeitshinweis, wenn die geplanten Mitteilungen (höchstens 60, Grenze des Systems) vor dem Ende der Fristen enden */
   erinnern_geplant_bis: (datum: string) => `Erinnerungen sind bis ${datum} geplant – öffne ${MARKE.name} bis dahin einmal, dann plant es die nächsten Fristen.`,
   /** E-192: Mitteilungen (lokal, 9 Uhr) */
   mitteilung_mehrere: (n: number) => `${n} Fristen`,
   mitteilung_vorher: (datum: string) => `Fällig am ${datum}`,
+  // E-207: Eintrag hängt noch von Angaben ab; Hinweis am Ende des Plans (lokale Mitteilungen plant nur die laufende App)
+  mitteilung_vielleicht: (datum: string) => `Fällig am ${datum}, falls es für dich gilt – kläre es in der App`,
+  mitteilung_weiterplanen_titel: "Erinnerungen weiter planen",
+  mitteilung_weiterplanen: `Öffne ${MARKE.name} einmal, damit es dich auch an die nächsten Fristen erinnert.`,
   // E-200: Beitragsnachweis – muss um 0 Uhr des Tabellentags vorliegen, also spätestens am Vortag übermitteln
   e200_uebermitteln_bis: (datum: string) => `Spätestens am ${datum} übermitteln`,
   e200_heute_uebermitteln: "Heute übermitteln – spätestens heute",
