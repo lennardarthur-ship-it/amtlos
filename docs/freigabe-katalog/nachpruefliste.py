@@ -3,9 +3,10 @@ Nachprüfliste je Rolle (E-196, E-197, E-198): was jede prüfende Person noch pr
 Excel-Datei; dazu ein E-Mail-Entwurf. Kein Blatt zum Unterschreiben mehr (E-197): Eine Bestätigung per E-Mail genügt.
 E-198: Kein E-Mail-Text im Repository – der Entwurf geht auf die Standardausgabe oder mit `--mail-ziel <ordner>` in einen
 Ordner außerhalb des Repositorys (ein Ordner im Repository wird abgelehnt). Im Versandordner liegen nur Listen und PDFs.
+E-199: Auch der Versandordner liegt außerhalb des Repositorys (ein Ziel im Repository wird abgelehnt, ziel.py).
 
     pnpm --filter @amtlos/fachlogik build
-    python3 docs/freigabe-katalog/nachpruefliste.py docs/freigabe-katalog/versand-2026-10-25-nachpruefung [--mail-ziel ~/Versand]
+    python3 docs/freigabe-katalog/nachpruefliste.py ~/Versand/nachpruefung [--mail-ziel ~/Versand]
 
 Inhalt je Rolle (recht, steuern, arbeitsschutz, hygiene):
   - Katalogeinträge, deren Freigabe ohne schriftliche Bestätigung im Register steht (`nachweis.art` ersetzt/offen) – mit
@@ -22,9 +23,6 @@ import os
 import subprocess
 import sys
 
-from openpyxl import Workbook
-from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
-from openpyxl.worksheet.datavalidation import DataValidation
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HIER, "../.."))
@@ -37,7 +35,11 @@ if "--mail-ziel" in sys.argv:
     del sys.argv[_i:_i + 2]
     if os.path.commonpath([MAIL_ZIEL, ROOT]) == ROOT:
         raise SystemExit(f"--mail-ziel {MAIL_ZIEL} liegt im Repository – E-Mail-Texte gehören nicht ins Projekt (E-198)")
-ZIEL = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HIER, "versand-2026-10-25-nachpruefung"))
+from ziel import ziel_ausserhalb  # noqa: E402  (E-199: Ziel außerhalb des Repositorys)
+ZIEL = ziel_ausserhalb(sys.argv[1] if len(sys.argv) > 1 else None, "Aufruf: python3 docs/freigabe-katalog/nachpruefliste.py <ziel> [--mail-ziel <ordner>]")
+from openpyxl import Workbook  # noqa: E402
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side  # noqa: E402
+from openpyxl.worksheet.datavalidation import DataValidation  # noqa: E402
 import anwenden  # noqa: E402  (Register, Regeln und Auswertung je Eintrag)
 
 STAND = "25.10.2026"

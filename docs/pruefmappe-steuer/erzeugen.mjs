@@ -3,7 +3,7 @@
  * Jahresszenarien mit Erwartungswerten und Steuerberater-Paketen, Katalog und Regelwerte der Bereiche Steuern/Lohn als CSV,
  * Prüflisten-Auszug (Zeilen mit StB) nach Thema und die DATEV-Konten der App (SKR03/SKR04) aus dem Code.
  *
- *   node docs/pruefmappe-steuer/erzeugen.mjs <ziel>      # z. B. /tmp/pruefmappe-steuer
+ *   node docs/pruefmappe-steuer/erzeugen.mjs <ziel>      # außerhalb des Repositorys (E-199), z. B. /tmp/pruefmappe-steuer
  *   KOSIT=<ordner>   optional: XRechnungen der Szenarien mit dem KoSIT-Validator prüfen (wie werkzeuge/jahr-szenario.mjs)
  *
  * Voraussetzung: `pnpm install`, Chromium (wie werkzeuge/dokumente-pruefen.mjs), pdftotext. Die Fachlogik wird hier gebaut.
@@ -19,7 +19,21 @@ const HIER = path.dirname(new URL(import.meta.url).pathname);
 const ROOT = path.resolve(HIER, "../..");
 const APP = path.join(ROOT, "apps/mobile");
 const FACH = path.join(ROOT, "packages/fachlogik");
-const ZIEL = path.resolve(process.argv[2] ?? "pruefmappe-steuer");
+/** E-199: Unterlagen für Prüfer entstehen nur außerhalb des Repositorys – ein Ziel im Repository wird abgelehnt. */
+function zielAusserhalb(p, aufruf) {
+  if (!p) {
+    console.error(`${aufruf} – Ziel fehlt (ein Ordner außerhalb des Repositorys, E-199)`);
+    process.exit(2);
+  }
+  const z = path.resolve(p);
+  const rel = path.relative(path.resolve(path.dirname(new URL(import.meta.url).pathname), "../.."), z);
+  if (!rel.startsWith("..") && !path.isAbsolute(rel)) {
+    console.error(`Ziel ${z} liegt im Repository – Unterlagen für oder von Prüfern gehören nicht ins Projekt (E-199)`);
+    process.exit(2);
+  }
+  return z;
+}
+const ZIEL = zielAusserhalb(process.argv[2], "Aufruf: node docs/pruefmappe-steuer/erzeugen.mjs <ziel>");
 const ROH = path.join(ZIEL, ".roh");
 fs.mkdirSync(ROH, { recursive: true });
 const kopiere = (von, nach) => {

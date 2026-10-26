@@ -1,6 +1,6 @@
 /**
  * E-167: Zuordnung der fachlichen Durchsicht Arbeitsschutz (Fachkraft für Arbeitssicherheit, Ergebnis vom 22.10.2026,
- * docs/pruefberichte/2026-10-22-arbeitsschutz-pruefergebnis.xlsx, Blatt „A Bausteine“) zu den Bausteinen im Code: Nummer
+ * beim Gründer, Blatt „A Bausteine“) zu den Bausteinen im Code: Nummer
  * der Prüfmappe (B-…) → Vorlage, Feld und heutiger Titel. So bleibt jede Änderung zuzuordnen, auch wenn neue Bausteine die
  * fortlaufende Nummer verschieben (docs/pruefmappe-arbeitsschutz/erzeugen.mjs nummeriert danach). Ein Baustein, der in
  * mehrere geteilt wurde (B-036 Fettbrand), steht mehrfach. „pruefstand“ wie im Blatt: bestätigt/plausibel – der Vermerk

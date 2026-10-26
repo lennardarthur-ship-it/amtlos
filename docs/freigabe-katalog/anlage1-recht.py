@@ -3,11 +3,14 @@ Anlage 1 zur Vereinbarung Pflege und Widerruf (Rechtsanwalt): alle von ihm best�
 Prüfsumme, die er bestätigt hat. Bei „nur Folgen bei Verstoß“ (Lebensmittel) die von ihm gesehene Version und der
 Hinweis, ob die Folgen seitdem unverändert sind.
 
-    python3 docs/freigabe-katalog/anlage1-recht.py <ziel.pdf>
+    python3 docs/freigabe-katalog/anlage1-recht.py <ziel.pdf>     # <ziel.pdf> außerhalb des Repositorys (E-199)
 """
 import glob, html, os, re, subprocess, sys
-import yaml
 HIER = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HIER, "../.."))
+sys.path.insert(0, HIER)
+from ziel import ziel_ausserhalb  # noqa: E402  (E-199: Ziel außerhalb des Repositorys)
+ZIEL = ziel_ausserhalb(sys.argv[1] if len(sys.argv) > 1 else None, "Aufruf: python3 docs/freigabe-katalog/anlage1-recht.py <ziel.pdf>")
+import yaml  # noqa: E402
 os.chdir(ROOT)
 src = open(os.path.join(HIER, "anwenden.py")).read().split('if __name__ == "__main__":')[0]
 g = {"__file__": os.path.join(HIER, "anwenden.py")}; exec(src, g)
@@ -47,7 +50,7 @@ page = f"""<!doctype html><meta charset=utf-8><style>@page{{size:A4;margin:12mm}
 <h2>A. Pflichtenkatalog ({len(rows)} Einträge)</h2><table><tr><th>Nr</th><th>ID</th><th>bestätigt</th><th>Umfang / Hinweis</th><th>Stand</th></tr>{ka}</table>
 <h2>B. Vorlagen ({len(vorl)})</h2><table><tr><th>Vorlage</th><th>Stand</th><th>Prüfsumme</th><th>Umfang</th></tr>{vo}</table>
 <h2>C. Texte und Einzelpunkte</h2><table><tr><th>Text</th><th>Stand</th><th>Prüfsumme</th></tr>{te}</table>"""
-ziel = os.path.abspath(sys.argv[1]); t = ziel[:-4] + ".html"; open(t, "w").write(page)
+ziel = ZIEL; t = ziel[:-4] + ".html"; open(t, "w").write(page)
 s = f"""const {{ chromium }} = require('playwright-core');(async()=>{{const b=await chromium.launch({{executablePath:'/opt/pw-browsers/chromium',args:['--no-sandbox']}});const p=await b.newPage();await p.goto('file://{t}');await p.pdf({{path:'{ziel}',format:'A4',preferCSSPageSize:true}});await b.close();}})();"""
 subprocess.run(["node", "-e", s], check=True, cwd=os.path.join(ROOT, "apps/web")); os.remove(t)
 print(len(rows), "Einträge,", len(vorl), "Vorlagen →", ziel)

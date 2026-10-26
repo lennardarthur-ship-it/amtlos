@@ -28,8 +28,7 @@ Das Bürokratie-Betriebssystem für Kleinunternehmer und Startups in Deutschland
 |---|---|
 | `ENTSCHEIDUNGEN.md` | alle Architektur- und Produktentscheidungen |
 | `PRUEFLISTE.md` | offene fachliche Prüfpunkte |
-| `docs/freigabe-katalog/`, `docs/freigabe-vorlagen/` | Freigabe-Register (`freigaben.yaml`, `geprueft.ts`), Prüfpakete je Rolle (nur Listen und PDFs) und Werkzeuge; `anwenden.py --pruefen` prüft die Nachweise |
-| `docs/pruefberichte/` | Berichte und vom Prüfer ausgefüllte Dateien – keine Mails: Bestätigungen per Mail bewahrt der Gründer auf, das Register nennt Art, Datum, Rolle und Umfang (E-198) |
+| `docs/freigabe-katalog/`, `docs/freigabe-vorlagen/` | Freigabe-Register (`freigaben.yaml`; Vorlagen in `packages/fachlogik/src/dokumente/geprueft.ts`) und Werkzeuge für die Prüfpakete; `anwenden.py --pruefen` prüft das Register. Keine Unterlagen von oder für Prüfer und keine Namen im Repository (E-199): Berichte, ausgefüllte Dateien, Mails und Pakete bewahrt der Gründer auf; das Register nennt je Freigabe Rolle, Datum, Umfang (in unseren Worten), Art und „beim Gründer“. Die Werkzeuge schreiben nur in einen Ordner außerhalb des Repositorys |
 | `docs/01-architektur.md` … `docs/07-betrieb.md` | Architektur, Datenmodell, Regel-Schema, Seiten, Risiken, Design, Betrieb |
 | `docs/testberichte/` | Testberichte je Bauabschnitt |
 

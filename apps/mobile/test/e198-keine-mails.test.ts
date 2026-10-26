@@ -1,6 +1,6 @@
 /**
  * E-198 (Gründerentscheidung 26.10.2026: „Du sollst keine E-Mails speichern.“): Das Repository enthält keine Mails – weder
- * die Mails der Prüfer (docs/pruefberichte) noch Entwürfe unserer Mails in den Versandordnern. Bestätigungen per Mail
+ * die Mails der Prüfer noch Entwürfe unserer Mails (seit E-199 gibt es weder docs/pruefberichte noch Versandordner). Bestätigungen per Mail
  * bewahrt der Gründer auf; Register und Vorlagen-Freigaben nennen nur Art, Datum, Rolle und Umfang (in unseren Worten).
  * Die Werkzeuge schreiben E-Mail-Texte nicht ins Repository (Standardausgabe oder Ordner außerhalb).
  */
@@ -18,13 +18,9 @@ const dateien = execFileSync("git", ["ls-files"], { cwd: WURZEL, encoding: "utf8
   .filter((d) => d && !d.includes("node_modules") && fs.existsSync(path.join(WURZEL, d)));
 
 describe("E-198: keine E-Mails im Repository", () => {
-  it("docs/pruefberichte: keine .eml, keine *mail*.txt, keine Datei mit Mail-Kopfzeilen", () => {
-    const pb = fs.readdirSync(path.join(WURZEL, "docs/pruefberichte"));
-    expect(pb.filter((d) => MAILNAME.test(d))).toEqual([]);
-    const mitKopf = pb.filter((d) => /\.(txt|md|json|html?)$/i.test(d) && istMail(fs.readFileSync(path.join(WURZEL, "docs/pruefberichte", d), "utf8").slice(0, 4000)));
-    expect(mitKopf).toEqual([]);
-    // was bleibt, sind Berichte, ausgefüllte Dateien und Bestätigungsblätter des Prüfers
-    expect(pb.every((d) => /\.(pdf|xlsx|md|txt|json)$/i.test(d)), pb.join(", ")).toBe(true);
+  it("keine .eml, keine *mail*.txt im ganzen Repository; docs/pruefberichte gibt es nicht mehr (E-199)", () => {
+    expect(dateien.filter((d) => MAILNAME.test(d))).toEqual([]);
+    expect(fs.existsSync(path.join(WURZEL, "docs/pruefberichte"))).toBe(false);
   });
 
   it("keine Entwürfe unserer Mails (E-Mail.txt) in Versandordnern oder sonst unter docs", () => {

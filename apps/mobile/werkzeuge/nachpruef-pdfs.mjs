@@ -7,7 +7,7 @@
  * Rolle: <ziel>/<rolle>/vorlagen/<vorlage>-<variante>.pdf, dazu varianten.json (Prüfsummen je Gruppe freigegeben/heute).
  * Unveränderte Varianten bekommen kein PDF: Für sie gilt die Freigabe weiter.
  *
- *   node werkzeuge/nachpruef-pdfs.mjs ../../docs/freigabe-katalog/versand-2026-10-25-nachpruefung
+ *   node werkzeuge/nachpruef-pdfs.mjs ~/Versand/nachpruefung      # Ziel außerhalb des Repositorys (E-199)
  */
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
@@ -16,13 +16,23 @@ import { createRequire } from "node:module";
 
 const HIER = path.dirname(new URL(import.meta.url).pathname);
 const APP = path.resolve(HIER, "..");
+/** E-199: Unterlagen für Prüfer entstehen nur außerhalb des Repositorys – ein Ziel im Repository wird abgelehnt. */
+function zielAusserhalb(p, aufruf) {
+  if (!p) {
+    console.error(`${aufruf} – Ziel fehlt (ein Ordner außerhalb des Repositorys, E-199)`);
+    process.exit(2);
+  }
+  const z = path.resolve(p);
+  const rel = path.relative(path.resolve(APP, "../.."), z);
+  if (!rel.startsWith("..") && !path.isAbsolute(rel)) {
+    console.error(`Ziel ${z} liegt im Repository – Unterlagen für oder von Prüfern gehören nicht ins Projekt (E-199)`);
+    process.exit(2);
+  }
+  return z;
+}
+const ZIEL = zielAusserhalb(process.argv[2], "Aufruf: node werkzeuge/nachpruef-pdfs.mjs <zielordner>");
 const require = createRequire(path.resolve(APP, "../web/package.json"));
 const { chromium } = require("playwright-core");
-if (!process.argv[2]) {
-  console.error("Aufruf: node werkzeuge/nachpruef-pdfs.mjs <zielordner>");
-  process.exit(2);
-}
-const ZIEL = path.resolve(process.argv[2]);
 
 const pnpm = path.resolve(APP, "../../node_modules/.pnpm");
 const esbuildOrdner = fs.readdirSync(pnpm).filter((d) => d.startsWith("esbuild@")).sort().at(-1);

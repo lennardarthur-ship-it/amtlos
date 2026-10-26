@@ -1,5 +1,5 @@
 /**
- * Nachprüfung der Vorlagen (23.10.2026, docs/pruefberichte/2026-10-23-rueckmeldungen-runde-nachpruefung.json): Änderungen
+ * Nachprüfung der Vorlagen (23.10.2026, beim Gründer): Änderungen
  * nach Steuerberater (8 Vorlagen), Sifa (4 Vorlagen, 14 Baustein-Anmerkungen, Hinweise zum Hygieneplan) und Rechtsanwalt
  * (Handelsregister für OHG/KG).
  */

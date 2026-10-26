@@ -13,6 +13,8 @@
  */
 /* global process, console, Buffer, URL */
 /* eslint-disable no-console -- Kommandozeilenwerkzeug */
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { MARKE, PLATZHALTER, markeEinsetzenTief } from "../../../packages/marke/index.js";
@@ -147,13 +149,32 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
   // E-198: keine Mails im Repository – weder Mails der Prüfer noch Entwürfe unserer Mails
   const mails = [];
   const durch = (ordner) => { for (const e of fs.existsSync(ordner) ? fs.readdirSync(ordner, { withFileTypes: true }) : []) { const p = path.join(ordner, e.name); if (e.isDirectory()) durch(p); else if (/(\.eml|\.msg|\.mbox|mail[^/]*\.txt)$/i.test(e.name) || (/\.(txt|md)$/.test(e.name) && /^(Betreff|Subject):/m.test(fs.readFileSync(p, "utf8").slice(0, 2000)))) mails.push(path.relative(path.join(APP, "../.."), p)); } };
-  for (const o of ["docs/pruefberichte", "docs/freigabe-katalog", "docs/freigabe-vorlagen"]) durch(path.join(APP, "../..", o));
+  durch(path.join(APP, "../..", "docs"));
   pruefe(!mails.length, `Keine Mails im Repository (E-198: Bestätigungen der Prüfer bewahrt der Gründer auf)${mails.length ? ` – ${mails.join(", ")}` : ""}`);
+  // E-199: keine Unterlagen von oder für Prüfer (Berichte, ausgefüllte Dateien, Pakete, Blätter) und keine Namen – Namen nur als
+  // SHA-256 der Wörter (docs/freigabe-katalog/namen-sha256.json), nicht im Klartext
+  {
+    const WURZEL = path.join(APP, "../..");
+    const dateien = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], { cwd: WURZEL, encoding: "utf8" })
+      .split("\n")
+      .filter((d) => d && !d.includes("node_modules") && fs.existsSync(path.join(WURZEL, d)) && fs.statSync(path.join(WURZEL, d)).isFile());
+    const unterlagen = dateien.filter((d) => /^docs\/(pruefberichte|freigabe-katalog\/versand)/.test(d) || /\.(xlsx|xls|xlsm|pdf|eml|msg|mbox|docx?|odt|ods)$/i.test(d) || (d.startsWith("docs/") && /\.(jpe?g|png|heic|tiff?)$/i.test(d)) || (d.startsWith("docs/freigabe-vorlagen/") && !d.endsWith(".py")));
+    const h = JSON.parse(fs.readFileSync(path.join(WURZEL, "docs/freigabe-katalog/namen-sha256.json"), "utf8"));
+    const sha = (s) => createHash("sha256").update(s).digest("hex");
+    const prueftexte = ["docs/freigabe-katalog/freigaben.yaml", "docs/freigabe-katalog/offene-punkte.yaml", "packages/fachlogik/src/dokumente/geprueft.ts", "apps/mobile/src/pflichten/pruefer.ts"];
+    const mitNamen = dateien.filter((d) => {
+      const roh = fs.readFileSync(path.join(WURZEL, d));
+      const w = (roh.subarray(0, 8000).includes(0) ? roh.toString("latin1") : roh.toString("utf8")).toLowerCase().match(/[a-zäöüß]+/g) ?? [];
+      const einzeln = new Set(prueftexte.includes(d) ? [...h.einzeln, ...h.mehrdeutig] : h.einzeln);
+      return [...new Set(w)].some((x) => einzeln.has(sha(x))) || w.slice(1).some((x, i) => h.paare.includes(sha(`${w[i]} ${x}`)));
+    });
+    pruefe(!unterlagen.length && !mitNamen.length, `Keine Prüfunterlagen und keine Namen im Repository (E-199: Unterlagen von und für Prüfer bewahrt der Gründer auf; Nachweis nur in freigaben.yaml und geprueft.ts)${unterlagen.length || mitNamen.length ? ` – ${[...unterlagen, ...mitNamen.map((d) => `${d} (Name)`)].join(", ")}` : ""}`);
+  }
   const katalog = JSON.parse(lies("src/pflichten/katalog.json"));
   const wartend = katalog.pflichten.filter((p) => p.pruefung?.status === "in_pruefung").map((p) => p.id);
-  pruefe(!wartend.length, `Katalog: alle freigegebenen Einträge schriftlich bestätigt (E-197, Nachweis ohne Mail im Projekt, E-198)${wartend.length ? ` – ${wartend.length} warten auf die Bestätigung per E-Mail bzw. Nachprüfung (docs/freigabe-katalog/versand-2026-10-25-nachpruefung, PRUEFLISTE T-200)` : ""}`);
+  pruefe(!wartend.length, `Katalog: alle freigegebenen Einträge schriftlich bestätigt (E-197, Nachweis ohne Mail im Projekt, E-198)${wartend.length ? ` – ${wartend.length} warten auf die Bestätigung per E-Mail bzw. Nachprüfung (Nachprüfliste beim Gründer, PRUEFLISTE T-200)` : ""}`);
   const entwurf = katalog.pflichten.filter((p) => p.pruefung?.status === "entwurf").map((p) => p.id);
-  pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; docs/freigabe-katalog/versand-2026-10-25-neue-eintraege)` : ""}`);
+  pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; Prüfpaket beim Gründer, PRUEFLISTE T-198)` : ""}`);
   const geprueft = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/geprueft.ts"), "utf8");
   const staende = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/pruefstaende.ts"), "utf8");
   const teilsummen = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/geprueft-teilsummen.ts"), "utf8");

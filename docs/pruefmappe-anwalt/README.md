@@ -76,7 +76,7 @@ Alle übrigen Vorlagen (Unterweisung, Betriebsanweisung, Hygieneplan, HACCP, All
 
 ## Stand nach Vorprüfung vom 21.10.2026
 
-Eine Vorprüfung (`docs/pruefberichte/2026-10-21-vorpruefung-phase-1.pdf`) hat die Abschnitte 8 und 9 vorbereitet. Sie ist **keine unterschriebene anwaltliche Stellungnahme**; ihre Vorschläge sind als Entwurf umgesetzt und warten auf Ihre Freigabe. Geändert wurde:
+Eine Vorprüfung (beim Gründer) hat die Abschnitte 8 und 9 vorbereitet. Sie ist **keine unterschriebene anwaltliche Stellungnahme**; ihre Vorschläge sind als Entwurf umgesetzt und warten auf Ihre Freigabe. Geändert wurde:
 
 **Datenschutzhinweis der App und Datenschutzerklärung der Website** (Frage 8)
 

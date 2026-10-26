@@ -13,7 +13,16 @@ storno_schluss): Der Vermerk entfällt nur für die Gruppen, deren Teilsumme sic
 freigegebenen Teilsummen nach src/dokumente/geprueft-teilsummen.ts geschrieben und `pruefsumme` in geprueft.ts auf die
 Gesamtsumme der freigegebenen Fassung gesetzt.
 
-    python3 packages/fachlogik/werkzeuge/pruefsummen-abgleich.py <ausgabe.json> [--schreiben]
+    python3 packages/fachlogik/werkzeuge/pruefsummen-abgleich.py <ausgabe.json> --namen <ersetzungen.json> [--schreiben]
+
+E-197/E-199 – Ersetzungen Name → Rolle: E-196 hat in Hilfetexten die Namen der Prüfer durch ihre Rolle ersetzt; das ist
+keine inhaltliche Änderung. Damit der Vergleich das erkennt, wird die freigegebene Fassung vor dem Rechnen genauso
+anonymisiert. Die Liste der Ersetzungen nennt die Namen und liegt deshalb NICHT im Repository (E-199): Der Gründer bewahrt
+sie auf und übergibt sie mit `--namen <datei>` – eine JSON-Liste von Paaren `[["<alter Text mit Namen>", "<Rolle>"], …]`,
+genau die Ersetzungen aus E-196, längere vor kürzeren. Eine Datei im Repository wird abgelehnt. Ohne `--namen` rechnet das
+Werkzeug ohne Anonymisierung; dann gilt eine Ausprägung, in der nur ein Name durch die Rolle ersetzt wurde, als geändert
+(so stand es vor dem Nachtrag zu E-197 bei der Bilanz/GuV). Die mit der Liste gerechneten Teilsummen stehen in
+src/dokumente/geprueft-teilsummen.ts und bleiben gültig, solange sich die Vorlagen nicht ändern.
 """
 import glob
 import json
@@ -71,9 +80,20 @@ def erster_commit(summe):
 # E-197: Namen der Prüfer wurden in E-196 durch Rollen ersetzt – keine inhaltliche Änderung. Für den Vergleich wird die
 # freigegebene Fassung genauso anonymisiert; stimmt eine Ausprägung danach mit heute überein, hat sich nur der Name geändert.
 # Ersetzt wird nur, was E-196 ersetzt hat; eine unvollständige Liste lässt eine Vorlage höchstens als „geändert“ stehen.
-NAMEN = [("StB-Prüfung Heckler und Busch", "StB-Prüfung Steuerberatungskanzlei"), ("Prüfbericht Heckler und Busch", "Prüfbericht Steuerberatungskanzlei"),
-         ("Kanzlei Heckler und Busch", "Steuerberatungskanzlei"), ("Heckler und Busch", "Steuerberatungskanzlei"),
-         ("StB Busch", "Steuerberater"), ("RA Dr. Weber", "Rechtsanwalt"), ("Dr. Weber", "Rechtsanwalt")]
+# E-199: Die Liste liegt beim Gründer, nicht im Repository (--namen <datei außerhalb>).
+def namen_laden(argv):
+    if "--namen" not in argv:
+        print("Hinweis: ohne --namen – Ersetzungen Name → Rolle (E-196) werden nicht berücksichtigt", file=sys.stderr)
+        return []
+    pfad = os.path.realpath(os.path.expanduser(argv[argv.index("--namen") + 1]))
+    if os.path.commonpath([pfad, ROOT]) == ROOT:
+        raise SystemExit(f"--namen {pfad} liegt im Repository – die Liste nennt Namen und gehört nicht ins Projekt (E-199)")
+    paare = json.load(open(pfad, encoding="utf-8"))
+    assert all(isinstance(p, list) and len(p) == 2 and all(isinstance(x, str) for x in p) for p in paare), "--namen: Liste von Paaren [alt, neu]"
+    return [tuple(p) for p in paare]
+
+
+NAMEN = []
 
 
 def anonymisieren(ordner):
@@ -106,6 +126,7 @@ def rechnen(commit, auftraege, arbeit, anonym=False):
 
 
 if __name__ == "__main__":
+    NAMEN = namen_laden(sys.argv)
     alle = freigaben()
     je_commit = {}
     for f in alle:

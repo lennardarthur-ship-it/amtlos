@@ -4,7 +4,7 @@
  * Arbeitsschutz-Vorlagen je Branchengruppe mit Quelle und Markierung (Markdown und CSV), Katalogeinträge zum Arbeitsschutz
  * als CSV und der Prüflisten-Auszug.
  *
- *   node docs/pruefmappe-arbeitsschutz/erzeugen.mjs <ziel>      # z. B. /tmp/pruefmappe-arbeitsschutz
+ *   node docs/pruefmappe-arbeitsschutz/erzeugen.mjs <ziel>      # außerhalb des Repositorys (E-199), z. B. /tmp/pruefmappe-arbeitsschutz
  *
  * Voraussetzung: `pnpm install`, Chromium (wie werkzeuge/dokumente-pruefen.mjs), pdftotext optional. Die Fachlogik wird
  * mit esbuild aus den Quellen gebündelt (ohne Typprüfung, ohne dist/). Schreibt nichts ins Repository.
@@ -19,7 +19,21 @@ const HIER = path.dirname(new URL(import.meta.url).pathname);
 const ROOT = path.resolve(HIER, "../..");
 const APP = path.join(ROOT, "apps/mobile");
 const DOK = path.join(ROOT, "packages/fachlogik/src/dokumente");
-const ZIEL = path.resolve(process.argv[2] ?? "pruefmappe-arbeitsschutz");
+/** E-199: Unterlagen für Prüfer entstehen nur außerhalb des Repositorys – ein Ziel im Repository wird abgelehnt. */
+function zielAusserhalb(p, aufruf) {
+  if (!p) {
+    console.error(`${aufruf} – Ziel fehlt (ein Ordner außerhalb des Repositorys, E-199)`);
+    process.exit(2);
+  }
+  const z = path.resolve(p);
+  const rel = path.relative(path.resolve(path.dirname(new URL(import.meta.url).pathname), "../.."), z);
+  if (!rel.startsWith("..") && !path.isAbsolute(rel)) {
+    console.error(`Ziel ${z} liegt im Repository – Unterlagen für oder von Prüfern gehören nicht ins Projekt (E-199)`);
+    process.exit(2);
+  }
+  return z;
+}
+const ZIEL = zielAusserhalb(process.argv[2], "Aufruf: node docs/pruefmappe-arbeitsschutz/erzeugen.mjs <ziel>");
 const ROH = path.join(ZIEL, ".roh");
 fs.mkdirSync(ROH, { recursive: true });
 const kopiere = (von, nach) => {

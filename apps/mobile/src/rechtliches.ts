@@ -72,7 +72,7 @@ const DRITTLAND_REVENUECAT = `Übermittlung in die USA auf Grundlage der ${SCC_F
  * in eckigen Klammern trägt der Gründer vor der Veröffentlichung ein – die App erfindet keine Angaben, der Store-Check
  * meldet sie. Fachlich zu prüfen (T-77): bis zur Freigabe `freigegeben: false`.
  */
-// Freigegeben von Rechtsanwalt 23.10.2026 für den Build ohne Sync (docs/pruefberichte/2026-10-23-vorlagen-recht.xlsx, Prüfsumme
+// Freigegeben von Rechtsanwalt 23.10.2026 für den Build ohne Sync (beim Gründer, Prüfsumme
 // 892aa8818e0e der Fassung aus docs/pruefmappe-anwalt). Bei Textänderung erneut vorlegen; der Sync-Zusatz ist nicht freigegeben.
 export const DATENSCHUTZ = {
   freigegeben: true,

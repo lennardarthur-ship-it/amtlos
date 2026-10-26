@@ -4,21 +4,23 @@ Prüfpaket für die fachliche Freigabe (E-143): alle Pflichten und Regelwerte de
 Anwältin, Anwalt oder Steuerberatung – mit Auslösern in Klartext, Fristen, Rechtsgrundlagen, Quellen und den
 offenen Prüfpunkten aus dem Katalog. Die gelb hinterlegten Spalten füllt die prüfende Person aus.
 
-    python3 scripts/pruefpaket.py [ziel.xlsx]
+    python3 scripts/pruefpaket.py <ziel.xlsx>     # außerhalb des Repositorys (E-199)
 """
 import glob
 import os
 import sys
 from datetime import date
 
-import yaml
-from openpyxl import Workbook
-from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
-from openpyxl.utils import get_column_letter
-from openpyxl.worksheet.datavalidation import DataValidation
 
 WURZEL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ZIEL = sys.argv[1] if len(sys.argv) > 1 else os.path.join(WURZEL, "Amtlos-Pruefpaket-Pflichten.xlsx")
+sys.path.insert(0, os.path.join(WURZEL, "docs/freigabe-katalog"))
+from ziel import ziel_ausserhalb  # noqa: E402  (E-199: Prüfunterlagen nicht ins Repository)
+ZIEL = ziel_ausserhalb(sys.argv[1] if len(sys.argv) > 1 else None, "Aufruf: python3 scripts/pruefpaket.py <ziel.xlsx>")
+import yaml  # noqa: E402
+from openpyxl import Workbook  # noqa: E402
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side  # noqa: E402
+from openpyxl.utils import get_column_letter  # noqa: E402
+from openpyxl.worksheet.datavalidation import DataValidation  # noqa: E402
 
 BEREICH = {
     "gruendung": "Gründung", "gesellschaft": "Gesellschaft", "steuern": "Steuern", "personal": "Personal",

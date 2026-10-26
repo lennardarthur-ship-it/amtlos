@@ -1,6 +1,6 @@
 /**
- * Rückmeldungen Runde 3 (24.10.2026): Rechtsanwalt (Fachfragen, docs/pruefberichte/2026-10-24-runde3-fachfragen-recht.xlsx)
- * zu B-276 und zum Hygieneplan Beauty; Steuerberater (docs/pruefberichte/2026-10-24-runde3-vorlagen-steuern.xlsx) zu Bilanz/GuV.
+ * Rückmeldungen Runde 3 (24.10.2026): Rechtsanwalt (Fachfragen, beim Gründer)
+ * zu B-276 und zum Hygieneplan Beauty; Steuerberater (beim Gründer) zu Bilanz/GuV.
  */
 import { describe, expect, it } from "vitest";
 import {

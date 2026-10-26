@@ -4,16 +4,20 @@ Freigabe der Vorlagen (T-52 ff.): je Prüfer ein Paket mit den Vorlagen-PDFs (le
 Die Prüfsumme (vorlagenPruefsumme) hält die Fassung fest: Nach der Rückmeldung wird sie in
 packages/fachlogik/src/dokumente/geprueft.ts eingetragen; ändert sich danach ein Text, verschwindet der Vermerk.
 
-    python3 docs/freigabe-vorlagen/erzeugen.py <mappen-ordner> <ziel>
+    python3 docs/freigabe-vorlagen/erzeugen.py <mappen-ordner> <ziel>     # <ziel> außerhalb des Repositorys (E-199)
     # <mappen-ordner>: Ausgabe von docs/pruefmappe-{anwalt,arbeitsschutz,steuer}/erzeugen.mjs in anwalt/, arbeitsschutz/, steuer/
 """
 import csv, hashlib, html, json, os, shutil, subprocess, sys
-from openpyxl import Workbook
-from openpyxl.styles import Alignment, Font, PatternFill
-from openpyxl.worksheet.datavalidation import DataValidation
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../.."))
-MAPPEN, ZIEL = sys.argv[1], sys.argv[2]
+sys.path.insert(0, os.path.join(ROOT, "docs/freigabe-katalog"))
+from ziel import ziel_ausserhalb  # noqa: E402  (E-199: Ziel außerhalb des Repositorys)
+if len(sys.argv) < 3:
+    raise SystemExit("Aufruf: python3 docs/freigabe-vorlagen/erzeugen.py <mappen-ordner> <ziel>")
+MAPPEN, ZIEL = sys.argv[1], ziel_ausserhalb(sys.argv[2], "Aufruf: python3 docs/freigabe-vorlagen/erzeugen.py <mappen-ordner> <ziel>")
+from openpyxl import Workbook  # noqa: E402
+from openpyxl.styles import Alignment, Font, PatternFill  # noqa: E402
+from openpyxl.worksheet.datavalidation import DataValidation  # noqa: E402
 # --nur '{"1 recht": ["handelsregister", "Nutzungsbedingungen (Entwurf)"], ...}': nur diese Vorlagen/Texte (Nachprüfung)
 NUR = json.loads(sys.argv[sys.argv.index("--nur") + 1]) if "--nur" in sys.argv else None
 RUNDE = " (Nachprüfung)" if NUR else ""

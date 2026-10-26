@@ -1,5 +1,5 @@
 """
-Freigaben aus dem Register (docs/freigabe-katalog/freigaben.yaml) in den Katalog schreiben (E-173, E-196, E-197).
+Freigaben aus dem Register (docs/freigabe-katalog/freigaben.yaml) in den Katalog schreiben (E-173, E-196, E-197, E-199).
 
     python3 docs/freigabe-katalog/anwenden.py            # schreibt pruefung-Blöcke, druckt Übersicht
     python3 docs/freigabe-katalog/anwenden.py --pruefen  # schreibt nichts, Exit 1 wenn der Katalog vom Register abweicht
@@ -9,23 +9,29 @@ Regel: Eine Freigabe gilt nur für die Fassung (Version), die der Prüfer gesehe
 für seinen Bereich alle nötigen Freigaben zur aktuellen Version passen UND schriftlich bestätigt sind:
 - Recht → `recht` (Rechtsanwalt); Steuern → `steuern` (Steuerberater); Arbeitsschutz → `arbeitsschutz` (Sifa);
 - Lebensmittel → `hygiene` (Lebensmittelfachbeauftragter, Inhalt ohne Folgen) UND `recht` (nur Folgen bei Verstoß).
-Schriftlich bestätigt (E-197, ersetzt die Unterschriftsregel aus E-196) heißt: Der Block hat einen `nachweis` mit `art`,
-`datum` (Tag der Bestätigung), `rolle` (= `pruefer`) und `umfang` (was bestätigt ist, in unseren Worten). E-198: Mails der
-Prüfer liegen nicht im Repository – nur der Gründer bewahrt sie auf (`aufbewahrung: beim Gründer`); kein Zitat aus einer Mail.
-- `art: mail` – Bestätigung des Prüfers per E-Mail (Textform); mit `blatt` (die ausgefüllte Datei des Prüfers unter
-  docs/pruefberichte) muss jeder Eintrag dort mit dieser Version „freigegeben“ sein;
-- `art: unterschrift_entfernt` – das unterschriebene Blatt lag vor und wurde auf Wunsch des Gründers am 25.10.2026 aus dem
-  Projekt entfernt (E-197); `umfang` sagt, was es bestätigte, `blatt` nennt die ausgefüllte Datei, soweit vorhanden;
-- `art: blatt` – vom Prüfer ausgefüllte Freigabe-Datei (`blatt`, Spalte Entscheidung);
+Schriftlich bestätigt (E-197) heißt: Der Block hat einen `nachweis` mit `art`, `datum` (Tag der Bestätigung), `rolle`
+(= `pruefer`), `umfang` (was bestätigt ist, in unseren Worten) und `aufbewahrung: beim Gründer`. E-198/E-199: Das
+Repository enthält keine Unterlagen der Prüfer (keine Mails, Berichte, ausgefüllten Dateien oder Bestätigungsblätter) und
+keine Namen – Register und packages/fachlogik/src/dokumente/geprueft.ts sind der einzige Nachweis im Projekt, ohne Zitat
+und ohne Dateiverweis; die Unterlagen bewahrt der Gründer auf.
+- `art: mail` – Bestätigung des Prüfers per E-Mail (Textform); der Stand im Vermerk ist das Datum der Mail;
+- `art: blatt` – vom Prüfer ausgefüllte Freigabe- bzw. Abgleich-Datei (Spalte Entscheidung) bzw. das unterschriebene
+  Blatt, das auf Wunsch des Gründers am 25.10.2026 aus dem Projekt entfernt wurde (E-197; `umfang` sagt es);
+- `art: bericht` – schriftlicher Bericht des Prüfers;
 - `art: ersetzt` oder `offen` zählt nicht.
-Das Datum im Vermerk (`geprueft_am`) liegt nie nach `datum`; bei `art: mail` ist es das Datum der Mail. Der pruefung-Block
-trägt `bestaetigt_am`.
+Das Datum im Vermerk (`geprueft_am`) liegt nie nach `datum`. Der pruefung-Block trägt `bestaetigt_am`.
 Bei Teil-Umfängen („ohne_sanktion“ / „sanktion“) bleibt eine Freigabe gültig, wenn sich seit der freigegebenen Version
 nur Felder außerhalb ihres Umfangs geändert haben (Vergleich mit der Fassung aus der git-Historie).
 Einschränkungen des Prüfers je Eintrag (`einschraenkung`, z. B. „ohne arbeitsmedizinische Angaben“) und offene
 Prüfpunkte (docs/freigabe-katalog/offene-punkte.yaml) kommen in den pruefung-Block; die App zeigt sie im Vermerk.
 Alles andere wird `in_pruefung` (zuvor oder ohne schriftliche Bestätigung freigegeben) bzw. bleibt `entwurf`. Die App zeigt
 „geprüft“ nur bei `geprueft_version == version` (apps/mobile/src/pflichten/pruefer.ts).
+
+`--pruefen` prüft außerdem: Register vollständig (je Block art, datum, rolle, umfang, aufbewahrung; je Eintrag version,
+stand, quelle; keine unbekannten Felder, kein Dateiverweis), kein Stand nach der Bestätigung, jede Version im Register
+gibt es im Katalog (nicht neuer als dort); je Vorlagen-Freigabe in geprueft.ts Nachweis mit Datum = `bestaetigt_am`,
+passender Rolle und Aufbewahrung, Prüfsumme = SHA-256 über die freigegebenen Teilsummen (geprueft-teilsummen.ts), heutiger
+Prüfstand vorhanden (pruefstaende.ts); keine Prüfunterlagen und keine Namen im Repository (namen-sha256.json).
 """
 import glob
 import json
@@ -85,85 +91,79 @@ BENOETIGT = {"recht": [(RECHT, "alles")], "steuer": [(STEUERN, "alles")], "arbei
 register = yaml.safe_load(open(os.path.join(ROOT, "docs/freigabe-katalog/freigaben.yaml"), encoding="utf-8"))
 
 
-ZAEHLT = {"mail", "unterschrift_entfernt", "blatt"}
-NACHWEIS_FELDER = {"art", "datum", "rolle", "umfang", "aufbewahrung", "blatt"}
-# E-198: Mails der Prüfer (und unsere Mail-Entwürfe) gehören nicht ins Repository
+ZAEHLT = {"mail", "blatt", "bericht"}
+ARTEN = ZAEHLT | {"ersetzt", "offen"}
+NACHWEIS_FELDER = {"art", "datum", "rolle", "umfang", "aufbewahrung"}
+EINTRAG_FELDER = {"version", "stand", "quelle", "einschraenkung"}
+AUFBEWAHRUNG = "beim Gründer"
+# E-198/E-199: keine Mails, Berichte, ausgefüllten Dateien oder Bestätigungsblätter der Prüfer im Repository – und kein
+# Verweis auf eine solche Datei im Register oder in geprueft.ts
 MAILDATEI = re.compile(r"(\.eml|\.msg|\.mbox|mail[^/]*\.txt)$", re.I)
-_blaetter = {}
-
-
-def _blatt(pfad):
-    """Einträge einer ausgefüllten Datei: ID → (Version, Entscheidung)."""
-    if pfad not in _blaetter:
-        import openpyxl
-        wb = openpyxl.load_workbook(os.path.join(ROOT, pfad), data_only=True)
-        out = {}
-        for ws in wb.worksheets:
-            zeilen = list(ws.iter_rows(values_only=True))
-            if not zeilen:
-                continue
-            kopf = [str(c) if c else "" for c in zeilen[0]]
-            if "ID" not in kopf or "Entscheidung" not in kopf or not ({"Aktuell", "Version"} & set(kopf)):
-                continue
-            i, e = kopf.index("ID"), kopf.index("Entscheidung")
-            v = kopf.index("Aktuell") if "Aktuell" in kopf else kopf.index("Version")
-            for z in zeilen[1:]:
-                if z[i]:
-                    out[str(z[i])] = (str(z[v]).lstrip("v"), str(z[e] or "").strip())
-        _blaetter[pfad] = out
-    return _blaetter[pfad]
+DATEIVERWEIS = re.compile(r"docs/pruefberichte|versand-|freigabe-vorlagen/|\.(xlsx|xls|pdf|eml|msg|jpe?g|png|txt|md|docx?)\b", re.I)
+UNTERLAGEN_ORDNER = ("docs/pruefberichte/", "docs/freigabe-katalog/versand-")
+UNTERLAGEN_ENDUNG = re.compile(r"\.(xlsx|xls|xlsm|pdf|eml|msg|mbox|docx?|odt|ods)$", re.I)  # im ganzen Repository
+SCAN_ENDUNG = re.compile(r"\.(jpe?g|png|heic|tiff?)$", re.I)  # unter docs/ (Scans)
+# Texte zur Prüfung: hier zählen auch Namen, die zugleich gewöhnliche Wörter sind („mehrdeutig“ in namen-sha256.json)
+PRUEFTEXTE = ("docs/freigabe-katalog/freigaben.yaml", "docs/freigabe-katalog/offene-punkte.yaml", "packages/fachlogik/src/dokumente/geprueft.ts",
+              "apps/mobile/src/pflichten/pruefer.ts")
 
 
 def bestaetigt(r):
-    """Tag der schriftlichen Bestätigung, wenn der Block einen gültigen Nachweis hat (E-197, E-198) – sonst None."""
+    """Tag der schriftlichen Bestätigung, wenn der Block einen zählenden Nachweis hat (E-197) – sonst None."""
     n = r.get("nachweis") or {}
-    if n.get("art") not in ZAEHLT:
-        return None
-    if n.get("blatt") and not os.path.isfile(os.path.join(ROOT, n["blatt"])):
-        raise SystemExit(f"freigaben.yaml: ausgefüllte Datei fehlt: {n['blatt']}")
-    if n["art"] == "blatt" and not n.get("blatt"):
-        raise SystemExit(f"freigaben.yaml: Block {r['pruefer']}/{r['umfang']} mit art: blatt ohne Datei")
-    return str(n["datum"])
+    return str(n["datum"]) if n.get("art") in ZAEHLT else None
 
 
 def nachweis_pruefen(r):
-    """E-198: Jeder Block hat einen Nachweis mit art, datum, rolle und umfang – ohne Mail-Datei und ohne Zitat; jeder Eintrag
-    eines bestätigten Blocks liegt nicht nach der Bestätigung und steht, wo eine ausgefüllte Datei genannt ist, dort mit
-    dieser Version und „freigegeben“."""
+    """E-198/E-199: Jeder Block hat einen Nachweis mit art, datum, rolle, umfang und aufbewahrung – ohne Dateiverweis und
+    ohne Zitat; jeder Eintrag hat version, stand und quelle und liegt nicht nach der Bestätigung (bei Mail: ihr Datum)."""
     n = r.get("nachweis") or {}
     wo = f"freigaben.yaml: Block {r['pruefer']}/{r['umfang']}"
-    for k in ("art", "datum", "rolle", "umfang"):
+    for k in ("art", "datum", "rolle", "umfang", "aufbewahrung"):
         assert n.get(k), f"{wo}: nachweis ohne {k}"
-    assert set(n) <= NACHWEIS_FELDER, f"{wo}: unbekannte Felder im nachweis {sorted(set(n) - NACHWEIS_FELDER)} (keine Mail-Datei, kein Zitat – E-198)"
+    assert set(n) <= NACHWEIS_FELDER, f"{wo}: unbekannte Felder im nachweis {sorted(set(n) - NACHWEIS_FELDER)} (keine Datei, kein Zitat – E-199)"
+    assert n["art"] in ARTEN, f"{wo}: unbekannte Art {n['art']}"
     assert n["rolle"] == r["pruefer"], f"{wo}: nachweis.rolle {n['rolle']} passt nicht"
+    assert n["aufbewahrung"] == AUFBEWAHRUNG, f"{wo}: aufbewahrung muss „{AUFBEWAHRUNG}“ sein (E-199)"
     assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(n["datum"])), f"{wo}: nachweis.datum {n['datum']}"
-    if n["art"] in ("mail", "unterschrift_entfernt"):
-        assert n.get("aufbewahrung"), f"{wo}: Mail bzw. entferntes Blatt ohne Angabe, wo es aufbewahrt wird"
-    if n.get("blatt"):
-        assert not MAILDATEI.search(n["blatt"]), f"{wo}: {n['blatt']} ist eine Mail (E-198)"
+    for k in ("umfang", "hinweis", "felder_hinweis"):
+        x = str(n.get(k, "")) + " " + str(r.get(k, ""))
+        assert not DATEIVERWEIS.search(x), f"{wo}: {k} verweist auf eine Datei (E-199)"
     am = bestaetigt(r)
-    if not am:
-        return
     for i, f in r["eintraege"].items():
-        assert "zitat" not in f, f"freigaben.yaml: {i} – kein Zitat aus einer Mail (E-198)"
-        assert not MAILDATEI.search(str(f.get("quelle", ""))), f"freigaben.yaml: {i} – Quelle ist eine Mail-Datei (E-198)"
-        assert str(f["stand"]) <= am, f"freigaben.yaml: {i} Stand {f['stand']} nach der Bestätigung {am}"
+        assert set(f) <= EINTRAG_FELDER, f"freigaben.yaml: {i} – unbekannte Felder {sorted(set(f) - EINTRAG_FELDER)} (kein Zitat – E-198)"
+        assert isinstance(f.get("version"), int) and f.get("stand") and f.get("quelle"), f"freigaben.yaml: {i} – version, stand und quelle nötig"
+        assert not DATEIVERWEIS.search(str(f["quelle"])), f"freigaben.yaml: {i} – Quelle verweist auf eine Datei (E-199): {f['quelle']}"
+        assert str(f["stand"]) <= str(n["datum"]) or not am, f"freigaben.yaml: {i} Stand {f['stand']} nach der Bestätigung {n['datum']}"
         if n["art"] == "mail":
             assert str(f["stand"]) == am, f"freigaben.yaml: {i} Stand {f['stand']} ist nicht das Datum der Mail {am}"
-        if n.get("blatt"):
-            v, e = _blatt(n["blatt"]).get(i, (None, None))
-            assert v == str(f["version"]) and e == "freigegeben", f"freigaben.yaml: {i} v{f['version']} in {n['blatt']} nicht freigegeben ({v}, {e})"
 
 
-def keine_mails():
-    """E-198: keine Mail-Dateien im Repository (Mails der Prüfer, Entwürfe unserer Mails)."""
-    dateien = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True).stdout.splitlines()
-    treffer = [d for d in dateien if "node_modules" not in d and (d.startswith("docs/") and MAILDATEI.search(d) or re.search(r"(^|/)E-Mail[^/]*\.txt$", d))]
+def _woerter(text):
+    w = re.findall(r"[a-zäöüß]+", text.lower())
+    return w, [f"{a} {b}" for a, b in zip(w, w[1:])]
+
+
+def keine_pruefunterlagen():
+    """E-198/E-199: keine Unterlagen von oder für Prüfer im Repository (Mails, Berichte, ausgefüllte Dateien, Pakete) und
+    kein Name eines Prüfers (Abgleich über SHA-256, namen-sha256.json)."""
+    import hashlib
+    dateien = [d for d in subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=ROOT, capture_output=True, text=True).stdout.splitlines()
+               if "node_modules" not in d and os.path.isfile(os.path.join(ROOT, d))]
+    treffer = [d for d in dateien if d.startswith(UNTERLAGEN_ORDNER) or UNTERLAGEN_ENDUNG.search(d) or (d.startswith("docs/") and (MAILDATEI.search(d) or SCAN_ENDUNG.search(d)))
+               or re.search(r"(^|/)E-Mail[^/]*\.txt$", d) or (d.startswith("docs/freigabe-vorlagen/") and not d.endswith(".py"))]
+    h = json.load(open(os.path.join(ROOT, "docs/freigabe-katalog/namen-sha256.json"), encoding="utf-8"))
+    einzeln, paare, mehrdeutig = set(h["einzeln"]), set(h["paare"]), set(h["mehrdeutig"])
+    sha = lambda s: hashlib.sha256(s.encode("utf-8")).hexdigest()
     for d in dateien:
-        if d.startswith("docs/pruefberichte/") and d.endswith((".txt", ".md")) and os.path.isfile(os.path.join(ROOT, d)):
-            kopf = open(os.path.join(ROOT, d), encoding="utf-8", errors="replace").read(2000)
-            if re.search(r"^(Betreff|Subject):", kopf, re.M) and re.search(r"^(Von|From|An|To|Anh(ä|ae)nge?):", kopf, re.M):
-                treffer.append(d)
+        try:
+            text = open(os.path.join(ROOT, d), encoding="utf-8").read()
+        except (UnicodeDecodeError, OSError):
+            continue
+        w, p = _woerter(text)
+        streng = einzeln | mehrdeutig if d in PRUEFTEXTE else einzeln
+        if any(sha(x) in streng for x in set(w)) or any(sha(x) in paare for x in set(p)):
+            treffer.append(f"{d} (Name eines Prüfers)")
     return treffer
 
 
@@ -172,6 +172,7 @@ BLOECKE = [(r["pruefer"], r["umfang"], set(r.get("felder_fehlen") or []), r["ein
 for _r in register:
     assert _r["pruefer"] in ROLLEN, f"freigaben.yaml: unbekannte Rolle {_r['pruefer']}"
     assert "unterschrift" not in _r and "unterschrieben_am" not in _r, "freigaben.yaml: Unterschriftsfelder durch `nachweis` ersetzt (E-197)"
+    assert set(_r) <= {"pruefer", "umfang", "nachweis", "hinweis", "eintraege", "gesehen", "felder_fehlen", "felder_hinweis"}, f"freigaben.yaml: unbekannte Felder {sorted(_r)}"
     nachweis_pruefen(_r)
 frei = {}
 for _p, _u, _fehl, _e, _am in BLOECKE:
@@ -294,63 +295,72 @@ def auswerten(pfad, d):
 
 
 def vorlagen_nachweis_pruefen():
-    """E-197, E-198: Jede Vorlagen-Freigabe in geprueft.ts hat einen Nachweis mit art, datum (= bestaetigt_am), rolle (= Rolle der
-    Freigabe) und umfang – ohne Mail-Datei und ohne Zitat; bei `mail` die Aufbewahrung, bei `bericht` den Bericht im
-    Repository. Nennt die Freigabe eine ausgefüllte Datei (`blatt`), steht dort die bestätigte Prüfsumme (`pruefsumme_alt`,
-    12 Zeichen) mit „freigegeben“ (bzw. im PDF des Blatts)."""
-    import openpyxl
-    ts = open(os.path.join(ROOT, "packages/fachlogik/src/dokumente/geprueft.ts"), encoding="utf-8").read()
-    fehler = []
+    """E-197 bis E-199: Jede Vorlagen-Freigabe in geprueft.ts hat einen Nachweis mit art (mail, bericht, blatt), datum
+    (= bestaetigt_am), rolle (= Rolle der Freigabe), umfang und aufbewahrung „beim Gründer“ – ohne Dateiverweis, ohne Zitat;
+    der Stand liegt nie nach der Bestätigung. Prüfsummen: `pruefsumme` ist der SHA-256 über die freigegebenen Teilsummen
+    (geprueft-teilsummen.ts), `pruefsumme_alt` hat 64 Hexziffern, und der heutige Prüfstand steht in pruefstaende.ts."""
+    import hashlib
+    d = os.path.join(ROOT, "packages/fachlogik/src/dokumente")
+    ts = open(os.path.join(d, "geprueft.ts"), encoding="utf-8").read()
+    teil = {m.group(1): json.loads(m.group(2)) for m in re.finditer(r'^ {2}"([\w#]+)": (\{[^\n]*\}),$', open(os.path.join(d, "geprueft-teilsummen.ts"), encoding="utf-8").read(), re.M)}
+    heute = {m.group(1) for m in re.finditer(r'^ {2}"([\w#]+)": \{ summe: "[0-9a-f]{64}"', open(os.path.join(d, "pruefstaende.ts"), encoding="utf-8").read(), re.M)}
+    fehler, schluessel, vorlage = [], [], None
     for zeile in ts.splitlines():
-        m = re.search(r'pruefsumme_alt: "([0-9a-f]{12})', zeile)
-        if not m or "stand:" not in zeile:
+        m = re.match(r" {2}(\w+): \{", zeile)
+        if m:
+            vorlage = m.group(1)
+        if "stand:" not in zeile or "pruefsumme:" not in zeile:
             continue
-        kurz = m.group(1)
+        k = vorlage if re.match(r" {2}\w+: \{ stand:", zeile) else f"{vorlage}#1"
+        schluessel.append(k)
         stand = re.search(r'stand: "([\d-]+)"', zeile).group(1)
-        rolle = re.search(r'stand: "[\d-]+", rolle: "(\w+)"', zeile).group(1)
+        rolle = re.search(r'stand: "[\d-]+", rolle: "(\w+)"', zeile)
         am = re.search(r'bestaetigt_am: ("[\d-]+"|null)', zeile)
-        n = re.search(r'nachweis: \{ art: "(\w+)", datum: "([\d-]+)", rolle: "(\w+)", umfang: "((?:[^"\\]|\\.)+)"(?:, aufbewahrung: "([^"]+)")?(?:, beleg: "([^"]+)")? \}', zeile)
-        blatt = re.search(r'\bblatt: "([^"]+)"', zeile)
-        blatt = blatt.group(1) if blatt else None
+        n = re.search(r'nachweis: \{ art: "(\w+)", datum: "([\d-]+)", rolle: "(\w+)", umfang: "((?:[^"\\]|\\.)+)", aufbewahrung: "([^"]+)" \}', zeile)
+        ps = re.search(r'pruefsumme: "([0-9a-f]*)"', zeile).group(1)
+        alt = re.search(r'pruefsumme_alt: "([0-9a-f]*)"', zeile)
+        if not rolle or rolle.group(1) not in ROLLEN:
+            fehler.append(f"{k}: ohne bekannte Rolle")
+            continue
         if not am or am.group(1) == "null" or not n:
-            fehler.append(f"{kurz}: ohne Nachweis (art, datum, rolle, umfang)")
+            fehler.append(f"{k}: ohne Nachweis (art, datum, rolle, umfang, aufbewahrung)")
             continue
-        art, datum, nrolle, umfang, aufbewahrung, beleg = n.groups()
+        art, datum, nrolle, umfang, aufbewahrung = n.groups()
         am = am.group(1).strip('"')
+        if art not in ("mail", "bericht", "blatt"):
+            fehler.append(f"{k}: unbekannte Art {art}")
         if datum != am:
-            fehler.append(f"{kurz}: nachweis.datum {datum} ≠ bestaetigt_am {am}")
-        if nrolle != rolle:
-            fehler.append(f"{kurz}: nachweis.rolle {nrolle} ≠ {rolle}")
+            fehler.append(f"{k}: nachweis.datum {datum} ≠ bestaetigt_am {am}")
+        if nrolle != rolle.group(1):
+            fehler.append(f"{k}: nachweis.rolle {nrolle} ≠ {rolle.group(1)}")
         if stand > am:
-            fehler.append(f"{kurz}: Stand {stand} nach der Bestätigung {am}")
-        if art == "mail" and not aufbewahrung:
-            fehler.append(f"{kurz}: Mail ohne Angabe, wo sie aufbewahrt wird")
-        if art == "bericht" and not (beleg and os.path.isfile(os.path.join(ROOT, beleg))):
-            fehler.append(f"{kurz}: Bericht fehlt ({beleg})")
-        if art not in ("mail", "bericht"):
-            fehler.append(f"{kurz}: unbekannte Art {art}")
-        if "nachweis_text" in zeile or MAILDATEI.search(beleg or "") or MAILDATEI.search(blatt or "") or re.search(r'docs/pruefberichte/[^"]*(mail[^"/]*\.txt|\.eml)', zeile):
-            fehler.append(f"{kurz}: Mail-Datei oder Mail-Text in geprueft.ts (E-198)")
-        if not blatt:
-            continue
-        if not os.path.isfile(os.path.join(ROOT, blatt)):
-            fehler.append(f"{kurz}: {blatt} fehlt")
-            continue
-        if blatt.endswith(".pdf"):
-            text = subprocess.run(["pdftotext", os.path.join(ROOT, blatt), "-"], capture_output=True, text=True).stdout
-            if kurz not in text:
-                fehler.append(f"{kurz}: nicht in {blatt}")
-            continue
-        wb = openpyxl.load_workbook(os.path.join(ROOT, blatt), data_only=True)
-        ok = False
-        for ws in wb.worksheets:
-            zeilen = list(ws.iter_rows(values_only=True))
-            kopf = [str(c) if c else "" for c in (zeilen[0] if zeilen else [])]
-            if "Prüfsumme (Kurz)" in kopf and "Entscheidung" in kopf:
-                ps, en = kopf.index("Prüfsumme (Kurz)"), kopf.index("Entscheidung")
-                ok |= any(str(z[ps]) == kurz and str(z[en]).strip() == "freigegeben" for z in zeilen[1:])
-        if not ok:
-            fehler.append(f"{kurz}: in {blatt} nicht mit „freigegeben“")
+            fehler.append(f"{k}: Stand {stand} nach der Bestätigung {am}")
+        if aufbewahrung != AUFBEWAHRUNG:
+            fehler.append(f"{k}: aufbewahrung muss „{AUFBEWAHRUNG}“ sein")
+        if re.search(r'\b(blatt|beleg|nachweis_text|zitat): ', zeile) or DATEIVERWEIS.search(zeile):
+            fehler.append(f"{k}: Dateiverweis oder Zitat in geprueft.ts (E-199)")
+        if len(ps) != 64 or not alt or len(alt.group(1)) != 64:
+            fehler.append(f"{k}: Prüfsumme bzw. alte Prüfsumme ohne 64 Hexziffern")
+        elif k not in teil:
+            fehler.append(f"{k}: keine freigegebenen Teilsummen (geprueft-teilsummen.ts)")
+        elif hashlib.sha256("\n".join(f"{g}={s}" for g, s in sorted(teil[k].items())).encode("utf-8")).hexdigest() != ps:
+            fehler.append(f"{k}: Prüfsumme passt nicht zu den freigegebenen Teilsummen")
+        if k not in heute:
+            fehler.append(f"{k}: kein heutiger Prüfstand (pruefstaende.ts – werkzeuge/pruefstaende-erzeugen.mjs)")
+    if sorted(schluessel) != sorted(teil):
+        fehler.append(f"Freigaben und Teilsummen passen nicht zusammen: {sorted(set(schluessel) ^ set(teil))}")
+    return fehler
+
+
+def register_katalog_pruefen(katalog):
+    """Jeder Eintrag im Register steht im Katalog, mit einer Version, die es dort gibt (nicht neuer als die aktuelle)."""
+    fehler = []
+    for _r in register:
+        for i, f in _r["eintraege"].items():
+            if i not in katalog:
+                fehler.append(f"{_r['pruefer']}/{_r['umfang']}: {i} fehlt im Katalog")
+            elif f["version"] > katalog[i]["version"]:
+                fehler.append(f"{_r['pruefer']}/{_r['umfang']}: {i} v{f['version']} neuer als der Katalog (v{katalog[i]['version']})")
     return fehler
 
 
@@ -383,13 +393,17 @@ if __name__ == "__main__":
     if ungeordnet:
         print("Prüfpunkte ohne Einordnung in offene-punkte.yaml:", *ungeordnet, sep="\n  ")
         sys.exit(1)
-    mails = keine_mails()
-    if mails:
-        print("Mail-Dateien im Repository (E-198: Mails gehören nicht ins Projekt):", *mails, sep="\n  ")
+    unterlagen = keine_pruefunterlagen()
+    if unterlagen:
+        print("Prüfunterlagen oder Namen im Repository (E-199: Unterlagen von und für Prüfer bewahrt der Gründer auf):", *unterlagen, sep="\n  ")
+        sys.exit(1)
+    kfehler = register_katalog_pruefen({b["id"]: b for b in berichte})
+    if kfehler:
+        print("Register passt nicht zum Katalog:", *kfehler, sep="\n  ")
         sys.exit(1)
     vfehler = vorlagen_nachweis_pruefen()
     if vfehler:
-        print("Vorlagen-Freigaben ohne passenden Nachweis (geprueft.ts):", *vfehler, sep="\n  ")
+        print("Vorlagen-Freigaben ohne passenden Nachweis oder mit falscher Prüfsumme (geprueft.ts):", *vfehler, sep="\n  ")
         sys.exit(1)
     if PRUEFEN and abweichung:
         print("Katalog weicht vom Freigabe-Register ab:", ", ".join(abweichung[:20]))

@@ -341,7 +341,7 @@ for (const [liste, alt, neu] of ERSETZE) {
   daten[liste] = JSON.parse(vorher.split(alt).join(neu));
 }
 /**
- * Rechtsanwalt, Fachfragen Runde 3 (24.10.2026, docs/pruefberichte/2026-10-24-runde3-fachfragen-recht.xlsx, Nr. 1 und 4),
+ * Rechtsanwalt, Fachfragen Runde 3 (24.10.2026, beim Gründer, Nr. 1 und 4),
  * Hygieneplan Beauty, Zeile „Umgang mit Blut – Stich-/Schnittverletzung“ – beide Sätze im Wortlaut des Prüfers:
  *   - HIV-PEP mit der Obergrenze, die die S2k-Leitlinie AWMF 055-004 nach Stich- oder Schnittverletzungen nennt (wie B-276);
  *   - keine routinemäßige Abfrage des Infektionsstatus: nur die freiwillige Auskunft der Kundin oder des Kunden
@@ -367,7 +367,7 @@ for (const [liste, schluessel, pfad, neu] of RA_RUNDE3) {
 }
 /**
  * E-167: fachliche Durchsicht durch eine Fachkraft für Arbeitssicherheit (Ergebnis vom 22.10.2026,
- * docs/pruefberichte/2026-10-22-arbeitsschutz-pruefergebnis.xlsx, Blatt „A Bausteine“). Je Eintrag die Nummer der
+ * beim Gründer, Blatt „A Bausteine“). Je Eintrag die Nummer der
  * Prüfmappe (B-…), damit jede Änderung zuzuordnen ist; die Zuordnung Nummer → Baustein steht in
  * src/dokumente/sifa.ts. „ändern“: Wortlaut der Spalte „Korrektur“ (nur an den Stil der Bausteine angepasst) und Fundstelle;
  * „ändern (Quelle)“: nur Fundstelle; „frei“: Fundstelle aus der Durchsicht ergänzt, Vermerke „Nutzertest“ und „fachlich zu
@@ -500,7 +500,7 @@ for (const [nr, liste, schluessel, aenderungen] of SIFA) {
   }
 }
 /**
- * Prüfbericht Lebensmittelhygiene (Lebensmittelfachbeauftragter, 22.10.2026, docs/pruefberichte/2026-10-22-lebensmittelhygiene.txt):
+ * Prüfbericht Lebensmittelhygiene (Lebensmittelfachbeauftragter, 22.10.2026, beim Gründer):
  * Tabelle „Grenzwerte je Kontrollpunkt“ und Änderungsliste – je Kontrollpunkt ein Wert, Quellen aus der Tabelle. Je
  * Eintrag die Nummer der Prüfmappe (L-…). Pfade wie bei SIFA; jede Änderung muss greifen. Nicht genannte Kontrollpunkte
  * (✔ ohne Änderung) bleiben unverändert.

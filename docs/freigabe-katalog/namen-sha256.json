@@ -1,0 +1,21 @@
+{
+  "hinweis": "E-199: SHA-256 der Namen der Prüfer (nicht im Klartext). Text in Kleinbuchstaben, Wörter = Folgen von Buchstaben (a–z, ä, ö, ü, ß); „einzeln“ prüft jedes Wort, „paare“ je zwei aufeinanderfolgende Wörter mit einem Leerzeichen; „mehrdeutig“ sind Namen, die auch gewöhnliche Wörter sind (Berufsbezeichnung, Pflanze) – geprüft nur in Texten zur Prüfung (Register, geprueft.ts, Vermerk, Prüfangaben im Katalog), nicht im ganzen Repository. Ein Treffer heißt: ein Name steht im Repository. Genutzt von anwenden.py --pruefen, store-check.mjs und apps/mobile/test/e199-keine-pruefunterlagen.test.ts.",
+  "einzeln": [
+    "0b6f2ec83a4d4ff373d76810a6d593dd38571af1420cc03dc2c7904946fe1b1e",
+    "25f102fa56f62b9aa18941e1c71bc51633e15b1ba0e3545f8610207b79abd482",
+    "42258bfc34d01f0078c5c25148b235ea9f7a67fbd6ab5ac4efdacaf310825022",
+    "65ba393b4c2ad1835847a9ac142de67c07225b01dc879e1c3d9912613fd4966f",
+    "7e66434f36f52d2c39611efb62d820c8ce15c9521f5649a43dd1418497c5b34b",
+    "ce632f1965d33f421223a405c3d5003b52127fcc4674aec57ad1233d2884bf94"
+  ],
+  "paare": [
+    "4ff9cccde4da519de7753fb66dc260bcc60d6437cf5cbd1cac465b9e14f35876",
+    "6b374b4d0fa5b5a8c721b0d016ffadc0dc1e433bd1a58627d73d1090060a9324",
+    "6e1fb10101257f9fa7aab814e8f9e5ee177bb047c9f0afa055c522673cff329d",
+    "bca512d645183386a94bcb628e4a065b6b626e1052f4089e60dbabcf2869f61d"
+  ],
+  "mehrdeutig": [
+    "86c9c198f7df1f0e6633e21a12bca14730a27070bbcc742fec8b2b14b44a0126",
+    "e11ac386b455f5891846c593791227be0e0fd692b2b3d8043415fe09ebba7ce6"
+  ]
+}

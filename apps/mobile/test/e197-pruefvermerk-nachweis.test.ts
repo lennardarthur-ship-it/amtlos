@@ -1,12 +1,14 @@
 /**
  * E-197 (ersetzt die Unterschriftsregel aus E-196): Der Prüfvermerk im Katalog folgt genau den schriftlich bestätigten
- * Freigaben (docs/freigabe-katalog/freigaben.yaml, `nachweis` mit Art, Datum, Rolle und Umfang): Bestätigung per Mail
- * (E-198: die Mail liegt beim Gründer, nicht im Repository), vom Prüfer ausgefüllte Datei oder ein unterschriebenes Blatt,
- * das auf Wunsch des Gründers am 25.10.2026 aus dem Projekt entfernt wurde. Je Rolle zeigen genau
+ * Freigaben (docs/freigabe-katalog/freigaben.yaml, `nachweis` mit Art, Datum, Rolle, Umfang und Aufbewahrung): Bestätigung
+ * per Mail, vom Prüfer ausgefüllte Datei bzw. unterschriebenes Blatt (auf Wunsch des Gründers am 25.10.2026 entfernt) oder
+ * Bericht. E-198/E-199: Keine dieser Unterlagen liegt im Repository – der Gründer bewahrt sie auf; das Register ist der
+ * einzige Nachweis im Projekt (ohne Dateiverweis, ohne Zitat, ohne Namen). Je Rolle zeigen genau
  * die Einträge einen Vermerk, die ein bestätigter Block mit dieser Version (bei Teil-Umfängen: gültig nach anwenden.py)
  * abdeckt – eine Version, die nach der Bestätigung entstanden ist, zeigt keinen; das Datum im Vermerk liegt nie nach der
  * Bestätigung; keine Person wird genannt.
  */
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
@@ -19,12 +21,21 @@ const YAML = createRequire(path.join(WURZEL, "packages/rules-engine/package.json
 interface Block {
   pruefer: string;
   umfang: "alles" | "sanktion" | "ohne_sanktion";
-  nachweis: { art: string; datum: string; rolle: string; umfang: string; aufbewahrung?: string; blatt?: string };
+  nachweis: { art: string; datum: string; rolle: string; umfang: string; aufbewahrung: string };
   eintraege: Record<string, { version: number; stand: string; quelle: string; einschraenkung?: string; zitat?: string }>;
 }
 const REGISTER = YAML.parse(fs.readFileSync(path.join(WURZEL, "docs/freigabe-katalog/freigaben.yaml"), "utf8")) as Block[];
-const ZAEHLT = ["mail", "unterschrift_entfernt", "blatt"];
-const bestaetigt = (b: Block) => ZAEHLT.includes(b.nachweis.art) && (!b.nachweis.blatt || fs.existsSync(path.join(WURZEL, b.nachweis.blatt)));
+const ZAEHLT = ["mail", "blatt", "bericht"];
+const bestaetigt = (b: Block) => ZAEHLT.includes(b.nachweis.art);
+/** E-199: Verweis auf eine Unterlage der Prüfer (Datei, Ordner) – das Register nennt keine */
+const DATEIVERWEIS = /docs\/pruefberichte|versand-|\.(xlsx|xls|pdf|eml|msg|jpe?g|png|txt|md|docx?)\b/i;
+/** E-199: Namen der Prüfer, abgeglichen über SHA-256 (docs/freigabe-katalog/namen-sha256.json) – ohne Klartext im Test */
+const NAMEN = JSON.parse(fs.readFileSync(path.join(WURZEL, "docs/freigabe-katalog/namen-sha256.json"), "utf8")) as { einzeln: string[]; paare: string[]; mehrdeutig: string[] };
+const sha = (s: string) => createHash("sha256").update(s).digest("hex");
+const nenntName = (text: string) => {
+  const w = text.toLowerCase().match(/[a-zäöüß]+/g) ?? [];
+  return w.some((x) => NAMEN.einzeln.includes(sha(x)) || NAMEN.mehrdeutig.includes(sha(x))) || w.slice(1).some((x, i) => NAMEN.paare.includes(sha(`${w[i]} ${x}`)));
+};
 const pflichten = KATALOG.pflichten as unknown as { id: string; version: number; pruefung?: PruefungRoh }[];
 const AM = new Date(2026, 9, 26);
 const ROLLEN = ["recht", "steuern", "arbeitsschutz", "hygiene"];
@@ -50,32 +61,29 @@ function noetig(id: string): [string, string][] {
 }
 
 describe("E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben", () => {
-  it("Register: Rollen statt Namen, Nachweis je Block ohne Mail (E-198), Stand nie nach der Bestätigung, keine Unterschriftsdateien", () => {
-    const MAIL = /(\.eml|\.msg|mail[^/]*\.txt)$/i;
+  it("Register: Rollen statt Namen, Nachweis je Block ohne Unterlage (E-198, E-199), Stand nie nach der Bestätigung", () => {
     for (const b of REGISTER) {
       expect(ROLLEN).toContain(b.pruefer);
       expect([...ZAEHLT, "ersetzt", "offen"], b.pruefer).toContain(b.nachweis.art);
       expect(b as object).not.toHaveProperty("unterschrift");
-      // Nachweis: Art, Datum, Rolle, Umfang – keine Mail-Datei, kein Zitat (E-198)
-      expect(Object.keys(b.nachweis).every((k) => ["art", "datum", "rolle", "umfang", "aufbewahrung", "blatt"].includes(k)), `${b.pruefer}: ${Object.keys(b.nachweis)}`).toBe(true);
+      // Nachweis: Art, Datum, Rolle, Umfang, Aufbewahrung – keine Datei, kein Zitat (E-198, E-199)
+      expect(Object.keys(b.nachweis).sort(), b.pruefer).toEqual(["art", "aufbewahrung", "datum", "rolle", "umfang"]);
       expect(b.nachweis.rolle, b.pruefer).toBe(b.pruefer);
       expect(String(b.nachweis.datum), b.pruefer).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(b.nachweis.umfang, b.pruefer).toBeTruthy();
-      if (b.nachweis.art === "mail" || b.nachweis.art === "unterschrift_entfernt") expect(b.nachweis.aufbewahrung, b.pruefer).toBe("beim Gründer");
-      if (b.nachweis.blatt) {
-        expect(fs.existsSync(path.join(WURZEL, b.nachweis.blatt)), b.nachweis.blatt).toBe(true);
-        expect(b.nachweis.blatt).not.toMatch(MAIL);
-      }
-      if (b.nachweis.art === "unterschrift_entfernt") expect(b.nachweis.umfang, b.pruefer).toMatch(/aus dem Projekt entfernt/);
+      expect(b.nachweis.aufbewahrung, b.pruefer).toBe("beim Gründer");
+      expect(b.nachweis.umfang, b.pruefer).not.toMatch(DATEIVERWEIS);
       for (const [id, e] of Object.entries(b.eintraege)) {
-        expect(e, `${b.pruefer} ${id}`).not.toHaveProperty("zitat");
-        expect(String(e.quelle), `${b.pruefer} ${id}`).not.toMatch(MAIL);
+        expect(Object.keys(e).every((k) => ["version", "stand", "quelle", "einschraenkung"].includes(k)), `${b.pruefer} ${id}`).toBe(true);
+        expect(String(e.quelle), `${b.pruefer} ${id}`).not.toMatch(DATEIVERWEIS);
         expect(String(e.stand) <= String(b.nachweis.datum), `${b.pruefer} ${id}`).toBe(true);
         // bei Bestätigung per Mail ist der Stand das Datum der Mail
         if (b.nachweis.art === "mail") expect(String(e.stand), `${b.pruefer} ${id}`).toBe(String(b.nachweis.datum));
       }
     }
-    expect(fs.readdirSync(path.join(WURZEL, "docs/pruefberichte")).filter((d) => /\.(jpe?g|png|heic|tiff?)$/i.test(d))).toEqual([]);
+    // E-199: keine Prüfunterlagen im Repository
+    expect(fs.existsSync(path.join(WURZEL, "docs/pruefberichte"))).toBe(false);
+    expect(nenntName(fs.readFileSync(path.join(WURZEL, "docs/freigabe-katalog/freigaben.yaml"), "utf8"))).toBe(false);
   });
 
   it("je Rolle: Einträge mit Vermerk = bestätigte Einträge (bei geteilter Prüfung: beide Rollen bestätigt)", () => {
@@ -134,9 +142,12 @@ describe("E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben", () =>
 
   it("kein Vermerk und kein Katalogfeld nennt eine Person", () => {
     for (const p of pflichten) {
-      expect(JSON.stringify(p.pruefung ?? {}), p.id).not.toMatch(/weber|busch|heckler|\bkoch\b|\bbaum\b/i);
+      expect(nenntName(JSON.stringify(p.pruefung ?? {})), p.id).toBe(false);
       const t = pruefVermerk(p.version, p.pruefung, AM);
-      if (t) expect(t, p.id).not.toMatch(/weber|busch|heckler|koch|baum|Dr\./i);
+      if (t) {
+        expect(nenntName(t), p.id).toBe(false);
+        expect(t, p.id).not.toMatch(/Dr\./);
+      }
     }
   });
 });

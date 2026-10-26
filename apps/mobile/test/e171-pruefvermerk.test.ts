@@ -1,9 +1,19 @@
+import { createHash } from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { ROLLEN, VERMERK_NEUTRAL, istGanzGeprueft, istGeprueft, nennungGilt, pruefVermerk } from "../src/pflichten/pruefer";
 import { katalogGeprueft } from "../src/rechtshinweis";
 
 const frei = { status: "freigegeben", geprueft_von: ["recht"], geprueft_am: "2026-10-22", geprueft_version: 3, bestaetigt_am: "2026-10-23" };
 const AM = new Date(2026, 10, 1);
+/** E-199: Namen der Prüfer nur als SHA-256 (docs/freigabe-katalog/namen-sha256.json), nie im Klartext */
+const NAMEN = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../../docs/freigabe-katalog/namen-sha256.json"), "utf8")) as { einzeln: string[]; paare: string[]; mehrdeutig: string[] };
+const sha = (s: string) => createHash("sha256").update(s).digest("hex");
+const nenntName = (text: string) => {
+  const w = text.toLowerCase().match(/[a-zäöüß]+/g) ?? [];
+  return w.some((x) => NAMEN.einzeln.includes(sha(x)) || NAMEN.mehrdeutig.includes(sha(x))) || w.slice(1).some((x, i) => NAMEN.paare.includes(sha(`${w[i]} ${x}`)));
+};
 
 describe("E-171 Prüfvermerk je Katalogeintrag", () => {
   it("gilt nur für die geprüfte Version und nur mit schriftlicher Bestätigung (E-196, E-197)", () => {
@@ -43,7 +53,7 @@ describe("E-171 Prüfvermerk je Katalogeintrag", () => {
   it("Wortlaut der Rollen ohne verbotene Zusätze und ohne Namen", () => {
     for (const r of Object.values(ROLLEN)) {
       expect(r.wortlaut).not.toMatch(/rechtssicher|garantiert|freigegeben/i);
-      expect(`${r.von} ${r.bezeichnung}`).not.toMatch(/weber|busch|heckler|koch|baum/i);
+      expect(nenntName(`${r.von} ${r.bezeichnung} ${r.wortlaut}`)).toBe(false);
     }
   });
 

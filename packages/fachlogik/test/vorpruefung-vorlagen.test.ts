@@ -1,5 +1,5 @@
 /**
- * Vorprüfung Phase 1 vom 21.10.2026 (docs/pruefberichte/2026-10-21-vorpruefung-phase-1.pdf), Vorlagen: Datenschutz-
+ * Vorprüfung Phase 1 vom 21.10.2026 (beim Gründer), Vorlagen: Datenschutz-
  * information, NachwG, § 2a SchwarzArbG, AVV, Gefährdungsbeurteilung, Impressum, KI-Schulung, IfSG, Hygieneplan,
  * Unterweisung, Website-Datenschutzerklärung. Der Bericht ist eine Vorarbeit, keine anwaltliche Freigabe.
  */

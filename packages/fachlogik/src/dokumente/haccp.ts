@@ -11,7 +11,7 @@
  * verpflegt“: 72 °C an allen Stellen für mindestens zwei Minuten; Stellungnahme 037/2020: Heißhalten mindestens 60 °C)
  * und die Kühlwerte der Lebensmittelüberwachung aus der Recherche (bausteine.ts, HACCP).
  *
- * Prüfbericht Lebensmittelhygiene (Lebensmittelfachbeauftragter, 22.10.2026, docs/pruefberichte/2026-10-22-lebensmittelhygiene.txt):
+ * Prüfbericht Lebensmittelhygiene (Lebensmittelfachbeauftragter, 22.10.2026, beim Gründer):
  * Kühlen und Kühllagern sind keine CCP, sondern Kontrollpunkte der guten Hygienepraxis (L-022, L-035, L-037; in der
  * CCP-Tabelle als „Kontrollpunkt (GHP)“ gekennzeichnet), je Kontrollpunkt ein Grenzwert, Quellen aktualisiert. Wo der
  * Bericht einen Baustein bestätigt (✔) oder die Änderung (✎) umgesetzt ist, entfällt die Markierung „fachlich zu prüfen“;

@@ -10,7 +10,8 @@ Unterschriftszeile: Die Seite liegt der Mail bei, und der Prüfer bestätigt per
 --bereich: alle Einträge des Prüfbereichs (wie anwenden.py) in der aktuellen Version, ohne E.56 – für die Bestätigung
 zusammen mit der Abgleich-Datei („ausgenommen die dort mit ‚ändern‘ markierten“). --ids: genau diese Einträge.
 
-Erzeugt eine HTML-Seite und druckt sie mit Chromium (Playwright) als PDF auf eine A4-Seite.
+Erzeugt eine HTML-Seite und druckt sie mit Chromium (Playwright) als PDF auf eine A4-Seite. E-199: <ziel.pdf> liegt
+außerhalb des Repositorys (ein Ziel im Repository wird abgelehnt).
 """
 import glob
 import html
@@ -18,7 +19,6 @@ import os
 import subprocess
 import sys
 
-import yaml
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../.."))
 args = [a for a in sys.argv[1:]]
@@ -36,6 +36,10 @@ if "--zusatz" in args:
 if "--auch" in args:
     i = args.index("--auch"); auch = [x for x in args[i + 1].split(",") if x]; del args[i:i + 2]
 ziel, pruefer, name, stand, nennung = args[:5]
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from ziel import ziel_ausserhalb  # noqa: E402  (E-199: Ziel außerhalb des Repositorys)
+ziel = ziel_ausserhalb(ziel, "Aufruf: python3 docs/freigabe-katalog/bestaetigung.py <ziel.pdf> …")
+import yaml  # noqa: E402
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 _src = open(os.path.join(HIER, "anwenden.py"), encoding="utf-8").read().split('if __name__ == "__main__":')[0]

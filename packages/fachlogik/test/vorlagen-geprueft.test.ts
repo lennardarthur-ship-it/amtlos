@@ -1,6 +1,7 @@
 /**
  * Vermerk unter den Vorlagen (zuerst Nachkontrolle Lebensmittelfachbeauftragter, 23.10.2026; E-196, E-197): nur bei
- * schriftlich bestätigter Freigabe (Mail beim Gründer oder schriftlicher Bericht des Prüfers, E-198), solange die Teilsummen der gedruckten Ausprägungen, die die Unterlage betreffen (Rechtsform,
+ * schriftlich bestätigter Freigabe (Mail, Bericht oder ausgefüllte Datei des Prüfers – alles beim Gründer, nicht im
+ * Repository, E-198/E-199), solange die Teilsummen der gedruckten Ausprägungen, die die Unterlage betreffen (Rechtsform,
  * Land, Rechnungsart …), zum freigegebenen Stand passen; mit Rolle statt Namen, mit Einschränkung des Prüfers und
  * „teilweise“, wenn die Vorlage noch „fachlich zu prüfen“ enthält.
  */
@@ -11,6 +12,15 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { LEERER_BETRIEB, PRUEFHINWEIS, PRUEFSTAENDE, PRUEF_ROLLEN, VERIFIZIERUNG, VORLAGEN, aktuellerPruefstand, pruefGruppenFuer, type Betrieb, dokumentHtml, freigabeBestaetigt, freigabenFuer, leereDaten, VORLAGEN_GEPRUEFT, geprueftVermerk, pruefHinweisFuer, sha256, vorlageFuer, vorlageGeprueft, vorlagenPruefstand, vorlagenPruefsumme, type Daten, type Vorlage, type VorlagenFreigabe, type VorlagenNachweis } from "../src/index.js";
 
 const WURZEL = path.resolve(__dirname, "../../..");
+/** E-199: Namen der Prüfer nur als SHA-256 (docs/freigabe-katalog/namen-sha256.json), nie im Klartext */
+const NAMEN = JSON.parse(fs.readFileSync(path.join(WURZEL, "docs/freigabe-katalog/namen-sha256.json"), "utf8")) as { einzeln: string[]; paare: string[]; mehrdeutig: string[] };
+const sha = (s: string) => createHash("sha256").update(s).digest("hex");
+const nenntName = (text: string) => {
+  const w = text.toLowerCase().match(/[a-zäöüß]+/g) ?? [];
+  return w.some((x) => NAMEN.einzeln.includes(sha(x)) || NAMEN.mehrdeutig.includes(sha(x))) || w.slice(1).some((x, i) => NAMEN.paare.includes(sha(`${w[i]} ${x}`)));
+};
+/** E-199: Verweis auf eine Unterlage der Prüfer (Datei, Ordner) – geprueft.ts nennt keine */
+const DATEIVERWEIS = /docs\/pruefberichte|versand-|\.(xlsx|xls|pdf|eml|msg|jpe?g|png|txt|md|docx?)\b/i;
 const FUENF = ["haccp", "hygieneplan", "allergene", "ifsg_belehrung", "hygieneschulung"];
 const WEITERE = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldung", "lohnkonto", "unterweisung", "gefahrstoffverzeichnis",
   "betriebsanweisung_maschine", "pruefprotokoll_elektro", "datenschutz_dokumentation", "datenschutzerklaerung_website", "avv", "datenschutzinformation", "datenpanne",
@@ -50,23 +60,23 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
       expect(f.pruefsumme_alt, id).toMatch(/^[0-9a-f]{64}$/);
       expect(["2026-10-23", "2026-10-24", "2026-10-25"]).toContain(f.stand);
       // nie ein Name im Register der App
-      expect(JSON.stringify(f), id).not.toMatch(/weber|busch|heckler|\bkoch\b|\bbaum\b/i);
+      expect(nenntName(JSON.stringify(f)), id).toBe(false);
     }
   });
 
   it("E-197: jede Freigabe schriftlich bestätigt – Nachweis liegt vor, der Stand liegt nie nach der Bestätigung", () => {
     for (const { schluessel, f } of alleFreigaben()) {
       expect(freigabeBestaetigt(f), schluessel).toBe(true);
-      // E-198: Nachweis mit Art, Datum, Rolle und Umfang – die Mail selbst liegt beim Gründer, nicht im Repository
+      // E-198/E-199: Nachweis mit Art, Datum, Rolle, Umfang und Aufbewahrung – die Unterlage liegt beim Gründer, nicht im Repository
       const n = f.nachweis!;
-      expect(["mail", "bericht"], schluessel).toContain(n.art);
+      expect(["mail", "bericht", "blatt"], schluessel).toContain(n.art);
+      expect(Object.keys(n).sort(), schluessel).toEqual(["art", "aufbewahrung", "datum", "rolle", "umfang"]);
       expect(n.datum, schluessel).toBe(f.bestaetigt_am);
       expect(n.rolle, schluessel).toBe(f.rolle);
       expect(n.umfang.length, schluessel).toBeGreaterThan(20);
-      if (n.art === "mail") expect(n.aufbewahrung, schluessel).toBe("beim Gründer");
-      if (n.art === "bericht") expect(fs.existsSync(path.join(WURZEL, n.beleg!)), `${schluessel}: ${n.beleg}`).toBe(true);
-      if (f.blatt) expect(fs.existsSync(path.join(WURZEL, f.blatt)), `${schluessel}: ${f.blatt}`).toBe(true);
-      expect(JSON.stringify(f), schluessel).not.toMatch(/mail[^"/]*\.txt|\.eml|nachweis_text/i);
+      expect(n.aufbewahrung, schluessel).toBe("beim Gründer");
+      expect(JSON.stringify(f), schluessel).not.toMatch(DATEIVERWEIS);
+      expect(JSON.stringify(f), schluessel).not.toMatch(/"(nachweis_text|beleg|zitat|blatt)":/);
       expect(f.stand <= f.bestaetigt_am!, schluessel).toBe(true);
       // keine Unterschriften mehr im Projekt (E-197)
       expect(JSON.stringify(f), schluessel).not.toMatch(/\.jpe?g"/);
@@ -76,7 +86,8 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
       const f = VORLAGEN_GEPRUEFT[id]!;
       expect(f.nachweis!.umfang, id).toContain(f.pruefsumme_alt!.slice(0, 12));
     }
-    expect(fs.readdirSync(path.join(WURZEL, "docs/pruefberichte")).filter((d) => /\.(jpe?g|png|heic)$/i.test(d))).toEqual([]);
+    // E-199: keine Prüfunterlagen im Repository
+    expect(fs.existsSync(path.join(WURZEL, "docs/pruefberichte"))).toBe(false);
   });
 
   it("die erzeugte Liste PRUEFSTAENDE passt zur Rechnung (sonst: werkzeuge/pruefstaende-erzeugen.mjs)", () => {

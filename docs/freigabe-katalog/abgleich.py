@@ -2,7 +2,7 @@
 Abgleich-Datei je Prüfer (E-173): alle Einträge seines Bereichs, die in der aktuellen Fassung noch nicht von ihm
 freigegeben sind – mit Gegenüberstellung „Ihre geprüfte Fassung“ / „aktuelle Fassung“ für jedes geänderte Feld.
 
-    python3 docs/freigabe-katalog/abgleich.py <ziel-ordner> [--notizen notizen.json]
+    python3 docs/freigabe-katalog/abgleich.py <ziel-ordner> [--notizen notizen.json]   # beides außerhalb des Repositorys (E-199)
 
 notizen.json: {"<id>": "Satz, was sich geändert hat und warum"} (optional, erscheint je Eintrag).
 """
@@ -11,13 +11,16 @@ import json
 import os
 import sys
 
-import yaml
-from openpyxl import Workbook
-from openpyxl.styles import Alignment, Font, PatternFill
-from openpyxl.worksheet.datavalidation import DataValidation
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HIER, "../.."))
+sys.path.insert(0, HIER)
+from ziel import ziel_ausserhalb  # noqa: E402  (E-199: Ziel außerhalb des Repositorys)
+ziel = ziel_ausserhalb(([a for a in sys.argv[1:] if not a.startswith("--")] or [None])[0], "Aufruf: python3 docs/freigabe-katalog/abgleich.py <ziel-ordner>")
+import yaml  # noqa: E402
+from openpyxl import Workbook  # noqa: E402
+from openpyxl.styles import Alignment, Font, PatternFill  # noqa: E402
+from openpyxl.worksheet.datavalidation import DataValidation  # noqa: E402
 sys.argv_ = sys.argv
 src = open(os.path.join(HIER, "anwenden.py"), encoding="utf-8").read().split('if __name__ == "__main__":')[0]
 g = {"__file__": os.path.join(HIER, "anwenden.py")}
@@ -25,7 +28,6 @@ exec(compile(src, "anwenden.py", "exec"), g)
 gebiet, BENOETIGT, frei, fassung, gueltig, abgedeckt = g["gebiet"], g["BENOETIGT"], g["frei"], g["fassung"], g["gueltig"], g["abgedeckt"]
 RECHT, STEUERN, SIFA, LMH = g["RECHT"], g["STEUERN"], g["SIFA"], g["LMH"]
 
-ziel = os.path.abspath([a for a in sys.argv[1:] if not a.startswith("--")][0])
 os.makedirs(ziel, exist_ok=True)
 notizen = json.load(open(sys.argv[sys.argv.index("--notizen") + 1], encoding="utf-8")) if "--notizen" in sys.argv else {}
 AUSGENOMMEN = set()  # E.56 seit E-174 bei Rechtsanwalt
@@ -93,11 +95,11 @@ def text(v, k=None):
     return yaml.safe_dump(v, allow_unicode=True, default_flow_style=True, width=200).strip()
 
 
-PERSON = {RECHT: "Rechtsanwalt", STEUERN: "Steuerberater", SIFA: "Fachkraft für Arbeitssicherheit", LMH: "Lebensmittelfachbeauftragter"}
+ROLLE_LANG = {RECHT: "Rechtsanwalt", STEUERN: "Steuerberater", SIFA: "Fachkraft für Arbeitssicherheit", LMH: "Lebensmittelfachbeauftragter"}
 NAME = {RECHT: "Rechtsanwalt", STEUERN: "Steuerberater", SIFA: "Sifa", LMH: "Lebensmittelhygiene"}
 register = yaml.safe_load(open(os.path.join(ROOT, "docs/freigabe-katalog/freigaben.yaml"), encoding="utf-8"))
 GESEHEN = {(r["pruefer"], r["umfang"]): r.get("gesehen") or {} for r in register}
-je = {p: [] for p in PERSON}
+je = {p: [] for p in ROLLE_LANG}
 for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
     d = yaml.safe_load(open(pfad, encoding="utf-8"))
     if d["id"] in AUSGENOMMEN:
@@ -168,7 +170,7 @@ for p, liste in je.items():
     ws.add_data_validation(dv); dv.add(f"I2:I{ws.max_row}")
     ws.freeze_panes = "C2"
     hw = wb.create_sheet("So geht's")
-    for z in [[f"Abgleich – {PERSON[p]}"], [""],
+    for z in [[f"Abgleich – {ROLLE_LANG[p]}"], [""],
               [f"Diese Datei enthält die {len(liste)} Einträge Ihres Bereichs, die Sie in der aktuellen Fassung noch nicht freigegeben haben – weil sie sich nach Ihrer Durchsicht geändert haben (meist durch die Umsetzung Ihrer Anmerkungen) oder neu sind."],
               ["Je geändertem Feld stehen „In Ihrer Fassung“ und „Aktuelle Fassung“ nebeneinander. Unveränderte Felder sind nicht aufgeführt."],
               ["Bitte je Eintrag in der gelben Spalte „Entscheidung“ wählen: freigegeben (in der aktuellen Fassung) oder ändern."],
@@ -181,4 +183,4 @@ for p, liste in je.items():
             c.alignment = Alignment(wrap_text=True, vertical="top")
     datei = os.path.join(ziel, f"Betriebsklar-Abgleich-{NAME[p]}.xlsx")
     wb.save(datei)
-    print(f"{PERSON[p]}: {len(liste)} Einträge → {datei}")
+    print(f"{ROLLE_LANG[p]}: {len(liste)} Einträge → {datei}")

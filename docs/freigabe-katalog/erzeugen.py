@@ -3,7 +3,7 @@ Freigabe-Mappen für den Pflichtenkatalog (E-170): je Fachgebiet eine Excel-Date
 freigibt oder eine Änderung vermerkt. Seit E-197 ohne Blatt zum Unterschreiben: Die prüfende Person bestätigt ihr Ergebnis
 per E-Mail (Textform) und schickt die Datei mit der ausgefüllten Spalte „Entscheidung“ mit.
 
-    python3 docs/freigabe-katalog/erzeugen.py <ziel>
+    python3 docs/freigabe-katalog/erzeugen.py <ziel>     # <ziel>: Ordner außerhalb des Repositorys (E-199)
 
 Zuordnung (eine Person je Eintrag, Hauptzuständigkeit): Steuern -> Steuerberater; Arbeitsschutz -> Fachkraft für
 Arbeitssicherheit; Lebensmittelhygiene -> Lebensmittelfachmann; alles andere (Recht) -> Rechtsanwalt.
@@ -14,15 +14,17 @@ import glob
 import os
 import sys
 
-import yaml
-from openpyxl import Workbook
-from openpyxl.styles import Alignment, Font, PatternFill
-from openpyxl.worksheet.datavalidation import DataValidation
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HIER, "../.."))
 ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
-ZIEL = os.path.abspath(ARGS[0] if ARGS else "freigabe-katalog")
+sys.path.insert(0, HIER)
+from ziel import ziel_ausserhalb  # noqa: E402  (E-199: Ziel außerhalb des Repositorys)
+ZIEL = ziel_ausserhalb(ARGS[0] if ARGS else None, "Aufruf: python3 docs/freigabe-katalog/erzeugen.py <ziel>")
+import yaml  # noqa: E402
+from openpyxl import Workbook  # noqa: E402
+from openpyxl.styles import Alignment, Font, PatternFill  # noqa: E402
+from openpyxl.worksheet.datavalidation import DataValidation  # noqa: E402
 # Runde 2: nur noch nicht (in dieser Version) freigegebene Einträge, mit unserer Rückfrage je Eintrag
 NUR_OFFEN = "--nur-offen" in sys.argv
 IDS = set(sys.argv[sys.argv.index("--ids") + 1].split(",")) if "--ids" in sys.argv else None

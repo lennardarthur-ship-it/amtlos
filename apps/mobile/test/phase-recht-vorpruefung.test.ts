@@ -1,5 +1,5 @@
 /**
- * Vorprüfung Recht (21.10.2026, docs/pruefberichte/2026-10-21-vorpruefung-phase-1.pdf, Abschnitte 8 und 9):
+ * Vorprüfung Recht (21.10.2026, beim Gründer, Abschnitte 8 und 9):
  * Datenschutzhinweis (Verantwortlicher, SCC-Fundstelle, Speicherdauer RevenueCat, Aufsichtsbehörde, Sync-Backups),
  * Nutzungsbedingungen „Fassung zur Freigabe“ und die Zustimmung beim ersten Start (§ 305 Abs. 2 BGB) – aktiv erst mit
  * `NUTZUNGSBEDINGUNGEN.freigegeben`. Beide Zustände des Schalters werden geprüft.
