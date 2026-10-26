@@ -66,6 +66,8 @@ def de(x):
 
 def wert_text(wert, einheit):
     """Wert mit Einheit wie in der App (pruefer.ts `regelwertText`)."""
+    if einheit == "kalenderjahr":  # E-213: Jahreszahl ohne Tausenderpunkt
+        return str(int(wert)) if float(wert).is_integer() else str(wert)
     ganz, _, rest = f"{round(wert, 2):.2f}".partition(".")
     z = re.sub(r"\B(?=(\d{3})+(?!\d))", ".", ganz) + ("" if rest == "00" else "," + rest)
     eins = wert == 1

@@ -44,7 +44,8 @@ const STEUERN_23 = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldun
 // E-208: Bei der Rechnung hat sich der gemeinsame Teil (`basis`) geändert – Einzelpreis bei Bruttopreisen so genau, dass
 // Menge × Preis den Zeilenbetrag ergibt (Beispielvariante 2 × 123,45 € brutto zu 7 %: 115,375 € statt 115,37 €). Bis der
 // Steuerberater die neue Fassung bestätigt (PRUEFLISTE T-245), zeigt die Rechnung in keiner Variante einen Vermerk.
-const OHNE_VERMERK_E208 = ["rechnung"];
+// E-213: die Rechnung ist seit dem 26.10.2026 wieder bestätigt (Steuerberater) – keine Vorlage mehr ohne Vermerk wegen E-208
+const OHNE_VERMERK_E208: string[] = [];
 const MIT_VERMERK: string[] = ALLE.filter((id) => !OHNE_VERMERK_E208.includes(id));
 /** E-202: neue, vorab freigegebene Fassungen (Prüfsumme nach dem Streichen von „fachlich zu prüfen“ bzw. Satzänderungen) */
 const NEUE_FASSUNG = ["unterweisung", "hautschutzplan", "gefaehrdungsbeurteilung", "datenschutzerklaerung_website", "video_hinweisschild"];
@@ -133,8 +134,8 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
     // ohne Betrieb: alle Varianten müssen passen – seit E-200 auch bei der Rechnung (Co.-KG-Varianten nachgeprüft); seit E-202
     // auch das Storno einer Schlussrechnung (eigene Gruppe, nur mit diesen Daten) vom Steuerberater bestätigt
     for (const id of STEUERN_23) expect(pruefHinweisFuer(vorlageFuer(id)!, {}) !== PRUEFHINWEIS, id).toBe(!OHNE_VERMERK_E208.includes(id));
-    // E-208: Rechnung bis zur erneuten Bestätigung ohne Vermerk – auch das Storno einer Schlussrechnung (braucht `basis`)
-    expect(pruefHinweisFuer(vorlageFuer("rechnung")!, { storno_zu: "RE-1", schluss: true, storno_abschlaege: true })).toBe(PRUEFHINWEIS);
+    // E-208: Rechnung bis zur erneuten Bestätigung ohne Vermerk – E-213: bestätigt, auch das Storno einer Schlussrechnung
+    expect(pruefHinweisFuer(vorlageFuer("rechnung")!, { storno_zu: "RE-1", schluss: true, storno_abschlaege: true })).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 26.10.2026)");
     // GmbH & Co. KG: nur die Rechnung druckt die geänderte Fußzeile – seit E-200 vom Steuerberater nachgeprüft (26.10.2026)
     const coKg: Betrieb = { ...CAFE, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" };
     for (const id of STEUERN_23) expect(pruefHinweisFuer(vorlageFuer(id)!, {}, coKg) !== PRUEFHINWEIS, id).toBe(!OHNE_VERMERK_E208.includes(id));
@@ -164,9 +165,13 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
   it("E-196/E-200/E-202: Rechnung des Einzelunternehmens mit Vermerk vom 23.10., GmbH & Co. KG, UG & Co. KG und Storno einer Schlussrechnung vom 26.10.", () => {
     const re = vorlageFuer("rechnung")!;
     const ja = (d: Daten, b?: Betrieb) => pruefHinweisFuer(re, d, b) !== PRUEFHINWEIS;
-    // E-208: `basis` geändert (Einzelpreis bei Bruttopreisen) – keine der drei Freigaben passt, bis der Steuerberater bestätigt
+    // E-208: `basis` geändert (Einzelpreis bei Bruttopreisen) – keine der drei Freigaben passt mehr; E-213: die vierte Freigabe
+    // (Steuerberater 26.10.2026, alle heutigen Teilsummen) deckt jede Variante
     const coKg8 = { ...CAFE, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" };
-    for (const [d, b] of [[{}, CAFE], [{ schluss: true }, CAFE], [{ storno_zu: "RE-1" }, CAFE], [{ storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, CAFE], [{}, coKg8]] as [Daten, Betrieb][]) expect(ja(d, b)).toBe(false);
+    for (const [d, b] of [[{}, CAFE], [{ schluss: true }, CAFE], [{ storno_zu: "RE-1" }, CAFE], [{ storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, CAFE], [{}, coKg8]] as [Daten, Betrieb][]) {
+      expect(ja(d, b)).toBe(true);
+      expect(pruefHinweisFuer(re, d, b)).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 26.10.2026)");
+    }
     // die übrigen Teilsummen passen weiter zu den Freigaben (nur `basis` ist neu)
     const [f1, f2, f3] = freigabenFuer("rechnung");
     for (const [f, ok] of [[f3!, ["storno_schluss", ...CO_KG]], [f2!, CO_KG], [f1!, []]] as const)
@@ -353,10 +358,13 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
     expect(freigabenFuer("bilanz_guv")).toHaveLength(1);
     expect(freigabenFuer("gibt_es_nicht")).toEqual([]);
     // E-200: Rechnung mit der Nachprüfung der Co.-KG-Varianten; E-202: Storno der Schlussrechnung
-    expect(VORLAGEN_GEPRUEFT.rechnung!.weitere?.map((x) => [x.stand, x.varianten])).toEqual([["2026-10-26", ["rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"]], ["2026-10-26", ["storno_schluss", "rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"]]]);
+    // E-213: erneute Bestätigung nach E-208 über alle Varianten
+    expect(VORLAGEN_GEPRUEFT.rechnung!.weitere?.map((x) => [x.stand, x.varianten])).toEqual([["2026-10-26", ["rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"]], ["2026-10-26", ["storno_schluss", "rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"]], ["2026-10-26", undefined]]);
+    // E-213: Impressum der Co. KG (Rechtsanwalt), nur diese zwei Varianten
+    expect(VORLAGEN_GEPRUEFT.impressum!.weitere?.map((x) => [x.stand, x.rolle, x.varianten])).toEqual([["2026-10-26", "recht", ["rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"]]]);
     // E-202: je eine neue, vorab freigegebene Fassung (gleiche Rolle, Stand 26.10.2026)
     for (const id of NEUE_FASSUNG) expect(VORLAGEN_GEPRUEFT[id]!.weitere?.map((x) => [x.stand, x.rolle]), id).toEqual([["2026-10-26", VORLAGEN_GEPRUEFT[id]!.rolle]]);
-    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan" && id !== "rechnung" && !NEUE_FASSUNG.includes(id)) expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
+    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan" && id !== "rechnung" && id !== "impressum" && !NEUE_FASSUNG.includes(id)) expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
   });
 
   it("je Fassung eine eigene Prüfsumme: Beauty unterscheidet sich von der Lebensmittel-Fassung", () => {

@@ -75,7 +75,7 @@ Jeder Fakt hat einen Typ. Der Validator lehnt unbekannte Fakten, unpassende Oper
 
 ### Regelwerte (E-034)
 
-`{ regelwert: id }` wird zum **Stichtag der Auswertung** aufgelöst: die freigegebene Version mit `gueltig_ab ≤ Stichtag ≤ gueltig_bis`. Die Begründung nennt Wert, Version und Quelle. Termine in einem späteren Kalenderjahr als der Stichtag werden mit `vorlaeufig: true` markiert: Sie beruhen auf heutigen Fakten (etwa der Vorjahres-Zahllast), die sich bis dahin ändern. Zum Jahreswechsel löst der Tageswechsel-Job eine Neuberechnung aus; dann gelten die neuen Regelwerte und Fakten.
+`{ regelwert: id }` wird zum **Stichtag der Auswertung** aufgelöst: die freigegebene Version mit `gueltig_ab ≤ Stichtag ≤ gueltig_bis` (`gueltig_ab: null` = ohne Stichtag, gilt ohne bekannten Anfang – E-213; in der Datenbank als `-infinity`). Die Begründung nennt Wert, Version und Quelle. Termine in einem späteren Kalenderjahr als der Stichtag werden mit `vorlaeufig: true` markiert: Sie beruhen auf heutigen Fakten (etwa der Vorjahres-Zahllast), die sich bis dahin ändern. Zum Jahreswechsel löst der Tageswechsel-Job eine Neuberechnung aus; dann gelten die neuen Regelwerte und Fakten.
 
 ## Fristen
 

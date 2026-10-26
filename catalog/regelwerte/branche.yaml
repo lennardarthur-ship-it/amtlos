@@ -13,7 +13,7 @@
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 634a, url: "https://www.gesetze-im-internet.de/bgb/__634a.html", abgerufen: null }
   fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: branche.gewaehrleistung.bauwerk_jahre
@@ -29,7 +29,7 @@
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 634a, url: "https://www.gesetze-im-internet.de/bgb/__634a.html", abgerufen: null }
   fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: branche.gewaehrleistung.kauf_jahre
@@ -45,7 +45,7 @@
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 438, url: "https://www.gesetze-im-internet.de/bgb/__438.html", abgerufen: null }
   fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: branche.gewaehrleistung.beweislastumkehr_jahre
@@ -61,4 +61,4 @@
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 477, url: "https://www.gesetze-im-internet.de/bgb/__477.html", abgerufen: null }
   fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; gueltig_ab (Umsetzung der Warenkaufrichtlinie) nicht geprüft"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }

@@ -1,19 +1,19 @@
 # Werte unverändert aus Spezifikation Abschnitt 4, Katalog G (E-054). Fachlich zu prüfen.
 - schema_version: 1
   id: online.vsbg.schwelle_beschaeftigte
-  version: 1
+  version: 2
   katalog_nr: G.69
   bezeichnung: { de: "Beschäftigte, ab deren Überschreiten die Hinweispflicht nach § 36 VSBG gilt", en: "Employees above which the § 36 VSBG notice applies" }
   einheit: anzahl
   wert: 10
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2017-02-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 36 Abs. 3 VSBG"]
   quellen:
     - { titel: Verbraucherstreitbeilegungsgesetz § 36, url: "https://www.gesetze-im-internet.de/vsbg/__36.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "„mehr als 10“: Vergleich > 10 in den Regeln"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.02.2017; Ausnahme für bis zu zehn Beschäftigte am 31. Dezember des Vorjahres – Vergleich > 10 – laut Rechtsanwalt 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: online.bfsg.kleinst_beschaeftigte
@@ -29,7 +29,7 @@
   quellen:
     - { titel: Barrierefreiheitsstärkungsgesetz, url: "https://www.gesetze-im-internet.de/bfsg/", abgerufen: null }
   fachlich_zu_pruefen: ["Rechtsgrundlage ergänzt"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: online.bfsg.kleinst_umsatz
@@ -45,4 +45,4 @@
   quellen:
     - { titel: Barrierefreiheitsstärkungsgesetz, url: "https://www.gesetze-im-internet.de/bfsg/", abgerufen: null }
   fachlich_zu_pruefen: ["Alternative Bilanzsumme fehlt im Profil", "Rechtsgrundlage ergänzt"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }

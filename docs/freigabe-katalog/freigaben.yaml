@@ -2337,3 +2337,41 @@
       version: 3
       quelle: Vorabfreigabe der Satzzeichen-Korrektur per Mail vom 26.10.2026 (beim Gründer)
       stand: '2026-10-26'
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: 'Erneute Bestätigung nach E-206: Umsatzsteuer-Voranmeldung v7 (bei „Weiß ich nicht“ ohne Vorjahressteuer vorläufig monatlich;
+      Neugründer ab 2027 im Gründungs- und Folgejahr monatlich, auch gegen die Angabe „vierteljährlich“, samt Hinweissatz) und elektronische
+      Lohnsteuerbescheinigung v2 (Auslöser ohne Anmeldezeitraum, Satz zu § 41b Abs. 6 EStG bleibt im Text) bestätigt; die Anregung zur
+      Dauerfristverlängerung ist kein Teil dieser Bestätigung (Text unverändert, PRUEFLISTE T-268)'
+    aufbewahrung: beim Gründer
+  felder_fehlen: []
+  hinweis: 'E-213: Antwort des Steuerberaters vom 26.10.2026 (Mail beim Gründer)'
+  eintraege:
+    steuern.ust_voranmeldung:
+      version: 7
+      quelle: Bestätigung per Mail vom 26.10.2026 (beim Gründer)
+      stand: '2026-10-26'
+    personal.lohnsteuerbescheinigung:
+      version: 2
+      quelle: Bestätigung per Mail vom 26.10.2026 (beim Gründer)
+      stand: '2026-10-26'
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: 'Erneute Bestätigung nach E-206: Lohnsteuer-Anmeldung v7 (Auslöser „mindestens eine beschäftigte Person und Anmeldezeitraum
+      nicht „keine““ – ohne Angabe des Anmeldezeitraums gilt die Pflicht) bestätigt'
+    aufbewahrung: beim Gründer
+  felder_fehlen: []
+  hinweis: 'E-213: Antwort des Rechtsanwalts vom 26.10.2026 (Mail beim Gründer)'
+  eintraege:
+    personal.lohnsteuer_anmeldung:
+      version: 7
+      quelle: Bestätigung per Mail vom 26.10.2026 (beim Gründer)
+      stand: '2026-10-26'

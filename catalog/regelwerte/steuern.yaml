@@ -1,35 +1,35 @@
 # Werte unverändert aus Spezifikation Abschnitt 4 (E-054). Jede Datei: Liste von Regelwert-Versionen.
 - schema_version: 1
   id: steuern.ust_va.grenze_befreiung
-  version: 1
+  version: 2
   katalog_nr: C.24
   bezeichnung: { de: "Vorjahres-Zahllast, bis zu der eine Befreiung von der USt-Voranmeldung möglich ist" }
   einheit: EUR
   wert: 2000
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2025-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 18 Abs. 2 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 18, url: "https://www.gesetze-im-internet.de/ustg_1980/__18.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter (Beginn Betrachtungszeitraum), tatsächliches Inkrafttreten der Grenze eintragen"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2025 (Anhebung von 1.000 € durch das Wachstumschancengesetz) und Vergleich „nicht mehr als“ (≤, Befreiung im Ermessen des Finanzamts, § 18 Abs. 2 Satz 3 UStG) laut Steuerberater 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.ust_va.grenze_monatlich
-  version: 1
+  version: 2
   katalog_nr: C.24
   bezeichnung: { de: "Vorjahres-Zahllast, ab der die USt-Voranmeldung monatlich abzugeben ist" }
   einheit: EUR
   wert: 9000
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2025-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 18 Abs. 2 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 18, url: "https://www.gesetze-im-internet.de/ustg_1980/__18.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Spezifikation: 'über 9.000 € monatlich' – Vergleich '>' bestätigen"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2025 (vorher 7.500 €), monatlich bei mehr als 9.000 € (Vergleich „>“, § 18 Abs. 2 Satz 2 UStG) laut Steuerberater 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.ust_va.neugruender_monatlich_ab
@@ -46,119 +46,119 @@
   quellen:
     - { titel: Umsatzsteuergesetz § 18, url: "https://www.gesetze-im-internet.de/ustg_1980/__18.html", abgerufen: "2026-10-26" }
   fachlich_zu_pruefen: ["E-206: Wert aus C.21 (Steuerberater 22.10.2026: keine Verlängerung von Satz 6 über 2026 hinaus bekannt) – bei einer Verlängerung durch das Jahressteuergesetz neue Version mit dem späteren Jahr"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.ustg19.grenze_vorjahr
-  version: 1
+  version: 2
   katalog_nr: C.23
   bezeichnung: { de: Kleinunternehmer – Umsatzgrenze Vorjahr }
   einheit: EUR
   wert: 25000
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2025-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 19 Abs. 1 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 19, url: "https://www.gesetze-im-internet.de/ustg_1980/__19.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Grenze inklusive oder exklusive ('max. 25.000 €')?"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2025; inklusive – Kleinunternehmer, wenn der Gesamtumsatz des Vorjahres 25.000 € nicht überschritten hat (≤) – laut Steuerberater 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.ustg19.grenze_laufendes_jahr
-  version: 1
+  version: 2
   katalog_nr: C.23
   bezeichnung: { de: Kleinunternehmer – Umsatzgrenze laufendes Jahr }
   einheit: EUR
   wert: 100000
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2025-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 19 Abs. 1 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 19, url: "https://www.gesetze-im-internet.de/ustg_1980/__19.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Gründungsjahr: abweichende Grenze 25.000 € als eigener Regelwert"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2025; inklusive (≤ 100.000 €), beim Überschreiten ist schon der Umsatz regelbesteuert, mit dem die Grenze überschritten wird – laut Steuerberater 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.ustg19.grenze_gruendungsjahr
-  version: 1
+  version: 2
   katalog_nr: C.23
   bezeichnung: { de: Kleinunternehmer – Umsatzgrenze für das laufende Jahr im Gründungsjahr }
   einheit: EUR
   wert: 25000
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2025-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 19 Abs. 1 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 19, url: "https://www.gesetze-im-internet.de/ustg_1980/__19.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Grenze inklusive oder exklusive?"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2025; inklusive (≤ 25.000 €) im Jahr der Aufnahme der Tätigkeit, als eigener Regelwert richtig – laut Steuerberater 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.ao141.grenze_umsatz
-  version: 1
+  version: 2
   katalog_nr: C.28
   bezeichnung: { de: Buchführungspflicht nach § 141 AO – Umsatzgrenze }
   einheit: EUR
   wert: 800000
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2024-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 141 AO"]
   quellen:
     - { titel: Abgabenordnung § 141, url: "https://www.gesetze-im-internet.de/ao_1977/__141.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Bezugsjahr und Vergleich (> oder ≥) bestätigen"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2024 (vorher 600.000 €); Vergleich „>“ (mehr als 800.000 € im Kalenderjahr); Pflicht erst ab dem Wirtschaftsjahr nach der Mitteilung des Finanzamts (§ 141 Abs. 2 AO), nicht für Freiberufler – laut Steuerberater 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.ao141.grenze_gewinn
-  version: 1
+  version: 2
   katalog_nr: C.28
   bezeichnung: { de: Buchführungspflicht nach § 141 AO – Gewinngrenze }
   einheit: EUR
   wert: 80000
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2024-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 141 AO"]
   quellen:
     - { titel: Abgabenordnung § 141, url: "https://www.gesetze-im-internet.de/ao_1977/__141.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Bezugsjahr und Vergleich (> oder ≥) bestätigen"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2024 (vorher 60.000 €); Vergleich „>“ (mehr als 80.000 € im Wirtschaftsjahr), sonst wie die Umsatzgrenze – laut Steuerberater 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.hgb241a.grenze_umsatz
-  version: 1
+  version: 2
   katalog_nr: C.28
   bezeichnung: { de: "Befreiung von der Buchführung nach § 241a HGB – Umsatzgrenze" }
   einheit: EUR
   wert: 800000
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2024-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 241a HGB"]
   quellen:
     - { titel: Handelsgesetzbuch § 241a, url: "https://www.gesetze-im-internet.de/hgb/__241a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter (R10, Steuerprüfung: 800.000 € Umsatzerlöse)"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2024; befreit bei ≤ 800.000 € Umsatzerlösen und ≤ 80.000 € Jahresüberschuss an zwei aufeinanderfolgenden Abschlussstichtagen (bei Neugründung der erste); nur für Einzelkaufleute (e. K.) – laut Steuerberater 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.hgb241a.grenze_gewinn
-  version: 1
+  version: 2
   katalog_nr: C.28
   bezeichnung: { de: "Befreiung von der Buchführung nach § 241a HGB – Grenze Jahresüberschuss" }
   einheit: EUR
   wert: 80000
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2024-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 241a HGB"]
   quellen:
     - { titel: Handelsgesetzbuch § 241a, url: "https://www.gesetze-im-internet.de/hgb/__241a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter (R10, Steuerprüfung: 80.000 € Jahresüberschuss)", "Jahresüberschuss mit dem angegebenen Gewinn gleichgesetzt"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2024; wie die Umsatzgrenze (≤ 80.000 €); Jahresüberschuss mit dem angegebenen Gewinn gleichzusetzen ist als Näherung in Ordnung – laut Steuerberater 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.e_rechnung.grenze_vorjahresumsatz_2027
@@ -174,24 +174,24 @@
   quellen:
     - { titel: Umsatzsteuergesetz § 27, url: "https://www.gesetze-im-internet.de/ustg_1980/__27.html", abgerufen: null }
   fachlich_zu_pruefen: ["Übergangsregel-Fundstelle (§ 27 Abs. 38 UStG) ergänzt, nicht aus Spezifikation", "gueltig_ab/gueltig_bis als Übergangszeitraum bestätigen"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 # ---- Bauabschnitt 4 (Finanzen light) ----
 - schema_version: 1
   id: steuern.aufbewahrung.belege_jahre
-  version: 1
+  version: 2
   katalog_nr: C.32
   bezeichnung: { de: "Aufbewahrungsfrist für Buchungsbelege einschließlich Rechnungen", en: "Retention period for accounting vouchers incl. invoices" }
   einheit: jahre
   wert: 8
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2025-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 147 AO", "§ 257 HGB"]
   quellen:
     - { titel: Abgabenordnung § 147, url: "https://www.gesetze-im-internet.de/ao_1977/__147.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlagen ergänzt", "Fristbeginn (Ende des Kalenderjahres) als Regel ergänzen"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: 8 Jahre seit 01.01.2025 (§ 147 Abs. 3 AO, § 257 Abs. 4 HGB, § 14b Abs. 1 UStG) für alle Unterlagen, deren Frist am 01.01.2025 noch nicht abgelaufen war; Fristbeginn mit dem Schluss des Kalenderjahres (§ 147 Abs. 4 AO, § 257 Abs. 5 HGB); kein Ablauf, solange die Festsetzungsfrist läuft (§ 147 Abs. 3 Satz 5 AO) – laut Steuerberater 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.aufbewahrung.buecher_jahre
@@ -207,7 +207,7 @@
   quellen:
     - { titel: Abgabenordnung § 147, url: "https://www.gesetze-im-internet.de/ao_1977/__147.html", abgerufen: null }
   fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlagen ergänzt"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.aufbewahrung.geschaeftsbriefe_jahre
@@ -223,7 +223,7 @@
   quellen:
     - { titel: Abgabenordnung § 147, url: "https://www.gesetze-im-internet.de/ao_1977/__147.html", abgerufen: null }
   fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlagen ergänzt"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.ust.satz_regel
@@ -238,7 +238,7 @@
   quellen:
     - { titel: Umsatzsteuergesetz § 12, url: "https://www.gesetze-im-internet.de/ustg_1980/__12.html", abgerufen: null }
   fachlich_zu_pruefen: ["[FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen", "gueltig_ab ist Platzhalter"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: steuern.ust.satz_ermaessigt
@@ -253,4 +253,4 @@
   quellen:
     - { titel: Umsatzsteuergesetz § 12, url: "https://www.gesetze-im-internet.de/ustg_1980/__12.html", abgerufen: null }
   fachlich_zu_pruefen: ["[FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen", "Welche Leistungen ermäßigt sind, entscheidet der Nutzer – Hinweis/Hilfe fachlich formulieren", "gueltig_ab ist Platzhalter"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }

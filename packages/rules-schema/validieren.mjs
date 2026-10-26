@@ -219,15 +219,17 @@ export function validiereKatalog(katalogDir, optionen = {}) {
     }
   }
   const tag = (d) => (d == null ? Infinity : Date.parse(d));
+  // E-213: gueltig_ab null = ohne Stichtag (gilt ohne bekannten Anfang)
+  const ab = (d) => (d == null ? -Infinity : Date.parse(d));
   for (const [id, versionen] of regelwerte) {
     const nummern = versionen.map((v) => v.version);
     if (new Set(nummern).size !== nummern.length) fehlerAus(versionen[0].datei, `${id}: doppelte Versionsnummer`);
-    const sortiert = [...versionen].sort((a, b) => tag(a.gueltig_ab) - tag(b.gueltig_ab));
+    const sortiert = [...versionen].sort((a, b) => ab(a.gueltig_ab) - ab(b.gueltig_ab));
     for (let i = 1; i < sortiert.length; i++) {
-      if (tag(sortiert[i].gueltig_ab) <= tag(sortiert[i - 1].gueltig_bis))
+      if (ab(sortiert[i].gueltig_ab) <= tag(sortiert[i - 1].gueltig_bis))
         fehlerAus(sortiert[i].datei, `${id}: Gültigkeit v${sortiert[i].version} überlappt v${sortiert[i - 1].version}`);
     }
-    for (const v of versionen) if (v.gueltig_bis && tag(v.gueltig_bis) < tag(v.gueltig_ab)) fehlerAus(v.datei, `${id}@${v.version}: gueltig_bis vor gueltig_ab`);
+    for (const v of versionen) if (v.gueltig_bis && tag(v.gueltig_bis) < ab(v.gueltig_ab)) fehlerAus(v.datei, `${id}@${v.version}: gueltig_bis vor gueltig_ab`);
   }
 
   // ---------- Pflichten ----------

@@ -1,64 +1,80 @@
 # Werte unverändert aus Spezifikation Abschnitt 4, Katalog B.14 (E-054). Rechtsgrundlagen ergänzt – fachlich zu prüfen.
 - schema_version: 1
   id: gesellschaft.gmbh.stammkapital_mindest
-  version: 1
+  version: 2
   katalog_nr: B.14
   bezeichnung: { de: "Mindeststammkapital der GmbH", en: "Minimum share capital of a GmbH" }
   einheit: EUR
   wert: 25000
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2002-01-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 5 GmbHG"]
   quellen:
     - { titel: GmbH-Gesetz § 5, url: "https://www.gesetze-im-internet.de/gmbhg/__5.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlage ergänzt, steht nicht in der Spezifikation"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2002 (Euro-Umstellung), mindestens 25.000 € (§ 5 Abs. 1 GmbHG) laut Rechtsanwalt 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: gesellschaft.gmbh.mindesteinzahlung_anteil
-  version: 1
+  version: 2
   katalog_nr: B.14
-  bezeichnung: { de: "Mindestens einzuzahlender Anteil des Stammkapitals (GmbH)", en: "Minimum share of capital to be paid in (GmbH)" }
+  bezeichnung: { de: "Mindestens einzuzahlender Anteil des Nennbetrags je Geschäftsanteil (GmbH, Geldeinlage)", en: "Minimum share of the nominal amount to be paid in per share (GmbH, cash contribution)" }
   einheit: prozent
-  wert: 50
-  gueltig_ab: "2026-01-01"
+  wert: 25
+  gueltig_ab: "2008-11-01"
   gueltig_bis: null
   status_recht: in_kraft
-  rechtsgrundlage: ["§ 7 Abs. 2 GmbHG"]
+  rechtsgrundlage: ["§ 7 Abs. 2 Satz 1 GmbHG"]
   quellen:
     - { titel: GmbH-Gesetz § 7, url: "https://www.gesetze-im-internet.de/gmbhg/__7.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Spezifikation: „mindestens Hälfte einzuzahlen“ – Bezug (Mindeststammkapital oder Summe der Anteile) und Einzahlung je Geschäftsanteil prüfen", "Rechtsgrundlage ergänzt"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: Rechtsanwalt 26.10.2026 – nicht „50 % des Stammkapitals“, sondern auf jeden Geschäftsanteil ein Viertel des Nennbetrags (soweit keine Sacheinlage); insgesamt mindestens die Hälfte des Mindeststammkapitals (eigener Regelwert gesellschaft.gmbh.mindesteinzahlung_gesamt); gültig ab 01.11.2008 (MoMiG); in der korrigierten Form vorab bestätigt"]
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
+
+- schema_version: 1
+  id: gesellschaft.gmbh.mindesteinzahlung_gesamt
+  version: 1
+  katalog_nr: B.14
+  bezeichnung: { de: "Mindestens einzuzahlender Gesamtbetrag vor der Anmeldung (GmbH: Geldeinlagen und Nennbeträge der Sacheinlagen)", en: "Minimum total to be paid in before registration (GmbH: cash contributions plus nominal amounts of contributions in kind)" }
+  einheit: EUR
+  wert: 12500
+  gueltig_ab: "2008-11-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 7 Abs. 2 Satz 2 GmbHG", "§ 5 Abs. 1 GmbHG"]
+  quellen:
+    - { titel: GmbH-Gesetz § 7, url: "https://www.gesetze-im-internet.de/gmbhg/__7.html", abgerufen: null }
+  fachlich_zu_pruefen: ["E-213: neu nach der Korrektur des Rechtsanwalts 26.10.2026 – insgesamt müssen Geldeinlagen plus Nennbeträge der Sacheinlagen die Hälfte des Mindeststammkapitals (§ 5 Abs. 1 GmbHG), also 12.500 €, erreichen; gültig ab 01.11.2008 (MoMiG); in der korrigierten Form vorab bestätigt"]
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: gesellschaft.ug.stammkapital_mindest
-  version: 1
+  version: 2
   katalog_nr: B.14
   bezeichnung: { de: "Mindeststammkapital der UG (haftungsbeschränkt)", en: "Minimum share capital of a UG" }
   einheit: EUR
   wert: 1
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2008-11-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 5a GmbHG"]
   quellen:
     - { titel: GmbH-Gesetz § 5a, url: "https://www.gesetze-im-internet.de/gmbhg/__5a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlage ergänzt"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.11.2008 (MoMiG); Stammkapital unter 25.000 €, Geschäftsanteile auf volle Euro, also mindestens 1 € (§ 5a Abs. 1 i. V. m. § 5 Abs. 2 Satz 1 GmbHG) laut Rechtsanwalt 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
   id: gesellschaft.ug.ruecklage_anteil
-  version: 1
+  version: 2
   katalog_nr: B.14
   bezeichnung: { de: "Rücklage der UG: Anteil am Jahresüberschuss", en: "UG statutory reserve: share of annual surplus" }
   einheit: prozent
   wert: 25
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2008-11-01"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 5a Abs. 3 GmbHG"]
   quellen:
     - { titel: GmbH-Gesetz § 5a, url: "https://www.gesetze-im-internet.de/gmbhg/__5a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlage ergänzt", "Berechnungsbasis (Jahresüberschuss abzüglich Verlustvortrag) prüfen"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 01.11.2008 (MoMiG); ein Viertel des um einen Verlustvortrag aus dem Vorjahr geminderten Jahresüberschusses (§ 5a Abs. 3 Satz 1 GmbHG) laut Rechtsanwalt 26.10.2026"]
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }

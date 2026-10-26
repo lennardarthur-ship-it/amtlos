@@ -1,16 +1,16 @@
 # Werte unverändert aus Spezifikation Abschnitt 4, Katalog F (E-054). Fachlich zu prüfen.
 - schema_version: 1
   id: datenschutz.dsb.schwelle_personen
-  version: 1
+  version: 2
   katalog_nr: F.61
   bezeichnung: { de: "Personen mit ständiger automatisierter Verarbeitung, ab denen ein Datenschutzbeauftragter zu benennen ist", en: "Persons regularly engaged in automated processing from which a data protection officer is required" }
   einheit: anzahl
   wert: 20
-  gueltig_ab: "2026-01-01"
+  gueltig_ab: "2019-11-26"
   gueltig_bis: null
   status_recht: in_kraft
   rechtsgrundlage: ["§ 38 Abs. 1 BDSG"]
   quellen:
     - { titel: Bundesdatenschutzgesetz § 38, url: "https://www.gesetze-im-internet.de/bdsg_2018/__38.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Geplante Streichung bis Ende 2026 (Radar F.61) – gueltig_bis setzen, sobald beschlossen"]
-  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+  fachlich_zu_pruefen: ["E-213: gültig ab 26.11.2019 (Anhebung von 10 auf 20 durch das Zweite DSAnpUG-EU); „in der Regel mindestens 20 Personen“ – Vergleich ≥ 20 – laut Rechtsanwalt 26.10.2026", "Geplante Streichung bis Ende 2026 (Radar F.61) – gueltig_bis setzen, sobald beschlossen"]
+  pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }

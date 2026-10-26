@@ -26,19 +26,21 @@ describe("Vermerk je Vorlage in der App", () => {
     // E-201: sieben Arbeitsschutz-Vorlagen waren ohne Vermerk, bis die Fachkraft für Arbeitssicherheit die neu gerechnete
     // Prüfsumme bestätigt – seit E-202 (26.10.2026) wieder mit Vermerk
     // E-208: Rechnung ohne Vermerk, bis der Steuerberater die geänderte Fassung bestätigt (Einzelpreis bei Bruttopreisen, T-245)
-    const OHNE = ["handelsregister", "rechnung"];
+    // – seit E-213 (26.10.2026) bestätigt, in allen Varianten wieder mit Vermerk
+    const OHNE = ["handelsregister"];
     const cafe = { ...LEERER_STAND.betrieb, name: "Café Sonne", bundesland: "Berlin" };
     const coKg = { ...cafe, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" };
     for (const v of VORLAGEN) {
       const d: Daten = v.id === "hygieneplan" ? { art: "lebensmittel" } : {};
       expect(pruefHinweisFuer(v, d, cafe) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id));
       // E-200: Rechnung der GmbH & Co. KG vom Steuerberater nachgeprüft (26.10.2026)
-      // E-210: Impressum der GmbH & Co. KG geändert (Vertretung durch die Komplementärin) – ohne Vermerk bis zur Bestätigung (T-254)
-      expect(pruefHinweisFuer(v, d, coKg) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id) && v.id !== "impressum");
+      // E-210: Impressum der GmbH & Co. KG geändert (Vertretung durch die Komplementärin) – seit E-213 vom Rechtsanwalt bestätigt
+      expect(pruefHinweisFuer(v, d, coKg) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id));
       if (v.id === "hygieneplan") expect(pruefHinweisFuer(v, { art: "beauty" }, cafe)).toContain("von einem Rechtsanwalt (Länderzusatz nur für Bayern geprüft)");
     }
-    // E-208: in keiner Variante der Rechnung ein Vermerk (gemeinsamer Teil geändert)
-    for (const [d, b] of [[{}, cafe], [{ storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, cafe], [{}, coKg]] as const) expect(pruefHinweisFuer(vorlageFuer("rechnung")!, d, b)).toBe(PRUEFHINWEIS);
+    // E-208: gemeinsamer Teil der Rechnung geändert – E-213: vom Steuerberater bestätigt, Vermerk in jeder Variante mit Stand 26.10.2026
+    for (const [d, b] of [[{}, cafe], [{ storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, cafe], [{}, coKg]] as const) expect(pruefHinweisFuer(vorlageFuer("rechnung")!, d, b)).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 26.10.2026)");
+    expect(pruefHinweisFuer(vorlageFuer("impressum")!, {}, coKg)).toBe("Vorlage fachlich durchgesehen von einem Rechtsanwalt (Stand 26.10.2026)");
     expect(pruefHinweisFuer(vorlageFuer("handelsregister")!, { rechtsform: "GmbH" }, { ...cafe, rechtsform: "GmbH" })).toBe("Vorlage fachlich durchgesehen von einem Rechtsanwalt (Stand 25.10.2026)");
     expect(pruefHinweisFuer(vorlageFuer("bilanz_guv")!, {}, { ...cafe, rechtsform: "GmbH" })).toContain("von einem Steuerberater");
   });

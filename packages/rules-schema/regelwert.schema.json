@@ -16,7 +16,7 @@
     },
     "einheit": { "enum": ["EUR", "EUR_pro_stunde", "EUR_pro_monat", "prozent", "anzahl", "tage", "monate", "jahre", "kalenderjahr"] },
     "wert": { "type": "number" },
-    "gueltig_ab": { "type": "string", "format": "date" },
+    "gueltig_ab": { "type": ["string", "null"], "format": "date", "description": "null = ohne Stichtag (E-213): gilt ohne bekannten Anfang, z. B. seit Inkrafttreten einer Vorschrift beim jeweiligen Träger oder solange ein Umsetzungsgesetz fehlt" },
     "gueltig_bis": { "type": ["string", "null"], "format": "date" },
     "status_recht": { "enum": ["in_kraft", "beschlossen", "entwurf", "geplant", "ausgelaufen"] },
     "rechtsgrundlage": { "type": "array", "minItems": 1, "items": { "type": "string" } },

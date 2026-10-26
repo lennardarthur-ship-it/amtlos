@@ -22,7 +22,7 @@ export class Regelwerte {
   /** undefined, wenn zum Stichtag keine Version gilt (→ Vergleich wird "unbekannt"). */
   zumStichtag(id: string, stichtag: Datum): AufgeloesterRegelwert | undefined {
     const treffer = (this.nachId.get(id) ?? []).filter(
-      (v) => vergleiche(v.gueltig_ab, stichtag) <= 0 && (v.gueltig_bis == null || vergleiche(stichtag, v.gueltig_bis) <= 0),
+      (v) => (v.gueltig_ab == null || vergleiche(v.gueltig_ab, stichtag) <= 0) && (v.gueltig_bis == null || vergleiche(stichtag, v.gueltig_bis) <= 0),
     );
     if (treffer.length > 1) {
       // Datenbank und Validator verhindern das; hier hart abbrechen statt zu raten.

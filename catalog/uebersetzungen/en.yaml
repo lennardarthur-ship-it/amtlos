@@ -1417,8 +1417,10 @@ eintraege:
   en: At least 20 people are constantly involved in automated data processing.
 - de: Mindestens einmal im Jahr wiederholst du die Unterweisung.
   en: You repeat the safety briefing at least once a year.
-- de: Mindestens einzuzahlender Anteil des Stammkapitals (GmbH)
-  en: Minimum portion of share capital to be paid in (GmbH)
+- de: Mindestens einzuzahlender Anteil des Nennbetrags je Geschäftsanteil (GmbH, Geldeinlage)
+  en: Minimum share of the nominal amount to be paid in per share (GmbH, cash contribution)
+- de: "Mindestens einzuzahlender Gesamtbetrag vor der Anmeldung (GmbH: Geldeinlagen und Nennbeträge der Sacheinlagen)"
+  en: "Minimum total to be paid in before registration (GmbH: cash contributions plus nominal amounts of contributions in kind)"
 - de: Mindestlohn zahlen
   en: Pay the minimum wage
 - de: Mindeststammkapital der GmbH

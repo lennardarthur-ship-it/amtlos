@@ -94,18 +94,17 @@ describe("E-201: Rückmeldungen Rechtsanwalt und Steuerberater im Katalog", () =
     expect(ksk.rechtsgrundlage).toContain("§ 29 KSVG");
     expect(pruefVermerk(ksk.version, ksk.pruefung, AM)).toMatch(/^Inhalt fachlich geprüft von einem Rechtsanwalt, Stand 26\.10\.2026\./);
     const lstb = p("personal.lohnsteuerbescheinigung");
-    // E-206: v2 (Auslöser ohne Anmeldezeitraum) – die Freigabe von v1 gilt nicht mehr, bis der Steuerberater v2 bestätigt (PRUEFLISTE T-237)
+    // E-206: v2 (Auslöser ohne Anmeldezeitraum) – die Freigabe von v1 galt nicht mehr, bis der Steuerberater v2 bestätigt (PRUEFLISTE T-237);
+    // E-213: v2 am 26.10.2026 bestätigt
     expect(lstb.version).toBe(2);
-    expect(pruefVermerk(lstb.version, lstb.pruefung, AM)).toBeNull();
+    expect(pruefVermerk(lstb.version, lstb.pruefung, AM)).toMatch(/^Fachlich durchgesehen von einem Steuerberater \(Stand 26\.10\.2026\)/);
   });
   it("alle 228 Einträge freigegeben, keine offenen Punkte mehr – außer den drei von E-206 geänderten (Nachprüfung PRUEFLISTE T-236, T-237)", () => {
     expect(pflichten.length).toBe(228);
     const E206 = ["personal.lohnsteuer_anmeldung", "personal.lohnsteuerbescheinigung", "steuern.ust_voranmeldung"];
     for (const x of pflichten) {
-      if (E206.includes(x.id)) {
-        expect(pruefVermerk(x.version, x.pruefung, AM), x.id).toBeNull();
-        continue;
-      }
+      // E-213: die drei von E-206 geänderten Einträge sind seit dem 26.10.2026 erneut bestätigt
+      if (E206.includes(x.id)) expect(x.pruefung?.bestaetigt_am, x.id).toBe("2026-10-26");
       expect(pruefVermerk(x.version, x.pruefung, AM), x.id).not.toBeNull();
       expect(x.pruefung?.offen ?? [], x.id).toEqual([]);
     }
@@ -134,10 +133,10 @@ describe("E-201: Fachkraft für Arbeitssicherheit – Vorlagen", () => {
       expect(pruefHinweisFuer(vorlageFuer(id)!, {}, cafe), id).toMatch(/von einer Fachkraft für Arbeitssicherheit.*\(Stand 26\.10\.2026\)/);
     }
     expect(Object.keys(VORLAGEN_GEPRUEFT).filter((id) => freigabenFuer(id).some((f) => f.vermerk_ausgesetzt))).toEqual([]);
-    // ein Café sieht den Vermerk auf 41 von 43 Vorlagen (nicht Handelsregister, das nur für GmbH, OHG, KG bestätigt ist;
-    // E-208: nicht die Rechnung, bis der Steuerberater die geänderte Fassung bestätigt – PRUEFLISTE T-245)
+    // ein Café sieht den Vermerk auf 42 von 43 Vorlagen (nicht Handelsregister, das nur für GmbH, OHG, KG bestätigt ist;
+    // E-208: die Rechnung fehlte, bis der Steuerberater die geänderte Fassung bestätigte – seit E-213 wieder 42)
     expect(VORLAGEN.length).toBe(43);
-    expect(VORLAGEN.filter((v) => pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}, cafe) !== PRUEFHINWEIS).length).toBe(41);
+    expect(VORLAGEN.filter((v) => pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}, cafe) !== PRUEFHINWEIS).length).toBe(42);
   });
   it("Einschränkung nur bei Prüfprotokoll, Gefährdungsbeurteilung und Betriebsanweisung Biostoffe", () => {
     expect(VORLAGEN_GEPRUEFT.pruefprotokoll_elektro!.einschraenkung).toBe("ohne die elektrotechnischen Grenzwerte");

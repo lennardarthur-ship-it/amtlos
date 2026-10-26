@@ -19,15 +19,18 @@ const AM = new Date(2026, 10, 1);
 const HEUTE = "2026-11-01";
 type P = { id: string; version: number; status_recht?: string; pruefung?: PruefungRoh };
 const pflichten = KATALOG.pflichten as unknown as P[];
-const regelwerte = (KATALOG as unknown as { regelwerte: RegelwertRoh[] }).regelwerte;
+const imKatalog = (KATALOG as unknown as { regelwerte: RegelwertRoh[] }).regelwerte;
+// E-213: Seit dem 26.10.2026 sind alle Regelwerte bestätigt – die Mechanik prüfen wir am Stand vor der Bestätigung
+const regelwerte = imKatalog.map((r) => ({ ...r, pruefung: { status: "entwurf", geprueft_von: null, geprueft_am: null } }));
 const pflicht = (id: string) => pflichten.find((p) => p.id === id)!;
 const freigabe = (version: number): PruefungRoh => ({ status: "freigegeben", geprueft_von: ["steuern"], geprueft_am: "2026-11-02", geprueft_version: version, bestaetigt_am: "2026-11-02" });
 const alleBestaetigt = regelwerte.map((r) => ({ ...r, pruefung: freigabe(r.version) }));
 
 describe("E-211 Inventar: Regelwerte im Bündel und ihre Verwendung", () => {
-  it("36 Regelwert-Versionen im Bündel, mit Prüfstand; keine ist bisher bestätigt", () => {
-    expect(regelwerte).toHaveLength(36);
-    for (const r of regelwerte) expect(r.pruefung, r.id).toBeTruthy();
+  it("37 Regelwert-Versionen im Bündel, mit Prüfstand; seit E-213 alle bestätigt (vorher keine)", () => {
+    expect(imKatalog).toHaveLength(37);
+    for (const r of imKatalog) expect(r.pruefung, r.id).toBeTruthy();
+    expect(imKatalog.filter(regelwertBestaetigt)).toHaveLength(37);
     expect(regelwerte.filter(regelwertBestaetigt)).toHaveLength(0);
   });
 
@@ -113,7 +116,8 @@ describe("E-211 Summen: „fachlich geprüft“ erst mit bestätigten Regelwerte
 });
 
 describe("E-211 Startblocker in store-check", () => {
-  it("meldet die von Pflichten verwendeten, nicht bestätigten Regelwerte mit ID", () => {
+  // E-213: alle Regelwerte bestätigt – der Startblocker ist erfüllt
+  it("Startblocker Regelwerte erfüllt (E-213); vorher mit ID gemeldet", () => {
     let aus = "";
     try {
       aus = execFileSync("node", [path.join(WURZEL, "apps/mobile/werkzeuge/store-check.mjs"), "--ios"], { cwd: path.join(WURZEL, "apps/mobile"), encoding: "utf8" });
@@ -121,9 +125,7 @@ describe("E-211 Startblocker in store-check", () => {
       aus = String((e as { stdout?: string }).stdout ?? "");
     }
     const zeile = aus.split("\n").find((z) => z.includes("Regelwerte"))!;
-    expect(zeile).toMatch(/^ {2}✗ Startblocker Regelwerte: /);
-    expect(zeile).toContain("18 von Pflichten verwendete Regelwert-Versionen noch nicht fachlich bestätigt");
-    expect(zeile).toContain("steuern.ustg19.grenze_vorjahr@1");
-    expect(zeile).toContain("online.vsbg.schwelle_beschaeftigte@1");
+    expect(zeile).toMatch(/^ {2}✓ Startblocker Regelwerte: /);
+    expect(zeile).not.toContain("noch nicht fachlich bestätigt");
   }, 60_000);
 });

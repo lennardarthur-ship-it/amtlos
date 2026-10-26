@@ -70,7 +70,8 @@ export async function importiereKatalog(db: Datenbank, katalogDir: string): Prom
         `insert into katalog.regelwert_version (regelwert_id, version, wert, gueltig_ab, gueltig_bis, status_recht, daten, erstellt_von)
          values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`,
         [rw.id, rw.version],
-        [rw.id, rw.version, rw.wert, rw.gueltig_ab, rw.gueltig_bis ?? null, rw.status_recht, rw, SYSTEMKONTO_KATALOG],
+        // E-213: gueltig_ab null (ohne Stichtag) – in der Datenbank „not null“, daher '-infinity'
+        [rw.id, rw.version, rw.wert, rw.gueltig_ab ?? "-infinity", rw.gueltig_bis ?? null, rw.status_recht, rw, SYSTEMKONTO_KATALOG],
         rw,
         `Regelwert ${rw.id}@${rw.version}`,
       );

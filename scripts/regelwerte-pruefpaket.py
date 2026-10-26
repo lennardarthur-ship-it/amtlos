@@ -51,7 +51,7 @@ def zeilen_je_rolle():
             verwendet.append(rw.CODE_VERWENDUNG[d["id"]])
         je[rw.rolle(d["id"])].append({
             "katalog_nr": d.get("katalog_nr", ""), "id": d["id"], "version": d["version"], "bezeichnung": rw.de(d.get("bezeichnung")),
-            "wert": rw.wert_text(d["wert"], d.get("einheit", "")), "ab": datum(d.get("gueltig_ab")), "bis": datum(d.get("gueltig_bis")) or "offen",
+            "wert": rw.wert_text(d["wert"], d.get("einheit", "")), "ab": datum(d.get("gueltig_ab")) or "ohne Stichtag", "bis": datum(d.get("gueltig_bis")) or "offen",
             "rechtsstand": RECHTSSTAND.get(d.get("status_recht"), d.get("status_recht", "")), "recht": ", ".join(d.get("rechtsgrundlage") or []),
             "quelle": "\n".join(f"{q.get('titel', '')}: {q.get('url', '')}" for q in d.get("quellen") or []),
             "offen": "\n".join(f"• {x}" for x in d.get("fachlich_zu_pruefen") or []),

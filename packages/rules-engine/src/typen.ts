@@ -105,7 +105,8 @@ export interface RegelwertVersion {
   id: string;
   version: number;
   wert: number;
-  gueltig_ab: Datum;
+  /** null = ohne Stichtag (E-213): gilt ohne bekannten Anfang */
+  gueltig_ab: Datum | null;
   gueltig_bis?: Datum | null;
   [weitere: string]: unknown;
 }

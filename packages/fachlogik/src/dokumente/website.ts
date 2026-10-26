@@ -264,12 +264,14 @@ function impressumTeile(d: Daten, b: Betrieb): { titel: string; text: string }[]
   const rf = rechtsformImp(d, b);
   const wer = text(d, "vertreten") || (b.vertretung ?? "").trim() || b.verantwortlich.trim();
   const coKg = istCoKg({ rechtsform: rf, name: b.name });
-  // Stammkapital als eigener Teil nach dem Registereintrag (nicht unter „Vertreten durch“)
-  const kapital = text(d, "kapital") && /GmbH|UG/.test(rf) ? { titel: "Stammkapital", text: `${text(d, "kapital")}${text(d, "ausstehend") ? `\nAusstehende Einlagen: ${text(d, "ausstehend")}` : ""}` } : null;
+  // Stammkapital als eigener Teil nach dem Registereintrag (nicht unter „Vertreten durch“); E-213 (Rechtsanwalt): nicht bei
+  // der GmbH & Co. KG bzw. UG (haftungsbeschränkt) & Co. KG – die KG hat kein Stammkapital
+  const kapital = !coKg && text(d, "kapital") && /GmbH|UG/.test(rf) ? { titel: "Stammkapital", text: `${text(d, "kapital")}${text(d, "ausstehend") ? `\nAusstehende Einlagen: ${text(d, "ausstehend")}` : ""}` } : null;
   const t: { titel: string; text: string }[] = [
     // E-210: Rechtsform nur anhängen, wenn der Name noch keinen Zusatz nennt („Muster UG“ + „UG (haftungsbeschränkt)“)
     { titel: "Angaben gemäß § 5 DDG", text: [firmaMitRechtsform(b.name, rf), b.strasse, [b.plz, b.ort].filter(Boolean).join(" "), ...(rf !== "Einzelunternehmen" ? [`Rechtsform: ${rf}`] : [])].filter((x) => x.trim()).join("\n") || FEHLT },
-    { titel: IMP_VERTRETUNG[rf] ?? (istKapitalgesellschaft(rf) ? "Vertretungsberechtigte Geschäftsführung" : "Vertreten durch"), text: coKg ? coKgVertretung(wer, b) : wer || FEHLT },
+    // E-213 (Rechtsanwalt): bei beiden Co.-KG-Formen einheitlich „Vertreten durch“ (die UG & Co. KG zeigte „Vertretungsberechtigte Geschäftsführung“)
+    { titel: coKg ? "Vertreten durch" : IMP_VERTRETUNG[rf] ?? (istKapitalgesellschaft(rf) ? "Vertretungsberechtigte Geschäftsführung" : "Vertreten durch"), text: coKg ? coKgVertretung(wer, b) : wer || FEHLT },
     { titel: "Kontakt", text: [b.telefon ? `Telefon: ${b.telefon}` : "", `E-Mail: ${b.email.trim() || FEHLT}`].filter(Boolean).join("\n") },
   ];
   const gericht = text(d, "register_gericht") || (b.registergericht ?? "").trim();
@@ -349,7 +351,7 @@ export const impressum: Vorlage = {
     if (!b.email.trim()) f.push("E-Mail (Mein Betrieb)");
     if (!b.telefon.trim()) f.push("Telefon (Mein Betrieb) – neben der E-Mail ist ein zweiter direkter Kontaktweg nötig");
     // Kapital nur mit ausstehenden Einlagen (§ 35a Abs. 1 S. 2 GmbHG analog) – sonst lieber weglassen (R10)
-    if (text(d, "kapital") && /GmbH|UG/.test(rechtsformImp(d, b)) && !text(d, "ausstehend")) f.push("Ausstehende Einlagen (bei voller Einzahlung „keine“) – oder das Stammkapital weglassen");
+    if (text(d, "kapital") && /GmbH|UG/.test(rechtsformImp(d, b)) && !istCoKg({ rechtsform: rechtsformImp(d, b), name: b.name }) && !text(d, "ausstehend")) f.push("Ausstehende Einlagen (bei voller Einzahlung „keine“) – oder das Stammkapital weglassen");
     // Hinweis: Name mit Rechtsform-Zusatz, der nicht zur gewählten Rechtsform passt („Salon Sonne GmbH“ als Einzelunternehmen)
     const imNamen = formImNamen(b.name);
     const rf = rechtsformImp(d, b);

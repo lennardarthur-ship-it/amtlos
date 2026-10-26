@@ -256,7 +256,7 @@ export async function neueRegelwertversion(db: Datenbank, autor: StudioKonto, da
     const id = String(daten.id ?? "");
     const max = await tx.eine<{ v: number | null }>("select max(version) as v from katalog.regelwert_version where regelwert_id = $1", [id]);
     const version = (max?.v ?? 0) + 1;
-    const rw = { ...daten, schema_version: 1, version } as unknown as Record<string, unknown> & { einheit: string; bezeichnung: unknown; wert: number; gueltig_ab: string; gueltig_bis?: string | null; status_recht: string; quellen?: unknown };
+    const rw = { ...daten, schema_version: 1, version } as unknown as Record<string, unknown> & { einheit: string; bezeichnung: unknown; wert: number; gueltig_ab: string | null; gueltig_bis?: string | null; status_recht: string; quellen?: unknown };
     delete rw.pruefung;
     const fehler = pruefeRegelwertObjekt(rw);
     if (fehler.length) throw new StudioFehler(fehler.join("\n"));
@@ -266,14 +266,14 @@ export async function neueRegelwertversion(db: Datenbank, autor: StudioKonto, da
     const r = await tx.eine<{ id: string }>(
       `insert into katalog.regelwert_version (regelwert_id, version, wert, gueltig_ab, gueltig_bis, status_recht, daten, pruef_status, erstellt_von)
        values ($1, $2, $3, $4, $5, $6, $7, 'in_pruefung', $8) returning id`,
-      [id, version, rw.wert, rw.gueltig_ab, rw.gueltig_bis ?? null, rw.status_recht, rw, autor.id],
+      [id, version, rw.wert, rw.gueltig_ab ?? "-infinity", rw.gueltig_bis ?? null, rw.status_recht, rw, autor.id],
     );
     await quellenVerknuepfen(tx, "regelwert_version", r!.id, (rw.quellen as { titel: string; url: string; abgerufen?: string | null; fundstelle?: string }[]) ?? []);
     await tx.abfrage(
       `update katalog.regelwert_version set pruef_status = 'zurueckgezogen'
         where regelwert_id = $1 and version < $2 and pruef_status in ('entwurf', 'in_pruefung')
           and daterange(gueltig_ab, gueltig_bis, '[]') && daterange($3::date, $4::date, '[]')`,
-      [id, version, rw.gueltig_ab, rw.gueltig_bis ?? null],
+      [id, version, rw.gueltig_ab ?? "-infinity", rw.gueltig_bis ?? null],
     );
     return { id: r!.id, version };
   });

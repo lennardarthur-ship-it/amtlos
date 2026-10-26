@@ -151,6 +151,8 @@ export function regelwertText(wert: number, einheit: string): string {
     case "jahre": return zeit("Jahr", "Jahre");
     case "monate": return zeit("Monat", "Monate");
     case "tage": return zeit("Tag", "Tage");
+    // E-213 (Steuerberater): Jahreszahl ohne Tausenderpunkt („2027“, nicht „2.027“)
+    case "kalenderjahr": return String(wert);
     default: return z;
   }
 }

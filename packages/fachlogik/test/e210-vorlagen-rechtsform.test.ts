@@ -36,9 +36,9 @@ describe("a) Impressum der GmbH & Co. KG: vertreten durch die Komplementärin, d
     expect(imp.alsText!({}, ohne)).toContain("die persönlich haftende Gesellschafterin [bitte ergänzen], diese vertreten durch ihre Geschäftsführer Alex Muster, Kim Beispiel");
     expect(fehlendeAngaben(imp, {}, ohne).join("\n")).toContain(KG_KOMPLEMENTAER);
   });
-  it("Prüfvermerk: entfällt nur für die Co.-KG-Varianten des Impressums (Rechtsanwalt muss die Passage bestätigen)", () => {
-    expect(pruefHinweisFuer(imp, {}, coKg)).toBe(PRUEFHINWEIS);
-    expect(pruefHinweisFuer(imp, {}, { ...coKg, name: "Muster UG (haftungsbeschränkt) & Co. KG", rechtsform: "UG (haftungsbeschränkt) & Co. KG" })).toBe(PRUEFHINWEIS);
+  it("Prüfvermerk: entfiel nur für die Co.-KG-Varianten des Impressums – seit E-213 vom Rechtsanwalt bestätigt (Stand 26.10.2026)", () => {
+    expect(pruefHinweisFuer(imp, {}, coKg)).toBe("Vorlage fachlich durchgesehen von einem Rechtsanwalt (Stand 26.10.2026)");
+    expect(pruefHinweisFuer(imp, {}, { ...coKg, name: "Muster UG (haftungsbeschränkt) & Co. KG", rechtsform: "UG (haftungsbeschränkt) & Co. KG" })).toBe("Vorlage fachlich durchgesehen von einem Rechtsanwalt (Stand 26.10.2026)");
     for (const rf of ["GmbH", "UG (haftungsbeschränkt)", "KG", "OHG", "e. K.", "Einzelunternehmen"]) expect(pruefHinweisFuer(imp, {}, { ...basis, name: `Muster ${rf}`, rechtsform: rf }), rf).not.toBe(PRUEFHINWEIS);
   });
   it("andere Rechtsformen unverändert", () => {

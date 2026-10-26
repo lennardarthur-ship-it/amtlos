@@ -3,7 +3,9 @@
 # blatt oder bericht; datum = Tag der Bestätigung; rolle; umfang in unseren Worten; aufbewahrung: beim Gründer) und je
 # Regelwert die bestätigte Version mit stand und quelle. Keine Namen, keine Zitate, kein Dateiverweis (E-198, E-199).
 # Eintragen: python3 docs/freigabe-katalog/regelwerte-uebernehmen.py (aus der zurückgeschickten Prüfliste), dann
-# python3 docs/freigabe-katalog/anwenden.py schreibt die pruefung-Zeilen. Bisher ist kein Regelwert bestätigt (T-86, T-259).
+# python3 docs/freigabe-katalog/anwenden.py schreibt die pruefung-Zeilen. E-213: alle 37 Regelwert-Versionen bestätigt (Mails vom
+# 26.10.2026 zu den Prüflisten Steuerberater, Rechtsanwalt, Fachkraft für Arbeitssicherheit; korrigierte Fassungen laut Anmerkung
+# mit --korrekturen, je Gruppe ein Block mit genauem Umfang).
 #
 # Beispiel (Form, kein Eintrag):
 # - pruefer: steuern
@@ -11,4 +13,349 @@
 #   nachweis: { art: mail, datum: 'JJJJ-MM-TT', rolle: steuern, umfang: Regelwerte laut Prüfliste mit Ergebnis „richtig“, aufbewahrung: beim Gründer }
 #   eintraege:
 #     steuern.ustg19.grenze_vorjahr: { version: 1, stand: 'JJJJ-MM-TT', quelle: ausgefüllte Prüfliste Regelwerte (beim Gründer) }
-[]
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 1 und 2: Minijob-Grenze 603 € (2026) und 633 € (ab 01.01.2027) wie vorgelegt bestätigt – Vergleich ≤ (Minijob, solange das regelmäßige Entgelt die Grenze nicht übersteigt), gültig ab/bis wie vorgelegt"
+    aufbewahrung: beim Gründer
+  eintraege:
+    personal.minijob.grenze_monat:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 1 und 2: Minijob-Grenze 603 € (2026) und 633 € (ab 01.01.2027) wie vorgelegt bestätigt – Vergleich ≤ (Minijob, solange das regelmäßige Entgelt die Grenze nicht übersteigt), gültig ab/bis wie vorgelegt"
+    aufbewahrung: beim Gründer
+  eintraege:
+    personal.minijob.grenze_monat:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 3: Befreiung von der Voranmeldung bis 2.000 € Vorjahressteuer – Wert, Vergleich ≤ (nicht mehr als), gültig ab 01.01.2025 laut Anmerkung (korrigierte Fassung v2)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    steuern.ust_va.grenze_befreiung:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: steuern.ust_va.grenze_befreiung v1)"
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 4: monatliche Voranmeldung bei mehr als 9.000 € Vorjahressteuer – Wert, Vergleich > (mehr als), gültig ab 01.01.2025 laut Anmerkung (korrigierte Fassung v2)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    steuern.ust_va.grenze_monatlich:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: steuern.ust_va.grenze_monatlich v1)"
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 5: erstes Jahr der monatlichen Voranmeldung für Neugründer 2027 wie vorgelegt bestätigt (§ 18 Abs. 2 Satz 6 UStG gilt 2021 bis 2026, keine Verlängerung bekannt, Stand 26.10.2026); Jahreszahl ohne Tausenderpunkt anzeigen"
+    aufbewahrung: beim Gründer
+  eintraege:
+    steuern.ust_va.neugruender_monatlich_ab:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 6 bis 8: Kleinunternehmergrenzen 25.000 € Vorjahr, 100.000 € laufendes Jahr, 25.000 € im Gründungsjahr – Werte, Vergleich ≤ (inklusive), gültig ab 01.01.2025 laut Anmerkung (korrigierte Fassungen v2)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    steuern.ustg19.grenze_vorjahr:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: steuern.ustg19.grenze_vorjahr v1)"
+    steuern.ustg19.grenze_laufendes_jahr:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: steuern.ustg19.grenze_laufendes_jahr v1)"
+    steuern.ustg19.grenze_gruendungsjahr:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: steuern.ustg19.grenze_gruendungsjahr v1)"
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 9 und 10: Buchführungspflicht nach § 141 AO bei mehr als 800.000 € Umsatz bzw. 80.000 € Gewinn – Werte, Vergleich > (mehr als), gültig ab 01.01.2024 laut Anmerkung (korrigierte Fassungen v2); Pflicht erst nach Mitteilung des Finanzamts, nicht für Freiberufler"
+    aufbewahrung: beim Gründer
+  eintraege:
+    steuern.ao141.grenze_umsatz:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: steuern.ao141.grenze_umsatz v1)"
+    steuern.ao141.grenze_gewinn:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: steuern.ao141.grenze_gewinn v1)"
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 11 und 12: Befreiung nach § 241a HGB bei höchstens 800.000 € Umsatzerlösen und 80.000 € Jahresüberschuss – Werte, Vergleich ≤ (inklusive), gültig ab 01.01.2024 laut Anmerkung (korrigierte Fassungen v2); nur für Einzelkaufleute (e. K.)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    steuern.hgb241a.grenze_umsatz:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: steuern.hgb241a.grenze_umsatz v1)"
+    steuern.hgb241a.grenze_gewinn:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: steuern.hgb241a.grenze_gewinn v1)"
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 13: E-Rechnung-Übergang 2027 bis 800.000 € Vorjahresumsatz wie vorgelegt bestätigt – Vergleich ≤ (Papier- oder sonstige Rechnung zulässig bei nicht mehr als 800.000 €), gültig 01.01.2026 bis 31.12.2027 wie vorgelegt"
+    aufbewahrung: beim Gründer
+  eintraege:
+    steuern.e_rechnung.grenze_vorjahresumsatz_2027:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 14: Aufbewahrung von Buchungsbelegen 8 Jahre – Wert, gültig ab 01.01.2025 und Fristbeginn laut Anmerkung (korrigierte Fassung v2)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    steuern.aufbewahrung.belege_jahre:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: steuern.aufbewahrung.belege_jahre v1)"
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: "Prüfliste Regelwerte Nr. 15 bis 18: Aufbewahrung 10 und 6 Jahre, Umsatzsteuersätze 19 % und 7 % – Werte wie vorgelegt bestätigt; zur Gültigkeit kein Datum erbeten (gültig ab bleibt 01.01.2026, Anmerkungen ohne Änderung des Werts)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    steuern.aufbewahrung.buecher_jahre:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+    steuern.aufbewahrung.geschaeftsbriefe_jahre:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+    steuern.ust.satz_regel:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+    steuern.ust.satz_ermaessigt:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: "Prüfliste Regelwerte Nr. 1 bis 4: Verjährung der Mängelansprüche 2/5/2 Jahre und Beweislastumkehr 1 Jahr – Werte und gültig ab wie vorgelegt bestätigt (01.01.2002 bzw. 01.01.2022)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    branche.gewaehrleistung.werk_jahre:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+    branche.gewaehrleistung.bauwerk_jahre:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+    branche.gewaehrleistung.kauf_jahre:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+    branche.gewaehrleistung.beweislastumkehr_jahre:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: "Prüfliste Regelwerte Nr. 5: Datenschutzbeauftragter ab 20 Personen – Wert, Vergleich ≥ (in der Regel mindestens 20), gültig ab 26.11.2019 laut Anmerkung (korrigierte Fassung v2); gültig bis offen (geplante Streichung)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    datenschutz.dsb.schwelle_personen:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: datenschutz.dsb.schwelle_personen v1)"
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: "Prüfliste Regelwerte Nr. 6, 8 und 9: Mindeststammkapital GmbH 25.000 € (gültig ab 01.01.2002), UG 1 € und Rücklage der UG 25 % (gültig ab 01.11.2008) – Werte wie vorgelegt, gültig ab laut Anmerkung (korrigierte Fassungen v2)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    gesellschaft.gmbh.stammkapital_mindest:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: gesellschaft.gmbh.stammkapital_mindest v1)"
+    gesellschaft.ug.stammkapital_mindest:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: gesellschaft.ug.stammkapital_mindest v1)"
+    gesellschaft.ug.ruecklage_anteil:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: gesellschaft.ug.ruecklage_anteil v1)"
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: "Prüfliste Regelwerte Nr. 7 (Ergebnis falsch, in der korrigierten Form ohne erneute Vorlage bestätigt): statt 50 % des Stammkapitals zwei Werte – je Geschäftsanteil ein Viertel des Nennbetrags (25 %, v2) und insgesamt mindestens 12.500 € (neu), § 7 Abs. 2 GmbHG, gültig ab 01.11.2008"
+    aufbewahrung: beim Gründer
+  eintraege:
+    gesellschaft.gmbh.mindesteinzahlung_anteil:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: gesellschaft.gmbh.mindesteinzahlung_anteil v1)"
+    gesellschaft.gmbh.mindesteinzahlung_gesamt:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: gesellschaft.gmbh.mindesteinzahlung_anteil v1)"
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: "Prüfliste Regelwerte Nr. 10: Hinweispflicht nach § 36 VSBG bei mehr als 10 Beschäftigten – Wert, Vergleich > 10 (Stichtag 31.12. des Vorjahres), gültig ab 01.02.2017 laut Anmerkung (korrigierte Fassung v2)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    online.vsbg.schwelle_beschaeftigte:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: online.vsbg.schwelle_beschaeftigte v1)"
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: "Prüfliste Regelwerte Nr. 11 und 12: BFSG-Kleinstunternehmen – ab 10 Beschäftigten (Vergleich ≥ 10) bzw. bis 2.000.000 € Jahresumsatz (Vergleich ≤) wie vorgelegt bestätigt, gültig ab 28.06.2025 wie vorgelegt"
+    aufbewahrung: beim Gründer
+  eintraege:
+    online.bfsg.kleinst_beschaeftigte:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+    online.bfsg.kleinst_umsatz:
+      version: 1
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer)"
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: "Prüfliste Regelwerte Nr. 13 und 14: Mindestlohn 13,90 € (2026) und 14,60 € (ab 01.01.2027) – Werte und Gültigkeit wie vorgelegt, Rechtsgrundlage Fünfte Mindestlohnanpassungsverordnung vom 5.11.2025 (BGBl. 2025 I Nr. 268) laut Anmerkung (korrigierte Fassungen v3 und v4)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    personal.mindestlohn.stunde:
+      version: 3
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: personal.mindestlohn.stunde v1)"
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: "Prüfliste Regelwerte Nr. 13 und 14: Mindestlohn 13,90 € (2026) und 14,60 € (ab 01.01.2027) – Werte und Gültigkeit wie vorgelegt, Rechtsgrundlage Fünfte Mindestlohnanpassungsverordnung vom 5.11.2025 (BGBl. 2025 I Nr. 268) laut Anmerkung (korrigierte Fassungen v3 und v4)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    personal.mindestlohn.stunde:
+      version: 4
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: personal.mindestlohn.stunde v2)"
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: "Prüfliste Regelwerte Nr. 15 und 16: Schwerbehinderten-Quote ab 20 Arbeitsplätzen (gültig ab 01.01.2018) und interne Meldestelle ab 50 Beschäftigten (gültig ab 17.12.2023) – Werte, Vergleich ≥, gültig ab laut Anmerkung (korrigierte Fassungen v2)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    personal.schwerbehinderte.schwelle_arbeitsplaetze:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: personal.schwerbehinderte.schwelle_arbeitsplaetze v1)"
+    personal.hinschg.schwelle:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: personal.hinschg.schwelle v1)"
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: "Prüfliste Regelwerte Nr. 17 (Ergebnis falsch, in der korrigierten Form ohne erneute Vorlage bestätigt): Berichtspflicht Entgelttransparenz ab 150 Beschäftigten – Vergleich ≥ 150 (Art. 9 RL (EU) 2023/970), gültig ab offen (kein deutsches Umsetzungsgesetz), Rechtsstand geplant (korrigierte Fassung v2)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    personal.entgelttransparenz.berichtspflicht_schwelle:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: personal.entgelttransparenz.berichtspflicht_schwelle v1)"
+- pruefer: arbeitsschutz
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: arbeitsschutz
+    umfang: "Prüfliste Regelwerte Nr. 1: Ersthelfer ab 2 anwesenden Versicherten (§ 26 Abs. 1 Satz 1 Nr. 1 DGUV Vorschrift 1) – Wert, Vergleich ≥ 2, gezählt die anwesenden Versicherten; gültig ab ohne Stichtag laut Anmerkung (korrigierte Fassung v2)"
+    aufbewahrung: beim Gründer
+  eintraege:
+    arbeitsschutz.ersthelfer.schwelle_versicherte:
+      version: 2
+      stand: '2026-10-26'
+      quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: arbeitsschutz.ersthelfer.schwelle_versicherte v1)"
