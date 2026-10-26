@@ -74,8 +74,112 @@ export function istGanzGeprueft(version: number, pruefung: PruefungRoh | undefin
   return istGeprueft(version, pruefung) && !pruefung!.einschraenkung && !(pruefung!.offen ?? []).length;
 }
 
-/** Vermerk für die Pflicht-Details, oder null, wenn der Eintrag (in dieser Version) nicht geprüft ist. */
-export function pruefVermerk(version: number, pruefung: PruefungRoh | undefined | null, heute: Date = new Date()): string | null {
+/**
+ * E-211: Regelwert-Version aus catalog/regelwerte (Schwelle, Betrag, Satz) mit eigenem Prüfstand – gleiche Werte und gleiche
+ * Bedeutung wie bei Pflichten (`pruefung.status` „freigegeben“, `geprueft_version` = `version`, schriftlich bestätigt;
+ * Register docs/freigabe-katalog/freigaben-regelwerte.yaml, anwenden.py).
+ */
+export interface RegelwertRoh {
+  id: string;
+  version: number;
+  bezeichnung?: { de?: string } | string;
+  einheit?: string;
+  wert?: unknown;
+  gueltig_ab?: string;
+  gueltig_bis?: string | null;
+  pruefung?: PruefungRoh | null;
+}
+
+/** Nicht bestätigter Regelwert, auf den eine Pflicht verweist – so steht er im Vermerk. */
+export interface OffenerRegelwert {
+  id: string;
+  version: number;
+  bezeichnung: string;
+  einheit: string;
+  wert: number;
+  /** gilt erst ab diesem Tag (ISO), sonst null */
+  ab: string | null;
+}
+
+/** Ist die Regelwert-Version fachlich geprüft und schriftlich bestätigt (wie `istGeprueft` bei Pflichten)? */
+export const regelwertBestaetigt = (r: RegelwertRoh): boolean => istGeprueft(r.version, r.pruefung);
+
+/** IDs der Regelwerte, auf die eine Pflicht verweist (`{ regelwert: id }` in Auslöser, Frist usw.), in Reihenfolge, ohne Doppelungen. */
+export function regelwertVerweise(pflicht: unknown): string[] {
+  const ids: string[] = [];
+  const geh = (o: unknown) => {
+    if (Array.isArray(o)) o.forEach(geh);
+    else if (o && typeof o === "object") {
+      const r = (o as { regelwert?: unknown }).regelwert;
+      if (typeof r === "string" && !ids.includes(r)) ids.push(r);
+      Object.values(o).forEach(geh);
+    }
+  };
+  geh(pflicht);
+  return ids;
+}
+
+/**
+ * Regelwerte einer Pflicht, die heute oder künftig gelten (nicht ausgelaufen) und nicht bestätigt sind. `heute` als ISO-Tag.
+ * Leer, sobald alle bestätigt sind – dann zeigt die Pflicht wieder den vollen Vermerk.
+ */
+export function offeneRegelwerte(pflicht: unknown, regelwerte: readonly RegelwertRoh[] | undefined, heute: string): OffenerRegelwert[] {
+  const offen: OffenerRegelwert[] = [];
+  for (const id of regelwertVerweise(pflicht))
+    for (const r of (regelwerte ?? []).filter((x) => x.id === id).sort((a, b) => a.version - b.version)) {
+      if (r.gueltig_bis && r.gueltig_bis < heute) continue;
+      if (regelwertBestaetigt(r) || typeof r.wert !== "number") continue;
+      const bez = typeof r.bezeichnung === "string" ? r.bezeichnung : (r.bezeichnung?.de ?? r.id);
+      offen.push({ id: r.id, version: r.version, bezeichnung: bez, einheit: r.einheit ?? "", wert: r.wert, ab: r.gueltig_ab && r.gueltig_ab > heute ? r.gueltig_ab : null });
+    }
+  return offen;
+}
+
+const tausender = (n: number) => {
+  const [ganz, rest] = (Math.round(n * 100) / 100).toString().split(".");
+  return ganz!.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + (rest ? `,${rest.padEnd(2, "0")}` : "");
+};
+/** Wert mit Einheit in Worten: 25.000 €, 13,90 € je Stunde, 603 € im Monat, 19 %, 8 Jahre, 20 (Anzahl). */
+export function regelwertText(wert: number, einheit: string): string {
+  const z = tausender(wert);
+  const zeit = (eins: string, viele: string) => `${z} ${wert === 1 ? eins : viele}`;
+  switch (einheit) {
+    case "EUR": return `${z} €`;
+    case "EUR_pro_stunde": return `${z} € je Stunde`;
+    case "EUR_pro_monat": return `${z} € im Monat`;
+    case "prozent": return `${z} %`;
+    case "jahre": return zeit("Jahr", "Jahre");
+    case "monate": return zeit("Monat", "Monate");
+    case "tage": return zeit("Tag", "Tage");
+    default: return z;
+  }
+}
+
+/** „Schwellenwert „…“ (25.000 €) noch nicht fachlich bestätigt.“ – mehrere Versionen eines Werts in einer Klammer. */
+export function offeneWerteSatz(offen: readonly OffenerRegelwert[]): string {
+  if (!offen.length) return "";
+  const je = new Map<string, OffenerRegelwert[]>();
+  for (const r of offen) je.set(r.id, [...(je.get(r.id) ?? []), r]);
+  const teile = [...je.values()].map((l) => `„${l[0]!.bezeichnung}“ (${l.map((r) => regelwertText(r.wert, r.einheit) + (r.ab ? ` ab ${datumDe(r.ab)}` : "")).join("; ")})`);
+  const schwelle = offen.every((r) => r.einheit === "EUR" || r.einheit === "anzahl");
+  const wort = schwelle ? (teile.length > 1 ? "Schwellenwerte" : "Schwellenwert") : teile.length > 1 ? "Werte" : "Wert";
+  const liste = teile.length > 1 ? `${teile.slice(0, -1).join(", ")} und ${teile[teile.length - 1]}` : teile[0];
+  return `${wort} ${liste} noch nicht fachlich bestätigt.`;
+}
+
+/**
+ * Vermerk für die Pflicht-Details, oder null, wenn der Eintrag (in dieser Version) nicht geprüft ist. E-211: `werte` sind
+ * die nicht bestätigten Regelwerte der Pflicht (`offeneRegelwerte`) – sie stehen als eigener Satz im Vermerk.
+ */
+export function pruefVermerk(version: number, pruefung: PruefungRoh | undefined | null, heute: Date = new Date(), werte: readonly OffenerRegelwert[] = []): string | null {
+  const v = pflichtVermerk(version, pruefung, heute);
+  if (!v || !werte.length) return v;
+  const satz = offeneWerteSatz(werte);
+  const i = v.indexOf(" Die Prüfung betrifft");
+  return i >= 0 ? `${v.slice(0, i)} ${satz}${v.slice(i)}` : `${v} ${satz}`;
+}
+
+function pflichtVermerk(version: number, pruefung: PruefungRoh | undefined | null, heute: Date): string | null {
   if (!istGeprueft(version, pruefung)) return null;
   const p = pruefung!;
   const stand = datumDe(p.geprueft_am!);
