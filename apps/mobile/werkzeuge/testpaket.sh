@@ -144,8 +144,8 @@ Arbeitssicherheit, Lebensmittelfachbeauftragter). Die App zeigt einen Prüfverme
 des Prüfers genau diese Fassung abdeckt (Stand 25.10.2026: 226 der 228 Pflichten; zwei neue Einträge warten
 auf die Prüfung) – mit der Rolle, nie mit Namen, z. B. „Inhalt fachlich geprüft von einem Rechtsanwalt, Stand …“;
 Einschränkungen stehen dabei („ohne arbeitsmedizinische Angaben“), offene Punkte als „teilweise geprüft“.
-Alle 43 Vorlagen sind schriftlich bestätigt. Keinen Vermerk zeigen zurzeit die Bilanz (Hilfetext seit der Prüfung
-geändert), die Rechnung für GmbH & Co. KG / UG & Co. KG und beim Storno einer Schlussrechnung mit Abschlägen (seit der
+Alle 43 Vorlagen sind schriftlich bestätigt (per Mail; die Mails bewahrt der Anbieter auf). Keinen Vermerk zeigen
+zurzeit die Rechnung für GmbH & Co. KG / UG & Co. KG und beim Storno einer Schlussrechnung mit Abschlägen (seit der
 Prüfung geändert) sowie die Handelsregister-Vorlage außer für GmbH, OHG und KG (nur diese geprüft).
 Der Vermerk gilt je Variante (Rechtsform, Land, Rechnungsart): Jede Änderung hebt ihn für die betroffene Variante auf,
 bis erneut geprüft ist. Rechtsberatung im Einzelfall ist die App nicht.

@@ -1,7 +1,7 @@
 Alles auf einmal – 23.10.2026 (ersetzt den Ordner „Nachpruefung 23.10“, der nicht verschickt werden soll)
 
 Je Prüfer ein Ordner mit:
-- E-Mail.txt: Betreff und Text zum Kopieren
+- E-Mail.txt: Betreff und Text zum Kopieren (am 26.10.2026 aus dem Projekt entfernt, E-198 – keine Mails im Repository)
 - Betriebsklar-Paket-<Name>.zip: das hängst du an (enthält Teil A Nachprüfung und Teil B Vorlagen)
   Bei Lebensmittelfachbeauftragter statt ZIP die zwei Dateien aus „A Nachpruefung Katalog“ anhängen.
 

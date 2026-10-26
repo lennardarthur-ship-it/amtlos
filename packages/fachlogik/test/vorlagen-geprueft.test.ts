@@ -1,6 +1,6 @@
 /**
  * Vermerk unter den Vorlagen (zuerst Nachkontrolle Lebensmittelfachbeauftragter, 23.10.2026; E-196, E-197): nur bei
- * schriftlich bestätigter Freigabe (Mail oder schriftliche Antwort des Prüfers), solange die Teilsummen der gedruckten Ausprägungen, die die Unterlage betreffen (Rechtsform,
+ * schriftlich bestätigter Freigabe (Mail beim Gründer oder schriftlicher Bericht des Prüfers, E-198), solange die Teilsummen der gedruckten Ausprägungen, die die Unterlage betreffen (Rechtsform,
  * Land, Rechnungsart …), zum freigegebenen Stand passen; mit Rolle statt Namen, mit Einschränkung des Prüfers und
  * „teilweise“, wenn die Vorlage noch „fachlich zu prüfen“ enthält.
  */
@@ -8,7 +8,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LEERER_BETRIEB, PRUEFHINWEIS, PRUEFSTAENDE, PRUEF_ROLLEN, VERIFIZIERUNG, VORLAGEN, aktuellerPruefstand, pruefGruppenFuer, type Betrieb, dokumentHtml, freigabeBestaetigt, freigabenFuer, leereDaten, VORLAGEN_GEPRUEFT, geprueftVermerk, pruefHinweisFuer, sha256, vorlageFuer, vorlageGeprueft, vorlagenPruefstand, vorlagenPruefsumme, type Daten, type Vorlage, type VorlagenFreigabe } from "../src/index.js";
+import { LEERER_BETRIEB, PRUEFHINWEIS, PRUEFSTAENDE, PRUEF_ROLLEN, VERIFIZIERUNG, VORLAGEN, aktuellerPruefstand, pruefGruppenFuer, type Betrieb, dokumentHtml, freigabeBestaetigt, freigabenFuer, leereDaten, VORLAGEN_GEPRUEFT, geprueftVermerk, pruefHinweisFuer, sha256, vorlageFuer, vorlageGeprueft, vorlagenPruefstand, vorlagenPruefsumme, type Daten, type Vorlage, type VorlagenFreigabe, type VorlagenNachweis } from "../src/index.js";
 
 const WURZEL = path.resolve(__dirname, "../../..");
 const FUENF = ["haccp", "hygieneplan", "allergene", "ifsg_belehrung", "hygieneschulung"];
@@ -32,6 +32,8 @@ const STEUERN_23 = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldun
 const MIT_VERMERK: string[] = ALLE;
 const CAFE: Betrieb = { ...LEERER_BETRIEB, name: "Café Sonne", bundesland: "Berlin" };
 const CO_KG = ["rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"];
+/** Erfundener Nachweis für Test-Freigaben (E-198: Art, Datum, Rolle, Umfang) */
+const testNachweis = (datum: string, rolle: VorlagenNachweis["rolle"]): VorlagenNachweis => ({ art: "mail", datum, rolle, umfang: "Testfreigabe (nur im Test)", aufbewahrung: "beim Gründer" });
 const alleFreigaben = () => Object.keys(VORLAGEN_GEPRUEFT).flatMap((id) => freigabenFuer(id).map((f, i) => ({ id, f, schluessel: i ? `${id}#${i}` : id })));
 const datenFuer = (id: string, f: Omit<VorlagenFreigabe, "weitere">): Daten => ({ ...(f.fassung ? { [f.fassung.feld]: f.fassung.wert } : {}), ...(f.rechtsformen ? { rechtsform: f.rechtsformen[0]! } : {}), ...(id === "hygieneplan" && !f.fassung ? { art: "lebensmittel" } : {}) });
 
@@ -55,18 +57,24 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
   it("E-197: jede Freigabe schriftlich bestätigt – Nachweis liegt vor, der Stand liegt nie nach der Bestätigung", () => {
     for (const { schluessel, f } of alleFreigaben()) {
       expect(freigabeBestaetigt(f), schluessel).toBe(true);
-      expect(f.nachweis!, schluessel).toMatch(/^docs\/pruefberichte\//);
-      expect(fs.existsSync(path.join(WURZEL, f.nachweis!)), `${schluessel}: ${f.nachweis}`).toBe(true);
+      // E-198: Nachweis mit Art, Datum, Rolle und Umfang – die Mail selbst liegt beim Gründer, nicht im Repository
+      const n = f.nachweis!;
+      expect(["mail", "bericht"], schluessel).toContain(n.art);
+      expect(n.datum, schluessel).toBe(f.bestaetigt_am);
+      expect(n.rolle, schluessel).toBe(f.rolle);
+      expect(n.umfang.length, schluessel).toBeGreaterThan(20);
+      if (n.art === "mail") expect(n.aufbewahrung, schluessel).toBe("beim Gründer");
+      if (n.art === "bericht") expect(fs.existsSync(path.join(WURZEL, n.beleg!)), `${schluessel}: ${n.beleg}`).toBe(true);
       if (f.blatt) expect(fs.existsSync(path.join(WURZEL, f.blatt)), `${schluessel}: ${f.blatt}`).toBe(true);
-      expect(f.nachweis_text, schluessel).toBeTruthy();
+      expect(JSON.stringify(f), schluessel).not.toMatch(/mail[^"/]*\.txt|\.eml|nachweis_text/i);
       expect(f.stand <= f.bestaetigt_am!, schluessel).toBe(true);
       // keine Unterschriften mehr im Projekt (E-197)
       expect(JSON.stringify(f), schluessel).not.toMatch(/\.jpe?g"/);
     }
-    // Prüfsumme der bestätigten Fassung steht in der Mail selbst, wo die Mail sie nennt
+    // die bestätigte Prüfsumme steht im Nachweis, wo die Bestätigung sie nennt
     for (const id of ["handelsregister", "gefaehrdungsbeurteilung", "betriebsanweisung_biostoffe", "bilanz_guv"]) {
       const f = VORLAGEN_GEPRUEFT[id]!;
-      expect(fs.readFileSync(path.join(WURZEL, f.nachweis!), "utf8"), id).toContain(f.pruefsumme_alt!.slice(0, 12));
+      expect(f.nachweis!.umfang, id).toContain(f.pruefsumme_alt!.slice(0, 12));
     }
     expect(fs.readdirSync(path.join(WURZEL, "docs/pruefberichte")).filter((d) => /\.(jpe?g|png|heic)$/i.test(d))).toEqual([]);
   });
@@ -148,7 +156,7 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
     const g = vorlageFuer("gefaehrdungsbeurteilung")!;
     const f = VORLAGEN_GEPRUEFT.gefaehrdungsbeurteilung!;
     expect(PRUEFSTAENDE.gefaehrdungsbeurteilung!.offen).toBeGreaterThan(0);
-    const test: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, gefaehrdungsbeurteilung: { ...f, bestaetigt_am: "2026-10-25", nachweis: "test-mail.txt", pruefsumme: vorlagenPruefsumme({ ...g }, f), teilsummen: undefined } };
+    const test: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, gefaehrdungsbeurteilung: { ...f, bestaetigt_am: "2026-10-25", nachweis: testNachweis("2026-10-25", "arbeitsschutz"), pruefsumme: vorlagenPruefsumme({ ...g }, f), teilsummen: undefined } };
     const frei = vorlageGeprueft(g, {}, test)!;
     expect(frei).toBeDefined();
     expect(geprueftVermerk(frei.stand, frei, vorlagenPruefstand({ ...g }, f).offen)).toMatch(/^Vorlage teilweise fachlich durchgesehen von einer Fachkraft für Arbeitssicherheit \(ohne arbeitsmedizinische Angaben\)/);
@@ -214,7 +222,7 @@ describe("E-196: Prüfsumme über alle gedruckten Ausprägungen", () => {
 describe("E-196: Vermerk je Variantengruppe – eine Textänderung in einer Variante nimmt genau dieser den Vermerk", () => {
   const re = vorlageFuer("rechnung")!;
   const haccp = vorlageFuer("haccp")!;
-  const BESTAETIGT = { bestaetigt_am: "2026-10-23", nachweis: "test-mail.txt" };
+  const BESTAETIGT = { bestaetigt_am: "2026-10-23", nachweis: testNachweis("2026-10-23", "steuern") };
   const freigabeFuer = (v: Vorlage): Record<string, VorlagenFreigabe> => {
     const st = vorlagenPruefstand({ ...v }, {});
     return { ...VORLAGEN_GEPRUEFT, [v.id]: { stand: "2026-10-23", rolle: "steuern", bezug: "Test", ...BESTAETIGT, pruefsumme: st.summe, teilsummen: st.teile } };
@@ -290,9 +298,9 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
   const h = vorlageFuer("hygieneplan")!;
   const lm = VORLAGEN_GEPRUEFT.hygieneplan!;
   const BEAUTY = { fassung: { feld: "art", wert: "beauty" } };
-  const BESTAETIGT = { rolle: "recht" as const, bestaetigt_am: "2026-11-02", nachweis: "test-mail.txt" };
+  const BESTAETIGT = { rolle: "recht" as const, bestaetigt_am: "2026-11-02", nachweis: testNachweis("2026-11-02", "recht") };
   // erfundene, bestätigte Freigaben – nur im Test, nicht in geprueft.ts
-  const lmTest = { ...lm, ...BESTAETIGT, rolle: "hygiene" as const, bestaetigt_am: "2026-10-23", pruefsumme: vorlagenPruefsumme({ ...h }, lm), teilsummen: vorlagenPruefstand({ ...h }, lm).teile };
+  const lmTest = { ...lm, ...BESTAETIGT, rolle: "hygiene" as const, bestaetigt_am: "2026-10-23", nachweis: testNachweis("2026-10-23", "hygiene"), pruefsumme: vorlagenPruefsumme({ ...h }, lm), teilsummen: vorlagenPruefstand({ ...h }, lm).teile };
   const beautyFreigabe = { stand: "2026-11-02", bezug: "Test", pruefsumme: vorlagenPruefsumme(h, BEAUTY), ...BEAUTY, ...BESTAETIGT };
   const mitBeauty: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, hygieneplan: { ...lmTest, weitere: [beautyFreigabe] } };
 

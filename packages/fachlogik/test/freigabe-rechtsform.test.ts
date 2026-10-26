@@ -4,9 +4,9 @@ import { LEERER_BETRIEB, VORLAGEN_GEPRUEFT, vorlageFuer, vorlageGeprueft, vorlag
 
 describe("Freigabe auf Rechtsformen beschränkt", () => {
   const v = vorlageFuer("handelsregister")!;
-  // unterschriebene Test-Freigabe (E-196); die Prüfsumme rechnet nur mit Beispielbetrieben dieser Rechtsformen
+  // bestätigte Test-Freigabe (E-197, E-198); die Prüfsumme rechnet nur mit Beispielbetrieben dieser Rechtsformen
   const RF = ["GmbH", "OHG", "KG"];
-  const f: VorlagenFreigabe = { stand: "2026-10-25", rolle: "recht", bestaetigt_am: "2026-10-25", nachweis: "test-mail.txt", bezug: "Test", pruefsumme: vorlagenPruefsumme(v, { rechtsformen: RF }), rechtsformen: RF };
+  const f: VorlagenFreigabe = { stand: "2026-10-25", rolle: "recht", bestaetigt_am: "2026-10-25", nachweis: { art: "mail", datum: "2026-10-25", rolle: "recht", umfang: "Testfreigabe (nur im Test)", aufbewahrung: "beim Gründer" }, bezug: "Test", pruefsumme: vorlagenPruefsumme(v, { rechtsformen: RF }), rechtsformen: RF };
   const liste = { ...VORLAGEN_GEPRUEFT, handelsregister: f };
   it("Rechtsform aus der Unterlage oder aus „Mein Betrieb“", () => {
     expect(vorlageGeprueft(v, { rechtsform: "OHG" }, liste)?.stand).toBe("2026-10-25");

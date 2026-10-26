@@ -50,7 +50,7 @@ export { RECHTSFORMEN } from "./bausteine.js";
 export { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN, arbeitsminuten, arbeitszeitPruefung, monatAus, monatSchluessel, stunden } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent, fassungText, zahl } from "./html.js";
-export { PRUEF_ROLLEN, VORLAGEN_GEPRUEFT, freigabeBestaetigt, freigabenFuer, geprueftVermerk, sha256, type PruefRolle, type VorlagenFreigabe } from "./geprueft.js";
+export { PRUEF_ROLLEN, VORLAGEN_GEPRUEFT, freigabeBestaetigt, freigabenFuer, geprueftVermerk, sha256, type PruefRolle, type VorlagenFreigabe, type VorlagenNachweis } from "./geprueft.js";
 export { PRUEFSTAENDE } from "./pruefstaende.js";
 // StB-Prüfung Steuerberatungskanzlei (21.10.2026): Rechnungen, Voranmeldung, OSS und ZM
 export { GUTSCHRIFT_PRAEFIX, KUNDEN_ARTEN, NULLSATZ_HINWEIS as NULLSATZ_TEXT, RECHNUNG_EINHEIT_CODE, RECHNUNG_GUTSCHRIFT_NUMMER, RECHNUNG_LEITWEG_FEHLT, RECHNUNG_LEITWEG_FORMAT, RECHNUNG_NULLSATZ_GEMISCHT, RECHNUNG_OSS_LAND, RECHNUNG_OSS_SATZ, RECHNUNG_OSS_VORSCHLAG, RECHNUNG_SCHLUSS_HOCH, RECHNUNG_SCHLUSS_LEER, RECHNUNG_SCHLUSS_SATZ, SATZ_NULLSATZ, abschlaegeAus, euPrivatLand, istGutschriftNummer, leitwegFormatOk, mitGrundstueckHinweis, ossSatz, satzZahl, vollEuro } from "./buchhaltung.js";

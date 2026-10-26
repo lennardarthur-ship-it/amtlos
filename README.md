@@ -28,6 +28,8 @@ Das Bürokratie-Betriebssystem für Kleinunternehmer und Startups in Deutschland
 |---|---|
 | `ENTSCHEIDUNGEN.md` | alle Architektur- und Produktentscheidungen |
 | `PRUEFLISTE.md` | offene fachliche Prüfpunkte |
+| `docs/freigabe-katalog/`, `docs/freigabe-vorlagen/` | Freigabe-Register (`freigaben.yaml`, `geprueft.ts`), Prüfpakete je Rolle (nur Listen und PDFs) und Werkzeuge; `anwenden.py --pruefen` prüft die Nachweise |
+| `docs/pruefberichte/` | Berichte und vom Prüfer ausgefüllte Dateien – keine Mails: Bestätigungen per Mail bewahrt der Gründer auf, das Register nennt Art, Datum, Rolle und Umfang (E-198) |
 | `docs/01-architektur.md` … `docs/07-betrieb.md` | Architektur, Datenmodell, Regel-Schema, Seiten, Risiken, Design, Betrieb |
 | `docs/testberichte/` | Testberichte je Bauabschnitt |
 

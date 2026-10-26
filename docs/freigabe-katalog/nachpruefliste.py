@@ -1,9 +1,11 @@
 """
-Nachprüfliste je Rolle (E-196, E-197): was jede prüfende Person noch prüfen und per E-Mail bestätigen soll, als
-Excel-Datei und E-Mail-Entwurf. Kein Blatt zum Unterschreiben mehr (E-197): Eine Bestätigung per E-Mail genügt.
+Nachprüfliste je Rolle (E-196, E-197, E-198): was jede prüfende Person noch prüfen und per E-Mail bestätigen soll, als
+Excel-Datei; dazu ein E-Mail-Entwurf. Kein Blatt zum Unterschreiben mehr (E-197): Eine Bestätigung per E-Mail genügt.
+E-198: Kein E-Mail-Text im Repository – der Entwurf geht auf die Standardausgabe oder mit `--mail-ziel <ordner>` in einen
+Ordner außerhalb des Repositorys (ein Ordner im Repository wird abgelehnt). Im Versandordner liegen nur Listen und PDFs.
 
     pnpm --filter @amtlos/fachlogik build
-    python3 docs/freigabe-katalog/nachpruefliste.py docs/freigabe-katalog/versand-2026-10-25-nachpruefung
+    python3 docs/freigabe-katalog/nachpruefliste.py docs/freigabe-katalog/versand-2026-10-25-nachpruefung [--mail-ziel ~/Versand]
 
 Inhalt je Rolle (recht, steuern, arbeitsschutz, hygiene):
   - Katalogeinträge, deren Freigabe ohne schriftliche Bestätigung im Register steht (`nachweis.art` ersetzt/offen) – mit
@@ -28,7 +30,13 @@ HIER = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HIER, "../.."))
 sys.path.insert(0, HIER)
 sys.dont_write_bytecode = True
-sys.argv = [sys.argv[0]] + [a for a in sys.argv[1:]]
+MAIL_ZIEL = None
+if "--mail-ziel" in sys.argv:
+    _i = sys.argv.index("--mail-ziel")
+    MAIL_ZIEL = os.path.abspath(os.path.expanduser(sys.argv[_i + 1]))
+    del sys.argv[_i:_i + 2]
+    if os.path.commonpath([MAIL_ZIEL, ROOT]) == ROOT:
+        raise SystemExit(f"--mail-ziel {MAIL_ZIEL} liegt im Repository – E-Mail-Texte gehören nicht ins Projekt (E-198)")
 ZIEL = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HIER, "versand-2026-10-25-nachpruefung"))
 import anwenden  # noqa: E402  (Register, Regeln und Auswertung je Eintrag)
 
@@ -85,7 +93,7 @@ def katalog():
                 continue
             f = r["eintraege"][d["id"]]
             if anwenden.gueltig(pfad, d, f, r["umfang"]) and not (r.get("felder_fehlen") and r["umfang"] != "sanktion"):
-                info["unbestaetigt"].append({"rolle": r["pruefer"], "umfang": r["umfang"], "version": f["version"], "quelle": f["quelle"], "stand": str(f["stand"]), "grund": fuer_pruefer((r.get("nachweis") or {}).get("text", ""))})
+                info["unbestaetigt"].append({"rolle": r["pruefer"], "umfang": r["umfang"], "version": f["version"], "quelle": f["quelle"], "stand": str(f["stand"]), "grund": fuer_pruefer((r.get("nachweis") or {}).get("umfang", ""))})
         out.append(info)
     return out
 
@@ -245,7 +253,12 @@ if __name__ == "__main__":
         os.makedirs(ordner, exist_ok=True)
         z = zeilen_fuer(rolle, kat, vorl)
         datei = mappe(rolle, z, ordner)
-        open(os.path.join(ordner, "E-Mail.txt"), "w", encoding="utf-8").write(mail(rolle, z, datei, vorl))
+        text = mail(rolle, z, datei, vorl)
+        if MAIL_ZIEL:  # E-198: nur außerhalb des Repositorys
+            os.makedirs(MAIL_ZIEL, exist_ok=True)
+            open(os.path.join(MAIL_ZIEL, f"{rolle}-E-Mail.txt"), "w", encoding="utf-8").write(text)
+        else:
+            print(f"----- E-Mail-Entwurf {rolle} (nicht gespeichert) -----", text, sep="\n")
         zahl = {}
         for art, *_ in z:
             zahl[art] = zahl.get(art, 0) + 1

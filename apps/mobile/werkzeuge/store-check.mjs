@@ -141,11 +141,17 @@ pruefe(s.bilder.every((x) => fs.existsSync(path.join(webBilder, `${x.bildschirm}
 // Fachliche Freigabe
 const pl =fs.readFileSync(path.join(APP, "../../PRUEFLISTE.md"), "utf8");
 pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche Freigabe der Vorlagen (PRUEFLISTE T-52 ff.) – vor dem Livegang durch Fachleute");
-// E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben (Mail des Prüfers) – was noch auf Bestätigung oder Nachprüfung wartet
+// E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben (Bestätigung per Mail; E-198: die Mail bewahrt der Gründer auf,
+// im Repository steht nur der Nachweis mit Art, Datum, Rolle und Umfang) – was noch auf Bestätigung oder Nachprüfung wartet
 {
+  // E-198: keine Mails im Repository – weder Mails der Prüfer noch Entwürfe unserer Mails
+  const mails = [];
+  const durch = (ordner) => { for (const e of fs.existsSync(ordner) ? fs.readdirSync(ordner, { withFileTypes: true }) : []) { const p = path.join(ordner, e.name); if (e.isDirectory()) durch(p); else if (/(\.eml|\.msg|\.mbox|mail[^/]*\.txt)$/i.test(e.name) || (/\.(txt|md)$/.test(e.name) && /^(Betreff|Subject):/m.test(fs.readFileSync(p, "utf8").slice(0, 2000)))) mails.push(path.relative(path.join(APP, "../.."), p)); } };
+  for (const o of ["docs/pruefberichte", "docs/freigabe-katalog", "docs/freigabe-vorlagen"]) durch(path.join(APP, "../..", o));
+  pruefe(!mails.length, `Keine Mails im Repository (E-198: Bestätigungen der Prüfer bewahrt der Gründer auf)${mails.length ? ` – ${mails.join(", ")}` : ""}`);
   const katalog = JSON.parse(lies("src/pflichten/katalog.json"));
   const wartend = katalog.pflichten.filter((p) => p.pruefung?.status === "in_pruefung").map((p) => p.id);
-  pruefe(!wartend.length, `Katalog: alle freigegebenen Einträge schriftlich bestätigt (E-197)${wartend.length ? ` – ${wartend.length} warten auf die Bestätigung per E-Mail bzw. Nachprüfung (docs/freigabe-katalog/versand-2026-10-25-nachpruefung, PRUEFLISTE T-200)` : ""}`);
+  pruefe(!wartend.length, `Katalog: alle freigegebenen Einträge schriftlich bestätigt (E-197, Nachweis ohne Mail im Projekt, E-198)${wartend.length ? ` – ${wartend.length} warten auf die Bestätigung per E-Mail bzw. Nachprüfung (docs/freigabe-katalog/versand-2026-10-25-nachpruefung, PRUEFLISTE T-200)` : ""}`);
   const entwurf = katalog.pflichten.filter((p) => p.pruefung?.status === "entwurf").map((p) => p.id);
   pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; docs/freigabe-katalog/versand-2026-10-25-neue-eintraege)` : ""}`);
   const geprueft = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/geprueft.ts"), "utf8");
@@ -161,7 +167,7 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
   const ohneBestaetigung = freigaben.filter(([, u]) => u === "null").map(([k]) => k);
   const geaendert = freigaben.filter(([k, u]) => u !== "null" && (!frei[k] || !heute[k] || Object.keys(frei[k]).some((g) => frei[k][g] !== heute[k][g])));
   const gruppen = [...new Set(geaendert.flatMap(([k]) => Object.keys(frei[k] ?? {}).filter((g) => frei[k][g] !== heute[k]?.[g]).map((g) => `${k}: ${g}`)))].sort();
-  pruefe(freigaben.length > 0 && !ohneBestaetigung.length && !geaendert.length, `Vorlagen: heutige Fassung schriftlich bestätigt (E-197)${ohneBestaetigung.length || geaendert.length ? ` – ${ohneBestaetigung.length} von ${freigaben.length} Freigaben ohne Bestätigung; ${geaendert.length} ohne Vermerk in seit der Bestätigung geänderten Varianten (${gruppen.join(", ") || "–"}) (Nachprüfliste, PRUEFLISTE T-204)` : ""}`);
+  pruefe(freigaben.length > 0 && !ohneBestaetigung.length && !geaendert.length, `Vorlagen: heutige Fassung schriftlich bestätigt (E-197, Nachweis ohne Mail im Projekt, E-198)${ohneBestaetigung.length || geaendert.length ? ` – ${ohneBestaetigung.length} von ${freigaben.length} Freigaben ohne Bestätigung; ${geaendert.length} ohne Vermerk in seit der Bestätigung geänderten Varianten (${gruppen.join(", ") || "–"}) (Nachprüfliste, PRUEFLISTE T-204)` : ""}`);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
