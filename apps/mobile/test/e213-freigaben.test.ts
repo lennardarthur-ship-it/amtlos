@@ -155,7 +155,8 @@ describe("E-213 B) Pflichten erneut bestätigt", () => {
       expect(pruefVermerk(p.version, p.pruefung, AM), id).toMatch(new RegExp(`von einem ${wer}.*26\\.10\\.2026`));
     }
     expect(pflicht("personal.lohnsteuerbescheinigung").erklaerung!.de).toContain("gibt es keine Lohnsteuerbescheinigung (§ 41b Abs. 6 EStG)");
-    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id)).toEqual([]);
+    // E-215: drei Einträge nach der Empfehlung des Rechtsanwalts neu gefasst – Vermerk erst nach seiner Bestätigung (T-278)
+    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual(["datenschutz.dsb", "it_sicherheit.nis2_meldepflichten", "it_sicherheit.nis2_registrierung"]);
   });
 });
 
