@@ -1,7 +1,7 @@
 # Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.lohnsteuer_anmeldung
-version: 6
+version: 7
 katalog_nr: D.40
 titel:
   de: Lohnsteuer anmelden
@@ -21,14 +21,15 @@ ausloeser:
     wert: true
     label:
       de: Du beschäftigst mindestens eine Person.
-  - feld: profil.personal.lohnsteuer_anmeldezeitraum
-    op: vorhanden
-    label:
-      de: Du hast deinen Anmeldezeitraum angegeben.
   # „keine“: nur Minijobs mit einheitlicher Pauschsteuer, die an die Minijob-Zentrale geht (§ 40a Abs. 2, 6 EStG)
-  - feld: profil.personal.lohnsteuer_anmeldezeitraum
-    op: '!='
-    wert: keine
+  # E-206: ohne Angabe des Anmeldezeitraums gilt die Pflicht (nur der Rhythmus ist offen) – nicht „trifft nicht zu“
+  - not:
+      all:
+      - feld: profil.personal.lohnsteuer_anmeldezeitraum
+        op: vorhanden
+      - feld: profil.personal.lohnsteuer_anmeldezeitraum
+        op: ==
+        wert: keine
     label:
       de: Du meldest Lohnsteuer beim Finanzamt an.
 frist:
@@ -64,6 +65,8 @@ sanktion:
     de: 'Gibst du die Lohnsteuer-Anmeldung nicht oder nicht fristgerecht ab, kann das Finanzamt einen Verspätungszuschlag festsetzen. Er richtet sich nach Dauer und Häufigkeit der Fristüberschreitung und der Höhe der Steuer und beträgt höchstens 25.000 € (§ 152 Abs. 1, 8, 10 AO).'
   schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Gilt jetzt für jeden Arbeitgeber, auch bevor du den Anmeldezeitraum angegeben hast – die Termine erscheinen, sobald der Zeitraum feststeht.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -75,9 +78,6 @@ quellen:
   url: https://www.gesetze-im-internet.de/ao_1977/__152.html
   abgerufen: '2026-10-22'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - recht
-  geprueft_am: '2026-10-23'
-  geprueft_version: 6
-  bestaetigt_am: '2026-10-23'
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

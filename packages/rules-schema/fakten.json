@@ -821,6 +821,12 @@
       "ab": 2
     },
     {
+      "pfad": "abgeleitet.jahr",
+      "typ": "ganzzahl",
+      "herleitung": "Jahr(Stichtag); bei Rhythmus je_jahr das Jahr der Periode (E-206)",
+      "ab": 2
+    },
+    {
       "pfad": "abgeleitet.noch_nicht_gestartet",
       "typ": "bool",
       "herleitung": "gruendungsdatum liegt nach dem Stichtag",

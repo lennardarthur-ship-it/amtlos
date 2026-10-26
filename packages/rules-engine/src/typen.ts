@@ -54,7 +54,18 @@ export type Frist =
     }
   | {
       typ: "wiederkehrend";
-      rhythmus: Rhythmus | { waehle: { wenn: Bedingung; dann: Rhythmus }[]; sonst: Rhythmus };
+      rhythmus:
+        | Rhythmus
+        | {
+            /** E-206: Hinweis aus dem Katalog, wenn dieser Zweig den Rhythmus bestimmt (z. B. warum monatlich statt der Angabe) */
+            waehle: { wenn: Bedingung; dann: Rhythmus; hinweis?: Text }[];
+            sonst: Rhythmus;
+            /**
+             * E-206: Rhythmus je Kalenderjahr wählen – die abgeleiteten Fakten (abgeleitet.ist_gruendungsjahr, abgeleitet.jahr …)
+             * gelten dann für das Jahr der Periode statt für den Stichtag (z. B. monatlich nur im Gründungs- und Folgejahr).
+             */
+            je_jahr?: boolean;
+          };
       faellig: FaelligkeitsRegel;
       verlaengerung?: { wenn: Bedingung; versatz: string };
       verschiebung: Verschiebung;

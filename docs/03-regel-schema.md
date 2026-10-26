@@ -86,6 +86,8 @@ Jeder Fakt hat einen Typ. Der Validator lehnt unbekannte Fakten, unpassende Oper
 | `relativ` | BG-Anmeldung 7 Tage nach Gründung | Bezug (Ereignis, Datums-Fakt oder andere erledigte Pflicht) + Versatz |
 | `wiederkehrend` | USt-VA | Rhythmus (ggf. abhängig von Fakten) + Fälligkeitsregel + optionale Verlängerung |
 
+Rhythmus abhängig von Fakten: `rhythmus: { waehle: [{ wenn, dann, hinweis? }], sonst, je_jahr? }` – der erste Zweig, der gilt, bestimmt den Rhythmus; ist ein Zweig unbekannt, gibt es keine Termine und eine Rückfrage. `hinweis` (Text) zeigt die App, wenn der Zweig gewählt ist (E-206). Mit `je_jahr: true` wird je Kalenderjahr der Perioden gewählt; die abgeleiteten Fakten (`abgeleitet.ist_gruendungsjahr`, `abgeleitet.jahr` …) gelten dann für das Jahr der Periode, Profil-Fakten und Regelwerte bleiben die zum Stichtag (Beispiel: Neugründer ab 2027 im Gründungs- und Folgejahr monatlich).
+
 Fälligkeitsregeln bei `wiederkehrend`: `tag_nach_periodenende` (USt-VA, Lohnsteuer), `feste_termine` (Vorauszahlungen `03-10`, `06-10`, …), `n_letzter_bankarbeitstag` (SV-Beiträge, mit `arbeitstage_vorher` für den Beitragsnachweis).
 
 **Relative Fristen:** Fehlt das Bezugsereignis, gilt die Pflicht trotzdem, aber ohne Termin; die Karte zeigt „Termin hängt von … ab“. Bei `zeitpunkt: vor_beginn` ist der Termin der Tag vor dem Bezugstag. Mehrere Ereignisse gleichen Typs: Bezug ist das früheste nicht stornierte. Mit `je_ereignis: true` entsteht stattdessen je Ereignis eine eigene Instanz mit der Periode `aenderung-JJJJMMTT` (z. B. SV-Anmeldung je Einstellung, E-091).

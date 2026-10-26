@@ -16,7 +16,7 @@ import {
 import { fehlendeFakten, genutzteRegelwerte, werteAus, type Auswertungskontext, type Knoten } from "./bedingung.js";
 import { mitAbgeleitetenFakten, zuErfragendeFakten } from "./fakten.js";
 import { Regelwerte } from "./regelwerte.js";
-import type { Ereignis, Ergebnis, Fakten, Katalog, Pflicht } from "./typen.js";
+import type { Ereignis, Ergebnis, Fakten, Katalog, Pflicht, Text } from "./typen.js";
 
 export const ENGINE_VERSION = "0.1.0";
 
@@ -52,6 +52,8 @@ export interface PflichtErgebnis {
   termine: TerminErgebnis[];
   /** Hinweise zur Terminberechnung, z. B. „Termin hängt von Ereignis X ab“ */
   hinweise: string[];
+  /** E-206: Texte aus dem Katalog zum gewählten Rhythmus (`waehle[].hinweis`), z. B. warum monatlich statt vierteljährlich */
+  hinweis_texte?: Text[];
 }
 
 const RADAR = new Set(["entwurf", "beschlossen", "geplant"]);
@@ -82,14 +84,17 @@ export function auswerten(e: Eingabe): PflichtErgebnis[] {
   return e.katalog.pflichten
     .filter((p) => gueltigAm(p, e.stichtag))
     .map((p) => {
-      const begruendung = werteAus(p.ausloeser, ctx);
+      // E-206: an einem geplanten Ereignis hängende Frist (z. B. erster Arbeitstag) – das geplante Ereignis zählt beim Auslöser
+      const bezug = p.frist.typ === "relativ" && "ereignis" in p.frist.bezug ? p.frist.bezug.ereignis : undefined;
+      const begruendung = werteAus(p.ausloeser, bezug ? { ...ctx, geplantZaehlt: bezug } : ctx);
       const fehlend = new Set(fehlendeFakten(begruendung));
       const regelwerteGenutzt = genutzteRegelwerte(begruendung);
       const hinweise: string[] = [];
+      const hinweisTexte: Text[] = [];
       let termine: TerminErgebnis[] = [];
 
       if (begruendung.ergebnis !== "gilt_nicht") {
-        const t = termineFuer(p, ctx, ort, e, fenster, hinweise, fehlend, regelwerteGenutzt);
+        const t = termineFuer(p, ctx, ort, e, fenster, hinweise, fehlend, regelwerteGenutzt, hinweisTexte);
         const jahr = jahrVon(e.stichtag);
         termine = t.map((x) => ({ ...x, vorlaeufig: jahrVon(x.faellig_am) > jahr && p.frist.typ === "wiederkehrend" }));
       }
@@ -105,6 +110,7 @@ export function auswerten(e: Eingabe): PflichtErgebnis[] {
         regelwerte_genutzt: regelwerteGenutzt,
         termine,
         hinweise,
+        ...(hinweisTexte.length ? { hinweis_texte: hinweisTexte } : {}),
       };
     });
 }
@@ -118,6 +124,7 @@ function termineFuer(
   hinweise: string[],
   fehlend: Set<string>,
   regelwerteGenutzt: { id: string; version: number }[],
+  hinweisTexte: Text[] = [],
 ): Termin[] {
   const f = p.frist;
   switch (f.typ) {
@@ -168,23 +175,43 @@ function termineFuer(
     }
 
     case "wiederkehrend": {
-      let rhythmus: Rhythmus | undefined;
-      if (typeof f.rhythmus === "string") rhythmus = f.rhythmus;
-      else {
+      // Rhythmus wählen (in einem Kontext); undefined = unbekannt (Rückfrage, keine Termine)
+      const waehle = (c: Auswertungskontext): { rhythmus: Rhythmus; hinweis?: Text } | undefined => {
+        if (typeof f.rhythmus === "string") return { rhythmus: f.rhythmus };
         for (const w of f.rhythmus.waehle) {
-          const k = werteAus(w.wenn, ctx);
+          const k = werteAus(w.wenn, c);
           regelwerteGenutzt.push(...genutzteRegelwerte(k).filter((r) => !regelwerteGenutzt.some((x) => x.id === r.id && x.version === r.version)));
-          if (k.ergebnis === "gilt") {
-            rhythmus = w.dann;
-            break;
-          }
+          if (k.ergebnis === "gilt") return { rhythmus: w.dann, ...(w.hinweis ? { hinweis: w.hinweis } : {}) };
           if (k.ergebnis === "unbekannt") {
             fehlendeFakten(k).forEach((x) => fehlend.add(x));
+            return undefined;
+          }
+        }
+        return { rhythmus: f.rhythmus.sonst };
+      };
+      // Termine erst ab Gründung
+      const gruendung = ctx.fakten["profil.gruendungsdatum"];
+      const von = typeof gruendung === "string" && vergleiche(gruendung, fenster.von) > 0 ? gruendung : fenster.von;
+      // E-206 „je_jahr“: je Kalenderjahr der Perioden (ab dem Jahr vor dem Fenster – Fälligkeiten liegen nach dem
+      // Periodenende) mit den abgeleiteten Fakten dieses Jahres wählen; Profil-Fakten und Regelwerte bleiben die zum Stichtag.
+      // Ohne „je_jahr“ eine Wahl zum Stichtag für alle Perioden (Schlüssel 0).
+      const je = new Map<number, { rhythmus: Rhythmus; hinweis?: Text }>();
+      if (typeof f.rhythmus !== "string" && f.rhythmus.je_jahr) {
+        for (let jahr = jahrVon(von) - 1; jahr <= jahrVon(fenster.bis); jahr++) {
+          const w = waehle({ ...ctx, fakten: mitAbgeleitetenFakten(e.fakten, `${jahr}-12-31`) });
+          if (!w) {
             hinweise.push("rhythmus_unbekannt");
             return [];
           }
+          je.set(jahr, w);
         }
-        rhythmus ??= f.rhythmus.sonst;
+      } else {
+        const w = waehle(ctx);
+        if (!w) {
+          hinweise.push("rhythmus_unbekannt");
+          return [];
+        }
+        je.set(0, w);
       }
       let verlaengerung: string | undefined;
       if (f.verlaengerung) {
@@ -193,12 +220,20 @@ function termineFuer(
         // Unbekannt: ohne Verlängerung rechnen – der frühere Termin ist der sichere (Hinweis für die Anzeige)
         if (k.ergebnis === "unbekannt") hinweise.push("verlaengerung_unbekannt_frueherer_termin");
       }
-      // Termine erst ab Gründung
-      const gruendung = ctx.fakten["profil.gruendungsdatum"];
-      const von = typeof gruendung === "string" && vergleiche(gruendung, fenster.von) > 0 ? gruendung : fenster.von;
-      return wiederkehrendeTermine({ rhythmus, faellig: f.faellig, verlaengerung, verschiebung: f.verschiebung }, von, fenster.bis, ort, e.kalender).filter(
-        (t) => typeof gruendung !== "string" || periodeEndetNach(t.periode, gruendung),
-      );
+      const wahlFuer = (periode: string) => je.get(0) ?? je.get(Number(periode.slice(0, 4)));
+      const termine = [...new Set([...je.values()].map((w) => w.rhythmus))]
+        .flatMap((rhythmus) =>
+          wiederkehrendeTermine({ rhythmus, faellig: f.faellig, verlaengerung, verschiebung: f.verschiebung }, von, fenster.bis, ort, e.kalender).filter(
+            (t) => wahlFuer(t.periode)?.rhythmus === rhythmus && (typeof gruendung !== "string" || periodeEndetNach(t.periode, gruendung)),
+          ),
+        )
+        .sort((a, b) => vergleiche(a.faellig_am, b.faellig_am) || a.periode.localeCompare(b.periode));
+      // Hinweise nur aus Jahren, die einen Termin im Fenster haben
+      for (const t of termine) {
+        const h = wahlFuer(t.periode)?.hinweis;
+        if (h && !hinweisTexte.some((x) => JSON.stringify(x) === JSON.stringify(h))) hinweisTexte.push(h);
+      }
+      return termine;
     }
   }
 }

@@ -15,7 +15,11 @@ gruende:
   nachgeprueft: Der Prüfer hat den offenen Punkt am 26.10.2026 erneut geprüft und per Mail als erledigt bestätigt (E-201); erneute Vorlage zu den in PRUEFLISTE genannten Terminen.
   beantwortet: Frage zum Entwurf, die der Prüfer mit seiner Freigabe am 26.10.2026 beantwortet hat (E-201).
   neu_geprueft: Neuer Eintrag mit der Bitte um vollständige Prüfung; der Prüfer hat ihn danach freigegeben (Unterschrift siehe Register).
-offen: []
+offen:
+# E-206: monatlicher Rhythmus „je Kalenderjahr“ für Neugründer ab 2027 und Hinweis bei der Angabe „vierteljährlich“ (PRUEFLISTE T-237)
+- id: steuern.ust_voranmeldung
+  punkt: 'E-206 (externer Prüfer): „Weiß ich nicht“ ohne Steuer des Vo'
+  thema: Monatlicher Rhythmus für Neugründer ab 2027 im Gründungs- und Folgejahr
 erledigt:
 - id: arbeitsschutz.arbeitsmedizinische_vorsorge
   punkt: Fristen je Vorsorgeart nach AMR 2.1 und Bewertung Kosmetik m

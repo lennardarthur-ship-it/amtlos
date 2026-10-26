@@ -223,6 +223,8 @@ export function PflichtDetail({ id }: { id: string }) {
       {/* E-200: Beitragsnachweis – der Termin ist der letzte Tag zum Übermitteln (Eingang um 0 Uhr am Tag danach) */}
       {gilt && termin && p.uebermittelnVortag ? <Hinweis text={TEXT.e200_uebermitteln_hinweis(datumDe(termin), datumDe(plusTage(termin, 1)))} /> : null}
       {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
+      {/* E-206: warum der Rhythmus von der Angabe abweicht (Satz aus dem Katalog, z. B. Neugründer ab 2027 monatlich) */}
+      {gilt && p.rhythmusHinweise?.length ? p.rhythmusHinweise.map((h) => <Hinweis key={h} text={h} />) : null}
       {/* Gewerbe online anmelden – Schritt für Schritt: frei, auch ohne Pro */}
       {p.id === GEWERBE_PFLICHT ? (
         <Karte stil={{ marginTop: 8 }}>

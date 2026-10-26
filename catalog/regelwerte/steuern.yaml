@@ -32,6 +32,23 @@
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
 
 - schema_version: 1
+  id: steuern.ust_va.neugruender_monatlich_ab
+  version: 1
+  katalog_nr: C.21
+  bezeichnung: { de: "Erstes Kalenderjahr, in dem Neugründer im Gründungs- und Folgejahr die USt-Voranmeldung wieder monatlich abgeben (§ 18 Abs. 2 Satz 4 UStG; Satz 6 gilt nur für 2021 bis 2026)" }
+  einheit: kalenderjahr
+  wert: 2027
+  # gilt seit Einführung der Aussetzung (Satz 6) für 2021 bis 2026 – vorher galt Satz 4 ohne Ausnahme
+  gueltig_ab: "2021-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 18 Abs. 2 Satz 4 UStG", "§ 18 Abs. 2 Satz 6 UStG"]
+  quellen:
+    - { titel: Umsatzsteuergesetz § 18, url: "https://www.gesetze-im-internet.de/ustg_1980/__18.html", abgerufen: "2026-10-26" }
+  fachlich_zu_pruefen: ["E-206: Wert aus C.21 (Steuerberater 22.10.2026: keine Verlängerung von Satz 6 über 2026 hinaus bekannt) – bei einer Verlängerung durch das Jahressteuergesetz neue Version mit dem späteren Jahr"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
   id: steuern.ustg19.grenze_vorjahr
   version: 1
   katalog_nr: C.23
