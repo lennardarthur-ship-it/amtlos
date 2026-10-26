@@ -26,6 +26,7 @@ import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { PartnerHinweis } from "./Partner";
 import { freiePflichten } from "../pro/regeln";
 import { AboEndeHinweis } from "./AboEnde";
+import { euBerichtigungen, periodeText } from "../unterlagen/ustAusRechnungen";
 
 
 // Formatter einmal anlegen (R9 Performance)
@@ -74,6 +75,8 @@ export function Heute() {
   const monat = useMemo(() => monatsSumme(unterlagen, betrieb, tag.slice(0, 7)), [unterlagen, betrieb, tag]);
   // überfällige Rechnungen gehören zu „Als Nächstes“ – Geld, das fehlt, ist dringender als jede Liste
   const ueberfaellig = useMemo(() => unterlagen.filter((u) => (ueberJe.get(u.id) ?? 0) > 0).sort((x, y) => (ueberJe.get(y.id) ?? 0) - (ueberJe.get(x.id) ?? 0)).slice(0, 2), [unterlagen, ueberJe]);
+  // E-214: Stornos „Fehler in der Rechnung“ bei EU-Umsätzen – ZM und Voranmeldung des ursprünglichen Zeitraums berichtigen
+  const berichtigen = useMemo(() => euBerichtigungen(unterlagen, betrieb, erledigt).filter((b) => !b.erledigt), [unterlagen, betrieb, erledigt]);
   const hatRechnungen = unterlagen.some((u) => u.vorlage === "rechnung" && u.festgeschrieben);
   const zuletzt = useMemo(() => sortiert({ unterlagen } as Stand).slice(0, 3), [unterlagen]);
   const jetzt = new Date();
@@ -139,6 +142,13 @@ export function Heute() {
         <Karte stil={{ marginBottom: 18 }}>
           {aufenthaltLaeuftAb({ mitarbeiter }, tag).map((x, i, l) => (
             <Zeile key={x.id} symbol="exclamationmark.triangle" ton={x.tage < 0 ? "frist" : "bald"} titel={TEXT.r12p_heute_aufenthalt(x.name, x.tage)} text={TEXT.r12p_heute_aufenthalt_text(textAus(x.bis))} onPress={() => nav.oeffnen(`person-${x.id}`, () => <PersonSeite art="mitarbeiter" id={x.id} />, true)} letzte={i === l.length - 1} />
+          ))}
+        </Karte>
+      ) : null}
+      {berichtigen.length ? (
+        <Karte stil={{ marginBottom: 18 }}>
+          {berichtigen.map((b, i, l) => (
+            <Zeile key={b.stornoId} symbol="exclamationmark.triangle" ton={b.zmFrist < tag ? "frist" : "bald"} titel={TEXT.e214_berichtigen_titel(`${periodeText(b.monat)} bzw. ${periodeText(b.quartal)}`)} text={TEXT.e214_berichtigen_text(b.stornoNr, b.rechnungNr, textAus(b.zmFrist))} onPress={() => oeffnen(b.stornoId)} letzte={i === l.length - 1} />
           ))}
         </Karte>
       ) : null}

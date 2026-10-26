@@ -1815,7 +1815,7 @@ paths:
       tags: [Synchronisation]
       summary: Verschlüsselten Stand und verschlüsselten Sync-Schlüssel holen (E-134)
       responses:
-        "200": { description: OK }
+        "200": { description: "OK – version, schluessel, daten, geaendert_am (Serverzeit der aktuellen Version), seit (Einrichtung des Tresors, E-214), konto_id" }
         "404": { description: Noch nicht eingerichtet }
     post:
       tags: [Synchronisation]
@@ -1831,7 +1831,7 @@ paths:
       summary: Verschlüsselten Stand speichern – nur auf der zuletzt gesehenen Version
       requestBody: { required: true, content: { application/json: { schema: { type: object, required: [version, daten], additionalProperties: false, properties: { version: { type: integer, minimum: 0 }, daten: { type: string } } } } } }
       responses:
-        "200": { description: Gespeichert, neue Version }
+        "200": { description: "Gespeichert – version (neue Version), empfangen (Serverzeit des Eingangs) und seit (Einrichtung des Tresors); die App vermerkt damit den Eingang von Korrekturen beim Server (E-214)" }
         "402": { description: Amtlos Pro nötig }
         "404": { description: Noch nicht eingerichtet }
         "409": { description: Inzwischen geändert – erst holen und zusammenführen }

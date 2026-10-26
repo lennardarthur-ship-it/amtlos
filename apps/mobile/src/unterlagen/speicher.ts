@@ -3,7 +3,7 @@
  * ohne Gerät testbar sind; zustand.tsx speichert den Stand über standAblage.ts in verschlüsselten Teildateien (E-194).
  */
 import { letzteVollsicherung, nachweisText, nachweiseAus, type SicherungsNachweis } from "./sicherungNachweis";
-import { KU_HINWEIS, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, kontenvorgabenAus, kontenvorgabenGesetzt, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Kontenvorgaben, type Sachentnahme } from "@amtlos/fachlogik";
+import { KU_HINWEIS, zeitDe, belegEingangAus, eingangVergleich, geraetAus, type BelegEingang, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, kontenvorgabenAus, kontenvorgabenGesetzt, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Kontenvorgaben, type Sachentnahme } from "@amtlos/fachlogik";
 import { LEERER_BETRIEB, STORNO_ABSCHLAEGE, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, istGutschriftNummer, leereDaten, type Beleg, naechsteNummer, zahlbetrag, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 import { sha256 } from "@noble/hashes/sha2";
 import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils";
@@ -106,7 +106,7 @@ export function fassungHash(f: Pick<GeteilteFassung, "daten" | "absender" | "inh
 export interface ProtokollEintrag {
   id: string;
   zeitpunkt: string;
-  art: "beleg_geloescht" | "beleg_ungueltig" | "beleg_korrigiert" | "sachentnahme_geloescht" | "entwurf_geloescht";
+  art: "beleg_geloescht" | "beleg_ungueltig" | "beleg_korrigiert" | "sachentnahme_geloescht" | "entwurf_geloescht" | "korrektur_nicht_uebernommen";
   /** ID des Belegs, der Sachentnahme bzw. der Unterlage */
   bezug: string;
   /** Amtlos-Belegnummer bzw. Nummer der Unterlage (bleibt vergeben, auch wenn gelöscht) */
@@ -116,6 +116,14 @@ export interface ProtokollEintrag {
   vorlage?: string;
   /** E-200 („entwurf_geloescht“): die geteilten Fassungen – Zeitpunkt, Art und Prüfwert */
   geteilt?: { am: string; art: GeteilteFassung["art"]; sha256: string }[];
+  /**
+   * E-214 („korrektur_nicht_uebernommen“): bei der Zusammenführung (Synchronisation, Wiederherstellen) nicht übernommene
+   * Änderung – Zeitpunkt (`fassung_bis`, Uhr des Geräts), Gerät und Eingang beim Server der nicht übernommenen Fassung;
+   * der Inhalt steht vollständig in der Historie des Belegs bzw. in der Konfliktkopie.
+   */
+  fassung_bis?: string;
+  geraet?: string;
+  eingang?: BelegEingang;
 }
 
 /** R12: frühere Fassung eines festgeschriebenen Nachweises – nie gelöscht (Historie). */
@@ -227,6 +235,11 @@ export interface Stand {
   sachentnahmen: Sachentnahme[];
   /** R12 GoBD: Lösch- und Korrekturprotokoll (nur anhängen) */
   protokoll: ProtokollEintrag[];
+  /**
+   * E-214: zufällige Kennung dieses Geräts – steht an Festschreibungen und Korrekturen von Belegen (`Beleg.geraet`) und
+   * im Änderungsprotokoll. Gerätegebunden: nicht synchronisiert, beim Wiederherstellen behält jedes Gerät seine.
+   */
+  geraet?: string;
   /**
    * Phase 2.3 (E-156): Partner, der Amtlos empfohlen hat („Empfohlen von …“, `partner/partner.ts`). Nur Anzeige – schaltet
    * nie etwas frei. Bleibt auf dem Gerät und in der Datensicherung, wird nicht synchronisiert.
@@ -535,17 +548,18 @@ export function standAus(json: string | null): Stand {
     ...(iso(r.pruefexport) ? { pruefexport: iso(r.pruefexport) } : {}),
     ...(iso(r.proZuletzt) ? { proZuletzt: iso(r.proZuletzt) } : {}),
     ...(iso(r.aboHinweisGesehen) ? { aboHinweisGesehen: iso(r.aboHinweisGesehen) } : {}),
+    ...(geraetAus(r.geraet) ? { geraet: geraetAus(r.geraet)! } : {}),
   });
 }
 
 /** R12 GoBD: Protokoll lesen – Unlesbares fällt weg. */
 function protokollAus(roh: unknown): ProtokollEintrag[] {
-  const arten = ["beleg_geloescht", "beleg_ungueltig", "beleg_korrigiert", "sachentnahme_geloescht", "entwurf_geloescht"];
+  const arten = ["beleg_geloescht", "beleg_ungueltig", "beleg_korrigiert", "sachentnahme_geloescht", "entwurf_geloescht", "korrektur_nicht_uebernommen"];
   const geteilt = (w: unknown): ProtokollEintrag["geteilt"] =>
     Array.isArray(w) ? (w as unknown[]).filter((g): g is Record<string, unknown> => istObjekt(g) && istIso(g.am) && (g.art === "pdf" || g.art === "druck" || g.art === "xml") && typeof g.sha256 === "string").map((g) => ({ am: g.am as string, art: g.art as GeteilteFassung["art"], sha256: g.sha256 as string })) : undefined;
   return (Array.isArray(roh) ? (roh as unknown[]) : [])
     .filter((x): x is Record<string, unknown> => istObjekt(x) && typeof x.id === "string" && istIso(x.zeitpunkt) && arten.includes(String(x.art)) && typeof x.bezug === "string")
-    .map((x) => ({ id: x.id as string, zeitpunkt: x.zeitpunkt as string, art: x.art as ProtokollEintrag["art"], bezug: x.bezug as string, ...(typeof x.nr === "string" && x.nr ? { nr: x.nr } : {}), text: typeof x.text === "string" ? x.text.slice(0, 500) : "", ...(typeof x.vorlage === "string" && x.vorlage ? { vorlage: x.vorlage } : {}), ...(geteilt(x.geteilt)?.length ? { geteilt: geteilt(x.geteilt) } : {}) }));
+    .map((x) => ({ id: x.id as string, zeitpunkt: x.zeitpunkt as string, art: x.art as ProtokollEintrag["art"], bezug: x.bezug as string, ...(typeof x.nr === "string" && x.nr ? { nr: x.nr } : {}), text: typeof x.text === "string" ? x.text.slice(0, 500) : "", ...(typeof x.vorlage === "string" && x.vorlage ? { vorlage: x.vorlage } : {}), ...(geteilt(x.geteilt)?.length ? { geteilt: geteilt(x.geteilt) } : {}), ...(istIso(x.fassung_bis) ? { fassung_bis: x.fassung_bis as string } : {}), ...(geraetAus(x.geraet) ? { geraet: geraetAus(x.geraet)! } : {}), ...(belegEingangAus(x.eingang) ? { eingang: belegEingangAus(x.eingang)! } : {}) }));
 }
 
 /** R12 GoBD: Protokolle zweier Stände nach ID vereinen (nur anhängen). */
@@ -966,10 +980,19 @@ export function vaAbgegebenFuer(s: Pick<Stand, "unterlagen">, tag: string): stri
 export const absenderFuer = (s: Pick<Stand, "betrieb">, u: Pick<Unterlage, "absender" | "festgeschrieben"> | undefined): Betrieb => (u?.festgeschrieben && u.absender ? u.absender : s.betrieb);
 
 /**
+ * E-214: Grund des Stornos einer Rechnung mit EU-Umsatz (ZM), in den Daten der Stornorechnung – nicht gedruckt.
+ * „rechnung“: Fehler in der Rechnung (die ursprüngliche Meldung war falsch – ZM und Voranmeldung des ursprünglichen
+ * Zeitraums berichtigen); „betrag“: Betrag hat sich geändert (Änderung der Bemessungsgrundlage im Zeitraum des Stornos).
+ */
+export const EU_STORNO_GRUND = "eu_storno_grund";
+export type EuStornoGrund = "rechnung" | "betrag";
+
+/**
  * Storno (E-127): eine festgeschriebene Rechnung wird nicht geändert, sondern durch eine Stornorechnung mit neuer
  * Nummer und negativen Beträgen aufgehoben; die Stornorechnung verweist auf Nummer und Datum der ursprünglichen.
+ * E-214: `euGrund` – Grund bei Rechnungen mit EU-Umsatz (die Seite fragt danach).
  */
-export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [Stand, Unterlage | null] {
+export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId(), euGrund?: EuStornoGrund): [Stand, Unterlage | null] {
   const alt = s.unterlagen.find((u) => u.id === id);
   const v = alt ? vorlageFuer(alt.vorlage) : undefined;
   if (!alt || !v?.storno || !alt.festgeschrieben || alt.storniertDurch || alt.daten.storno_zu || alt.konfliktKopieVon) return [s, null];
@@ -978,6 +1001,8 @@ export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [
   if (Array.isArray(daten.positionen)) daten.positionen = (daten.positionen as Record<string, unknown>[]).map((e) => ({ ...e, preis: negativ(e.preis) })) as Daten[string];
   daten.storno_zu = typeof alt.daten.nummer === "string" ? alt.daten.nummer : "";
   daten.storno_zu_datum = typeof alt.daten.datum === "string" ? alt.daten.datum : null;
+  delete daten[EU_STORNO_GRUND];
+  if (euGrund) daten[EU_STORNO_GRUND] = euGrund;
   // E-193 (8b): Storno einer Schlussrechnung spiegelt auch die abgesetzten Abschläge – es hebt nur den Rest auf
   if (alt.daten.schluss === true) daten[STORNO_ABSCHLAEGE] = true;
   daten.datum = heute(jetzt);
@@ -1004,6 +1029,7 @@ export function kopieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [St
   // die Kopie ist ein neuer Entwurf: kein Storno-Bezug, nicht ausgegeben, nicht festgeschrieben
   delete daten.storno_zu;
   delete daten.storno_zu_datum;
+  delete daten[EU_STORNO_GRUND];
   // StB-Prüfung (C-6): die Ersatzrechnung nennt die stornierte Rechnung (Voranmeldung: Korrektur im Zeitraum des Stornos; XRechnung BG-3)
   if (ersetzt && alt.vorlage === "rechnung" && typeof alt.daten.nummer === "string") daten.ersetzt_nummer = alt.daten.nummer;
   else delete daten.ersetzt_nummer;
@@ -1311,16 +1337,21 @@ export function belegSetzen(s: Stand, b: Beleg, jetzt: Date, grund?: string): St
   const historie = [...(alt?.historie ?? [])];
   const geaendert = alt ? belegInhaltGeaendert(alt, b) : false;
   let protokoll = s.protokoll;
+  // E-214: Gerät der Korrektur; der neue Inhalt ist noch nicht beim Server eingegangen
+  const geraet = s.geraet ?? neueId();
+  const korrektur = Boolean(alt?.festgeschrieben && geaendert);
   if (alt?.festgeschrieben && geaendert) {
     if (!grundGenuegt(grund)) return s;
-    historie.push(belegFassung(alt, iso, grund));
+    historie.push({ ...belegFassung(alt, iso, grund), ...belegMeta(alt) });
     protokoll = [...protokoll, { id: neueId(), zeitpunkt: iso, art: "beleg_korrigiert", bezug: b.id, ...(alt.nr ? { nr: alt.nr } : {}), text: grund!.trim().slice(0, 300) }];
   } else if (alt && geaendert && jetzt.getTime() - Date.parse(alt.geaendert) > BELEG_RUHE_MS) historie.push(belegFassung(alt, iso));
-  const { historie: _h, ...rest } = b;
-  // Nummer und Festschreibung gehören nicht zum Inhalt – sie bleiben, wie sie sind
+  const { historie: _h, geraet: _g, eingang: _e, ...rest } = b;
+  // Nummer und Festschreibung gehören nicht zum Inhalt – sie bleiben, wie sie sind; E-214: Gerät und Eingang beim Server
+  // ebenso, außer nach einer Korrektur (dann dieses Gerät, Eingang noch offen)
   const nr = alt?.nr ?? b.nr ?? naechsteBelegnummer([...s.belege, ...s.belegArchiv], b.datum.slice(0, 4), s.protokoll.map((p) => p.nr ?? "").filter(Boolean));
-  const neu: Beleg = { ...rest, nr, ...(alt?.festgeschrieben ? { festgeschrieben: alt.festgeschrieben } : {}), geaendert: iso, ...(historie.length ? { historie } : {}) };
-  return { ...s, protokoll, belege: alt ? s.belege.map((x) => (x.id === b.id ? neu : x)) : [neu, ...s.belege] };
+  const meta = korrektur ? { geraet } : alt?.festgeschrieben ? belegMeta(alt) : {};
+  const neu: Beleg = { ...rest, nr, ...(alt?.festgeschrieben ? { festgeschrieben: alt.festgeschrieben } : {}), ...meta, geaendert: iso, ...(historie.length ? { historie } : {}) };
+  return { ...s, ...(korrektur && !s.geraet ? { geraet } : {}), protokoll, belege: alt ? s.belege.map((x) => (x.id === b.id ? neu : x)) : [neu, ...s.belege] };
 }
 
 /** R12 GoBD: Belege festschreiben (Steuerberater-Paket, abgegebene Voranmeldung) – schon festgeschriebene behalten ihren Zeitpunkt. */
@@ -1328,8 +1359,13 @@ export function belegeFestschreiben(s: Stand, ids: readonly string[], jetzt = ne
   const set = new Set(ids);
   if (!s.belege.some((b) => set.has(b.id) && !b.festgeschrieben)) return s;
   const iso = jetzt.toISOString();
-  return { ...s, belege: s.belege.map((b) => (set.has(b.id) && !b.festgeschrieben ? { ...b, festgeschrieben: iso, geaendert: iso } : b)) };
+  // E-214: Gerät der Festschreibung
+  const geraet = s.geraet ?? neueId();
+  return { ...s, geraet, belege: s.belege.map((b) => (set.has(b.id) && !b.festgeschrieben ? { ...b, festgeschrieben: iso, geaendert: iso, geraet } : b)) };
 }
+
+/** E-214: Gerät und Eingang beim Server eines Belegs bzw. einer Fassung – nur gesetzte Werte. */
+export const belegMeta = (b: { geraet?: string | null; eingang?: BelegEingang | null }): { geraet?: string; eingang?: BelegEingang } => ({ ...(b.geraet ? { geraet: b.geraet } : {}), ...(b.eingang ? { eingang: b.eingang } : {}) });
 
 /**
  * Darf der Beleg endgültig gelöscht werden? Nur leer (nichts erfasst) oder frisch erfasst (24 Stunden) und noch in
@@ -1592,11 +1628,30 @@ function kanonisch(x: unknown): string {
   }
   return JSON.stringify(x);
 }
-/** Inhalt eines Belegs bzw. einer früheren Fassung – ohne Gültigkeitszeitpunkt und Grund (E-209). */
+/** Inhalt eines Belegs bzw. einer früheren Fassung – ohne Gültigkeitszeitpunkt und Grund (E-209), ohne Gerät, Eingang beim Server und Angaben zum Vorrang (E-214). */
 const belegInhaltText = (f: BelegFassung) => {
-  const { bis: _b, grund: _g, ...rest } = f;
+  const { bis: _b, grund: _g, geraet: _ge, eingang: _e, vorrang: _v, gegen_geaendert: _gg, gegen_geraet: _gr, gegen_eingang: _ge2, korrektur_grund: _k, ...rest } = f;
   return kanonisch(rest);
 };
+/** E-214: Schlüssel einer Fassung in der Historie – ohne die nach dem Hochladen nachgetragene Serverzeit */
+const ohneZeit = (e: BelegEingang | null | undefined) => (e ? { seit: e.seit, version: e.version, ...(e.spaetestens ? { spaetestens: true } : {}) } : e);
+const fassungSchluessel = (f: BelegFassung) => kanonisch({ ...f, eingang: ohneZeit(f.eingang), gegen_eingang: ohneZeit(f.gegen_eingang) });
+const zeitenVon = (f: BelegFassung) => (f.eingang?.zeit ? 1 : 0) + (f.gegen_eingang?.zeit ? 1 : 0);
+
+/** E-214: zwei Eingänge desselben Inhalts vereinen – der frühere gilt (mit Serverzeit, wenn eine Seite sie schon hat). */
+function eingangVereinen(a: BelegEingang | null | undefined, b: BelegEingang | null | undefined): BelegEingang | undefined {
+  if (!a || !b) return a ?? b ?? undefined;
+  const v = eingangVergleich(a, b)!;
+  if (v !== 0) return v < 0 ? a : b;
+  if (a.spaetestens !== b.spaetestens) return a.spaetestens ? b : a;
+  return a.zeit ? a : b;
+}
+
+/** E-214: der Grund, mit dem die geltende Fassung eines Belegs ihre Vorgängerin ersetzt hat (letzter Eintrag mit Grund vor ihr) */
+function korrekturGrundVon(b: Beleg): string | null {
+  const l = [...(b.historie ?? [])].filter((h) => h.grund && h.grund !== BELEG_KONFLIKT_GRUND && h.bis <= b.geaendert).sort((x, y) => x.bis.localeCompare(y.bis));
+  return l.at(-1)?.grund ?? null;
+}
 type BelegFassung = NonNullable<Beleg["historie"]>[number];
 /** Grund in der Historie, wenn zwei Geräte denselben festgeschriebenen Beleg verschieden korrigiert haben (E-209). */
 export const BELEG_KONFLIKT_GRUND = "Abweichende Korrektur auf einem anderen Gerät (bei der Zusammenführung nicht übernommen)";
@@ -1608,17 +1663,24 @@ export const BELEG_KONFLIKT_GRUND = "Abweichende Korrektur auf einem anderen Ger
  *   wieder Entwurf). Hat das andere Gerät den Entwurf nach der Festschreibung noch geändert, wird diese Änderung nicht
  *   übernommen, aber als Konflikt gemeldet.
  * - Beide festgeschrieben, verschiedener Inhalt: Steht der Inhalt der einen Seite in der Historie der anderen, ist die
- *   andere ihre Korrektur und gilt. Sonst (zwei verschiedene Korrekturen) gilt die zuletzt geänderte; der Inhalt der
+ *   andere ihre Korrektur und gilt. Sonst (zwei verschiedene Korrekturen) gilt die zuletzt eingegangene; der Inhalt der
  *   anderen kommt mit einem Konfliktgrund in die Historie und wird gemeldet. Die Festschreibung gilt ab dem früheren Zeitpunkt.
+ *   E-214 (Steuerberater 26.10.2026): „zuletzt“ ist der Eingang beim Synchronisationsserver (`eingang`, Versionszähler
+ *   des Servers) – nur wenn eine Seite keinen hat (Sicherung, Datei, vor der ersten Synchronisation), die Uhr der Geräte
+ *   (`geaendert`), vermerkt als `vorrang: "geraetezeit"`. Die nicht übernommene Fassung bleibt vollständig erhalten:
+ *   Inhalt, Zeitpunkt, Gerät, Eingang, der Grund ihrer Korrektur und warum sie nicht gilt (`vorrang`, `gegen_*`);
+ *   zusätzlich ein Eintrag im Änderungsprotokoll (`konfliktProtokoll`).
  * - Sonst wie bisher: die zuletzt geänderte Fassung gewinnt.
  * Gleiches Ergebnis in beiden Richtungen; erneutes Zusammenführen mit einer der Seiten ändert nichts mehr.
  */
-export function belegZweiVereinen(l: Beleg, e: Beleg): { b: Beleg; konflikt: boolean } {
+export function belegZweiVereinen(l: Beleg, e: Beleg): { b: Beleg; konflikt: boolean; nichtUebernommen?: BelegFassung } {
   if (l === e) return { b: l, konflikt: false };
   const hist = new Map<string, BelegFassung>();
   for (const f of [...(l.historie ?? []), ...(e.historie ?? [])]) {
-    const k = kanonisch(f);
-    if (!hist.has(k)) hist.set(k, f);
+    // E-214: dieselbe Fassung mit und ohne nachgetragene Serverzeit ist ein Eintrag – der mit Serverzeit bleibt
+    const k = fassungSchluessel(f);
+    const da = hist.get(k);
+    if (!da || zeitenVon(f) > zeitenVon(da)) hist.set(k, f);
   }
   const inHistorie = new Set([...hist.values()].map(belegInhaltText));
   const il = belegInhaltText(belegFassung(l, ""));
@@ -1629,18 +1691,24 @@ export function belegZweiVereinen(l: Beleg, e: Beleg): { b: Beleg; konflikt: boo
   const neuere = l.geaendert !== e.geaendert ? (l.geaendert > e.geaendert ? l : e) : il <= ie ? l : e;
   let basis: Beleg;
   let konflikt = false;
+  let nichtUebernommen: BelegFassung | undefined;
   if (fl && fe) {
     if (il === ie) basis = neuere;
     else if (inHistorie.has(il) && !inHistorie.has(ie)) basis = e;
     else if (inHistorie.has(ie) && !inHistorie.has(il)) basis = l;
     else {
-      basis = neuere;
+      // E-214: zuletzt beim Server eingegangen; ohne Eingang auf beiden Seiten nach der Uhr der Geräte
+      const v = eingangVergleich(l.eingang, e.eingang);
+      const vorrang = v !== null && v !== 0 ? "eingang" : "geraetezeit";
+      basis = vorrang === "eingang" ? (v! > 0 ? l : e) : neuere;
       const zweite = basis === l ? e : l;
       const iz = basis === l ? ie : il;
       if (!inHistorie.has(iz)) {
-        const f = belegFassung(zweite, zweite.geaendert, BELEG_KONFLIKT_GRUND);
-        hist.set(kanonisch(f), f);
+        const kg = korrekturGrundVon(zweite);
+        const f: BelegFassung = { ...belegFassung(zweite, zweite.geaendert, BELEG_KONFLIKT_GRUND), ...belegMeta(zweite), vorrang, gegen_geaendert: basis.geaendert, ...(basis.geraet ? { gegen_geraet: basis.geraet } : {}), ...(basis.eingang ? { gegen_eingang: basis.eingang } : {}), ...(kg ? { korrektur_grund: kg } : {}) };
+        hist.set(fassungSchluessel(f), f);
         konflikt = true;
+        nichtUebernommen = f;
       }
     }
   } else if (fl || fe) {
@@ -1654,6 +1722,15 @@ export function belegZweiVereinen(l: Beleg, e: Beleg): { b: Beleg; konflikt: boo
   const r: Beleg = { ...basis };
   const fest = fl && fe ? (fl < fe ? fl : fe) : fl || fe;
   if (fest) r.festgeschrieben = fest;
+  // E-214: derselbe Inhalt auf beiden Seiten – der frühere Eingang beim Server gilt, das Gerät der früheren Fassung
+  if (fl && fe && il === ie) {
+    const eg = eingangVereinen(l.eingang, e.eingang);
+    if (eg) r.eingang = eg;
+    else delete r.eingang;
+    const frueher = eingangVergleich(l.eingang, e.eingang);
+    const g = frueher === null || frueher === 0 ? basis.geraet ?? zweite.geraet : frueher < 0 ? l.geraet ?? e.geraet : e.geraet ?? l.geraet;
+    if (g) r.geraet = g;
+  }
   if (!r.nr && zweite.nr) r.nr = zweite.nr;
   // ungültig markiert (die neuere Markierung) bleibt – auch wenn der Inhalt von der anderen Seite kommt
   if (!r.ungueltig && zweite.ungueltig && zweite.geaendert > basis.geaendert) {
@@ -1661,19 +1738,101 @@ export function belegZweiVereinen(l: Beleg, e: Beleg): { b: Beleg; konflikt: boo
     r.ungueltig_grund = zweite.ungueltig_grund ?? null;
     r.geaendert = zweite.geaendert;
   }
-  const liste = [...hist.values()].sort((x, y) => (x.bis !== y.bis ? (x.bis < y.bis ? -1 : 1) : kanonisch(x) < kanonisch(y) ? -1 : 1));
+  // E-214: Serverzeit je Version, soweit eine Seite sie kennt, überall nachtragen (gleiche Version = gleicher Eingang)
+  const zeiten = new Map<string, string>();
+  const merke = (x: BelegEingang | null | undefined) => {
+    if (x?.zeit && !x.spaetestens) zeiten.set(`${x.seit}|${x.version}`, x.zeit);
+  };
+  for (const b of [l, e]) {
+    merke(b.eingang);
+    for (const f of b.historie ?? []) {
+      merke(f.eingang);
+      merke(f.gegen_eingang);
+    }
+  }
+  const mitZeit = <X extends BelegEingang | null | undefined>(x: X): X => (x && !x.zeit && !x.spaetestens && zeiten.has(`${x.seit}|${x.version}`) ? ({ ...x, zeit: zeiten.get(`${x.seit}|${x.version}`)! } as X) : x);
+  if (r.eingang) r.eingang = mitZeit(r.eingang);
+  const liste = [...hist.values()]
+    .map((f) => (f.eingang || f.gegen_eingang ? { ...f, ...(f.eingang ? { eingang: mitZeit(f.eingang) } : {}), ...(f.gegen_eingang ? { gegen_eingang: mitZeit(f.gegen_eingang) } : {}) } : f))
+    .sort((x, y) => (x.bis !== y.bis ? (x.bis < y.bis ? -1 : 1) : kanonisch(x) < kanonisch(y) ? -1 : 1));
   if (liste.length) r.historie = liste;
   else delete r.historie;
   // unverändert: dasselbe Objekt (Vergleich „nichts Neues“ beim Übernehmen)
-  if (kanonisch(r) === kanonisch(l)) return { b: l, konflikt };
-  return { b: r, konflikt };
+  const extra = nichtUebernommen ? { nichtUebernommen } : {};
+  if (kanonisch(r) === kanonisch(l)) return { b: l, konflikt, ...extra };
+  return { b: r, konflikt, ...extra };
+}
+
+/** E-214: bei der Zusammenführung nicht übernommene Korrektur eines Belegs (für das Änderungsprotokoll) */
+export interface NichtUebernommen {
+  beleg: Beleg;
+  fassung: BelegFassung;
+}
+
+const eingangText = (e: BelegEingang | null | undefined) => (e ? `Eingang beim Server ${e.spaetestens ? "spätestens mit " : "mit "}Version ${e.version}${e.zeit ? ` am ${zeitDe(e.zeit)}` : ""}` : "ohne Eingang beim Server");
+const geraetKurz = (g: string | null | undefined) => (g ? g.slice(-8) : "unbekannt");
+
+/**
+ * E-214 (Steuerberater 26.10.2026): Eintrag im Änderungsprotokoll für eine nicht übernommene Korrektur – mit fester ID
+ * je Beleg und Fassung, damit zwei Geräte, die denselben Konflikt sehen, nur einen Eintrag ergeben.
+ */
+export function konfliktProtokoll(n: NichtUebernommen, jetzt: Date): ProtokollEintrag {
+  const f = n.fassung;
+  const summe = f.steuer.reduce((a, x) => a + x.brutto_cent, 0);
+  const warum = f.vorrang === "eingang" ? "weil die andere Korrektur später beim Synchronisationsserver einging" : "nach der Uhr der Geräte (ohne Eingang beim Server, z. B. Sicherung oder Datei)";
+  const text = `Abweichende Korrektur vom ${zeitDe(f.bis)} (Gerät …${geraetKurz(f.geraet)}, ${eingangText(f.eingang)}${f.korrektur_grund ? `, Grund: ${f.korrektur_grund}` : ""}) nicht übernommen – es gilt die Korrektur vom ${f.gegen_geaendert ? zeitDe(f.gegen_geaendert) : "?"} (Gerät …${geraetKurz(f.gegen_geraet)}, ${eingangText(f.gegen_eingang)}), ${warum}. Nicht übernommen: ${f.datum}, ${f.lieferant}, ${(summe / 100).toFixed(2).replace(".", ",")} € brutto, ${f.kategorie}; vollständig in der Historie des Belegs.`;
+  return { id: `nu-${n.beleg.id}-${kurzHash(fassungSchluessel(f))}`, zeitpunkt: jetzt.toISOString(), art: "korrektur_nicht_uebernommen", bezug: n.beleg.id, ...(n.beleg.nr ? { nr: n.beleg.nr } : {}), text: text.slice(0, 500), fassung_bis: f.bis, ...(f.geraet ? { geraet: f.geraet } : {}), ...(f.eingang ? { eingang: f.eingang } : {}) };
+}
+
+/**
+ * E-214: Eintrag im Änderungsprotokoll für eine Konfliktkopie (K1, E-209) – eine abweichend festgeschriebene Fassung
+ * einer Unterlage, die nicht gilt (gültig bleibt die zuerst festgeschriebene bzw. die Korrektur, die sie enthält).
+ */
+export function konfliktKopieProtokoll(k: Unterlage, jetzt: Date): ProtokollEintrag {
+  const nr = nummerVon(k);
+  const titel = vorlageFuer(k.vorlage)?.titel ?? k.vorlage;
+  return { id: `nu-${k.id}`, zeitpunkt: jetzt.toISOString(), art: "korrektur_nicht_uebernommen", bezug: k.konfliktKopieVon ?? k.id, ...(nr ? { nr } : {}), vorlage: k.vorlage, text: `${titel}${nr ? ` ${nr}` : ""}: abweichend festgeschriebene Fassung (festgeschrieben ${k.festgeschrieben ? zeitDe(k.festgeschrieben) : "?"}) bei der Zusammenführung nicht übernommen – sie bleibt als Konfliktkopie vollständig erhalten und zählt nirgends mit; es gilt die zuerst festgeschriebene Fassung bzw. die Korrektur, die sie enthält.`.slice(0, 500), ...(k.festgeschrieben ? { fassung_bis: k.festgeschrieben } : {}) };
+}
+
+/** E-214: Protokolleinträge für Konflikte einer Zusammenführung – neue Konfliktkopien und nicht übernommene Korrekturen. */
+export function konfliktEintraege(vorher: readonly ProtokollEintrag[], unterlagen: readonly Unterlage[], belege: readonly NichtUebernommen[], jetzt: Date): ProtokollEintrag[] {
+  const da = new Set(vorher.map((p) => p.id));
+  const neu = [...unterlagen.filter((u) => u.konfliktKopieVon && u.festgeschrieben).map((u) => konfliktKopieProtokoll(u, jetzt)), ...belege.map((n) => konfliktProtokoll(n, jetzt))];
+  return neu.filter((p, i) => !da.has(p.id) && neu.findIndex((x) => x.id === p.id) === i);
+}
+
+/**
+ * E-214: Eingang beim Server vormerken – festgeschriebene Belege ohne `eingang` bekommen den angegebenen (Synchronisation:
+ * lokal die Version, die dieses Hochladen bekommt; vom Server Geholtes „spätestens“ mit der geholten Version).
+ */
+export function eingangVormerken<T extends Pick<Stand, "belege" | "belegArchiv">>(s: T, e: BelegEingang): T {
+  const ohne = (b: Beleg) => b.festgeschrieben && !b.eingang;
+  if (!s.belege.some(ohne) && !s.belegArchiv.some(ohne)) return s;
+  const setzen = (l: Beleg[]) => l.map((b) => (ohne(b) ? { ...b, eingang: { ...e } } : b));
+  return { ...s, belege: setzen(s.belege), belegArchiv: setzen(s.belegArchiv) };
+}
+
+/** E-214: nach dem Hochladen die Serverzeit an die Eingänge dieser Version schreiben (an Belegen und in der Historie). */
+export function eingangZeitSetzen(s: Stand, seit: string, version: number, zeit: string): Stand {
+  const passt = (e: BelegEingang | null | undefined) => !!e && e.seit === seit && e.version === version && !e.zeit && !e.spaetestens;
+  const mit = (e: BelegEingang) => ({ ...e, zeit });
+  let geaendert = false;
+  const beleg = (b: Beleg): Beleg => {
+    const h = b.historie?.some((f) => passt(f.eingang) || passt(f.gegen_eingang));
+    if (!passt(b.eingang) && !h) return b;
+    geaendert = true;
+    return { ...b, ...(passt(b.eingang) ? { eingang: mit(b.eingang!) } : {}), ...(h ? { historie: b.historie!.map((f) => ({ ...f, ...(passt(f.eingang) ? { eingang: mit(f.eingang!) } : {}), ...(passt(f.gegen_eingang) ? { gegen_eingang: mit(f.gegen_eingang!) } : {}) })) } : {}) };
+  };
+  const belege = s.belege.map(beleg);
+  const belegArchiv = s.belegArchiv.map(beleg);
+  return geaendert ? { ...s, belege, belegArchiv } : s;
 }
 
 /**
  * Belege beider Seiten (gültige und ungültig markierte) nach ID vereinen (siehe `belegZweiVereinen`). `konflikte`
  * sammelt die Belegnummern (bzw. IDs) mit Konflikt.
  */
-export function belegeVereinen(a: Beleg[], b: Beleg[], konflikte?: Set<string>): Map<string, Beleg> {
+export function belegeVereinen(a: Beleg[], b: Beleg[], konflikte?: Set<string>, nichtUebernommen?: NichtUebernommen[]): Map<string, Beleg> {
   const m = new Map(a.map((x) => [x.id, x]));
   for (const x of b) {
     const l = m.get(x.id);
@@ -1684,6 +1843,7 @@ export function belegeVereinen(a: Beleg[], b: Beleg[], konflikte?: Set<string>):
     const v = belegZweiVereinen(l, x);
     m.set(x.id, v.b);
     if (v.konflikt) konflikte?.add(v.b.nr || v.b.id);
+    if (v.nichtUebernommen) nichtUebernommen?.push({ beleg: v.b, fassung: v.nichtUebernommen });
   }
   return m;
 }
@@ -1771,7 +1931,8 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
     } else wieder.push(g);
   }
   const belegKonflikte = new Set<string>();
-  const belegNachId = belegeVereinen(lokaleBelege, wieder, belegKonflikte);
+  const nichtUebernommen: NichtUebernommen[] = [];
+  const belegNachId = belegeVereinen(lokaleBelege, wieder, belegKonflikte, nichtUebernommen);
   for (const g of wieder) {
     const a = lokalIds.get(g.id);
     if (!a) continue;
@@ -1808,6 +1969,9 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
     protokoll: protokollVereinen(aktuell.protokoll, gesichert.protokoll),
     sachentnahmen: sachentnahmenVereinen(aktuell.sachentnahmen, gesichert.sachentnahmen, aktuell.geloescht),
   };
+  // E-214: Konflikte (nicht übernommene Korrekturen, Konfliktkopien) auch ins Änderungsprotokoll
+  const konfliktNeu = konfliktEintraege(stand.protokoll, unterlagen, nichtUebernommen, jetzt);
+  if (konfliktNeu.length) stand.protokoll = protokollVereinen(stand.protokoll, konfliktNeu);
   // Phase 2.3: Partner aus der Sicherung nur übernehmen, wenn auf dem Gerät keiner gesetzt ist
   const partnerId = aktuell.partnerId ?? gesichert.partnerId;
   if (partnerId) stand.partnerId = partnerId;

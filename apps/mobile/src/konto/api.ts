@@ -42,7 +42,11 @@ export function tresorServer(basis: string, token: () => Promise<string>, abruf:
   return {
     holen: async () => (await anfrage("GET", "tresor", undefined, true)) as Awaited<ReturnType<TresorServer["holen"]>>,
     einrichten: async (schluessel) => (await anfrage("POST", "tresor", { schluessel })) as { version: number; konto_id?: string },
-    speichern: async (version, daten) => ((await anfrage("PUT", "tresor", { version, daten })) as { version: number }).version,
+    // E-214: neue Version mit Serverzeit des Eingangs und Einrichtung des Tresors
+    speichern: async (version, daten) => {
+      const r = (await anfrage("PUT", "tresor", { version, daten })) as { version: number; empfangen?: string; seit?: string };
+      return { version: r.version, ...(typeof r.empfangen === "string" ? { empfangen: r.empfangen } : {}), ...(typeof r.seit === "string" ? { seit: r.seit } : {}) };
+    },
     schluesselSetzen: async (schluessel) => {
       await anfrage("PUT", "tresor/schluessel", { schluessel });
     },
