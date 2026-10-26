@@ -1489,8 +1489,18 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
   const sa = andere.fassungen?.length ?? 0;
   let basis: Unterlage;
   let kopie: Unterlage | undefined;
-  if (sl !== sa) basis = sl > sa ? lokal : andere;
-  else if (fl && fa) {
+  if (sl !== sa) {
+    basis = sl > sa ? lokal : andere;
+    // E-209: Die Korrektur ersetzt eine festgeschriebene Fassung nur, wenn sie diese in ihren Fassungen enthält –
+    // sonst (fremde oder präparierte Fassung) bleibt die festgeschriebene als Konfliktkopie erhalten, nie still verdrängt
+    const zweite = basis === lokal ? andere : lokal;
+    const zd = JSON.stringify(zweite.daten);
+    const enthalten = (basis.festgeschrieben === zweite.festgeschrieben && JSON.stringify(basis.daten) === zd) || (basis.fassungen ?? []).some((f) => f.festgeschrieben === zweite.festgeschrieben && JSON.stringify(f.daten) === zd);
+    if (zweite.festgeschrieben && !zweite.konfliktKopieVon && !enthalten) {
+      const { storniertDurch: _s, bezahlt: _b, bezahltGeaendert: _bg, zahlungen: _z, ...rest } = zweite;
+      kopie = { ...rest, id: `${lokal.id}-konflikt-${kurzHash(zd)}`, konfliktKopieVon: lokal.id };
+    }
+  } else if (fl && fa) {
     const dl = JSON.stringify(lokal.daten);
     const da = JSON.stringify(andere.daten);
     // zuerst festgeschrieben gewinnt; bei gleichem Zeitpunkt entscheidet der Inhalt – auf allen Geräten gleich
@@ -1569,12 +1579,111 @@ export function unterlagenZusammenfuehren(lokal: Unterlage[], andere: Unterlage[
   return { liste: m, konflikte: [...konflikte].sort(), neu, aktualisiert, behalten };
 }
 
-/** Belege beider Seiten (gültige und ungültig markierte) nach ID: die zuletzt geänderte Fassung gewinnt. */
-export function belegeVereinen(a: Beleg[], b: Beleg[]): Map<string, Beleg> {
+/** JSON mit sortierten Schlüsseln, ohne leere Werte (null/undefined) – gleicher Inhalt ergibt gleichen Text. */
+function kanonisch(x: unknown): string {
+  if (Array.isArray(x)) return `[${x.map(kanonisch).join(",")}]`;
+  if (x && typeof x === "object") {
+    const o = x as Record<string, unknown>;
+    return `{${Object.keys(o)
+      .filter((k) => o[k] !== null && o[k] !== undefined)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${kanonisch(o[k])}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(x);
+}
+/** Inhalt eines Belegs bzw. einer früheren Fassung – ohne Gültigkeitszeitpunkt und Grund (E-209). */
+const belegInhaltText = (f: BelegFassung) => {
+  const { bis: _b, grund: _g, ...rest } = f;
+  return kanonisch(rest);
+};
+type BelegFassung = NonNullable<Beleg["historie"]>[number];
+/** Grund in der Historie, wenn zwei Geräte denselben festgeschriebenen Beleg verschieden korrigiert haben (E-209). */
+export const BELEG_KONFLIKT_GRUND = "Abweichende Korrektur auf einem anderen Gerät (bei der Zusammenführung nicht übernommen)";
+
+/**
+ * E-209 (GoBD, § 146 Abs. 4 AO): zwei Fassungen desselben Belegs vereinen – für Synchronisation und Wiederherstellen.
+ * - Die Historie ist nur fortzuschreiben: Einträge beider Seiten werden vereint (gleicher Eintrag nur einmal), nie gekürzt.
+ * - Festgeschrieben schlägt nicht festgeschrieben, unabhängig vom Zeitstempel (ein festgeschriebener Beleg wird nie
+ *   wieder Entwurf). Hat das andere Gerät den Entwurf nach der Festschreibung noch geändert, wird diese Änderung nicht
+ *   übernommen, aber als Konflikt gemeldet.
+ * - Beide festgeschrieben, verschiedener Inhalt: Steht der Inhalt der einen Seite in der Historie der anderen, ist die
+ *   andere ihre Korrektur und gilt. Sonst (zwei verschiedene Korrekturen) gilt die zuletzt geänderte; der Inhalt der
+ *   anderen kommt mit einem Konfliktgrund in die Historie und wird gemeldet. Die Festschreibung gilt ab dem früheren Zeitpunkt.
+ * - Sonst wie bisher: die zuletzt geänderte Fassung gewinnt.
+ * Gleiches Ergebnis in beiden Richtungen; erneutes Zusammenführen mit einer der Seiten ändert nichts mehr.
+ */
+export function belegZweiVereinen(l: Beleg, e: Beleg): { b: Beleg; konflikt: boolean } {
+  if (l === e) return { b: l, konflikt: false };
+  const hist = new Map<string, BelegFassung>();
+  for (const f of [...(l.historie ?? []), ...(e.historie ?? [])]) {
+    const k = kanonisch(f);
+    if (!hist.has(k)) hist.set(k, f);
+  }
+  const inHistorie = new Set([...hist.values()].map(belegInhaltText));
+  const il = belegInhaltText(belegFassung(l, ""));
+  const ie = belegInhaltText(belegFassung(e, ""));
+  const fl = l.festgeschrieben || "";
+  const fe = e.festgeschrieben || "";
+  // zuletzt geändert; bei gleichem Zeitpunkt entscheidet der Inhalt (auf allen Geräten gleich)
+  const neuere = l.geaendert !== e.geaendert ? (l.geaendert > e.geaendert ? l : e) : il <= ie ? l : e;
+  let basis: Beleg;
+  let konflikt = false;
+  if (fl && fe) {
+    if (il === ie) basis = neuere;
+    else if (inHistorie.has(il) && !inHistorie.has(ie)) basis = e;
+    else if (inHistorie.has(ie) && !inHistorie.has(il)) basis = l;
+    else {
+      basis = neuere;
+      const zweite = basis === l ? e : l;
+      const iz = basis === l ? ie : il;
+      if (!inHistorie.has(iz)) {
+        const f = belegFassung(zweite, zweite.geaendert, BELEG_KONFLIKT_GRUND);
+        hist.set(kanonisch(f), f);
+        konflikt = true;
+      }
+    }
+  } else if (fl || fe) {
+    basis = fl ? l : e;
+    const zweite = fl ? e : l;
+    const iz = fl ? ie : il;
+    // nach der Festschreibung auf einem anderen Gerät noch geändert – nicht übernommen, aber sichtbar
+    konflikt = iz !== (fl ? il : ie) && !inHistorie.has(iz) && zweite.geaendert > (basis.festgeschrieben as string);
+  } else basis = neuere;
+  const zweite = basis === l ? e : l;
+  const r: Beleg = { ...basis };
+  const fest = fl && fe ? (fl < fe ? fl : fe) : fl || fe;
+  if (fest) r.festgeschrieben = fest;
+  if (!r.nr && zweite.nr) r.nr = zweite.nr;
+  // ungültig markiert (die neuere Markierung) bleibt – auch wenn der Inhalt von der anderen Seite kommt
+  if (!r.ungueltig && zweite.ungueltig && zweite.geaendert > basis.geaendert) {
+    r.ungueltig = zweite.ungueltig;
+    r.ungueltig_grund = zweite.ungueltig_grund ?? null;
+    r.geaendert = zweite.geaendert;
+  }
+  const liste = [...hist.values()].sort((x, y) => (x.bis !== y.bis ? (x.bis < y.bis ? -1 : 1) : kanonisch(x) < kanonisch(y) ? -1 : 1));
+  if (liste.length) r.historie = liste;
+  else delete r.historie;
+  // unverändert: dasselbe Objekt (Vergleich „nichts Neues“ beim Übernehmen)
+  if (kanonisch(r) === kanonisch(l)) return { b: l, konflikt };
+  return { b: r, konflikt };
+}
+
+/**
+ * Belege beider Seiten (gültige und ungültig markierte) nach ID vereinen (siehe `belegZweiVereinen`). `konflikte`
+ * sammelt die Belegnummern (bzw. IDs) mit Konflikt.
+ */
+export function belegeVereinen(a: Beleg[], b: Beleg[], konflikte?: Set<string>): Map<string, Beleg> {
   const m = new Map(a.map((x) => [x.id, x]));
   for (const x of b) {
     const l = m.get(x.id);
-    if (!l || l.geaendert < x.geaendert) m.set(x.id, x);
+    if (!l) {
+      m.set(x.id, x);
+      continue;
+    }
+    const v = belegZweiVereinen(l, x);
+    m.set(x.id, v.b);
+    if (v.konflikt) konflikte?.add(v.b.nr || v.b.id);
   }
   return m;
 }
@@ -1602,6 +1711,8 @@ export interface Zusammenfuehrung {
   nummernKonflikte: string[];
   /** auf zwei Geräten verschieden festgeschrieben (K1): gültig bleibt die zuerst festgeschriebene, die andere ist Konfliktkopie */
   festKonflikte: string[];
+  /** E-209: festgeschriebene Belege, deren abweichende Fassung aus der Sicherung nicht übernommen wurde (Belegnummern) */
+  belegKonflikte: string[];
   /** Rechnungen mit mehr als einer festgeschriebenen Stornorechnung (K2) */
   mehrfachStorniert: string[];
 }
@@ -1640,7 +1751,8 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
   const unterlagen = stornoVerweisePruefen([...u.liste.values()].filter((x) => !weg(x)));
 
   const personen = (a: Person[], g: Person[]) => [...a, ...g.filter((p) => !a.some((x) => x.id === p.id))];
-  // Belege: nach ID, die zuletzt geänderte Fassung gewinnt; nur auf dem Gerät Vorhandenes bleibt
+  // Belege: nach ID vereint wie bei der Synchronisation (E-209: festgeschriebene nie ersetzt, Historie nur ergänzt);
+  // nur auf dem Gerät Vorhandenes bleibt
   const lokaleBelege = [...aktuell.belege, ...aktuell.belegArchiv];
   const lokalIds = new Map(lokaleBelege.map((b) => [b.id, b]));
   let neu = u.neu;
@@ -1649,20 +1761,23 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
   const iso = jetzt.toISOString();
   const wieder: Beleg[] = [];
   for (const g of [...gesichert.belege, ...gesichert.belegArchiv]) {
-    const a = lokalIds.get(g.id);
-    if (!a) {
+    if (!lokalIds.has(g.id)) {
       neu++;
       // auf dem Gerät (oder einem anderen) gelöscht, jetzt bewusst zurückgeholt: schlägt den Löschvermerk
       if (geloescht[`b:${g.id}`]) {
         delete geloescht[`b:${g.id}`];
         wieder.push({ ...g, geaendert: iso });
       } else wieder.push(g);
-    } else if (a.geaendert < g.geaendert) {
-      aktualisiert++;
-      wieder.push(g);
-    } else behalten++;
+    } else wieder.push(g);
   }
-  const belegNachId = belegeVereinen(lokaleBelege, wieder);
+  const belegKonflikte = new Set<string>();
+  const belegNachId = belegeVereinen(lokaleBelege, wieder, belegKonflikte);
+  for (const g of wieder) {
+    const a = lokalIds.get(g.id);
+    if (!a) continue;
+    if (belegNachId.get(g.id) === a) behalten++;
+    else aktualisiert++;
+  }
   const alleBelege = [...belegNachId.values()];
   const erledigt = { ...gesichert.erledigt, ...aktuell.erledigt };
   // E-193 (8c): Zeitpunkte je Bereich beider Seiten (der spätere je Schlüssel) – sonst hielte eine spätere
@@ -1699,7 +1814,7 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
   // E-193 (8c): Nachweise der Vollsicherung (StB GoBD, D-11) beider Seiten – der Nachweis geht mit der Sicherung nicht verloren
   const nachweise = nachweiseAus([...(aktuell.sicherungsNachweis ?? []), ...(gesichert.sicherungsNachweis ?? [])].filter((n, i, a) => a.findIndex((x) => x.am === n.am && x.ziel === n.ziel) === i));
   if (nachweise.length) stand.sicherungsNachweis = nachweise;
-  return { stand: belegNummernSichern(stand), neu, behalten, aktualisiert, nummernKonflikte: nummernKonflikteVon(stand), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(stand.unterlagen) };
+  return { stand: belegNummernSichern(stand), neu, behalten, aktualisiert, nummernKonflikte: nummernKonflikteVon(stand), festKonflikte: u.konflikte, belegKonflikte: [...belegKonflikte].sort(), mehrfachStorniert: mehrfachStorniert(stand.unterlagen) };
 }
 
 /** Nummern, die in zwei verschiedenen Unterlagen derselben Vorlage vorkommen. */

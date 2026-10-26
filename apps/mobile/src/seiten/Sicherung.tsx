@@ -7,7 +7,7 @@ import { useMeldung } from "../ui/meldung";
 import { RADIUS, useFarben } from "../ui/thema";
 import { PASSWORT_EMPFOHLEN, SicherungsFehler, passwortSchwaeche, schluesselAusPasswort, schluesselKennung, sicherungMitSchluessel, sicherungsDatei, sicherungsDateiLesen, sicherungsKdf, sicherungsName, type SicherungsSchluessel } from "../unterlagen/sicherung";
 import { belegeErgaenzt, containerOeffnen, containerSchreiben, textSicherungOeffnen, type GeoeffneteSicherung } from "../unterlagen/sicherungContainer";
-import { ORDNER_WAHL, cloudBeiseitelegen, cloudDateiLesen, cloudDateiSchreiben, cloudDateien, cloudLesen, cloudSchreiben, cloudVerfuegbar, ordnerStatus, ordnerVergessen, ordnerWaehlen, type OrdnerStatus } from "../unterlagen/cloud";
+import { ORDNER_WAHL, SicherungUnlesbar, cloudDateiLesen, cloudDateiSchreiben, cloudDateien, cloudSchreiben, cloudVerfuegbar, cloudVorhanden, ordnerStatus, ordnerVergessen, ordnerWaehlen, type OrdnerStatus } from "../unterlagen/cloud";
 import { bestaetigen } from "../ui/bestaetigen";
 import { ANDROID } from "../plattform";
 import { autoSchluesselHolen, autoSchluesselLoeschen, autoSchluesselSpeichern } from "../unterlagen/schluesselbund";
@@ -294,10 +294,11 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
             void (async () => {
               // Android (E-190): ohne erreichbaren Ordner zuerst die Ordnerauswahl (z. B. auf einem neuen Smartphone)
               if (!cloud && ORDNER_WAHL && (await ordnerWaehlen())?.art !== "ok") return;
-              const text = await cloudLesen();
+              // E-209: eine noch nicht geladene Sicherung ist nicht „keine“ – Laden anstoßen und das sagen
+              const v = await cloudVorhanden().catch(() => ({ art: "keine" }) as const);
               setGeoeffnet(null);
-              if (text) setDatei({ name: TEXT.icloud_sicherung_name, text, leser: null, entfernen: () => undefined });
-              else setHinweis(TEXT.icloud_leer);
+              if (v.art === "lesbar") setDatei({ name: TEXT.icloud_sicherung_name, text: v.text, leser: null, entfernen: () => undefined });
+              else setHinweis(v.art === "unlesbar" ? TEXT.sicherung_noch_nicht_lesbar : TEXT.icloud_leer);
             })()
           }
           stil={{ marginTop: 4 }}
@@ -319,6 +320,7 @@ function Vorschau({ aktuell, gelesen }: { aktuell: Stand; gelesen: Stand }) {
       <Hinweis text={TEXT.zusammenfuehren_text(z.neu, z.aktualisiert, z.behalten)} />
       {z.nummernKonflikte.length ? <Hinweis art="fehler" text={TEXT.nummern_konflikt(z.nummernKonflikte)} /> : null}
       {z.festKonflikte.length ? <Hinweis art="fehler" text={TEXT.fest_konflikt(z.festKonflikte)} /> : null}
+      {z.belegKonflikte.length ? <Hinweis art="warnung" text={TEXT.beleg_konflikt(z.belegKonflikte, "sicherung")} /> : null}
       {z.mehrfachStorniert.length ? <Hinweis art="fehler" text={TEXT.mehrfach_storniert(z.mehrfachStorniert)} /> : null}
     </View>
   );
@@ -462,12 +464,15 @@ async function ordnerNeuWaehlen(z: ReturnType<typeof useAmtlos>, melden?: (t: st
   const st = await ordnerWaehlen();
   if (st?.art !== "ok") return st;
   const k = await autoSchluesselHolen();
-  const vorhanden = await cloudLesen();
-  const kdf = vorhanden ? sicherungsKdf(vorhanden) : null;
-  if (vorhanden && (!k || !kdf || schluesselKennung(kdf.salz) !== schluesselKennung(k.salz))) {
-    await cloudBeiseitelegen(vorhanden);
-    melden?.(TEXT.ordner_beiseite);
+  // E-209: eine vorhandene, aber (noch) nicht lesbare Sicherung wird nie überschrieben – nur gemeldet
+  const v = await cloudVorhanden().catch(() => ({ art: "keine" }) as const);
+  if (v.art === "unlesbar") {
+    melden?.(TEXT.sicherung_unlesbar);
+    return st;
   }
+  const kdf = v.art === "lesbar" ? sicherungsKdf(v.text) : null;
+  // anderer Schlüssel: `cloudSchreiben` legt die vorhandene Sicherung zuerst beiseite (E-209)
+  if (v.art === "lesbar" && (!k || !kdf || schluesselKennung(kdf.salz) !== schluesselKennung(k.salz))) melden?.(TEXT.ordner_beiseite);
   await automatischSichern(z).catch(() => undefined);
   return st;
 }
@@ -542,6 +547,8 @@ function CloudSicherungSeite() {
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState(false);
   const [fehlend, setFehlend] = useState(0);
+  // E-209: vorhandene Sicherung nicht lesbar (z. B. noch nicht aus iCloud geladen) – nichts geschrieben
+  const [unlesbar, setUnlesbar] = useState(false);
   // Android (E-190): zuerst der Ordner – ein schon gewählter, erreichbarer wird übernommen
   const vorher = useOrdnerStatus();
   const [ordner, setOrdner] = useState<OrdnerStatus | null>(null);
@@ -549,31 +556,47 @@ function CloudSicherungSeite() {
   const ordnerOk = !ORDNER_WAHL || gewaehlt?.art === "ok";
   const bereit = passwortBereit(pw, pw2) && ordnerOk;
   const waehlen = () => void ordnerWaehlen().then((x) => x && setOrdner(x)).catch(() => setFehler(true));
-  const los = async () => {
+  const los = async (ersetzen = false) => {
     setFehler(false);
     setLaedt(true);
     try {
       await gleich();
       // Liegt schon eine Sicherung in iCloud (z. B. vom alten iPhone), nie einfach überschreiben:
-      // öffnet das Passwort sie, wird sie zuerst übernommen; sonst wird sie beiseitegelegt.
-      const vorhanden = await cloudLesen();
+      // öffnet das Passwort sie, wird sie zuerst übernommen; sonst legt `cloudSchreiben` sie beiseite (E-209).
+      // E-209: Lässt sie sich nicht lesen (auf einem neuen iPhone oft noch nicht aus iCloud geladen, Lesefehler,
+      // 0 Byte), wird nichts geschrieben – erst nach erneutem Versuch oder ausdrücklicher Wahl „Ersetzen“.
+      const v = ersetzen ? ({ art: "keine" } as const) : await cloudVorhanden();
+      if (v.art === "unlesbar") {
+        setUnlesbar(true);
+        return;
+      }
+      setUnlesbar(false);
       let k: SicherungsSchluessel | null = null;
-      if (vorhanden) {
+      if (v.art === "lesbar") {
         try {
-          const r = textSicherungOeffnen(vorhanden, pw);
+          const r = textSicherungOeffnen(v.text, pw);
           k = { schluessel: r.schluessel, salz: r.kdf.salz, iterationen: r.kdf.iterationen };
-          await z.zusammenfuehren(r.stand);
+          const zf = await z.zusammenfuehren(r.stand);
           await z.dateienEinspielen(mitCloudBelegen(r));
-          melden(TEXT.icloud_uebernommen);
+          melden(zf.belegKonflikte.length ? TEXT.beleg_konflikt(zf.belegKonflikte, "sicherung") : TEXT.icloud_uebernommen);
         } catch {
-          await cloudBeiseitelegen(vorhanden);
+          /* anderes Passwort oder keine Sicherung: wird beim Schreiben beiseitegelegt */
         }
       }
       k ??= schluesselAusPasswort(pw, zufall);
       await autoSchluesselSpeichern(k);
       const stand = z.aktuellerStand();
       const ohne = await belegeHochladen(z, k, stand);
-      await cloudSchreiben(sicherungMitSchluessel(stand, k, zufall, new Date()));
+      try {
+        await cloudSchreiben(sicherungMitSchluessel(stand, k, zufall, new Date()), new Date(), { ersetzen });
+      } catch (e) {
+        // inzwischen nicht mehr lesbar: nichts überschrieben, wie oben melden
+        if (e instanceof SicherungUnlesbar) {
+          setUnlesbar(true);
+          return;
+        }
+        throw e;
+      }
       z.cloudSicherungSetzen(true);
       // nur vollständig gilt als gesichert (H3)
       if (ohne) {
@@ -594,7 +617,7 @@ function CloudSicherungSeite() {
       unter={TEXT.icloud_einrichten_text}
       fuss={
           <Fuss>
-            <Knopf text={laedt ? TEXT.sicherung_laeuft : TEXT.icloud_einschalten} symbol="icloud" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
+            <Knopf text={laedt ? TEXT.sicherung_laeuft : unlesbar ? TEXT.sicherung_unlesbar_erneut : TEXT.icloud_einschalten} symbol="icloud" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
           </Fuss>
       }
     >
@@ -612,6 +635,20 @@ function CloudSicherungSeite() {
         {ORDNER_WAHL && !ordnerOk && passwortBereit(pw, pw2) ? <Hinweis text={TEXT.ordner_fehlt} symbol="folder" /> : null}
         {fehler ? <Hinweis art="fehler" text={TEXT.icloud_fehler} /> : null}
         {fehlend ? <Hinweis art="fehler" text={TEXT.sicherung_dateien_fehlen(fehlend)} /> : null}
+        {unlesbar ? (
+          <View style={{ gap: 6 }}>
+            <Hinweis art="warnung" text={TEXT.sicherung_unlesbar} symbol="icloud" />
+            <TextKnopf
+              symbol="exclamationmark.triangle"
+              text={TEXT.sicherung_unlesbar_ersetzen}
+              onPress={() =>
+                void bestaetigen({ titel: TEXT.sicherung_unlesbar_ersetzen_wirklich, text: TEXT.sicherung_unlesbar_ersetzen_text, ja: TEXT.sicherung_unlesbar_ersetzen_ja }).then((ok) => {
+                  if (ok) void los(true);
+                })
+              }
+            />
+          </View>
+        ) : null}
       </View>
     </BuehnenBlatt>
   );
