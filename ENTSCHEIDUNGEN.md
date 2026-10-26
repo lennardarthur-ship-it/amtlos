@@ -1480,6 +1480,9 @@ Alle vier Prüfer haben am 26.10.2026 per Mail geantwortet (Mails und ausgefüll
 
 **Antwortpakete** (außerhalb des Repositorys, beim Gründer): Rechtsanwalt (Zuordnung der Prüfsummen mit Abgleich je Variante, Stellen „fachlich zu prüfen“ im Wortlaut, PDFs der drei Vorlagen, Gegenüberstellung Künstlersozialabgabe v1/v2, Android-Hinweis endgültig, Platzhalter für die Prüfsummen der KG-Varianten), Fachkraft für Arbeitssicherheit (Zuordnung, 41 Bausteine mit Nummer und Text, PDFs der sieben Vorlagen), Steuerberater (kurze Mail, Storno-PDF folgt aus der Arbeit am Code). Erzeugt mit `pruefsummen-abgleich.py`, `docs/pruefmappe-arbeitsschutz/erzeugen.mjs` und `dokumente-pruefen.mjs` in Ordner außerhalb des Repositorys. Tests: `apps/mobile/test/e201-rueckmeldungen.test.ts` (neu), angepasst `e197-pruefvermerk-nachweis.test.ts`, `android.test.ts`, `vorlagen-geprueft.test.ts` (App und Fachlogik). PRUEFLISTE T-215 bis T-222; T-177 und T-198 erledigt, Nachträge zu T-178, T-179, T-199, T-202, T-203.
 
+
+**Nachtrag E-201 (26.10.2026, Gründer):** Den Auftrag des Rechtsanwalts für die Nutzungsbedingungen unter Google Play hat der Gründer erteilt und bezahlt; der Entwurf wird bis 6.11.2026 erwartet (T-220). Die auf die Rollenangabe umgestellte Vereinbarung mit dem Rechtsanwalt hat der Gründer unterschrieben (beim Gründer, T-218).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
