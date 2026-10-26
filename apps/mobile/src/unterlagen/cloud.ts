@@ -30,7 +30,7 @@ function lib(): Lib | null {
   return geladen;
 }
 
-/** Technischer Ordnername in iCloud Drive – nicht mit der Marke ändern (docs/14-marke.md). */
+/** Technischer Ordnername in iCloud Drive – nicht mit der Marke ändern (amtlos-intern: docs/14-marke.md). */
 const ORDNER = "/Amtlos";
 export const AKTUELL = `${ORDNER}/${MARKE.name}-Sicherung-aktuell.amtlos`;
 

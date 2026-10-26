@@ -1,5 +1,5 @@
 /**
- * Marke (docs/14-marke.md): Der sichtbare Produktname steht nur in packages/marke/marke.json. Dieser Test hält fest,
+ * Marke (amtlos-intern: docs/14-marke.md): Der sichtbare Produktname steht nur in packages/marke/marke.json. Dieser Test hält fest,
  * dass nirgends sonst ein fest geschriebener Name sichtbar wird – weder der alte („Amtlos“) noch der aktuelle – und
  * dass ein anderer Name in marke.json bis in App-Texte, Rechtstexte, Dokumente und Store-Texte durchschlägt.
  *

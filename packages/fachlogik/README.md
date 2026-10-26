@@ -65,4 +65,4 @@ Prüfung als Bibliothek: `node werkzeuge/bibliothek-pruefen.mjs` im Wurzelordner
 ## Lizenz
 
 `UNLICENSED` – Eigentum des Anbieters von Amtlos; Nutzung nur nach schriftlicher Vereinbarung (siehe
-docs/13-b2b-lizenz.md). Mitgelieferte Fremdsoftware: `qrcode-generator` (MIT).
+amtlos-intern: docs/13-b2b-lizenz.md). Mitgelieferte Fremdsoftware: `qrcode-generator` (MIT).

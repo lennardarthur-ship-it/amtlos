@@ -9,7 +9,7 @@ import { heute } from "../unterlagen/speicher";
 import { BuehnenBlatt, Gruppe } from "./gemeinsam";
 
 /**
- * „Steuerberatung finden“ (docs/15-partnerkanzleien.md): gelistete Kanzleien mit fester Listungsgebühr, nie gegen
+ * „Steuerberatung finden“ (amtlos-intern: docs/15-partnerkanzleien.md): gelistete Kanzleien mit fester Listungsgebühr, nie gegen
  * Provision. Nur sichtbar, wenn mindestens eine gültige Kanzlei in der gebündelten Liste steht. Die Liste und der
  * Kontakt sind für alle frei; das Paket bleibt eine Pro-Funktion (die Prüfung macht `senden`, wie bisher).
  */

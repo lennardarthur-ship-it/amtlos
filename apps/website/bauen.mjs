@@ -18,7 +18,7 @@
  * Hilfe und Kontakt (Support-URL im App Store): hilfe.html zeigt ANBIETER.email aus rechtliches.ts – dieselbe Quelle wie
  * die App. Solange sie leer ist, steht dort „folgt vor dem Start“.
  *
- * Marke (docs/14-marke.md): seite.html und die Texte hier nennen den Namen nur als Platzhalter ({{MARKE}}, {{MARKE_PRO}},
+ * Marke (amtlos-intern: docs/14-marke.md): seite.html und die Texte hier nennen den Namen nur als Platzhalter ({{MARKE}}, {{MARKE_PRO}},
  * {{DOMAIN}}, {{EMAIL}}); eingesetzt wird packages/marke/marke.json in jede geschriebene Seite. Bleibt ein Platzhalter
  * oder der alte Name „Amtlos“ stehen, bricht der Build ab.
  *
@@ -78,7 +78,7 @@ fs.mkdirSync(path.join(OUT, "bilder"), { recursive: true });
 const schreibe = (datei, html) => {
   const fertig = markeEinsetzen(html);
   const rest = /\{\{[A-Z_]+\}\}|\bAmtlos\b/.exec(fertig.replace(/(?:Amtlos (?:Sans|Serif))/g, ""));
-  if (rest) throw new Error(`${datei}: „${rest[0]}“ übrig – Marke über {{MARKE}} usw. einsetzen (docs/14-marke.md)`);
+  if (rest) throw new Error(`${datei}: „${rest[0]}“ übrig – Marke über {{MARKE}} usw. einsetzen (amtlos-intern: docs/14-marke.md)`);
   fs.writeFileSync(path.join(OUT, datei), fertig);
 };
 const recht = await rechtliches();
@@ -226,7 +226,7 @@ fs.cpSync(path.join(HIER, "schriften"), path.join(OUT, "schriften"), { recursive
 for (const d of ["favicon.svg", "apple-touch-icon.png"]) fs.copyFileSync(path.join(HIER, d), path.join(OUT, d));
 if (anbieterFehlt) offen.push("Anbieterangaben für das Impressum (ANBIETER in apps/mobile/src/rechtliches.ts, § 5 DDG) – Impressum zeigt „folgt vor dem Start“");
 if (!recht.DATENSCHUTZ.freigegeben) offen.push("Datenschutz fachlich freigeben (DATENSCHUTZ.freigegeben) und Angaben zum Hosting ergänzen");
-if (!androidFrei) offen.push("Datenschutzhinweis der Android-App freigeben (DATENSCHUTZ_ANDROID.freigegeben, docs/datenschutz-android-entwurf.md) – datenschutz.html beschreibt bis dahin nur die iPhone-App; vor dem Start bei Google Play nötig");
+if (!androidFrei) offen.push("Datenschutzhinweis der Android-App freigeben (DATENSCHUTZ_ANDROID.freigegeben, amtlos-intern: docs/datenschutz-android-entwurf.md) – datenschutz.html beschreibt bis dahin nur die iPhone-App; vor dem Start bei Google Play nötig");
 if (!NB.freigegeben) offen.push("Nutzungsbedingungen anwaltlich freigeben (NUTZUNGSBEDINGUNGEN.freigegeben) – nutzungsbedingungen.html zeigt „Entwurf – noch nicht in Kraft“");
 if (A.rechtsform && !A.register) offen.push("Registergericht und Registernummer (ANBIETER.register) nach der Eintragung – Impressum zeigt „folgt vor dem Start“");
 console.log(`✓ ${OUT}`);

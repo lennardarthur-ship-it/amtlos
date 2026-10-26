@@ -26,7 +26,7 @@ const MONAT_JAHR = new Intl.DateTimeFormat("de-DE", { month: "long", year: "nume
 /**
  * Paket für die Steuerberatung (E-133): Zeitraum wählen, Kontenrahmen und DATEV-Nummern angeben, ZIP teilen.
  * Das Paket entsteht auf dem Gerät; die Belegdateien werden dafür entschlüsselt.
- * „Steuerberatung finden“ (docs/15) erscheint nur mit gelisteten Kanzleien; `kanzleienZuerst` stellt den Bereich nach
+ * „Steuerberatung finden“ (amtlos-intern: docs/15) erscheint nur mit gelisteten Kanzleien; `kanzleienZuerst` stellt den Bereich nach
  * oben (Einstieg aus einer Steuer-Pflicht).
  */
 export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boolean } = {}) {

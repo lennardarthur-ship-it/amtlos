@@ -88,7 +88,7 @@ Eine Marke (E-105) gilt für die Hostnamen, die im Studio unter „Marken“ ein
 
 ## Skalierung
 
-Lasttest: `PGHOST=… node scripts/lasttest-neuberechnung.mjs 10000 8` (Ergebnisse in docs/testberichte/lasttest.md). Mehrere API- und Worker-Instanzen sind möglich (Caches je Prozess sind unkritisch). Die Ratenbegrenzung zählt je Instanz (G-23).
+Lasttest: `PGHOST=… node scripts/lasttest-neuberechnung.mjs 10000 8` (Ergebnisse in amtlos-intern: docs/testberichte/lasttest.md). Mehrere API- und Worker-Instanzen sind möglich (Caches je Prozess sind unkritisch). Die Ratenbegrenzung zählt je Instanz (G-23).
 
 ## Identity-Provider (Zitadel)
 

@@ -739,7 +739,7 @@ export const T = {
   steuerpaket_leer: "In diesem Zeitraum gibt es keine geteilten Rechnungen und keine Belege.",
   steuerpaket_hinweis: "Das DATEV-Format ist noch nicht gegen den offiziellen Leitfaden geprüft. Die LIESMICH-Datei im Paket sagt deiner Steuerberatung, was drin ist.",
   steuerpaket_ohne_xml: (n: number) => `${n === 1 ? "1 Rechnung hat" : `${n} Rechnungen haben`} keine E-Rechnung im Paket, weil Angaben fehlen.`,
-  // Partnerkanzleien (docs/15): nur sichtbar, wenn eine gültige Kanzlei gelistet ist; feste Listungsgebühr, nie je Mandat
+  // Partnerkanzleien (amtlos-intern: docs/15): nur sichtbar, wenn eine gültige Kanzlei gelistet ist; feste Listungsgebühr, nie je Mandat
   kanzlei_finden: "Steuerberatung finden",
   kanzlei_finden_text: "Kanzleien, die mit Paketen aus der App arbeiten. Tippe für Kontakt und Paket.",
   kanzlei_transparenz: `Die Kanzleien beraten eigenverantwortlich unter eigenem Namen. ${MARKE.name} vermittelt nicht gegen Provision; Kanzleien zahlen eine feste Gebühr für die Listung.`,

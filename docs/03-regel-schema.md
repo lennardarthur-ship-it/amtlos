@@ -154,7 +154,7 @@ Er prüft auch, dass sich Versionen eines Regelwerts zeitlich nicht überlappen 
 
 ## Startbestand und Lücken (E-075)
 
-Der Startbestand wird aus der Spezifikation erzeugt (`scripts/katalog_startbestand.py`), danach im Studio gepflegt. Lücken werden nicht gefüllt, sondern sichtbar gemacht:
+Der Startbestand wird aus der Spezifikation erzeugt (amtlos-intern: `scripts/katalog_startbestand.py`), danach im Studio gepflegt. Lücken werden nicht gefüllt, sondern sichtbar gemacht:
 
 | Spezifikation nennt nicht … | Im Katalog | Prüfpunkt |
 |---|---|---|

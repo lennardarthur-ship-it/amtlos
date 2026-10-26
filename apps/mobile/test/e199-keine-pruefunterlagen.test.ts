@@ -4,7 +4,10 @@
  * Prüfpakete oder Nachprüflisten – und keinen Namen eines Prüfers. Die Unterlagen bewahrt der Gründer auf. Einziger
  * Nachweis im Projekt sind das Register docs/freigabe-katalog/freigaben.yaml und packages/fachlogik/src/dokumente/geprueft.ts
  * (Rolle, Datum, Umfang in unseren Worten, Art, `aufbewahrung: beim Gründer`). Die Werkzeuge, die Unterlagen erzeugen,
- * schreiben nur in ein Ziel außerhalb des Repositorys.
+ * schreiben nur in ein Ziel außerhalb des Repositorys. Seit 26.10.2026 liegen die meisten davon (Freigabe- und Abgleich-
+ * Dateien, Bestätigungsblätter, Nachprüflisten, Prüfpakete, Prüfmappen) im privaten Repository amtlos-intern; dort prüft
+ * `python3 pruefen.py` Namen, Unterlagen und die Ablehnung von Zielen in beiden Repositorys. In amtlos bleiben das
+ * Register (freigaben.yaml, offene-punkte.yaml, namen-sha256.json, anwenden.py) und die Werkzeuge, die Code brauchen.
  *
  * Namen stehen hier nicht im Klartext: Abgeglichen wird über SHA-256 der Wörter (docs/freigabe-katalog/namen-sha256.json).
  */
@@ -36,7 +39,9 @@ describe("E-199: keine Prüfunterlagen und keine Namen im Repository", () => {
   it("keine Berichte, ausgefüllten Dateien, Pakete oder Bestätigungsblätter der Prüfer", () => {
     expect(fs.existsSync(path.join(WURZEL, "docs/pruefberichte"))).toBe(false);
     expect(fs.readdirSync(path.join(WURZEL, "docs/freigabe-katalog")).filter((d) => d.startsWith("versand"))).toEqual([]);
-    expect(fs.readdirSync(path.join(WURZEL, "docs/freigabe-vorlagen"))).toEqual(["erzeugen.py"]);
+    // in docs/freigabe-katalog nur noch das Register und anwenden.py – Werkzeuge für Prüfunterlagen liegen in amtlos-intern
+    expect(fs.readdirSync(path.join(WURZEL, "docs/freigabe-katalog")).filter((d) => d !== "__pycache__").sort()).toEqual(["anwenden.py", "freigaben.yaml", "namen-sha256.json", "offene-punkte.yaml"]);
+    expect(fs.existsSync(path.join(WURZEL, "docs/freigabe-vorlagen"))).toBe(false);
     // Excel, PDF, Mails und Office-Dateien gibt es im ganzen Repository nicht, Bilder unter docs/ (Scans) auch nicht
     expect(dateien.filter((d) => /\.(xlsx|xls|xlsm|pdf|eml|msg|mbox|docx?|odt|ods)$/i.test(d))).toEqual([]);
     expect(dateien.filter((d) => d.startsWith("docs/") && /\.(jpe?g|png|heic|tiff?)$/i.test(d))).toEqual([]);
@@ -68,18 +73,8 @@ describe("E-199: keine Prüfunterlagen und keine Namen im Repository", () => {
 
   it("Werkzeuge für Prüfunterlagen schreiben nur außerhalb des Repositorys", () => {
     const ziel = path.join(WURZEL, "docs", "e199-test-ziel");
-    const aufrufe: [string, string[]][] = [
-      ["python3", ["docs/freigabe-katalog/erzeugen.py", ziel]],
-      ["python3", ["docs/freigabe-katalog/abgleich.py", ziel]],
-      ["python3", ["docs/freigabe-katalog/bestaetigung.py", `${ziel}.pdf`, "recht", "Rechtsanwalt", "01.01.2026", "Nennung"]],
-      ["python3", ["docs/freigabe-katalog/anlage1-recht.py", `${ziel}.pdf`]],
-      ["python3", ["docs/freigabe-katalog/nachpruefliste.py", ziel]],
-      ["python3", ["docs/freigabe-katalog/gobd-fachfragen.py", ziel]],
-      ["python3", ["docs/freigabe-vorlagen/erzeugen.py", "/tmp", ziel]],
-      ["python3", ["scripts/pruefpaket.py", `${ziel}.xlsx`]],
-      ["node", ["apps/mobile/werkzeuge/nachpruef-pdfs.mjs", ziel]],
-      ...["anwalt", "steuer", "arbeitsschutz", "lebensmittel"].map((m): [string, string[]] => ["node", [`docs/pruefmappe-${m}/erzeugen.mjs`, ziel]]),
-    ];
+    // die übrigen Werkzeuge (Freigabe-Dateien, Prüfpakete, Prüfmappen) prüft amtlos-intern: pruefen.py
+    const aufrufe: [string, string[]][] = [["node", ["apps/mobile/werkzeuge/nachpruef-pdfs.mjs", ziel]]];
     for (const [prog, args] of aufrufe) {
       const r = spawnSync(prog, args, { cwd: WURZEL, encoding: "utf8", env: { ...process.env, PYTHONDONTWRITEBYTECODE: "1" } });
       expect(r.status, args[0]).not.toBe(0);

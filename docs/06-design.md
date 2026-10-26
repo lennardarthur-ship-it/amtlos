@@ -100,7 +100,7 @@ Siehe Tabelle oben. Kontraste hell: Tinte 16,5, Tinte leise 8,6 (Blatt) / 7,8 (P
 
 ### Dokumente
 
-Ohne eigene Hausfarbe drucken die Dokumente in **Indigo `#3b30c4`** (8,7:1 zu Weiß, Hauch 8 % = `#efeefa`); Indigo steht als erste der nun neun Hausfarben in „Mein Betrieb“. Gewählte Hausfarben (Graphit, Marineblau …) bleiben unverändert (docs/10-dokumente-gestaltung.md).
+Ohne eigene Hausfarbe drucken die Dokumente in **Indigo `#3b30c4`** (8,7:1 zu Weiß, Hauch 8 % = `#efeefa`); Indigo steht als erste der nun neun Hausfarben in „Mein Betrieb“. Gewählte Hausfarben (Graphit, Marineblau …) bleiben unverändert (amtlos-intern: docs/10-dokumente-gestaltung.md).
 
 ### Store-Bilder
 

@@ -5,7 +5,7 @@
  *
  * Ohne Vorgabe gilt das Standardkonto des Kontenrahmens (`BUCHUNGSKONTEN` in buchungen.ts). Der Betrieb trägt
  * Abweichungen selbst ein oder lädt eine kleine JSON-Datei, die die Kanzlei schickt (Format: `kontenvorgabenAusJson`,
- * beschrieben in docs/pruefmappe-steuer/kontenvorgaben.md). Reine Funktionen ohne Gerät.
+ * beschrieben in amtlos-intern: docs/pruefmappe-steuer/kontenvorgaben.md). Reine Funktionen ohne Gerät.
  */
 import type { Kontenrahmen } from "./buchungen.js";
 

@@ -2,7 +2,9 @@
  * E-198 (Gründerentscheidung 26.10.2026: „Du sollst keine E-Mails speichern.“): Das Repository enthält keine Mails – weder
  * die Mails der Prüfer noch Entwürfe unserer Mails (seit E-199 gibt es weder docs/pruefberichte noch Versandordner). Bestätigungen per Mail
  * bewahrt der Gründer auf; Register und Vorlagen-Freigaben nennen nur Art, Datum, Rolle und Umfang (in unseren Worten).
- * Die Werkzeuge schreiben E-Mail-Texte nicht ins Repository (Standardausgabe oder Ordner außerhalb).
+ * Die Werkzeuge schreiben E-Mail-Texte nicht ins Repository (Standardausgabe oder Ordner außerhalb). Die Werkzeuge für
+ * Prüfunterlagen (nachpruefliste.py mit `--mail-ziel` u. a.) liegen seit 26.10.2026 im privaten Repository amtlos-intern;
+ * dort prüft `python3 pruefen.py` dieselben Regeln.
  */
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
@@ -35,9 +37,8 @@ describe("E-198: keine E-Mails im Repository", () => {
       // in einen Ordner des Projekts (Versandordner, ZIEL, HIER, ROOT) – erlaubt ist nur ein Ziel außerhalb (`--mail-ziel`)
       expect(src, d).not.toMatch(/(open|writeFileSync)\((os\.)?path\.join\((ordner|ZIEL|HIER|ROOT|WURZEL)\b[^)\n]*E-Mail/);
     }
-    const np = fs.readFileSync(path.join(WURZEL, "docs/freigabe-katalog/nachpruefliste.py"), "utf8");
-    expect(np).toContain("--mail-ziel");
-    expect(np).toMatch(/liegt im Repository/);
+    // nachpruefliste.py (`--mail-ziel` nur außerhalb) liegt in amtlos-intern – geprüft von dessen pruefen.py
+    expect(fs.existsSync(path.join(WURZEL, "docs/freigabe-katalog/nachpruefliste.py"))).toBe(false);
   });
 
   it("Register und Vorlagen-Freigaben verweisen auf keine Mail-Datei und zitieren keine Mail", () => {

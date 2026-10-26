@@ -22,7 +22,7 @@ for paket in rules-engine fristen; do
 done
 mkdir -p "$P/pakete/i18n" "$P/pakete/marke"
 cp -r "$PAKETE/i18n/src" "$P/pakete/i18n/"
-# Marke (docs/14-marke.md): Name, Domain, Kontakt aus packages/marke/marke.json
+# Marke (amtlos-intern: docs/14-marke.md): Name, Domain, Kontakt aus packages/marke/marke.json
 cp "$PAKETE/marke/index.js" "$PAKETE/marke/index.d.ts" "$PAKETE/marke/marke.json" "$P/pakete/marke/"
 find "$P/pakete/i18n/src" -name '*.test.ts' -delete
 find "$P/pakete" -name '*.map' -delete

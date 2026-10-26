@@ -1,5 +1,5 @@
 /**
- * Partnerkanzleien „Steuerberatung finden“ (docs/15-partnerkanzleien.md): feste Listungsgebühr, nie Provision je Mandat
+ * Partnerkanzleien „Steuerberatung finden“ (amtlos-intern: docs/15-partnerkanzleien.md): feste Listungsgebühr, nie Provision je Mandat
  * (§ 9 StBerG, § 49b Abs. 3 BRAO – Prüfbericht Rechtsanwalt, Abschnitt 7). Vorsorglich gebaut und verborgen, solange die
  * gebündelte Liste leer ist.
  */
@@ -171,10 +171,5 @@ describe("Berufsrecht und Datenschutz", () => {
     expect(teilen.text).toContain("Pakete für die Steuerberatung");
     expect(teilen.text).not.toMatch(/Partnerkanzlei/);
     expect(datenschutzAbschnitte(true).find((a) => a.titel === "Was du teilst")!.text).toContain("an eine Kanzlei deiner Wahl");
-  });
-
-  it("Doku beschreibt Modell, Vertrag und Freigabe", () => {
-    const doku = fs.readFileSync(path.resolve(__dirname, "../../../docs/15-partnerkanzleien.md"), "utf8");
-    for (const s of ["§ 9 StBerG", "§ 49b Abs. 3 BRAO", "Listungsvertrag", "Festgebühr", "eigener Verantwortlicher", "kanzleien.ts", "Vor dem Livegang"]) expect(doku, s).toContain(s);
   });
 });

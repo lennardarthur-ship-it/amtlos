@@ -107,7 +107,7 @@ Module erscheinen nur, wenn das Profil sie aktiviert (z. B. „Personal“ erst 
 /radar                              Rechtsänderungen pflegen
 /vorlagen[/[id]]                    Vorlagen-Editor mit Vorschau aus Fixture-Profil
 /mitteilungen                       „Was ändert sich für dich?“ je Release
-/pruefliste                         alle [FACHLICH ZU PRÜFEN]-Punkte aus Katalog und PRUEFLISTE.md
+/pruefliste                         alle [FACHLICH ZU PRÜFEN]-Punkte aus Katalog und amtlos-intern: PRUEFLISTE.md
 /experten                           Prüfer und Qualifikationen verwalten (nur plattform_admin)
 /partner                            Marktplatz-Partner pflegen, Zulassungsprüfung (Admin/Redaktion) (9)
 /marken                             White-Label-Marken mit Kontrastprüfung (nur plattform_admin)     (10)

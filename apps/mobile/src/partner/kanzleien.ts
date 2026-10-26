@@ -1,5 +1,5 @@
 /**
- * Partnerkanzleien „Steuerberatung finden“ – reine Daten, ohne Gerät testbar (docs/15-partnerkanzleien.md).
+ * Partnerkanzleien „Steuerberatung finden“ – reine Daten, ohne Gerät testbar (amtlos-intern: docs/15-partnerkanzleien.md).
  *
  * Berufsrecht (Prüfbericht Rechtsanwalt, Abschnitt 7): Eine Kanzlei zahlt eine feste Gebühr für die Listung – nie eine
  * Provision oder sonst ein Entgelt je Mandat (§ 9 StBerG, § 49b Abs. 3 BRAO). Die App bleibt ein Werkzeug zur
@@ -53,7 +53,7 @@ export interface Kanzlei {
   gueltigBis: string;
 }
 
-/** Gebündelte Liste. Absichtlich leer – siehe oben und docs/15-partnerkanzleien.md. */
+/** Gebündelte Liste. Absichtlich leer – siehe oben und amtlos-intern: docs/15-partnerkanzleien.md. */
 export const KANZLEIEN: Kanzlei[] = [];
 
 const ID_FORM = /^[a-z0-9][a-z0-9-]{1,59}$/;

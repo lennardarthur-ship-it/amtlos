@@ -31,7 +31,7 @@ const OPS_FUER_TYP = {
   text: ["==", "!=", "in", "nicht_in"],
 };
 const IMMER_ERLAUBT = ["vorhanden", "nicht_vorhanden"];
-/** Platzhalter des Startbestands für noch nicht erfasste Folgen (scripts/katalog_startbestand.py FOLGEN_PLATZHALTER) */
+/** Platzhalter des Startbestands für noch nicht erfasste Folgen (amtlos-intern: scripts/katalog_startbestand.py FOLGEN_PLATZHALTER) */
 const SANKTION_PLATZHALTER = /noch nicht fachlich erfasst/i;
 
 const FELDNAMEN = {

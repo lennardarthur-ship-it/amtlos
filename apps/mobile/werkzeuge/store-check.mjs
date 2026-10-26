@@ -1,6 +1,6 @@
 /**
  * Vor dem Einreichen im App Store (E-132) und bei Google Play (E-190): listet alles, was noch fehlt – Anbieterangaben,
- * Links, EAS, Abo-Schlüssel je Plattform, Store-Texte (Längen), Rechtstexte-Freigabe, Play Console, Prüfliste. Exit 1,
+ * Links, EAS, Abo-Schlüssel je Plattform, Store-Texte (Längen), Rechtstexte-Freigabe, Play Console, Freigaben. Exit 1,
  * solange etwas offen ist.
  *
  *   node werkzeuge/store-check.mjs                    # prüft das Profil „production“, beide Stores
@@ -9,7 +9,7 @@
  *   node werkzeuge/store-check.mjs --texte            # nur die Store-Texte mit eingesetzter Marke ausgeben (für App Store Connect)
  *
  * Store-Texte (store/de.json) enthalten die Marke nur als Platzhalter ({{MARKE}}, {{MARKE_PRO}}); eingesetzt wird der
- * Name aus packages/marke/marke.json (docs/14-marke.md).
+ * Name aus packages/marke/marke.json (amtlos-intern: docs/14-marke.md).
  */
 /* global process, console, Buffer, URL */
 /* eslint-disable no-console -- Kommandozeilenwerkzeug */
@@ -60,7 +60,7 @@ const profil = (argProfil > 0 ? process.argv[argProfil + 1] : "") || process.env
 const rcSchluessel = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || eas.build?.[profil]?.env?.EXPO_PUBLIC_REVENUECAT_IOS_KEY || "";
 if (profil === "production") {
   // EAS-Variablen der Umgebung „production“ sieht dieser Aufruf nur über `npx eas-cli env:exec production "node werkzeuge/store-check.mjs"`
-  pruefe(rcSchluessel, "RevenueCat-Schlüssel EXPO_PUBLIC_REVENUECAT_IOS_KEY für das Profil „production“ (eas env:create --environment production …, siehe docs/11 §3; prüfen mit eas env:exec production) – ohne ihn lässt sich Pro im Store-Build nicht kaufen");
+  pruefe(rcSchluessel, "RevenueCat-Schlüssel EXPO_PUBLIC_REVENUECAT_IOS_KEY für das Profil „production“ (eas env:create --environment production …, siehe amtlos-intern: docs/11 §3; prüfen mit eas env:exec production) – ohne ihn lässt sich Pro im Store-Build nicht kaufen");
   if (rcSchluessel) pruefe(/^appl_/.test(rcSchluessel), "RevenueCat-Schlüssel ist der öffentliche iOS-Schlüssel (beginnt mit „appl_“)");
 } else {
   console.log(`  · Profil „${profil}“: RevenueCat-Schlüssel ${rcSchluessel ? "gesetzt" : "nicht gesetzt (Testmodus oder kein Kauf)"}`);
@@ -68,7 +68,7 @@ if (profil === "production") {
 const app = JSON.parse(lies("app.json")).expo;
 pruefe(app.extra?.eas?.projectId, "EAS-Projekt verknüpft (eas init → app.json extra.eas.projectId)");
 pruefe(app.ios?.config?.usesNonExemptEncryption !== undefined || app.ios?.infoPlist?.ITSAppUsesNonExemptEncryption !== undefined, "Export-Compliance der Verschlüsselung entschieden (ios.config.usesNonExemptEncryption, PRUEFLISTE T-77)");
-if (app.ios?.config?.usesNonExemptEncryption === true) console.log("  · Verschlüsselung: in App Store Connect „Standard encryption algorithms … in addition to Apple's operating system“ angeben; Frankreich nur mit französischer Verschlüsselungserklärung, sonst bis dahin ausschließen (docs/11 §5)");
+if (app.ios?.config?.usesNonExemptEncryption === true) console.log("  · Verschlüsselung: in App Store Connect „Standard encryption algorithms … in addition to Apple's operating system“ angeben; Frankreich nur mit französischer Verschlüsselungserklärung, sonst bis dahin ausschließen (amtlos-intern: docs/11 §5)");
 pruefe(app.ios?.privacyManifests?.NSPrivacyTracking === false, "Privacy Manifest vorhanden");
 // R7: Kaufhistorie (RevenueCat) mit den Zwecken App-Funktionalität und Analysen; Konto-Daten nur mit Sync (app.config.ts)
 const datenarten = app.ios?.privacyManifests?.NSPrivacyCollectedDataTypes ?? [];
@@ -88,7 +88,7 @@ pruefe(!datenarten.some((d) => nurSync.includes(d.NSPrivacyCollectedDataType)) &
 
 // Store-Texte
 const s = storeJson;
-// Marke nur als Platzhalter in store/de.json – kein fest geschriebener Name (docs/14-marke.md)
+// Marke nur als Platzhalter in store/de.json – kein fest geschriebener Name (amtlos-intern: docs/14-marke.md)
 pruefe(!/Amtlos/.test(storeRoh) && !storeRoh.includes(MARKE.name) && !/\{\{[A-Z_]+\}\}/.test(JSON.stringify(s)) && PLATZHALTER.length > 0, `Store-Texte nennen die Marke nur über Platzhalter ({{MARKE}} → „${MARKE.name}“)`);
 const b = (x) => Buffer.byteLength(x);
 pruefe(s.name.length <= 30, `Name ≤ 30 Zeichen (${s.name.length})`);
@@ -140,9 +140,8 @@ pruefe(s.bilder.every((x) => fs.existsSync(path.join(webBilder, `${x.bildschirm}
   pruefe(!befunde.length, `Kein eigener Freischaltweg (App Review 3.1.1): Pro nur aus RevenueCat-Berechtigung bzw. Testmodus, Partner-Code nur Anzeige${befunde.length ? ` – ${befunde.join("; ")}` : ""}`);
 }
 
-// Fachliche Freigabe
-const pl =fs.readFileSync(path.join(APP, "../../PRUEFLISTE.md"), "utf8");
-pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche Freigabe der Vorlagen (PRUEFLISTE T-52 ff.) – vor dem Livegang durch Fachleute");
+// Fachliche Freigabe – die Prüfliste (PRUEFLISTE T-52 ff.) liegt seit 26.10.2026 in amtlos-intern; ob die Vorlagen
+// freigegeben sind, prüft unten „Vorlagen: heutige Fassung schriftlich bestätigt“ aus geprueft.ts und den Prüfständen.
 // E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben (Bestätigung per Mail; E-198: die Mail bewahrt der Gründer auf,
 // im Repository steht nur der Nachweis mit Art, Datum, Rolle und Umfang) – was noch auf Bestätigung oder Nachprüfung wartet
 {
@@ -193,7 +192,7 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Google Play (E-190): Android-App in gleicher Qualität. Was im Code geht, ist erledigt; offen bleibt, was das
-// Organisationskonto der UG, die Play Console oder eine fachliche Freigabe braucht (docs/11-store-start.md §10).
+// Organisationskonto der UG, die Play Console oder eine fachliche Freigabe braucht (amtlos-intern: docs/11-store-start.md §10).
 const okA = [];
 const offenA = [];
 const pruefeA = (bed, text) => (bed ? okA : offenA).push(text);
@@ -211,12 +210,12 @@ const pruefeA = (bed, text) => (bed ? okA : offenA).push(text);
     if (rcAndroid) pruefeA(/^goog_/.test(rcAndroid), "RevenueCat-Schlüssel ist der öffentliche Google-Play-Schlüssel (beginnt mit „goog_“)");
   }
   // Rechtstexte
-  pruefeA(/export const DATENSCHUTZ_ANDROID = \{\s*freigegeben: true/.test(recht), "Datenschutzhinweis der Android-App freigegeben (DATENSCHUTZ_ANDROID.freigegeben, Entwurf docs/datenschutz-android-entwurf.md – Rechtsanwalt, PRUEFLISTE T-177)");
-  pruefeA(/export const NUTZUNGSBEDINGUNGEN = \{[^}]*?freigegeben: true/.test(recht), "Nutzungsbedingungen mit Android-Teil freigegeben (docs/nutzungsbedingungen-android-entwurf.md, PRUEFLISTE T-178) – bis dahin zeigt die Android-App keinen Link auf Nutzungsbedingungen");
+  pruefeA(/export const DATENSCHUTZ_ANDROID = \{\s*freigegeben: true/.test(recht), "Datenschutzhinweis der Android-App freigegeben (DATENSCHUTZ_ANDROID.freigegeben, Entwurf amtlos-intern: docs/datenschutz-android-entwurf.md – Rechtsanwalt, PRUEFLISTE T-177)");
+  pruefeA(/export const NUTZUNGSBEDINGUNGEN = \{[^}]*?freigegeben: true/.test(recht), "Nutzungsbedingungen mit Android-Teil freigegeben (amtlos-intern: docs/nutzungsbedingungen-android-entwurf.md, PRUEFLISTE T-178) – bis dahin zeigt die Android-App keinen Link auf Nutzungsbedingungen");
   // Play Console
   const ds = play.datensicherheit ?? {};
   const unsicher = [...(ds.erhoben ?? [])].filter((e) => e.pruefen).map((e) => e.datentyp);
-  pruefeA(k.datensicherheitAbgesendet === true && !unsicher.length, `Formular „Datensicherheit“ ausgefüllt (docs/play-datensicherheit.md${unsicher.length ? `; noch zu bestätigen: ${unsicher.join(", ")}` : ""}) – PRUEFLISTE T-179`);
+  pruefeA(k.datensicherheitAbgesendet === true && !unsicher.length, `Formular „Datensicherheit“ ausgefüllt (amtlos-intern: docs/play-datensicherheit.md${unsicher.length ? `; noch zu bestätigen: ${unsicher.join(", ")}` : ""}) – PRUEFLISTE T-179`);
   pruefeA(k.inhaltseinstufung === true, "Inhaltseinstufung (IARC-Fragebogen) in der Play Console ausgefüllt (store/de-android.json → inhaltseinstufung)");
   pruefeA(k.zielgruppe === true, "Zielgruppe und Inhalte (18 und älter, nicht für Kinder) in der Play Console angegeben");
   pruefeA(k.finanzfunktionen === true, "Erklärung zu Finanzfunktionen in der Play Console abgegeben (Rechnungen/Kassenbuch – Einordnung prüfen, PRUEFLISTE T-179)");

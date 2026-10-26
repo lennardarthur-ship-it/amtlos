@@ -1,7 +1,7 @@
 {
   "name": "@amtlos/marke",
   "version": "0.1.0",
-  "description": "Sichtbarer Produktname, Domain und Kontakt – einzige Quelle für App, Website, Store-Texte und Dokumente (docs/14-marke.md). Ohne Abhängigkeiten und ohne Node-APIs.",
+  "description": "Sichtbarer Produktname, Domain und Kontakt – einzige Quelle für App, Website, Store-Texte und Dokumente (amtlos-intern: docs/14-marke.md). Ohne Abhängigkeiten und ohne Node-APIs.",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",

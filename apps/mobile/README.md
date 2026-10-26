@@ -18,7 +18,7 @@ Vier Tabs (E-131):
 
 Rechnungen sind fortlaufend nummeriert, werden beim Teilen festgeschrieben (GoBD, E-127), lassen sich als XRechnung teilen
 (E-128) und speisen die Umsatzsteuer-Voranmeldung nach Soll oder Ist (E-129). Dokumente haben je Zweck eine eigene Gestalt
-(Brief, Vertrag, Aushang, Nachweis, Vordruck, Handbuch – docs/10, E-130) mit eingebetteten Schriften.
+(Brief, Vertrag, Aushang, Nachweis, Vordruck, Handbuch – amtlos-intern: docs/10, E-130) mit eingebetteten Schriften.
 
 ## Aufbau
 
@@ -51,7 +51,7 @@ node werkzeuge/schriften.mjs                # nach Schriftänderungen: eingebett
 eigenständiges Paket mit Anleitung (`LIESMICH.txt`): Node installieren, `npm install`, `npx expo start`, QR-Code mit
 Expo Go öffnen (iPhone: Kamera-App; Android: „Scan QR code“ in Expo Go aus Google Play).
 
-**Amtlos Pro (E-132):** `src/pro/` – Regeln (Freikontingent), Kauf über RevenueCat (je Plattform ein Schlüssel: `EXPO_PUBLIC_REVENUECAT_IOS_KEY` bzw. `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY`, sonst Testmodus), Bewertungsbitte; Bezahlschirm `seiten/Pro.tsx`, Rechtliches `src/rechtliches.ts` + `seiten/Recht.tsx`. Store: `store/de.json` (App Store), `store/de-android.json` (Google Play), `werkzeuge/store-bilder.mjs` (`PLAY=1` für Google Play), `werkzeuge/store-check.mjs`, `eas.json`, Anleitung docs/11-store-start.md. Käufe gelten je Plattform (Apple-Account bzw. Google-Konto) – ohne Konto gibt es keinen Übertrag zwischen iPhone und Android.
+**Amtlos Pro (E-132):** `src/pro/` – Regeln (Freikontingent), Kauf über RevenueCat (je Plattform ein Schlüssel: `EXPO_PUBLIC_REVENUECAT_IOS_KEY` bzw. `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY`, sonst Testmodus), Bewertungsbitte; Bezahlschirm `seiten/Pro.tsx`, Rechtliches `src/rechtliches.ts` + `seiten/Recht.tsx`. Store: `store/de.json` (App Store), `store/de-android.json` (Google Play), `werkzeuge/store-bilder.mjs` (`PLAY=1` für Google Play), `werkzeuge/store-check.mjs`, `eas.json`, Anleitung amtlos-intern: docs/11-store-start.md. Käufe gelten je Plattform (Apple-Account bzw. Google-Konto) – ohne Konto gibt es keinen Übertrag zwischen iPhone und Android.
 
 **Konto und Synchronisation (E-134):** `src/konto/` – `sync.ts` (Hülle, Verschlüsselung, Zusammenführen, Ablauf; rein und
 getestet), `api.ts` (`/v1/tresor`), `sitzung.ts` (OIDC/PKCE bzw. Entwicklungszugang, Schlüsselbund), `konto.tsx`
@@ -68,7 +68,7 @@ Speicherzugriffs-Framework; Ablauf gemeinsam mit iCloud in `unterlagen/cloudLogi
 (Kalender-Dialog). Symbole: SF Symbols auf iOS, Ionicons auf Android und Web (`FALLBACK` in `ui/bausteine.tsx`, jeder
 Name braucht einen Eintrag – `test/android.test.ts`). Benachrichtigungskanal „Fristen“, App-Sperre mit Biometrie bzw.
 Displaysperre, `FLAG_SECURE` bei eingeschalteter Sperre, Tastatur weicht randlos selbst aus. Datenschutzhinweis auf
-Android: Entwurf `DATENSCHUTZ_ANDROID` (nicht freigegeben, docs/datenschutz-android-entwurf.md).
+Android: Entwurf `DATENSCHUTZ_ANDROID` (nicht freigegeben, amtlos-intern: docs/datenschutz-android-entwurf.md).
 
 ```bash
 cd apps/mobile && CI=1 npx expo export --platform android --output-dir /tmp/expo-android    # Android-Bündel prüfen

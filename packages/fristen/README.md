@@ -61,4 +61,4 @@ const termine = wiederkehrendeTermine(
 ## Lizenz
 
 `UNLICENSED` – Eigentum des Anbieters von Amtlos; Nutzung nur nach schriftlicher Vereinbarung (siehe
-docs/13-b2b-lizenz.md).
+amtlos-intern: docs/13-b2b-lizenz.md).

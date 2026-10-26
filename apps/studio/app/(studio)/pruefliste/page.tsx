@@ -11,7 +11,7 @@ export default async function Pruefliste() {
     <div className="space-y-6">
       <h1 className="text-titel font-bold">Offene fachliche Prüfpunkte ({punkte.length})</h1>
       <p className="lesetext text-tinte-leise">
-        Aus „fachlich_zu_pruefen“ der neuesten Versionen. Grundsätzliche Punkte (G-…) und juristische Fragen (J-…) stehen in PRUEFLISTE.md im Repository.
+        Aus „fachlich_zu_pruefen“ der neuesten Versionen. Grundsätzliche Punkte (G-…) und juristische Fragen (J-…) stehen in PRUEFLISTE.md im internen Repository amtlos-intern.
       </p>
       <table className="tabelle">
         <thead>

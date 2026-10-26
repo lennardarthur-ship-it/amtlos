@@ -11,7 +11,7 @@ Das Modell hat zwei Ebenen:
 
 | Muster | Regel |
 |---|---|
-| Mandant | Jede mandantenbezogene Tabelle hat `unternehmen_id` und die RLS-Policy `mandant`. Ausnahme nur mit Eintrag in `ENTSCHEIDUNGEN.md`. |
+| Mandant | Jede mandantenbezogene Tabelle hat `unternehmen_id` und die RLS-Policy `mandant`. Ausnahme nur mit Eintrag in amtlos-intern: `ENTSCHEIDUNGEN.md`. |
 | Versionierung | Fachlich relevante Stände werden als neue Version angelegt, nie überschrieben (`profil_version`, `pflicht_version`, `regelwert_version`, `vorlage_version`). |
 | Append-only | Ereignisse, Zeitbuchungen, Unterschriften, Audit: nur `insert`; Korrektur über Storno-Eintrag. |
 | Freigabe | Katalog-Inhalte haben `pruef_status`; `freigegeben` nur über Vier-Augen-Freigabe (Trigger). Freigegebene Versionen sind unveränderlich. |

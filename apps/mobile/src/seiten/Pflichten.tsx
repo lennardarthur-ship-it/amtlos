@@ -264,7 +264,7 @@ export function PflichtDetail({ id }: { id: string }) {
           </Karte>
         </Gruppe>
       ) : null}
-      {/* docs/15: nur bei Steuer-Pflichten und nur, wenn Kanzleien gelistet sind – frei, ohne Pro */}
+      {/* Partnerkanzleien (amtlos-intern: docs/15): nur bei Steuer-Pflichten und nur, wenn Kanzleien gelistet sind – frei, ohne Pro */}
       {p.kategorie === "steuern" && kanzleienSichtbar() ? (
         <Karte stil={{ marginTop: 24 }}>
           <Zeile symbol="briefcase" ton="amt" titel={TEXT.kanzlei_finden} text={TEXT.kanzlei_finden_text} onPress={() => nav.oeffnen("steuerberatung", () => <SteuerberatungSeite kanzleienZuerst />, true)} letzte />

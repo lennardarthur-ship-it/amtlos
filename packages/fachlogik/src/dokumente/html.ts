@@ -1,7 +1,7 @@
 /**
  * Bausteine für die HTML-Dokumente (A4, druckfertig). Alle Eingaben werden maskiert.
  *
- * Gestaltung (E-130, docs/10-dokumente-gestaltung.md): Jede Vorlage hat eine Gestalt, die zu Leser und Zweck passt –
+ * Gestaltung (E-130, amtlos-intern: docs/10-dokumente-gestaltung.md): Jede Vorlage hat eine Gestalt, die zu Leser und Zweck passt –
  * Brief (DIN 5008), Vertrag, Aushang, Nachweis, Formular, Handbuch. Das eine prägende Element ist die Randspalte:
  * Abschnittsnummer und Rechtsgrundlage stehen links neben dem Text wie Randnummern in einem Gesetzeskommentar.
  */

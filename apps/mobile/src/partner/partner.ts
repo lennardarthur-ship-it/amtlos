@@ -4,7 +4,7 @@
  * Ein Partner (z. B. eine Kammer, ein Verband, eine Steuerkanzlei) empfiehlt Amtlos seinen Mitgliedern. Die App zeigt
  * dann „Empfohlen von {name}“ – mehr nicht. Ein Partner-Code schaltet NIE etwas frei (App Review 3.1.1: keine eigenen
  * Freischaltwege wie Lizenzschlüssel oder QR-Codes). Den Zugang zu Pro bekommen Mitglieder eines Partners
- * ausschließlich über Apples Abo-Angebotscodes („Code einlösen“, `pro/kauf.ts` → StoreKit), siehe docs/13-b2b-lizenz.md.
+ * ausschließlich über Apples Abo-Angebotscodes („Code einlösen“, `pro/kauf.ts` → StoreKit), siehe amtlos-intern: docs/13-b2b-lizenz.md.
  *
  * Die Partner-ID bleibt auf dem Gerät (und in der verschlüsselten Datensicherung); sie wird nicht synchronisiert und an
  * niemanden gesendet.

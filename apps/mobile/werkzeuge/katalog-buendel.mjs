@@ -7,7 +7,7 @@
  * Für den Pflichten-Check (E-126) zusätzlich den ganzen Katalog für die Regel-Engine: alle Pflichten und Regelwerte,
  * nur deutsch, ohne die Prüfnotizen der Redaktion → src/pflichten/katalog.json.
  *
- * Marke (docs/14-marke.md): Die redaktionellen Katalogtexte (catalog/, versioniert und geprüft) nennen die App „Amtlos“.
+ * Marke (amtlos-intern: docs/14-marke.md): Die redaktionellen Katalogtexte (catalog/, versioniert und geprüft) nennen die App „Amtlos“.
  * Im Bündel steht stattdessen der sichtbare Name aus packages/marke/marke.json – nach einer Umbenennung neu bündeln.
  *
  *   node werkzeuge/katalog-buendel.mjs

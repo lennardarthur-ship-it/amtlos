@@ -447,7 +447,7 @@
       "items": {
         "type": "string"
       },
-      "description": "Konkrete offene Punkte; jeder erscheint in PRUEFLISTE.md"
+      "description": "Konkrete offene Punkte; jeder erscheint in PRUEFLISTE.md (amtlos-intern)"
     },
     "pruefung": {
       "type": "object",

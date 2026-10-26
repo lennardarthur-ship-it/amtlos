@@ -73,7 +73,7 @@ const DRITTLAND_REVENUECAT = `Übermittlung in die USA auf Grundlage der ${SCC_F
  * meldet sie. Fachlich zu prüfen (T-77): bis zur Freigabe `freigegeben: false`.
  */
 // Freigegeben von Rechtsanwalt 23.10.2026 für den Build ohne Sync (beim Gründer, Prüfsumme
-// 892aa8818e0e der Fassung aus docs/pruefmappe-anwalt). Bei Textänderung erneut vorlegen; der Sync-Zusatz ist nicht freigegeben.
+// 892aa8818e0e der Fassung aus amtlos-intern: docs/pruefmappe-anwalt). Bei Textänderung erneut vorlegen; der Sync-Zusatz ist nicht freigegeben.
 export const DATENSCHUTZ = {
   freigegeben: true,
   abschnitte: [
@@ -93,7 +93,7 @@ export const DATENSCHUTZ = {
     { titel: "Speicherdauer", text: "Auf dem iPhone: bis du die Daten in der App löschst oder die App entfernst. Bei RevenueCat: solange dein Abo besteht. Spätestens vier Monate nach Ende deines Abos lassen wir die Daten zu deiner App-Kennung bei RevenueCat löschen – früher, wenn du die Löschung verlangst. Die Zeit danach brauchen wir für Erstattungen und Rückbuchungen über Apple. Endet unser Vertrag, löscht RevenueCat die Daten oder gibt sie auf unsere Anforderung zurück; Sicherungskopien nach den Sicherungs- und Archivierungsroutinen von RevenueCat." },
     { titel: "Musst du Daten angeben?", text: `Nein. Die App funktioniert ohne Angaben an ${MARKE.name}. Nur für ${MARKE.proName} ist die Prüfung des Kaufs über RevenueCat nötig – ohne sie lässt sich Pro nicht nutzen.` },
     { titel: "Keine automatisierte Entscheidung", text: "Es gibt keine automatisierte Entscheidung und kein Profiling im Sinne von Art. 22 DSGVO. Der Pflichten-Check rechnet auf deinem iPhone und zeigt, welche Pflichten nach deinen Angaben in Frage kommen – er entscheidet nichts über dich." },
-    // „Kanzlei deiner Wahl“ stimmt auch ohne gelistete Partnerkanzlei (docs/15): Daten gehen nur über das eigene Teilen
+    // „Kanzlei deiner Wahl“ stimmt auch ohne gelistete Partnerkanzlei (amtlos-intern: docs/15): Daten gehen nur über das eigene Teilen
     { titel: "Was du teilst", text: "PDFs, E-Rechnungen, Pakete für die Steuerberatung und Sicherungen verlassen das iPhone nur, wenn du sie selbst teilst – an wen, entscheidest du im Teilen-Menü, auch an eine Kanzlei deiner Wahl. Die Kanzlei verarbeitet, was du ihr sendest, als eigener Verantwortlicher." },
     { titel: "Deine Rechte", text: `Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerspruch und Beschwerde bei einer Datenschutz-Aufsichtsbehörde (Art. 15 ff., 77 DSGVO). Da ${MARKE.name} deine Unterlagen nicht speichert, löschst du sie selbst unter „Mein Betrieb“. Für alles andere: Kontakt beim Verantwortlichen oben. ${RECHTE_BESCHWERDE}` },
   ],
@@ -103,7 +103,7 @@ export const DATENSCHUTZ = {
  * Zusatz für Builds mit Synchronisation (E-134, `EXPO_PUBLIC_API_URL` gesetzt). Ersetzt „Kurz gesagt“ und kommt nach
  * „Sicherungen“. Fachlich zu prüfen (T-80): Hoster des Servers, Identity-Provider, Auftragsverarbeitung, Aufbewahrung der
  * Server-Backups. Vorprüfung 21.10.2026 (Frage 9): Metadaten und Konto-Daten sind für uns personenbezogen (EuGH
- * C-413/23 P) – vor dem Sync-Build einen AVV mit dem Betrieb anbieten (docs/12 §2).
+ * C-413/23 P) – vor dem Sync-Build einen AVV mit dem Betrieb anbieten (amtlos-intern: docs/12 §2).
  */
 export const DATENSCHUTZ_SYNC = {
   kurz: { titel: "Kurz gesagt", text: `${MARKE.name} speichert deine Angaben verschlüsselt auf deinem iPhone. Nutzt du die Synchronisation, liegen sie zusätzlich auf einem Server von ${MARKE.name} – Ende-zu-Ende-verschlüsselt, sodass wir deine Unterlagen, Kunden und Mitarbeiter nicht lesen können. ${MARKE.name} macht keine eigenen Analysen; nur für ${MARKE.proName} wertet RevenueCat die Käufe für die Abo-Verwaltung aus.` },
@@ -120,7 +120,7 @@ export const DATENSCHUTZ_SYNC = {
  * Sicherung in einen selbst gewählten Ordner (Speicherzugriffs-Framework von Android) statt iCloud, Android-Schlüsselspeicher
  * statt Schlüsselbund, keine Gerätesicherung durch Android (`allowBackup: false`). Die rechtliche Einordnung (Google und
  * der Anbieter des Cloud-Ordners als eigene Verantwortliche) ist aus dem iPhone-Text übertragen und von Rechtsanwalt zu
- * prüfen – Gegenüberstellung in docs/datenschutz-android-entwurf.md. Die App zeigt ihn nur auf Android, mit dem Hinweis
+ * prüfen – Gegenüberstellung in amtlos-intern: docs/datenschutz-android-entwurf.md. Die App zeigt ihn nur auf Android, mit dem Hinweis
  * „Entwurf“; der Store-Check meldet ihn als offen; die Website zeigt ihn erst nach der Freigabe.
  */
 export const DATENSCHUTZ_ANDROID = {

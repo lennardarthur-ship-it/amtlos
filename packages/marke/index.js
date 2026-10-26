@@ -1,6 +1,6 @@
 /**
  * Sichtbare Marke (Produktname, Domain, Kontakt) aus `marke.json` – der einzigen Stelle, an der der Name steht
- * (docs/14-marke.md). Alles, was Nutzer, Store oder Website zeigen, liest von hier: Texte als Template-Strings mit
+ * (amtlos-intern: docs/14-marke.md). Alles, was Nutzer, Store oder Website zeigen, liest von hier: Texte als Template-Strings mit
  * `MARKE.name` bzw. `MARKE.proName`, Textdateien (Store-Texte, Website) mit Platzhaltern über `markeEinsetzen`.
  *
  * Technische Kennungen (Paketnamen @amtlos/*, Bundle-ID, URL-Schema, Speicherschlüssel, Dateiformate, Abo-IDs)

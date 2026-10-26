@@ -1,7 +1,7 @@
 {
-  "_hinweis": "Store-Eintrag bei Google Play (E-190), Sprache Deutsch (de-DE). Marke nur über Platzhalter ({{MARKE}}, {{MARKE_PRO}}, {{EMAIL}}, {{WEBSITE}}). Grenzen prüft test/store-android.test.ts; Datensicherheit ausführlich in docs/play-datensicherheit.md – Antworten mit \"pruefen\" vor dem Absenden bestätigen.",
+  "_hinweis": "Store-Eintrag bei Google Play (E-190), Sprache Deutsch (de-DE). Marke nur über Platzhalter ({{MARKE}}, {{MARKE_PRO}}, {{EMAIL}}, {{WEBSITE}}). Grenzen prüft test/store-android.test.ts; Datensicherheit ausführlich in amtlos-intern: docs/play-datensicherheit.md – Antworten mit \"pruefen\" vor dem Absenden bestätigen.",
   "konsole": {
-    "_hinweis": "Vom Gründer nach Erledigung in der Play Console eintragen – werkzeuge/store-check.mjs meldet offene Punkte (docs/11-store-start.md §10).",
+    "_hinweis": "Vom Gründer nach Erledigung in der Play Console eintragen – werkzeuge/store-check.mjs meldet offene Punkte (amtlos-intern: docs/11-store-start.md §10).",
     "entwicklerkontoId": "",
     "organisationskonto": false,
     "datensicherheitAbgesendet": false,
@@ -38,7 +38,7 @@
   "werbung": false,
   "app_zugriff": "Most features require the subscription ({{MARKE_PRO}}, Google Play Billing). Without a subscription the app is a free trial of the obligations check only (\"Pflichten-Check\": all questions, the number of obligations that may apply and the first 3 with due date). To review invoices, receipts, cash register, templates and reminders, please start the free trial on the paywall or use a license-testing account (Play Console → License testing). The paywall opens once after the first completed check (dismissible with \"Später\") and from tab \"Mein Betrieb\" → \"{{MARKE_PRO}}\". No login or account is needed; all data stays encrypted on the device. Always available without a subscription: viewing own data, sharing already issued documents again, cancelling an invoice, exporting receipts and the cash book, backup, restore, data export, deleting data.",
   "datensicherheit": {
-    "_hinweis": "Antworten für das Formular „Datensicherheit“ in der Play Console, aus dem Code des Builds OHNE Synchronisation (EXPO_PUBLIC_API_URL leer). \"pruefen\": true heißt: vor dem Absenden fachlich bzw. mit RevenueCat bestätigen (PRUEFLISTE T-179). Begründungen: docs/play-datensicherheit.md.",
+    "_hinweis": "Antworten für das Formular „Datensicherheit“ in der Play Console, aus dem Code des Builds OHNE Synchronisation (EXPO_PUBLIC_API_URL leer). \"pruefen\": true heißt: vor dem Absenden fachlich bzw. mit RevenueCat bestätigen (PRUEFLISTE T-179). Begründungen: amtlos-intern: docs/play-datensicherheit.md.",
     "erhebt_oder_teilt_daten": true,
     "verschluesselung_bei_uebertragung": true,
     "loeschung_auf_anfrage": true,

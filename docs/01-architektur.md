@@ -1,6 +1,6 @@
 # 01 · Systemarchitektur
 
-Stand: 2026-10-11 · Entscheidungen dazu: `ENTSCHEIDUNGEN.md` (E-010 bis E-020)
+Stand: 2026-10-11 · Entscheidungen dazu: amtlos-intern: `ENTSCHEIDUNGEN.md` (E-010 bis E-020)
 
 ## Überblick
 
@@ -192,10 +192,11 @@ amtlos/
 │  ├─ migrieren.mjs   Migrations-Runner mit Prüfsummen
 │  └─ tests/
 ├─ infra/             OpenTofu, Helm-Charts
-├─ docs/
-├─ ENTSCHEIDUNGEN.md
-└─ PRUEFLISTE.md
+└─ docs/             Architektur, Datenmodell, Regel-Schema, Seiten, Design, Betrieb
 ```
+
+Entscheidungen (`ENTSCHEIDUNGEN.md`), offene Prüfpunkte (`PRUEFLISTE.md`), Konzepte und Testberichte liegen im privaten
+Repository amtlos-intern (seit 26.10.2026).
 
 ## Sicherheit (Querschnitt)
 

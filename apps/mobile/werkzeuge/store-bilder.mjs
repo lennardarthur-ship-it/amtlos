@@ -60,7 +60,7 @@ const gebaut = path.join(OUT, ".demo-stand.mjs");
 execFileSync(path.join(esbuild, "bin/esbuild"), [path.join(HIER, "demo-stand.ts"), "--bundle", "--platform=node", "--format=esm", `--outfile=${gebaut}`, "--log-level=warning"]);
 const stand = execFileSync("node", [gebaut], { encoding: "utf8" }).trim();
 fs.rmSync(gebaut);
-// Marke aus packages/marke/marke.json in die Store-Texte einsetzen ({{MARKE}} …, docs/14-marke.md)
+// Marke aus packages/marke/marke.json in die Store-Texte einsetzen ({{MARKE}} …, amtlos-intern: docs/14-marke.md)
 const texte = markeEinsetzenTief(JSON.parse(fs.readFileSync(path.join(APP, PLAY ? "store/de-android.json" : "store/de.json"), "utf8")));
 
 const srv = http.createServer((req, res) => {

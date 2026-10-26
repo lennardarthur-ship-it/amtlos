@@ -6,7 +6,7 @@
  * stehen deshalb nur in Builds mit `EXPO_PUBLIC_API_URL` im Manifest; ein Build ohne Sync deklariert allein die
  * Kaufhistorie (RevenueCat), passend zu den Angaben in App Store Connect.
  *
- * Marke (docs/14-marke.md): Anzeigename (auch CFBundleDisplayName) und die Platzhalter {{MARKE}} in den Texten von
+ * Marke (amtlos-intern: docs/14-marke.md): Anzeigename (auch CFBundleDisplayName) und die Platzhalter {{MARKE}} in den Texten von
  * `app.json` (z. B. Berechtigungstexte) kommen aus packages/marke/marke.json. Bundle-ID und URL-Schema stehen dort nur
  * zur Übersicht unter „technisch“ und bleiben in `app.json` maßgeblich (test/marke.test.ts prüft, dass beide gleich sind).
  */
