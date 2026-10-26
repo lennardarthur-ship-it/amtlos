@@ -311,9 +311,16 @@ export interface PflichtInfo {
   termine: string[];
   /**
    * E-192: Termine einer wiederkehrenden Pflicht (Katalog `frist.typ: wiederkehrend`) in den letzten 13 Monaten vor dem
-   * Stichtag (ISO, aufsteigend) – daraus bestimmt `terminStand`, ob ein Termin überfällig ist. Sonst leer.
+   * Stichtag (ISO, aufsteigend) – daraus bestimmt `terminStand`, ob ein Termin überfällig ist. E-207: ebenso die
+   * vergangenen Termine einmaliger Fristen (`absolut`, `relativ`). Sonst leer.
    */
   vergangeneTermine?: string[];
+  /**
+   * E-207: einmalige Frist ohne Bezug auf ein Ereignis (Katalog `frist.typ: absolut` oder `relativ` mit `bezug.fakt`, z. B.
+   * Fragebogen zur steuerlichen Erfassung) – ein vergangener, nicht abgehakter Termin bleibt überfällig, auch wenn er vor
+   * dem Check lag: Es gibt keinen nächsten Termin, der ihn ablöst.
+   */
+  einmaligFest?: boolean;
   /**
    * E-192: überfällige, nicht abgehakte Termine (ISO, aufsteigend), gesetzt von `terminStand` – der älteste ist dann
    * `naechsterTermin`, bis er abgehakt ist. Ohne `terminStand` bzw. ohne Überfälliges nicht gesetzt.
@@ -615,7 +622,9 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
     const p = nachId.get(e.pflicht_id) as Pflicht & { stelle?: unknown; quellen?: { titel: string; url?: string }[]; pruefung?: PruefungRoh };
     const termine = e.termine.map((t) => t.faellig_am).filter((d) => d >= stichtag).sort();
     const termin = termine[0] ?? null;
-    const vergangen = p.frist.typ === "wiederkehrend" ? [...new Set(e.termine.map((t) => t.faellig_am).filter((d) => d < stichtag))].sort() : [];
+    // E-207: auch einmalige Fristen (absolut, relativ) – ein versäumter Termin verschwindet nicht (`terminStand`)
+    const vergangen = p.frist.typ === "wiederkehrend" || p.frist.typ === "absolut" || p.frist.typ === "relativ" ? [...new Set(e.termine.map((t) => t.faellig_am).filter((d) => d < stichtag))].sort() : [];
+    const einmaligFest = p.wiederholung?.art !== "periodisch" && (p.frist.typ === "absolut" || (p.frist.typ === "relativ" && "fakt" in p.frist.bezug));
     return {
       id: p.id,
       titel: text(p.titel),
@@ -641,6 +650,7 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       ...(e.termine.some((t) => "eingang_am" in t && t.eingang_am) ? { uebermittelnVortag: true } : {}),
       termine,
       vergangeneTermine: vergangen,
+      ...(einmaligFest ? { einmaligFest: true } : {}),
       ausloeserFelder: profilFelder(e.begruendung),
       offeneFragen: zuErfragendeFakten(e.fehlende_fakten)
         .filter((f) => f.startsWith("profil."))
@@ -788,10 +798,14 @@ export function begleitetSeit(p: Pick<PflichtInfo, "ausloeserFelder">, zeiten: R
  * E-192: Überfällige Termine einer wiederkehrenden Pflicht. Ein Haken bei einer wiederkehrenden Pflicht gilt für einen
  * Termin X und alle davor (abhaken lässt sich immer nur der älteste offene). Überfällig sind die vergangenen Termine
  * nach X – ohne Haken die ab `begleitetSeit`. Laufende Pflichten je Zeitraum (HACCP, Arbeitszeit) bleiben außen vor.
+ * E-207: Einmalige Fristen je Ereignis (z. B. je Einstellung) zählen genauso; eine einmalige Frist ohne Ereignis
+ * (`einmaligFest`, z. B. Fragebogen zur steuerlichen Erfassung) ist ohne Haken überfällig, sobald ihr Termin vorbei ist –
+ * unabhängig davon, seit wann die App sie begleitet.
  */
 export function ueberfaelligeTermine(p: PflichtInfo, e: Pick<Erledigt, "erledigt" | "zeiten">, heute: string): string[] {
   const vergangen = (p.vergangeneTermine ?? []).filter((t) => t < heute);
   if (!vergangen.length || (p.erledigung?.zeitraum && p.erledigung.art !== "einmalig")) return [];
+  if (p.einmaligFest && !p.termine.length) return e.erledigt[p.id] ? [] : vergangen;
   const h = haken(e.erledigt[p.id]);
   const bis = h ? (h.termin ?? h.datum.slice(0, 10)) : null;
   const seit = begleitetSeit(p, e.zeiten);
@@ -809,7 +823,10 @@ export function terminStand(a: Auswertung, e: Pick<Erledigt, "erledigt" | "zeite
     const offen = ueberfaelligeTermine(p, e, heute);
     return offen.length ? { ...p, naechsterTermin: offen[0]!, ueberfaellig: offen } : p;
   };
-  return { gilt: a.gilt.map(mit), gruendung: a.gruendung.map(mit), unbekannt: a.unbekannt.map(mit), beiEinstellung: a.beiEinstellung.map(mit), kommend: a.kommend };
+  // E-207: einmalige Termine nur, wo die Pflicht gilt – Gründungsschritte eines Bestandsbetriebs („Aus der Gründung“),
+  // unklare Einträge und „bei Neueinstellung“ werden durch einen alten Termin nicht „überfällig“
+  const nurWiederkehrend = (p: PflichtInfo): PflichtInfo => (p.einmaligFest || !p.wiederkehrend ? p : mit(p));
+  return { gilt: a.gilt.map(mit), gruendung: a.gruendung.map(nurWiederkehrend), unbekannt: a.unbekannt.map(nurWiederkehrend), beiEinstellung: a.beiEinstellung.map(nurWiederkehrend), kommend: a.kommend };
 }
 
 /**
