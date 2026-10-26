@@ -37,14 +37,16 @@ export { ALLERGENE_HILFE, IFSG_HAUSHALT, IFSG_WER, ohneLatein } from "./branchen
 export { SCHULUNG_HILFE, SCHULUNG_THEMEN } from "./schulung.js";
 // E-166: HACCP-Kern (Gefahrenanalyse, CCP, Verifizierung) und Hygieneplan-Zeilen für Bäckerei und Foodtruck
 export { AUFZEICHNUNGEN, CCP_BEGRUENDUNG, CCP_EINSTUFUNG, CCP_FRAGEN, CCP_FRAGEN_QUELLE, CCP_HINWEIS, CCP_VORSCHLAEGE, GEFAHRENANALYSE, GEFAHR_ARTEN, GHP_HINWEIS, GHP_KURZ, GRENZWERT_HACCP, GRENZWERT_HILFE, HACCP_AUFBEWAHRUNG, HACCP_AUFBEWAHRUNG_QUELLE, HACCP_FLEXIBEL, HACCP_RUECKRUF, HACCP_VEREINFACHT, HYGIENE_BAECKEREI, HYGIENE_FOODTRUCK, PROZESSSCHRITTE, VERIFIZIERUNG } from "./haccp.js";
-export { bausteinText } from "./website.js";
+export { LUECKE_TEXT, bausteinText } from "./website.js";
+import { LUECKE_TEXT } from "./website.js";
+export { firmaMitRechtsform, rechtsformImNamen, rechtsformzusatzImNamen } from "./rechtsform.js";
 export { EUER_KAPITALGESELLSCHAFT, GUTSCHRIFT_AUSWAHL, RECHNUNG_NEGATIV, RECHNUNG_NULL, RECHNUNG_PLZ_FEHLT, VERSTEUERUNG, VORSTEUER_AUFTEILEN, aufbewahrenBis, eRechnungAus, faelligAm, kennzahlBefreiung, leistungszeitraumAus, rechnungsTitel } from "./buchhaltung.js";
 // R10 Steuer
 export { NULLSATZ_HINWEIS, RECHNUNG_13B_TEXT, RECHNUNG_EU_19, RECHNUNG_GUTSCHRIFT_STEUER, RECHNUNG_KU_DRITTLAND, RECHNUNG_KU_EU, RECHNUNG_KU_IGL, RECHNUNG_KU_PROFIL, RECHNUNG_KU_RC, RECHNUNG_LEITWEG, UST_FRIST, UST_FRIST_DFV, drittlandLand, euUnternehmenLand, istNullsatzText, istOeffentlicherEmpfaenger, kuFuer } from "./buchhaltung.js";
 export { RECHNUNG_SKONTO_FALSCH, RECHNUNG_SKONTO_FRIST, RECHNUNG_SKONTO_HOCH, skontoFuer } from "./buchhaltung.js";
 // R12 UX
-export { GMBH_ANGABEN, KG_ANGABEN, KG_REGISTERGERICHT, KG_REGISTERNUMMER, komplementaerAngabenFehlen, STORNO_ABSCHLAEGE, RECHNUNG_KU_GUTSCHEIN, RECHNUNG_MONAT_ZEITRAUM, gmbhAngabenFehlen, istPrivatperson, kleinbetrag, standardAnrede } from "./buchhaltung.js";
-export { istCoKg, komplementaerZeile, vertretungLabel } from "./html.js";
+export { GMBH_ANGABEN, KG_ANGABEN, KG_KOMPLEMENTAER, KG_REGISTERGERICHT, KG_REGISTERNUMMER, komplementaerAngabenFehlen, STORNO_ABSCHLAEGE, RECHNUNG_KU_GUTSCHEIN, RECHNUNG_MONAT_ZEITRAUM, gmbhAngabenFehlen, istPrivatperson, kleinbetrag, standardAnrede } from "./buchhaltung.js";
+export { istCoKg, komplementaerAngaben, komplementaerZeile, vertretungLabel } from "./html.js";
 export { REGISTER_FORMEN, istKapitalgesellschaft, mitVertretung, rechtsformAus, registerAus } from "./betrieb.js";
 export { RECHTSFORMEN } from "./bausteine.js";
 export { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN, arbeitsminuten, arbeitszeitPruefung, monatAus, monatSchluessel, stunden } from "./lohn.js";
@@ -342,11 +344,31 @@ export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
       else if (platzhalterOffen(f, d[f.id])) fehlt.push(platzhalterText(f));
     }
   if (b && v.pruefen) fehlt.push(...v.pruefen(d, b));
+  // E-210: Lücken im fertigen Text (Impressum, Datenschutzerklärung: „[bitte ergänzen]“) – auch wenn kein Pflichtfeld fehlt
+  const luecken = b ? offeneLuecken(v, d, b) : 0;
+  if (luecken) fehlt.push(LUECKEN_IM_TEXT(luecken));
   // ohne Namen des Betriebs bleibt der Kopf leer (R10) – eine Kontrolle kann das Blatt keinem Betrieb zuordnen. Prüfungen
   // der Vorlage, die den Namen schon nennen („Name und Anschrift …“), reichen.
   if (b && !b.name.trim() && !fehlt.some((x) => /^Name\b.*\(Mein Betrieb\)/.test(x))) fehlt.push(BETRIEBSNAME_FEHLT);
   return fehlt;
 }
+
+/**
+ * E-210: Platzhalter, die im fertigen Text einer Vorlage nicht stehen bleiben dürfen – die Markierung einer fehlenden
+ * Angabe (website.ts: im PDF eine Linie, in der Textfassung „[bitte ergänzen]“) und nicht ersetzte Platzhalter der
+ * Bausteine („{hoster_name}“). Linien zum Ausfüllen auf Papier (Unterschrift, Datum) zählen nicht: geprüft wird die
+ * Textfassung (`alsText`) – Vorlagen ohne Textfassung haben keine solchen Lücken.
+ */
+const LUECKE_MUSTER = /\[bitte erg(?:ä|ae)nzen\]|\uE000|\{[a-z_]{2,40}\}/gi;
+
+/** E-210: Anzahl der Lücken im fertigen Text einer Unterlage (0 bei Vorlagen ohne Textfassung). */
+export function offeneLuecken(v: Vorlage, d: Daten, b: Betrieb): number {
+  if (!v.alsText) return 0;
+  return v.alsText(ohneVerdeckte(v, d), b).match(LUECKE_MUSTER)?.length ?? 0;
+}
+
+/** E-210: Meldung in „Fehlt noch“, solange der Text Lücken hat – die Unterlage gilt dann nicht als fertig. */
+export const LUECKEN_IM_TEXT = (n: number) => `${n === 1 ? "Eine Lücke" : `${n} Lücken`} im Text („${LUECKE_TEXT}“) – fehlende Angaben eintragen, bevor du den Text veröffentlichst`;
 
 /** Text auf höchstens `max` Zeichen, am Wortende gekürzt mit „…“ (ein einzelnes zu langes Wort hart). */
 function kuerzen(t: string, max: number): string {

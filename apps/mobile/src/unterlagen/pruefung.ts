@@ -1,5 +1,6 @@
 /** Was einer Unterlage noch fehlt – Pflichtangaben der Vorlage plus Prüfungen über alle Unterlagen (doppelte Nummer). */
-import { GMBH_ANGABEN, KG_REGISTERGERICHT, KG_REGISTERNUMMER, fehlendeAngaben, vorlageFuer, type Betrieb } from "@amtlos/fachlogik";
+import { GMBH_ANGABEN, KG_REGISTERGERICHT, KG_REGISTERNUMMER, fehlendeAngaben, offeneLuecken, vorlageFuer, type Betrieb, type Daten, type Vorlage } from "@amtlos/fachlogik";
+import { T as TEXT } from "../texte";
 import { nummerDoppelt, type Stand, type Unterlage } from "./speicher";
 
 export const NUMMER_DOPPELT = "Rechnungsnummer ist schon vergeben";
@@ -21,4 +22,13 @@ export function fehltFuer(s: Stand, u: Unterlage): string[] {
   // E-193 (8a): ebenso Registergericht und -nummer der GmbH & Co. KG selbst (die Komplementärin ist schon eingetragen)
   const fehlt = fehlendeAngaben(v, u.daten, betriebFuerPruefung(s)).filter((x) => eingetragen || !(x.includes(GMBH_ANGABEN) || x === KG_REGISTERGERICHT || x === KG_REGISTERNUMMER));
   return [...fehlt, ...(nummerDoppelt(s, u) ? [NUMMER_DOPPELT] : [])];
+}
+
+/**
+ * E-210: Rückfrage vor Teilen, Drucken und „Als Text teilen“, solange der Text Lücken hat („[bitte ergänzen]“, im PDF eine
+ * leere Linie) – sonst null. Kundendokumente gehen ohnehin nur vollständig hinaus.
+ */
+export function lueckenFrage(v: Vorlage, d: Daten, b: Betrieb): { titel: string; text: string; ja: string } | null {
+  const n = offeneLuecken(v, d, b);
+  return n ? { titel: TEXT.e210_luecken_titel(n), text: TEXT.e210_luecken_text, ja: TEXT.e210_luecken_ja } : null;
 }

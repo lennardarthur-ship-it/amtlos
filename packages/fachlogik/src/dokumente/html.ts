@@ -9,6 +9,7 @@ import { istGueltig, plusMonate as plusMonateDatum } from "@amtlos/fristen";
 import type { Betrieb, Daten, Eintrag, Option } from "./typen.js";
 import { FRUEHERE_TEXTE } from "./bausteine.js";
 import { rundeCent } from "../rechnung.js";
+import { rechtsformImNamen } from "./rechtsform.js";
 
 /**
  * Hinweis zur fachlichen Abnahme (PRUEFLISTE T-52 ff.). Steht in der App vor dem Erstellen, nicht im Dokument: Die
@@ -924,12 +925,8 @@ export function vertretungLabel(rechtsform: string | undefined): string {
   if (/^(e?gbr|ohg|kg|partg|partgmbb)$/.test(rf)) return "Gesellschafter/innen";
   return "Geschäftsführung";
 }
-/** Steht die Rechtsform schon im Namen des Betriebs („Aydın Autotechnik GmbH“)? */
-const rechtsformImNamen = (b: Betrieb) => {
-  const n = (x: string) => x.toLocaleLowerCase("de").replace(/[\s.()]/g, "");
-  const rf = n(b.rechtsform ?? "");
-  return !rf || n(b.name).includes(rf) || (rf.startsWith("ug") && /\bUG\b/.test(b.name));
-};
+/** Steht die Rechtsform schon im Namen des Betriebs („Aydın Autotechnik GmbH“, „Muster UG (haftungsbeschraenkt)“; E-210: alle Schreibweisen)? */
+const rechtsformSchonImNamen = (b: Betrieb) => rechtsformImNamen(b.name, b.rechtsform);
 
 /**
  * E-193 (8a): GmbH & Co. KG bzw. UG (haftungsbeschränkt) & Co. KG nach der Rechtsform aus „Mein Betrieb“, ohne Angabe
@@ -950,14 +947,20 @@ export function istCoKg(b: Pick<Betrieb, "rechtsform" | "name">): boolean {
 /** E-200: Bezeichnung der Geschäftsführer bei der GmbH & Co. KG bzw. UG (haftungsbeschränkt) & Co. KG (Fußzeile, BT-33). */
 export const CO_KG_GESCHAEFTSFUEHRER = "Geschäftsführer der Komplementärin";
 
-export function komplementaerZeile(b: Betrieb): string {
+/**
+ * Angaben zur Komplementärin aus „Mein Betrieb“: Firma, Rechtsform (wenn nicht schon in der Firma, E-210: alle
+ * Schreibweisen), Sitz, Registergericht und -nummer – leere entfallen. Ohne Firma leer.
+ */
+export function komplementaerAngaben(b: Betrieb): string[] {
   const t = (x: string | undefined) => (x ?? "").trim();
-  if (!istCoKg(b) || !t(b.komplementaer)) return "";
-  const n = (x: string) => x.toLocaleLowerCase("de").replace(/[\s.()]/g, "");
+  if (!t(b.komplementaer)) return [];
   const rf = t(b.komplementaer_rechtsform);
-  const rfImNamen = !rf || n(t(b.komplementaer)).includes(n(rf)) || (n(rf).startsWith("ug") && /\bUG\b/.test(t(b.komplementaer)));
-  const teile = [t(b.komplementaer), rfImNamen ? "" : rf, t(b.komplementaer_sitz) ? `Sitz ${t(b.komplementaer_sitz)}` : "", [t(b.komplementaer_registergericht), t(b.komplementaer_registernummer)].filter(Boolean).join(" ")].filter(Boolean);
-  return `Persönlich haftende Gesellschafterin: ${teile.join(", ")}`;
+  return [t(b.komplementaer), rechtsformImNamen(t(b.komplementaer), rf) ? "" : rf, t(b.komplementaer_sitz) ? `Sitz ${t(b.komplementaer_sitz)}` : "", [t(b.komplementaer_registergericht), t(b.komplementaer_registernummer)].filter(Boolean).join(" ")].filter(Boolean);
+}
+
+export function komplementaerZeile(b: Betrieb): string {
+  if (!istCoKg(b) || !(b.komplementaer ?? "").trim()) return "";
+  return `Persönlich haftende Gesellschafterin: ${komplementaerAngaben(b).join(", ")}`;
 }
 
 /** Spalten der Geschäfts-Fußzeile aus „Mein Betrieb“ (leere entfallen). Zeilen mit **…** werden fett. */
@@ -971,7 +974,7 @@ export function fussSpalten(b: Betrieb): string[][] {
       t(b.steuernummer) ? `Steuernr. ${t(b.steuernummer)}` : "",
       t(b.ust_idnr) ? `USt-IdNr. ${t(b.ust_idnr)}` : "",
       // Gesellschaften: Rechtsform (wenn nicht schon im Namen), Sitz, Registergericht und -nummer, Geschäftsführung (§ 35a GmbHG, § 37a HGB)
-      t(b.rechtsform) && t(b.registergericht) ? `${rechtsformImNamen(b) ? "" : `${t(b.rechtsform)}, `}Sitz ${t(b.ort)}, ${[t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" ")}` : [t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" "),
+      t(b.rechtsform) && t(b.registergericht) ? `${rechtsformSchonImNamen(b) ? "" : `${t(b.rechtsform)}, `}Sitz ${t(b.ort)}, ${[t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" ")}` : [t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" "),
       // E-193 (8a): GmbH & Co. KG – die Komplementärin mit ihren Angaben (§§ 125, 177a HGB), danach ihre Geschäftsführer
       komplementaerZeile(b),
       // R12 (Bäckerei #14): beim e. K. „Inhaber“, bei Personengesellschaften „Gesellschafter“, sonst „Geschäftsführung“;

@@ -5,13 +5,17 @@
 import { AVV_KLAUSELN, DSE } from "./bausteine.js";
 import { formGleich, formImNamen, istKapitalgesellschaft, mitVertretung, rechtsformAus } from "./betrieb.js";
 import { aufsichtFuer } from "./datenschutz.js";
-import { LINIE, abschnitt, abschnitte, angaben, ankreuzen, anschrift, anschriftMehrzeilig, auswahl, datumDe, dokument, esc, ja, liste, parteien, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
+import { KG_KOMPLEMENTAER } from "./buchhaltung.js";
+import { LINIE, abschnitt, abschnitte, angaben, ankreuzen, anschrift, anschriftMehrzeilig, auswahl, datumDe, dokument, esc, istCoKg, ja, komplementaerAngaben, liste, parteien, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
+import { firmaMitRechtsform } from "./rechtsform.js";
 import type { Betrieb, Daten, EinfachesFeld, Vorlage } from "./typen.js";
 import { MARKE } from "@amtlos/marke";
 
-/** Markierung für eine fehlende Angabe; im Dokument eine Linie, im Text „[bitte ergänzen]“. */
+/** Markierung für eine fehlende Angabe; im Dokument eine Linie, im Text „[bitte ergänzen]“ (E-210: `offeneLuecken` zählt sie). */
 const FEHLT = "\uE000";
+/** Text einer fehlenden Angabe in der Textfassung (`alsText`) */
+export const LUECKE_TEXT = "[bitte ergänzen]";
 
 /** Platzhalter der Bausteine füllen. Unbekannte oder leere Angaben werden als fehlend markiert. */
 export function bausteinText(t: string, d: Daten, b: Betrieb): string {
@@ -40,7 +44,7 @@ export function bausteinText(t: string, d: Daten, b: Betrieb): string {
 }
 // Zeilenumbrüche bleiben erhalten (z. B. in „Weitere Verarbeitungen“), wie im Impressum
 const alsHtml = (t: string) => `<p>${esc(t).replace(/\n/g, "<br>").replace(/\uE000/g, LINIE)}</p>`;
-const alsKlartext = (t: string) => t.replace(/\uE000/g, "[bitte ergänzen]");
+const alsKlartext = (t: string) => t.replace(/\uE000/g, LUECKE_TEXT);
 
 /**
  * R12 (Coach #10): Bausteine für Online-Kurse per Videokonferenz und für Zahlungsdienstleister – mit Anbieter,
@@ -240,13 +244,32 @@ const rechtsformImp = (d: Daten, b: Betrieb) => rechtsformAus(text(d, "rechtsfor
 /** Juristische Personen (§ 5 Abs. 1 Nr. 1 DDG): Rechtsform und Vertretungsberechtigte; Personengesellschaften ebenso vertreten. */
 const IMP_VERTRETUNG: Record<string, string> = { "Einzelunternehmen": "Inhaber/in", "e. K.": "Inhaber/in", GbR: "Vertretungsberechtigte Gesellschafter/innen", OHG: "Vertretungsberechtigte Gesellschafter/innen", KG: "Vertretungsberechtigte Gesellschafter/innen", "UG (haftungsbeschränkt)": "Vertretungsberechtigte Geschäftsführung", GmbH: "Vertretungsberechtigte Geschäftsführung" };
 
+/**
+ * E-210: GmbH & Co. KG bzw. UG (haftungsbeschränkt) & Co. KG – die KG wird durch ihre persönlich haftende Gesellschafterin
+ * vertreten (§ 124 Abs. 1, § 161 Abs. 2, § 170 Abs. 1 HGB), diese durch ihre Geschäftsführer (§ 35 Abs. 1 GmbHG). Die
+ * Personen aus dem Feld bzw. aus „Mein Betrieb“ sind die Geschäftsführer der Komplementärin (wie in Fußzeile und
+ * XRechnung: „Geschäftsführer der Komplementärin“); Firma, Sitz und Register der Komplementärin aus „Mein Betrieb“.
+ * Nennt das Feld die Komplementärin schon selbst, bleibt es, wie es ist.
+ */
+function coKgVertretung(wer: string, b: Betrieb): string {
+  const k = (b.komplementaer ?? "").trim();
+  const n = (x: string) => x.toLocaleLowerCase("de").replace(/[\s.,()-]/g, "");
+  if (wer && ((k && n(wer).includes(n(k))) || /persönlich haftende/i.test(wer))) return wer;
+  const mehrere = /,|;|\n|&|\bund\b/.test(wer);
+  const komplementaerin = komplementaerAngaben(b).join(", ") || FEHLT;
+  return `die persönlich haftende Gesellschafterin ${komplementaerin}, diese vertreten durch ${mehrere ? "ihre" : "ihren"} Geschäftsführer ${wer.replace(/\s*\n\s*/g, ", ") || FEHLT}`;
+}
+
 function impressumTeile(d: Daten, b: Betrieb): { titel: string; text: string }[] {
   const rf = rechtsformImp(d, b);
+  const wer = text(d, "vertreten") || (b.vertretung ?? "").trim() || b.verantwortlich.trim();
+  const coKg = istCoKg({ rechtsform: rf, name: b.name });
   // Stammkapital als eigener Teil nach dem Registereintrag (nicht unter „Vertreten durch“)
   const kapital = text(d, "kapital") && /GmbH|UG/.test(rf) ? { titel: "Stammkapital", text: `${text(d, "kapital")}${text(d, "ausstehend") ? `\nAusstehende Einlagen: ${text(d, "ausstehend")}` : ""}` } : null;
   const t: { titel: string; text: string }[] = [
-    { titel: "Angaben gemäß § 5 DDG", text: [b.name.trim() + (!b.name.includes(rf) && rf !== "Einzelunternehmen" ? ` ${rf}` : ""), b.strasse, [b.plz, b.ort].filter(Boolean).join(" "), ...(rf !== "Einzelunternehmen" ? [`Rechtsform: ${rf}`] : [])].filter((x) => x.trim()).join("\n") || FEHLT },
-    { titel: IMP_VERTRETUNG[rf] ?? (istKapitalgesellschaft(rf) ? "Vertretungsberechtigte Geschäftsführung" : "Vertreten durch"), text: text(d, "vertreten") || (b.vertretung ?? "").trim() || b.verantwortlich.trim() || FEHLT },
+    // E-210: Rechtsform nur anhängen, wenn der Name noch keinen Zusatz nennt („Muster UG“ + „UG (haftungsbeschränkt)“)
+    { titel: "Angaben gemäß § 5 DDG", text: [firmaMitRechtsform(b.name, rf), b.strasse, [b.plz, b.ort].filter(Boolean).join(" "), ...(rf !== "Einzelunternehmen" ? [`Rechtsform: ${rf}`] : [])].filter((x) => x.trim()).join("\n") || FEHLT },
+    { titel: IMP_VERTRETUNG[rf] ?? (istKapitalgesellschaft(rf) ? "Vertretungsberechtigte Geschäftsführung" : "Vertreten durch"), text: coKg ? coKgVertretung(wer, b) : wer || FEHLT },
     { titel: "Kontakt", text: [b.telefon ? `Telefon: ${b.telefon}` : "", `E-Mail: ${b.email.trim() || FEHLT}`].filter(Boolean).join("\n") },
   ];
   const gericht = text(d, "register_gericht") || (b.registergericht ?? "").trim();
@@ -332,6 +355,8 @@ export const impressum: Vorlage = {
     const rf = rechtsformImp(d, b);
     // Aufsichtsbehörde aus der Zeit vor dem Schalter „behördliche Zulassung“: nachfragen, statt sie still zu drucken
     if (text(d, "aufsicht") && d.zulassung === undefined) f.push("Aufsichtsbehörde eingetragen: Braucht deine Tätigkeit eine behördliche Zulassung? Dann den Schalter einschalten, sonst gehört die Behörde nicht ins Impressum.");
+    // E-210: GmbH & Co. KG – ohne Komplementärin in „Mein Betrieb“ bliebe „vertreten durch die persönlich haftende Gesellschafterin …“ offen
+    if (istCoKg({ rechtsform: rf, name: b.name }) && !(b.komplementaer ?? "").trim() && !/persönlich haftende/i.test(text(d, "vertreten"))) f.push(KG_KOMPLEMENTAER);
     if (imNamen && !formGleich(imNamen, rf)) f.push(`Der Name des Betriebs enthält die Rechtsform „${imNamen}“, gewählt ist „${rf}“ – bitte prüfen.`);
     return f;
   },

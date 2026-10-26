@@ -32,7 +32,8 @@ describe("Vermerk je Vorlage in der App", () => {
       const d: Daten = v.id === "hygieneplan" ? { art: "lebensmittel" } : {};
       expect(pruefHinweisFuer(v, d, cafe) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id));
       // E-200: Rechnung der GmbH & Co. KG vom Steuerberater nachgeprüft (26.10.2026)
-      expect(pruefHinweisFuer(v, d, coKg) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id));
+      // E-210: Impressum der GmbH & Co. KG geändert (Vertretung durch die Komplementärin) – ohne Vermerk bis zur Bestätigung (T-254)
+      expect(pruefHinweisFuer(v, d, coKg) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id) && v.id !== "impressum");
       if (v.id === "hygieneplan") expect(pruefHinweisFuer(v, { art: "beauty" }, cafe)).toContain("von einem Rechtsanwalt (Länderzusatz nur für Bayern geprüft)");
     }
     expect(pruefHinweisFuer(vorlageFuer("rechnung")!, {}, cafe)).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 23.10.2026)");

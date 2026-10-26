@@ -1622,5 +1622,10 @@ export const T = {
   stb_vollsicherung_faellig: (tage: number | null) => (tage === null ? `Noch keine Sicherung außerhalb des ${W.geraetGenitiv}. Geht es verloren, wären Rechnungen und Belege weg – einmal im Monat sichern.` : `Deine letzte Sicherung außerhalb des ${W.geraetGenitiv} ist ${tage} Tage alt. Einmal im Monat als Datei sichern – auf dem Computer, einem USB-Stick oder in einem Cloud-Speicher.`),
   stb_letzte_vollsicherung: (t: string | null) => (t ? `Letzte Sicherung außerhalb des Geräts: ${t}` : "Noch keine Sicherung außerhalb des Geräts festgehalten."),
   stb_vollsicherung_hinweis: `Lege die Datei außerhalb des ${W.geraetGenitiv} ab (Computer, USB-Stick, Cloud-Speicher) – ${ANDROID ? "die Gerätesicherung von Android enthält die Daten von " + MARKE.name + " nicht" : "das iCloud-Backup des iPhones allein genügt nicht"}. Datum und Art jeder Sicherung hält ${MARKE.name} als Nachweis fest; eine neue Verfahrensdokumentation übernimmt sie.`,
+  // E-210: Lücken „[bitte ergänzen]“ im Text (Impressum, Datenschutzerklärung) – Hinweis am Dokument und Rückfrage vor dem Weitergeben
+  e210_luecken_hinweis: (n: number) => `${n === 1 ? "Eine Stelle" : `${n} Stellen`} im Text ${n === 1 ? "ist" : "sind"} noch leer – im PDF als Linie, im Text als „[bitte ergänzen]“. Erst ausfüllen, dann veröffentlichen.`,
+  e210_luecken_titel: (n: number) => (n === 1 ? "Im Text fehlt noch eine Angabe" : `Im Text fehlen noch ${n} Angaben`),
+  e210_luecken_text: "An diesen Stellen steht „[bitte ergänzen]“ bzw. im PDF eine leere Linie. So veröffentlicht, wäre der Text unvollständig.",
+  e210_luecken_ja: "Trotzdem weitergeben",
   stb_vollsicherung_icloud: `Die automatische ${ANDROID ? "Sicherung in deinen Ordner" : "iCloud-Sicherung"} läuft. Einmal im Monat zusätzlich als Datei oder offenes Archiv sichern – das ist der Nachweis außerhalb des Geräts.`,
 };

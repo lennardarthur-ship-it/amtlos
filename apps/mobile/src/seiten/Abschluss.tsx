@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { GMBH_ANGABEN, KG_ANGABEN, KU_HINWEIS, betragUnplausibel, pruefHinweisFuer, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Daten, type Vorlage } from "@amtlos/fachlogik";
+import { GMBH_ANGABEN, KG_ANGABEN, KU_HINWEIS, betragUnplausibel, offeneLuecken, pruefHinweisFuer, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Daten, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -11,7 +11,7 @@ import { Papier, PapierBlatt } from "./Papier";
 import { GrosserBetrag, RechtsHinweis } from "./gemeinsam";
 import { mitVorlagenHinweis } from "../rechtshinweis";
 import { drucken, pdfTeilenMitHash } from "../unterlagen/pdf";
-import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
+import { NUMMER_DOPPELT, fehltFuer, lueckenFrage } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
 import { absenderFuer, geteiltOffenLetzte, geteilteVersionen, heute } from "../unterlagen/speicher";
 import { euroText, faelligAm, offenBrutto, rechnungBrutto } from "../unterlagen/ablage";
@@ -86,6 +86,9 @@ export function useTeilen(id: string) {
     if (!u || !v) return;
     setFehler(null);
     if (v.kundendokument && fehltFuer(z.stand, u).length) return setFehler(TEXT.erst_vollstaendig);
+    // E-210: Lücken im Text („[bitte ergänzen]“) – nachfragen, bevor ein unvollständiges Impressum hinausgeht
+    const luecken = lueckenFrage(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro));
+    if (luecken && !(await bestaetigen(luecken))) return;
     // E-188: eine noch nie ausgegebene Rechnung bzw. Vorlage nur mit Pro; erneutes Teilen, Stornos und Kassenbuch gehen immer
     if (!ausgabeErlaubt(u, z.pro) && !sperre(ausgabeGrund(u), undefined, { entwurf: true })) return;
     setLaedt(art === "teilen");
@@ -161,6 +164,8 @@ function VorschauSeite({ id }: { id: string }) {
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const v = u ? vorlageFuer(u.vorlage) : undefined;
   if (!u || !v) return <Unterseite titel="">{null}</Unterseite>;
+  // E-210: Lücken im Text auch in der Vorschau ansagen
+  const luecken = u.festgeschrieben ? 0 : offeneLuecken(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro));
   return (
     <Unterseite titel={TEXT.vorschau}>
       {/* das Dokument als Blatt Papier mit Rand und Schatten (E-144) */}
@@ -169,7 +174,7 @@ function VorschauSeite({ id }: { id: string }) {
           <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro))} quer={v.querformat} />
         </View>
       </View>
-      <Fuss ueber={teilen.fehler ? <Ansage text={teilen.fehler} farbe={f.frist} /> : teilen.kontingent ? <T v="caption" leise>{teilen.kontingent.text}</T> : festschreibenHinweis(v, Boolean(u.festgeschrieben)) ? <T v="caption" leise>{festschreibenHinweis(v, Boolean(u.festgeschrieben))}</T> : null}>
+      <Fuss ueber={teilen.fehler ? <Ansage text={teilen.fehler} farbe={f.frist} /> : luecken ? <Ansage text={TEXT.e210_luecken_hinweis(luecken)} farbe={f.frist} /> : teilen.kontingent ? <T v="caption" leise>{teilen.kontingent.text}</T> : festschreibenHinweis(v, Boolean(u.festgeschrieben)) ? <T v="caption" leise>{festschreibenHinweis(v, Boolean(u.festgeschrieben))}</T> : null}>
         <Knopf text={TEXT.mitPro(TEXT.pdf_teilen, teilen.frei)} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
       </Fuss>
     </Unterseite>
@@ -213,6 +218,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   // Prüfungen außerhalb der Schritte: einem Schritt zuordnen, wenn ein Feld dort so heißt; sonst „Mein Betrieb“ bzw. ohne Sprung
   const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: x === NUMMER_DOPPELT ? nummerSchritt : schrittFuer(v, x), betrieb: x.includes("Mein Betrieb") }));
   const html = dokumentHtml(v, d, betriebFuerDokument(absenderFuer(z.stand, u), z.pro));
+  const luecken = offeneLuecken(v, d, betriebFuerDokument(absenderFuer(z.stand, u), z.pro));
   const ergebnis = v.ergebnis?.(d) ?? [];
   const fertig = alle.length === 0;
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(iso));
@@ -372,6 +378,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           </View>
         ) : null}
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
+        {/* E-210: Lücken im Text – auch wenn alle Pflichtfelder ausgefüllt sind */}
+        {!fest && luecken ? <Hinweis art="warnung" text={TEXT.e210_luecken_hinweis(luecken)} /> : null}
         {/* Plausibilität (G6): nur ein Hinweis, kein Hindernis */}
         {v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? <Hinweis art="warnung" text={TEXT.betrag_unplausibel} /> : null}
         {/* Nachkontrolle Rechtsanwalt: die Form vor dem Teilen als eigener Kasten – Schriftform auch nach dem Teilen (ausdrucken) */}
@@ -395,7 +403,12 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           {[
             ...(v.eRechnung && eRechnung ? [{ symbol: "doc.text", titel: TEXT.mitPro(TEXT.e_rechnung, eRechnungErlaubt(u, z.pro)), los: () => void eRechnung() }] : []),
             { symbol: "printer", titel: TEXT.mitPro(TEXT.drucken, ausgabeErlaubt(u, z.pro)), los: () => void druckenLos() },
-            ...(v.alsText ? [{ symbol: "doc.on.doc", titel: TEXT.als_text, los: () => void Share.share({ message: v.alsText!(d, z.stand.betrieb) }).catch(() => undefined) }] : []),
+            // E-210: mit Lücken erst nach Rückfrage
+            ...(v.alsText ? [{ symbol: "doc.on.doc", titel: TEXT.als_text, los: () => void (async () => {
+              const luecken = lueckenFrage(v, d, z.stand.betrieb);
+              if (luecken && !(await bestaetigen(luecken))) return;
+              await Share.share({ message: v.alsText!(d, z.stand.betrieb) });
+            })().catch(() => undefined) }] : []),
             {
               symbol: "plus.circle",
               // E-188: eine Kopie ist eine neue Unterlage – mit Pro

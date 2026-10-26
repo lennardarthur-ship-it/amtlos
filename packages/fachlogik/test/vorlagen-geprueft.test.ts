@@ -149,7 +149,8 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
       // E-202: Storno der Schlussrechnung bestätigt („rechnung#2“); die Fassungen vor dem Streichen von „fachlich zu prüfen“
       // (Sifa: nur der gemeinsame Teil) bzw. vor den Satzänderungen (Rechtsanwalt: alle Varianten) sind durch „#1“ ersetzt
       const alleGruppen = Object.keys(f0(k).teilsummen!).sort();
-      const soll = k === "rechnung" ? [...CO_KG, "storno_schluss"] : k === "rechnung#1" ? ["storno_schluss"] : ["unterweisung", "hautschutzplan", "gefaehrdungsbeurteilung"].includes(k) ? ["basis"] : ["datenschutzerklaerung_website", "video_hinweisschild"].includes(k) ? alleGruppen : [];
+      // E-210: Impressum der GmbH & Co. KG bzw. UG & Co. KG – Vertretung durch die Komplementärin (Vermerk nur dieser Varianten entfallen)
+      const soll = k === "rechnung" ? [...CO_KG, "storno_schluss"] : k === "impressum" ? [...CO_KG] : k === "rechnung#1" ? ["storno_schluss"] : ["unterweisung", "hautschutzplan", "gefaehrdungsbeurteilung"].includes(k) ? ["basis"] : ["datenschutzerklaerung_website", "video_hinweisschild"].includes(k) ? alleGruppen : [];
       expect(g, k).toEqual([...soll].sort());
     }
   });
