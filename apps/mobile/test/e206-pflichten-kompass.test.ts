@@ -130,13 +130,24 @@ function streng(b: Bedingung, fakten: Record<string, unknown>, nurGeplant: Set<s
 }
 
 /**
- * Bewusste, vom Prüfer freigegebene Vermutungen „ohne Angabe nicht betroffen“ (Stand E-206, PRUEFLISTE T-239 zur
- * Bestätigung durch den Rechtsanwalt). Kommt ein Eintrag hinzu, schlägt der Test fehl – erst entscheiden, dann eintragen.
- * - datenschutz.dsb: Art. 37 DSGVO / § 38 BDSG nur bei Hinweisen (Gesundheitsdaten, Video, Ortung) oder angegebenen Gründen;
- * - it_sicherheit.nis2_*: ohne Umsatzangabe gilt ein Betrieb unter 50 Beschäftigten als klein (in der Regel nicht erfasst);
- *   Registrierung und Meldepflichten folgen nur auf „ja“ – bei „weiß ich nicht“ steht „NIS2 prüfen“ (sofern nicht klein).
+ * Bewusste, vom Prüfer freigegebene Vermutungen „ohne Angabe nicht betroffen“ – E-215 (Rechtsanwalt 26.10.2026, T-239):
+ * nur noch außerhalb der Branchen, in denen der Fall typisch ist. Kommt ein Fall hinzu, schlägt der Test fehl – erst
+ * entscheiden, dann eintragen.
+ * - datenschutz.dsb: außerhalb von Gesundheit/Pflege und Kosmetik nur bei Hinweisen (Gesundheitsdaten, Video, Ortung) oder
+ *   angegebenen Gründen; in diesen Branchen „hängt ab“, solange die Angaben fehlen;
+ * - it_sicherheit.nis2_*: außerhalb der Branchen, die der Katalog NIS2 zuordnet (IT und „Andere“), gilt ein Betrieb unter
+ *   50 Beschäftigten ohne Umsatzangabe als klein; Registrierung und Meldepflichten folgen nur auf „ja“ – bei „weiß ich nicht“
+ *   steht in diesen Branchen „NIS2 prüfen“ mit der Frage (Ausnahme nur, wenn „NIS2 prüfen“ sichtbar ist).
  */
-const VERMUTUNG = new Set(["datenschutz.dsb", "it_sicherheit.nis2_pruefen", "it_sicherheit.nis2_registrierung", "it_sicherheit.nis2_meldepflichten"]);
+const DSB_BRANCHEN = ["gesundheit_pflege", "beauty_kosmetik"];
+const NIS2_BRANCHEN = ["it_agentur_freelancer", "sonstige"];
+function vermutung(id: string, antworten: Profil, sichtbar: Set<string>): boolean {
+  const branchen = (antworten["taetigkeit.branchen"] as string[] | undefined) ?? [];
+  if (id === "datenschutz.dsb") return !branchen.some((b) => DSB_BRANCHEN.includes(b));
+  if (!id.startsWith("it_sicherheit.nis2_")) return false;
+  if (!branchen.some((b) => NIS2_BRANCHEN.includes(b))) return true;
+  return id !== "it_sicherheit.nis2_pruefen" && antworten["nis2.betroffen"] === "unklar" && sichtbar.has("it_sicherheit.nis2_pruefen");
+}
 
 /** Pflichten, die ausgeblendet sind, obwohl sie nur an einer fehlenden bzw. unklaren Angabe scheitern. */
 function stillAusgeblendet(antworten: Profil, stichtag = STICHTAG): string[] {
@@ -154,7 +165,7 @@ function stillAusgeblendet(antworten: Profil, stichtag = STICHTAG): string[] {
     // bewusst: Gründungsschritte eines laufenden Betriebs ohne passende Frage entfallen (R12 Coach #1)
     .filter((e) => !(bestehend && phase.get(e.pflicht_id) === "gruendung"))
     .map((e) => e.pflicht_id)
-    .filter((id) => !VERMUTUNG.has(id));
+    .filter((id) => !vermutung(id, antworten, sichtbar));
 }
 
 const PROFILE: Record<string, Profil> = {
@@ -166,6 +177,9 @@ const PROFILE: Record<string, Profil> = {
   "Handwerk Tischlerei, startet 2027, 1 Beschäftigte geplant": { "taetigkeit.branchen": ["handwerk"], rechtsform: "einzelunternehmen", gruendungsdatum: "2027-03-01", bundesland: "BW", "beschaeftigte.gesamt": 1 },
   "Café GmbH, läuft seit 2025, 5 Beschäftigte": { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "gmbh", gruendungsdatum: "2025-05-01", bundesland: "HE", "beschaeftigte.gesamt": 5 },
   "Friseur, gerade gestartet, 2 Beschäftigte": { "taetigkeit.branchen": ["beauty_kosmetik"], rechtsform: "einzelunternehmen", gruendungsdatum: "2026-09-01", bundesland: "NI", "beschaeftigte.gesamt": 2 },
+  // E-215: Branchen, in denen „ohne Angabe nicht betroffen“ nicht mehr gilt (Datenschutzbeauftragter bzw. NIS2)
+  "Pflegedienst GmbH, 15 Beschäftigte, seit 2023": { "taetigkeit.branchen": ["gesundheit_pflege"], rechtsform: "gmbh", gruendungsdatum: "2023-01-01", bundesland: "RP", "beschaeftigte.gesamt": 15 },
+  "Andere Branche, 5 Beschäftigte, seit 2021": { "taetigkeit.branchen": ["sonstige"], rechtsform: "einzelunternehmen", gruendungsdatum: "2021-05-01", bundesland: "SH", "beschaeftigte.gesamt": 5 },
 };
 const VARIANTEN: Record<string, (p: Profil) => Profil> = {
   "ohne weitere Antworten": (p) => p,
