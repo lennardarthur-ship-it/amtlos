@@ -2,7 +2,7 @@
 # Rechtsstand 21.10.2026: NIS2UmsuCG seit 6.12.2025 in Kraft, Meldepflichten nach § 32 BSIG
 schema_version: 1
 id: it_sicherheit.nis2_meldepflichten
-version: 3
+version: 4
 katalog_nr: F.64
 titel:
   de: Sicherheitsvorfälle melden (NIS2)
@@ -33,8 +33,21 @@ ausloeser:
       - feld: profil.taetigkeit.branchen
         op: enthaelt
         wert: it_agentur_freelancer
+    # E-215 (Rechtsanwalt 26.10.2026, T-239): unter 50 Beschäftigten erfasst, wenn Jahresumsatz und Jahresbilanzsumme je über
+    # 10 Mio. € liegen – in den Branchen, die der Katalog NIS2 zuordnet (wie it_sicherheit.nis2_pruefen: IT und „Andere“), ohne
+    # Umsatzangabe „hängt ab“ statt ausgeblendet; die Bilanzsumme steht nicht im Profil (IT war schon ausgenommen)
+    - all:
+      - feld: profil.taetigkeit.branchen
+        op: vorhanden
+      - feld: profil.taetigkeit.branchen
+        op: enthaelt
+        wert: sonstige
+      - not:
+          feld: profil.umsatz.vorjahr
+          op: '<='
+          wert: 10000000
     label:
-      de: Dein Betrieb ist kein Kleinstbetrieb außerhalb der IT-Branche.
+      de: Dein Betrieb ist kein Kleinstbetrieb außerhalb der IT-Branche, oder bei „Andere“ lag der Umsatz im Vorjahr über 10 Mio. €.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -48,6 +61,8 @@ sanktion:
     de: Bußgeld bis 10 Mio. € für besonders wichtige und bis 7 Mio. € für wichtige Einrichtungen, wenn eine Meldung fehlt, falsch oder zu spät ist; bei mehr als 500 Mio. € Gesamtumsatz bis 2 % bzw. 1,4 % des weltweiten Umsatzes (§ 65 Abs. 2 Nr. 4, Abs. 5 Satz 1 Nr. 1, Abs. 6, 7 BSIG).
   schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Bei der Branche „Andere“ erscheint der Eintrag jetzt auch unter 10 Beschäftigten als „hängt ab“, solange du keinen Umsatz angegeben hast.
 status_recht: in_kraft
 gueltig_ab: '2025-12-06'
 gueltig_bis: null
@@ -70,9 +85,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Prüfvermerk Rechtsanwalt 22.10.2026: Meldestufen nach § 32 BSIG, Sanktionsrahmen § 65 BSIG und Ausblendung der Geschäftsleitungspflichten (§ 38 BSIG) bestätigt. Offen: für Kleinstbetriebe (unter 10 Beschäftigte, nicht IT) ausgeblendet (T-105) – Umsatz- und Bilanzschwelle nicht abgebildet'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - recht
-  geprueft_am: '2026-10-23'
-  geprueft_version: 3
-  bestaetigt_am: '2026-10-23'
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

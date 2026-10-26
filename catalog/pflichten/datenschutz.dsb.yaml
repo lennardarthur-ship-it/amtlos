@@ -1,7 +1,7 @@
 # Katalog F.61 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.dsb
-version: 3
+version: 4
 katalog_nr: F.61
 titel:
   de: Datenschutzbeauftragten benennen
@@ -49,6 +49,27 @@ ausloeser:
       wert: [kerntaetigkeit_ueberwachung, kerntaetigkeit_besondere_daten, dsfa_pflichtig, uebermittlung_marktforschung]
       label:
         de: Deine Verarbeitung fällt unter Art. 37 Abs. 1 Buchst. b, c DSGVO oder § 38 Abs. 1 Satz 2 BDSG.
+  # E-215 (Rechtsanwalt 26.10.2026, T-239): in Branchen, in denen Gesundheitsdaten oder Videoüberwachung typisch sind (Gesundheit,
+  # Pflege, Kosmetik mit Anamnese), „hängt ab“, solange die Angaben zur Datenverarbeitung fehlen – § 38 Abs. 1 Satz 2 BDSG gilt
+  # unabhängig von der Zahl, wenn eine Datenschutz-Folgenabschätzung nötig ist; sonst bleibt es ohne Angabe bei „nicht betroffen“
+  - all:
+    - feld: profil.taetigkeit.branchen
+      op: vorhanden
+    - feld: profil.taetigkeit.branchen
+      op: enthaelt_eines
+      wert: [gesundheit_pflege, beauty_kosmetik]
+      label:
+        de: Du arbeitest in Gesundheit, Pflege oder Kosmetik.
+    - feld: profil.datenverarbeitung.arten
+      op: enthaelt_eines
+      wert: [gesundheitsdaten, videoueberwachung, ortung]
+      label:
+        de: Du verarbeitest Gesundheitsdaten, überwachst per Video oder ortest Beschäftigte bzw. Fahrzeuge.
+    - feld: profil.datenschutz.dsb_gruende
+      op: enthaelt_eines
+      wert: [kerntaetigkeit_ueberwachung, kerntaetigkeit_besondere_daten, dsfa_pflichtig, uebermittlung_marktforschung]
+      label:
+        de: Deine Verarbeitung fällt unter Art. 37 Abs. 1 Buchst. b, c DSGVO oder § 38 Abs. 1 Satz 2 BDSG.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -62,6 +83,8 @@ sanktion:
     de: Bußgeld bis 10 Mio. € oder bis 2 % des weltweiten Jahresumsatzes, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 4 Buchst. a DSGVO).
   schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: In Gesundheit, Pflege und Kosmetik erscheint der Eintrag jetzt als „hängt ab“, solange du nichts zu deiner Datenverarbeitung angegeben hast.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -78,9 +101,6 @@ quellen:
 fachlich_zu_pruefen:
 - 'Frist „unverzüglich nach Eintritt der Voraussetzung“ (Prüfvermerk Rechtsanwalt 22.10.2026) nur im Text – kein Ereignis dafür'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - recht
-  geprueft_am: '2026-10-23'
-  geprueft_version: 3
-  bestaetigt_am: '2026-10-23'
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

@@ -98,9 +98,9 @@ describe("E-201: Rückmeldungen Rechtsanwalt und Steuerberater im Katalog", () =
     expect(lstb.version).toBe(2);
     expect(pruefVermerk(lstb.version, lstb.pruefung, AM)).toBeNull();
   });
-  it("alle 228 Einträge freigegeben, keine offenen Punkte mehr – außer den drei von E-206 geänderten (Nachprüfung PRUEFLISTE T-236, T-237)", () => {
+  it("alle 228 Einträge freigegeben, keine offenen Punkte mehr – außer den drei von E-206 und den drei von E-215 geänderten (Nachprüfung PRUEFLISTE T-236, T-237, T-278)", () => {
     expect(pflichten.length).toBe(228);
-    const E206 = ["personal.lohnsteuer_anmeldung", "personal.lohnsteuerbescheinigung", "steuern.ust_voranmeldung"];
+    const E206 = ["personal.lohnsteuer_anmeldung", "personal.lohnsteuerbescheinigung", "steuern.ust_voranmeldung", "datenschutz.dsb", "it_sicherheit.nis2_registrierung", "it_sicherheit.nis2_meldepflichten"];
     for (const x of pflichten) {
       if (E206.includes(x.id)) {
         expect(pruefVermerk(x.version, x.pruefung, AM), x.id).toBeNull();

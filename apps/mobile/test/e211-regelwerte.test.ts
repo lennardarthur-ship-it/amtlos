@@ -103,8 +103,8 @@ describe("E-211 Summen: „fachlich geprüft“ erst mit bestätigten Regelwerte
     // auch ohne die Einschränkungen nicht „alle“: eigener Hinweis mit den Schwellenwerten
     expect(katalogGeprueft(pflichten.map(ganz), regelwerte, HEUTE)).toBe("werte_offen");
     expect(checkHinweis("werte_offen")).toBe(T.check_hinweis_werte);
-    expect(T.check_hinweis_werte).toMatch(/einzelne Schwellenwerte noch nicht/);
-    expect(T.hinweis_pflichten_werte).toMatch(/einzelne Schwellenwerte noch nicht/);
+    expect(T.check_hinweis_werte).toMatch(/einzelne Schwellenwerte noch nicht bestätigt/);
+    expect(T.hinweis_pflichten_werte).toMatch(/einzelne Schwellenwerte noch nicht bestätigt/);
     expect(rechtsHinweis("pflichten").text).toBe(T.hinweis_pflichten_teil);
   });
   it("mit bestätigten Regelwerten wieder „alle“", () => {

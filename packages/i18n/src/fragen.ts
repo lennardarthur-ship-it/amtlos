@@ -793,8 +793,8 @@ export const SCHRITTE: Schritt[] = [
         art: "auswahl",
         frage: { de: "Wie oft meldest du die Lohnsteuer an?", en: "How often do you file the wage tax return?" },
         hilfe: {
-          de: "Das folgt aus der Lohnsteuer des Vorjahres (§ 41a Abs. 2 EStG): über 5.000 € monatlich, über 1.080 € vierteljährlich, sonst jährlich. Im ersten Jahr zählt die aufs Jahr hochgerechnete Lohnsteuer des ersten Monats. Wenn du es nicht weißt, frag deine Steuerberatung.",
-          en: "It follows from last year's wage tax (§ 41a(2) EStG): over €5,000 monthly, over €1,080 quarterly, otherwise yearly. In the first year the first month's wage tax projected to a full year counts. If you don't know, ask your tax adviser.",
+          de: "Das folgt aus der Lohnsteuer des Vorjahres (§ 41a Abs. 2 EStG): über 5.000 € monatlich, über 1.080 € vierteljährlich, sonst jährlich. Im ersten Jahr zählt die aufs Jahr hochgerechnete Lohnsteuer des ersten Monats. „Keine“ gilt zum Beispiel, wenn du nur Minijobber beschäftigst, deren Lohnsteuer pauschal über die Minijob-Zentrale abgeführt wird. Wenn du es nicht weißt, frag deine Steuerberatung.",
+          en: "It follows from last year's wage tax (§ 41a(2) EStG): over €5,000 monthly, over €1,080 quarterly, otherwise yearly. In the first year the first month's wage tax projected to a full year counts. “None” applies, for example, if you only employ mini-jobbers whose wage tax is paid as a flat rate via the Minijob-Zentrale. If you don't know, ask your tax adviser.",
         },
         optionen: {
           monatlich: { de: "Monatlich", en: "Monthly" },
