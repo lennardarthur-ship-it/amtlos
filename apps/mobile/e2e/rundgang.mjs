@@ -186,6 +186,9 @@ try {
     // weitere Datumsfragen (R11, z. B. „Seit wann hast du die elektronische Kasse“)
     if (await sichtbar(/^Seit wann /)) { await p.getByRole("textbox").locator("visible=true").last().fill("01.03.2024"); await knopf("Weiter").click(); await warte(1200); continue; }
     if (await sichtbar("Wer macht die Löhne")) { await radio("Ein Lohnbüro").click(); continue; }
+    // E-212: „Wo sitzen deine Kunden?“ (Mehrfachauswahl im Kern-Check) – nur Deutschland
+    const inland = p.getByRole("checkbox", { name: "Deutschland", exact: true }).locator("visible=true");
+    if (await inland.count()) { await inland.last().click(); await knopf("Weiter").click(); continue; }
     const ja = p.getByRole("radio", { name: "Ja", exact: true }).locator("visible=true");
     if ((await sichtbar(/Kasse/)) && (await ja.count())) { await ja.last().click(); continue; }
     const nein = p.getByRole("radio", { name: /^Nein/ }).locator("visible=true");

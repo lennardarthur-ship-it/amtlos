@@ -5,7 +5,7 @@ import { T as TEXT } from "../texte";
 import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Stempel, Symbol, Karte, Knopf, MehrfachWahl, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
-import { CHECK_FELDER, auswertung, checkFragenAnzahl, beantwortet, checkFragen, dringlichkeit, folgeAntworten, offeneFragenNachWirkung, selten, terminStand, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
+import { CHECK_FELDER, WEISS_NICHT_FELDER, auswertung, checkFragenAnzahl, beantwortet, checkFragen, dringlichkeit, istErledigt, folgeAntworten, offeneFragenNachWirkung, selten, terminStand, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { umsatzFakten } from "../unterlagen/kuUmsatz";
 import { GesperrtePflichten, PflichtZeile } from "./Pflichten";
@@ -45,8 +45,6 @@ function herkunftFuer(feld: string, profil: Profil): Record<string, string> | un
 
 /** R12 (Kfz #6): Rechtsform aus dem Check für „Mein Betrieb“ (Geschäftsbriefe, § 35a GmbHG) – nur Gesellschaften und e. K. */
 const RECHTSFORM_TEXT: Record<string, string> = { gbr: "GbR", ek: "e. K.", ohg: "OHG", kg: "KG", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG", partg: "PartG", partg_mbb: "PartG mbB" };
-/** R11 (Nutzertest Gründerin #8): Ja/Nein-Fragen mit „Weiß ich nicht“ */
-const WEISS_NICHT = ["kasse.elektronisch", "ust.kleinunternehmer"];
 
 /**
  * Eingabe je Fragenart aus dem Fragebogen (packages/i18n/fragen.ts). `aufBlur`: Zahlen und Text erst beim Verlassen
@@ -73,13 +71,14 @@ export function Antwort({ f, wert, setzen, aufBlur, herkunft }: { f: Frage; wert
           optionen={[
             { wert: "ja", text: TEXT.ja },
             { wert: "nein", text: TEXT.nein },
-            ...(WEISS_NICHT.includes(f.feld) ? [{ wert: "unklar", text: TEXT.r11_weiss_nicht }] : []),
+            ...(WEISS_NICHT_FELDER.includes(f.feld) ? [{ wert: "unklar", text: TEXT.r11_weiss_nicht }] : []),
           ]}
         />
       );
     case "zahl":
     case "betrag":
-      return <ZahlFeld label={f.frage.de} wert={typeof wert === "number" ? wert : null} setzen={(n) => setzen(n)} aufBlur={aufBlur} />;
+      // E-212: Gewinn des Vorjahres im Kern-Check – „bei Verlust mit Minus“ (Muster der Frage erlaubt das Vorzeichen)
+      return <ZahlFeld label={f.frage.de} wert={typeof wert === "number" ? wert : null} setzen={(n) => setzen(n)} aufBlur={aufBlur} negativ={Boolean(f.muster?.startsWith("-?"))} />;
     case "datum":
       return <DatumFeld ohneLabel label={f.frage.de} wert={typeof wert === "string" ? wert : null} aendern={(d) => setzen(d)} />;
     default:
@@ -87,22 +86,24 @@ export function Antwort({ f, wert, setzen, aufBlur, herkunft }: { f: Frage; wert
   }
 }
 
-function ZahlFeld({ label, wert, setzen, aufBlur }: { label: string; wert: number | null; setzen: (n: number | null) => void; aufBlur?: boolean }) {
+function ZahlFeld({ label, wert, setzen, aufBlur, negativ }: { label: string; wert: number | null; setzen: (n: number | null) => void; aufBlur?: boolean; negativ?: boolean }) {
   const [text, setText] = useState(wert === null ? "" : String(wert));
-  const uebernehmen = (t = text) => setzen(t === "" ? null : Number(t));
+  const uebernehmen = (t = text) => setzen(t === "" || t === "-" ? null : Number(t));
   return (
     <Feld
       ohneLabel
       label={label}
       wert={text}
       aendern={(t) => {
-        const rein = t.replace(/[^0-9]/g, "");
+        // nur Ziffern; bei `negativ` ein Minus vorn (Verlust)
+        const ziffern = t.replace(/[^0-9]/g, "");
+        const rein = negativ && t.trim().startsWith("-") ? `-${ziffern}` : ziffern;
         setText(rein);
         if (!aufBlur) uebernehmen(rein);
       }}
       onBlur={aufBlur ? () => uebernehmen() : undefined}
       onSubmitEditing={aufBlur ? () => uebernehmen() : undefined}
-      keyboardType="number-pad"
+      keyboardType={negativ ? "numbers-and-punctuation" : "number-pad"}
     />
   );
 }
@@ -304,7 +305,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
                   <T v="gross">{TEXT.ergebnis_anfangen(anfangen.length)}</T>
                   <Karte stil={{ marginTop: 10 }}>
                     {anfangen.map((p, k, l) => (
-                      <PflichtZeile key={p.id} p={p} erledigt={false} ohneWichtig letzte={k === l.length - 1} />
+                      <PflichtZeile key={p.id} p={p} a={a} erledigt={istErledigt(p, z.stand)} ohneWichtig letzte={k === l.length - 1} />
                     ))}
                   </Karte>
                 </View>

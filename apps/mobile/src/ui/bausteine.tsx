@@ -150,12 +150,12 @@ export function tageBis(termin: string, heute: string): number {
  * oben trägt den Status (rot überfällig, bernstein bald, Minze erledigt). Für VoiceOver verborgen; das Datum steht
  * immer zusätzlich als Text daneben.
  */
-export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: string; heute: string; erledigt?: boolean; groesse?: number }) {
+export function Fristblatt({ termin, heute, erledigt, ruhig, groesse = 46 }: { termin: string; heute: string; erledigt?: boolean; /** E-212: Frist vor dem ersten Check – ruhig statt rot */ ruhig?: boolean; groesse?: number }) {
   const f = useFarben();
   const d = new Date(`${termin}T12:00:00Z`);
   const tage = tageBis(termin, heute);
   // getöntes Quadrat mit Tag und Monat – der Ton trägt den Status (rot überfällig, bernstein bald, Minze erledigt)
-  const t = erledigt ? tonFarben(f, "erfolg") : tage < 0 ? tonFarben(f, "frist") : tage <= 14 ? tonFarben(f, "bald") : { grund: f.flaeche, zeichen: f.tinte };
+  const t = erledigt ? tonFarben(f, "erfolg") : ruhig ? { grund: f.flaeche, zeichen: f.tinteLeise } : tage < 0 ? tonFarben(f, "frist") : tage <= 14 ? tonFarben(f, "bald") : { grund: f.flaeche, zeichen: f.tinte };
   const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", ...o }).format(d).replace(".", "");
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: RADIUS.klein, backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>

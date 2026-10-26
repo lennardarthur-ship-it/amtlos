@@ -67,6 +67,11 @@ export const T = {
   frist_morgen: "Morgen fällig",
   frist_in: (n: number) => `In ${n} Tagen fällig`,
   frist_ueber: (n: number) => (n === 1 ? "Seit gestern überfällig" : `Seit ${n} Tagen überfällig`),
+  // E-212 (T-240): einmalige Frist, die schon vor dem ersten Pflichten-Check vorbei war – ruhig statt „überfällig“
+  e212_frist_war: (datum: string) => `Frist war am ${datum} – schon erledigt?`,
+  e212_ja_erledigt: "Ja, erledigt",
+  e212_ja_erledigt_label: (titel: string) => `${titel}: Ja, erledigt`,
+  e212_vor_check_hinweis: "Diese Frist lag vor deinem ersten Pflichten-Check. Hast du das schon erledigt, tipp auf „Ja, erledigt“. Sonst hol es jetzt nach – was zu tun ist, steht unten.",
   auswaehlen: "Auswählen",
   optional: "optional",
   neu: "Neu",
@@ -1049,12 +1054,15 @@ export const T = {
   steuerpaket_bilanz: "Für eine Gesellschaft mit Bilanz ist das Paket eine Zuarbeit für deine Steuerberatung: Rechnungen, Belege und ein Buchungsvorschlag dazu – ohne Bank, Kasse, Anlagen, Abgrenzungen und Abschlussbuchungen. Die Buchführung und den Jahresabschluss macht weiter die Kanzlei; frag sie, ob ihr das Paket hilft.",
   ust_ku_gemischt: "Im Zeitraum gibt es Rechnungen mit Umsatzsteuer, obwohl du als Kleinunternehmer giltst – sie sind übernommen. Hast du die Umsatzgrenze überschritten, gilt ab dieser Rechnung die Regelbesteuerung (§ 19 Abs. 1 Satz 2 UStG); Vorsteuer ist nur aus Belegen ab dann übernommen. Sonst schuldest du die ausgewiesene Steuer trotzdem (§ 14c UStG, Kz 69) – bitte mit der Steuerberatung klären.",
   // R10 Pflichten
-  r10_ergebnis_bald: (termine: number, ohne: number) =>
-    termine === 0 && ohne === 0
-      ? "Nach deinen Angaben: in den nächsten 2\u00a0Wochen nichts Dringendes"
-      : termine === 0
-        ? `Nach deinen Angaben: keine Termine in den nächsten 2\u00a0Wochen, ${ohne === 1 ? "1\u00a0wichtige Aufgabe" : `${ohne}\u00a0wichtige Aufgaben`}`
-        : `Nach deinen Angaben: ${termine === 1 ? "1\u00a0Termin" : `${termine}\u00a0Termine`} in den nächsten 2\u00a0Wochen${ohne ? `, dazu ${ohne === 1 ? "1\u00a0wichtige Aufgabe" : `${ohne}\u00a0wichtige Aufgaben`}` : ""}`,
+  // E-212 (T-240): Fristen vor dem ersten Check zählen als „zu klären“, nicht als Termin
+  r10_ergebnis_bald: (termine: number, ohne: number, klaeren = 0) => {
+    const aufgaben = ohne ? (ohne === 1 ? "1\u00a0wichtige Aufgabe" : `${ohne}\u00a0wichtige Aufgaben`) : "";
+    const offen = klaeren ? (klaeren === 1 ? "1\u00a0Frist zu klären" : `${klaeren}\u00a0Fristen zu klären`) : "";
+    const rest = [aufgaben, offen].filter(Boolean);
+    if (termine === 0 && !rest.length) return "Nach deinen Angaben: in den nächsten 2\u00a0Wochen nichts Dringendes";
+    if (termine === 0) return `Nach deinen Angaben: keine Termine in den nächsten 2\u00a0Wochen, ${rest.join(", ")}`;
+    return `Nach deinen Angaben: ${termine === 1 ? "1\u00a0Termin" : `${termine}\u00a0Termine`} in den nächsten 2\u00a0Wochen${rest.length ? `, dazu ${rest.join(", ")}` : ""}`;
+  },
   r10_zaehlung: (p: number, h: number, o: number): string => {
     const teile = [p === 1 ? "1 Pflicht" : `${p} Pflichten`, ...(h ? [h === 1 ? "1 Hinweis" : `${h} Hinweise`] : []), ...(o ? [o === 1 ? "1 Option" : `${o} Optionen`] : [])];
     return teile.length > 1 ? `${teile.slice(0, -1).join(", ")} und ${teile[teile.length - 1]}` : teile[0]!;

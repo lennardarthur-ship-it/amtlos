@@ -73,6 +73,11 @@ export const CHECK_FELDER = [
   "vertrieb.ausserhalb_geschaeftsraeume",
   // R12 (Rechtsprüfung Befund 2): Aufträge per Telefon, E-Mail oder Messenger (Fernabsatz)
   "vertrieb.fernabsatz",
+  // E-212 (T-241): Kunden in anderen EU-Ländern – die bestehende Frage, auf die OSS, ZM und USt-IdNr. sich stützen; bei
+  // „Andere EU-Länder“ die Angaben, die der Auslöser der OSS-Erklärung außerdem braucht (Privatkunden, Vertriebsweg)
+  "kunden.regionen",
+  "kunden.segmente",
+  "vertrieb.kanaele",
   // R11 (Nutzertest Gründerin #2): bei Gastronomie die Fragen, ohne die man nicht starten darf
   "ifsg.selbst",
   "erlaubnis.gewo_paragraphen",
@@ -100,8 +105,20 @@ export const CHECK_FELDER = [
   "ust.kleinunternehmer",
   // R12 (UX #3): Rhythmus der Voranmeldung, sobald die Kleinunternehmerregelung verneint ist – sonst bleibt „Dein Jahr“ leer
   "ust.voranmeldung_rhythmus",
+  // E-212 (T-241): bei Betrieben mit Vorjahr die Angaben, die EÜR, Gewerbesteuererklärung und Vorauszahlungen einen
+  // Termin geben (vorher nur bei „Genauer machen“) – nur, wo sie entscheiden (`FRAGE_PASST`)
+  "gewinn.vorjahr",
+  "steuern.buchfuehrung_mitteilung",
+  "vorauszahlung.est_kst",
+  "vorauszahlung.gewst",
   "steuerberater",
 ] as const;
+
+/**
+ * R11 (Nutzertest Gründerin #8): Ja/Nein-Fragen mit „Weiß ich nicht“ (lässt die Angabe offen). E-212: auch die
+ * Vorjahresfragen im Kern-Check – wer den Bescheid nicht zur Hand hat, soll nicht raten müssen.
+ */
+export const WEISS_NICHT_FELDER: readonly string[] = ["kasse.elektronisch", "ust.kleinunternehmer", "steuern.buchfuehrung_mitteilung", "vorauszahlung.est_kst", "vorauszahlung.gewst"];
 
 const FRAGE = new Map<string, { frage: Frage; nurWenn?: { feld: string; in: string[] } }>();
 for (const s of SCHRITTE) for (const f of s.fragen) FRAGE.set(f.feld, { frage: f, nurWenn: s.nurWenn });
@@ -121,6 +138,10 @@ const VORJAHR_FRAGEN = ["umsatz.vorjahr", "gewinn.vorjahr", "ust.zahllast_vorjah
 const KRAFT_RECHTSFORM_GEWERBE = ["ug", "gmbh", "gmbh_co_kg"];
 /** Jahr des Starts liegt im laufenden Jahr oder später (Europe/Berlin) – dann gibt es kein Vorjahr des Betriebs. */
 const ohneVorjahr = (p: Profil, heute = heuteBerlin()) => typeof p.gruendungsdatum === "string" && ISO.test(p.gruendungsdatum) && p.gruendungsdatum.slice(0, 4) >= heute.slice(0, 4);
+/** E-212: Start bekannt und vor dem laufenden Jahr (Europe/Berlin) – es gibt ein Vorjahr des Betriebs. */
+const mitVorjahr = (p: Profil, heute = heuteBerlin()) => typeof p.gruendungsdatum === "string" && ISO.test(p.gruendungsdatum) && p.gruendungsdatum.slice(0, 4) < heute.slice(0, 4);
+/** E-212: Rechtsformen, die kraft Handelsrecht Bücher führen (EÜR und E-Bilanz hängen dann nicht an Gewinn und Mitteilung) */
+const HANDELSGESELLSCHAFT = ["ug", "gmbh", "gmbh_co_kg", "ohg", "kg"];
 /** R12: Betrieb läuft seit mehr als sechs Monaten (wie `bestehend` in der Auswertung) */
 const laengerAlsBestand = (p: Profil, heute = heuteBerlin()) => typeof p.gruendungsdatum === "string" && ISO.test(p.gruendungsdatum) && p.gruendungsdatum <= plusMonate(heute, -BESTAND_AB_MONATEN);
 const zahl = (p: Profil, feld: string) => (typeof p[feld] === "number" ? (p[feld] as number) : null);
@@ -222,6 +243,17 @@ const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
   "kasse.bargeld": (p) => !freiberuflich(p) || inBranche(p, "gastronomie_lebensmittel", "beauty_kosmetik", "handwerk", "gesundheit_pflege", "unterricht_sport_coaching"),
   "kasse.elektronisch": (p) => (!freiberuflich(p) || inBranche(p, "gastronomie_lebensmittel", "beauty_kosmetik", "handwerk", "gesundheit_pflege", "unterricht_sport_coaching")) && p["kasse.bargeld"] === true,
   "online.social_media": (p) => p["online.website"] === false,
+  // E-212 (T-241): Privatkunden und Vertriebsweg nur bei Kunden in anderen EU-Ländern (Auslöser der OSS-Erklärung:
+  // Privatpersonen, EU, Online-Vertrieb oder Fernabsatz); der Vertriebsweg nicht, wenn Fernabsatz schon bejaht ist
+  "kunden.segmente": (p) => Boolean(liste(p, "kunden.regionen")?.includes("eu")),
+  "vertrieb.kanaele": (p) => Boolean(liste(p, "kunden.regionen")?.includes("eu")) && Boolean(liste(p, "kunden.segmente")?.includes("b2c")) && p["vertrieb.fernabsatz"] !== true,
+  // E-212 (T-241): Vorjahresangaben nur bei bekanntem Start vor diesem Jahr. Gewinn: Gewerbesteuererklärung (Freibetrag) –
+  // nicht bei Kapitalgesellschaften (gilt kraft Rechtsform) und nicht im freien Beruf; Mitteilung zur Buchführung
+  // (§ 141 AO): EÜR und E-Bilanz – nur Gewerbe ohne Buchführung kraft Handelsrecht (e. K. hängt zusätzlich an § 241a HGB)
+  "gewinn.vorjahr": (p) => mitVorjahr(p) && !freiberuflich(p) && !(typeof p.rechtsform === "string" && KRAFT_RECHTSFORM_GEWERBE.includes(p.rechtsform)),
+  "steuern.buchfuehrung_mitteilung": (p) => mitVorjahr(p) && !freiberuflich(p) && !(typeof p.rechtsform === "string" && [...HANDELSGESELLSCHAFT, "ek"].includes(p.rechtsform)),
+  "vorauszahlung.est_kst": (p) => mitVorjahr(p),
+  "vorauszahlung.gewst": (p) => mitVorjahr(p) && !freiberuflich(p),
 };
 
 /**
@@ -330,6 +362,12 @@ export interface PflichtInfo {
    * `naechsterTermin`, bis er abgehakt ist. Ohne `terminStand` bzw. ohne Überfälliges nicht gesetzt.
    */
   ueberfaellig?: string[];
+  /**
+   * E-212 (T-240): einmalige Frist (`einmaligFest`), die schon abgelaufen war, bevor die App die Pflicht begleitete (erster
+   * Check bzw. letzte Änderung einer Angabe, auf der sie beruht – `begleitetSeit`). Dann ist sie `naechsterTermin`, aber
+   * nicht `ueberfaellig`: ruhig „Frist war am … – schon erledigt?“, zählt als „zu klären“, keine Mitteilung.
+   */
+  vorCheck?: string;
   /** E-192: Profilangaben, auf denen das Ergebnis beruht (ohne „profil.“) – ab ihrer letzten Änderung zählen Termine als versäumt */
   ausloeserFelder?: string[];
   /** Fragen, die für eine unklare Pflicht noch fehlen (Profilfelder) */
@@ -656,7 +694,8 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       termine,
       vergangeneTermine: vergangen,
       ...(einmaligFest ? { einmaligFest: true } : {}),
-      ausloeserFelder: profilFelder(e.begruendung),
+      // E-212: bei einmaligen Fristen ab einer Angabe (z. B. Startdatum) zählt auch diese – ab ihrer Änderung kennt die App den Termin
+      ausloeserFelder: [...new Set([...profilFelder(e.begruendung), ...(einmaligFest && p.frist.typ === "relativ" && "fakt" in p.frist.bezug ? (QUELLFAKTEN[p.frist.bezug.fakt] ?? [p.frist.bezug.fakt]).filter((q) => q.startsWith("profil.")).map((q) => q.slice("profil.".length)) : [])])].sort(),
       offeneFragen: zuErfragendeFakten(e.fehlende_fakten)
         .filter((f) => f.startsWith("profil."))
         .map((f) => f.slice("profil.".length))
@@ -827,7 +866,12 @@ export function ueberfaelligeTermine(p: PflichtInfo, e: Pick<Erledigt, "erledigt
 export function terminStand(a: Auswertung, e: Pick<Erledigt, "erledigt" | "zeiten">, heute: string): Auswertung {
   const mit = (p: PflichtInfo): PflichtInfo => {
     const offen = ueberfaelligeTermine(p, e, heute);
-    return offen.length ? { ...p, naechsterTermin: offen[0]!, ueberfaellig: offen } : p;
+    if (!offen.length) return p;
+    // E-212 (T-240): eine einmalige Frist, die schon vor dem ersten Check (bzw. bevor die Pflicht galt) vorbei war, ist
+    // „zu klären“ statt rot überfällig – ohne Zeitpunkte (ältere Daten) bleibt es bei „überfällig“
+    const seit = p.einmaligFest && !p.termine.length ? begleitetSeit(p, e.zeiten) : null;
+    if (seit && offen.every((t) => t < seit)) return { ...p, naechsterTermin: offen[0]!, vorCheck: offen[0]! };
+    return { ...p, naechsterTermin: offen[0]!, ueberfaellig: offen };
   };
   // E-207: einmalige Termine nur, wo die Pflicht gilt – Gründungsschritte eines Bestandsbetriebs („Aus der Gründung“),
   // unklare Einträge und „bei Neueinstellung“ werden durch einen alten Termin nicht „überfällig“
@@ -1022,7 +1066,8 @@ export function dringlichkeit(a: Auswertung, e: Erledigt, heute: string) {
   const selbst = offen.filter((p) => !p.lohnbuero || p.id === "personal.sofortmeldung");
   const bald = plusTage(heute, 14);
   const spaeter = plusTage(heute, 45);
-  const mitTermin = selbst.filter((p) => p.naechsterTermin).sort((x, y) => x.naechsterTermin!.localeCompare(y.naechsterTermin!));
+  // E-212 (T-240): Fristen vor dem ersten Check („zu klären“) nach den echten Terminen
+  const mitTermin = selbst.filter((p) => p.naechsterTermin).sort((x, y) => Number(Boolean(x.vorCheck)) - Number(Boolean(y.vorCheck)) || x.naechsterTermin!.localeCompare(y.naechsterTermin!));
   const terminBald = mitTermin.filter((p) => p.naechsterTermin! <= bald);
   // Hinweise und Optionen ohne Termin sind nie „dringend“ (außer offenen Klärungen, R12)
   // R12 (Coach #3): die offene Einordnung (Gewerbe oder freier Beruf?) ist ein Hinweis, aber „jetzt dran“
@@ -1031,7 +1076,8 @@ export function dringlichkeit(a: Auswertung, e: Erledigt, heute: string) {
   const naechsteWochen = mitTermin.filter((p) => p.naechsterTermin! > bald && p.naechsterTermin! <= spaeter);
   const imBlick = offen.filter((p) => !jetzt.includes(p) && !naechsteWochen.includes(p));
   // „N Termine in den nächsten 2 Wochen“ zählt nur Termine, nicht die wichtigen Aufgaben ohne Termin (Nutzertests Lea, Sabine)
-  return { jetzt, naechsteWochen, imBlick, termine: terminBald.length, ohneTermin: wichtigOhne.length };
+  // E-212 (T-240): Fristen vor dem ersten Check zählen als „zu klären“, nicht als Termin
+  return { jetzt, naechsteWochen, imBlick, termine: terminBald.filter((p) => !p.vorCheck).length, ohneTermin: wichtigOhne.length, zuKlaeren: terminBald.filter((p) => p.vorCheck).length };
 }
 
 /** Höchstens einmal im Jahr fällig (ein Termin oder keiner in den nächsten zwölf Monaten) – für „viele davon nur einmal im Jahr“. */

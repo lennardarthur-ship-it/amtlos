@@ -75,7 +75,8 @@ describe("Pflichten-Check", () => {
     expect(checkFragen({}).map((f) => f.feld)).not.toContain("gesellschaft.handelsregister");
     expect(checkFragen({ rechtsform: "gmbh" }).map((f) => f.feld)).toContain("gesellschaft.handelsregister");
     // R12: dazu die Zahl der Betriebsstätten (Rundfunkbeitrag, Gewerbeabfall) und „Nimmst du Bargeld an?“ statt der Kassenfrage
-    expect(checkFragen({}).length).toBeLessThanOrEqual(11);
+    // E-212 (T-241): dazu „Wo sitzen deine Kunden?“ (OSS, ZM, USt-IdNr.)
+    expect(checkFragen({}).length).toBeLessThanOrEqual(12);
     // R10: branchentypische Fragen im Kern-Check, Minijob direkt nach der Zahl der Beschäftigten
     const felder = (p: Profil) => checkFragen(p).map((f) => f.feld);
     const gastro = felder({ "taetigkeit.branchen": ["gastronomie_lebensmittel"], "beschaeftigte.gesamt": 4 });

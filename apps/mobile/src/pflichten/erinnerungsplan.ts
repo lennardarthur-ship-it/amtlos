@@ -16,6 +16,10 @@
  * „Öffne die App, damit sie die nächsten Fristen plant“ (`weiterplanen`): am Tag nach der letzten geplanten Erinnerung,
  * wenn die Höchstzahl den Plan kürzt, sonst elf Monate nach heute (der Plan reicht zwölf Monate weit). Wer die App
  * danach monatelang nicht öffnet, bekommt keine weiteren Erinnerungen – das kann eine App ohne Server nicht verhindern.
+ *
+ * E-212: Eine einmalige Frist, die schon vor dem ersten Pflichten-Check abgelaufen war (`vorCheck`), meldet sich nicht –
+ * sie steht in der App als „Frist war am … – schon erledigt?“. „Falls es für dich gilt“ bleibt der Rückfall für
+ * Einträge, deren Fragen (seit E-212 großteils im Kern-Check) noch offen sind.
  */
 import { differenzTage, plusMonate, plusTage } from "@amtlos/fristen";
 import { T as TEXT } from "../texte";
@@ -73,7 +77,8 @@ export function erinnerungen(a: Auswertung, e: Erledigt, heute: string, o: { vor
   const ee = { ...e, heute: e.heute ?? heute };
   const aus: Erinnerung[] = [];
   for (const p of a.gilt) {
-    if (!p.naechsterTermin || p.lohnbuero) continue;
+    // E-212 (T-240): eine Frist, die schon vor dem ersten Check vorbei war, steht ruhig in der App – keine Mitteilung
+    if (!p.naechsterTermin || p.lohnbuero || p.vorCheck) continue;
     const neu = (termin: string, am: string, art: ErinnerungsArt) => aus.push({ pflichtId: p.id, titel: p.titel, termin, am, art, ...(p.uebermittelnVortag ? { uebermitteln: true } : {}) });
     const fuer = (termin: string) => {
       if (termin > heute) {

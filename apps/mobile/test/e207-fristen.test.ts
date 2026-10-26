@@ -23,7 +23,8 @@ const finde = (a: ReturnType<typeof auswertung>, id: string) => a.gilt.find((p) 
 
 describe("Befund 4: versäumte einmalige Fristen bleiben sichtbar (E-207)", () => {
   it("Fragebogen am 01.10. versäumt → am 26.10. überfällig, oben in „Jetzt dran“, gezählt, mit Erinnerung", () => {
-    const { a, e } = stand(jung, "2026-10-26");
+    // E-212 (T-240): Check vor dem Termin – Termine vor dem ersten Check sind „zu klären“ (e212-kerncheck.test.ts)
+    const { a, e } = stand(jung, "2026-10-26", {}, imCheck(jung, "2026-09-15T08:00:00.000Z"));
     const fb = finde(a, FB);
     expect(fb.naechsterTermin).toBe("2026-10-01");
     expect(fb.ueberfaellig).toEqual(["2026-10-01"]);
@@ -45,7 +46,10 @@ describe("Befund 4: versäumte einmalige Fristen bleiben sichtbar (E-207)", () =
   });
   it("auch ohne Zeitpunkte der Antworten und wenn der Termin vor dem Check lag – eine einmalige Pflicht hat keinen nächsten Termin", () => {
     expect(finde(stand(jung, "2026-10-26", {}, undefined).a, FB).naechsterTermin).toBe("2026-10-01");
-    expect(finde(stand(jung, "2027-01-15").a, FB).ueberfaellig).toEqual(["2026-10-01"]);
+    expect(finde(stand(jung, "2027-01-15", {}, imCheck(jung, "2026-09-15T08:00:00.000Z")).a, FB).ueberfaellig).toEqual(["2026-10-01"]);
+    // E-212 (T-240): lag der Termin vor dem ersten Check, bleibt er sichtbar, aber als „zu klären“ statt „überfällig“
+    const vor = finde(stand(jung, "2027-01-15").a, FB);
+    expect([vor.naechsterTermin, vor.vorCheck, vor.ueberfaellig]).toEqual(["2026-10-01", "2026-10-01", undefined]);
   });
   it("abgehakt → erledigt, nicht mehr dran, keine Erinnerung; Haken entfernen → wieder überfällig", () => {
     const erledigt = erledigtSetzen(LEERER_STAND, FB, "2026-10-26", null).erledigt;

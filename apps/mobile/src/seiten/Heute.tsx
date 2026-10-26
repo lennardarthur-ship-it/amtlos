@@ -154,7 +154,7 @@ export function Heute() {
           {zeilen ? (
             <Karte>
               {naechste.map((p, i) => (
-                <PflichtZeile key={p.id} p={p} erledigt={istErledigt(p, { erledigt, unterlagen, betrieb })} ohneWichtig={Boolean(p.naechsterTermin)} letzte={i === zeilen - 1} />
+                <PflichtZeile key={p.id} p={p} a={a} erledigt={istErledigt(p, { erledigt, unterlagen, betrieb })} ohneWichtig={Boolean(p.naechsterTermin)} letzte={i === zeilen - 1} />
               ))}
               {ueberfaellig.map((u, i) => (
                 <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={naechste.length + i === zeilen - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={betrieb} onPress={oeffnen} />

@@ -8,7 +8,7 @@ import { useMeldung } from "../ui/meldung";
 import { BausteinListe, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, SCHRIFT, useFarben, weich } from "../ui/thema";
-import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringendOhneTermin, dringlichkeit, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, hakenOhne, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, terminStand, zaehlung, type PflichtInfo } from "../pflichten/check";
+import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, type Auswertung, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringendOhneTermin, dringlichkeit, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, hakenOhne, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, terminStand, zaehlung, type PflichtInfo } from "../pflichten/check";
 import { erinnerungsPlan } from "../pflichten/erinnerungsplan";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { LEERER_STAND, heute } from "../unterlagen/speicher";
@@ -159,18 +159,20 @@ export function PflichtDetail({ id }: { id: string }) {
   };
   const termin = p.naechsterTermin && !abgehakt ? p.naechsterTermin : null;
   const tage = termin ? tageBis(termin, heute()) : 0;
+  // E-212 (T-240): Frist lag vor dem ersten Check – ruhig „Frist war am … – schon erledigt?“, „Ja, erledigt“ als Hauptknopf
+  const vorCheck = Boolean(gilt && termin && p.vorCheck === termin);
   const fuss = gilt ? (
     <Fuss>
       {p.vorlage ? (
         // Haken als zweiter Knopf im Fuß – nicht als Textlink halb unter der Leiste
         <>
           {/* R10 UI (Mehmet #24): schon durch eine Unterlage erledigt – kein zweites „Erledigt“ daneben */}
-          {durchUnterlage && !bestaetigen ? null : <Knopf ton text={abgehakt ? (bestaetigen ? TEXT.r10_bestaetigen_entfernen : TEXT.haken_entfernen_kurz) : bestaetigen ?? TEXT.als_erledigt_kurz} symbol={abgehakt ? "xmark" : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />}
+          {durchUnterlage && !bestaetigen ? null : <Knopf ton={!vorCheck} text={abgehakt ? (bestaetigen ? TEXT.r10_bestaetigen_entfernen : TEXT.haken_entfernen_kurz) : bestaetigen ?? (vorCheck ? TEXT.e212_ja_erledigt : TEXT.als_erledigt_kurz)} symbol={abgehakt ? "xmark" : "checkmark"} onPress={abhaken} stil={{ flex: vorCheck ? 1.3 : 1 }} />}
           {/* die eigene Unterlage öffnet immer; die Vorlage zur Pflicht starten gehört zu den Pro-Details (E-156) */}
-          {vorhanden ? <Knopf text={TEXT.unterlage_oeffnen_kurz} onPress={() => oeffnen(vorhanden.id)} stil={{ flex: 1.3 }} /> : <Knopf text={TEXT.unterlage_erstellen_kurz} symbol="plus" onPress={() => starten(p.vorlage!)} stil={{ flex: 1.3 }} />}
+          {vorhanden ? <Knopf ton={vorCheck} text={TEXT.unterlage_oeffnen_kurz} onPress={() => oeffnen(vorhanden.id)} stil={{ flex: vorCheck ? 1 : 1.3 }} /> : <Knopf ton={vorCheck} text={TEXT.unterlage_erstellen_kurz} symbol="plus" onPress={() => starten(p.vorlage!)} stil={{ flex: vorCheck ? 1 : 1.3 }} />}
         </>
       ) : (
-        <Knopf ton={abgehakt} text={abgehakt ? (bestaetigen ? TEXT.r10_bestaetigen_entfernen : TEXT.haken_entfernen) : bestaetigen ?? TEXT.als_erledigt} symbol={abgehakt ? undefined : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
+        <Knopf ton={abgehakt} text={abgehakt ? (bestaetigen ? TEXT.r10_bestaetigen_entfernen : TEXT.haken_entfernen) : bestaetigen ?? (vorCheck ? TEXT.e212_ja_erledigt : TEXT.als_erledigt)} symbol={abgehakt ? undefined : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
       )}
     </Fuss>
   ) : null;
@@ -182,7 +184,13 @@ export function PflichtDetail({ id }: { id: string }) {
       unter={p.kurz}
       fuss={fuss}
       buehne={
-        termin ? (
+        vorCheck && termin ? (
+          // E-212 (T-240): ruhig – das Datum und die Frage, ohne rote Tageszahl
+          <View style={{ marginTop: 6, gap: 2 }}>
+            <T fett farbe={f.buehneText}>{TEXT.e212_frist_war(datumDe(termin))}</T>
+            <T v="klein" farbe={f.buehneLeise}>{TAG_LANG.format(new Date(`${termin}T12:00:00Z`))}</T>
+          </View>
+        ) : termin ? (
           // der nächste Termin groß: Tage bis dahin und das Datum – das Wichtigste zuerst
           <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 12, marginTop: 6 }}>
             {/* die Zahl steht daneben in Worten („In 11 Tagen fällig“) – für VoiceOver verborgen */}
@@ -205,6 +213,7 @@ export function PflichtDetail({ id }: { id: string }) {
         ) : undefined
       }
     >
+      {vorCheck && !abgehakt ? <Hinweis text={TEXT.e212_vor_check_hinweis} /> : null}
       {durchUnterlage ? <Hinweis art="erfolg" text={laufendBis ? `${TEXT.erledigt_durch_unterlage} ${TEXT.r10_laufend_bis(datumDe(laufendBis))}` : TEXT.erledigt_durch_unterlage} /> : null}
       {p.einordnung !== "pflicht" ? <Hinweis text={TEXT.r10_einordnung[p.einordnung] ?? ""} /> : null}
       {lohnWer ? <Hinweis text={TEXT.r10_lohn_hinweis(lohnWer)} /> : null}
@@ -325,14 +334,24 @@ export function fristText(termin: string, tag = heute()): string {
 /** Symbol je Bereich des Katalogs – vor Pflichten ohne Termin. */
 const BEREICH_SYMBOL_KAT: Record<string, string> = { gruendung: "flag", gesellschaft: "building.columns", steuern: "eurosign", personal: "person.2", arbeitsschutz: "hammer", datenschutz: "lock.shield", it_sicherheit: "lock", ki: "sparkles", online: "globe", produkte: "tray", branche: "storefront", umwelt: "trash" };
 
-export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtInfo; letzte: boolean; erledigt: boolean; ohneWichtig?: boolean }) {
+export function PflichtZeile({ p, letzte, erledigt, ohneWichtig, a }: { p: PflichtInfo; letzte: boolean; erledigt: boolean; ohneWichtig?: boolean; /** E-212: Auswertung für „Ja, erledigt“ direkt in der Zeile (Voraussetzungen prüfen) */ a?: Auswertung }) {
   const nav = useNav();
   const z = useAmtlos();
+  const melden = useMeldung();
   const termin = !erledigt && p.naechsterTermin ? p.naechsterTermin : null;
+  // E-212 (T-240): Frist lag vor dem ersten Check – ruhig, mit „Ja, erledigt“ direkt in der Zeile
+  const vorCheck = Boolean(termin && p.vorCheck === termin);
   // das Datum steht im Fristblatt – im Text nur kurz (ohne Jahr, wenn es dieses Jahr ist)
   const fern = termin ? tageBis(termin, heute()) > 30 : false;
   const lohn = p.lohnbuero ? TEXT.r10_lohn_durch[String(z.stand.profil["personal.lohn_durch"])] : undefined;
-  const basis = erledigt ? TEXT.erledigt : termin ? (fern ? fristText(termin) : `${fristText(termin)}\u00a0· ${datumDe(termin).slice(0, 6)}`) : p.vorlage ? TEXT.unterlage_in_amtlos : p.kurz;
+  const basis = erledigt ? TEXT.erledigt : vorCheck ? TEXT.e212_frist_war(datumDe(termin!)) : termin ? (fern ? fristText(termin) : `${fristText(termin)}\u00a0· ${datumDe(termin).slice(0, 6)}`) : p.vorlage ? TEXT.unterlage_in_amtlos : p.kurz;
+  const jaErledigt = () => {
+    // wie im Detail: erst abhakbar, wenn die Voraussetzungen erledigt sind (z. B. ELSTER-Konto vor dem Fragebogen)
+    const vorher = a ? offeneVoraussetzungen(p, a, z.stand) : [];
+    if (vorher.length) return melden(TEXT.r11_erst_erledigen(vorher.map((x) => x.titel)));
+    z.erledigtSetzen(p.id, heute(), null);
+    melden(TEXT.als_erledigt_vermerkt);
+  };
   // R10: was das Lohnbüro bzw. die Steuerberatung macht, steht dabei
   const unter = lohn && !erledigt ? `${lohn}\u00a0· ${basis}` : basis;
   const wichtig = !erledigt && !ohneWichtig && dringendOhneTermin(p) && p.einordnung === "pflicht";
@@ -342,11 +361,12 @@ export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtI
     <Zeile
       // mit Termin: das Fristblatt (Datum auf einen Blick); ohne Termin eine ruhige graue Kachel mit dem Bereich (A24) –
       // kein bernsteinfarbenes „!“, das wie eine Frist aussieht
-      links={termin ? <Fristblatt termin={termin} heute={heute()} /> : <Kachel symbol={erledigt ? "checkmark" : BEREICH_SYMBOL_KAT[p.kategorie] ?? "doc.text"} ton={erledigt ? "erfolg" : "leise"} groesse={46} />}
+      links={termin ? <Fristblatt termin={termin} heute={heute()} ruhig={vorCheck} /> : <Kachel symbol={erledigt ? "checkmark" : BEREICH_SYMBOL_KAT[p.kategorie] ?? "doc.text"} ton={erledigt ? "erfolg" : "leise"} groesse={46} />}
       titel={p.titel}
       text={unter}
       // „Wichtig“ als Plakette unter dem Titel – VoiceOver liest sie mit
       marke={marke}
+      rechts={vorCheck && a ? <TextKnopf text={TEXT.e212_ja_erledigt} label={TEXT.e212_ja_erledigt_label(p.titel)} onPress={jaErledigt} /> : undefined}
       onPress={() => nav.oeffnen(`pflicht-${p.id}`, () => <PflichtDetail id={p.id} />, true)}
       letzte={letzte}
     />
@@ -385,7 +405,7 @@ function PflichtenFrei({ frei }: { frei: ReadonlySet<string> }) {
         {reihe.length ? (
           <Karte>
             {reihe.map((p, i) => (
-              <PflichtZeile key={p.id} p={p} erledigt={istErledigt(p, { erledigt, unterlagen, betrieb })} letzte={i === reihe.length - 1} />
+              <PflichtZeile key={p.id} p={p} a={a} erledigt={istErledigt(p, { erledigt, unterlagen, betrieb })} letzte={i === reihe.length - 1} />
             ))}
           </Karte>
         ) : null}
@@ -436,7 +456,7 @@ function PflichtenAlle() {
           <Karte>
             {d.jetzt.map((p, i) => (
               // sind alle „wichtig“, sagt das Wort nichts – dann zählt der Termin
-              <PflichtZeile key={p.id} p={p} erledigt={false} ohneWichtig={d.jetzt.every(dringendOhneTermin)} letzte={i === d.jetzt.length - 1} />
+              <PflichtZeile key={p.id} p={p} a={a} erledigt={false} ohneWichtig={d.jetzt.every(dringendOhneTermin)} letzte={i === d.jetzt.length - 1} />
             ))}
           </Karte>
         </Gruppe>
@@ -450,7 +470,7 @@ function PflichtenAlle() {
         <Gruppe titel={TEXT.naechste_wochen(d.naechsteWochen.length)}>
           <Karte>
             {d.naechsteWochen.map((p, i) => (
-              <PflichtZeile key={p.id} p={p} erledigt={false} letzte={i === d.naechsteWochen.length - 1} />
+              <PflichtZeile key={p.id} p={p} a={a} erledigt={false} letzte={i === d.naechsteWochen.length - 1} />
             ))}
           </Karte>
         </Gruppe>
@@ -476,7 +496,7 @@ function PflichtenAlle() {
           <Gruppe key={k} titel={KATEGORIE_TITEL[k]}>
             <Karte>
               {l.map((p, i) => (
-                <PflichtZeile key={p.id} p={p} erledigt={fertig(p)} letzte={i === l.length - 1} />
+                <PflichtZeile key={p.id} p={p} a={a} erledigt={fertig(p)} letzte={i === l.length - 1} />
               ))}
             </Karte>
           </Gruppe>
@@ -486,7 +506,7 @@ function PflichtenAlle() {
         <Gruppe titel={TEXT.weitere_pflichten}>
           <Karte>
             {sonst.map((p, i) => (
-              <PflichtZeile key={p.id} p={p} erledigt={fertig(p)} letzte={i === sonst.length - 1} />
+              <PflichtZeile key={p.id} p={p} a={a} erledigt={fertig(p)} letzte={i === sonst.length - 1} />
             ))}
           </Karte>
         </Gruppe>
@@ -498,7 +518,7 @@ function PflichtenAlle() {
           {gruendungZeigen ? (
             <Karte>
               {a.gruendung.map((p, i) => (
-                <PflichtZeile key={p.id} p={p} erledigt={fertig(p)} letzte={i === a.gruendung.length - 1} />
+                <PflichtZeile key={p.id} p={p} a={a} erledigt={fertig(p)} letzte={i === a.gruendung.length - 1} />
               ))}
             </Karte>
           ) : null}
@@ -511,7 +531,7 @@ function PflichtenAlle() {
           {einstellungZeigen ? (
             <Karte>
               {a.beiEinstellung.map((p, i) => (
-                <PflichtZeile key={p.id} p={p} erledigt={fertig(p)} ohneWichtig letzte={i === a.beiEinstellung.length - 1} />
+                <PflichtZeile key={p.id} p={p} a={a} erledigt={fertig(p)} ohneWichtig letzte={i === a.beiEinstellung.length - 1} />
               ))}
             </Karte>
           ) : null}
@@ -689,7 +709,7 @@ export function PflichtenTab() {
       ueber={gemacht ? TEXT.fortschritt_text(fs.fertig, fs.gesamt) : TEXT.tabs.pflichten}
       rechts={gemacht ? <BuehnenKnopf text={TEXT.jahr_neu_pruefen} onPress={check} /> : undefined}
       // groß, was in den nächsten zwei Wochen ansteht – die Gesamtzahl klein darunter (sie erschlägt sonst)
-      titel={gemacht ? TEXT.r10_ergebnis_bald(d.termine, d.ohneTermin) : TEXT.pflichten_karte_titel}
+      titel={gemacht ? TEXT.r10_ergebnis_bald(d.termine, d.ohneTermin, d.zuKlaeren) : TEXT.pflichten_karte_titel}
       satz
       buehne={
         gemacht ? (
