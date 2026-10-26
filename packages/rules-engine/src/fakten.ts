@@ -40,6 +40,8 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
     f["abgeleitet.ist_vorjahr_gruendungsjahr"] = j === s - 1;
     f["abgeleitet.noch_nicht_gestartet"] = gruendung > stichtag; // ISO-Daten sind lexikographisch vergleichbar
   }
+  // E-206: Kalenderjahr des Stichtags (bei Rhythmus „je_jahr“ das Jahr der Periode), z. B. für Regeln, die ab einem Jahr gelten
+  f["abgeleitet.jahr"] = jahrVon(stichtag);
   // Steuerberater 22.10.2026: Fristen ab Eröffnung bzw. Aufnahme der Tätigkeit (§ 138 Abs. 4 AO) – eigene Angabe, sonst das
   // Startdatum (die Startfrage lautet „Wann hast du angefangen oder wann willst du anfangen?“)
   const beginn = profil["profil.taetigkeit_beginn"];

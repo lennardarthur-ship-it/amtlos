@@ -117,7 +117,7 @@ export function pruefeRegelwertObjekt(rw) {
   if (!pruefeRegelwert(rw)) return [...new Set(pruefeRegelwert.errors.map(meldungDeutsch).filter(Boolean).map((m) => m.replace(/^Pflicht:/, "Regelwert:")))];
   const fehler = [];
   if (rw.gueltig_bis && rw.gueltig_bis < rw.gueltig_ab) fehler.push("Gültig bis: liegt vor „Gültig ab“");
-  if (["EUR", "EUR_pro_stunde", "EUR_pro_monat", "anzahl", "tage", "monate", "jahre"].includes(rw.einheit) && rw.wert < 0) fehler.push("Wert: darf nicht negativ sein");
+  if (["EUR", "EUR_pro_stunde", "EUR_pro_monat", "anzahl", "tage", "monate", "jahre", "kalenderjahr"].includes(rw.einheit) && rw.wert < 0) fehler.push("Wert: darf nicht negativ sein");
   if (rw.einheit === "prozent" && (rw.wert < 0 || rw.wert > 100)) fehler.push("Wert: Prozent zwischen 0 und 100");
   return fehler;
 }

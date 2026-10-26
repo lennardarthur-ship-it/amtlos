@@ -307,6 +307,8 @@ export interface PflichtInfo {
    * Einzugsstellen) – der Termin ist der letzte Tag zum Übermitteln („spätestens am … übermitteln“).
    */
   uebermittelnVortag?: boolean;
+  /** E-206: Hinweise aus dem Katalog zum gewählten Rhythmus, z. B. warum monatlich statt der Angabe „vierteljährlich“ */
+  rhythmusHinweise?: string[];
   /** alle Termine ab heute in den nächsten zwölf Monaten (ISO, aufsteigend) – für den Jahresblick */
   termine: string[];
   /**
@@ -639,6 +641,7 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       vorlagen: VORLAGEN_JE_PFLICHT.get(p.id) ?? [],
       naechsterTermin: termin,
       ...(e.termine.some((t) => "eingang_am" in t && t.eingang_am) ? { uebermittelnVortag: true } : {}),
+      ...(e.hinweis_texte?.length ? { rhythmusHinweise: e.hinweis_texte.map(text).filter(Boolean) } : {}),
       termine,
       vergangeneTermine: vergangen,
       ausloeserFelder: profilFelder(e.begruendung),

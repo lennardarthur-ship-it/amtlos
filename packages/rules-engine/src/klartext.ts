@@ -87,7 +87,7 @@ export function fristAlsText(f: Frist): string {
       return `${wann} (${VERSCHIEBUNG[f.verschiebung.regel]})`;
     }
     case "wiederkehrend": {
-      const r = typeof f.rhythmus === "string" ? f.rhythmus : `${f.rhythmus.waehle.map((w) => w.dann).join(" oder ")}, sonst ${f.rhythmus.sonst}`;
+      const r = typeof f.rhythmus === "string" ? f.rhythmus : `${[...new Set(f.rhythmus.waehle.map((w) => w.dann))].join(" oder ")}, sonst ${f.rhythmus.sonst}${f.rhythmus.je_jahr ? " (je Kalenderjahr)" : ""}`;
       const fa = f.faellig;
       const faellig =
         fa.art === "tag_nach_periodenende"

@@ -76,8 +76,35 @@ ausloeser:
 frist:
   typ: wiederkehrend
   # R10: zuerst der angegebene Rhythmus; ohne Angabe (oder „weiß nicht“) nach der Zahllast des Vorjahres
+  # E-206: je Kalenderjahr – davor Neugründer ab 2027 im Gründungs- und Folgejahr monatlich (§ 18 Abs. 2 Satz 4 UStG, C.21),
+  # auch gegen die Angabe „vierteljährlich“ und eine Vorjahressteuer bis zur Monatsgrenze; danach die übliche Regel
   rhythmus:
+    je_jahr: true
     waehle:
+      - wenn:
+          all:
+            - { feld: profil.gruendungsdatum, op: vorhanden }
+            - feld: abgeleitet.jahr
+              op: ">="
+              wert: { regelwert: steuern.ust_va.neugruender_monatlich_ab }
+            - any:
+                - { feld: abgeleitet.ist_gruendungsjahr, op: "==", wert: true }
+                - { feld: abgeleitet.ist_vorjahr_gruendungsjahr, op: "==", wert: true }
+            - { feld: profil.ust.voranmeldung_rhythmus, op: vorhanden }
+            - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: quartalsweise }
+        dann: monatlich
+        # Wortlaut aus der Erklärung dieses Eintrags
+        hinweis: { de: "Hast du 2026 oder später gegründet, gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG)." }
+      - wenn:
+          all:
+            - { feld: profil.gruendungsdatum, op: vorhanden }
+            - feld: abgeleitet.jahr
+              op: ">="
+              wert: { regelwert: steuern.ust_va.neugruender_monatlich_ab }
+            - any:
+                - { feld: abgeleitet.ist_gruendungsjahr, op: "==", wert: true }
+                - { feld: abgeleitet.ist_vorjahr_gruendungsjahr, op: "==", wert: true }
+        dann: monatlich
       - wenn:
           any:
             - all:
@@ -136,7 +163,7 @@ sanktion:
   schwere: hoch
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
-  de: Weißt du den Rhythmus nicht, rechnet Amtlos jetzt vorläufig mit monatlichen Terminen – dem früheren Termin – statt vierteljährlich.
+  de: Weißt du den Rhythmus nicht, rechnet Amtlos jetzt vorläufig mit monatlichen Terminen – dem früheren Termin – statt vierteljährlich. Hast du 2026 oder später gegründet, zeigt Amtlos ab 2027 im Gründungsjahr und im Folgejahr monatliche Termine.
 aktion: { art: uebermittlung, ziel: elster.ust_va, nachweis_erforderlich: true }
 status_recht: in_kraft
 # Steuerberater 22.10.2026: Fassung der Grenzen 9.000 € / 2.000 € ab 01.01.2025
@@ -162,8 +189,8 @@ quellen:
     url: https://www.gesetze-im-internet.de/ao_1977/__370.html
     abgerufen: null
 fachlich_zu_pruefen:
-  - "Steuerberater 22.10.2026: Neugründer ab 2027 im Gründungs- und Folgejahr monatlich (§ 18 Abs. 2 Satz 4 UStG) – nur als Hinweis im Text; der Rhythmus bei „weiß ich nicht“ bzw. ohne Angabe rechnet dann weiter vierteljährlich, weil die Regeln das Kalenderjahr des Stichtags nicht abfragen können"
-  - "E-206 (externer Prüfer): „Weiß ich nicht“ ohne Steuer des Vorjahres rechnet jetzt vorläufig monatlich (früherer Termin) statt vierteljährlich – deckt Neugründer ab 2027 ab. Offen: angegebener Rhythmus „vierteljährlich“ bzw. bekannte Vorjahressteuer bis zur Monatsgrenze (Regelwert steuern.ust_va.grenze_monatlich) eines Neugründers im Gründungs- oder Folgejahr ab 2027 ergibt weiter vierteljährliche Termine (PRUEFLISTE T-238)"
+  - "Steuerberater 22.10.2026: Neugründer ab 2027 im Gründungs- und Folgejahr monatlich (§ 18 Abs. 2 Satz 4 UStG) – nur als Hinweis im Text; der Rhythmus bei „weiß ich nicht“ bzw. ohne Angabe rechnet dann weiter vierteljährlich, weil die Regeln das Kalenderjahr des Stichtags nicht abfragen können (technische Grenze mit E-206 behoben: Rhythmus je Kalenderjahr)"
+  - "E-206 (externer Prüfer): „Weiß ich nicht“ ohne Steuer des Vorjahres rechnet jetzt vorläufig monatlich (früherer Termin) statt vierteljährlich – deckt Neugründer ab 2027 ab. Neugründer ab 2027: Gründungs- und Folgejahr jetzt je Kalenderjahr monatlich, auch gegen die Angabe „vierteljährlich“ und eine Vorjahressteuer bis 9.000 € (Regelwert steuern.ust_va.neugruender_monatlich_ab, Wert aus C.21); bei der Angabe „vierteljährlich“ zeigt die App den Satz aus der Erklärung als Hinweis. bitte mit v7 prüfen (PRUEFLISTE T-237)"
 pruefung:
   status: in_pruefung
   geprueft_von: null

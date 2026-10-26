@@ -1,6 +1,6 @@
 /** Formular für eine Regelwertversion (Server-Komponente, ohne Client-JavaScript). */
 export const EINHEITEN: Record<string, string> = {
-  EUR: "Euro", EUR_pro_stunde: "Euro pro Stunde", EUR_pro_monat: "Euro pro Monat", prozent: "Prozent", anzahl: "Anzahl", tage: "Tage", monate: "Monate", jahre: "Jahre",
+  EUR: "Euro", EUR_pro_stunde: "Euro pro Stunde", EUR_pro_monat: "Euro pro Monat", prozent: "Prozent", anzahl: "Anzahl", tage: "Tage", monate: "Monate", jahre: "Jahre", kalenderjahr: "Kalenderjahr",
 };
 export const STATUS_RECHT: Record<string, string> = { in_kraft: "in Kraft", beschlossen: "beschlossen", entwurf: "Entwurf", geplant: "geplant", ausgelaufen: "ausgelaufen" };
 

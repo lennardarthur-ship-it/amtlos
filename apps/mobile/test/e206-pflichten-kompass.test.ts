@@ -83,6 +83,19 @@ describe("E-206 Befund 3: Umsatzsteuer-Voranmeldung bei „weiß ich nicht“", 
     const p = finde(auswertung({ ...CAFE, gruendungsdatum: "2019-01-01" }, STICHTAG), "steuern.ust_voranmeldung")!;
     expect(p.naechsterTermin).toBe("2026-11-10");
   });
+  it("T-238: Gründung 01/2027 mit Angabe „vierteljährlich“ – monatlich ab 10.02.2027, mit dem Hinweis aus dem Katalog", () => {
+    const p = finde(auswertung({ ...CAFE, gruendungsdatum: "2027-01-04", "ust.voranmeldung_rhythmus": "quartalsweise" }, STICHTAG), "steuern.ust_voranmeldung")!;
+    expect(p.termine.slice(0, 3)).toEqual(["2027-02-10", "2027-03-10", "2027-04-12"]);
+    expect(p.rhythmusHinweise).toEqual(["Hast du 2026 oder später gegründet, gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG)."]);
+    // Mitte 2028 gerechnet: Dezember 2028 noch monatlich, danach vierteljährlich
+    const spaeter = finde(auswertung({ ...CAFE, gruendungsdatum: "2027-01-04", "ust.voranmeldung_rhythmus": "quartalsweise" }, "2028-10-20"), "steuern.ust_voranmeldung")!;
+    expect(spaeter.termine).toEqual(["2028-11-10", "2028-12-11", "2029-01-10", "2029-04-10", "2029-07-10", "2029-10-10"]);
+  });
+  it("T-238: Gründung 2026 (Café ab 1.12.), Angabe „vierteljährlich“ – Q4 2026 vierteljährlich, 2027 monatlich", () => {
+    const p = finde(auswertung({ ...CAFE, "ust.voranmeldung_rhythmus": "quartalsweise" }, STICHTAG), "steuern.ust_voranmeldung")!;
+    expect(p.termine.slice(0, 3)).toEqual(["2027-01-11", "2027-02-10", "2027-03-10"]);
+    expect(p.rhythmusHinweise).toHaveLength(1);
+  });
   it("bekannte Vorjahressteuer und angegebener Rhythmus entscheiden weiter wie bisher", () => {
     const bestand = { ...CAFE, gruendungsdatum: "2019-01-01" };
     expect(finde(auswertung({ ...bestand, "ust.zahllast_vorjahr": 4000 }, STICHTAG), "steuern.ust_voranmeldung")!.naechsterTermin).toBe("2027-01-11");

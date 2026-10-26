@@ -1000,12 +1000,21 @@
                       },
                       "dann": {
                         "$ref": "#/$defs/rhythmusWert"
+                      },
+                      "hinweis": {
+                        "$ref": "#/$defs/text",
+                        "description": "E-206: Hinweis für die Anzeige, wenn dieser Zweig den Rhythmus bestimmt (z. B. warum monatlich statt der Angabe vierteljährlich)"
                       }
                     }
                   }
                 },
                 "sonst": {
                   "$ref": "#/$defs/rhythmusWert"
+                },
+                "je_jahr": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "E-206: Rhythmus je Kalenderjahr der Perioden wählen – abgeleitete Fakten (abgeleitet.ist_gruendungsjahr, abgeleitet.jahr …) gelten für das Jahr der Periode statt für den Stichtag"
                 }
               }
             }

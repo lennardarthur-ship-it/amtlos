@@ -58,3 +58,56 @@ describe("E-206: geplantes Ereignis beim Auslöser", () => {
     }
   });
 });
+
+/*
+ * E-206 / T-238: Neugründer ab 2027 geben im Gründungs- und Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG, C.21) – je
+ * Kalenderjahr gewählt (`rhythmus.je_jahr`), auch gegen die Angabe „vierteljährlich“ und eine Vorjahressteuer bis 9.000 €.
+ */
+describe("E-206: Rhythmus der Voranmeldung je Kalenderjahr (Neugründer ab 2027)", () => {
+  const katalog = ladeKatalog();
+  const va = (fakten: Record<string, unknown>, stichtag: string, fenster?: { von: string; bis: string }) =>
+    auswerten({
+      katalog: { ...katalog, pflichten: katalog.pflichten.filter((p) => p.id === "steuern.ust_voranmeldung") },
+      fakten: { "profil.bundesland": "SN", "profil.ust.kleinunternehmer": false, ...fakten },
+      ereignisse: [],
+      stichtag,
+      kalender: new StandardKalender(),
+      ...(fenster ? { fenster } : {}),
+    })[0]!;
+  const perioden = (r: ReturnType<typeof va>) => r.termine.map((t) => t.periode);
+  const monate = (jahr: number) => Array.from({ length: 12 }, (_, i) => `${jahr}-${String(i + 1).padStart(2, "0")}`);
+
+  it("Gründung 01/2027 mit Angabe „vierteljährlich“: monatlich 2027 und 2028, ab 2029 vierteljährlich – mit Hinweis", () => {
+    const r = va({ "profil.gruendungsdatum": "2027-01-04", "profil.ust.voranmeldung_rhythmus": "quartalsweise" }, "2026-10-26", { von: "2027-01-01", bis: "2029-12-31" });
+    expect(r.ergebnis).toBe("gilt");
+    expect(r.termine[0]).toMatchObject({ periode: "2027-01", faellig_am: "2027-02-10" });
+    expect(perioden(r)).toEqual([...monate(2027), ...monate(2028), "2029-Q1", "2029-Q2", "2029-Q3"]);
+    expect(r.termine.find((t) => t.periode === "2028-12")!.faellig_am).toBe("2029-01-10");
+    expect(r.termine.find((t) => t.periode === "2029-Q1")!.faellig_am).toBe("2029-04-10");
+    expect(r.hinweis_texte).toEqual([{ de: "Hast du 2026 oder später gegründet, gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG)." }]);
+  });
+  it("Hinweis nur, solange ein Termin aus dem Gründungs- oder Folgejahr im Fenster liegt", () => {
+    const r = va({ "profil.gruendungsdatum": "2027-01-04", "profil.ust.voranmeldung_rhythmus": "quartalsweise" }, "2029-06-01", { von: "2029-02-01", bis: "2029-12-31" });
+    expect(perioden(r)).toEqual(["2029-Q1", "2029-Q2", "2029-Q3"]);
+    expect(r.hinweis_texte).toBeUndefined();
+  });
+  it("Gründung 2026, Angabe „vierteljährlich“: 2026 vierteljährlich, 2027 monatlich (Folgejahr), 2028 wieder vierteljährlich", () => {
+    const r = va({ "profil.gruendungsdatum": "2026-03-01", "profil.ust.voranmeldung_rhythmus": "quartalsweise" }, "2026-10-26", { von: "2026-04-01", bis: "2028-12-31" });
+    expect(perioden(r)).toEqual(["2026-Q1", "2026-Q2", "2026-Q3", "2026-Q4", ...monate(2027), "2028-Q1", "2028-Q2", "2028-Q3"]);
+    expect(r.termine.find((t) => t.periode === "2027-01")!.faellig_am).toBe("2027-02-10");
+  });
+  it("Gründung 2026, Vorjahressteuer 4.000 € (sonst vierteljährlich): 2027 monatlich, ohne Hinweis", () => {
+    const r = va({ "profil.gruendungsdatum": "2026-03-01", "profil.ust.zahllast_vorjahr": 4000 }, "2027-03-01", { von: "2027-01-01", bis: "2028-12-31" });
+    expect(perioden(r)).toEqual(["2026-Q4", ...monate(2027), "2028-Q1", "2028-Q2", "2028-Q3"]);
+    expect(r.hinweis_texte).toBeUndefined();
+  });
+  it("Gründung 2025: Folgejahr 2026 liegt vor 2027 – die Angabe „vierteljährlich“ gilt", () => {
+    const r = va({ "profil.gruendungsdatum": "2025-02-01", "profil.ust.voranmeldung_rhythmus": "quartalsweise" }, "2026-10-26", { von: "2026-01-01", bis: "2027-12-31" });
+    expect(perioden(r)).toEqual(["2025-Q4", "2026-Q1", "2026-Q2", "2026-Q3", "2026-Q4", "2027-Q1", "2027-Q2", "2027-Q3"]);
+  });
+  it("ohne Startdatum: keine Neugründer-Regel, keine Rückfrage – Rhythmus wie angegeben", () => {
+    const r = va({ "profil.ust.voranmeldung_rhythmus": "quartalsweise" }, "2026-10-26");
+    expect(r.hinweise).not.toContain("rhythmus_unbekannt");
+    expect(perioden(r)[0]).toMatch(/-Q\d$/);
+  });
+});

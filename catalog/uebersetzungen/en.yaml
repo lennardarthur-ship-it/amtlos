@@ -4218,5 +4218,9 @@ eintraege:
   en: Now applies to every employer, even before you have entered the filing period – the deadlines appear as soon as the period is known.
 - de: Gilt jetzt für jeden Arbeitgeber, auch bevor du den Anmeldezeitraum der Lohnsteuer angegeben hast.
   en: Now applies to every employer, even before you have entered the wage tax filing period.
-- de: Weißt du den Rhythmus nicht, rechnet Amtlos jetzt vorläufig mit monatlichen Terminen – dem früheren Termin – statt vierteljährlich.
-  en: If you don't know the frequency, Amtlos now provisionally assumes monthly deadlines – the earlier deadline – instead of quarterly.
+- de: Weißt du den Rhythmus nicht, rechnet Amtlos jetzt vorläufig mit monatlichen Terminen – dem früheren Termin – statt vierteljährlich. Hast du 2026 oder später gegründet, zeigt Amtlos ab 2027 im Gründungsjahr und im Folgejahr monatliche Termine.
+  en: If you don't know the frequency, Amtlos now provisionally assumes monthly deadlines – the earlier deadline – instead of quarterly. If you founded in 2026 or later, Amtlos shows monthly deadlines from 2027 in the founding year and the following year.
+- de: Hast du 2026 oder später gegründet, gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG).
+  en: If you founded in 2026 or later, from 2027 you file monthly in the founding year and the following year (§ 18(2) sentence 4 UStG).
+- de: Erstes Kalenderjahr, in dem Neugründer im Gründungs- und Folgejahr die USt-Voranmeldung wieder monatlich abgeben (§ 18 Abs. 2 Satz 4 UStG; Satz 6 gilt nur für 2021 bis 2026)
+  en: First calendar year in which new businesses again file the advance VAT return monthly in the founding year and the following year (§ 18(2) sentence 4 UStG; sentence 6 applies only for 2021 to 2026)

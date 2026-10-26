@@ -14,7 +14,7 @@
       "type": "object", "additionalProperties": false, "required": ["de"],
       "properties": { "de": { "type": "string" }, "en": { "type": "string" } }
     },
-    "einheit": { "enum": ["EUR", "EUR_pro_stunde", "EUR_pro_monat", "prozent", "anzahl", "tage", "monate", "jahre"] },
+    "einheit": { "enum": ["EUR", "EUR_pro_stunde", "EUR_pro_monat", "prozent", "anzahl", "tage", "monate", "jahre", "kalenderjahr"] },
     "wert": { "type": "number" },
     "gueltig_ab": { "type": "string", "format": "date" },
     "gueltig_bis": { "type": ["string", "null"], "format": "date" },
