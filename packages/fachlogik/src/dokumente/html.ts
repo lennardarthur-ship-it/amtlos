@@ -942,10 +942,14 @@ export function istCoKg(b: Pick<Betrieb, "rechtsform" | "name">): boolean {
 }
 
 /**
- * E-193 (8a): Angaben zur Komplementärin auf Geschäftsbriefen einer GmbH & Co. KG (§ 125a Abs. 1 Satz 2, § 177a HGB): ihre
+ * E-193 (8a): Angaben zur Komplementärin auf Geschäftsbriefen einer GmbH & Co. KG (§ 125 Abs. 1 Satz 2, § 177a HGB): ihre
  * Firma und für sie die Angaben nach § 35a GmbHG – Rechtsform (wenn nicht schon in der Firma), Sitz, Registergericht und
- * Registernummer; ihre Geschäftsführer folgen in der Zeile „Geschäftsführung“. Leer, wenn keine Firma eingetragen ist.
+ * Registernummer; ihre Geschäftsführer folgen in der Zeile „Geschäftsführer der Komplementärin“ (E-200). Leer, wenn keine
+ * Firma eingetragen ist.
  */
+/** E-200: Bezeichnung der Geschäftsführer bei der GmbH & Co. KG bzw. UG (haftungsbeschränkt) & Co. KG (Fußzeile, BT-33). */
+export const CO_KG_GESCHAEFTSFUEHRER = "Geschäftsführer der Komplementärin";
+
 export function komplementaerZeile(b: Betrieb): string {
   const t = (x: string | undefined) => (x ?? "").trim();
   if (!istCoKg(b) || !t(b.komplementaer)) return "";
@@ -968,10 +972,11 @@ export function fussSpalten(b: Betrieb): string[][] {
       t(b.ust_idnr) ? `USt-IdNr. ${t(b.ust_idnr)}` : "",
       // Gesellschaften: Rechtsform (wenn nicht schon im Namen), Sitz, Registergericht und -nummer, Geschäftsführung (§ 35a GmbHG, § 37a HGB)
       t(b.rechtsform) && t(b.registergericht) ? `${rechtsformImNamen(b) ? "" : `${t(b.rechtsform)}, `}Sitz ${t(b.ort)}, ${[t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" ")}` : [t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" "),
-      // E-193 (8a): GmbH & Co. KG – die Komplementärin mit ihren Angaben (§§ 125a, 177a HGB), danach ihre Geschäftsführung
+      // E-193 (8a): GmbH & Co. KG – die Komplementärin mit ihren Angaben (§§ 125, 177a HGB), danach ihre Geschäftsführer
       komplementaerZeile(b),
-      // R12 (Bäckerei #14): beim e. K. „Inhaber“, bei Personengesellschaften „Gesellschafter“, sonst „Geschäftsführung“
-      t(b.vertretung) ? `${istCoKg(b) ? "Geschäftsführung" : vertretungLabel(b.rechtsform)}: ${t(b.vertretung)}` : "",
+      // R12 (Bäckerei #14): beim e. K. „Inhaber“, bei Personengesellschaften „Gesellschafter“, sonst „Geschäftsführung“;
+      // E-200: bei der GmbH & Co. KG „Geschäftsführer der Komplementärin“ (Empfehlung des Rechtsanwalts)
+      t(b.vertretung) ? `${istCoKg(b) ? CO_KG_GESCHAEFTSFUEHRER : vertretungLabel(b.rechtsform)}: ${t(b.vertretung)}` : "",
     ],
   ];
   return spalten.map((s) => s.filter(Boolean)).filter((s) => s.length);

@@ -28,7 +28,7 @@ export interface Betrieb {
   vertretung?: string;
   /**
    * E-193 (8a): GmbH & Co. KG bzw. UG (haftungsbeschränkt) & Co. KG – Angaben zur persönlich haftenden Gesellschafterin
-   * (Komplementärin) für Geschäftsbriefe und Rechnungen (§ 125a Abs. 1 Satz 2, § 177a HGB i. V. m. § 35a GmbHG): Firma,
+   * (Komplementärin) für Geschäftsbriefe und Rechnungen (§ 125 Abs. 1 Satz 2, § 177a HGB i. V. m. § 35a GmbHG): Firma,
    * Rechtsform, Sitz, Registergericht und Registernummer; ihre Geschäftsführer stehen in `vertretung`.
    */
   komplementaer?: string;

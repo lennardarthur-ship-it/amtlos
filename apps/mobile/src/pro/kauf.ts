@@ -91,6 +91,26 @@ export async function proAktiv(): Promise<boolean> {
 }
 
 /**
+ * E-200: Stand des Pro-Abos laut Store – aktiv, ob es sich verlängert (RevenueCat `willRenew`; false nach einer Kündigung)
+ * und wann es endet bzw. endete (`expirationDate`). null ohne Kauf-Anbindung, ohne Abo oder bei einem Fehler.
+ */
+export interface AboStand {
+  aktiv: boolean;
+  verlaengert: boolean;
+  endetAm: string | null;
+}
+export async function aboStand(): Promise<AboStand | null> {
+  const p = await laden();
+  if (!p) return null;
+  try {
+    const e = (await p.getCustomerInfo()).entitlements.all[PRO_BERECHTIGUNG];
+    return e ? { aktiv: e.isActive, verlaengert: e.willRenew, endetAm: e.expirationDate ?? null } : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Darf das Apple-Konto den kostenlosen Testzeitraum nutzen (App-Review R2)? Nur „berechtigt“ zählt; unbekannt, nicht
  * berechtigt oder ein Fehler der Abfrage heißt: kein Testzeitraum anzeigen – lieber ehrlich den Preis als ein Trial,
  * das Apple dann nicht gewährt.

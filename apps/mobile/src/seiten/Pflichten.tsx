@@ -1,6 +1,7 @@
 import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useMemo, useState } from "react";
 import { AppState, Linking, View } from "react-native";
+import { plusTage } from "@amtlos/fristen";
 import { vorlageFuer } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
@@ -219,6 +220,8 @@ export function PflichtDetail({ id }: { id: string }) {
       {/* R10: laufende Pflichten und Pflichten, die erst mit einer Bestätigung erledigt sind */}
       {gilt && p.erledigung.art === "laufend" ? <Hinweis text={p.erledigung.zeitraum ? TEXT.r10_laufend(p.erledigung.zeitraum, zeitraumText(heute())) : TEXT.r10_laufend_termin} /> : null}
       {gilt && bestaetigen && !abgehakt ? <Hinweis text={TEXT.r10_bestaetigen_hinweis(bestaetigen)} /> : null}
+      {/* E-200: Beitragsnachweis – der Termin ist der letzte Tag zum Übermitteln (Eingang um 0 Uhr am Tag danach) */}
+      {gilt && termin && p.uebermittelnVortag ? <Hinweis text={TEXT.e200_uebermitteln_hinweis(datumDe(termin), datumDe(plusTage(termin, 1)))} /> : null}
       {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
       {/* Gewerbe online anmelden – Schritt für Schritt: frei, auch ohne Pro */}
       {p.id === GEWERBE_PFLICHT ? (

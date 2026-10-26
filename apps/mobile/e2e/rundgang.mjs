@@ -5,6 +5,8 @@
  * Kopie, Löschen, verschlüsselte Sicherung und Wiederherstellen. Bildschirmfotos zur Sichtprüfung. Bricht beim ersten Befund ab.
  * E-188: der erste Pflichten-Check ohne Pro (Bezahlschirm einmal danach, „Später“, nur die ersten 3 Pflichten), am Ende
  * der Teil ohne Pro (Neues gesperrt; erneut teilen, Storno, Kasse und Kassenbuch frei).
+ * E-200: Hinweis nach dem Ende von Pro (Aufzeichnungs- und Aufbewahrungspflichten laufen weiter), „Alle Daten löschen“ erst
+ * nach dem kostenlosen Export „Daten für die Betriebsprüfung“ (ZIP geprüft) und der Bestätigung, dass er gespeichert ist.
  *
  *   cd apps/mobile && CI=1 npx expo export --platform web --output-dir /tmp/expo-web
  *   node e2e/rundgang.mjs /tmp/expo-web /tmp/bilder        # DUNKEL=1 für Dunkelmodus, BREITE=375 für 375 pt, CHROMIUM_PFAD optional
@@ -14,6 +16,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { MARKE } from "../../../packages/marke/index.js";
+import { strFromU8, unzipSync } from "fflate";
 
 const require = createRequire(path.resolve(path.dirname(new URL(import.meta.url).pathname), "../../web/package.json"));
 const { chromium } = require("playwright-core");
@@ -140,6 +143,12 @@ try {
   };
   await proSchalten(false);
   pruefe(await sichtbar("Pflichten-Check kostenlos – alles Weitere mit Pro"), "ohne Pro fehlt unter „Mein Betrieb“ der Hinweis, was kostenlos ist");
+  // E-200: Pro war (testweise) an und ist beendet – Hinweis, dass die Aufzeichnungs- und Aufbewahrungspflichten weiterlaufen
+  pruefe((await sichtbar("ist beendet. Deine Aufzeichnungs- und Aufbewahrungspflichten laufen weiter")) && (await knopf("Daten exportieren").count()) > 0, "kein Hinweis nach dem Ende von Pro (E-200)");
+  await foto("pro-beendet");
+  await tippe(knopf("Verstanden"));
+  await warte(500);
+  pruefe(!(await sichtbar("ist beendet. Deine Aufzeichnungs- und Aufbewahrungspflichten laufen weiter")), "Hinweis zum Ende von Pro lässt sich nicht wegtippen");
 
   // Pflichten-Check (E-126): Fragen beantworten, Ergebnis, Pflichten, Unterlage zur Pflicht
   await p.getByRole("tab", { name: "Pflichten" }).click();
@@ -635,10 +644,10 @@ try {
   pruefe((await feld("Name des Betriebs").inputValue()) === "Salon Sonne", "Betrieb nach Neustart verloren");
   await zurueck();
   await warte(700);
-  // „Alle Daten löschen“ ist gesperrt, solange geteilte Rechnungen nicht gesichert sind (E-129)
+  // „Alle Daten löschen“ ist gesperrt, solange aufbewahrungspflichtige Daten nicht exportiert sind (E-129, E-200)
   await tippe(knopf("Alle Daten löschen"));
   await warte(400);
-  pruefe(await sichtbar("Erstelle zuerst eine Sicherung"), "Löschen trotz ungesicherter Rechnungen möglich");
+  pruefe(await sichtbar("Exportiere zuerst die Daten für die Betriebsprüfung"), "Löschen ohne Export für die Betriebsprüfung möglich");
   await tippe(knopf("Abbrechen"));
   await warte(300);
   await tippe(knopf("Daten sichern"));
@@ -657,7 +666,30 @@ try {
   pruefe(await sichtbar("Sicherung erstellt."), "keine Bestätigung nach dem Sichern");
   await zurueck();
   await warte(800);
+  // E-200: die Sicherung allein genügt nicht – erst der Export für die Betriebsprüfung, als gespeichert bestätigt
   await tippe(knopf("Alle Daten löschen"));
+  await warte(400);
+  pruefe((await sichtbar("Exportiere zuerst die Daten für die Betriebsprüfung")) && !(await knopf("Ja, löschen").count()), "Löschen nach der Sicherung ohne Export möglich (E-200)");
+  await tippe(knopf("Daten für Betriebsprüfung exportieren"));
+  await warte(900);
+  pruefe((await sichtbar("Daten für die Betriebsprüfung")) && (await sichtbar("Kostenlos, auch ohne Pro")), "Seite „Daten für die Betriebsprüfung“ öffnet nicht");
+  await foto("pruefexport");
+  const [zipLaden] = await Promise.all([p.waitForEvent("download"), knopf("Exportieren").click()]);
+  const pruefZip = `${OUT}/${zipLaden.suggestedFilename()}`;
+  await zipLaden.saveAs(pruefZip);
+  const pruefInhalt = unzipSync(new Uint8Array(fs.readFileSync(pruefZip)));
+  const pruefNamen = Object.keys(pruefInhalt);
+  pruefe(/Betriebspruefung/.test(zipLaden.suggestedFilename()), `Dateiname des Exports: ${zipLaden.suggestedFilename()}`);
+  for (const n of ["Rechnungen.csv", "Belege.csv", "Kassenabschluesse.csv", "Aenderungsprotokoll.csv", "Feldbeschreibung.txt"]) pruefe(pruefNamen.includes(n), `Export ohne ${n}`);
+  // der Beleg im Rundgang ist eine empfangene E-Rechnung (Original unverändert); die Rechnung an eine Privatperson hat keine XRechnung
+  pruefe(pruefNamen.some((n) => n.startsWith("E-Rechnungen/eingehend/")) && strFromU8(pruefInhalt["Belege.csv"]).includes("E-Rechnungen/eingehend/"), "Export ohne empfangene E-Rechnung bzw. ohne Pfad in der Belegliste");
+  pruefe(!pruefNamen.some((n) => /EXTF|stand\.json|\.pdf$/.test(n) && !n.startsWith("Belege/")), `Export enthält mehr als verlangt: ${pruefNamen.join(", ")}`);
+  pruefe(strFromU8(pruefInhalt["Feldbeschreibung.txt"]).includes("Rechnungen.csv") && strFromU8(pruefInhalt["Rechnungen.csv"]).includes("2026-001"), "Feldbeschreibung oder Rechnungsliste unvollständig");
+  await warte(600);
+  await tippe(p.getByRole("switch", { name: "Ich habe die Datei gespeichert" }).locator("visible=true").last());
+  await warte(900);
+  pruefe((await sichtbar("Export vom")) && (await knopf("Ja, löschen").count()) > 0, "nach dem bestätigten Export kein „Ja, löschen“ (E-200)");
+  await foto("loeschen-nach-export");
   await tippe(knopf("Ja, löschen"));
   await warte(800);
   pruefe(await sichtbar("Betrieb eintragen"), "Betrieb nach „alles löschen“ nicht leer");

@@ -30,11 +30,14 @@ describe("Vermerk je Vorlage in der App", () => {
     for (const v of VORLAGEN) {
       const d: Daten = v.id === "hygieneplan" ? { art: "lebensmittel" } : {};
       expect(pruefHinweisFuer(v, d, cafe) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id));
-      expect(pruefHinweisFuer(v, d, coKg) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id) && v.id !== "rechnung");
+      // E-200: Rechnung der GmbH & Co. KG vom Steuerberater nachgeprüft (26.10.2026)
+      expect(pruefHinweisFuer(v, d, coKg) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id));
       if (v.id === "hygieneplan") expect(pruefHinweisFuer(v, { art: "beauty" }, cafe)).toContain("von einem Rechtsanwalt (Länderzusatz nur für Bayern geprüft)");
     }
     expect(pruefHinweisFuer(vorlageFuer("rechnung")!, {}, cafe)).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 23.10.2026)");
     expect(pruefHinweisFuer(vorlageFuer("rechnung")!, { storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, cafe)).toBe(PRUEFHINWEIS);
+    expect(pruefHinweisFuer(vorlageFuer("rechnung")!, {}, coKg)).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 26.10.2026)");
+    expect(pruefHinweisFuer(vorlageFuer("rechnung")!, { storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, coKg)).toBe(PRUEFHINWEIS);
     expect(pruefHinweisFuer(vorlageFuer("handelsregister")!, { rechtsform: "GmbH" }, { ...cafe, rechtsform: "GmbH" })).toBe("Vorlage fachlich durchgesehen von einem Rechtsanwalt (Stand 25.10.2026)");
     expect(pruefHinweisFuer(vorlageFuer("bilanz_guv")!, {}, { ...cafe, rechtsform: "GmbH" })).toContain("von einem Steuerberater");
   });

@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { unzipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 import { STORNO_ABSCHLAEGE, dokumentHtml, eRechnungAus, vorlageFuer, type Daten } from "@amtlos/fachlogik";
-import { LEERER_STAND, anlegen, ausgeben, bezahltSetzen, felderSetzen, geteiltOffenLetzte, geteilteFassungFestschreiben, loeschen, standAus, steuerberatungSetzen, steuerberatungVereinen, stornieren, teilenOffenVermerken, unterlagenVereinen, zusammenfuehren, type Stand } from "../src/unterlagen/speicher";
+import { LEERER_STAND, anlegen, ausgeben, bezahltSetzen, felderSetzen, geteiltOffenLetzte, fassungHash, geteilteFassungFestschreiben, loeschen, standAus, steuerberatungSetzen, steuerberatungVereinen, stornieren, teilenOffenVermerken, unterlagenVereinen, zusammenfuehren, type Stand } from "../src/unterlagen/speicher";
 import { einnahmenAusRechnungen, steuerpaket } from "../src/unterlagen/steuerpaket";
 import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
 import { rechnungBrutto } from "../src/unterlagen/ablage";
@@ -54,9 +54,14 @@ describe("8b: Storno einer Schlussrechnung spiegelt die Buchung des Rests", () =
     expect(rechnungBrutto(st, s.betrieb)).toBe(-476000);
     const text = sichtbarerText(dokumentHtml(vorlageFuer("rechnung")!, st.daten, s.betrieb));
     expect(text).toContain("Gesamtbetrag der Leistung −11.900,00 €");
-    expect(text).toContain("abzüglich Abschlagsrechnung Nr. 2026-010 vom 01.08.2026: Entgelt 6.000,00 €");
-    expect(text).toContain("Verbleibendes Entgelt −4.000,00 €, darauf Umsatzsteuer −760,00 €");
-    expect(text).toContain("Noch zu zahlen −4.760,00 €");
+    // E-200: Vorzeichen gespiegelt – die Abschläge stehen als „zuzüglich … (bleibt bestehen)“ mit positivem Betrag da,
+    // sodass jede Zeile so rechnet, wie sie dasteht (−11.900 + 6.000 + 1.140 = −4.760)
+    expect(text).toContain("zuzüglich Abschlagsrechnung Nr. 2026-010 vom 01.08.2026 (bleibt bestehen): Entgelt 6.000,00 €");
+    expect(text).toContain("zuzüglich darauf entfallende Umsatzsteuer 19 % 1.140,00 €");
+    expect(text).toContain("Storniertes Entgelt −4.000,00 €, darauf Umsatzsteuer −760,00 €");
+    expect(text).toContain("Stornobetrag −4.760,00 €");
+    expect(text).toContain("Storniert wird nur der Restbetrag der Schlussrechnung Nr. 2026-011. Die Abschlagsrechnung Nr. 2026-010 vom 01.08.2026 über 7.140,00 € bleibt bestehen.");
+    expect(text).not.toMatch(/abzüglich|Noch zu zahlen/);
     // XRechnung: Abschläge mit umgekehrtem Vorzeichen, sodass die Rechnungskorrektur nur den Rest erstattet
     const { daten } = eRechnungAus(st.daten, s.betrieb);
     expect(daten.art).toBe("storno");
@@ -157,7 +162,9 @@ describe("4: Android – Teilen abgebrochen zählt nicht als verschickt", () => 
     const u = nein().unterlagen[0]!;
     expect(u.festgeschrieben).toBeUndefined();
     expect(u.ausgegeben).toBeUndefined();
-    expect(u.geteiltOffen).toEqual([{ am: "2026-10-12T09:00:00.000Z", art: "pdf", daten: u.daten, pdfSha256: "ab12", absender: BETRIEB }]);
+    // E-200: mit Prüfwert über Inhalt und Absender
+    expect(u.geteiltOffen).toEqual([{ am: "2026-10-12T09:00:00.000Z", art: "pdf", daten: u.daten, pdfSha256: "ab12", absender: BETRIEB, inhaltSha256: fassungHash({ daten: u.daten, absender: BETRIEB }) }]);
+    expect(u.geteiltOffen![0]!.inhaltSha256).toMatch(/^[0-9a-f]{64}$/);
     expect(geteiltOffenLetzte(u)).toMatchObject({ geaendert: false });
   });
 
@@ -200,8 +207,11 @@ describe("4: Android – Teilen abgebrochen zählt nicht als verschickt", () => 
     expect(teilenOffenVermerken(fest, "r1", t("2026-10-14"), { art: "pdf", daten: {} }).unterlagen[0]!.geteiltOffen).toHaveLength(1);
   });
 
-  it("Löschen eines geteilten Entwurfs bleibt möglich (er ging laut Nutzer nicht hinaus) – mit Warnung vor der Nummer", () => {
-    expect(loeschen(nein(), "r1").unterlagen).toEqual([]);
+  it("Löschen eines geteilten Entwurfs nur mit Grund (E-200) – protokolliert, die Nummer bleibt vergeben", () => {
+    expect(loeschen(nein(), "r1").unterlagen).toHaveLength(1);
+    const weg = loeschen(nein(), "r1", t("2026-10-13"), "nicht verschickt");
+    expect(weg.unterlagen).toEqual([]);
+    expect(weg.protokoll.at(-1)).toMatchObject({ art: "entwurf_geloescht", nr: "2026-001", vorlage: "rechnung" });
     expect(lies("seiten/Abschluss.tsx")).toContain("TEXT.fs_loeschen_text(datumDe(offen.fassung.am))");
   });
 

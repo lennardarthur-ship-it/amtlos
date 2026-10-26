@@ -8,6 +8,7 @@ import {
   perioden,
   plusDauer,
   plusMonate,
+  plusTage,
   relativerTermin,
   rohtermin,
   verschiebe,
@@ -255,8 +256,20 @@ describe("SV-Fälligkeiten 2026 und 2027 (amtliche Tabellen, E-192)", () => {
   it("Fälligkeit der Beiträge (drittletzter Bankarbeitstag) wie in der Tabelle", () => {
     expect(Object.fromEntries(sv().map((t) => [t.periode, t.faellig_am]))).toEqual(Object.fromEntries(Object.entries(TABELLE).map(([m, [, f]]) => [m, f])));
   });
-  it("Beitragsnachweis (zwei Arbeitstage vor Fälligkeit) wie in der Tabelle", () => {
-    expect(Object.fromEntries(sv(2).map((t) => [t.periode, t.faellig_am]))).toEqual(Object.fromEntries(Object.entries(TABELLE).map(([m, [n]]) => [m, n])));
+  it("Beitragsnachweis (zwei Arbeitstage vor Fälligkeit): Eingang um 0 Uhr wie in der Tabelle", () => {
+    expect(Object.fromEntries(sv(2).map((t) => [t.periode, t.eingang_am]))).toEqual(Object.fromEntries(Object.entries(TABELLE).map(([m, [n]]) => [m, n])));
+  });
+  // E-200 (Steuerberater, 26.10.2026): der Nachweis muss um 0 Uhr des fünftletzten Bankarbeitstags vorliegen – Termin in
+  // der App ist der Kalendertag davor („spätestens am … übermitteln“), in allen 24 Monaten Tabellendatum − 1 Tag
+  it("E-200: Termin des Beitragsnachweises = Tabellendatum − 1 Kalendertag (24 Monate 2026/2027)", () => {
+    const t = sv(2);
+    expect(t).toHaveLength(24);
+    expect(Object.fromEntries(t.map((x) => [x.periode, x.faellig_am]))).toEqual(Object.fromEntries(Object.entries(TABELLE).map(([m, [n]]) => [m, plusTage(n, -1)])));
+    // Beispiele: Dezember 2026 Tabelle 22.12. → 21.12.; Januar 2026 Tabelle Montag 26.01. → Sonntag 25.01.
+    expect(t.find((x) => x.periode === "2026-12")!.faellig_am).toBe("2026-12-21");
+    expect(t.find((x) => x.periode === "2026-01")!.faellig_am).toBe("2026-01-25");
+    // die Beitragsfälligkeit selbst bleibt der Tabellentag (kein Eingang um 0 Uhr)
+    expect(sv().every((x) => x.eingang_am === undefined)).toBe(true);
   });
   it("hängt nicht vom Bundesland des Betriebs ab (maßgeblich ist die Krankenkasse)", () => {
     for (const bundesland of ["BE", "BY", "NW", "SN"] as const) {

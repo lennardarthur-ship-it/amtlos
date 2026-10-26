@@ -1,6 +1,6 @@
 /**
  * E-193: Befunde der externen Prüfung – XRechnung „zahlbar sofort“ (BR-CO-25, Defekt 5), Storno einer Schlussrechnung
- * (Defekt 8b) und Angaben der GmbH & Co. KG auf Geschäftsbriefen und Rechnungen (Defekt 8a, §§ 125a, 177a HGB).
+ * (Defekt 8b) und Angaben der GmbH & Co. KG auf Geschäftsbriefen und Rechnungen (Defekt 8a, §§ 125, 177a HGB).
  * Die XML-Beispiele prüft zusätzlich der KoSIT-Validator in der CI (scripts/e-rechnung-beispiele.mjs).
  */
 import { describe, expect, it } from "vitest";
@@ -45,6 +45,23 @@ describe("Defekt 5: XRechnung „zahlbar sofort“ verletzte BR-CO-25", () => {
     const x = xml({ ...RE, zahlungsziel: "sofort", bezahlt_am: "2026-10-12" });
     expect(x).toContain("<cbc:Note>Der Rechnungsbetrag wurde am 12.10.2026 bezahlt.</cbc:Note>");
     expect(brCo25(x)).toBe(true);
+    // E-200: bezahlt ist der ganze Betrag (BT-113), zu zahlen nichts mehr (BT-115 = 0,00) – wie auf dem PDF
+    expect([tag(x, "TaxInclusiveAmount"), tag(x, "PrepaidAmount"), tag(x, "PayableAmount")]).toEqual(["186.18", "186.18", "0.00"]);
+  });
+  it("E-200: schon bezahlte Schlussrechnung – BT-113 = Abschläge + Rest, BT-115 = 0,00; Anmerkung nennt weiter nur die Abschläge", () => {
+    const d: Daten = { ...RE, zahlungsziel: "sofort", bezahlt_am: "2026-10-12", schluss: true, abschlaege: [{ nummer: "2026-010", datum: "01.08.2026", netto: "6.000,00", satz: "19" }], positionen: [{ bezeichnung: "Umbau", menge: "1", einheit: "Pauschale", preis: "10.000,00", satz: "19" }] };
+    const x = xml(d);
+    expect([tag(x, "TaxInclusiveAmount"), tag(x, "PrepaidAmount"), tag(x, "PayableAmount")]).toEqual(["11900.00", "11900.00", "0.00"]);
+    expect(x).toContain("Bereits gezahlt: 7140.00 EUR.");
+    expect(x).toContain("<cbc:Note>Der Rechnungsbetrag wurde am 12.10.2026 bezahlt.</cbc:Note>");
+    expect(dokumentHtml(vorlageFuer("rechnung")!, d, BETRIEB)).toContain("Der Rechnungsbetrag wurde am 12.10.2026 bezahlt.");
+  });
+  it("E-200: nicht bezahlt (oder Zahlung nach dem Rechnungsdatum) – kein PrepaidAmount, voller Zahlbetrag", () => {
+    for (const d of [{ ...RE, zahlungsziel: "14" }, { ...RE, zahlungsziel: "14", bezahlt_am: "2026-10-20" }]) {
+      const x = xml(d);
+      expect(tag(x, "PrepaidAmount")).toBeNull();
+      expect(tag(x, "PayableAmount")).toBe("186.18");
+    }
   });
   it("ohne Zahlungsziel: die App erfindet keine Bedingung – „Zahlungsziel“ fehlt für die E-Rechnung", () => {
     expect(eRechnungAus({ ...RE, zahlungsziel: "" }, BETRIEB).fehlt).toContain("Zahlungsziel");
@@ -90,7 +107,7 @@ describe("Defekt 8b: Storno einer Schlussrechnung spiegelt die Abschläge", () =
   }
 });
 
-describe("Defekt 8a: GmbH & Co. KG – Angaben zur Komplementärin (§§ 125a, 177a HGB)", () => {
+describe("Defekt 8a: GmbH & Co. KG – Angaben zur Komplementärin (§§ 125, 177a HGB)", () => {
   const KG: Betrieb = { ...BETRIEB, name: "Holzbau Nord GmbH & Co. KG", rechtsform: "GmbH & Co. KG", registergericht: "Amtsgericht Hamburg", registernummer: "HRA 12345", vertretung: "Jana Holm, Tom Berg", ort: "Hamburg", komplementaer: "Holzbau Nord Verwaltungs-GmbH", komplementaer_rechtsform: "GmbH", komplementaer_sitz: "Hamburg", komplementaer_registergericht: "Amtsgericht Hamburg", komplementaer_registernummer: "HRB 67890" };
 
   it("erkennt GmbH & Co. KG und UG (haftungsbeschränkt) & Co. KG – nicht GmbH, KG oder OHG", () => {
@@ -100,14 +117,14 @@ describe("Defekt 8a: GmbH & Co. KG – Angaben zur Komplementärin (§§ 125a, 1
     for (const rf of ["GmbH", "KG", "OHG", "UG (haftungsbeschränkt)"]) expect(istCoKg({ rechtsform: rf, name: "" })).toBe(false);
   });
 
-  it("Fußzeile jeder Unterlage: KG mit Sitz und HRA, dann die Komplementärin mit Sitz, Registergericht und HRB, dann ihre Geschäftsführung", () => {
+  it("Fußzeile jeder Unterlage: KG mit Sitz und HRA, dann die Komplementärin mit Sitz, Registergericht und HRB, dann ihre Geschäftsführer (E-200: „Geschäftsführer der Komplementärin“)", () => {
     const sp = fussSpalten(KG).at(-1)!;
     expect(sp).toEqual([
       "Steuernr. 143/123/45678",
       "USt-IdNr. DE123456789",
       "Sitz Hamburg, Amtsgericht Hamburg HRA 12345",
       "Persönlich haftende Gesellschafterin: Holzbau Nord Verwaltungs-GmbH, Sitz Hamburg, Amtsgericht Hamburg HRB 67890",
-      "Geschäftsführung: Jana Holm, Tom Berg",
+      "Geschäftsführer der Komplementärin: Jana Holm, Tom Berg",
     ]);
     // Rechtsform nicht in der Firma: sie steht dazu
     expect(fussSpalten({ ...KG, komplementaer: "Holzbau Nord Verwaltung" }).at(-1)).toContain("Persönlich haftende Gesellschafterin: Holzbau Nord Verwaltung, GmbH, Sitz Hamburg, Amtsgericht Hamburg HRB 67890");
@@ -121,16 +138,16 @@ describe("Defekt 8a: GmbH & Co. KG – Angaben zur Komplementärin (§§ 125a, 1
     expect(fehlendeAngaben(v, d, KG)).toEqual([]);
     const leer = { ...KG, registernummer: "", komplementaer: "", komplementaer_sitz: "", komplementaer_registergericht: "", komplementaer_registernummer: "", vertretung: "" };
     expect(komplementaerAngabenFehlen(leer)).toEqual([
-      "Registernummer der KG, z. B. HRA 12345 (Mein Betrieb, §§ 125a, 177a HGB)",
-      "Firma der persönlich haftenden Gesellschafterin (Mein Betrieb, §§ 125a, 177a HGB)",
-      "Sitz der persönlich haftenden Gesellschafterin (Mein Betrieb, §§ 125a, 177a HGB)",
-      "Registergericht der persönlich haftenden Gesellschafterin (Mein Betrieb, §§ 125a, 177a HGB)",
-      "Registernummer der persönlich haftenden Gesellschafterin, z. B. HRB 12345 (Mein Betrieb, §§ 125a, 177a HGB)",
-      "Alle Geschäftsführerinnen und Geschäftsführer der persönlich haftenden Gesellschafterin (Mein Betrieb, §§ 125a, 177a HGB)",
+      "Registernummer der KG, z. B. HRA 12345 (Mein Betrieb, §§ 125, 177a HGB)",
+      "Firma der persönlich haftenden Gesellschafterin (Mein Betrieb, §§ 125, 177a HGB)",
+      "Sitz der persönlich haftenden Gesellschafterin (Mein Betrieb, §§ 125, 177a HGB)",
+      "Registergericht der persönlich haftenden Gesellschafterin (Mein Betrieb, §§ 125, 177a HGB)",
+      "Registernummer der persönlich haftenden Gesellschafterin, z. B. HRB 12345 (Mein Betrieb, §§ 125, 177a HGB)",
+      "Alle Geschäftsführerinnen und Geschäftsführer der persönlich haftenden Gesellschafterin (Mein Betrieb, §§ 125, 177a HGB)",
     ]);
     expect(fehlendeAngaben(v, d, leer)).toEqual(expect.arrayContaining(komplementaerAngabenFehlen(leer)));
     // Rechtsform der Komplementärin: aus der Firma oder dem eigenen Feld
-    expect(komplementaerAngabenFehlen({ ...KG, komplementaer: "Holzbau Verwaltung", komplementaer_rechtsform: "" })).toEqual(["Rechtsform der persönlich haftenden Gesellschafterin (Mein Betrieb, §§ 125a, 177a HGB)"]);
+    expect(komplementaerAngabenFehlen({ ...KG, komplementaer: "Holzbau Verwaltung", komplementaer_rechtsform: "" })).toEqual(["Rechtsform der persönlich haftenden Gesellschafterin (Mein Betrieb, §§ 125, 177a HGB)"]);
     // UG & Co. KG: keine § 35a-Meldungen für die KG selbst (sie ist keine UG), sondern die der KG
     const ug = { ...leer, name: "Muster UG (haftungsbeschränkt) & Co. KG", rechtsform: "UG (haftungsbeschränkt) & Co. KG" };
     expect(fehlendeAngaben(v, d, ug).some((x) => x.includes("§ 35a GmbHG"))).toBe(false);
@@ -140,7 +157,7 @@ describe("Defekt 8a: GmbH & Co. KG – Angaben zur Komplementärin (§§ 125a, 1
     const html = dokumentHtml(vorlageFuer("rechnung")!, { ...RE, zahlungsziel: "14" }, KG);
     expect(html).toContain("Persönlich haftende Gesellschafterin: Holzbau Nord Verwaltungs-GmbH, Sitz Hamburg, Amtsgericht Hamburg HRB 67890");
     const x = xml({ ...RE, zahlungsziel: "14" }, KG);
-    expect(tag(x, "CompanyLegalForm")).toBe("GmbH &amp; Co. KG, Sitz Hamburg, Amtsgericht Hamburg HRA 12345, Persönlich haftende Gesellschafterin: Holzbau Nord Verwaltungs-GmbH, Sitz Hamburg, Amtsgericht Hamburg HRB 67890, Geschäftsführung: Jana Holm, Tom Berg");
+    expect(tag(x, "CompanyLegalForm")).toBe("GmbH &amp; Co. KG, Sitz Hamburg, Amtsgericht Hamburg HRA 12345, Persönlich haftende Gesellschafterin: Holzbau Nord Verwaltungs-GmbH, Sitz Hamburg, Amtsgericht Hamburg HRB 67890, Geschäftsführer der Komplementärin: Jana Holm, Tom Berg");
   });
 
   it("E-196: die neue Fußzeile ändert die Prüfsumme der Rechnungsvorlage – der Vermerk entfällt bis zur erneuten Durchsicht (T-191)", () => {

@@ -302,6 +302,11 @@ export interface PflichtInfo {
   vorlagen: string[];
   /** nächster Termin aus dem Katalog (wiederkehrende Pflichten) */
   naechsterTermin: string | null;
+  /**
+   * E-200: die Meldung muss zu Beginn (0 Uhr) des Tags nach dem Termin vorliegen (Beitragsnachweis, Tabellen der
+   * Einzugsstellen) – der Termin ist der letzte Tag zum Übermitteln („spätestens am … übermitteln“).
+   */
+  uebermittelnVortag?: boolean;
   /** alle Termine ab heute in den nächsten zwölf Monaten (ISO, aufsteigend) – für den Jahresblick */
   termine: string[];
   /**
@@ -633,6 +638,7 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       giltAb: p.gueltig_ab && p.gueltig_ab > stichtag ? p.gueltig_ab : GILT_AB_TERMIN.has(p.id) && p.frist.typ === "absolut" && p.frist.datum > stichtag ? p.frist.datum : null,
       vorlagen: VORLAGEN_JE_PFLICHT.get(p.id) ?? [],
       naechsterTermin: termin,
+      ...(e.termine.some((t) => "eingang_am" in t && t.eingang_am) ? { uebermittelnVortag: true } : {}),
       termine,
       vergangeneTermine: vergangen,
       ausloeserFelder: profilFelder(e.begruendung),

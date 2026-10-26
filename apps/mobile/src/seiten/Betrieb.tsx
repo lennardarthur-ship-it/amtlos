@@ -9,7 +9,9 @@ import { type Ton, DatumFeld, Feld, Fuss, Initialen, Karte, Knopf, Schalter, Suc
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, RADIUS, useFarben, weich } from "../ui/thema";
-import { allesLoeschenErlaubt, aufbewahrungspflichtig, betriebFehlt, neueId, personenSortiert, PERSONEN_LISTE } from "../unterlagen/speicher";
+import { allesLoeschenErlaubt, aufbewahrungspflichtig, betriebFehlt, neueId, personenSortiert, pruefexportAktuell, PERSONEN_LISTE } from "../unterlagen/speicher";
+import { AboEndeHinweis } from "./AboEnde";
+import { PruefexportSeite } from "./Pruefexport";
 import { entsperren, sperreMoeglich } from "../unterlagen/sperre";
 import { KATALOG, regelwert } from "../pflichten/check";
 import { APP_VERSION } from "../version";
@@ -276,7 +278,7 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
             <Feld label={TEXT.b_registernummer} {...feld("registernummer")} placeholder="z. B. HRB 123456" autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
             <Feld label={coKg ? TEXT.b_vertretung_cokg : TEXT.b_vertretung} {...feld("vertretung")} placeholder="Vor- und Nachname, mehrere mit Komma" />
           </Karte>
-          {/* E-193 (8a): GmbH & Co. KG – die Komplementärin mit ihren Angaben (§§ 125a, 177a HGB) */}
+          {/* E-193 (8a): GmbH & Co. KG – die Komplementärin mit ihren Angaben (§§ 125, 177a HGB) */}
           {coKg ? (
             <View>
               <View style={{ marginTop: 20, marginBottom: 8, marginLeft: 4 }}>
@@ -418,6 +420,8 @@ export function Betrieb() {
   return (
     <BuehnenSeite key={zaehler} ueber={betriebFehlt(b) ? undefined : TEXT.betrieb_titel} buehne={<BetriebKopf b={b} onPress={betriebFehlt(b) ? oeffneAlles : () => oeffneTeil("angaben")} />}>
       <ProZeile />
+      {/* E-200: Pro gekündigt bzw. beendet – Aufzeichnungs- und Aufbewahrungspflichten laufen weiter */}
+      <AboEndeHinweis stil={{ marginTop: 10 }} />
       {/* Phase 2.3: Partner-Lizenzen über Apples Angebotscodes – Apples Einlöseblatt, nie ein eigener Freischaltweg */}
       {paywallVerfuegbar && !z.pro ? <CodeEinloesenKnopf leise /> : null}
       <Gruppe titel={TEXT.betrieb_gruppe}>
@@ -464,7 +468,9 @@ export function Betrieb() {
         {/* Sichern und Wiederherstellen als Listenzeilen – wie in den iPhone-Einstellungen */}
         <Karte>
           <Zeile symbol="lock.fill" titel={TEXT.sichern} label={TEXT.sichern} text={TEXT.letzte_sicherung(z.stand.letzteSicherung ? datumKurz(z.stand.letzteSicherung) : null)} onPress={() => nav.oeffnen("sicherung", () => <SicherungSeite />, true)} />
-          <Zeile symbol="arrow.clockwise" ton="blau" titel={TEXT.wiederherstellen} label={TEXT.wiederherstellen} onPress={() => nav.oeffnen("wiederherstellen", () => <WiederherstellenSeite fertig={() => setZaehler((x) => x + 1)} />, true)} letzte />
+          <Zeile symbol="arrow.clockwise" ton="blau" titel={TEXT.wiederherstellen} label={TEXT.wiederherstellen} onPress={() => nav.oeffnen("wiederherstellen", () => <WiederherstellenSeite fertig={() => setZaehler((x) => x + 1)} />, true)} />
+          {/* E-200: Daten für die Betriebsprüfung – kostenlos, auch ohne Pro */}
+          <Zeile symbol="folder" ton="gold" titel={TEXT.e200_pruef_zeile} label={TEXT.e200_pruef_zeile} text={TEXT.e200_pruef_zeile_text} onPress={() => nav.oeffnen("pruefexport", () => <PruefexportSeite />, true)} letzte />
         </Karte>
       </Gruppe>
       {beiseite && !z.ladefehler ? (
@@ -486,14 +492,17 @@ export function Betrieb() {
         {frage && !darfLoeschen ? (
           <Karte stil={{ paddingVertical: 14, gap: 10 }}>
             <T>{TEXT.r12p_loeschen_gesperrt(fest, regelwert("steuern.aufbewahrung.belege_jahre") ?? 8)}</T>
+            {/* E-200: erst der vollständige Export für die Betriebsprüfung (als gespeichert bestätigt), dann Löschen */}
             <View style={{ flexDirection: "row", gap: 10 }}>
-              <Knopf symbol="lock" text={TEXT.jetzt_sichern} onPress={() => { setFrage(false); nav.oeffnen("sicherung", () => <SicherungSeite />, true); }} stil={{ flex: 1 }} />
+              <Knopf symbol="square.and.arrow.up" text={TEXT.e200_loeschen_export} onPress={() => nav.oeffnen("pruefexport", () => <PruefexportSeite schliessen />, true)} stil={{ flex: 1 }} />
               <Knopf ton text={TEXT.abbrechen} onPress={() => setFrage(false)} stil={{ flex: 1 }} />
             </View>
           </Karte>
         ) : frage ? (
           <Karte stil={{ paddingVertical: 14, gap: 10 }}>
             <T fett>{TEXT.loeschen_wirklich}</T>
+            {/* E-200: mit aufbewahrungspflichtigen Daten – der bestätigte Export und die weiterlaufende Aufbewahrungspflicht */}
+            {fest && z.stand.pruefexport && pruefexportAktuell(z.stand) ? <T v="klein">{TEXT.e200_loeschen_nach_export(datumKurz(z.stand.pruefexport))}</T> : null}
             <View style={{ flexDirection: "row", gap: 10 }}>
               <Knopf
                 gefahr

@@ -13,7 +13,7 @@ import { mitVorlagenHinweis } from "../rechtshinweis";
 import { drucken, pdfTeilenMitHash } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
-import { absenderFuer, geteiltOffenLetzte, heute } from "../unterlagen/speicher";
+import { absenderFuer, geteiltOffenLetzte, geteilteVersionen, heute } from "../unterlagen/speicher";
 import { euroText, faelligAm, offenBrutto, rechnungBrutto } from "../unterlagen/ablage";
 import { useAmtlos } from "../zustand";
 import { versandBestaetigt } from "./versand";
@@ -146,7 +146,7 @@ export function useTeilen(id: string) {
 }
 
 
-/** R12: Angabe aus „Mein Betrieb“ ergänzen – Gesellschaftsangaben (§ 35a GmbHG; E-193: §§ 125a, 177a HGB) bzw. Absender. */
+/** R12: Angabe aus „Mein Betrieb“ ergänzen – Gesellschaftsangaben (§ 35a GmbHG; E-193: §§ 125, 177a HGB) bzw. Absender. */
 export function betriebOeffnen(nav: ReturnType<typeof useNav>, fehlt: string[]) {
   const betrieb = fehlt.filter((x) => x.includes("Mein Betrieb"));
   if (betrieb.length && betrieb.every((x) => x.includes(GMBH_ANGABEN) || x.includes(KG_ANGABEN))) nav.oeffnen("betrieb-gesellschaft", () => <BetriebTeilSeite teil="gesellschaft" />, true);
@@ -192,6 +192,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const stempel = u && v && u.festgeschrieben && v.storno && !u.daten.storno_zu ? (u.bezahlt ? "bezahlt" : "geteilt") : null;
   const stempelVorher = useRef(stempel);
   const stempelNeu = useRef<string | null>(null);
+  // E-200: Grund, wenn ein geteilter, nicht bestätigter Entwurf gelöscht wird (Änderungsprotokoll)
+  const [loeschGrund, setLoeschGrund] = useState("");
   if (stempel !== stempelVorher.current) {
     stempelNeu.current = stempel;
     stempelVorher.current = stempel;
@@ -203,6 +205,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const fest = Boolean(u.festgeschrieben);
   // E-193 (4): zuletzt geteilte, auf Android nicht als verschickt bestätigte Fassung
   const offen = geteiltOffenLetzte(u);
+  // E-200: verschiedene geteilte Fassungen – bei mehr als einer wählt der Nutzer, welche hinausging
+  const versionen = geteilteVersionen(u);
   const nummerSchritt = v.fortlaufend ? v.abschnitte.findIndex((a) => a.felder.some((x) => x.id === v.fortlaufend)) : -1;
   const storno = u.storniertDurch ? z.stand.unterlagen.find((x) => x.id === u.storniertDurch) : undefined;
   const imFormular = new Set(jeSchritt.flat());
@@ -212,6 +216,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const ergebnis = v.ergebnis?.(d) ?? [];
   const fertig = alle.length === 0;
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(iso));
+  const zeitDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   const geteilt = fest && v.storno && !d.storno_zu;
   // Rechnung an jemanden: auf der Bühne Stand und Empfänger – der Betrag steht groß auf dem Papier darunter (A13)
   const kunde = typeof d.kunde_name === "string" ? d.kunde_name.trim() : "";
@@ -329,15 +334,41 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             <T v="klein" fett>{TEXT.fs_offen_titel(datumDe(offen.fassung.am))}</T>
             <T v="caption">{TEXT.fs_offen_text(Boolean(v.storno))}</T>
             {offen.geaendert ? <T v="caption">{TEXT.fs_offen_geaendert}</T> : null}
-            <TextKnopf
-              symbol="lock"
-              text={TEXT.fs_offen_knopf}
-              onPress={() =>
-                void bestaetigen({ titel: TEXT.fs_offen_wirklich(datumDe(offen.fassung.am)), text: TEXT.fs_offen_wirklich_text(offen.geaendert, Boolean(v.storno)), ja: TEXT.fs_offen_ja }).then((ok) => {
-                  if (ok && z.geteiltFestschreiben(id)) z.erfolg();
-                })
-              }
-            />
+            {versionen.length > 1 ? (
+              // E-200: mehrere verschiedene Fassungen – nicht automatisch die letzte, sondern die gewählte festschreiben
+              <View style={{ gap: 4, marginTop: 4 }}>
+                <T v="caption" fett>{TEXT.e200_fassungen_titel(versionen.length)}</T>
+                <T v="caption">{TEXT.e200_fassungen_text}</T>
+                {versionen.map((ver) => {
+                  const zeit = zeitDe(ver.am);
+                  const geaendert = JSON.stringify(ver.fassung.daten) !== JSON.stringify(u.daten);
+                  return (
+                    <View key={ver.sha256} style={{ marginTop: 4 }}>
+                      <T v="caption" leise>{TEXT.e200_fassung_zeile(zeit, [...new Set(ver.ausgaben.map((a) => TEXT.e200_fassung_art[a.art] ?? a.art))].join(", "), ver.sha256.slice(0, 12), ver.ausgaben.length)}</T>
+                      <TextKnopf
+                        symbol="lock"
+                        text={TEXT.e200_fassung_knopf(zeit)}
+                        onPress={() =>
+                          void bestaetigen({ titel: TEXT.fs_offen_wirklich(zeit), text: TEXT.fs_offen_wirklich_text(geaendert, Boolean(v.storno)), ja: TEXT.fs_offen_ja }).then((ok) => {
+                            if (ok && z.geteiltFestschreiben(id, ver.am)) z.erfolg();
+                          })
+                        }
+                      />
+                    </View>
+                  );
+                })}
+              </View>
+            ) : (
+              <TextKnopf
+                symbol="lock"
+                text={TEXT.fs_offen_knopf}
+                onPress={() =>
+                  void bestaetigen({ titel: TEXT.fs_offen_wirklich(datumDe(offen.fassung.am)), text: TEXT.fs_offen_wirklich_text(offen.geaendert, Boolean(v.storno)), ja: TEXT.fs_offen_ja }).then((ok) => {
+                    if (ok && z.geteiltFestschreiben(id)) z.erfolg();
+                  })
+                }
+              />
+            )}
           </View>
         ) : null}
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
@@ -404,18 +435,22 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             ) : null
           ) : u.fassungen?.length ? null : (
             // R12 Personal: ein Nachweis mit früheren Fassungen ist in der Korrektur – löschen geht nicht
-            <TextKnopf
-              symbol="trash"
-              gefahr
-              text={TEXT.loeschen}
-              onPress={() =>
-                void bestaetigen({ titel: TEXT.loeschen_wirklich, ...(offen ? { text: TEXT.fs_loeschen_text(datumDe(offen.fassung.am)) } : {}), ja: TEXT.loeschen_ja }).then((ok) => {
-                  if (!ok) return;
-                  z.loeschen(id);
-                  melden(TEXT.geloescht, "info");
-                })
-              }
-            />
+            <View style={{ gap: 6 }}>
+              {/* E-200: geteilter, nicht bestätigter Entwurf – nur mit Grund (Änderungsprotokoll), die Nummer bleibt vergeben */}
+              {offen ? <Feld label={TEXT.e200_entwurf_grund} hilfe={TEXT.e200_entwurf_grund_hilfe} wert={loeschGrund} aendern={setLoeschGrund} /> : null}
+              <TextKnopf
+                symbol="trash"
+                gefahr
+                text={TEXT.loeschen}
+                onPress={() =>
+                  void bestaetigen({ titel: TEXT.loeschen_wirklich, ...(offen ? { text: TEXT.fs_loeschen_text(datumDe(offen.fassung.am)) } : {}), ja: TEXT.loeschen_ja }).then((ok) => {
+                    if (!ok) return;
+                    z.loeschen(id, offen ? loeschGrund.trim() || TEXT.e200_entwurf_grund_standard : undefined);
+                    melden(TEXT.geloescht, "info");
+                  })
+                }
+              />
+            </View>
           )}
         </View>
         <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />

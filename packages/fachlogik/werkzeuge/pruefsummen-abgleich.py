@@ -9,7 +9,8 @@ Inhalt hat sich seit der Freigabe in keiner Ausprägung geändert; die Freigabe 
 Verschieden = der Inhalt hat sich geändert (z. B. Fußzeile der GmbH & Co. KG oder Storno, E-193).
 
 Verglichen wird je Variantengruppe (basis, rf:<Rechtsform>, land:<Land>, ku, bei der Rechnung schlussrechnung, storno,
-storno_schluss): Der Vermerk entfällt nur für die Gruppen, deren Teilsumme sich geändert hat. Mit --schreiben werden die
+storno_schluss): Der Vermerk entfällt nur für die Gruppen, deren Teilsumme sich geändert hat. E-200: Eine Nachprüfung
+einzelner Varianten (`varianten`) übernimmt nur deren Teilsummen; alle übrigen kommen aus der ersten Freigabe der Vorlage. Mit --schreiben werden die
 freigegebenen Teilsummen nach src/dokumente/geprueft-teilsummen.ts geschrieben und `pruefsumme` in geprueft.ts auf die
 Gesamtsumme der freigegebenen Fassung gesetzt.
 
@@ -25,6 +26,7 @@ Werkzeug ohne Anonymisierung; dann gilt eine Ausprägung, in der nur ein Name du
 src/dokumente/geprueft-teilsummen.ts und bleiben gültig, solange sich die Vorlagen nicht ändern.
 """
 import glob
+import hashlib
 import json
 import os
 import subprocess
@@ -64,7 +66,7 @@ def freigaben():
     js = """import('./packages/fachlogik/dist/index.js').then((F) => {
       const out = [];
       for (const [id, f] of Object.entries(F.VORLAGEN_GEPRUEFT)) {
-        F.freigabenFuer(id).forEach((x, i) => out.push({ id, schluessel: i ? `${id}#${i}` : id, pruefsumme: x.pruefsumme, pruefsumme_alt: x.pruefsumme_alt, stand: x.stand,
+        F.freigabenFuer(id).forEach((x, i) => out.push({ id, schluessel: i ? `${id}#${i}` : id, pruefsumme: x.pruefsumme, pruefsumme_alt: x.pruefsumme_alt, stand: x.stand, varianten: x.varianten ?? null,
           freigabe: { ...(x.fassung ? { fassung: x.fassung } : {}), ...(x.gruppen ? { gruppen: x.gruppen } : {}), ...(x.rechtsformen ? { rechtsformen: x.rechtsformen } : {}) } }));
       }
       console.log(JSON.stringify(out));
@@ -160,6 +162,17 @@ if __name__ == "__main__":
                                  "fusszeile_geaendert": sum(1 for i in range(max(len(ta), len(th))) if (ta[i] if i < len(ta) else "").split(" ‖ ")[-1] != (th[i] if i < len(th) else "").split(" ‖ ")[-1])})
                 del ergebnis[-1]["neue_woerter"]
                 ergebnis[-1]["neue_woerter"] = geaendert[:40]
+    # E-200: Nachprüfung einzelner Varianten (`varianten`) – nur deren Teilsummen aus der Nachprüfung, alle übrigen aus der
+    # ersten Freigabe derselben Vorlage (die der Prüfer damals bestätigt hat); Gesamtsumme über die zusammengesetzten Teilsummen
+    erste = {e["id"]: e for e in ergebnis if e["schluessel"] == e["id"]}
+    for e in ergebnis:
+        if e.get("varianten") and e["teile_freigegeben"] and e["id"] in erste:
+            teile = dict(erste[e["id"]]["teile_freigegeben"])
+            teile.update({g: e["teile_freigegeben"][g] for g in e["varianten"] if g in e["teile_freigegeben"]})
+            e["teile_freigegeben"] = teile
+            e["neu_freigegeben"] = hashlib.sha256("\n".join(f"{g}={t}" for g, t in sorted(teile.items())).encode("utf-8")).hexdigest()
+            e["gruppen_geaendert"] = sorted(g for g in set(teile) | set(e["teile_heute"]) if teile.get(g) != e["teile_heute"].get(g))
+            e["unveraendert"] = not e["gruppen_geaendert"]
     json.dump(ergebnis, open(sys.argv[1], "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     for e in ergebnis:
         print(f"{e['schluessel']:32} {e['commit'][:10] if e['commit'] else '-':10} alt ok={e['alt_bestaetigt']!s:5} unverändert={e['unveraendert']!s:5} offen={e['offen_heute']} geändert={','.join(e['gruppen_geaendert']) or '-'}")
@@ -173,7 +186,8 @@ if __name__ == "__main__":
         open(os.path.join(ROOT, "packages/fachlogik/src/dokumente/geprueft-teilsummen.ts"), "w", encoding="utf-8").write(
             "/**\n * Erzeugt von werkzeuge/pruefsummen-abgleich.py --schreiben (E-196) – nicht von Hand ändern. Teilsummen der freigegebenen\n"
             " * Fassung je Variantengruppe (pruefvarianten.ts), gerechnet über die Quellen des Commits, in dem die Freigabe eingetragen\n"
-            " * wurde. Schlüssel: Vorlage, weitere Freigaben mit „#1“ usw.\n */\n"
+            " * wurde. Schlüssel: Vorlage, weitere Freigaben mit „#1“ usw. Nachprüfungen einzelner Varianten (`varianten` in geprueft.ts,\n"
+            " * z. B. „rechnung#1“, E-200): die Teilsummen dieser Varianten aus der Nachprüfung, alle übrigen aus der ersten Freigabe.\n */\n"
             "export const FREIGEGEBENE_TEILSUMMEN: Readonly<Record<string, Readonly<Record<string, string>>>> = {\n" + "\n".join(zeilen) + "\n};\n")
         g = open(os.path.join(ROOT, GEPRUEFT), encoding="utf-8").read()
         for e in ergebnis:

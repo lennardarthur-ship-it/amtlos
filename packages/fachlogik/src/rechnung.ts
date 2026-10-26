@@ -191,6 +191,12 @@ export interface RechnungsDaten {
    * und BT-20 verletzt eine Rechnung mit positivem Zahlbetrag BR-CO-25.
    */
   zahlungsbedingung?: string | null;
+  /**
+   * E-200: Tag der Zahlung einer schon bezahlten Rechnung (am oder vor dem Rechnungsdatum; das PDF sagt „Der
+   * Rechnungsbetrag wurde am … bezahlt.“). In der XRechnung ist dann der ganze Betrag bezahlt (BT-113) und nichts mehr
+   * zu zahlen (BT-115 = 0,00) – passend zum PDF ohne Zahlungsaufforderung.
+   */
+  bezahlt_am?: string | null;
 }
 
 /** Eine abgesetzte Abschlagsrechnung (Schlussrechnung, C-4): Nummer, Datum, Entgelt und Steuer je Steuersatz. */

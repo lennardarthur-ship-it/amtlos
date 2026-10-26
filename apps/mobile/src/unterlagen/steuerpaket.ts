@@ -562,6 +562,122 @@ const csvFeld = (roh: string) => {
   return /[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 export const csv = (kopf: string[], zeilen: string[][]) => "﻿" + [kopf, ...zeilen].map((z) => z.map(csvFeld).join(";")).join("\r\n") + "\r\n";
+
+/**
+ * E-200: Spalte einer Liste mit Beschreibung – dieselbe Definition ergibt die Kopfzeile der CSV-Dateien (Paket für die
+ * Steuerberatung, Daten für die Betriebsprüfung) und die Feldbeschreibung im Export für die Betriebsprüfung.
+ */
+export interface Spalte {
+  name: string;
+  beschreibung: string;
+}
+export const kopfAus = (l: readonly Spalte[]) => l.map((x) => x.name);
+const EURO = "Euro, Tausenderpunkt und Dezimalkomma";
+
+/** Spalten der Rechnungsliste bzw. der Liste der Gutschriften (E-200: auch Feldbeschreibung). */
+export function rechnungsSpalten(o: { gutschriften: boolean; bis: string; datei: boolean }): Spalte[] {
+  return [
+    { name: "Nummer", beschreibung: "Rechnungsnummer, wie auf der Rechnung" },
+    { name: "Datum", beschreibung: "Rechnungsdatum (TT.MM.JJJJ)" },
+    { name: "Leistungsdatum", beschreibung: "Tag der Leistung, wenn ein einzelner Tag angegeben ist" },
+    { name: "Leistungszeitraum", beschreibung: "Leistungszeitraum, wie in der Rechnung eingetragen (leer, wenn er schon als Leistungsdatum dasteht)" },
+    { name: o.gutschriften ? "Leistender (Empfänger der Gutschrift)" : "Kunde", beschreibung: o.gutschriften ? "Name des Leistenden, über dessen Leistung die Gutschrift abrechnet" : "Name des Rechnungsempfängers" },
+    { name: o.gutschriften ? "USt-IdNr. Leistender" : "USt-IdNr. Kunde", beschreibung: "Umsatzsteuer-Identifikationsnummer, falls angegeben" },
+    { name: "Steuerart", beschreibung: "wie in der Rechnung gewählt: Standard, igL (innergemeinschaftliche Lieferung), Reverse Charge (Steuerschuldnerschaft des Leistungsempfängers), befreit, Nullsteuersatz (§ 12 Abs. 3 UStG) oder § 19 (Kleinunternehmer)" },
+    { name: "Netto", beschreibung: `Summe der Entgelte (${EURO}; Stornorechnungen negativ)` },
+    { name: "USt", beschreibung: `Umsatzsteuer (${EURO})` },
+    { name: "Brutto", beschreibung: `Rechnungsbetrag (${EURO}); bei einer Schlussrechnung vor Abzug der Abschläge` },
+    { name: "Steuersätze", beschreibung: "Steuersätze der Positionen" },
+    { name: "Fällig am", beschreibung: "Fälligkeit aus dem Zahlungsziel (leer bei Stornorechnungen)" },
+    { name: "Bezahlt am", beschreibung: "vermerkter Zahlungseingang" },
+    { name: `Offener Betrag zum ${datumDe(o.bis)}`, beschreibung: "an diesem Tag laut Zahlungsvermerken noch offener Betrag (Schlussrechnung: nach Abzug der Abschläge; storniert: 0)" },
+    { name: "Storno zu", beschreibung: "bei Stornorechnungen die Nummer der stornierten Rechnung" },
+    ...(o.datei ? [{ name: "Datei", beschreibung: "Name der PDF-Datei der Rechnung im Ordner Rechnungen/" }] : []),
+  ];
+}
+
+/** Spalten der Belegliste (E-200: auch Feldbeschreibung). */
+export const BELEG_SPALTEN: readonly Spalte[] = [
+  { name: `${MARKE.name}-Belegnr.`, beschreibung: "fortlaufende Belegnummer der App (z. B. B2026-001); bleibt vergeben, auch wenn der Beleg gelöscht oder als ungültig markiert wird" },
+  { name: "Datum", beschreibung: "Belegdatum (TT.MM.JJJJ)" },
+  { name: "Lieferant", beschreibung: "Aussteller des Belegs" },
+  { name: "Belegnummer (Lieferant)", beschreibung: "Rechnungs- bzw. Belegnummer des Lieferanten" },
+  { name: "Belegfeld 1 (DATEV)", beschreibung: "Belegkennung wie im DATEV-Buchungsstapel (Belegnummer des Lieferanten, ohne sie die Belegnummer der App)" },
+  { name: "Kategorie", beschreibung: "Ausgabenkategorie in der App" },
+  { name: "Zeile Anlage EÜR", beschreibung: "Zeile der Anlage EÜR, der die Kategorie in der App zugeordnet ist" },
+  { name: "Konto (DATEV)", beschreibung: "Sachkonto im eingestellten Kontenrahmen" },
+  { name: "Netto", beschreibung: `Nettobetrag (${EURO})` },
+  { name: "USt", beschreibung: `Umsatzsteuer laut Beleg (${EURO})` },
+  { name: "Vorsteuer", beschreibung: `davon als Vorsteuer angesetzt (${EURO})` },
+  { name: "Brutto", beschreibung: `Bruttobetrag (${EURO})` },
+  { name: "Steuersätze", beschreibung: "Steuersätze laut Beleg" },
+  { name: "Zahlung", beschreibung: "Zahlungsweg (z. B. bar, Karte, Überweisung, privat)" },
+  { name: "Zahltag (für EÜR verwendet)", beschreibung: "Tag der Zahlung; fehlt er, steht das Belegdatum mit Vermerk" },
+  { name: "Datei", beschreibung: "Name bzw. Pfad der Originaldatei (Foto, PDF, E-Rechnung)" },
+  { name: "Notiz", beschreibung: "Notiz zum Beleg" },
+  { name: "Steuerschuldnerschaft", beschreibung: "Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG) mit Art und Steuerbetrag, falls angegeben" },
+  { name: "Im Buchungsstapel", beschreibung: "ob der Beleg in den DATEV-Buchungsstapel der App geht" },
+  { name: "Erfasst am", beschreibung: "Zeitpunkt der Erfassung in der App (TT.MM.JJJJ, HH:MM, deutsche Zeit)" },
+  { name: "Festgeschrieben am", beschreibung: "Zeitpunkt der Festschreibung (danach Änderungen nur mit Grund)" },
+  { name: "Änderungen (siehe Änderungsprotokoll)", beschreibung: "Anzahl früherer Fassungen; ihr Inhalt steht im Änderungsprotokoll" },
+  { name: "Vorsteuerabzug", beschreibung: "voll, keine oder anteilig (mit Anteil bzw. abziehbarem Betrag)" },
+];
+
+/** Spalten der Liste der Kassenabschlüsse (E-200: auch Feldbeschreibung). */
+export const KASSEN_SPALTEN: readonly Spalte[] = [
+  { name: "Datum", beschreibung: "Geschäftstag (TT.MM.JJJJ)" },
+  { name: "Standort/Kasse", beschreibung: "Betriebsstätte und Bezeichnung der Kasse" },
+  { name: "Z-Bon", beschreibung: "Nummer des Tagesabschlusses (Z-Bon) bzw. „geschlossen“" },
+  { name: "Umsatz 19 % brutto", beschreibung: `Umsatz zum Steuersatz 19 % (${EURO})` },
+  { name: "Umsatz 7 % brutto", beschreibung: `Umsatz zum Steuersatz 7 % (${EURO})` },
+  { name: "Umsatz 0 % brutto", beschreibung: `Umsatz zu 0 % (${EURO})` },
+  { name: "Karte (mit Trinkgeld)", beschreibung: `Kartenzahlungen einschließlich Kartentrinkgeld (${EURO})` },
+  { name: "davon Kartentrinkgeld (an Personal bar ausgezahlt)", beschreibung: `per Karte gezahltes, bar an das Personal ausgezahltes Trinkgeld (${EURO})` },
+  { name: "App", beschreibung: `Zahlungen per App (${EURO})` },
+  { name: "Auf Rechnung", beschreibung: `Umsatz auf Rechnung (${EURO})` },
+  { name: "Gutscheine", beschreibung: "Verkauf und Einlösung von Gutscheinen (Art, Steuersatz, Betrag)" },
+  { name: "Sonstige Zahlungsarten (ältere Daten)", beschreibung: `sonstige Zahlungsarten aus älteren App-Versionen (${EURO})` },
+  { name: "Bar (Umsatz)", beschreibung: `Barumsatz (${EURO})` },
+  { name: "Bar auf Rechnungen (kein Umsatz)", beschreibung: `bar kassierte Rechnungen – kein Umsatz des Tags (${EURO})` },
+  { name: "Rechnungsnummern", beschreibung: "Nummern der bar kassierten Rechnungen" },
+  { name: "Privatentnahme", beschreibung: `Privatentnahmen aus der Kasse (${EURO})` },
+  { name: "Privateinlage", beschreibung: `Privateinlagen in die Kasse (${EURO})` },
+  { name: "Geldtransit zur Bank", beschreibung: `Einzahlungen zur Bank (${EURO})` },
+  { name: "Eigenbelege", beschreibung: "Nummern der Eigenbelege zu diesen Bewegungen" },
+  { name: "Anfangsbestand", beschreibung: `Bargeldbestand zu Beginn des Tags (${EURO}; beim ersten Abschluss des Tags)` },
+  { name: "Barausgaben (Belege)", beschreibung: `bar bezahlte Belege des Tags (${EURO})` },
+  { name: "Bestand rechnerisch", beschreibung: `rechnerischer Bargeldbestand am Ende des Tags (${EURO}; beim letzten Abschluss des Tags)` },
+  { name: "Bestand gezählt", beschreibung: `gezählter Bargeldbestand, falls gezählt (${EURO})` },
+  { name: "Differenz", beschreibung: `Differenz zwischen gezähltem und rechnerischem Bestand (${EURO})` },
+  { name: "Art", beschreibung: "„Kassenbericht (retrograd)“, wenn statt eines Z-Bons ein Kassenbericht erfasst ist" },
+  { name: "TSE/Bediener", beschreibung: "Seriennummer der TSE, Transaktionsnummern und Bediener, falls angegeben" },
+  { name: "Erfasst am", beschreibung: "Zeitpunkt der Erfassung in der App (TT.MM.JJJJ, HH:MM, deutsche Zeit)" },
+  { name: "Festgeschrieben am", beschreibung: "Zeitpunkt der Festschreibung" },
+  { name: "Nacherfasst", beschreibung: "Nacherfassung mit Anzahl der Tage nach dem Geschäftstag und Grund" },
+  { name: "Korrigiert (Anzahl)", beschreibung: "Anzahl der Korrekturen" },
+  { name: "Korrekturen (Zeitpunkt: Grund)", beschreibung: "Zeitpunkt und Grund jeder Korrektur; die Werte davor stehen im Änderungsprotokoll" },
+];
+
+/** Spalten des Änderungsprotokolls (E-200: auch Feldbeschreibung). */
+export const PROTOKOLL_SPALTEN: readonly Spalte[] = [
+  { name: "Zeitpunkt", beschreibung: "Zeitpunkt des Vorgangs (TT.MM.JJJJ, HH:MM, deutsche Zeit)" },
+  { name: "Bereich", beschreibung: "Beleg, Kasse, Sachentnahme oder Rechnung" },
+  { name: "Beleg/Tag", beschreibung: "Belegnummer, Lieferant und Datum, Geschäftstag bzw. Rechnungsnummer" },
+  { name: "Vorgang", beschreibung: "Art des Vorgangs (geändert, korrigiert, gelöscht, als ungültig markiert, nacherfasst, Entwurf nach dem Teilen gelöscht)" },
+  { name: "Grund bzw. Inhalt", beschreibung: "Grund und die Werte bis zur Änderung" },
+];
+
+/** Spalten der Liste der ungültig markierten Belege (E-200: auch Feldbeschreibung). */
+export const UNGUELTIG_SPALTEN: readonly Spalte[] = [
+  { name: `${MARKE.name}-Belegnr.`, beschreibung: "Belegnummer der App" },
+  { name: "Datum", beschreibung: "Belegdatum (TT.MM.JJJJ)" },
+  { name: "Lieferant", beschreibung: "Aussteller des Belegs" },
+  { name: "Brutto", beschreibung: `Bruttobetrag (${EURO})` },
+  { name: "Ungültig seit", beschreibung: "Zeitpunkt, zu dem der Beleg als ungültig markiert wurde" },
+  { name: "Grund", beschreibung: "Grund der Markierung" },
+  { name: "Datei vorhanden", beschreibung: "ob eine Originaldatei vorliegt" },
+];
+
 /** Teil eines Dateinamens im Paket: Umlaute umgeschrieben („Söhne“ → „Soehne“), höchstens 60 Zeichen */
 const sicher = (s: string) => dateinamenTeil(s, 60, "._-") || "ohne-name";
 /** Nummern wie „2026-002“ und „2026-010“ in natürlicher Reihenfolge */
@@ -671,24 +787,7 @@ export function rechnungenCsv(s: Stand, z: Zeitraum, gutschriften = false, pdfs?
     });
   if (zeilen.length) summenZeilen.push(summenZeile("Summe gesamt", "", gesamt, betrag(offenGesamt)));
   return csv(
-    [
-      "Nummer",
-      "Datum",
-      "Leistungsdatum",
-      "Leistungszeitraum",
-      gutschriften ? "Leistender (Empfänger der Gutschrift)" : "Kunde",
-      gutschriften ? "USt-IdNr. Leistender" : "USt-IdNr. Kunde",
-      "Steuerart",
-      "Netto",
-      "USt",
-      "Brutto",
-      "Steuersätze",
-      "Fällig am",
-      "Bezahlt am",
-      `Offener Betrag zum ${datumDe(z.bis)}`,
-      "Storno zu",
-      ...(pdfs ? ["Datei"] : []),
-    ],
+    kopfAus(rechnungsSpalten({ gutschriften, bis: z.bis, datei: Boolean(pdfs) })),
     [...zeilen, ...summenZeilen],
   );
 }
@@ -760,7 +859,7 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
   });
   const summenZeile = ["Summe", "", "", "", "", "", "", "", betrag(summe.netto), betrag(summe.ust), betrag(summe.vorsteuer), betrag(summe.brutto), "", "", "", "", "", "", "", "", "", "", ""];
   return csv(
-    [`${MARKE.name}-Belegnr.`, "Datum", "Lieferant", "Belegnummer (Lieferant)", "Belegfeld 1 (DATEV)", "Kategorie", "Zeile Anlage EÜR", "Konto (DATEV)", "Netto", "USt", "Vorsteuer", "Brutto", "Steuersätze", "Zahlung", "Zahltag (für EÜR verwendet)", "Datei", "Notiz", "Steuerschuldnerschaft", "Im Buchungsstapel", "Erfasst am", "Festgeschrieben am", "Änderungen (siehe Änderungsprotokoll)", "Vorsteuerabzug"],
+    kopfAus(BELEG_SPALTEN),
     zeilen.length ? [...zeilen, summenZeile] : [],
   );
 }
@@ -835,7 +934,7 @@ export function kassenCsv(s: Stand, z: Zeitraum): string {
     });
   const sz = ["Summe", "", "", betrag(summe.b19), betrag(summe.b7), betrag(summe.b0), betrag(summe.karte), betrag(summe.trinkgeld), betrag(summe.app), betrag(summe.aufrechnung), `Saldo ${betrag(summe.gs)}`, betrag(summe.sonstige), betrag(summe.bar), betrag(summe.rechnungen), "", betrag(summe.entnahmen), betrag(summe.einlagen), betrag(summe.transit), "", "", betrag(summe.ausgaben), "", "", "", "", "", "", "", "", "", ""];
   return csv(
-    ["Datum", "Standort/Kasse", "Z-Bon", "Umsatz 19 % brutto", "Umsatz 7 % brutto", "Umsatz 0 % brutto", "Karte (mit Trinkgeld)", "davon Kartentrinkgeld (an Personal bar ausgezahlt)", "App", "Auf Rechnung", "Gutscheine", "Sonstige Zahlungsarten (ältere Daten)", "Bar (Umsatz)", "Bar auf Rechnungen (kein Umsatz)", "Rechnungsnummern", "Privatentnahme", "Privateinlage", "Geldtransit zur Bank", "Eigenbelege", "Anfangsbestand", "Barausgaben (Belege)", "Bestand rechnerisch", "Bestand gezählt", "Differenz", "Art", "TSE/Bediener", "Erfasst am", "Festgeschrieben am", "Nacherfasst", "Korrigiert (Anzahl)", "Korrekturen (Zeitpunkt: Grund)"],
+    kopfAus(KASSEN_SPALTEN),
     zeilen.length ? [...zeilen, sz] : [],
   );
 }
@@ -858,12 +957,14 @@ export function aenderungsprotokoll(s: Stand, z: Zeitraum): string[][] {
     const n = nacherfasstTage(k.datum, k.erstellt);
     if (n) zeilen.push({ t: k.erstellt, z: [zeitDe(k.erstellt), "Kasse", `${datumDe(k.datum)}${k.zbon ? ` Z ${k.zbon}` : ""}`, `nacherfasst (${n} Tage nach dem Geschäftstag)`, k.nacherfasst_grund ?? ""] });
   }
-  const artText: Record<ProtokollEintrag["art"], [string, string]> = { beleg_geloescht: ["Beleg", "endgültig gelöscht"], beleg_ungueltig: ["Beleg", "als ungültig markiert"], beleg_korrigiert: ["Beleg", "Korrektur nach der Festschreibung"], sachentnahme_geloescht: ["Sachentnahme", "gelöscht"] };
+  // E-200: nach dem Teilen gelöschter, nicht als verschickt bestätigter Entwurf – Nummer bleibt vergeben (Lücke)
+  const artText: Record<ProtokollEintrag["art"], [string, string]> = { beleg_geloescht: ["Beleg", "endgültig gelöscht"], beleg_ungueltig: ["Beleg", "als ungültig markiert"], beleg_korrigiert: ["Beleg", "Korrektur nach der Festschreibung"], sachentnahme_geloescht: ["Sachentnahme", "gelöscht"], entwurf_geloescht: ["Rechnung", "Entwurf nach dem Teilen gelöscht (Nummer bleibt vergeben)"] };
   for (const p of s.protokoll) {
     if (p.zeitpunkt.slice(0, 10) < z.von || p.zeitpunkt.slice(0, 10) > tagNach(z.bis, 400)) continue;
     // Korrekturen stehen schon mit der früheren Fassung oben
     if (p.art === "beleg_korrigiert") continue;
-    zeilen.push({ t: p.zeitpunkt, z: [zeitDe(p.zeitpunkt), artText[p.art][0], p.nr ?? p.bezug, artText[p.art][1], p.text] });
+    const bereich = p.art === "entwurf_geloescht" && p.vorlage && p.vorlage !== "rechnung" ? (vorlageFuer(p.vorlage)?.titel ?? p.vorlage) : artText[p.art][0];
+    zeilen.push({ t: p.zeitpunkt, z: [zeitDe(p.zeitpunkt), bereich, p.nr ?? p.bezug, artText[p.art][1], p.text] });
   }
   return zeilen.sort((a, b) => a.t.localeCompare(b.t)).map((x) => x.z);
 }
@@ -1240,9 +1341,9 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   if (kasseImZeitraum.length) inhalt[`Kassenabschluesse_${z.name}.csv`] = utf8(kassenCsv(s, z));
   // R12 GoBD: Änderungsprotokoll (Belege, Kasse, Löschungen) und ungültig markierte Belege mit Grund
   const protokollZeilen = aenderungsprotokoll(s, z);
-  if (protokollZeilen.length) inhalt[`Aenderungsprotokoll_${z.name}.csv`] = utf8(csv(["Zeitpunkt", "Bereich", "Beleg/Tag", "Vorgang", "Grund bzw. Inhalt"], protokollZeilen));
+  if (protokollZeilen.length) inhalt[`Aenderungsprotokoll_${z.name}.csv`] = utf8(csv(kopfAus(PROTOKOLL_SPALTEN), protokollZeilen));
   const ungueltig = s.belegArchiv.filter((b) => imZeitraum(b.datum, z));
-  if (ungueltig.length) inhalt[`Belege_ungueltig_${z.name}.csv`] = utf8(csv([`${MARKE.name}-Belegnr.`, "Datum", "Lieferant", "Brutto", "Ungültig seit", "Grund", "Datei vorhanden"], ungueltig.map((b) => [nummern.get(b.id) ?? "", datumDe(b.datum), b.lieferant, betrag(belegSummen(b).brutto_cent), b.ungueltig ? zeitDe(b.ungueltig) : "", b.ungueltig_grund ?? "", b.datei ? "ja (beim Betrieb)" : "nein"])));
+  if (ungueltig.length) inhalt[`Belege_ungueltig_${z.name}.csv`] = utf8(csv(kopfAus(UNGUELTIG_SPALTEN), ungueltig.map((b) => [nummern.get(b.id) ?? "", datumDe(b.datum), b.lieferant, betrag(belegSummen(b).brutto_cent), b.ungueltig ? zeitDe(b.ungueltig) : "", b.ungueltig_grund ?? "", b.datei ? "ja (beim Betrieb)" : "nein"])));
   const se = sachentnahmenFuer(s.sachentnahmen, z.von, z.bis);
   const skontoZm = gestellteRechnungen(s).filter((u) => (u.zahlungen ?? []).some((x) => x.minderung_cent && imZeitraum(x.datum, z)) && zmBetroffen(rechnungFuerBuchung(u, s.betrieb)));
   // „Wichtig“: an fester Stelle direkt nach den Mandantendaten, jeder Punkt nur einmal (R10)

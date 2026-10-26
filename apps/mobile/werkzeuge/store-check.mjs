@@ -190,9 +190,21 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
   for (const m of geprueft.matchAll(/^ {2}(\w+): \{ stand: "[\d-]+", rolle: "\w+", bestaetigt_am: ("[\d-]+"|null)/gm)) freigaben.push([m[1], m[2]]);
   for (const m of geprueft.matchAll(/^ {2}(\w+): \{[^\n]*\n(?: {4}[^\n]*\n)*? {4}weitere: \[\{ stand: "[\d-]+", rolle: "\w+", bestaetigt_am: ("[\d-]+"|null)/gm)) freigaben.push([`${m[1]}#1`, m[2]]);
   const ohneBestaetigung = freigaben.filter(([, u]) => u === "null").map(([k]) => k);
-  const geaendert = freigaben.filter(([k, u]) => u !== "null" && (!frei[k] || !heute[k] || Object.keys(frei[k]).some((g) => frei[k][g] !== heute[k][g])));
-  const gruppen = [...new Set(geaendert.flatMap(([k]) => Object.keys(frei[k] ?? {}).filter((g) => frei[k][g] !== heute[k]?.[g]).map((g) => `${k}: ${g}`)))].sort();
-  pruefe(freigaben.length > 0 && !ohneBestaetigung.length && !geaendert.length, `Vorlagen: heutige Fassung schriftlich bestätigt (E-197, Nachweis ohne Mail im Projekt, E-198)${ohneBestaetigung.length || geaendert.length ? ` – ${ohneBestaetigung.length} von ${freigaben.length} Freigaben ohne Bestätigung; ${geaendert.length} ohne Vermerk in seit der Bestätigung geänderten Varianten (${gruppen.join(", ") || "–"}) (Nachprüfliste, PRUEFLISTE T-204)` : ""}`);
+  // E-200: eine Variante gilt als bestätigt, wenn irgendeine bestätigte Freigabe derselben Vorlage (auch eine Nachprüfung
+  // einzelner Varianten, „#1“) für sie die heutige Teilsumme hat
+  const bestaetigt = freigaben.filter(([, u]) => u !== "null").map(([k]) => k);
+  const offenJe = new Map();
+  for (const k of bestaetigt) {
+    const id = k.split("#")[0];
+    for (const g of Object.keys(heute[k] ?? frei[k] ?? {})) {
+      const ok = bestaetigt.some((x) => x.split("#")[0] === id && frei[x]?.[g] !== undefined && frei[x][g] === heute[x]?.[g]);
+      if (!ok) offenJe.set(id, new Set([...(offenJe.get(id) ?? []), g]));
+    }
+    if (!frei[k] || !heute[k]) offenJe.set(id, new Set([...(offenJe.get(id) ?? []), "(ohne Teilsummen)"]));
+  }
+  const geaendert = [...offenJe.keys()];
+  const gruppen = [...offenJe].flatMap(([id, g]) => [...g].map((x) => `${id}: ${x}`)).sort();
+  pruefe(freigaben.length > 0 && !ohneBestaetigung.length && !geaendert.length, `Vorlagen: heutige Fassung schriftlich bestätigt (E-197, Nachweis ohne Mail im Projekt, E-198)${ohneBestaetigung.length || geaendert.length ? ` – ${ohneBestaetigung.length} von ${freigaben.length} Freigaben ohne Bestätigung; ${geaendert.length} ${geaendert.length === 1 ? "Vorlage" : "Vorlagen"} ohne Vermerk in seit der Bestätigung geänderten Varianten (${gruppen.join(", ") || "–"}) (Nachprüfliste, PRUEFLISTE T-204)` : ""}`);
   // E-201: Vermerk auf Bitte des Prüfers ausgesetzt (Bestätigung der neu gerechneten Prüfsumme ausstehend)
   const ausgesetzt = [...geprueft.matchAll(/^ {2}(\w+): \{ stand:[^\n]*vermerk_ausgesetzt: "/gm)].map((m) => m[1]);
   pruefe(!ausgesetzt.length, `Vorlagen: kein Vermerk ausgesetzt (E-201)${ausgesetzt.length ? ` – ${ausgesetzt.length} Freigaben ohne Vermerk, bis der Prüfer die neu gerechnete Prüfsumme bestätigt (${ausgesetzt.join(", ")}; PRUEFLISTE T-216)` : ""}`);

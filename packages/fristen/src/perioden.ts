@@ -63,6 +63,20 @@ export interface Termin {
   verlaengert?: Datum;
   faellig_am: Datum;
   uebersprungen: VerschiebungsErgebnis["uebersprungen"];
+  /**
+   * E-200: Tag, an dessen Beginn (0 Uhr) die Meldung vorliegen muss – beim Beitragsnachweis der fünftletzte
+   * Bankarbeitstag aus den Tabellen der Einzugsstellen. `faellig_am` ist dann der Kalendertag davor („spätestens am …
+   * übermitteln“). Nur bei `n_letzter_bankarbeitstag` mit `arbeitstage_vorher`.
+   */
+  eingang_am?: Datum;
+}
+
+/**
+ * E-200: Regel „Eingang um 0 Uhr“ – Fälligkeiten nach dem n-letzten Bankarbeitstag mit Arbeitstagen vorher (§ 28f Abs. 3
+ * SGB IV, Beitragsnachweis) müssen zu Beginn dieses Tags vorliegen; übermitteln heißt also spätestens am Kalendertag davor.
+ */
+export function eingangUmNullUhr(regel: FaelligkeitsRegel): boolean {
+  return regel.art === "n_letzter_bankarbeitstag" && (regel.arbeitstage_vorher ?? 0) > 0;
 }
 
 /** Rohtermin für eine Periode nach den Regeln 'tag_nach_periodenende' bzw. 'n_letzter_bankarbeitstag'. */
@@ -109,8 +123,11 @@ export function wiederkehrendeTermine(f: WiederkehrendeFrist, von: Datum, bis: D
   const nimm = (periode: string, roh: Datum) => {
     const verlaengert = f.verlaengerung ? plusDauer(roh, f.verlaengerung) : undefined;
     const v = verschiebe(verlaengert ?? roh, f.verschiebung, ort, kal);
-    if (vergleiche(v.datum, von) >= 0 && vergleiche(v.datum, bis) <= 0) {
-      termine.push({ periode, roh, ...(verlaengert ? { verlaengert } : {}), faellig_am: v.datum, uebersprungen: v.uebersprungen });
+    // E-200: Eingang um 0 Uhr – der Termin ist der Kalendertag davor
+    const vortag = eingangUmNullUhr(f.faellig);
+    const faellig = vortag ? plusTage(v.datum, -1) : v.datum;
+    if (vergleiche(faellig, von) >= 0 && vergleiche(faellig, bis) <= 0) {
+      termine.push({ periode, roh, ...(verlaengert ? { verlaengert } : {}), faellig_am: faellig, uebersprungen: v.uebersprungen, ...(vortag ? { eingang_am: v.datum } : {}) });
     }
   };
 

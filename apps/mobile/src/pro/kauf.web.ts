@@ -13,6 +13,13 @@ export interface Angebot {
   test: string | null;
 }
 export const proAktiv = async () => false;
+/** E-200: kein Store im Web – kein Abo-Stand */
+export interface AboStand {
+  aktiv: boolean;
+  verlaengert: boolean;
+  endetAm: string | null;
+}
+export const aboStand = async (): Promise<AboStand | null> => null;
 export const angebote = async (): Promise<Angebot[]> => [];
 export const kaufen = async (_id: string) => false;
 export const wiederherstellen = async () => false;

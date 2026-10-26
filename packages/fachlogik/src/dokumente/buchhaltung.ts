@@ -15,7 +15,7 @@ import { STEUERART_NULLSATZ } from "../steuerart.js";
 import { KUNDEN_ARTEN } from "./kundenarten.js";
 import { formImNamen, istKapitalgesellschaft } from "./betrieb.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
-import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, istCoKg, komplementaerZeile, absatz, angaben, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, steuerHinweis, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, istCoKg, komplementaerZeile, CO_KG_GESCHAEFTSFUEHRER, absatz, angaben, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, steuerHinweis, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 import { MARKE } from "@amtlos/marke";
 
@@ -226,12 +226,12 @@ export function gmbhAngabenFehlen(b: Betrieb): string[] {
 
 /**
  * E-193 (8a): Angaben auf Geschäftsbriefen einer GmbH & Co. KG bzw. UG (haftungsbeschränkt) & Co. KG: die der KG selbst
- * (Rechtsform, Sitz, Registergericht, Registernummer – § 125a Abs. 1 Satz 1, § 177a HGB) und, weil keine natürliche
+ * (Rechtsform, Sitz, Registergericht, Registernummer – § 125 Abs. 1 Satz 1, § 177a HGB) und, weil keine natürliche
  * Person persönlich haftet, die Firma der Komplementärin mit den Angaben nach § 35a GmbHG (Rechtsform, Sitz,
- * Registergericht, Registernummer, alle Geschäftsführer – § 125a Abs. 1 Satz 2 HGB). Zusatz „(Mein Betrieb, §§ 125a, 177a
+ * Registergericht, Registernummer, alle Geschäftsführer – § 125 Abs. 1 Satz 2 HGB). Zusatz „(Mein Betrieb, §§ 125, 177a
  * HGB)“, damit die App gleich die Gesellschaftsangaben öffnet.
  */
-export const KG_ANGABEN = "§§ 125a, 177a HGB";
+export const KG_ANGABEN = "§§ 125, 177a HGB";
 export const KG_REGISTERGERICHT = `Registergericht der KG (Mein Betrieb, ${KG_ANGABEN})`;
 export const KG_REGISTERNUMMER = `Registernummer der KG, z. B. HRA 12345 (Mein Betrieb, ${KG_ANGABEN})`;
 export const KG_SITZ = `Ort des Betriebs als Sitz der KG (Mein Betrieb, ${KG_ANGABEN})`;
@@ -360,6 +360,15 @@ const stornoSchlussD = (d: Daten) => ja(d, "schluss") && !!text(d, "storno_zu") 
  * Stornorechnung einer Schlussrechnung (E-193) mit umgekehrtem Vorzeichen wie ihre Positionen – das Storno hebt nur den
  * Rest auf, die Abschlagsrechnungen bleiben bestehen.
  */
+/**
+ * E-200: Satz auf dem Storno einer Schlussrechnung – storniert wird nur der mit der Schlussrechnung abgerechnete Rest, die
+ * Abschlagsrechnungen (Nummer, Datum, Betrag brutto) bleiben bestehen.
+ */
+export function stornoSchlussSatz(schlussNummer: string, ab: Abschlag[]): string {
+  const liste = ab.map((a) => `Nr. ${a.nummer}${a.datum ? ` vom ${datumDe(a.datum)}` : ""} über ${euro(-(a.netto_cent + a.ust_cent))}`);
+  const und = liste.length > 1 ? `${liste.slice(0, -1).join(", ")} und ${liste.at(-1)}` : (liste[0] ?? "");
+  return `Storniert wird nur der Restbetrag der Schlussrechnung Nr. ${schlussNummer}. ${liste.length > 1 ? "Die Abschlagsrechnungen" : "Die Abschlagsrechnung"} ${und} ${liste.length > 1 ? "bleiben" : "bleibt"} bestehen.`;
+}
 export function abschlaegeAus(d: Daten): Abschlag[] {
   if (stornoSchlussD(d)) return abschlaegeListe(d).map((a) => ({ ...a, netto_cent: 0 - a.netto_cent, ust_cent: 0 - a.ust_cent }));
   if (!schlussD(d)) return [];
@@ -549,6 +558,8 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     // E-193 (5): „Sofort“ – fällig am Rechnungsdatum (BT-9), dazu der Satz vom PDF als Zahlungsbedingung (BT-20, unten)
     faellig_am: datum && ziel === "sofort" ? (storno ? null : datum) : datum && ziel ? faelligAm(datum, Number(ziel), b.bundesland) || null : null,
     ...(zahlungsbedingung ? { zahlungsbedingung } : {}),
+    // E-200: schon bezahlt – in der XRechnung bezahlter Betrag (BT-113) = Rechnungsbetrag, Zahlbetrag (BT-115) = 0,00
+    ...(schonBezahlt ? { bezahlt_am: bezahltVorher } : {}),
     steller: { name: b.name.trim(), strasse: b.strasse.trim(), plz: b.plz.trim(), ort: b.ort.trim(), land: "DE", email: b.email.trim(), telefon: b.telefon.trim() || null, steuernummer: b.steuernummer.trim() || null, ust_idnr: b.ust_idnr.trim() || null, iban: b.iban.trim() || null, ...registerAngaben(b) },
     // Leitweg-ID bzw. Käuferreferenz (BT-10), ohne sie wie bisher die Rechnungsnummer
     kunde: {
@@ -603,8 +614,8 @@ function registerAngaben(b: Betrieb): { register?: string; rechtliches?: string 
   const nr = (b.registernummer ?? "").trim();
   if (!nr) return {};
   const form = (formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name) ?? (b.rechtsform ?? "").trim()) || "";
-  // E-193 (8a): GmbH & Co. KG – mit der Komplementärin und ihren Angaben (§§ 125a, 177a HGB), vor ihrer Geschäftsführung
-  const teile = [form, b.ort.trim() ? `Sitz ${b.ort.trim()}` : "", [(b.registergericht ?? "").trim(), nr].filter(Boolean).join(" "), komplementaerZeile(b), (b.vertretung ?? "").trim() ? `Geschäftsführung: ${(b.vertretung ?? "").trim().replace(/\s*\n\s*/g, ", ")}` : ""].filter(Boolean);
+  // E-193 (8a): GmbH & Co. KG – mit der Komplementärin und ihren Angaben (§§ 125, 177a HGB), vor ihren Geschäftsführern (E-200: „Geschäftsführer der Komplementärin“)
+  const teile = [form, b.ort.trim() ? `Sitz ${b.ort.trim()}` : "", [(b.registergericht ?? "").trim(), nr].filter(Boolean).join(" "), komplementaerZeile(b), (b.vertretung ?? "").trim() ? `${istCoKg(b) ? CO_KG_GESCHAEFTSFUEHRER : "Geschäftsführung"}: ${(b.vertretung ?? "").trim().replace(/\s*\n\s*/g, ", ")}` : ""].filter(Boolean);
   return { register: nr, rechtliches: teile.join(", ") };
 }
 
@@ -792,7 +803,7 @@ export const rechnung: Vorlage = {
     } else if (!b.steuernummer.trim() && !b.ust_idnr.trim()) f.push("Steuernummer oder USt-IdNr. (Mein Betrieb)");
     // R12 (Kfz #6): GmbH bzw. UG ohne Registerangaben – Pflicht auf jedem Geschäftsbrief (§ 35a GmbHG)
     f.push(...gmbhAngabenFehlen(b));
-    // E-193 (8a): GmbH & Co. KG – Angaben der KG und der Komplementärin (§§ 125a, 177a HGB)
+    // E-193 (8a): GmbH & Co. KG – Angaben der KG und der Komplementärin (§§ 125, 177a HGB)
     f.push(...komplementaerAngabenFehlen(b));
     // Anschrift des Empfängers: PLZ und Ort in der letzten Zeile (im Ausland: Land in der Zeile danach – dort keine Prüfung)
     const anschrift_ = text(d, "kunde_anschrift");
@@ -884,7 +895,8 @@ export const rechnung: Vorlage = {
     // Kleinunternehmer: ohne Umsatzsteuer gibt es kein „Netto“ (R10, Befund Freiberuf)
     const ab = abschlagsSumme(abschlaegeAus(d));
     const basis: [string, string][] = ku ? [["Rechnungsbetrag", euro(s.brutto_cent)]] : [["Netto", euro(s.netto_cent)], ["Umsatzsteuer", euro(s.ust_cent)], ["Rechnungsbetrag", euro(s.brutto_cent)]];
-    // C-4: Schlussrechnung – abgesetzte Abschläge und Rest
+    // C-4: Schlussrechnung – abgesetzte Abschläge und Rest; E-200: beim Storno gespiegelt (die Abschläge bleiben bestehen)
+    if (ab.brutto_cent && stornoSchlussD(d)) return [...basis, ["zuzüglich Abschläge (bleiben bestehen)", euro(-ab.brutto_cent)], ["Stornobetrag", euro(s.brutto_cent - ab.brutto_cent)]];
     return ab.brutto_cent ? [...basis, ["abzüglich Abschläge", euro(-ab.brutto_cent)], ["Noch zu zahlen", euro(s.brutto_cent - ab.brutto_cent)]] : basis;
   },
   html(d, b) {
@@ -901,6 +913,8 @@ export const rechnung: Vorlage = {
     const ab = abschlaegeAus(d);
     const abSumme = abschlagsSumme(ab);
     const zuZahlen = s.brutto_cent - abSumme.brutto_cent;
+    // E-200: Storno einer Schlussrechnung – nur der Rest wird storniert, die Abschlagsrechnungen bleiben bestehen
+    const stornoSchluss = stornoSchlussD(d) && ab.length > 0;
     const zeilenHtml = pos.map(({ e, p }, i) => [
       String(i + 1),
       zelle(p.bezeichnung),
@@ -925,15 +939,17 @@ export const rechnung: Vorlage = {
       ab.length
         ? `<tr><td>Gesamtbetrag der Leistung</td><td>${betrag(s.brutto_cent)}</td></tr>`
         : `<tr class="gesamt"><td>${gutschrift ? "Gutschriftsbetrag" : !ku && !leer && kleinbetrag(d) && s.gruppen.length === 1 && (s.gruppen[0]!.satz ?? 0) > 0 ? `Rechnungsbetrag inkl. ${s.gruppen[0]!.satz} % USt` : "Rechnungsbetrag"}</td><td>${betrag(s.brutto_cent)}</td></tr>`,
-      // C-4: Schlussrechnung – je Abschlag Entgelt und Umsatzsteuer getrennt absetzen (§ 14 Abs. 5 Satz 2 UStG)
+      // C-4: Schlussrechnung – je Abschlag Entgelt und Umsatzsteuer getrennt absetzen (§ 14 Abs. 5 Satz 2 UStG).
+      // E-200: Beim Storno einer Schlussrechnung stehen die Abschläge mit gespiegeltem Vorzeichen da („zuzüglich … bleibt
+      // bestehen“, positiver Betrag), damit jede Zeile so gerechnet wird, wie sie dasteht: −11.900 + 6.000 + 1.140 = −4.760.
       ...ab.flatMap((a) => [
-        `<tr><td>abzüglich Abschlagsrechnung Nr. ${esc(a.nummer)}${a.datum ? ` vom ${datumDe(a.datum)}` : ""}: Entgelt</td><td>${euro(-a.netto_cent)}</td></tr>`,
-        ...(ku ? [] : [`<tr><td>abzüglich darauf entfallende Umsatzsteuer${a.satz !== null ? ` ${a.satz} %` : ""}</td><td>${euro(-a.ust_cent)}</td></tr>`]),
+        `<tr><td>${stornoSchluss ? "zuzüglich" : "abzüglich"} Abschlagsrechnung Nr. ${esc(a.nummer)}${a.datum ? ` vom ${datumDe(a.datum)}` : ""}${stornoSchluss ? " (bleibt bestehen)" : ""}: Entgelt</td><td>${euro(-a.netto_cent)}</td></tr>`,
+        ...(ku ? [] : [`<tr><td>${stornoSchluss ? "zuzüglich" : "abzüglich"} darauf entfallende Umsatzsteuer${a.satz !== null ? ` ${a.satz} %` : ""}</td><td>${euro(-a.ust_cent)}</td></tr>`]),
       ]),
       ...(ab.length
         ? [
-            ...(ku ? [] : [`<tr><td>Verbleibendes Entgelt ${euro(s.netto_cent - abSumme.netto_cent)}, darauf Umsatzsteuer</td><td>${euro(s.ust_cent - abSumme.ust_cent)}</td></tr>`]),
-            `<tr class="gesamt"><td>Noch zu zahlen</td><td>${euro(zuZahlen)}</td></tr>`,
+            ...(ku ? [] : [`<tr><td>${stornoSchluss ? "Storniertes" : "Verbleibendes"} Entgelt ${euro(s.netto_cent - abSumme.netto_cent)}, darauf Umsatzsteuer</td><td>${euro(s.ust_cent - abSumme.ust_cent)}</td></tr>`]),
+            `<tr class="gesamt"><td>${stornoSchluss ? "Stornobetrag" : "Noch zu zahlen"}</td><td>${euro(zuZahlen)}</td></tr>`,
           ]
         : []),
     ].join("");
@@ -959,6 +975,8 @@ export const rechnung: Vorlage = {
       // ein kurzer Befreiungshinweis steht schon in der Summenzeile
       befreiungInSumme(befreiung) && !ku ? "" : befreiung,
       schonBezahlt ? `Der Rechnungsbetrag wurde am ${datumDe(bezahltAm)} bezahlt.` : "",
+      // E-200: Storno einer Schlussrechnung – was storniert wird und was bestehen bleibt, in einem Satz
+      stornoSchluss ? stornoSchlussSatz(storno, ab) : "",
     ].filter((x) => x.trim());
     // R12: Skonto als Bedingung im Zahlungsblock (§ 14 Abs. 4 Satz 1 Nr. 7 UStG) – der GiroCode bleibt beim vollen Betrag
     const sk = zahlbar && !leer && zuZahlen > 0 ? skontoFuer(d, b.bundesland) : null;

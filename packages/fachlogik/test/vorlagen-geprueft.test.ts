@@ -61,7 +61,7 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
       expect(Object.keys(PRUEF_ROLLEN), id).toContain(f.rolle);
       expect(f.pruefsumme, id).toMatch(/^[0-9a-f]{64}$/);
       expect(f.pruefsumme_alt, id).toMatch(/^[0-9a-f]{64}$/);
-      expect(["2026-10-23", "2026-10-24", "2026-10-25"]).toContain(f.stand);
+      expect(["2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26"]).toContain(f.stand);
       // nie ein Name im Register der App
       expect(nenntName(JSON.stringify(f)), id).toBe(false);
     }
@@ -121,11 +121,13 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
     for (const v of VORLAGEN) if (!MIT_VERMERK.includes(v.id) && !NUR_RECHTSFORM.includes(v.id)) expect(pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}, CAFE), v.id).toBe(PRUEFHINWEIS);
     // Handelsregister nur für GmbH, OHG, KG
     expect(pruefHinweisFuer(vorlageFuer("handelsregister")!, {}, CAFE)).toBe(PRUEFHINWEIS);
-    // ohne Betrieb: alle Varianten müssen passen – bei der Rechnung nicht, bei den vier übrigen ja
-    for (const id of STEUERN_23) expect(pruefHinweisFuer(vorlageFuer(id)!, {}) !== PRUEFHINWEIS, id).toBe(id !== "rechnung");
-    // GmbH & Co. KG: nur die Rechnung druckt die geänderte Fußzeile
+    // ohne Betrieb: alle Varianten müssen passen – seit E-200 auch bei der Rechnung (Co.-KG-Varianten nachgeprüft); das
+    // Storno einer Schlussrechnung (eigene Gruppe, nur mit diesen Daten) bleibt ohne Vermerk
+    for (const id of STEUERN_23) expect(pruefHinweisFuer(vorlageFuer(id)!, {}) !== PRUEFHINWEIS, id).toBe(true);
+    expect(pruefHinweisFuer(vorlageFuer("rechnung")!, { storno_zu: "RE-1", schluss: true, storno_abschlaege: true })).toBe(PRUEFHINWEIS);
+    // GmbH & Co. KG: nur die Rechnung druckt die geänderte Fußzeile – seit E-200 vom Steuerberater nachgeprüft (26.10.2026)
     const coKg: Betrieb = { ...CAFE, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" };
-    for (const id of STEUERN_23) expect(pruefHinweisFuer(vorlageFuer(id)!, {}, coKg) !== PRUEFHINWEIS, id).toBe(id !== "rechnung");
+    for (const id of STEUERN_23) expect(pruefHinweisFuer(vorlageFuer(id)!, {}, coKg) !== PRUEFHINWEIS, id).toBe(true);
   });
 
   it("E-196: geändert seit der Freigabe sind nur diese Varianten (Rechnung: Fußzeile GmbH & Co. KG und Storno, E-193)", () => {
@@ -137,12 +139,13 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
     }
     for (const [k, g] of Object.entries(geaendert)) {
       // Bilanz: nur der Name im Hilfetext durch die Rolle ersetzt (E-196 A) – zählt nicht als Änderung (E-197)
-      const soll = k === "rechnung" ? [...CO_KG, "storno_schluss"] : [];
+      // E-200: die Nachprüfung der Co.-KG-Varianten („rechnung#1“) – geändert bleibt nur das Storno der Schlussrechnung
+      const soll = k === "rechnung" ? [...CO_KG, "storno_schluss"] : k === "rechnung#1" ? ["storno_schluss"] : [];
       expect(g, k).toEqual([...soll].sort());
     }
   });
 
-  it("E-196: Rechnung des Einzelunternehmens mit Vermerk, GmbH & Co. KG und Storno einer Schlussrechnung ohne", () => {
+  it("E-196/E-200: Rechnung des Einzelunternehmens mit Vermerk vom 23.10., GmbH & Co. KG und UG & Co. KG vom 26.10., Storno einer Schlussrechnung ohne", () => {
     const re = vorlageFuer("rechnung")!;
     const ja = (d: Daten, b?: Betrieb) => pruefHinweisFuer(re, d, b) !== PRUEFHINWEIS;
     expect(ja({}, CAFE)).toBe(true);
@@ -150,10 +153,21 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
     expect(ja({ schluss: true }, CAFE)).toBe(true);
     expect(ja({ storno_zu: "RE-1" }, CAFE)).toBe(true);
     expect(ja({ storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, CAFE)).toBe(false);
-    expect(ja({}, { ...CAFE, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" })).toBe(false);
-    expect(ja({}, { ...CAFE, name: "Sonne UG (haftungsbeschränkt) & Co. KG" })).toBe(false);
+    // E-200: Steuerberater hat die Varianten GmbH & Co. KG und UG & Co. KG am 26.10.2026 bestätigt
+    const coKg = { ...CAFE, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" };
+    const ugCoKg = { ...CAFE, name: "Sonne UG (haftungsbeschränkt) & Co. KG" };
+    expect(ja({}, coKg)).toBe(true);
+    expect(ja({}, ugCoKg)).toBe(true);
+    expect(pruefHinweisFuer(re, {}, coKg)).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 26.10.2026)");
+    expect(pruefHinweisFuer(re, { schluss: true }, ugCoKg)).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 26.10.2026)");
+    // das Storno einer Schlussrechnung bleibt ohne Vermerk – auch bei der Co. KG (geänderte Darstellung noch nicht bestätigt)
+    expect(ja({ storno_zu: "RE-1", schluss: true, storno_abschlaege: true }, coKg)).toBe(false);
     expect(ja({}, { ...CAFE, name: "Sonne AG" })).toBe(false);
     expect(pruefHinweisFuer(re, {}, CAFE)).toBe("Vorlage fachlich durchgesehen von einem Steuerberater (Stand 23.10.2026)");
+    // die Nachprüfung umfasst nur die beiden Co.-KG-Varianten, alle übrigen Teilsummen sind die der ersten Freigabe
+    const [erste, nach] = freigabenFuer("rechnung");
+    expect(nach!.varianten).toEqual(CO_KG);
+    for (const g of Object.keys(erste!.teilsummen!)) expect(nach!.teilsummen![g], g).toBe(CO_KG.includes(g) ? PRUEFSTAENDE.rechnung!.teile[g] : erste!.teilsummen![g]);
   });
 
   it("Vermerk mit Rolle, Einschränkung und offenen Stellen – ohne Rolle der frühere Wortlaut", () => {
@@ -327,7 +341,9 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
     expect(lm.weitere?.map((x) => [x.fassung?.wert, x.stand, x.einschraenkung])).toEqual([["beauty", "2026-10-25", "Länderzusatz nur für Bayern geprüft"]]);
     expect(freigabenFuer("bilanz_guv")).toHaveLength(1);
     expect(freigabenFuer("gibt_es_nicht")).toEqual([]);
-    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan") expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
+    // E-200: Rechnung mit der Nachprüfung der Co.-KG-Varianten
+    expect(VORLAGEN_GEPRUEFT.rechnung!.weitere?.map((x) => [x.stand, x.varianten])).toEqual([["2026-10-26", ["rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"]]]);
+    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan" && id !== "rechnung") expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
   });
 
   it("je Fassung eine eigene Prüfsumme: Beauty unterscheidet sich von der Lebensmittel-Fassung", () => {
