@@ -27,6 +27,8 @@ export type Knoten =
       op: "eingetreten" | "nicht_eingetreten" | "geplant";
       innerhalb?: string;
       gefunden?: Datum;
+      /** E-206: „eingetreten“ durch ein geplantes (künftiges) Ereignis, an dem die Frist der Pflicht hängt */
+      geplant?: true;
     };
 
 export interface Auswertungskontext {
@@ -34,6 +36,13 @@ export interface Auswertungskontext {
   ereignisse: readonly Ereignis[];
   stichtag: Datum;
   regelwerte: Regelwerte;
+  /**
+   * E-206: Ereignistyp, an dem die Frist der gerade ausgewerteten Pflicht hängt (Frist „relativ“ mit Bezug auf das
+   * Ereignis). Für diesen Typ zählt bei „eingetreten“ (ohne „innerhalb“) auch ein geplantes Ereignis: Die Frist läuft
+   * spätestens mit dem Ereignis ab (z. B. Sofortmeldung am ersten Arbeitstag) – wer die Einstellung erst plant, muss
+   * die Pflicht vorher sehen, nicht als „trifft nicht zu“.
+   */
+  geplantZaehlt?: string;
 }
 
 const bekannt = (x: unknown): boolean => x !== undefined && x !== null;
@@ -97,7 +106,8 @@ export function werteAus(b: Bedingung, ctx: Auswertungskontext): Knoten {
       (e) => vergleiche(e.datum, ctx.stichtag) <= 0 && (ab === undefined || vergleiche(e.datum, ab) > 0),
     );
     const zukuenftig = passend.filter((e) => vergleiche(e.datum, ctx.stichtag) > 0);
-    const treffer = b.op === "geplant" ? zukuenftig : vergangen;
+    const mitGeplant = b.op === "eingetreten" && !b.innerhalb && ctx.geplantZaehlt === b.ereignis && vergangen.length === 0 && zukuenftig.length > 0;
+    const treffer = b.op === "geplant" || mitGeplant ? zukuenftig : vergangen;
     const ergebnis = b.op === "nicht_eingetreten" ? ausBool(treffer.length === 0) : ausBool(treffer.length > 0);
     const gefunden = treffer.map((e) => e.datum).sort()[0];
     return {
@@ -107,6 +117,7 @@ export function werteAus(b: Bedingung, ctx: Auswertungskontext): Knoten {
       op: b.op,
       ...(b.innerhalb ? { innerhalb: b.innerhalb } : {}),
       ...(gefunden ? { gefunden } : {}),
+      ...(mitGeplant ? { geplant: true as const } : {}),
       ...(b.label ? { label: b.label } : {}),
     };
   }

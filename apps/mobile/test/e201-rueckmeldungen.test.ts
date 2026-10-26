@@ -94,11 +94,18 @@ describe("E-201: Rückmeldungen Rechtsanwalt und Steuerberater im Katalog", () =
     expect(ksk.rechtsgrundlage).toContain("§ 29 KSVG");
     expect(pruefVermerk(ksk.version, ksk.pruefung, AM)).toMatch(/^Inhalt fachlich geprüft von einem Rechtsanwalt, Stand 26\.10\.2026\./);
     const lstb = p("personal.lohnsteuerbescheinigung");
-    expect(pruefVermerk(lstb.version, lstb.pruefung, AM)).toBe("Fachlich durchgesehen von einem Steuerberater (Stand 26.10.2026) – ohne Gewähr für den Einzelfall.");
+    // E-206: v2 (Auslöser ohne Anmeldezeitraum) – die Freigabe von v1 gilt nicht mehr, bis der Steuerberater v2 bestätigt (PRUEFLISTE T-237)
+    expect(lstb.version).toBe(2);
+    expect(pruefVermerk(lstb.version, lstb.pruefung, AM)).toBeNull();
   });
-  it("alle 228 Einträge freigegeben, keine offenen Punkte mehr", () => {
+  it("alle 228 Einträge freigegeben, keine offenen Punkte mehr – außer den drei von E-206 geänderten (Nachprüfung PRUEFLISTE T-236, T-237)", () => {
     expect(pflichten.length).toBe(228);
+    const E206 = ["personal.lohnsteuer_anmeldung", "personal.lohnsteuerbescheinigung", "steuern.ust_voranmeldung"];
     for (const x of pflichten) {
+      if (E206.includes(x.id)) {
+        expect(pruefVermerk(x.version, x.pruefung, AM), x.id).toBeNull();
+        continue;
+      }
       expect(pruefVermerk(x.version, x.pruefung, AM), x.id).not.toBeNull();
       expect(x.pruefung?.offen ?? [], x.id).toEqual([]);
     }

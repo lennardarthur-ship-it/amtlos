@@ -82,7 +82,9 @@ export function auswerten(e: Eingabe): PflichtErgebnis[] {
   return e.katalog.pflichten
     .filter((p) => gueltigAm(p, e.stichtag))
     .map((p) => {
-      const begruendung = werteAus(p.ausloeser, ctx);
+      // E-206: an einem geplanten Ereignis hängende Frist (z. B. erster Arbeitstag) – das geplante Ereignis zählt beim Auslöser
+      const bezug = p.frist.typ === "relativ" && "ereignis" in p.frist.bezug ? p.frist.bezug.ereignis : undefined;
+      const begruendung = werteAus(p.ausloeser, bezug ? { ...ctx, geplantZaehlt: bezug } : ctx);
       const fehlend = new Set(fehlendeFakten(begruendung));
       const regelwerteGenutzt = genutzteRegelwerte(begruendung);
       const hinweise: string[] = [];

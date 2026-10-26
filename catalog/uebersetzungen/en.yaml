@@ -3176,11 +3176,12 @@ eintraege:
   en: If you do business with companies in other EU countries – as a customer or as a supplier –, you apply for a VAT ID at the Federal Central Tax Office.
 - de: Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Liegt dein Umsatz über der Kleinunternehmergrenze,
     gilt die Pflicht sicher – offen ist dann nur, ob monatlich oder vierteljährlich. Den Rhythmus legt das Finanzamt fest – er steht im Schreiben des Finanzamts. Weißt du ihn nicht und kennt Amtlos die
-    Steuer des Vorjahres nicht, rechnet Amtlos vorläufig mit vierteljährlich. Hast du 2026 oder später gegründet, gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG).
+    Steuer des Vorjahres nicht, rechnet Amtlos vorläufig mit monatlich – das ist der frühere Termin; vierteljährlich wäre zu spät, wenn das Finanzamt monatlich verlangt. Hast du 2026 oder später
+    gegründet, gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG).
     Amtlos bereitet die Zahlen vor; du übermittelst selbst.
   en: Anyone who shows VAT on invoices files an advance return via ELSTER monthly or quarterly, depending on last year's tax. If your turnover is above the small business limit, the obligation definitely
     applies – the only open question is whether monthly or quarterly. The tax office sets the frequency – it is stated in the tax office's letter. If you don't know it and Amtlos does not know last year's
-    tax, Amtlos provisionally assumes quarterly. If you founded in 2026 or later, from 2027 you file monthly in the founding year and the following year (§ 18(2) sentence 4 UStG). Amtlos prepares the figures;
+    tax, Amtlos provisionally assumes monthly – the earlier deadline; quarterly would be too late if the tax office requires monthly returns. If you founded in 2026 or later, from 2027 you file monthly in the founding year and the following year (§ 18(2) sentence 4 UStG). Amtlos prepares the figures;
     you submit them yourself.
 - de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung. Das gilt auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und für
     Gewerbetreibende, denen das Finanzamt keine Buchführungspflicht mitgeteilt hat. Die Anlage EÜR übermittelst du mit der Einkommensteuer- bzw. Feststellungserklärung, also in denselben Fristen (§ 149
@@ -4213,3 +4214,9 @@ eintraege:
     of up to €50,000 (§ 36(2), (3) KSVG). Without a report, the Künstlersozialkasse or the pension insurance estimates the fees (§ 27(1) KSVG).
 - de: Du hast eine eigene Website.
   en: You have your own website.
+- de: Gilt jetzt für jeden Arbeitgeber, auch bevor du den Anmeldezeitraum angegeben hast – die Termine erscheinen, sobald der Zeitraum feststeht.
+  en: Now applies to every employer, even before you have entered the filing period – the deadlines appear as soon as the period is known.
+- de: Gilt jetzt für jeden Arbeitgeber, auch bevor du den Anmeldezeitraum der Lohnsteuer angegeben hast.
+  en: Now applies to every employer, even before you have entered the wage tax filing period.
+- de: Weißt du den Rhythmus nicht, rechnet Amtlos jetzt vorläufig mit monatlichen Terminen – dem früheren Termin – statt vierteljährlich.
+  en: If you don't know the frequency, Amtlos now provisionally assumes monthly deadlines – the earlier deadline – instead of quarterly.

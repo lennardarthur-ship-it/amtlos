@@ -110,7 +110,8 @@ describe("E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben", () =>
 
   it("je Rolle so viele Einträge mit Vermerk wie vor E-196 – E-201: dazu Künstlersozialabgabe (Rechtsanwalt) und Lohnsteuerbescheinigung (Steuerberater)", () => {
     const zahl = (r: string) => pflichten.filter((p) => pruefVermerk(p.version, p.pruefung, AM) && p.pruefung!.geprueft_von!.includes(r)).length;
-    expect(ROLLEN.map(zahl)).toEqual([166, 35, 27, 14]);
+    // E-206: Lohnsteuer-Anmeldung (Rechtsanwalt), Lohnsteuerbescheinigung und Umsatzsteuer-Voranmeldung (Steuerberater) neu vorzulegen
+    expect(ROLLEN.map(zahl)).toEqual([165, 33, 27, 14]);
     // die 17 von E-196 zurückgestuften Einträge zeigen den Vermerk wieder – ihre Version ist die bestätigte
     for (const id of ["steuern.buchfuehrungspflicht", "steuern.e_bilanz", "steuern.oss_erklaerung", "steuern.euer", "steuern.feststellungserklaerung", "gesellschaft.jahresabschluss_personenhandel",
       "arbeitsschutz.arbeitsmedizinische_vorsorge", "gesellschaft.gesellschaftsvertrag_notar", "gesellschaft.handelsregister_anmeldung", "gesellschaft.transparenzregister", "gesellschaft.geschaeftsbriefe_pflichtangaben",

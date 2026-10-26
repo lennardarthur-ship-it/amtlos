@@ -1,7 +1,7 @@
 # Katalog C.24. Zeigt: Rhythmus abhängig von Fakten, Regelwerte, Dauerfristverlängerung. StB-Durchsicht 22.10.2026 umgesetzt.
 schema_version: 1
 id: steuern.ust_voranmeldung
-version: 6
+version: 7
 katalog_nr: C.24
 titel:
   de: Umsatzsteuer-Voranmeldung abgeben
@@ -14,7 +14,8 @@ erklaerung:
     der Kleinunternehmergrenze, gilt die Pflicht sicher – offen ist dann nur, ob monatlich
     oder vierteljährlich. Den Rhythmus legt das Finanzamt fest – er steht im Schreiben des Finanzamts.
     Weißt du ihn nicht und kennt Amtlos die Steuer des Vorjahres nicht, rechnet Amtlos
-    vorläufig mit vierteljährlich. Hast du 2026 oder später gegründet, gibst du ab 2027 im
+    vorläufig mit monatlich – das ist der frühere Termin; vierteljährlich wäre zu spät, wenn
+    das Finanzamt monatlich verlangt. Hast du 2026 oder später gegründet, gibst du ab 2027 im
     Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG). Amtlos bereitet
     die Zahlen vor; du übermittelst selbst.
 rechtsgrundlage: ["§ 18 UStG"]
@@ -90,6 +91,12 @@ frist:
                 - feld: profil.ust.zahllast_vorjahr
                   op: ">"
                   wert: { regelwert: steuern.ust_va.grenze_monatlich }
+            # E-206: „Weiß ich nicht“ ohne Steuer des Vorjahres ⇒ vorläufig monatlich, der frühere (sichere) Termin – auch für
+            # Neugründer, die ab 2027 im Gründungs- und Folgejahr monatlich abgeben (§ 18 Abs. 2 Satz 4 UStG, siehe C.21)
+            - all:
+                - { feld: profil.ust.voranmeldung_rhythmus, op: vorhanden }
+                - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: unklar }
+                - { feld: profil.ust.zahllast_vorjahr, op: nicht_vorhanden }
         dann: monatlich
       - wenn:
           any:
@@ -104,11 +111,6 @@ frist:
                 - feld: profil.ust.zahllast_vorjahr
                   op: "<="
                   wert: { regelwert: steuern.ust_va.grenze_monatlich }
-            # R12 (UX #3): „Weiß ich nicht“ ohne Steuer des Vorjahres ⇒ vorläufig vierteljährlich (mit Hinweis im Text)
-            - all:
-                - { feld: profil.ust.voranmeldung_rhythmus, op: vorhanden }
-                - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: unklar }
-                - { feld: profil.ust.zahllast_vorjahr, op: nicht_vorhanden }
         dann: quartalsweise
       # ohne Angabe zum Rhythmus und ohne Steuer des Vorjahres bleibt der Rhythmus offen (Rückfrage)
       - wenn:
@@ -134,7 +136,7 @@ sanktion:
   schwere: hoch
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
-  de: Die Folgen sind jetzt vollständig beschrieben (Schätzung, Strafbarkeit) und als „hoch“ eingestuft.
+  de: Weißt du den Rhythmus nicht, rechnet Amtlos jetzt vorläufig mit monatlichen Terminen – dem früheren Termin – statt vierteljährlich.
 aktion: { art: uebermittlung, ziel: elster.ust_va, nachweis_erforderlich: true }
 status_recht: in_kraft
 # Steuerberater 22.10.2026: Fassung der Grenzen 9.000 € / 2.000 € ab 01.01.2025
@@ -161,10 +163,8 @@ quellen:
     abgerufen: null
 fachlich_zu_pruefen:
   - "Steuerberater 22.10.2026: Neugründer ab 2027 im Gründungs- und Folgejahr monatlich (§ 18 Abs. 2 Satz 4 UStG) – nur als Hinweis im Text; der Rhythmus bei „weiß ich nicht“ bzw. ohne Angabe rechnet dann weiter vierteljährlich, weil die Regeln das Kalenderjahr des Stichtags nicht abfragen können"
+  - "E-206 (externer Prüfer): „Weiß ich nicht“ ohne Steuer des Vorjahres rechnet jetzt vorläufig monatlich (früherer Termin) statt vierteljährlich – deckt Neugründer ab 2027 ab. Offen: angegebener Rhythmus „vierteljährlich“ bzw. bekannte Vorjahressteuer bis zur Monatsgrenze (Regelwert steuern.ust_va.grenze_monatlich) eines Neugründers im Gründungs- oder Folgejahr ab 2027 ergibt weiter vierteljährliche Termine (PRUEFLISTE T-238)"
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - steuern
-  geprueft_am: '2026-10-23'
-  geprueft_version: 6
-  bestaetigt_am: '2026-10-23'
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

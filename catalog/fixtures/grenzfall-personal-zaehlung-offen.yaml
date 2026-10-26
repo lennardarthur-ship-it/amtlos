@@ -12,5 +12,6 @@ erwartet:
   personal.hinweisgeber_meldestelle: gilt_nicht
   personal.schwerbehinderte_anzeige: unbekannt
   personal.anmeldezeitraum_angeben: gilt
-  personal.lohnsteuer_anmeldung: gilt_nicht
+  # E-206: ohne Anmeldezeitraum gilt die Lohnsteuer-Anmeldung (Rhythmus offen) – vorher „gilt nicht“, das war der Fehler
+  personal.lohnsteuer_anmeldung: gilt
   personal.arbeitszeit_neuregelung: gilt
