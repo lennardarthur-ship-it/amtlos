@@ -233,7 +233,7 @@ export function ProSeite({ grund, anlass, anzahl, entwurf, danach }: { grund?: P
 
       <T v="caption" leise stil={{ marginTop: 18 }}>{TEXT.pro_abo_text}</T>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16, marginTop: 4 }}>
-        {/* E-190: auf Android kein Link auf Apples EULA – dort erst die eigenen Nutzungsbedingungen nach der Freigabe */}
+        {/* E-205: Android verlinkt die gemeinsame Fassung (bis zur Inkraftsetzung als Entwurf), das iPhone bis dahin Apples EULA */}
         {nutzungsLink() ? <TextKnopf text={TEXT.nutzungsbedingungen} leise onPress={() => void Linking.openURL(nutzungsLink())} /> : null}
         <TextKnopf text={TEXT.datenschutz} leise onPress={() => nav.oeffnen("datenschutz", () => <DatenschutzSeite />)} />
         {kaufAktiv ? <TextKnopf text={TEXT.pro_wiederherstellen} leise onPress={() => void zurueckholen()} /> : null}

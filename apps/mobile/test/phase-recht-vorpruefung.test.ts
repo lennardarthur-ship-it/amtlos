@@ -18,16 +18,17 @@ import { T as TEXT } from "../src/texte";
 
 const WURZEL = path.resolve(__dirname, "../../..");
 const lies = (p: string) => fs.readFileSync(path.join(WURZEL, p), "utf8");
-const AN = { ...NUTZUNGSBEDINGUNGEN, freigegeben: true };
+// E-205: bis zur Veröffentlichung ist NUTZUNGSBEDINGUNGEN.fassung leer – „an“ heißt in Kraft, also mit Fassungsdatum
+const AN = { ...NUTZUNGSBEDINGUNGEN, freigegeben: true, fassung: "2027-01-15" };
 const AUS = { ...NUTZUNGSBEDINGUNGEN, freigegeben: false };
-const Z = { fassung: NUTZUNGSBEDINGUNGEN.fassung, zeitpunkt: "2026-10-22T09:15:00.000Z" };
+const Z = { fassung: AN.fassung, zeitpunkt: "2026-10-22T09:15:00.000Z" };
 
 describe("Zustimmung zu den Nutzungsbedingungen: Schalter aus (heutiger Stand)", () => {
-  it("die eigenen Bedingungen sind noch nicht freigegeben – Apples Standard-EULA bleibt der Link", () => {
+  it("die eigenen Bedingungen sind noch nicht in Kraft – auf dem iPhone bleibt Apples Standard-EULA der Link", () => {
     expect(NUTZUNGSBEDINGUNGEN.freigegeben).toBe(false);
     expect(LINKS.nutzung).toBe("https://www.apple.com/legal/internet-services/itunes/dev/stdeula/");
     expect(nutzungsLink()).toBe(LINKS.nutzung);
-    expect(nutzungsLink(AUS)).toBe(LINKS.nutzung);
+    expect(nutzungsLink(AUS, false)).toBe(LINKS.nutzung);
   });
 
   it("fragt nie – weder beim ersten Start noch mit alter oder fehlender Zustimmung (Rundgang unverändert)", () => {
@@ -163,13 +164,13 @@ describe("Nutzungsbedingungen – Fassung zur Freigabe (Abschnitt 9)", () => {
   /** Klauseltext ohne Arbeitsnotizen („>“) – das, was die Website zeigt */
   const klauseln = md.split(/\n\s*\n/).filter((a) => !a.trim().startsWith(">")).join("\n\n");
 
-  it("Ziffer 1.1 aus ANBIETER, Fassung passt zu NUTZUNGSBEDINGUNGEN.fassung", () => {
+  it("Ziffer 1.1 aus ANBIETER, Fassung passt zu NUTZUNGSBEDINGUNGEN.fassung (E-205: bis zur Veröffentlichung Platzhalter)", () => {
     const z11 = /^1\.1 .*$/m.exec(md)![0];
     for (const w of [ANBIETER.name, ANBIETER.anschrift, ANBIETER.vertretung, ANBIETER.email]) expect(z11).toContain(w);
     expect(z11).toContain("[nach Eintragung]");
-    const [, t, m, j] = /Fassung vom (\d{2})\.(\d{2})\.(\d{4})/.exec(md)!;
-    expect(`${j}-${m}-${t}`).toBe(NUTZUNGSBEDINGUNGEN.fassung);
-    expect(md).toContain("Fassung zur Freigabe");
+    expect(md).toMatch(/^Fassung vom \[Datum der Veröffentlichung\]$/m);
+    expect(NUTZUNGSBEDINGUNGEN.fassung).toBe("");
+    expect(md).toContain("inhaltlich freigegeben");
     expect(md).toContain(MARKE.name);
   });
 
@@ -177,7 +178,7 @@ describe("Nutzungsbedingungen – Fassung zur Freigabe (Abschnitt 9)", () => {
     for (const s of [
       "Ob eine Pflicht für dich gilt, hängt von Umständen ab, die die App nicht abfragt.",
       "auch über die Familienfreigabe, soweit die Nutzungsregeln das erlauben",
-      "Den Kauf schließt du mit Apple ab; über dein Widerrufsrecht informiert dich Apple beim Kauf.",
+      "über dein Widerrufsrecht informiert dich Apple bzw. Google beim Kauf.",
       "Rechtsänderung",
       "(Sicherheit)",
       "(technische Anpassung)",
@@ -238,7 +239,7 @@ describe("Website und Store-Check", () => {
     } catch (e) {
       aus = String((e as { stdout?: Buffer }).stdout ?? "");
     }
-    expect(aus).toContain("✗ Eigene Nutzungsbedingungen freigegeben");
+    expect(aus).toContain("✗ Eigene Nutzungsbedingungen in Kraft");
     expect(aus).toContain("✓ Datenschutzhinweis der App fachlich freigegeben");
   });
 });

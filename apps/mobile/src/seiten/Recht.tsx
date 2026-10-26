@@ -1,5 +1,6 @@
 import { Linking, Share, View } from "react-native";
-import { ANBIETER, LINKS, datenschutzAbschnitte, datenschutzFreigegeben, hilfeZiel, nutzungsLink, storeLink } from "../rechtliches";
+import { ANBIETER, LINKS, aboVerwaltenLink, datenschutzAbschnitte, datenschutzFreigegeben, hilfeZiel, nutzungsLink, storeLink } from "../rechtliches";
+import { paywallVerfuegbar } from "../pro/kauf";
 import { syncAngeboten } from "../konto/konfig";
 import { T as TEXT } from "../texte";
 import { Hinweis, Karte, T, Zeile } from "../ui/bausteine";
@@ -7,7 +8,7 @@ import { Unterseite, useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { Inhalt, RechtsHinweis } from "./gemeinsam";
 import { PartnerSeite, partnerZeileText } from "./Partner";
-import { useStandWahl } from "../zustand";
+import { useAmtlos, useStandWahl } from "../zustand";
 
 /**
  * Impressum der App (§ 5 DDG) aus `rechtliches.ts` – fehlende Angaben stehen als „folgt“ da. Das ist nur im
@@ -66,6 +67,7 @@ export function DatenschutzSeite() {
 export function UeberGruppe() {
   const nav = useNav();
   const partnerId = useStandWahl((s) => s.partnerId);
+  const { pro } = useAmtlos();
   const hilfe = hilfeZiel(LINKS.support, ANBIETER.email);
   const teilen = () => void Share.share({ message: TEXT.empfehlen_text(storeLink() || LINKS.website) }).catch(() => undefined);
   const zeilen = [
@@ -75,8 +77,10 @@ export function UeberGruppe() {
     ...(hilfe ? [{ titel: TEXT.hilfe_kontakt, symbol: "questionmark.circle", onPress: () => void Linking.openURL(hilfe) }] : []),
     { titel: TEXT.datenschutz, symbol: "hand.raised", onPress: () => nav.oeffnen("datenschutz", () => <DatenschutzSeite />) },
     { titel: TEXT.impressum, symbol: "info.circle", onPress: () => nav.oeffnen("impressum", () => <ImpressumSeite />) },
-    // E-190: auf Android erst mit den eigenen, freigegebenen Nutzungsbedingungen (Apples EULA gilt dort nicht)
+    // E-205: auf beiden Plattformen – Android zeigt die gemeinsame Fassung (bis zur Inkraftsetzung als Entwurf), das iPhone bis dahin Apples EULA
     ...(nutzungsLink() ? [{ titel: TEXT.nutzungsbedingungen, symbol: "doc.plaintext", onPress: () => void Linking.openURL(nutzungsLink()) }] : []),
+    // E-205 (Abo-Richtlinie von Google Play): einfacher Weg zur Kündigung – Abo-Seite des Stores, wo es Pro gibt
+    ...(paywallVerfuegbar || pro ? [{ titel: TEXT.abo_verwalten, text: TEXT.abo_verwalten_text, symbol: "creditcard", onPress: () => void Linking.openURL(aboVerwaltenLink()).catch(() => undefined) }] : []),
   ];
   return (
     <View>

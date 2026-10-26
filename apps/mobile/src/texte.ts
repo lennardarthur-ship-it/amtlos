@@ -640,7 +640,8 @@ export const T = {
   pro_test_zeitraum: (z: string) => `${z} kostenlos testen`,
   pro_test_danach: (test: string, preis: string, je: string) => `${test} kostenlos, danach ${preis} ${je}`.trim(),
   pro_preis_je: (preis: string, je: string) => `${preis} ${je}`.trim(),
-  pro_kuendbar: "Jederzeit kündbar.",
+  // E-205 (Abo-Richtlinie von Google Play): automatische Verlängerung ohne weiteren Schritt direkt am Kaufknopf sichtbar
+  pro_kuendbar: ANDROID ? "Verlängert sich automatisch, bis du kündigst. Jederzeit kündbar." : "Jederzeit kündbar.",
   pro_abonnieren: "Pro abonnieren",
   pro_test_starten: "Kostenlos testen",
   pro_test_einschalten: "Pro testweise einschalten",
@@ -669,6 +670,9 @@ export const T = {
   /** Kennzeichnung einer Pro-Funktion, solange Pro nicht aktiv ist – man soll nicht erst beim Teilen gegen den Bezahlschirm laufen */
   mitPro: (text: string, pro: boolean) => (pro ? text : `${text} · Pro`),
   nutzungsbedingungen: "Nutzungsbedingungen",
+  // E-205: Abo-Verwaltung des Stores (Google Play: „Zahlungen und Abos“ › „Abos“) aus „Mein Betrieb“
+  abo_verwalten: "Abo verwalten",
+  abo_verwalten_text: ANDROID ? "In Google Play kündigen oder ändern" : "Im App Store kündigen oder ändern",
   datenschutz: "Datenschutz",
   impressum: "Impressum",
   anbieter: "Anbieter",

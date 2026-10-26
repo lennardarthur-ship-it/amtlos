@@ -35,10 +35,14 @@ export const LINKS = {
   /** Support-Seite oder E-Mail-Link (Pflichtangabe im App Store) */
   support: MARKE.hilfe,
   /**
-   * Nutzungsbedingungen: Apples Standard-Lizenzvertrag, solange keine eigenen AGB gelten. Bleibt so, bis die eigenen
-   * Bedingungen freigegeben sind (`NUTZUNGSBEDINGUNGEN.freigegeben`); die App verlinkt über `nutzungsLink()`.
+   * Nutzungsbedingungen: Apples Standard-Lizenzvertrag, solange keine eigenen AGB gelten. Bleibt auf dem iPhone so, bis
+   * die eigenen Bedingungen in Kraft sind (`NUTZUNGSBEDINGUNGEN.freigegeben`); die App verlinkt über `nutzungsLink()`.
    */
   nutzung: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+  /** Abo-Verwaltung im App Store (E-205: Eintrag „Abo verwalten“ unter „Mein Betrieb“) */
+  aboVerwaltenIos: "https://apps.apple.com/account/subscriptions",
+  /** Abo-Verwaltung bei Google Play für dieses Paket (E-205, Abo-Richtlinie von Google Play: einfacher Weg zur Kündigung) */
+  aboVerwaltenAndroid: `https://play.google.com/store/account/subscriptions?package=${MARKE.technisch.bundleId}`,
   /** App-Store-Seite, sobald die App veröffentlicht ist (Weiterempfehlen) */
   appStore: "",
   /** Seite bei Google Play, sobald die Android-App veröffentlicht ist (Weiterempfehlen auf Android, E-190) */
@@ -47,6 +51,9 @@ export const LINKS = {
 
 /** Store-Seite der laufenden Plattform für „Weiterempfehlen“ – leer, solange nicht veröffentlicht. */
 export const storeLink = (android: boolean = ANDROID) => (android ? LINKS.googlePlay : LINKS.appStore);
+
+/** „Abo verwalten“ der laufenden Plattform (E-205): Abo-Seite des App Store bzw. von Google Play für dieses Paket. */
+export const aboVerwaltenLink = (android: boolean = ANDROID) => (android ? LINKS.aboVerwaltenAndroid : LINKS.aboVerwaltenIos);
 
 /**
  * Zuständige Datenschutz-Aufsichtsbehörde des Anbieters (Art. 13 Abs. 2 lit. d, Art. 77 DSGVO): richtet sich nach dem
@@ -173,27 +180,44 @@ export function datenschutzAbschnitte(sync: boolean, android: boolean = ANDROID)
 export const PLATZHALTER_RECHT = "[vor Veröffentlichung eintragen]";
 
 /**
- * Eigene Nutzungsbedingungen (docs/nutzungsbedingungen-entwurf.md, „Fassung zur Freigabe“). Solange `freigegeben`
- * false ist: Die App verlinkt Apples Standard-EULA (`LINKS.nutzung`), die Website zeigt nutzungsbedingungen.html als
- * „Entwurf – noch nicht in Kraft“, und die Zustimmung beim ersten Start (§ 305 Abs. 2 BGB, `zustimmungNoetig`) ist aus.
- * Nach der anwaltlichen Freigabe: `freigegeben: true` – dann fragt die App jeden Nutzer einmal und bei jeder neuen
- * `fassung` erneut. `fassung` muss zum Datum „Fassung vom …“ im Dokument passen (Test).
+ * Eigene Nutzungsbedingungen (docs/nutzungsbedingungen-entwurf.md): seit E-205 die gemeinsame Fassung für iPhone und
+ * Android, vom Rechtsanwalt am 26.10.2026 inhaltlich freigegeben (`NUTZUNGSBEDINGUNGEN_BESTAETIGUNG`), aber **nicht in
+ * Kraft** – in Kraft erst nach der Eintragung der UG (Registerangaben und USt-IdNr. in Ziffer 1.1 und `ANBIETER`, ohne
+ * „i. G.“, Datum der Veröffentlichung in „Fassung vom …“ und in `fassung`), dann `freigegeben: true`.
+ *
+ * Solange `freigegeben` false ist: Die iPhone-App verlinkt Apples Standard-EULA (`LINKS.nutzung`), die Android-App diese
+ * Fassung als Entwurf (Apples EULA gilt bei Google Play nicht); die Website zeigt nutzungsbedingungen.html als „Entwurf –
+ * noch nicht in Kraft“, und die Zustimmung beim ersten Start (§ 305 Abs. 2 BGB, `zustimmungNoetig`) ist aus.
+ * Mit `freigegeben: true` fragt die App jeden Nutzer einmal und bei jeder neuen `fassung` erneut. `fassung` muss zum
+ * Datum „Fassung vom …“ im Dokument passen (Website-Build und Test); bis zur Veröffentlichung steht dort der Platzhalter
+ * des Rechtsanwalts „[Datum der Veröffentlichung]“ und `fassung` ist leer.
  */
 export const NUTZUNGSBEDINGUNGEN = {
   freigegeben: false,
-  /** Datum der Fassung (ISO) – eine neue Fassung fragt erneut nach der Zustimmung */
-  // Rechtsanwalt 23.10.2026: Datum der Fassung, die veröffentlicht wird (vorher 21.10.2026 – passte nicht mehr zum geänderten Text)
-  fassung: "2026-10-23",
-  /** Adresse auf der Website (apps/website/bauen.mjs schreibt nutzungsbedingungen.html) */
+  /** Datum der Fassung (ISO) – eine neue Fassung fragt erneut nach der Zustimmung; leer bis zur Veröffentlichung (E-205) */
+  // Rechtsanwalt 26.10.2026: gemeinsame Fassung mit neuem Fassungsdatum (ersetzt die iPhone-Fassung vom 23.10.2026); das
+  // Datum setzt erst die Inkraftsetzung nach der Eintragung der UG (PRUEFLISTE T-235).
+  fassung: "",
+  /** Adresse auf der Website (apps/website/bauen.mjs schreibt nutzungsbedingungen.html) – eine Seite für beide Apps */
   url: `${MARKE.website}/nutzungsbedingungen.html`,
 };
 export type NutzungsbedingungenStand = { freigegeben: boolean; fassung: string; url: string };
 
 /**
- * Link „Nutzungsbedingungen“ in der App: eigene erst nach Freigabe, bis dahin Apples Standard-EULA. Android (E-190):
- * Apples EULA gilt dort nicht und Google Play hat keine Standard-EULA – bis zur Freigabe kein Link (leer).
+ * Inhaltliche Freigabe der gemeinsamen Fassung durch den Rechtsanwalt (E-205; Mail beim Gründer). Umfang: der Klauseltext
+ * in docs/nutzungsbedingungen-entwurf.md; Prüfsumme = SHA-256 über die Absätze ohne Arbeitsnotizen, ohne Ziffer 1.1 und
+ * ohne die Zeile „Fassung vom …“ (verbunden mit Leerzeile, mit Zeilenende), 12 Zeichen – test/e205-nutzungsbedingungen.test.ts
+ * rechnet nach. Die Inkraftsetzung (Ziffer 1.1, Fassungsdatum) ändert die Prüfsumme nicht; jede andere Änderung schon.
  */
-export const nutzungsLink = (nb: NutzungsbedingungenStand = NUTZUNGSBEDINGUNGEN, android: boolean = ANDROID) => (nb.freigegeben ? nb.url : android ? "" : LINKS.nutzung);
+export const NUTZUNGSBEDINGUNGEN_PRUEFSUMME = "3b1c5a0ba3f9";
+export const NUTZUNGSBEDINGUNGEN_BESTAETIGUNG = { art: "mail", datum: "2026-10-26", rolle: "recht", pruefsumme: NUTZUNGSBEDINGUNGEN_PRUEFSUMME, umfang: "gemeinsame Fassung für iPhone und Android; in Kraft erst nach Eintragung der UG", aufbewahrung: "beim Gründer" } as const;
+
+/**
+ * Link „Nutzungsbedingungen“ in der App: in Kraft die eigenen auf beiden Plattformen. Bis dahin auf dem iPhone Apples
+ * Standard-EULA; auf Android (E-205) die gemeinsame Fassung als Entwurf – Apples EULA gilt dort nicht, und Google Play
+ * hat keine Standard-EULA (vorher, E-190: kein Link).
+ */
+export const nutzungsLink = (nb: NutzungsbedingungenStand = NUTZUNGSBEDINGUNGEN, android: boolean = ANDROID) => (nb.freigegeben || android ? nb.url : LINKS.nutzung);
 
 /** Gespeicherte Zustimmung zu den Nutzungsbedingungen (im Stand, nur auf dem Gerät und in der Sicherung). */
 export interface Zustimmung {

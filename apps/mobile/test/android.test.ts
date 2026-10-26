@@ -264,8 +264,8 @@ describe("Rechtstexte auf Android (E-190)", () => {
     expect(DATENSCHUTZ_ANDROID.abschnitte.length).toBe(DATENSCHUTZ.abschnitte.length);
     expect(datenschutzAbschnitte(true, true).map((a) => a.text).join("\n")).not.toMatch(IOS_WOERTER_RE);
   });
-  it("Nutzungsbedingungen: auf Android kein Link auf Apples EULA, solange die eigenen nicht freigegeben sind", () => {
-    expect(nutzungsLink({ ...NUTZUNGSBEDINGUNGEN, freigegeben: false }, true)).toBe("");
+  it("Nutzungsbedingungen: auf Android nie Apples EULA – seit E-205 die gemeinsame Fassung, bis zur Inkraftsetzung als Entwurf", () => {
+    expect(nutzungsLink({ ...NUTZUNGSBEDINGUNGEN, freigegeben: false }, true)).toBe(NUTZUNGSBEDINGUNGEN.url);
     expect(nutzungsLink({ ...NUTZUNGSBEDINGUNGEN, freigegeben: false }, false)).toMatch(/apple\.com/);
     expect(nutzungsLink({ ...NUTZUNGSBEDINGUNGEN, freigegeben: true }, true)).toBe(NUTZUNGSBEDINGUNGEN.url);
   });

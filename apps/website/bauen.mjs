@@ -4,7 +4,7 @@
  * impressum.html, datenschutz.html und hilfe.html aus apps/mobile/src/rechtliches.ts (fehlende Angaben: „folgt vor dem
  * Start“ – nichts wird erfunden), nutzungsbedingungen.html aus docs/nutzungsbedingungen-entwurf.md (ohne die Arbeitsnotizen
  * mit „>“; solange NUTZUNGSBEDINGUNGEN.freigegeben false ist, als „Entwurf – noch nicht in Kraft“, noindex und nicht
- * verlinkt), 404.html, robots.txt, sitemap.xml, Bilder, Schriften (selbst gehostet, OFL), Favicon.
+ * im Fuß verlinkt – die Android-App verlinkt den Entwurf, E-205), 404.html, robots.txt, sitemap.xml, Bilder, Schriften (selbst gehostet, OFL), Favicon.
  *
  * Adresse der Website (eine Stelle): seite.json → url, sonst LINKS.website aus rechtliches.ts. Daraus canonical,
  * og:url, absolutes og:image, JSON-LD url/image, robots.txt und sitemap.xml. Ohne Adresse entstehen relative Verweise
@@ -133,7 +133,7 @@ const FOLGT = "folgt vor dem Start";
 const marke = /<a class="marke"[\s\S]*?<\/a>/.exec(rumpf)?.[0];
 if (!marke) throw new Error("Logo (<a class=\"marke\">) fehlt in seite.html");
 const NB = recht.NUTZUNGSBEDINGUNGEN;
-// eigene Nutzungsbedingungen erst nach der Freigabe verlinken – bis dahin gilt Apples Standard-EULA
+// eigene Nutzungsbedingungen erst in Kraft im Fuß verlinken – bis dahin gilt auf dem iPhone Apples Standard-EULA (die Android-App verlinkt den Entwurf direkt, E-205)
 const fussNav = `<nav aria-label="Rechtliches"><a href="./">Startseite</a><a href="hilfe.html">Hilfe und Kontakt</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a>${NB.freigegeben ? `<a href="nutzungsbedingungen.html">Nutzungsbedingungen</a>` : ""}</nav>`;
 // Unterseiten im Stil der Startseite: Logo im Kopf, gleiche Fußzeile; `wurzel` = "/" für 404.html (an jeder Adresse)
 const rechtsSeite = (titel, beschreibung, inhalt, { index = false, pfad = "", wurzel = "" } = {}) =>
@@ -174,15 +174,19 @@ schreibe(
   const absaetze = md.split(/\n\s*\n/).map((a) => a.trim()).filter((a) => a && !a.startsWith("# ") && !a.startsWith(">"));
   const inline = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   const html = absaetze.map((a) => (a.startsWith("## ") ? `<h2>${inline(a.slice(3))}</h2>` : `<p>${inline(a.replace(/\s*\n\s*/g, " "))}</p>`)).join("\n");
-  const fassung = /Fassung vom (\d{2})\.(\d{2})\.(\d{4})/.exec(md);
-  if (!fassung || `${fassung[3]}-${fassung[2]}-${fassung[1]}` !== NB.fassung) throw new Error(`docs/nutzungsbedingungen-entwurf.md: „Fassung vom …“ passt nicht zu NUTZUNGSBEDINGUNGEN.fassung (${NB.fassung})`);
+  // E-205: bis zur Veröffentlichung steht dort der Platzhalter des Rechtsanwalts und NUTZUNGSBEDINGUNGEN.fassung ist leer;
+  // in Kraft (freigegeben) nur mit Datum und ohne Platzhalter in Ziffer 1.1
+  const fassung = /^Fassung vom (\d{2})\.(\d{2})\.(\d{4})$/m.exec(md);
+  const ohneDatum = !fassung && /^Fassung vom \[Datum der Veröffentlichung\]$/m.test(md) && NB.fassung === "";
+  if (!ohneDatum && (!fassung || `${fassung[3]}-${fassung[2]}-${fassung[1]}` !== NB.fassung)) throw new Error(`docs/nutzungsbedingungen-entwurf.md: „Fassung vom …“ passt nicht zu NUTZUNGSBEDINGUNGEN.fassung (${NB.fassung || "leer"})`);
+  if (NB.freigegeben && (ohneDatum || /\[nach Eintragung\]|\[Datum der Veröffentlichung\]/.test(md))) throw new Error("docs/nutzungsbedingungen-entwurf.md: in Kraft nur mit Registerangaben, USt-IdNr. und Fassungsdatum (Platzhalter des Rechtsanwalts noch da)");
   if (A.name && !md.includes(A.name)) throw new Error("docs/nutzungsbedingungen-entwurf.md: Ziffer 1.1 nennt nicht ANBIETER.name aus rechtliches.ts");
   schreibe(
     "nutzungsbedingungen.html",
     rechtsSeite(
       "Nutzungsbedingungen",
-      "Nutzungsbedingungen der App {{MARKE}}",
-      `<h1>Nutzungsbedingungen</h1>\n${NB.freigegeben ? "" : `<p class="hinweis">Entwurf – noch nicht in Kraft. Bis zur Freigabe gilt für die App der <a href="${esc(recht.LINKS.nutzung)}">Standard-Lizenzvertrag von Apple</a>.</p>\n`}${html}`,
+      "Nutzungsbedingungen der App {{MARKE}} für iPhone und Android",
+      `<h1>Nutzungsbedingungen</h1>\n${NB.freigegeben ? "" : `<p class="hinweis">Entwurf – noch nicht in Kraft. Bis dahin gilt für die iPhone-App der <a href="${esc(recht.LINKS.nutzung)}">Standard-Lizenzvertrag von Apple</a>.</p>\n`}${html}`,
       NB.freigegeben ? { index: true, pfad: "nutzungsbedingungen.html" } : {},
     ),
   );
@@ -228,7 +232,7 @@ for (const d of ["favicon.svg", "apple-touch-icon.png"]) fs.copyFileSync(path.jo
 if (anbieterFehlt) offen.push("Anbieterangaben für das Impressum (ANBIETER in apps/mobile/src/rechtliches.ts, § 5 DDG) – Impressum zeigt „folgt vor dem Start“");
 if (!recht.DATENSCHUTZ.freigegeben) offen.push("Datenschutz fachlich freigeben (DATENSCHUTZ.freigegeben) und Angaben zum Hosting ergänzen");
 if (!androidFrei) offen.push("Datenschutzhinweis der Android-App freigeben (DATENSCHUTZ_ANDROID.freigegeben, docs/datenschutz-android-entwurf.md) – datenschutz.html beschreibt bis dahin nur die iPhone-App; vor dem Start bei Google Play nötig");
-if (!NB.freigegeben) offen.push("Nutzungsbedingungen anwaltlich freigeben (NUTZUNGSBEDINGUNGEN.freigegeben) – nutzungsbedingungen.html zeigt „Entwurf – noch nicht in Kraft“");
+if (!NB.freigegeben) offen.push("Nutzungsbedingungen in Kraft setzen (inhaltlich freigegeben 26.10.2026, E-205; nach Eintragung der UG: Registerangaben, USt-IdNr., ohne „i. G.“, Fassungsdatum, dann NUTZUNGSBEDINGUNGEN.freigegeben) – nutzungsbedingungen.html zeigt „Entwurf – noch nicht in Kraft“");
 if (A.rechtsform && !A.register) offen.push("Registergericht und Registernummer (ANBIETER.register) nach der Eintragung – Impressum zeigt „folgt vor dem Start“");
 console.log(`✓ ${OUT}`);
 if (!appStoreId) console.log("  · Ohne App-ID (seite.json → appStoreId): kein Smart-App-Banner, im JSON-LD kein downloadUrl und kein Angebot");

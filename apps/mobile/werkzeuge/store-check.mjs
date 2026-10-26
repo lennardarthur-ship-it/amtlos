@@ -43,9 +43,11 @@ const feld = (block, name) => {
 for (const [n, t] of [["name", "Firma"], ["anschrift", "Anschrift"], ["vertretung", "Vertretung"], ["email", "E-Mail"]]) pruefe(feld("ANBIETER", n), `Impressum: ${t} (src/rechtliches.ts → ANBIETER.${n})`);
 for (const [n, t] of [["website", "Website"], ["datenschutz", "Datenschutzerklärung im Netz (Pflicht im App Store)"], ["support", "Support-URL (Pflicht im App Store)"]]) pruefe(feld("LINKS", n), `${t} (LINKS.${n})`);
 pruefe(/export const DATENSCHUTZ = \{\s*freigegeben: true/.test(recht), "Datenschutzhinweis der App fachlich freigegeben (DATENSCHUTZ.freigegeben, PRUEFLISTE T-77)");
-// Vorprüfung 21.10.2026: eigene Nutzungsbedingungen (docs/nutzungsbedingungen-entwurf.md) – bis zur anwaltlichen Freigabe
-// gilt Apples Standard-EULA (LINKS.nutzung), und die App fragt beim Start nicht nach der Zustimmung
-pruefe(/export const NUTZUNGSBEDINGUNGEN = \{[^}]*?freigegeben: true/.test(recht), "Eigene Nutzungsbedingungen freigegeben (NUTZUNGSBEDINGUNGEN.freigegeben, docs/nutzungsbedingungen-entwurf.md) – bis dahin gilt Apples Standard-EULA");
+// Eigene Nutzungsbedingungen (docs/nutzungsbedingungen-entwurf.md, gemeinsame Fassung iPhone/Android, E-205): inhaltlich
+// freigegeben am 26.10.2026, in Kraft erst nach der Eintragung der UG – bis dahin gilt auf dem iPhone Apples Standard-EULA
+// (LINKS.nutzung), und die App fragt beim Start nicht nach der Zustimmung (Gründer, PRUEFLISTE T-235)
+const nbInKraft = /export const NUTZUNGSBEDINGUNGEN = \{[^}]*?freigegeben: true/.test(recht) && /^\d{4}-\d{2}-\d{2}$/.test(feld("NUTZUNGSBEDINGUNGEN", "fassung"));
+pruefe(nbInKraft, "Eigene Nutzungsbedingungen in Kraft (inhaltlich freigegeben 26.10.2026, E-205; nach Eintragung der UG: Registerangaben und USt-IdNr. in Ziffer 1.1, ohne „i. G.“, Fassungsdatum in docs/nutzungsbedingungen-entwurf.md und NUTZUNGSBEDINGUNGEN.fassung, dann freigegeben: true – PRUEFLISTE T-235) – bis dahin gilt Apples Standard-EULA");
 
 // EAS und Abo
 const eas = JSON.parse(lies("eas.json"));
@@ -245,7 +247,8 @@ const pruefeA = (bed, text) => (bed ? okA : offenA).push(text);
   }
   // Rechtstexte
   pruefeA(/export const DATENSCHUTZ_ANDROID = \{\s*freigegeben: true/.test(recht), "Datenschutzhinweis der Android-App freigegeben (DATENSCHUTZ_ANDROID.freigegeben, Entwurf docs/datenschutz-android-entwurf.md – Rechtsanwalt, PRUEFLISTE T-177)");
-  pruefeA(/export const NUTZUNGSBEDINGUNGEN = \{[^}]*?freigegeben: true/.test(recht), "Nutzungsbedingungen mit Android-Teil freigegeben (docs/nutzungsbedingungen-android-entwurf.md, PRUEFLISTE T-178) – bis dahin zeigt die Android-App keinen Link auf Nutzungsbedingungen");
+  // E-205: gemeinsame Fassung für beide Apps; bis zur Inkraftsetzung verlinkt die Android-App sie als Entwurf
+  pruefeA(nbInKraft, "Nutzungsbedingungen (gemeinsame Fassung iPhone/Android, inhaltlich freigegeben 26.10.2026, E-205) in Kraft – nach Eintragung der UG, PRUEFLISTE T-235; bis dahin verlinkt die Android-App sie als „Entwurf – noch nicht in Kraft“");
   // Play Console
   const ds = play.datensicherheit ?? {};
   const unsicher = [...(ds.erhoben ?? [])].filter((e) => e.pruefen).map((e) => e.datentyp);
