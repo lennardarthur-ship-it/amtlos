@@ -5,6 +5,8 @@ Freigaben aus dem Register (docs/freigabe-katalog/freigaben.yaml) in den Katalog
     python3 docs/freigabe-katalog/anwenden.py --pruefen  # schreibt nichts, Exit 1 wenn der Katalog vom Register abweicht
     python3 docs/freigabe-katalog/anwenden.py --bericht  # zusätzlich: je Eintrag, was ohne schriftliche Bestätigung freigegeben ist
 
+E-211: ebenso die Regelwerte (catalog/regelwerte) aus docs/freigabe-katalog/freigaben-regelwerte.yaml (regelwerte.py).
+
 Regel: Eine Freigabe gilt nur für die Fassung (Version), die der Prüfer gesehen hat. Ein Eintrag ist freigegeben, wenn
 für seinen Bereich alle nötigen Freigaben zur aktuellen Version passen UND schriftlich bestätigt sind:
 - Recht → `recht` (Rechtsanwalt); Steuern → `steuern` (Steuerberater); Arbeitsschutz → `arbeitsschutz` (Sifa);
@@ -105,7 +107,7 @@ UNTERLAGEN_ENDUNG = re.compile(r"\.(xlsx|xls|xlsm|pdf|eml|msg|mbox|docx?|odt|ods
 SCAN_ENDUNG = re.compile(r"\.(jpe?g|png|heic|tiff?)$", re.I)  # unter docs/ (Scans)
 # Texte zur Prüfung: hier zählen auch Namen, die zugleich gewöhnliche Wörter sind („mehrdeutig“ in namen-sha256.json)
 PRUEFTEXTE = ("docs/freigabe-katalog/freigaben.yaml", "docs/freigabe-katalog/offene-punkte.yaml", "packages/fachlogik/src/dokumente/geprueft.ts",
-              "apps/mobile/src/pflichten/pruefer.ts")
+              "apps/mobile/src/pflichten/pruefer.ts", "docs/freigabe-katalog/freigaben-regelwerte.yaml")
 
 
 def bestaetigt(r):
@@ -389,6 +391,16 @@ if __name__ == "__main__":
 
     je_rolle = {r: sum(1 for b in berichte if b["status"] == "freigegeben" and r in b["rollen"]) for r in ROLLEN}
     print(uebersicht, f"geändert: {len(abweichung)}", "je Rolle:", je_rolle)
+    # E-211: Regelwerte aus ihrem eigenen Register (freigaben-regelwerte.yaml), gleiche Regeln für den Nachweis
+    import regelwerte as _rw
+    rw_uebersicht, rw_abweichung, rw_fehler = _rw.anwenden(not PRUEFEN, nachweis_pruefen)
+    print("Regelwerte:", rw_uebersicht, f"geändert: {len(rw_abweichung)}")
+    if rw_fehler:
+        print("Register der Regelwerte fehlerhaft:", *rw_fehler, sep="\n  ")
+        sys.exit(1)
+    if PRUEFEN and rw_abweichung:
+        print("Regelwerte weichen vom Register ab:", ", ".join(rw_abweichung[:20]))
+        sys.exit(1)
     if BERICHT:
         for b in berichte:
             if b["ohne_nachweis"] or b["offen"] or b["einschraenkung"]:

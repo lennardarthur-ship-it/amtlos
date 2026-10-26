@@ -68,3 +68,10 @@ const zielVoll = path.join(hier, "../src/pflichten/katalog.json");
 fs.mkdirSync(path.dirname(zielVoll), { recursive: true });
 fs.writeFileSync(zielVoll, JSON.stringify(mitMarke({ rechtsstand, pflichten: voll, regelwerte })) + "\n");
 console.log(`✓ ${voll.length} Pflichten, ${regelwerte.length} Regelwerte, Rechtsstand ${rechtsstand.datum} (${Math.round(fs.statSync(zielVoll).size / 1024)} KB) → src/pflichten/katalog.json`);
+// E-211: Regelwerte mit eigenem Prüfstand – nicht bestätigte, auf die Pflichten verweisen, nennt der Vermerk der Pflicht;
+// store-check meldet sie als Startblocker. Hier nur der Hinweis (das Bündel braucht alle Werte, sonst rechnet die Engine „unbekannt“).
+{
+  const ids = new Set(JSON.stringify(voll).match(/"regelwert":"[a-z0-9_.]+"/g)?.map((m) => m.slice(13, -1)) ?? []);
+  const offen = regelwerte.filter((r) => ids.has(r.id) && !(r.pruefung?.status === "freigegeben" && r.pruefung.geprueft_version === r.version && r.pruefung.bestaetigt_am));
+  if (offen.length) console.log(`⚠ ${offen.length} von Pflichten verwendete Regelwert-Versionen noch nicht fachlich bestätigt (Vermerk nennt sie, store-check: Startblocker)`);
+}

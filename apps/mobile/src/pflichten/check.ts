@@ -10,9 +10,11 @@ import { StandardKalender, plusMonate } from "@amtlos/fristen";
 import { SCHRITTE, type Frage } from "@amtlos/i18n";
 import { QUELLFAKTEN, auswerten, entscheidendeSaetze, zuErfragendeFakten, type Ereignis, type Katalog, type Knoten, type Pflicht } from "@amtlos/rules-engine";
 import roh from "./katalog.json";
-import { istGeprueft, pruefVermerk, type PruefungRoh } from "./pruefer";
+import { istGeprueft, offeneRegelwerte, pruefVermerk, type PruefungRoh, type RegelwertRoh } from "./pruefer";
 
 export const KATALOG = roh as unknown as Katalog;
+/** E-211: Regelwerte mit Prüfstand – nicht bestätigte stehen im Vermerk der Pflichten, die auf sie verweisen */
+export const REGELWERTE = KATALOG.regelwerte as unknown as readonly RegelwertRoh[];
 
 /** Regelwert aus dem Katalog (z. B. Aufbewahrungsfristen) – keine Zahl in der App ist erfunden. */
 export function regelwert(id: string): number | null {
@@ -647,7 +649,8 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
         .map((f) => f.slice("profil.".length))
         .filter((f) => FRAGE.has(f)),
       geprueft: istGeprueft(p.version, p.pruefung),
-      pruefVermerk: pruefVermerk(p.version, p.pruefung),
+      // E-211: mit den Regelwerten (Schwellen, Beträge) der Pflicht, die noch nicht fachlich bestätigt sind
+      pruefVermerk: pruefVermerk(p.version, p.pruefung, undefined, offeneRegelwerte(p, REGELWERTE, stichtag)),
       // je Ereignis mit kommendem Termin (z. B. Unterweisung ein Jahr nach der letzten): „erledigt“ gilt nur für diesen
       // Termin – sonst hakte die Unterweisung, aus der der Termin entsteht, ihre eigene Wiederholung schon ab
       // R10: mehrere vergangene Einstellungen machen eine Pflicht je Einstellung nicht „wiederkehrend“ – nur kommende Termine zählen
@@ -732,7 +735,7 @@ export interface Erledigt {
 }
 
 const TAG = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" });
-const heuteBerlin = () => TAG.format(new Date());
+export const heuteBerlin = () => TAG.format(new Date());
 /** Derselbe Kalendermonat bzw. dasselbe Kalenderjahr (ISO-Daten oder -Zeitpunkte) */
 const gleicherZeitraum = (a: string, b: string, z: "monat" | "jahr") => a.slice(0, z === "monat" ? 7 : 4) === b.slice(0, z === "monat" ? 7 : 4);
 

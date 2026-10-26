@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://amtlos.de/schemas/regelwert/1.json",
   "title": "Regelwert – eine Version",
-  "description": "Schwelle, Betrag oder Satz mit Gültigkeitszeitraum (E-034). Überlappende freigegebene Zeiträume sind in der Datenbank ausgeschlossen.",
+  "description": "Schwelle, Betrag oder Satz mit Gültigkeitszeitraum (E-034). Überlappende freigegebene Zeiträume sind in der Datenbank ausgeschlossen. `pruefung` wie bei Pflichten, aus dem Register freigaben-regelwerte.yaml (E-211).",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "id", "version", "bezeichnung", "einheit", "wert", "gueltig_ab", "status_recht", "rechtsgrundlage", "quellen"],
@@ -39,7 +39,10 @@
       "properties": {
         "status": { "enum": ["entwurf", "in_pruefung", "freigegeben", "abgelehnt", "zurueckgezogen"] },
         "geprueft_von": { "type": ["array", "null"], "items": { "type": "string" } },
-        "geprueft_am": { "type": ["string", "null"], "format": "date" }
+        "geprueft_am": { "type": ["string", "null"], "format": "date" },
+        "geprueft_version": { "type": ["integer", "null"], "description": "Geprüfte Version; weicht `version` ab, gilt der Wert als nicht bestätigt (E-171, E-211)." },
+        "bestaetigt_am": { "type": ["string", "null"], "format": "date", "description": "Tag der schriftlichen Bestätigung (Nachweis in docs/freigabe-katalog/freigaben-regelwerte.yaml, E-211)." },
+        "einschraenkung": { "type": ["string", "null"] }
       }
     }
   }

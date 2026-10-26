@@ -167,7 +167,7 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
     const unterlagen = dateien.filter((d) => /^docs\/(pruefberichte|freigabe-katalog\/versand)/.test(d) || /\.(xlsx|xls|xlsm|pdf|eml|msg|mbox|docx?|odt|ods)$/i.test(d) || (d.startsWith("docs/") && /\.(jpe?g|png|heic|tiff?)$/i.test(d)) || (d.startsWith("docs/freigabe-vorlagen/") && !d.endsWith(".py")));
     const h = JSON.parse(fs.readFileSync(path.join(WURZEL, "docs/freigabe-katalog/namen-sha256.json"), "utf8"));
     const sha = (s) => createHash("sha256").update(s).digest("hex");
-    const prueftexte = ["docs/freigabe-katalog/freigaben.yaml", "docs/freigabe-katalog/offene-punkte.yaml", "packages/fachlogik/src/dokumente/geprueft.ts", "apps/mobile/src/pflichten/pruefer.ts"];
+    const prueftexte = ["docs/freigabe-katalog/freigaben.yaml", "docs/freigabe-katalog/offene-punkte.yaml", "packages/fachlogik/src/dokumente/geprueft.ts", "apps/mobile/src/pflichten/pruefer.ts", "docs/freigabe-katalog/freigaben-regelwerte.yaml"];
     const mitNamen = dateien.filter((d) => {
       const roh = fs.readFileSync(path.join(WURZEL, d));
       const w = (roh.subarray(0, 8000).includes(0) ? roh.toString("latin1") : roh.toString("utf8")).toLowerCase().match(/[a-zäöüß]+/g) ?? [];
@@ -181,6 +181,29 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
   pruefe(!wartend.length, `Katalog: alle freigegebenen Einträge schriftlich bestätigt (E-197, Nachweis ohne Mail im Projekt, E-198)${wartend.length ? ` – ${wartend.length} warten auf die Bestätigung per E-Mail bzw. Nachprüfung (Nachprüfliste beim Gründer, PRUEFLISTE T-200)` : ""}`);
   const entwurf = katalog.pflichten.filter((p) => p.pruefung?.status === "entwurf").map((p) => p.id);
   pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; Prüfpaket beim Gründer, PRUEFLISTE T-198)` : ""}`);
+  // E-211: Regelwerte (Schwellen, Beträge) haben eine eigene Prüfung. Solange ein Wert, auf den eine Pflicht verweist (Auslöser
+  // oder Frist), in der heute oder künftig geltenden Version nicht bestätigt ist, sagt der Vermerk der Pflicht das – vor dem
+  // Start sollen sie bestätigt sein (Prüfpakete je Rolle: scripts/regelwerte-pruefpaket.py, Übernahme regelwerte-uebernehmen.py).
+  {
+    const heute = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+    const bestaetigt = (r) => r.pruefung?.status === "freigegeben" && r.pruefung.geprueft_version === r.version && Boolean(r.pruefung.geprueft_am) && Boolean(r.pruefung.bestaetigt_am) && r.pruefung.geprueft_am <= r.pruefung.bestaetigt_am;
+    const verweise = (o, ids = new Set()) => {
+      if (Array.isArray(o)) o.forEach((x) => verweise(x, ids));
+      else if (o && typeof o === "object") {
+        if (typeof o.regelwert === "string") ids.add(o.regelwert);
+        Object.values(o).forEach((x) => verweise(x, ids));
+      }
+      return ids;
+    };
+    const offenFuer = (ids) => (katalog.regelwerte ?? []).filter((r) => ids.has(r.id) && !(r.gueltig_bis && r.gueltig_bis < heute) && !bestaetigt(r)).map((r) => `${r.id}@${r.version}`);
+    const vonPflichten = [...new Set(offenFuer(verweise(katalog.pflichten)))].sort();
+    // Werte, die die App selbst anzeigt (regelwert("…") in src/, z. B. Aufbewahrungsfrist beim Löschen)
+    const inApp = new Set();
+    const quellen = (o) => { for (const e of fs.readdirSync(o, { withFileTypes: true })) { const p = path.join(o, e.name); if (e.isDirectory()) quellen(p); else if (/\.tsx?$/.test(e.name)) for (const m of fs.readFileSync(p, "utf8").matchAll(/\bregelwert\("([a-z0-9_.]+)"\)/g)) inApp.add(m[1]); } };
+    quellen(path.join(APP, "src"));
+    const angezeigt = offenFuer(inApp).filter((x) => !vonPflichten.includes(x)).sort();
+    pruefe(!vonPflichten.length && !angezeigt.length, `Startblocker Regelwerte: von Pflichten verwendete Schwellen und Beträge fachlich bestätigt (E-211)${vonPflichten.length || angezeigt.length ? ` – ${vonPflichten.length} von Pflichten verwendete Regelwert-Versionen noch nicht fachlich bestätigt (${vonPflichten.join(", ")})${angezeigt.length ? `; dazu in der App angezeigt: ${angezeigt.join(", ")}` : ""}; der Vermerk dieser Pflichten nennt den Wert als „noch nicht fachlich bestätigt“ (Prüfpakete je Rolle beim Gründer, PRUEFLISTE T-259)` : ""}`);
+  }
   const geprueft = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/geprueft.ts"), "utf8");
   const staende = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/pruefstaende.ts"), "utf8");
   const teilsummen = fs.readFileSync(path.join(APP, "../../packages/fachlogik/src/dokumente/geprueft-teilsummen.ts"), "utf8");

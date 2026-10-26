@@ -1,0 +1,14 @@
+# E-211: Register der fachlichen Bestätigung von Regelwerten (catalog/regelwerte – Schwellen, Beträge, Sätze).
+# Aufbau wie freigaben.yaml: je Block die Rolle (steuern, recht, arbeitsschutz), umfang „alles“, ein Nachweis (art: mail,
+# blatt oder bericht; datum = Tag der Bestätigung; rolle; umfang in unseren Worten; aufbewahrung: beim Gründer) und je
+# Regelwert die bestätigte Version mit stand und quelle. Keine Namen, keine Zitate, kein Dateiverweis (E-198, E-199).
+# Eintragen: python3 docs/freigabe-katalog/regelwerte-uebernehmen.py (aus der zurückgeschickten Prüfliste), dann
+# python3 docs/freigabe-katalog/anwenden.py schreibt die pruefung-Zeilen. Bisher ist kein Regelwert bestätigt (T-86, T-259).
+#
+# Beispiel (Form, kein Eintrag):
+# - pruefer: steuern
+#   umfang: alles
+#   nachweis: { art: mail, datum: 'JJJJ-MM-TT', rolle: steuern, umfang: Regelwerte laut Prüfliste mit Ergebnis „richtig“, aufbewahrung: beim Gründer }
+#   eintraege:
+#     steuern.ustg19.grenze_vorjahr: { version: 1, stand: 'JJJJ-MM-TT', quelle: ausgefüllte Prüfliste Regelwerte (beim Gründer) }
+[]
