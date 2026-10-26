@@ -89,8 +89,9 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
     // Die freigegebene USt-Version verweist auf noch ungeprüfte Regelwerte → kein Release
     await expect(releaseVeroeffentlichen(studio, k.redakteurin!, "prod-Release")).rejects.toThrow(/Regelwerte fehlen.*grenze_befreiung/);
     const rw = await studio.imKontext({}, (tx) =>
-      // R10: die Voranmeldung nutzt auch die Kleinunternehmergrenzen (Pflicht über der Grenze ohne bekannte Zahllast)
-      tx.abfrage<{ id: string }>("select id from katalog.regelwert_version where regelwert_id in ('steuern.ust_va.grenze_befreiung', 'steuern.ust_va.grenze_monatlich', 'steuern.ustg19.grenze_vorjahr', 'steuern.ustg19.grenze_laufendes_jahr')"),
+      // R10: die Voranmeldung nutzt auch die Kleinunternehmergrenzen (Pflicht über der Grenze ohne bekannte Zahllast),
+      // E-206: und das Jahr, ab dem Neugründer wieder monatlich anmelden
+      tx.abfrage<{ id: string }>("select id from katalog.regelwert_version where regelwert_id in ('steuern.ust_va.grenze_befreiung', 'steuern.ust_va.grenze_monatlich', 'steuern.ust_va.neugruender_monatlich_ab', 'steuern.ustg19.grenze_vorjahr', 'steuern.ustg19.grenze_laufendes_jahr')"),
     );
     for (const { id } of rw) {
       await pruefentscheidung(studio, k.pruefer!, id, { entscheidung: "freigegeben", qualifikation: null }, "regelwert_version");
