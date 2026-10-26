@@ -92,7 +92,10 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
   // C-4: Schlussrechnung – abgesetzte Abschläge (brutto) als vorausbezahlter Betrag; E-193 (8b): beim Storno einer
   // Schlussrechnung gespiegelt (BT-113 negativ wie alle Beträge der Rechnungskorrektur), zu erstatten ist nur der Rest
   const abschlaege = !gs ? (r.abschlaege ?? []) : [];
-  const voraus = abschlagsSumme(abschlaege).brutto_cent;
+  // E-200: schon bezahlt (PDF: „Der Rechnungsbetrag wurde am … bezahlt.“) – bezahlt ist der ganze Betrag (BT-113, mit den
+  // Abschlägen einer Schlussrechnung), zu zahlen nichts mehr (BT-115 = 0,00); nie bei Stornos und Gutschriften
+  const bezahlt = !!r.bezahlt_am && !gs && r.art !== "storno" && s.brutto_cent > 0;
+  const voraus = bezahlt ? s.brutto_cent : abschlagsSumme(abschlaege).brutto_cent;
   const zahlbar = s.brutto_cent - voraus;
   const verweise = [
     ...(r.art === "storno" && r.storniert_nummer ? [r.storniert_nummer] : []),
@@ -100,7 +103,7 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     ...abschlaege.map((a) => a.nummer).filter(Boolean),
   ];
   const abschlagNotiz = abschlaege.length
-    ? `Abgesetzte Abschlagsrechnungen (§ 14 Abs. 5 Satz 2 UStG): ${abschlaege.map((a) => `Nr. ${a.nummer}${a.datum ? ` vom ${a.datum.slice(8, 10)}.${a.datum.slice(5, 7)}.${a.datum.slice(0, 4)}` : ""}: Entgelt ${betrag(a.netto_cent)} EUR, Umsatzsteuer ${a.satz === null ? "–" : `${a.satz} %`} ${betrag(a.ust_cent)} EUR`).join("; ")}. Bereits gezahlt: ${betrag(voraus)} EUR.`
+    ? `Abgesetzte Abschlagsrechnungen (§ 14 Abs. 5 Satz 2 UStG): ${abschlaege.map((a) => `Nr. ${a.nummer}${a.datum ? ` vom ${a.datum.slice(8, 10)}.${a.datum.slice(5, 7)}.${a.datum.slice(0, 4)}` : ""}: Entgelt ${betrag(a.netto_cent)} EUR, Umsatzsteuer ${a.satz === null ? "–" : `${a.satz} %`} ${betrag(a.ust_cent)} EUR`).join("; ")}. Bereits gezahlt: ${betrag(abschlagsSumme(abschlaege).brutto_cent)} EUR.`
     : null;
   // BT-30/BT-33: nur für den Betrieb als Verkäufer (bei einer Gutschrift ist der Leistende der Verkäufer)
   const register = !gs ? (r.steller.register ?? "").trim() : "";
@@ -158,7 +161,7 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
       ? { "cac:PaymentTerms": { "cbc:Note": zahlungsbedingungenMitSkonto(r.skonto, `Bei Zahlung bis zum ${r.skonto.bis.slice(8, 10)}.${r.skonto.bis.slice(5, 7)}.${r.skonto.bis.slice(0, 4)} (innerhalb von ${r.skonto.tage} Tagen) ${prozentText(r.skonto.prozent)} % Skonto (${betrag(skontoBetrag(zahlbar, r.skonto.prozent))} EUR).`) } }
       : // E-193 (5): „zahlbar sofort“ bzw. schon bezahlt – Zahlungsbedingung als Text (BT-20), sonst fehlt bei positivem
         // Zahlbetrag ohne Fälligkeitsdatum sowohl BT-9 als auch BT-20 (BR-CO-25) und Eingangsportale weisen die Rechnung ab
-        r.zahlungsbedingung && r.art !== "storno" && zahlbar > 0
+        r.zahlungsbedingung && r.art !== "storno" && (zahlbar > 0 || bezahlt)
         ? { "cac:PaymentTerms": { "cbc:Note": r.zahlungsbedingung } }
         : {}),
     // C-16: Nachlässe als Abschlag auf Dokumentebene (BG-20) mit Grund (BT-97) und Steuerkategorie (BT-95/96)
@@ -192,7 +195,7 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
       "cbc:TaxExclusiveAmount": m(s.netto_cent).wert, "cbc:TaxExclusiveAmount@currencyID": "EUR",
       "cbc:TaxInclusiveAmount": m(s.brutto_cent).wert, "cbc:TaxInclusiveAmount@currencyID": "EUR",
       ...(nachlassIdx.length ? { "cbc:AllowanceTotalAmount": betrag(nachlassSumme), "cbc:AllowanceTotalAmount@currencyID": "EUR" } : {}),
-      // BT-113: bereits gezahlte Abschläge (Schlussrechnung); BT-115 = Rest
+      // BT-113: bereits gezahlte Abschläge (Schlussrechnung) bzw. bei schon bezahlten Rechnungen der ganze Betrag; BT-115 = Rest
       ...(voraus ? { "cbc:PrepaidAmount": m(voraus).wert, "cbc:PrepaidAmount@currencyID": "EUR" } : {}),
       "cbc:PayableAmount": m(zahlbar).wert, "cbc:PayableAmount@currencyID": "EUR",
     },

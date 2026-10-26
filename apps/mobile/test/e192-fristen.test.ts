@@ -28,10 +28,11 @@ describe("SV-Termine in der App (E-192)", () => {
     const sv = finde(a, "personal.sv_beitraege").termine;
     const bn = finde(a, "personal.beitragsnachweis").termine;
     expect(sv.slice(0, 3)).toEqual(["2026-10-28", "2026-11-26", "2026-12-28"]);
-    expect(bn.slice(0, 3)).toEqual(["2026-10-26", "2026-11-24", "2026-12-22"]);
+    // E-200: Beitragsnachweis spätestens am Kalendertag vor dem Tabellendatum (26.10., 24.11., 22.12.) übermitteln
+    expect(bn.slice(0, 3)).toEqual(["2026-10-25", "2026-11-23", "2026-12-21"]);
     // Mai 2027: Fronleichnam (27.05.) in Ländern wie BY, NW – der frühere Termin, egal wo der Betrieb sitzt
     expect(sv).toContain("2027-05-26");
-    expect(bn).toContain("2027-05-24");
+    expect(bn).toContain("2027-05-23");
     expect(finde(auswertung({ ...salon, bundesland: "BE" }, "2026-10-25"), "personal.sv_beitraege").termine).toContain("2027-05-26");
   });
   it("Voranmeldung am 10. mit Verschiebung nach § 108 Abs. 3 AO (nicht nach Bankarbeitstagen)", () => {

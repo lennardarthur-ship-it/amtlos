@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import * as StoreReview from "expo-store-review";
 import { AppState } from "react-native";
 import { sollFragen } from "./pro/bewertung";
-import { kaufAktiv, proAktiv, proBeobachten, testmodus } from "./pro/kauf";
+import { aboStand, kaufAktiv, proAktiv, proBeobachten, testmodus, type AboStand } from "./pro/kauf";
 import { archivLoeschen, archivierteSchluessel, autoSchluesselLoeschen, schluesselArchivieren, schluesselHolen, schluesselLoeschen, schluesselbundMoeglich } from "./unterlagen/schluesselbund";
 import { allesAbsagen } from "./pflichten/erinnerungen";
 import { cacheLeeren } from "./unterlagen/aufraeumen";
@@ -87,14 +87,19 @@ interface Zustand {
   ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean): boolean;
   /** E-193 (4): Android – geteilt, aber „Nein, noch nicht“ verschickt: die ausgegebene Fassung merken, nicht festschreiben */
   teilenOffen(id: string, f: Omit<GeteilteFassung, "am">): void;
-  /** E-193 (4): „Doch verschickt – festschreiben“: die zuletzt geteilte Fassung festschreiben (sofort gespeichert) */
-  geteiltFestschreiben(id: string): boolean;
+  /**
+   * E-193 (4): „Doch verschickt – festschreiben“: die zuletzt geteilte Fassung festschreiben (sofort gespeichert). E-200: mit
+   * `am` die gewählte Fassung (Zeitpunkt einer ihrer Ausgaben), wenn verschiedene Fassungen geteilt wurden.
+   */
+  geteiltFestschreiben(id: string, am?: string): boolean;
   erinnerungenSetzen(an: boolean): void;
   stornieren(id: string): Unterlage | null;
   kopieren(id: string): Unterlage | null;
-  loeschen(id: string): void;
+  /** Entwurf löschen; E-200: ein geteilter, nicht bestätigter Entwurf nur mit Grund (protokolliert, Nummer bleibt vergeben) */
+  loeschen(id: string, grund?: string): void;
   /**
-   * löscht alles – verweigert (false), solange aufbewahrungspflichtige Unterlagen nicht gesichert sind. Im
+   * löscht alles – verweigert (false), solange aufbewahrungspflichtige Unterlagen nicht für die Betriebsprüfung exportiert
+   * und als gespeichert bestätigt sind (E-200, `allesLoeschenErlaubt`). Im
    * Ladefehler-Zustand nur mit `trotzLadefehler` (zweite, ausdrückliche Bestätigung, H4): Dann bleiben die
    * unlesbaren Daten beiseitegelegt, ihre Belegdateien und der alte Schlüssel erhalten.
    */
@@ -148,6 +153,12 @@ interface Zustand {
   proTestSetzen(an: boolean): void;
   /** E-188: der Bezahlschirm nach dem ersten Pflichten-Check kam von selbst – vermerken, damit er so nur einmal kommt */
   bezahlschirmNachCheckVermerken(): void;
+  /** E-200: Export „Daten für die Betriebsprüfung“ erstellt und als gespeichert bestätigt (ändert den Inhalt nicht) */
+  pruefexportBestaetigen(): void;
+  /** E-200: Stand des Abos laut Store (Kündigung erkennen) – null ohne Store bzw. ohne Abo */
+  abo: AboStand | null;
+  /** E-200: Hinweis zum Ende bzw. zur Kündigung von Pro für diesen Anlass weggetippt */
+  aboHinweisWeg(schluessel: string): void;
   /** Phase 2.3: Partner für „Empfohlen von …“ setzen bzw. entfernen (null) – nur Anzeige, schaltet nie etwas frei */
   partnerSetzen(id: string | null): void;
   /** Vorprüfung Recht (§ 305 Abs. 2 BGB): Zustimmung zu dieser Fassung der Nutzungsbedingungen mit Zeitpunkt speichern */
@@ -188,7 +199,7 @@ interface Zustand {
 }
 
 /** Zustandswerte ohne den Stand (ändern sich selten) */
-type StatusFelder = "bereit" | "ladefehler" | "ladefehlerArt" | "verschluesselt" | "speicherFehler" | "speicherFehlerArt" | "tab" | "pro" | "proBekannt";
+type StatusFelder = "bereit" | "ladefehler" | "ladefehlerArt" | "verschluesselt" | "speicherFehler" | "speicherFehlerArt" | "tab" | "pro" | "proBekannt" | "abo";
 export type AmtlosStatus = Pick<Zustand, StatusFelder>;
 /** Handlungen – über die ganze Laufzeit dieselben Funktionen (R9 Performance: kein Neuzeichnen wegen neuer Funktionen) */
 export type AmtlosAktionen = Omit<Zustand, StatusFelder | "stand">;
@@ -270,6 +281,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   }, []);
 
   const [storePro, setStorePro] = useState(false);
+  // E-200: Abo-Stand (Kündigung) – beim Start, bei jeder Rückkehr in die App und bei jeder Meldung des Stores
+  const [abo, setAbo] = useState<AboStand | null>(null);
   // E-156: erst wenn der Store geantwortet hat, steht fest, ob Pro fehlt – vorher keine Erinnerungen absagen
   const [proBekannt, setProBekannt] = useState(!kaufAktiv);
   useEffect(() => {
@@ -278,13 +291,20 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       setStorePro(an);
       setProBekannt(true);
     });
-    const abo = AppState.addEventListener("change", (z) => {
-      if (z === "active") void proAktiv().then(setStorePro);
+    void aboStand().then(setAbo);
+    const vordergrund = AppState.addEventListener("change", (z) => {
+      if (z === "active") {
+        void proAktiv().then(setStorePro);
+        void aboStand().then(setAbo);
+      }
     });
     // Phase 2.3: eingelöste Angebotscodes, Verlängerung, Kündigung – RevenueCat meldet die Berechtigung
-    const beobachtung = proBeobachten(setStorePro);
+    const beobachtung = proBeobachten((an) => {
+      setStorePro(an);
+      void aboStand().then(setAbo);
+    });
     return () => {
-      abo.remove();
+      vordergrund.remove();
       beobachtung();
     };
   }, []);
@@ -472,9 +492,19 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   }, [setzen]);
 
   const pro = storePro || (testmodus && stand.proTest);
+  // E-200: zuletzt mit Pro gesehen (Tag) – endet Pro, zeigt die App den Hinweis zu den Aufbewahrungspflichten. Wie
+  // `letzteSicherung` gerätegebunden und ohne „geaendert“ (sonst gälte der Stand als ungesichert bzw. nicht exportiert).
+  useEffect(() => {
+    if (!bereit || ladefehler || !pro) return;
+    const tag = new Date().toISOString().slice(0, 10);
+    if (aktuell.current.proZuletzt === tag) return;
+    aktuell.current = { ...aktuell.current, proZuletzt: tag };
+    setStand(aktuell.current);
+    planen();
+  }, [bereit, ladefehler, pro, planen, setStand]);
   const status = useMemo<AmtlosStatus>(
-    () => ({ bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehler: speicherFehlerArt !== null, speicherFehlerArt, tab, pro, proBekannt }),
-    [bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehlerArt, tab, pro, proBekannt],
+    () => ({ bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehler: speicherFehlerArt !== null, speicherFehlerArt, tab, pro, proBekannt, abo }),
+    [bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehlerArt, tab, pro, proBekannt, abo],
   );
 
   // alle Abhängigkeiten sind selbst stabil (useCallback ohne wechselnde Werte) – die Handlungen bleiben dieselben
@@ -521,8 +551,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         setzen(teilenOffenVermerken(aktuell.current, id, new Date(), f));
         schreiben();
       },
-      geteiltFestschreiben: (id) => {
-        const s = geteilteFassungFestschreiben(aktuell.current, id, new Date());
+      geteiltFestschreiben: (id, am) => {
+        const s = geteilteFassungFestschreiben(aktuell.current, id, new Date(), am);
         if (!s.unterlagen.find((u) => u.id === id)?.festgeschrieben) return false;
         setzen(s);
         schreiben();
@@ -539,7 +569,14 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         setzen(s);
         return u;
       },
-      loeschen: (id) => setzen(loeschen(aktuell.current, id)),
+      loeschen: (id, grund) => {
+        const vorher = aktuell.current;
+        const s = loeschen(vorher, id, new Date(), grund);
+        if (s === vorher) return;
+        setzen(s);
+        // E-200: ein protokolliertes Löschen (geteilter Entwurf) gleich speichern
+        if (s.protokoll.length !== vorher.protokoll.length) schreiben();
+      },
       zusammenfuehren: async (g) => {
         // Wiederherstellen nach einem Ladefehler: erst die unlesbaren Daten beiseitelegen, dann speichern
         if (sperre.current && !(await ladefehlerAufheben())) throw new Error("Ladefehler nicht aufgehoben");
@@ -596,6 +633,17 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       cloudSicherungSetzen: (an) => setzen({ ...aktuell.current, cloudSicherung: an }),
       proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
       proTestSetzen: (an) => setzen({ ...aktuell.current, proTest: an }),
+      pruefexportBestaetigen: () => {
+        // wie „gesichert“: ändert den Inhalt nicht (kein „geaendert“) – gilt, bis sich der Stand ändert
+        aktuell.current = { ...aktuell.current, pruefexport: new Date().toISOString() };
+        setStand(aktuell.current);
+        schreiben();
+      },
+      aboHinweisWeg: (schluessel) => {
+        aktuell.current = { ...aktuell.current, aboHinweisGesehen: schluessel };
+        setStand(aktuell.current);
+        planen();
+      },
       bezahlschirmNachCheckVermerken: () => {
         if (aktuell.current.bezahlschirmNachCheck) return;
         setzen({ ...aktuell.current, bezahlschirmNachCheck: new Date().toISOString() });

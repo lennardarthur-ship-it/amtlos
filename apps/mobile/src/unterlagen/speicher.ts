@@ -5,6 +5,8 @@
 import { letzteVollsicherung, nachweisText, nachweiseAus, type SicherungsNachweis } from "./sicherungNachweis";
 import { KU_HINWEIS, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, kontenvorgabenAus, kontenvorgabenGesetzt, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Kontenvorgaben, type Sachentnahme } from "@amtlos/fachlogik";
 import { LEERER_BETRIEB, STORNO_ABSCHLAEGE, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, istGutschriftNummer, leereDaten, type Beleg, naechsteNummer, zahlbetrag, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
+import { sha256 } from "@noble/hashes/sha2";
+import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils";
 import { partnerIdAus } from "../partner/partner";
 import { istKompakt, kompaktAufloesen } from "./kompakt";
 import { zustimmungAus, type Zustimmung } from "../rechtliches";
@@ -68,8 +70,9 @@ export interface Unterlage {
   inhaltSha256?: string;
   /**
    * E-193 (4): auf Android geteilt bzw. gedruckt, aber nicht als verschickt bestätigt („Nein, noch nicht“) – Android meldet
-   * einen Abbruch des Teilen-Menüs nicht. Je Ausgabe die Fassung, wie sie hinausging (Inhalt, PDF-Hash, Absender), älteste
-   * zuerst. „Doch verschickt – festschreiben“ schreibt die letzte davon fest; nur anhängen, beim Zusammenführen vereint.
+   * einen Abbruch des Teilen-Menüs nicht. Je Ausgabe die Fassung, wie sie hinausging (Inhalt, Inhalts- und PDF-Hash,
+   * Absender), älteste zuerst. E-200: nur anhängen, nie kürzen oder ändern (auch nicht nach der Festschreibung), beim
+   * Zusammenführen vereint; „Doch verschickt – festschreiben“ lässt bei mehreren verschiedenen Fassungen wählen.
    */
   geteiltOffen?: GeteilteFassung[];
 }
@@ -81,24 +84,38 @@ export interface GeteilteFassung {
   daten: Daten;
   pdfSha256?: string;
   absender?: Betrieb;
+  /** E-200: SHA-256 (hex) über Inhalt und Absender dieser Ausgabe (`fassungHash`) – beim Vermerken festgehalten */
+  inhaltSha256?: string;
 }
-/** höchstens so viele unbestätigte Ausgaben je Unterlage (die ältesten fallen weg) */
-const GETEILT_OFFEN_HOECHSTENS = 20;
+
+/**
+ * E-200: Prüfwert einer ausgegebenen Fassung – SHA-256 über Inhalt und Absender, wie sie hinausgingen. Zwei Ausgaben mit
+ * gleichem Prüfwert sind dieselbe Fassung. Ältere Vermerke ohne gespeicherten Wert rechnen ihn aus dem Vermerk nach.
+ */
+export function fassungHash(f: Pick<GeteilteFassung, "daten" | "absender" | "inhaltSha256">): string {
+  return f.inhaltSha256 ?? bytesToHex(sha256(utf8ToBytes(JSON.stringify({ daten: f.daten, absender: f.absender ?? null }))));
+}
 
 /**
  * R12 GoBD: Protokoll von Löschungen und Korrekturen (nur anhängen, nie ändern) – geht ins Steuerberater-Paket und ins
  * offene Archiv. „beleg_geloescht“: frisch erfasster Beleg endgültig gelöscht; „beleg_ungueltig“: als ungültig markiert;
- * „beleg_korrigiert“: festgeschriebener Beleg mit Grund geändert; „sachentnahme_geloescht“.
+ * „beleg_korrigiert“: festgeschriebener Beleg mit Grund geändert; „sachentnahme_geloescht“. E-200: „entwurf_geloescht“ –
+ * ein geteilter, nicht als verschickt bestätigter Entwurf (z. B. Rechnung) wurde mit Grund gelöscht; seine Nummer bleibt
+ * vergeben (Lücke in der Nummernfolge), die geteilten Fassungen stehen mit Zeitpunkt und Prüfwert dabei.
  */
 export interface ProtokollEintrag {
   id: string;
   zeitpunkt: string;
-  art: "beleg_geloescht" | "beleg_ungueltig" | "beleg_korrigiert" | "sachentnahme_geloescht";
-  /** ID des Belegs bzw. der Sachentnahme */
+  art: "beleg_geloescht" | "beleg_ungueltig" | "beleg_korrigiert" | "sachentnahme_geloescht" | "entwurf_geloescht";
+  /** ID des Belegs, der Sachentnahme bzw. der Unterlage */
   bezug: string;
-  /** Amtlos-Belegnummer (bleibt vergeben, auch wenn der Beleg gelöscht ist) */
+  /** Amtlos-Belegnummer bzw. Nummer der Unterlage (bleibt vergeben, auch wenn gelöscht) */
   nr?: string;
   text: string;
+  /** E-200 („entwurf_geloescht“): Vorlage der gelöschten Unterlage – ihre Nummer zählt für die Nummernfolge weiter */
+  vorlage?: string;
+  /** E-200 („entwurf_geloescht“): die geteilten Fassungen – Zeitpunkt, Art und Prüfwert */
+  geteilt?: { am: string; art: GeteilteFassung["art"]; sha256: string }[];
 }
 
 /** R12: frühere Fassung eines festgeschriebenen Nachweises – nie gelöscht (Historie). */
@@ -176,6 +193,16 @@ export interface Stand {
    * nur über die üblichen Anlässe. Gerätegebunden (nicht synchronisiert), bleibt in der Datensicherung.
    */
   bezahlschirmNachCheck?: string;
+  /**
+   * E-200: wann der Export „Daten für die Betriebsprüfung“ zuletzt erstellt und als gespeichert bestätigt wurde (ISO).
+   * Gilt, solange der Stand danach nicht geändert wurde (`pruefexportAktuell`) – Voraussetzung für „Alle Daten löschen“
+   * bei aufbewahrungspflichtigen Daten. Gerätegebunden, wie `letzteSicherung`.
+   */
+  pruefexport?: string;
+  /** E-200: zuletzt mit aktivem Pro gesehen (ISO-Tag) – endet Pro, erscheint der Hinweis zu den Aufbewahrungspflichten */
+  proZuletzt?: string;
+  /** E-200: Hinweis zum Ende von Pro bzw. zur Kündigung zuletzt weggetippt (ISO) – gerätegebunden */
+  aboHinweisGesehen?: string;
   /**
    * Als ungültig markierte Belege (H2): innerhalb der Aufbewahrungsfrist nicht gelöscht, sondern hier mit Grund
    * aufbewahrt – samt Datei. Sie erscheinen in keiner Liste und zählen nirgends mit.
@@ -393,9 +420,9 @@ function geteiltOffenAus(roh: unknown): GeteilteFassung[] {
   if (!Array.isArray(roh)) return [];
   return (roh as unknown[])
     .filter((x): x is Record<string, unknown> => istObjekt(x) && istIso(x.am) && (x.art === "pdf" || x.art === "druck" || x.art === "xml") && istObjekt(x.daten))
-    .map((x) => ({ am: x.am as string, art: x.art as GeteilteFassung["art"], daten: x.daten as Daten, ...(typeof x.pdfSha256 === "string" && x.pdfSha256 ? { pdfSha256: x.pdfSha256 } : {}), ...(istObjekt(x.absender) ? { absender: { ...LEERER_BETRIEB, ...Object.fromEntries(Object.entries(x.absender).filter(([, w]) => typeof w === "string")) } as Betrieb } : {}) }))
-    .sort((a, b) => a.am.localeCompare(b.am))
-    .slice(-GETEILT_OFFEN_HOECHSTENS);
+    .map((x) => ({ am: x.am as string, art: x.art as GeteilteFassung["art"], daten: x.daten as Daten, ...(typeof x.pdfSha256 === "string" && x.pdfSha256 ? { pdfSha256: x.pdfSha256 } : {}), ...(istObjekt(x.absender) ? { absender: { ...LEERER_BETRIEB, ...Object.fromEntries(Object.entries(x.absender).filter(([, w]) => typeof w === "string")) } as Betrieb } : {}), ...(typeof x.inhaltSha256 === "string" && /^[0-9a-f]{64}$/.test(x.inhaltSha256) ? { inhaltSha256: x.inhaltSha256 } : {}) }))
+    // E-200: vollständig – keine Ausgabe fällt weg
+    .sort((a, b) => a.am.localeCompare(b.am));
 }
 
 /** R12: Betriebsstätten lesen – unlesbare Einträge fallen weg. */
@@ -505,15 +532,20 @@ export function standAus(json: string | null): Stand {
     ...(partnerId ? { partnerId } : {}),
     ...(nutzungsbedingungen ? { nutzungsbedingungen } : {}),
     ...(iso(r.bezahlschirmNachCheck) ? { bezahlschirmNachCheck: iso(r.bezahlschirmNachCheck) } : {}),
+    ...(iso(r.pruefexport) ? { pruefexport: iso(r.pruefexport) } : {}),
+    ...(iso(r.proZuletzt) ? { proZuletzt: iso(r.proZuletzt) } : {}),
+    ...(iso(r.aboHinweisGesehen) ? { aboHinweisGesehen: iso(r.aboHinweisGesehen) } : {}),
   });
 }
 
 /** R12 GoBD: Protokoll lesen – Unlesbares fällt weg. */
 function protokollAus(roh: unknown): ProtokollEintrag[] {
-  const arten = ["beleg_geloescht", "beleg_ungueltig", "beleg_korrigiert", "sachentnahme_geloescht"];
+  const arten = ["beleg_geloescht", "beleg_ungueltig", "beleg_korrigiert", "sachentnahme_geloescht", "entwurf_geloescht"];
+  const geteilt = (w: unknown): ProtokollEintrag["geteilt"] =>
+    Array.isArray(w) ? (w as unknown[]).filter((g): g is Record<string, unknown> => istObjekt(g) && istIso(g.am) && (g.art === "pdf" || g.art === "druck" || g.art === "xml") && typeof g.sha256 === "string").map((g) => ({ am: g.am as string, art: g.art as GeteilteFassung["art"], sha256: g.sha256 as string })) : undefined;
   return (Array.isArray(roh) ? (roh as unknown[]) : [])
     .filter((x): x is Record<string, unknown> => istObjekt(x) && typeof x.id === "string" && istIso(x.zeitpunkt) && arten.includes(String(x.art)) && typeof x.bezug === "string")
-    .map((x) => ({ id: x.id as string, zeitpunkt: x.zeitpunkt as string, art: x.art as ProtokollEintrag["art"], bezug: x.bezug as string, ...(typeof x.nr === "string" && x.nr ? { nr: x.nr } : {}), text: typeof x.text === "string" ? x.text.slice(0, 500) : "" }));
+    .map((x) => ({ id: x.id as string, zeitpunkt: x.zeitpunkt as string, art: x.art as ProtokollEintrag["art"], bezug: x.bezug as string, ...(typeof x.nr === "string" && x.nr ? { nr: x.nr } : {}), text: typeof x.text === "string" ? x.text.slice(0, 500) : "", ...(typeof x.vorlage === "string" && x.vorlage ? { vorlage: x.vorlage } : {}), ...(geteilt(x.geteilt)?.length ? { geteilt: geteilt(x.geteilt) } : {}) }));
 }
 
 /** R12 GoBD: Protokolle zweier Stände nach ID vereinen (nur anhängen). */
@@ -610,9 +642,24 @@ export function istLesbar(json: string | null): boolean {
 
 /** Nächste fortlaufende Nummer einer Vorlage aus allen vorhandenen Unterlagen (festgeschriebene lassen sich nicht löschen). */
 function naechste(s: Stand, vorlageId: string, feld: string, jetzt: Date): string {
+  return naechsteNummer(vergebeneNummern(s, vorlageId, feld), heute(jetzt).slice(0, 4));
+}
+
+/**
+ * Nummern, die für die Nummernfolge einer Vorlage zählen: die aller vorhandenen Unterlagen und (E-200) jede Nummer, die
+ * schon einmal geteilt wurde – in einer unbestätigten Ausgabe (`geteiltOffen`) oder in einem nach dem Teilen gelöschten
+ * Entwurf (Protokoll „entwurf_geloescht“). Eine solche Nummer wird nie neu vergeben; die nächste Unterlage bekommt die
+ * nächste Nummer (die Lücke erklärt das Änderungsprotokoll). Gilt für Anlegen, Kopie und Storno gleichermaßen.
+ */
+export function vergebeneNummern(s: Pick<Stand, "unterlagen" | "protokoll">, vorlageId: string, feld: string): string[] {
   // StB-Prüfung (B-12): Gutschriften mit eigenem Nummernkreis („GS-…“) zählen nicht in der Reihe der Rechnungsnummern
-  const vorhanden = s.unterlagen.filter((u) => u.vorlage === vorlageId).map((u) => u.daten[feld]).filter((n): n is string => typeof n === "string" && !(vorlageId === "rechnung" && istGutschriftNummer(n)));
-  return naechsteNummer(vorhanden, heute(jetzt).slice(0, 4));
+  const zaehlt = (n: unknown): n is string => typeof n === "string" && n.trim() !== "" && !(vorlageId === "rechnung" && istGutschriftNummer(n));
+  const eigene = s.unterlagen.filter((u) => u.vorlage === vorlageId);
+  return [
+    ...eigene.map((u) => u.daten[feld]),
+    ...eigene.flatMap((u) => (u.geteiltOffen ?? []).map((g) => g.daten[feld])),
+    ...s.protokoll.filter((p) => p.art === "entwurf_geloescht" && p.vorlage === vorlageId).map((p) => p.nr),
+  ].filter(zaehlt);
 }
 
 const nummerVon = (u: Unterlage) => {
@@ -819,9 +866,40 @@ export function teilenOffenVermerken(s: Stand, id: string, jetzt: Date, f: Omit<
     unterlagen: s.unterlagen.map((u) => {
       if (u.id !== id || u.festgeschrieben || !vorlageFuer(u.vorlage)?.festschreiben) return u;
       const g: GeteilteFassung = { am: jetzt.toISOString(), art: f.art, daten: f.daten, ...(f.pdfSha256 ? { pdfSha256: f.pdfSha256 } : {}), ...(f.absender ? { absender: { ...f.absender } } : {}) };
-      return { ...u, geteiltOffen: [...(u.geteiltOffen ?? []), g].slice(-GETEILT_OFFEN_HOECHSTENS) };
+      // E-200: Prüfwert über Inhalt und Absender gleich festhalten; der Vermerk wird nur angehängt, nie gekürzt
+      return { ...u, geteiltOffen: [...(u.geteiltOffen ?? []), { ...g, inhaltSha256: fassungHash(g) }] };
     }),
   };
+}
+
+/** E-200: eine verschiedene Fassung unter den unbestätigten Ausgaben – mit allen Ausgaben dieser Fassung. */
+export interface GeteilteVersion {
+  sha256: string;
+  /** Zeitpunkt der letzten Ausgabe dieser Fassung – damit wird sie festgeschrieben */
+  am: string;
+  /** alle Ausgaben dieser Fassung (Zeitpunkt, Art), älteste zuerst */
+  ausgaben: { am: string; art: GeteilteFassung["art"] }[];
+  fassung: GeteilteFassung;
+}
+
+/**
+ * E-200: verschiedene Fassungen einer noch nicht festgeschriebenen Unterlage, die geteilt, aber nicht als verschickt
+ * bestätigt wurden (nach Prüfwert gruppiert, nach der letzten Ausgabe geordnet, die jüngste zuletzt). Mehr als eine:
+ * „Doch verschickt – festschreiben“ fragt, welche wirklich hinausging.
+ */
+export function geteilteVersionen(u: Pick<Unterlage, "geteiltOffen" | "festgeschrieben">): GeteilteVersion[] {
+  if (u.festgeschrieben) return [];
+  const m = new Map<string, GeteilteVersion>();
+  for (const g of u.geteiltOffen ?? []) {
+    const h = fassungHash(g);
+    const v = m.get(h);
+    if (v) {
+      v.ausgaben.push({ am: g.am, art: g.art });
+      v.am = g.am;
+      v.fassung = g;
+    } else m.set(h, { sha256: h, am: g.am, ausgaben: [{ am: g.am, art: g.art }], fassung: g });
+  }
+  return [...m.values()].sort((a, b) => a.am.localeCompare(b.am));
 }
 
 /** E-193 (4): zuletzt geteilte, unbestätigte Fassung – und ob die Unterlage seitdem geändert wurde. */
@@ -835,13 +913,17 @@ export function geteiltOffenLetzte(u: Pick<Unterlage, "geteiltOffen" | "daten" |
  * PDF-Hash und Absender, mit dem sie hinausging (GoBD: was das Gerät verlassen hat, ändert sich nicht mehr). Änderungen
  * seit dem Teilen werden dabei verworfen. Erste Ausgabe = erste unbestätigte Ausgabe; festgeschrieben = jetzt.
  */
-export function geteilteFassungFestschreiben(s: Stand, id: string, jetzt: Date): Stand {
+export function geteilteFassungFestschreiben(s: Stand, id: string, jetzt: Date, am?: string): Stand {
   const u = s.unterlagen.find((x) => x.id === id);
   const letzte = u ? geteiltOffenLetzte(u) : null;
   if (!u || !letzte) return s;
-  const f = letzte.fassung;
+  // E-200: bei mehreren verschiedenen Fassungen die gewählte (Zeitpunkt einer ihrer Ausgaben), sonst die zuletzt geteilte
+  const gewaehlt = am ? u.geteiltOffen!.find((g) => g.am === am) : letzte.fassung;
+  if (!gewaehlt) return s;
+  const f = gewaehlt;
+  const geaendert = JSON.stringify(f.daten) !== JSON.stringify(u.daten);
   const erste = u.ausgegeben ?? u.geteiltOffen![0]!.am;
-  const vorher: Stand = { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...x, daten: f.daten, ...(letzte.geaendert ? { geaendert: jetzt.toISOString() } : {}) } : x)) };
+  const vorher: Stand = { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...x, daten: f.daten, ...(geaendert ? { geaendert: jetzt.toISOString() } : {}) } : x)) };
   const fest = ausgeben(vorher, id, jetzt, f.daten, f.pdfSha256, f.absender, f.art === "xml");
   return { ...fest, unterlagen: fest.unterlagen.map((x) => (x.id === id && x.festgeschrieben ? { ...x, ausgegeben: erste } : x)) };
 }
@@ -937,12 +1019,39 @@ export function kopieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [St
   return [{ ...s, unterlagen: [u, ...s.unterlagen] }, u];
 }
 
-/** Löschen – außer festgeschriebene Unterlagen (Korrektur nur per Storno bzw. neue Fassung) und Nachweise mit Fassungen. */
-export function loeschen(s: Stand, id: string): Stand {
+/**
+ * Löschen – außer festgeschriebene Unterlagen (Korrektur nur per Storno bzw. neue Fassung) und Nachweise mit Fassungen.
+ * E-200: Ein geteilter, nicht als verschickt bestätigter Entwurf (`geteiltOffen`) lässt sich nur mit Grund löschen; das
+ * Änderungsprotokoll hält Nummer, Grund und jede geteilte Fassung (Zeitpunkt, Art, Prüfwert) fest, und die Nummer wird
+ * nie neu vergeben (`vergebeneNummern`). Ohne Grund bleibt der Entwurf.
+ */
+export function loeschen(s: Stand, id: string, jetzt = new Date(), grund = ""): Stand {
   const weg = s.unterlagen.find((u) => u.id === id && !u.festgeschrieben && !u.fassungen?.length);
   if (!weg) return s;
+  const geteilt = weg.geteiltOffen ?? [];
+  if (geteilt.length && !grund.trim()) return s;
+  const v = vorlageFuer(weg.vorlage);
+  const nr = v?.fortlaufend && typeof weg.daten[v.fortlaufend] === "string" ? String(weg.daten[v.fortlaufend]).trim() : "";
+  const nummern = [...new Set([nr, ...geteilt.map((g) => (v?.fortlaufend && typeof g.daten[v.fortlaufend] === "string" ? String(g.daten[v.fortlaufend]).trim() : ""))].filter(Boolean))];
+  const zeit = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  const eintrag: ProtokollEintrag | null = geteilt.length
+    ? {
+        id: neueId(),
+        zeitpunkt: jetzt.toISOString(),
+        art: "entwurf_geloescht",
+        bezug: id,
+        ...(nummern[0] ? { nr: nummern.join(", ") } : {}),
+        vorlage: weg.vorlage,
+        text: `Grund: ${grund.trim()} · ${geteilt.length === 1 ? "1-mal" : `${geteilt.length}-mal`} geteilt, nicht als verschickt bestätigt (${geteilt.map((g) => `${zeit(g.am)} ${g.art.toUpperCase()} Prüfwert ${fassungHash(g).slice(0, 12)}`).join("; ")})${nummern.length ? ` · ${nummern.length === 1 ? "die Nummer bleibt" : "die Nummern bleiben"} vergeben und ${nummern.length === 1 ? "wird" : "werden"} nicht neu verwendet` : ""}`,
+        geteilt: geteilt.map((g) => ({ am: g.am, art: g.art, sha256: fassungHash(g) })),
+      }
+    : null;
   // ein verworfener Storno-Entwurf gibt die ursprüngliche Rechnung wieder frei
-  return { ...vermerken(s, `u:${id}`), unterlagen: s.unterlagen.filter((u) => u.id !== id).map((u) => (u.storniertDurch === id ? (({ storniertDurch: _weg, ...rest }) => rest)(u) : u)) };
+  return {
+    ...vermerken(s, `u:${id}`, jetzt),
+    unterlagen: s.unterlagen.filter((u) => u.id !== id).map((u) => (u.storniertDurch === id ? (({ storniertDurch: _weg, ...rest }) => rest)(u) : u)),
+    ...(eintrag ? { protokoll: [...s.protokoll, eintrag] } : {}),
+  };
 }
 
 /** Person aus einer Unterlage merken (gleicher Name ergänzt den vorhandenen Eintrag). */
@@ -1259,10 +1368,18 @@ export function ungesichert(s: Stand): boolean {
 }
 
 /**
- * „Alle Daten löschen“ (E-129): Liegen aufbewahrungspflichtige Unterlagen auf dem Gerät, nur mit einer Sicherung,
- * die nach der letzten Änderung erstellt wurde – sonst wären Rechnungen weg, die Jahre aufbewahrt werden müssen.
+ * E-200: Der Export „Daten für die Betriebsprüfung“ ist erstellt, als gespeichert bestätigt und seitdem hat sich nichts
+ * geändert.
  */
-export const allesLoeschenErlaubt = (s: Stand) => aufbewahrungspflichtig(s).length === 0 || !ungesichert(s);
+export const pruefexportAktuell = (s: Pick<Stand, "pruefexport" | "geaendert">) => Boolean(s.pruefexport && (!s.geaendert || s.geaendert <= s.pruefexport));
+
+/**
+ * „Alle Daten löschen“ (E-129, geändert mit E-200): Liegen aufbewahrungspflichtige Unterlagen auf dem Gerät, nur nach dem
+ * vollständigen Export „Daten für die Betriebsprüfung“ (Listen, Änderungsprotokoll, E-Rechnungen, Originalbelege,
+ * Feldbeschreibung), den der Nutzer als gespeichert bestätigt hat und nach dem sich nichts geändert hat. Die eigene
+ * Sicherungsdatei allein genügt dafür nicht mehr (lesbar nur mit der App).
+ */
+export const allesLoeschenErlaubt = (s: Stand) => aufbewahrungspflichtig(s).length === 0 || pruefexportAktuell(s);
 
 /** Tage seit der letzten Sicherung, wenn eine fällig ist (ungesicherte Änderungen, älter als `nach` Tage), sonst null. */
 export function sicherungFaellig(s: Stand, jetzt: Date, nach = 7): { tage: number | null } | null {
@@ -1395,7 +1512,7 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
   // E-193 (4): unbestätigte Ausgaben beider Seiten (nach Zeitpunkt) – keine geht verloren
   const offen = new Map<string, GeteilteFassung>();
   for (const g of [...(lokal.geteiltOffen ?? []), ...(andere.geteiltOffen ?? [])]) if (!offen.has(g.am)) offen.set(g.am, g);
-  if (offen.size) r.geteiltOffen = [...offen.values()].sort((a, b) => a.am.localeCompare(b.am)).slice(-GETEILT_OFFEN_HOECHSTENS);
+  if (offen.size) r.geteiltOffen = [...offen.values()].sort((a, b) => a.am.localeCompare(b.am));
   else delete r.geteiltOffen;
   // R12: Fassungen beider Seiten – keine geht verloren (nach Zeitpunkt der Festschreibung)
   const fassungen = new Map<string, Fassung>();

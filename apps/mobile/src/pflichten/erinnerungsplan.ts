@@ -30,6 +30,8 @@ export interface Erinnerung {
   /** Tag der Mitteilung (ISO), zugestellt um 9 Uhr */
   am: string;
   art: ErinnerungsArt;
+  /** E-200: letzter Tag zum Übermitteln (Eingang um 0 Uhr am Tag danach) – Text „Spätestens am … übermitteln“ */
+  uebermitteln?: boolean;
 }
 
 /** Eine Mitteilung auf dem Gerät: alle Erinnerungen eines Tages. */
@@ -60,7 +62,7 @@ export function erinnerungen(a: Auswertung, e: Erledigt, heute: string, o: { vor
   const aus: Erinnerung[] = [];
   for (const p of a.gilt) {
     if (!p.naechsterTermin || p.lohnbuero) continue;
-    const neu = (termin: string, am: string, art: ErinnerungsArt) => aus.push({ pflichtId: p.id, titel: p.titel, termin, am, art });
+    const neu = (termin: string, am: string, art: ErinnerungsArt) => aus.push({ pflichtId: p.id, titel: p.titel, termin, am, art, ...(p.uebermittelnVortag ? { uebermitteln: true } : {}) });
     const fuer = (termin: string) => {
       if (termin > heute) {
         const frueh = plusTage(termin, -vorlauf);
@@ -91,6 +93,8 @@ const datumDe = (iso: string) => iso.split("-").reverse().join(".");
 /** Text einer Erinnerung am Tag der Mitteilung („Fällig am …“, „Heute fällig“, „Seit 3 Tagen überfällig“). */
 export function erinnerungsText(x: Erinnerung): string {
   if (x.art === "ueberfaellig") return TEXT.frist_ueber(differenzTage(x.termin, x.am));
+  // E-200: Beitragsnachweis – der Termin ist der letzte Tag zum Übermitteln
+  if (x.uebermitteln) return x.am === x.termin ? TEXT.e200_heute_uebermitteln : TEXT.e200_uebermitteln_bis(datumDe(x.termin));
   if (x.am === x.termin) return TEXT.frist_heute;
   return TEXT.mitteilung_vorher(datumDe(x.termin));
 }

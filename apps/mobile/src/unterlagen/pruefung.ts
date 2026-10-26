@@ -4,7 +4,7 @@ import { nummerDoppelt, type Stand, type Unterlage } from "./speicher";
 
 export const NUMMER_DOPPELT = "Rechnungsnummer ist schon vergeben";
 
-/** R12 (Kfz #6): Rechtsform aus dem Pflichten-Check, solange „Mein Betrieb“ keine nennt – für § 35a GmbHG (E-193: und §§ 125a, 177a HGB). */
+/** R12 (Kfz #6): Rechtsform aus dem Pflichten-Check, solange „Mein Betrieb“ keine nennt – für § 35a GmbHG (E-193: und §§ 125, 177a HGB). */
 const RECHTSFORM_AUS_CHECK: Record<string, string> = { ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG" };
 
 /** Betrieb für die Prüfung: mit der Rechtsform aus dem Check, wenn in „Mein Betrieb“ keine steht. */

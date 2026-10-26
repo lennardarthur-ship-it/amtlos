@@ -115,7 +115,7 @@ describe("Verschlüsselte Ablage und sicheres Zurückspielen (E-129)", () => {
     expect(zusammenfuehren(jetzt, doppelt).nummernKonflikte).toEqual([String(nach("r2").daten.nummer)]);
   });
 
-  it("verweigert „Alle Daten löschen“ bei ungesicherten Rechnungen und erinnert an die Sicherung", () => {
+  it("verweigert „Alle Daten löschen“ bei aufbewahrungspflichtigen Daten ohne bestätigten Export (E-200) und erinnert an die Sicherung", () => {
     let s = betriebSetzen(LEERER_STAND, B);
     expect(allesLoeschenErlaubt(s)).toBe(true);
     s = anlegen(s, "rechnung", new Date("2026-10-01T08:00:00Z"), "r1")[0];
@@ -124,6 +124,9 @@ describe("Verschlüsselte Ablage und sicheres Zurückspielen (E-129)", () => {
     expect(allesLoeschenErlaubt(s)).toBe(false);
     expect(sicherungFaellig(s, new Date("2026-10-02T08:00:00Z"))).toEqual({ tage: null });
     s = { ...s, letzteSicherung: "2026-10-01T10:00:00.000Z" };
+    // E-200: die eigene Sicherungsdatei allein genügt nicht mehr – erst der bestätigte Export für die Betriebsprüfung
+    expect(allesLoeschenErlaubt(s)).toBe(false);
+    s = { ...s, pruefexport: "2026-10-01T10:00:00.000Z" };
     expect(allesLoeschenErlaubt(s)).toBe(true);
     expect(sicherungFaellig(s, new Date("2026-10-20T08:00:00Z"))).toBeNull();
     s = { ...s, geaendert: "2026-10-02T08:00:00.000Z" };

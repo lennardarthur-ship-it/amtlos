@@ -85,6 +85,7 @@ termine_enthaelt:
   personal.schwangerschaft_mitteilung: [["aenderung-20261001", "2026-10-01"]]
   # 10.10.2026 ist ein Samstag → Montag 12.10.
   personal.lohnsteuer_anmeldung: [["2026-09", "2026-10-12"]]
-  # Oktober 2026: drittletzter Bankarbeitstag Mi 28.10.; zwei Arbeitstage davor Mo 26.10.
+  # Oktober 2026: drittletzter Bankarbeitstag Mi 28.10.; zwei Arbeitstage davor Mo 26.10. (Eingang 0 Uhr) –
+  # E-200: übermitteln spätestens am Kalendertag davor, So 25.10.
   personal.sv_beitraege: [["2026-10", "2026-10-28"]]
-  personal.beitragsnachweis: [["2026-10", "2026-10-26"]]
+  personal.beitragsnachweis: [["2026-10", "2026-10-25"]]

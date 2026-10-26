@@ -473,7 +473,13 @@ function variantenPassen(v: Vorlage, f: Omit<VorlagenFreigabe, "weitere">, liste
  * Freigabe – der Vermerk erscheint dann nur, wenn keine Variante geändert ist.
  */
 export function pruefGruppenFuer(v: Vorlage, freigegeben: Readonly<Record<string, string>>, d?: Daten, betrieb?: Betrieb): string[] {
-  if (!betrieb) return Object.keys(freigegeben).filter((g) => !EIGENE_GRUPPEN[v.id]?.some((x) => x.gruppe === g));
+  const gesetzt = (x: unknown) => x === true || (typeof x === "string" && x.trim() !== "");
+  const eigene = (EIGENE_GRUPPEN[v.id] ?? [])
+    .filter((x) => (x.verdeckt && Object.keys(x.verdeckt).every((k) => gesetzt(d?.[k]))) || (x.auswahl && Object.entries(x.auswahl).every(([k, w]) => d?.[k] === w)))
+    .sort((a, b) => Object.keys(b.verdeckt ?? {}).length - Object.keys(a.verdeckt ?? {}).length)[0];
+  // E-200: ohne Betrieb alle Gruppen der Freigabe außer den Rechnungsarten – und die Rechnungsart dieser Daten (z. B. Storno
+  // einer Schlussrechnung), damit sie auch ohne Betrieb nicht ungeprüft durchrutscht
+  if (!betrieb) return [...Object.keys(freigegeben).filter((g) => !EIGENE_GRUPPEN[v.id]?.some((x) => x.gruppe === g)), ...(eigene ? [eigene.gruppe] : [])];
   const g = ["basis"];
   const name = betrieb.name ?? "";
   const ugCoKg = /\bUG\b/.test(name) && /&\s*Co\.?\s*KG\b/.test(name) ? "UG (haftungsbeschränkt) & Co. KG" : null;
@@ -481,10 +487,6 @@ export function pruefGruppenFuer(v: Vorlage, freigegeben: Readonly<Record<string
   g.push(`rf:${rechtsformAus(roh, PRUEF_RECHTSFORMEN)}`);
   if (PRUEF_LAENDER.includes(betrieb.bundesland)) g.push(`land:${betrieb.bundesland}`);
   if (betrieb.ku_bis) g.push("ku");
-  const gesetzt = (x: unknown) => x === true || (typeof x === "string" && x.trim() !== "");
-  const eigene = (EIGENE_GRUPPEN[v.id] ?? [])
-    .filter((x) => (x.verdeckt && Object.keys(x.verdeckt).every((k) => gesetzt(d?.[k]))) || (x.auswahl && Object.entries(x.auswahl).every(([k, w]) => d?.[k] === w)))
-    .sort((a, b) => Object.keys(b.verdeckt ?? {}).length - Object.keys(a.verdeckt ?? {}).length)[0];
   if (eigene) g.push(eigene.gruppe);
   return g;
 }
