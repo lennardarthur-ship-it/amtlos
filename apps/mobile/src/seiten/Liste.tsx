@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { betragUnplausibel, cent, satzZahl, einheitFuerMenge, gruppenAusBranchen, mengeUngueltig, mobilerVerkauf, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, passendeVorschlaege, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
+import { betragUnplausibel, euroPreis, preisCent, satzZahl, zeilenCent, einheitFuerMenge, gruppenAusBranchen, mengeUngueltig, mobilerVerkauf, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, passendeVorschlaege, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { ChipLeiste, Fuss, HinzufuegenKnopf, Kaestchen, Karte, Knopf, Symbol, T, TextKnopf, Wahl, textAus } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -147,7 +147,7 @@ function EintragSeite({ id, feldId, index, neu }: { id: string; feldId: string; 
  */
 function Rechnung({ e, kleinunternehmer, brutto }: { e: Eintrag; kleinunternehmer: boolean; brutto?: boolean }) {
   const f = useFarben();
-  const preis = typeof e.preis === "string" ? cent(e.preis) : null;
+  const preis = typeof e.preis === "string" ? preisCent(e.preis) : null;
   if (preis === null || !("menge" in e || "satz" in e)) return null;
   const menge = typeof e.menge === "string" && e.menge.trim() ? (zahl(e.menge) ?? 1) : 1;
   // StB-Prüfung (Prio 1): „nullsatz“ (§ 12 Abs. 3 UStG) rechnet mit 0 %
@@ -158,7 +158,7 @@ function Rechnung({ e, kleinunternehmer, brutto }: { e: Eintrag; kleinunternehme
   const eur = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
   // R12 (UX #14): Einheit in der Mehrzahl („3 Stunden“)
   const einheit = typeof e.einheit === "string" && e.einheit.trim() ? ` ${einheitFuerMenge(e.einheit, menge)}` : "";
-  const text = TEXT.position_rechnung(`${new Intl.NumberFormat("de-DE", { maximumFractionDigits: 4 }).format(menge)}${einheit}`, eur(preis), eur(s.netto_cent), kleinunternehmer ? null : eur(s.brutto_cent));
+  const text = TEXT.position_rechnung(`${new Intl.NumberFormat("de-DE", { maximumFractionDigits: 4 }).format(menge)}${einheit}`, euroPreis(preis).replace("\u2212", "-"), eur(s.netto_cent), kleinunternehmer ? null : eur(s.brutto_cent));
   return (
     <View accessibilityRole="summary" style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 14, borderRadius: RADIUS.klein, backgroundColor: f.amtHauch }}>
       <T v="klein" fett farbe={f.amtTief} stil={{ fontVariant: ["tabular-nums"] }}>{text}</T>
@@ -284,13 +284,14 @@ export function ohneTitel(text: string, titel: string[]): string {
 
 /** Rechnungsposition: „2 Stunden × 45,00 € = 90,00 €“ – damit man in der Liste sieht, was die Position kostet. */
 function betragszeile(e: Record<string, unknown>): string | null {
-  const preis = typeof e.preis === "string" ? cent(e.preis) : null;
+  // E-208: Einzelpreis bis vier Nachkommastellen, Zeilenbetrag einmal gerundet – wie auf der Rechnung
+  const preis = typeof e.preis === "string" ? preisCent(e.preis) : null;
   if (preis === null) return null;
   const menge = typeof e.menge === "string" && e.menge.trim() ? (zahl(e.menge) ?? 1) : 1;
   // R12 (UX #14): „3 Stunden“, „7 Termine“ – nicht „3 Stunde“
   const einheit = typeof e.einheit === "string" && e.einheit.trim() ? ` ${einheitFuerMenge(e.einheit, menge)}` : "";
   const fmt = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
-  return `${new Intl.NumberFormat("de-DE", { maximumFractionDigits: 4 }).format(menge)}${einheit} × ${fmt(preis)} = ${fmt(Math.round(menge * preis))}`;
+  return `${new Intl.NumberFormat("de-DE", { maximumFractionDigits: 4 }).format(menge)}${einheit} × ${euroPreis(preis).replace("\u2212", "-")} = ${fmt(zeilenCent(menge, preis))}`;
 }
 
 /** Liste in einem Schritt: Einträge als ruhige Zeilen, darunter Vorschläge, Mitarbeiter übernehmen, eigener Eintrag. */

@@ -39,7 +39,7 @@ import {
   type RechnungsDaten,
   type Tx,
 } from "@amtlos/server";
-import { KU_HINWEIS, umsaetzeNachSatz, ustZeitraum } from "@amtlos/fachlogik";
+import { KU_HINWEIS, preisCentGueltig, umsaetzeNachSatz, ustZeitraum } from "@amtlos/fachlogik";
 import { Kontext, LESEN_VERTRAULICH, MitUnternehmen, type Anfragekontext } from "./auth.js";
 import { ELSTER } from "./elster.controller.js";
 import { DATUM, pruefe, seite, seitenkopf, uebersetzeDbFehler } from "./hilfen.js";
@@ -77,7 +77,8 @@ const PositionEingabe = z
     bezeichnung: TEXT(300),
     menge: z.number().positive().max(1e7).refine((x) => Math.round(x * 1000) === x * 1000, "höchstens drei Nachkommastellen"),
     einheit: z.enum(["stueck", "stunde", "tag", "monat", "pauschal", "kilogramm"]),
-    preis_cent: z.number().int().min(0).max(1e11),
+    // E-208: Einzelpreis bis vier Nachkommastellen in Euro (zwei in Cent, z. B. 34.56 für 0,3456 €/kWh)
+    preis_cent: z.number().min(0).max(1e11).refine(preisCentGueltig, "höchstens zwei Nachkommastellen in Cent"),
     ust_art: z.enum(["regel", "ermaessigt"]).nullable().default("regel"),
   })
   .strict();

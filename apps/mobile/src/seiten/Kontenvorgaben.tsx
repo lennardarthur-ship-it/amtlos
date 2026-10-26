@@ -21,6 +21,8 @@ function standardKonto(id: KontenvorgabeKonto, kr: "SKR03" | "SKR04"): string {
       return k.erloese.nullsatz;
     case "erloesOss":
       return k.erloese.oss;
+    case "erloesAusfuhr":
+      return k.erloese.ausfuhr;
     case "anlageMaschinen":
       return k.anlagen.maschinen;
     case "anlageBga":

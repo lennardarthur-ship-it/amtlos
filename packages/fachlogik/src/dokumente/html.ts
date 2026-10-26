@@ -1256,6 +1256,18 @@ export function cent(t: string | null | undefined): number | null {
   // erst auf Zehntel-Cent glätten (Gleitkomma: 1,005 × 100 = 100,4999…), dann kaufmännisch und für negative Beträge spiegelbildlich runden
   return n === null ? null : rundeCent(Math.round(n * 10_000) / 100);
 }
+/**
+ * E-208: Einzelpreis einer Rechnungsposition → Cent mit bis zu zwei Nachkommastellen (bis vier Nachkommastellen in Euro,
+ * z. B. „0,3456“ → 34,56). Mehr Stellen werden auf vier Stellen in Euro gerundet. Leer oder unlesbar → null.
+ */
+export function preisCent(t: string | null | undefined): number | null {
+  const n = lesen(t);
+  if (n === null) return null;
+  const h = Math.sign(n) * Math.round(Math.abs(n) * 10_000); // Hundertstel-Cent, symmetrisch gerundet
+  return h / 100 + 0; // + 0: kein „−0“
+}
+/** E-208: Einzelpreis für Dokumente – wie `euro`, aber mit bis zu vier Nachkommastellen („0,3456 €“; ganze Cent unverändert „45,00 €“). */
+export const euroPreis = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(c / 100).replace(/^-/, "\u2212");
 /** Zahl wie „1,5“ oder „2,345“ (Menge in kg) → 1.5 bzw. 2.345 – bis vier Nachkommastellen; leer oder unlesbar → null. */
 export function zahl(t: string | null | undefined): number | null {
   const n = lesen(t);

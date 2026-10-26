@@ -9,7 +9,11 @@ export interface Position {
   bezeichnung: string;
   menge: number;
   einheit: Einheit;
-  preis_cent: number; // Nettopreis je Einheit
+  /**
+   * Nettopreis je Einheit in Cent. E-208: bis zu zwei Nachkommastellen (Hundertstel-Cent, also bis vier Nachkommastellen
+   * in Euro, z. B. 34,56 Cent = 0,3456 € je kWh); der Zeilenbetrag wird erst aus Menge × Preis einmal auf Cent gerundet.
+   */
+  preis_cent: number;
   ust_satz: number | null; // Prozent; null bei Kleinunternehmern
   /** UN/ECE-Code der Einheit, wenn die Einheit frei eingegeben wurde (App, E-128) – sonst aus `einheit` */
   einheit_code?: string;
@@ -91,9 +95,50 @@ export interface Summen {
   brutto_cent: number;
 }
 
+/** E-208: Einzelpreise mit höchstens vier Nachkommastellen in Euro (zwei in Cent) – mehr nimmt die Eingabe nicht an. */
+export const PREIS_NACHKOMMA_EURO = 4;
+/** Hat der Preis (Cent) höchstens zwei Nachkommastellen? */
+export const preisCentGueltig = (cent: number) => Number.isFinite(cent) && Math.abs(cent * 100 - Math.round(cent * 100)) < 1e-6;
+
+/**
+ * Zeilenbetrag in Cent: Menge × Einzelpreis, einmal kaufmännisch gerundet (E-208 – vorher wurde der Preis schon vorher
+ * auf ganze Cent gerundet: 1.000 kWh × 0,3456 € ergaben 350,00 € statt 345,60 €). Mengen haben höchstens vier, Preise
+ * höchstens zwei Nachkommastellen in Cent: als ganze Zahlen rechnen, sonst rundet Gleitkomma falsch (0,57 × 1,50 € = 0,8549…).
+ */
+export const zeilenCent = (menge: number, cent: number) => rundeCent((Math.round(menge * 10_000) * Math.round(cent * 100)) / 1_000_000);
+
+/** Betrag in Euro als Dezimalzahl mit Punkt, mindestens zwei und höchstens `max` Nachkommastellen (Cent mit Bruchteilen). */
+export function euroDezimal(cent: number, max = PREIS_NACHKOMMA_EURO): string {
+  const t = (cent / 100).toFixed(max);
+  return t.replace(/(\.\d\d\d*?)0+$/, "$1");
+}
+
+/**
+ * E-208: Nettoeinzelpreis einer Position, wie er auf Rechnung und E-Rechnung steht (ohne Vorzeichen, als Text mit Punkt).
+ * Nettopreise: der eingegebene Preis. Bruttopreise (R11): Der Zeilenbetrag netto ist aus dem Brutto abgeleitet (und trägt
+ * ggf. die Rundungsdifferenz der Gruppe) – der Nettopreis je Einheit ist dann so genau angegeben (2 bis 10 Nachkommastellen),
+ * dass Menge × Preis kaufmännisch gerundet genau den Zeilenbetrag ergibt. Sonst widersprechen sich Preis und Zeile
+ * (10 × 8,39 € ≠ 83,95 €, PEPPOL-EN16931-R120 im KoSIT-Validator).
+ */
+export function nettoEinzelpreis(p: Position, zeileNetto: number): string {
+  const brutto = p.brutto_cent !== undefined && (p.ust_satz ?? 0) > 0;
+  if (!brutto || !(p.menge > 0)) return euroDezimal(Math.abs(p.preis_cent));
+  const zeile = Math.abs(zeileNetto);
+  const mengeE4 = Math.round(p.menge * 10_000);
+  for (let d = 2; d <= 10; d++) {
+    const f = 10 ** (d - 2); // Preis in 10^-d Euro = Cent × f
+    const preis = Math.round((zeile * f * 10_000) / mengeE4);
+    if (rundeCent((mengeE4 * preis) / (10_000 * f)) === zeile) {
+      // aus der ganzen Zahl gebildet (kein Gleitkomma beim Formatieren), Nullen am Ende bis auf zwei Stellen weg
+      const t = String(preis).padStart(d + 1, "0");
+      return `${t.slice(0, -d)}.${t.slice(-d)}`.replace(/(\.\d\d\d*?)0+$/, "$1");
+    }
+  }
+  return euroDezimal((zeile * 10_000) / mengeE4, 10);
+}
+
 export function summen(positionen: Position[], kleinunternehmer: boolean): Summen {
-  // Mengen haben höchstens vier Nachkommastellen: als ganze Zehntausendstel rechnen, sonst rundet Gleitkomma falsch (0,57 × 1,50 € = 0,8549…)
-  const mal = (menge: number, cent: number) => rundeCent((Math.round(menge * 10_000) * cent) / 10_000);
+  const mal = zeilenCent;
   const satzVon = (p: Position) => (kleinunternehmer ? null : p.ust_satz);
   // R11: Bruttopreise (nur mit Steuersatz > 0): Zeilen-Brutto genau, Netto je Satz aus dem Brutto der Gruppe
   const brutto = (p: Position) => p.brutto_cent !== undefined && (satzVon(p) ?? 0) > 0;
@@ -256,7 +301,7 @@ export function fehlendFuerERechnung(r: RechnungsDaten): string[] {
   if (!r.kunde.name || !r.kunde.strasse || !r.kunde.plz || !r.kunde.ort) f.push("kunde.anschrift");
   if (r.kunde.geschaeftskunde && !r.kunde.email) f.push("kunde.email");
   if (!r.positionen.length) f.push("positionen");
-  if (r.positionen.some((p) => !p.bezeichnung || !(p.menge > 0) || !Number.isInteger(p.preis_cent))) f.push("positionen.ungueltig");
+  if (r.positionen.some((p) => !p.bezeichnung || !(p.menge > 0) || !preisCentGueltig(p.preis_cent))) f.push("positionen.ungueltig");
   if (!r.kleinunternehmer && r.positionen.some((p) => p.ust_satz === null)) f.push("positionen.steuersatz");
   if (!r.leistungsdatum && !r.leistungszeitraum && !r.abschlag) f.push("leistungsdatum");
   // 0 % ohne Kleinunternehmer: Grund nötig; Reverse Charge und innergemeinschaftliche Lieferung brauchen beide USt-IdNr. (BR-AE-02/03, BR-IC-02/03)
@@ -285,7 +330,7 @@ function fehlendFuerGutschrift(r: RechnungsDaten): string[] {
   if (!r.steller.name || !r.steller.strasse || !r.steller.plz || !r.steller.ort) f.push("steller.anschrift");
   if (!r.steller.email) f.push("steller.email");
   if (!r.positionen.length) f.push("positionen");
-  if (r.positionen.some((p) => !p.bezeichnung || !(p.menge > 0) || !Number.isInteger(p.preis_cent))) f.push("positionen.ungueltig");
+  if (r.positionen.some((p) => !p.bezeichnung || !(p.menge > 0) || !preisCentGueltig(p.preis_cent))) f.push("positionen.ungueltig");
   if (!r.kleinunternehmer && r.positionen.some((p) => p.ust_satz === null)) f.push("positionen.steuersatz");
   if (!r.leistungsdatum && !r.leistungszeitraum) f.push("leistungsdatum");
   if (!r.kleinunternehmer && r.positionen.some((p) => p.ust_satz === 0) && (r.steuerart ?? "standard") === "standard") f.push("steuer.grund_null");

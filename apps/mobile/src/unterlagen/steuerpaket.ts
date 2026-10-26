@@ -214,6 +214,7 @@ export function rechnungFuerBuchung(u: Unterlage, betrieb: Betrieb, o: { tage?: 
     steuerart: daten.steuerart,
     kunde_land: daten.kunde.land,
     kunde_ust_idnr: daten.kunde.ust_idnr ?? null,
+    befreiungsgrund: daten.befreiungsgrund ?? null,
     leistungsdatum: istStorno(u) ? null : leistung,
     steuerperiode: o.tage?.get(u.id) ?? null,
     empfaenger_ku: o.betriebKu ?? false,
@@ -1164,6 +1165,7 @@ export function kontenvorgabenText(v: Kontenvorgaben | undefined, k: ReturnType<
     switch (id) {
       case "erloesNullsatz": return k.erloese.nullsatz;
       case "erloesOss": return k.erloese.oss;
+      case "erloesAusfuhr": return k.erloese.ausfuhr;
       case "anlageMaschinen": return k.anlagen.maschinen;
       case "anlageBga": return k.anlagen.bga;
       case "anlageKfz": return k.anlagen.kfz;

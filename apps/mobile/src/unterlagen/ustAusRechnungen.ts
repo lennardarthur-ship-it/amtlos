@@ -38,6 +38,13 @@
  * - 5.2: OSS-Rechnungen (Steuer des Bestimmungslands) gehören nicht in die deutsche Voranmeldung – sie werden gezählt,
  *   nicht übernommen. Rechnungen, die mangels Leistungsdatum nach dem Rechnungsdatum zugeordnet sind, stehen je Rechnung
  *   in der Voranmeldung (Feld „nach_rechnungsdatum“), weitere Annahmen im Feld „annahmen“.
+ *
+ * E-208: Innergemeinschaftliche Lieferungen und sonstige Leistungen an Unternehmen im übrigen Gemeinschaftsgebiet, die
+ * in die Zusammenfassende Meldung gehören (USt-IdNr. des Empfängers, Land im EU-Ausland), stehen in der Voranmeldung im
+ * selben Zeitraum wie in der ZM – das BZSt gleicht beide ab. Nach § 18b Satz 1 Nr. 1 und 2, Satz 2 und 3 UStG:
+ * Lieferungen (Kz 41) im Voranmeldungszeitraum, in dem die Rechnung ausgestellt wird, spätestens in dem, in dem der auf
+ * die Lieferung folgende Monat endet; sonstige Leistungen (Kz 21) im Zeitraum, in dem sie ausgeführt wurden – beides auch
+ * bei Ist-Versteuerung (vorher: Zahltag bzw. bei Soll für Lieferungen das Leistungsdatum, die ZM dagegen nach Rechnung).
  */
 import { sachentnahmenFuer, type Sachentnahme } from "@amtlos/fachlogik";
 import { eRechnungAus, fehlendeTage, istEuAusland, kassenUmsatz, kennzahlBefreiung, restGruppen, steuerschuldFuer, summen, ustZeitraum, vorsteuerFuer, zahlungsAnteile, type Beleg, type Betrieb, type Kassenabschluss, type RechnungsDaten } from "@amtlos/fachlogik";
@@ -136,15 +143,44 @@ function korrekturen(unterlagen: Unterlage[], betrieb: Betrieb): Map<string, str
   return aus;
 }
 
+/** letzter Tag des Monats nach dem Tag (ISO) */
+const endeFolgemonat = (tag: string) => new Date(Date.UTC(Number(tag.slice(0, 4)), Number(tag.slice(5, 7)) + 1, 0)).toISOString().slice(0, 10);
+
+/**
+ * E-208: Art in der Zusammenfassenden Meldung (§ 18a UStG) – „L“ innergemeinschaftliche Lieferung, „S“ sonstige Leistung
+ * an ein Unternehmen im übrigen Gemeinschaftsgebiet mit Steuerschuldnerschaft des Empfängers; sonst null (auch bei
+ * Kleinunternehmer-Rechnungen und ohne USt-IdNr. des Empfängers).
+ */
+export function euMeldeArt(daten: RechnungsDaten): "L" | "S" | null {
+  if (daten.kleinunternehmer || !daten.kunde.ust_idnr || !istEuAusland((daten.kunde.land ?? "DE").toUpperCase())) return null;
+  return daten.steuerart === "igl" ? "L" : daten.steuerart === "reverse_charge" ? "S" : null;
+}
+const euArtVon = (u: Unterlage, betrieb: Betrieb) => (u.daten.kleinunternehmer === true || istGutschrift(u) ? null : euMeldeArt(eRechnungAus(u.daten, betrieb).daten));
+
 function zuordnen(u: Unterlage, v: Versteuerung, betrieb: Betrieb, korr?: Map<string, string>): Zuordnung {
-  const k = v === "soll" ? korr?.get(u.id) : undefined;
+  const eu = euArtVon(u, betrieb);
+  // E-208: Lieferung (ZM „L“) nach der Rechnung – ohne die Soll-Korrekturen für Storno und Ersatzrechnung, wie in der ZM;
+  // sonstige Leistung (ZM „S“) wie bei Soll, auch bei Ist-Versteuerung
+  if (eu === "L") return zuordnenEinfach(u, v, betrieb);
+  const k = v === "soll" || eu === "S" ? korr?.get(u.id) : undefined;
   if (k) return { u, tag: k, ersatz: false };
   return zuordnenEinfach(u, v, betrieb);
 }
 
 function zuordnenEinfach(u: Unterlage, v: Versteuerung, betrieb: Betrieb): Zuordnung {
   const storno = istStornoU(u);
-  if (v === "ist") return { u, tag: u.bezahlt ?? null, ersatz: false };
+  const eu = euArtVon(u, betrieb);
+  // E-208: innergemeinschaftliche Lieferung – Zeitraum der Rechnung, spätestens der Monat nach der Lieferung (§ 18b Satz 2
+  // UStG, ebenso § 18a Abs. 8 UStG für die ZM), unabhängig von Soll/Ist; Storno im Zeitraum des Stornos
+  if (eu === "L") {
+    const datum = u.daten.datum as string;
+    if (storno) return { u, tag: datum, ersatz: false };
+    const lieferung = leistungVon(u, betrieb) ?? datum;
+    const spaetestens = endeFolgemonat(lieferung);
+    return { u, tag: datum < spaetestens ? datum : spaetestens, ersatz: false };
+  }
+  // E-208: sonstige Leistung an ein Unternehmen im EU-Ausland – Zeitraum der Ausführung (§ 18b Satz 3 UStG), auch bei Ist
+  if (v === "ist" && eu !== "S") return { u, tag: u.bezahlt ?? null, ersatz: false };
   if (storno) return { u, tag: u.daten.datum as string, ersatz: false };
   // Abschlagsrechnung (Anzahlung): Steuer entsteht mit der Zahlung (§ 13 Abs. 1 Nr. 1 a Satz 4 UStG) – unbezahlt noch nicht
   if (u.daten.abschlag === true) return { u, tag: u.bezahlt ?? null, ersatz: false };
@@ -323,7 +359,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   const gutschriften = gutschriftenListe.length;
   const alle = festeRechnungen(unterlagen)
     // R12: Ist mit einzelnen Zahlungen – die Zahlungen zählen je für sich (unten), nicht die ganze Rechnung
-    .filter((u) => !(v === "ist" && u.zahlungen?.length && !istStornoU(u)))
+    .filter((u) => !(v === "ist" && u.zahlungen?.length && !istStornoU(u) && !euArtVon(u, betrieb)))
     .map((u) => zuordnen(u, v, betrieb, korr))
     .filter((x) => x.tag && x.tag >= z.von && x.tag <= z.bis);
   const kuZeitraum = kuImZeitraum(alle.map((x) => x.u), kleinunternehmer) ?? false;
@@ -356,6 +392,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   let minderungen = 0;
   for (const u of festeRechnungen(unterlagen)) {
     if (kuRechnung(u) || istStornoU(u) || istOssRechnung(u) || !u.zahlungen?.length) continue;
+    // E-208: ZM-Umsätze zählen auch bei Ist ganz im Zeitraum nach § 18b UStG (oben), nicht je Zahlung
+    if (v === "ist" && euArtVon(u, betrieb)) continue;
     const daten = eRechnungAus(u.daten, betrieb).daten;
     // C-4: bei einer Schlussrechnung verteilen sich die Zahlungen auf den Rest nach den Abschlägen
     const anteile = zahlungsAnteile(restGruppen(daten), u.zahlungen);

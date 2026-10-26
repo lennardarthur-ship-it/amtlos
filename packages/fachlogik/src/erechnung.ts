@@ -3,7 +3,7 @@
  * Der Server macht daraus mit @e-invoice-eu/core CII und ZUGFeRD; die App schreibt das UBL-XML selbst (`xrechnungUbl`).
  * Beide prüft die CI mit dem KoSIT-Validator.
  */
-import { EINHEIT_CODE, abschlagsSumme, summen, type RechnungsDaten } from "./rechnung.js";
+import { EINHEIT_CODE, abschlagsSumme, nettoEinzelpreis, summen, type RechnungsDaten } from "./rechnung.js";
 import { istEuAusland } from "./buchungen.js";
 import { prozentText, skontoBetrag, zahlungsbedingungenMitSkonto } from "./skonto.js";
 
@@ -213,7 +213,8 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
       "cbc:InvoicedQuantity": String(vz * Math.sign(p.preis_cent || 1) * p.menge), "cbc:InvoicedQuantity@unitCode": p.einheit_code ?? EINHEIT_CODE[p.einheit],
       "cbc:LineExtensionAmount": m(s.zeilen[i]!).wert, "cbc:LineExtensionAmount@currencyID": "EUR",
       "cac:Item": { "cbc:Name": p.bezeichnung, "cac:ClassifiedTaxCategory": { ...kategorie(r.kleinunternehmer ? null : p.ust_satz, true), "cac:TaxScheme": { "cbc:ID": "VAT" } } },
-      "cac:Price": { "cbc:PriceAmount": betrag(Math.abs(p.preis_cent)), "cbc:PriceAmount@currencyID": "EUR" },
+      // E-208: Nettopreis bis vier Nachkommastellen; bei Bruttopreisen so genau, dass Menge × Preis = Zeilenbetrag (PEPPOL-EN16931-R120)
+      "cac:Price": { "cbc:PriceAmount": nettoEinzelpreis(r.kleinunternehmer ? { ...p, ust_satz: null } : p, s.zeilen[i]!), "cbc:PriceAmount@currencyID": "EUR" },
     })),
   };
   return { "ubl:Invoice": doc };

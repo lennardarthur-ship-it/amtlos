@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { datumLang, fuelle } from "@amtlos/i18n";
 import { EingabeFehler, api, apiAntwort } from "@/lib/api";
-import { centAus, euroFeld, euroText, mengeAus } from "@/lib/geld";
+import { euroText, mengeAus, preisCentAus, preisFeld, zeileCent } from "@/lib/geld";
 import { t } from "@/lib/sprache";
 
 export const metadata = { title: "Rechnung" };
@@ -24,7 +24,7 @@ function ausFormular(f: FormData, s: "de" | "en") {
   for (let i = 0; i < n; i++) {
     const bezeichnung = String(f.get(`p${i}_bezeichnung`) ?? "").trim();
     if (!bezeichnung) continue;
-    const preis = centAus(f.get(`p${i}_preis`), s);
+    const preis = preisCentAus(f.get(`p${i}_preis`), s);
     positionen.push({
       bezeichnung,
       menge: mengeAus(f.get(`p${i}_menge`), s),
@@ -98,7 +98,7 @@ export default async function RechnungSeite({ params, searchParams }: { params: 
               <tr key={i}>
                 <td>{p.bezeichnung}{p.ust_satz != null ? <span className="text-klein text-tinte-leise"> · {p.ust_satz} %</span> : null}</td>
                 <td className="text-right tabular-nums">{p.menge} {x.rechnung.einheiten[p.einheit]}</td>
-                <td className="text-right tabular-nums">{euroText(vz * Math.round(p.menge * p.preis_cent), s)}</td>
+                <td className="text-right tabular-nums">{euroText(vz * zeileCent(p.menge, p.preis_cent), s)}</td>
               </tr>
             ))}
           </tbody>
@@ -123,7 +123,7 @@ export default async function RechnungSeite({ params, searchParams }: { params: 
 
   const n = Math.max(Number(sp.zeilen ?? 0), r.positionen.length + (r.positionen.length ? 0 : 1));
   const zeilen: (Pos | null)[] = Array.from({ length: n }, (_, i) => r.positionen[i] ?? null);
-  const netto = r.positionen.reduce((a, p) => a + Math.round(p.menge * p.preis_cent), 0);
+  const netto = r.positionen.reduce((a, p) => a + zeileCent(p.menge, p.preis_cent), 0);
   const fehlend = sp.fehlend ? sp.fehlend.split(",").filter(Boolean) : [];
   return (
     <div className="space-y-6">
@@ -182,7 +182,7 @@ export default async function RechnungSeite({ params, searchParams }: { params: 
               </div>
               <div>
                 <label htmlFor={`p${i}_preis`} className="block text-klein font-bold">{x.rechnung.preis}</label>
-                <input id={`p${i}_preis`} name={`p${i}_preis`} inputMode="decimal" defaultValue={p ? euroFeld(p.preis_cent, s) : ""} className="feld mt-1" />
+                <input id={`p${i}_preis`} name={`p${i}_preis`} inputMode="decimal" defaultValue={p ? preisFeld(p.preis_cent, s) : ""} className="feld mt-1" />
               </div>
               {r.kleinunternehmer ? <input type="hidden" name={`p${i}_ust`} value="keine" /> : (
                 <div>

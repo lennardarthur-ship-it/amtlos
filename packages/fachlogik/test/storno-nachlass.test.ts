@@ -47,8 +47,11 @@ describe("Beträge und Exporte (Prüfbefund 2026-10-19)", () => {
     expect(zeile(0.57, -150)).toBe(-86);
     const re = eRechnungAus(mit([{ bezeichnung: "x", menge: "1", preis: "0,335", satz: "19" }]), B).daten;
     const st = eRechnungAus(mit([{ bezeichnung: "x", menge: "1", preis: "-0,335", satz: "19" }], { nummer: "2026-002", storno_zu: "2026-001" }), B).daten;
-    expect(re.positionen[0]!.preis_cent).toBe(34);
-    expect(st.positionen[0]!.preis_cent).toBe(34); // Storno dreht das Vorzeichen für die USt zurück
+    // E-208: der Einzelpreis bleibt mit vier Nachkommastellen (0,335 € = 33,5 Cent); gerundet wird erst der Zeilenbetrag
+    expect(re.positionen[0]!.preis_cent).toBe(33.5);
+    expect(st.positionen[0]!.preis_cent).toBe(33.5); // Storno dreht das Vorzeichen für die USt zurück
+    expect(summen(re.positionen, false).zeilen[0]).toBe(34);
+    expect(summen(st.positionen, false).zeilen[0]).toBe(34);
   });
   it("E-Rechnung ohne verbotene Steuerzeichen und ohne Zahlungshinweis im Storno", () => {
     const re = eRechnungAus(mit([{ bezeichnung: "Erste\u000bZeile", menge: "1", preis: "10", satz: "19" }], { hinweis: "Bitte geben Sie bei der Zahlung die Rechnungsnummer an." }), B).daten;

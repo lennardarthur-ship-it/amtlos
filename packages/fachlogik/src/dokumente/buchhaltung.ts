@@ -4,7 +4,7 @@
  * E-Bilanz, Kassenmeldung), erstellt die App als ausgefüllte Unterlage zum Übertragen – sie übermittelt nichts.
  * Gliederungen fachlich zu prüfen (T-58).
  */
-import { KU_HINWEIS, abschlagsSumme, einheitFuerMenge, fehlendFuerERechnung, mengeUngueltig, rundeCent, summen, type Abschlag, type Position, type RechnungsDaten } from "../rechnung.js";
+import { KU_HINWEIS, abschlagsSumme, einheitFuerMenge, fehlendFuerERechnung, mengeUngueltig, nettoEinzelpreis, rundeCent, summen, type Abschlag, type Position, type RechnungsDaten } from "../rechnung.js";
 import { einheitBekannt, einheitCode } from "../erechnung.js";
 import { giroCodeSvg } from "../girocode.js";
 import { BUNDESLAENDER, StandardKalender, verschiebe, type Bundesland } from "@amtlos/fristen";
@@ -15,7 +15,7 @@ import { STEUERART_NULLSATZ } from "../steuerart.js";
 import { KUNDEN_ARTEN } from "./kundenarten.js";
 import { formImNamen, istKapitalgesellschaft } from "./betrieb.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
-import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, istCoKg, komplementaerZeile, CO_KG_GESCHAEFTSFUEHRER, absatz, angaben, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, steuerHinweis, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, istCoKg, komplementaerZeile, CO_KG_GESCHAEFTSFUEHRER, absatz, angaben, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, preisCent, steuerHinweis, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 import { MARKE } from "@amtlos/marke";
 
@@ -291,6 +291,17 @@ function preisFelder(d: Daten, roh: number, satz: number | null): Pick<Position,
   return { preis_cent: rundeCent((roh * 100) / (100 + satz)), brutto_cent: roh };
 }
 
+/**
+ * E-208: Einzelpreis in der Tabelle der Rechnung – derselbe Nettopreis wie in der E-Rechnung (`nettoEinzelpreis`): bis
+ * vier Nachkommastellen, bei Bruttopreisen so genau, dass Menge × Preis den Betrag der Zeile ergibt. Ganze Cent wie bisher.
+ */
+function einzelpreisText(p: Position, zeile: number): string {
+  const t = nettoEinzelpreis(p, zeile);
+  const stellen = Math.max(2, t.split(".")[1]?.length ?? 0);
+  const n = Number(t) * (p.preis_cent < 0 ? -1 : 1);
+  return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: stellen }).format(n).replace(/^-/, "\u2212");
+}
+
 const positionenRoh = (d: Daten) => liste(d, "positionen").filter((e) => text(e, "bezeichnung") || text(e, "preis"));
 /** Steuersatz einer Position – bei OSS (5.2) der Satz des Bestimmungslands statt 19 % bzw. 7 %. */
 function satzFuer(d: Daten, e: Eintrag): number {
@@ -303,7 +314,7 @@ function positionen(d: Daten): { e: Eintrag; p: Position }[] {
   const ku = kuFuer(d);
   return positionenRoh(d).map((e) => {
     const satz = satzFuer(d, e);
-    return { e, p: { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck", ...preisFelder(d, cent(text(e, "preis")) ?? 0, ku ? null : satz), ust_satz: satz } };
+    return { e, p: { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck", ...preisFelder(d, preisCent(text(e, "preis")) ?? 0, ku ? null : satz), ust_satz: satz } };
   });
 }
 
@@ -575,7 +586,7 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     ...(text(d, "bestellnummer").trim() ? { bestellnummer: text(d, "bestellnummer").trim() } : {}),
     ...(ja(d, "abschlag") && !storno ? { abschlag: true } : {}),
     positionen: pos.map((e) => {
-      const preis = cent(text(e, "preis")) ?? 0;
+      const preis = preisCent(text(e, "preis")) ?? 0;
       // Storno: die Positionen tragen schon das umgedrehte Vorzeichen; `art: "storno"` dreht es für USt und XRechnung zurück
       const satz = ku ? null : satzFuer(d, e);
       return { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck" as const, einheit_code: einheitCode(text(e, "einheit")), ...preisFelder(d, storno ? -preis : preis, satz), ust_satz: satz };
@@ -927,7 +938,7 @@ export const rechnung: Vorlage = {
       String(i + 1),
       zelle(p.bezeichnung),
       `${zahlText(p.menge, 4)}${text(e, "einheit") ? ` ${esc(einheitFuerMenge(text(e, "einheit"), p.menge))}` : ""}`,
-      euro(p.preis_cent),
+      einzelpreisText(ku ? { ...p, ust_satz: null } : p, s.zeilen[i]!),
       ...(ku ? [] : [p.ust_satz === 0 ? "0 %" : `${p.ust_satz} %`]),
       euro(s.zeilen[i]!),
     ]);
