@@ -82,6 +82,9 @@ fachlich_zu_pruefen:
 - 'Ausnahme Privathaushalt ohne maschinelle Lohnabrechnung mit nur geringfügig Beschäftigten (§ 41b Abs. 3 EStG, Papierbescheinigung) nicht erwähnt, weil die App Betriebe anspricht – in Ordnung?'
 - 'Doppelung geprüft: personal.lohnsteuer_anmeldung (§ 41a EStG) und personal.lohnabrechnung (Meldungen SV) decken § 41b EStG nicht ab. Ein Querverweis in personal.lohnsteuer_anmeldung wäre eine Änderung am freigegebenen Eintrag (PRUEFLISTE T-198).'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - steuern
+  geprueft_am: '2026-10-26'
+  geprueft_version: 1
+  bestaetigt_am: '2026-10-26'

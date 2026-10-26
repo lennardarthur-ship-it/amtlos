@@ -2264,3 +2264,60 @@
       version: 4
       quelle: ausgefüllte Freigabe-Datei Runde 3 vom 23.10.2026 (beim Gründer)
       stand: '2026-10-23'
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: 'Nachprüfliste vom 25.10.2026, Positionen 1 bis 4: arbeitsmedizinische Vorsorge v6 bestätigt, offener Punkt erledigt, Einschränkung
+      auf die rechtliche Seite bestätigt; Wegfall der Schwelle nach § 38 BDSG v3 und elektronische Arbeitszeiterfassung v3 am 26.10.2026 erneut
+      geprüft und bestätigt (erneut vorlegen: § 38 BDSG sobald ein Entwurf vorliegt, spätestens Anfang Januar 2027; Arbeitszeit nach dem
+      Kabinettsbeschluss, spätestens zum Jahreswechsel). Dazu Künstlersozialabgabe: v2 vorab freigegeben, sofern seine zwei Änderungen und der
+      optionale Satz wörtlich übernommen werden – nachgeprüft: v2 unterscheidet sich von v1 nur darin (ausgefüllte Datei der neuen Einträge)'
+    aufbewahrung: beim Gründer
+  felder_fehlen: []
+  hinweis: 'E-201: Antwort des Rechtsanwalts vom 26.10.2026 (Mail und ausgefüllte Dateien beim Gründer)'
+  eintraege:
+    arbeitsschutz.arbeitsmedizinische_vorsorge:
+      version: 6
+      quelle: Bestätigung per Mail vom 26.10.2026 (beim Gründer)
+      stand: '2026-10-26'
+      einschraenkung: nur die rechtliche Seite, ohne medizinische Inhalte
+    datenschutz.dsb_streichung:
+      version: 3
+      quelle: Bestätigung per Mail vom 26.10.2026 (beim Gründer)
+      stand: '2026-10-26'
+    personal.arbeitszeit_neuregelung:
+      version: 3
+      quelle: Bestätigung per Mail vom 26.10.2026 (beim Gründer)
+      stand: '2026-10-26'
+    personal.kuenstlersozialabgabe:
+      version: 2
+      quelle: Vorabfreigabe per Mail vom 26.10.2026 mit ausgefüllter Datei der neuen Einträge (beim Gründer)
+      stand: '2026-10-26'
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: steuern
+    umfang: 'Nachprüfliste vom 25.10.2026, Positionen 1 und 2: Übergangsfristen der E-Rechnung ab 2027 und ab 2028 (je v3) am 26.10.2026 erneut
+      geprüft und bestätigt, „teilweise geprüft“ entfällt; dazu elektronische Lohnsteuerbescheinigung v1 freigegeben (ausgefüllte Datei der
+      neuen Einträge)'
+    aufbewahrung: beim Gründer
+  felder_fehlen: []
+  hinweis: 'E-201: Antwort des Steuerberaters vom 26.10.2026 (Mail und ausgefüllte Dateien beim Gründer)'
+  eintraege:
+    steuern.e_rechnung_versand_2027:
+      version: 3
+      quelle: Bestätigung per Mail vom 26.10.2026 (beim Gründer)
+      stand: '2026-10-26'
+    steuern.e_rechnung_versand_2028:
+      version: 3
+      quelle: Bestätigung per Mail vom 26.10.2026 (beim Gründer)
+      stand: '2026-10-26'
+    personal.lohnsteuerbescheinigung:
+      version: 1
+      quelle: Freigabe per Mail vom 26.10.2026 mit ausgefüllter Datei der neuen Einträge (beim Gründer)
+      stand: '2026-10-26'

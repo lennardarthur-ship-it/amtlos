@@ -39,7 +39,10 @@ const STEUERN_23 = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldun
 // der Abgleich rechnet die freigegebene Fassung ebenso anonymisiert (E-197).
 // Bei der Rechnung fehlt der Vermerk in den seit der Bestätigung geänderten Varianten (Fußzeile GmbH & Co. KG /
 // UG & Co. KG, Storno einer Schlussrechnung mit Abschlägen; E-193).
-const MIT_VERMERK: string[] = ALLE;
+// E-201: Auf Bitte der Fachkraft für Arbeitssicherheit (26.10.2026) zeigen diese sieben Vorlagen keinen Vermerk, bis sie die neu
+// gerechnete Prüfsumme bestätigt hat – die Freigabe bleibt eingetragen (`vermerk_ausgesetzt`).
+const SIFA_AUSGESETZT = ["unterweisung", "pruefprotokoll_elektro", "betriebsanweisung", "expositionsverzeichnis", "hautschutzplan", "gefaehrdungsbeurteilung", "betriebsanweisung_biostoffe"];
+const MIT_VERMERK: string[] = ALLE.filter((id) => !SIFA_AUSGESETZT.includes(id));
 const CAFE: Betrieb = { ...LEERER_BETRIEB, name: "Café Sonne", bundesland: "Berlin" };
 const CO_KG = ["rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"];
 /** Erfundener Nachweis für Test-Freigaben (E-198: Art, Datum, Rolle, Umfang) */
@@ -103,7 +106,7 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
         const v = vorlageFuer(id)!;
         const heute = aktuellerPruefstand(v, f).teile;
         const betrieb: Betrieb = f.rechtsformen ? { ...CAFE, name: "Sonne GmbH", rechtsform: "GmbH" } : CAFE;
-        const soll = freigabeBestaetigt(f) && pruefGruppenFuer(v, f.teilsummen!, datenFuer(id, f), betrieb).every((g) => heute[g] === f.teilsummen![g]);
+        const soll = freigabeBestaetigt(f) && !f.vermerk_ausgesetzt && pruefGruppenFuer(v, f.teilsummen!, datenFuer(id, f), betrieb).every((g) => heute[g] === f.teilsummen![g]);
         const hinweis = pruefHinweisFuer(v, datenFuer(id, f), betrieb);
         expect(hinweis !== PRUEFHINWEIS, `${rolle} ${id}`).toBe(soll);
         if (soll) {
@@ -159,15 +162,19 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
     expect(geprueftVermerk("2026-10-25", { rolle: "arbeitsschutz", einschraenkung: "ohne arbeitsmedizinische Angaben" })).toBe("Vorlage fachlich durchgesehen von einer Fachkraft für Arbeitssicherheit (ohne arbeitsmedizinische Angaben) (Stand 25.10.2026)");
     expect(geprueftVermerk("2026-10-23", { rolle: "hygiene" }, 2)).toBe("Vorlage teilweise fachlich durchgesehen von einem Lebensmittelfachbeauftragten (Stand 23.10.2026) – mit „fachlich zu prüfen“ gekennzeichnete Angaben sind noch offen");
     for (const t of Object.values(PRUEF_ROLLEN)) expect(t).not.toMatch(/rechtssicher|garantiert|freigegeben/i);
-    // Sifa: arbeitsmedizinische Angaben ausgenommen (Bestätigung und Mails vom 23. und 25.10.2026)
-    for (const id of ["betriebsanweisung", "expositionsverzeichnis", "hautschutzplan", "gefaehrdungsbeurteilung", "betriebsanweisung_biostoffe"]) expect(VORLAGEN_GEPRUEFT[id]!.einschraenkung, id).toBe("ohne arbeitsmedizinische Angaben");
+    // Sifa: arbeitsmedizinische Angaben ausgenommen nur, wo sie es erklärt hat (E-201: Gefährdungsbeurteilung, Betriebsanweisung
+    // Biostoffe; Prüfprotokoll ohne die elektrotechnischen Grenzwerte) – bei Betriebsanweisung, Expositionsverzeichnis und
+    // Hautschutzplan nicht (keine arbeitsmedizinischen Angaben, Einschränkung nie erklärt)
+    for (const id of ["gefaehrdungsbeurteilung", "betriebsanweisung_biostoffe"]) expect(VORLAGEN_GEPRUEFT[id]!.einschraenkung, id).toBe("ohne arbeitsmedizinische Angaben");
+    expect(VORLAGEN_GEPRUEFT.pruefprotokoll_elektro!.einschraenkung).toBe("ohne die elektrotechnischen Grenzwerte");
+    for (const id of ["betriebsanweisung", "expositionsverzeichnis", "hautschutzplan"]) expect(VORLAGEN_GEPRUEFT[id]!.einschraenkung, id).toBeUndefined();
   });
 
   it("Vorlagen mit offenen Stellen („fachlich zu prüfen“) bekämen nur „teilweise durchgesehen“", () => {
     const g = vorlageFuer("gefaehrdungsbeurteilung")!;
     const f = VORLAGEN_GEPRUEFT.gefaehrdungsbeurteilung!;
     expect(PRUEFSTAENDE.gefaehrdungsbeurteilung!.offen).toBeGreaterThan(0);
-    const test: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, gefaehrdungsbeurteilung: { ...f, bestaetigt_am: "2026-10-25", nachweis: testNachweis("2026-10-25", "arbeitsschutz"), pruefsumme: vorlagenPruefsumme({ ...g }, f), teilsummen: undefined } };
+    const test: Record<string, VorlagenFreigabe> = { ...VORLAGEN_GEPRUEFT, gefaehrdungsbeurteilung: { ...f, vermerk_ausgesetzt: undefined, bestaetigt_am: "2026-10-25", nachweis: testNachweis("2026-10-25", "arbeitsschutz"), pruefsumme: vorlagenPruefsumme({ ...g }, f), teilsummen: undefined } };
     const frei = vorlageGeprueft(g, {}, test)!;
     expect(frei).toBeDefined();
     expect(geprueftVermerk(frei.stand, frei, vorlagenPruefstand({ ...g }, f).offen)).toMatch(/^Vorlage teilweise fachlich durchgesehen von einer Fachkraft für Arbeitssicherheit \(ohne arbeitsmedizinische Angaben\)/);

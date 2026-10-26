@@ -1,10 +1,13 @@
-# Datenschutzhinweis der Android-App – Entwurf zur Freigabe (E-190)
+# Datenschutzhinweis der Android-App – Gegenüberstellung (E-190, freigegeben E-201)
 
-> **ENTWURF – NICHT FREIGEGEBEN.** Vorzulegen bei Rechtsanwalt (PRUEFLISTE T-177). Der freigegebene Datenschutzhinweis
-> der iPhone-App (`DATENSCHUTZ` in `apps/mobile/src/rechtliches.ts`, Freigabe 23.10.2026, Prüfsumme 892aa8818e0e) bleibt
-> **unverändert** und gilt weiter nur für das iPhone. Die Android-Fassung steht im Code als `DATENSCHUTZ_ANDROID`
-> (`freigegeben: false`): Die Android-App zeigt sie mit dem Vermerk „Entwurf – dieser Hinweis ist fachlich noch nicht
-> freigegeben“, `werkzeuge/store-check.mjs` meldet sie als offen, und die Website zeigt sie erst nach der Freigabe.
+> **FREIGEGEBEN am 26.10.2026 (E-201).** Rechtsanwalt hat die Android-Fassung freigegeben – für die Fassung, die dem
+> freigegebenen iPhone-Text (Prüfsumme 892aa8818e0e) mit genau den unten aufgeführten Änderungen entspricht, mit einer
+> eigenen Formulierung zum Sicherungsordner (Abschnitte „Sicherungen“ und „Empfänger und Drittland“, wörtlich übernommen:
+> keine Festlegung, dass der Cloud-Anbieter eigener Verantwortlicher ist). Der Sync-Zusatz ist wie auf dem iPhone nicht
+> umfasst. Im Code: `DATENSCHUTZ_ANDROID` (`freigegeben: true`, Prüfsumme `DATENSCHUTZ_ANDROID_PRUEFSUMME`) in
+> `apps/mobile/src/rechtliches.ts`; die Website zeigt eine Seite mit den Abschnitten „iPhone“ (`#iphone`) und „Android“
+> (`#android`). Folgepunkte: PRUEFLISTE T-219. Die Fragen unten sind beantwortet (Antworten beim Gründer, in unseren
+> Worten in E-201). Dieses Dokument bleibt als Gegenüberstellung.
 
 ## Vorgehen
 
@@ -30,11 +33,11 @@ nicht erfunden; wo eine Einordnung aus dem iPhone-Text übertragen wurde, steht 
 |---|---|---|
 | Kurz gesagt | „… nur auf deinem iPhone …“ | „… nur auf deinem Smartphone …“ – sonst gleich |
 | Was auf dem iPhone/Smartphone liegt | „… der Schlüssel liegt im Schlüsselbund dieses iPhones.“ | „… der Schlüssel liegt im Android-Schlüsselspeicher dieses Smartphones. Die Gerätesicherung von Android nimmt diese Daten nicht mit.“ |
-| Sicherungen | „… (z. B. Dateien, iCloud Drive). Die automatische iCloud-Sicherung legt dieselbe verschlüsselte Datei in deinem iCloud Drive ab. Für iCloud ist Apple eigener Verantwortlicher; es gelten die Datenschutzbestimmungen von Apple.“ | „… Du entscheidest, wo du sie ablegst. Die automatische Sicherung legt dieselbe verschlüsselte Datei in einem Ordner ab, den du einmal über die Ordnerauswahl von Android wählst (z. B. auf dem Smartphone, in Google Drive oder Nextcloud); Betriebsklar erhält dabei nur Zugriff auf diesen Ordner. Liegt der Ordner bei einem Cloud-Anbieter, ist dieser für die Speicherung eigener Verantwortlicher; es gelten seine Datenschutzbestimmungen.“ |
+| Sicherungen | „… (z. B. Dateien, iCloud Drive). Die automatische iCloud-Sicherung legt dieselbe verschlüsselte Datei in deinem iCloud Drive ab. Für iCloud ist Apple eigener Verantwortlicher; es gelten die Datenschutzbestimmungen von Apple.“ | „… Du entscheidest, wo du sie ablegst. Die automatische Sicherung legt dieselbe verschlüsselte Datei in einem Ordner ab, den du einmal über die Ordnerauswahl von Android wählst (z. B. auf dem Smartphone, in Google Drive oder Nextcloud); Betriebsklar erhält dabei nur Zugriff auf diesen Ordner. Liegt der Ordner bei einem Cloud-Anbieter, gelten für die Speicherung die Vereinbarungen zwischen dir und diesem Anbieter; die Datei ist mit deinem Passwort verschlüsselt, und wir haben keinen Zugriff darauf.“ (Formulierung des Rechtsanwalts, 26.10.2026) |
 | Erinnerungen | „… plant das iPhone selbst als lokale Mitteilungen …“ | „… plant das Smartphone selbst als lokale Benachrichtigungen …“ |
 | Betriebsklar Pro | „Käufe laufen über deinen Apple-Account; für App Store und Bezahlung ist Apple eigener Verantwortlicher. … Kaufbelege von Apple …“ | „Käufe laufen über dein Google-Konto bei Google Play; für Google Play und die Bezahlung ist Google eigener Verantwortlicher. … Kaufbelege von Google Play …“ |
 | Rechtsgrundlagen | „… (Schlüsselbund, Einstellungen) … Sicherung in iCloud Drive nur, wenn du sie einschaltest.“ | „… (Schlüsselspeicher, Einstellungen) … Automatische Sicherung in einen Ordner nur, wenn du sie einschaltest.“ |
-| Empfänger und Drittland | „Apple ist für App Store, Käufe und iCloud eigener Verantwortlicher.“ | „Google ist für Google Play und Käufe eigener Verantwortlicher, für einen Cloud-Ordner der Anbieter, den du wählst.“ |
+| Empfänger und Drittland | „Apple ist für App Store, Käufe und iCloud eigener Verantwortlicher.“ | „Google ist für Google Play und Käufe eigener Verantwortlicher. Wo du deine Sicherung ablegst, entscheidest du; wir übermitteln sie nicht.“ (Formulierung des Rechtsanwalts, 26.10.2026) |
 | Speicherdauer | „… Erstattungen und Rückbuchungen über Apple.“ | „… Erstattungen und Rückbuchungen über Google Play.“ |
 | Keine automatisierte Entscheidung, Was du teilst | „iPhone“ | „Smartphone“ |
 | Musst du Daten angeben?, Deine Rechte | – | unverändert |

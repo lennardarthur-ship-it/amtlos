@@ -154,15 +154,16 @@ schreibe(
   ),
 );
 const abschnitte = recht.datenschutzAbschnitte(false, false);
-// E-190: Abschnitt zur Android-App erst nach der Freigabe (DATENSCHUTZ_ANDROID ist bis dahin ein Entwurf für Rechtsanwalt)
+// E-190: Abschnitt zur Android-App erst nach der Freigabe. E-201: am 26.10.2026 freigegeben – eine Seite mit getrennten
+// Abschnitten „iPhone“ (#iphone) und „Android“ (#android); die Play Console verlinkt direkt auf #android (LINKS.datenschutzAndroid).
 const androidFrei = Boolean(recht.DATENSCHUTZ_ANDROID?.freigegeben);
-const androidTeil = androidFrei ? `\n<h2>Die Android-App {{MARKE}}</h2>\n${recht.datenschutzAbschnitte(false, true).map((a) => `<h3>${esc(a.titel)}</h3>\n<p>${esc(a.text)}</p>`).join("\n")}` : "";
+const androidTeil = androidFrei ? `\n<h2 id="android">Android</h2>\n<p>Datenschutzhinweis der App {{MARKE}} für Android (Google Play).</p>\n${recht.datenschutzAbschnitte(false, true).map((a) => `<h3>${esc(a.titel)}</h3>\n<p>${esc(a.text)}</p>`).join("\n")}` : "";
 schreibe(
   "datenschutz.html",
   rechtsSeite(
     "Datenschutz",
     "Datenschutzhinweis der App {{MARKE}} und dieser Website",
-    `<h1>Datenschutz</h1>\n${recht.DATENSCHUTZ.freigegeben ? "" : `<p class="hinweis">Entwurf – fachlich noch nicht freigegeben.</p>\n`}<h2>Verantwortlich</h2>\n<p>${A.name ? `${esc([A.name, A.anschrift, A.email].filter(Boolean).join(", "))}${A.vertretung ? `<br>Vertreten durch ${esc(A.vertretung)}` : ""}` : `<span class="offen">Die Angaben zum Anbieter folgen vor der Veröffentlichung.</span>`}</p>\n<h2>Die App {{MARKE}}${androidFrei ? " für das iPhone" : ""}</h2>\n${abschnitte.map((a) => `<h3>${esc(a.titel)}</h3>\n<p>${esc(a.text)}</p>`).join("\n")}${androidTeil}\n<h2>Diese Website</h2>\n<p>Diese Website setzt keine Cookies, nutzt kein Tracking und lädt keine Inhalte von fremden Servern.</p>\n<h3>Kurz-Check auf der Startseite</h3>\n<p>Der Kurz-Check rechnet nur in deinem Browser: Die Beispielzahlen sind in der Seite enthalten, deine Auswahl (Branche, Team) wird weder an einen Server gesendet noch gespeichert.</p>\n<h3>Schriftarten</h3>\n<p>Die Schrift Onest liegt auf diesem Server und wird nicht von einem fremden Anbieter (z. B. Google Fonts) geladen.</p>\n<h3>Hosting und Server-Protokolle</h3>\n<p><span class="offen">Angaben zum Hosting (Anbieter, Server-Protokolle, Speicherdauer, Auftragsverarbeitung) folgen, sobald der Hoster feststeht.</span></p>`,
+    `<h1>Datenschutz</h1>\n${recht.DATENSCHUTZ.freigegeben ? "" : `<p class="hinweis">Entwurf – fachlich noch nicht freigegeben.</p>\n`}<h2>Verantwortlich</h2>\n<p>${A.name ? `${esc([A.name, A.anschrift, A.email].filter(Boolean).join(", "))}${A.vertretung ? `<br>Vertreten durch ${esc(A.vertretung)}` : ""}` : `<span class="offen">Die Angaben zum Anbieter folgen vor der Veröffentlichung.</span>`}</p>\n${androidFrei ? `<h2 id="iphone">iPhone</h2>\n<p>Datenschutzhinweis der App {{MARKE}} für das iPhone (App Store).</p>` : `<h2 id="iphone">Die App {{MARKE}}</h2>`}\n${abschnitte.map((a) => `<h3>${esc(a.titel)}</h3>\n<p>${esc(a.text)}</p>`).join("\n")}${androidTeil}\n<h2>Diese Website</h2>\n<p>Diese Website setzt keine Cookies, nutzt kein Tracking und lädt keine Inhalte von fremden Servern.</p>\n<h3>Kurz-Check auf der Startseite</h3>\n<p>Der Kurz-Check rechnet nur in deinem Browser: Die Beispielzahlen sind in der Seite enthalten, deine Auswahl (Branche, Team) wird weder an einen Server gesendet noch gespeichert.</p>\n<h3>Schriftarten</h3>\n<p>Die Schrift Onest liegt auf diesem Server und wird nicht von einem fremden Anbieter (z. B. Google Fonts) geladen.</p>\n<h3>Hosting und Server-Protokolle</h3>\n<p><span class="offen">Angaben zum Hosting (Anbieter, Server-Protokolle, Speicherdauer, Auftragsverarbeitung) folgen, sobald der Hoster feststeht.</span></p>`,
   ),
 );
 

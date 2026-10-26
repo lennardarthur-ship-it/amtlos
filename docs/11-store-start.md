@@ -191,9 +191,11 @@ Drei-Tasten-Navigation. Dann Release in „Produktion“ (gestaffelt, z. B. 20 %
   ```
 - **Datensicherheit:** Antworten in `docs/play-datensicherheit.md` (nur aus dem Code; Punkte mit „[prüfen]“ vorher
   bestätigen, T-179). Danach in `store/de-android.json` → `konsole.datensicherheitAbgesendet: true`.
-- **Datenschutzerklärung:** Google verlangt eine öffentliche URL, die die Android-App beschreibt. Der Android-Teil ist
-  ein Entwurf (`DATENSCHUTZ_ANDROID`, `docs/datenschutz-android-entwurf.md`) – erst nach der Freigabe durch Rechtsanwalt
-  (T-177) erscheint er auf `datenschutz.html`. Nutzungsbedingungen mit Android-Teil: T-178.
+- **Datenschutzerklärung:** Google verlangt eine öffentliche URL, die die Android-App beschreibt. Der Android-Teil
+  (`DATENSCHUTZ_ANDROID`) ist seit 26.10.2026 freigegeben (E-201) und steht auf `datenschutz.html` im Abschnitt
+  „Android“ – in der Play Console direkt `…/datenschutz.html#android` eintragen (`LINKS.datenschutzAndroid`,
+  `store/de-android.json` → `datenschutz`). Die Angaben im Formular „Datensicherheit“ müssen zum Hinweis passen (T-219).
+  Nutzungsbedingungen mit Android-Teil: T-178/T-220.
 - **Inhaltseinstufung (IARC), Zielgruppe (18+), Werbung (keine), App-Zugriff (Hinweise für die Prüfung, Lizenztester),
   Erklärung zu Finanzfunktionen:** Vorschläge in `store/de-android.json` und `docs/play-datensicherheit.md`; nach dem
   Absenden die Häkchen in `store/de-android.json` → `konsole` setzen.

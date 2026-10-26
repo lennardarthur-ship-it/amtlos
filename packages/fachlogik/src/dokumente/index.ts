@@ -449,10 +449,10 @@ export function vorlagenPruefsumme(v: Vorlage, freigabe: Pick<VorlagenFreigabe, 
 /**
  * Freigabe einer Vorlage, solange ihr Inhalt dem freigegebenen Stand entspricht (Prüfsumme) und – bei einer Freigabe
  * nur für eine Fassung – die Unterlage diese Fassung hat. Bei mehreren Freigaben (`weitere`) die erste, deren Fassung
- * zu den Daten passt und deren Prüfsumme stimmt. Sonst `undefined`.
+ * zu den Daten passt und deren Prüfsumme stimmt. Sonst `undefined`. E-201: Eine ausgesetzte Freigabe (`vermerk_ausgesetzt`) zählt nicht.
  */
 export function vorlageGeprueft(v: Vorlage, d?: Daten, liste: Readonly<Record<string, VorlagenFreigabe>> = VORLAGEN_GEPRUEFT, betrieb?: Betrieb): Omit<VorlagenFreigabe, "weitere"> | undefined {
-  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && freigabeBestaetigt(f) && fassungPasst(f, d) && rechtsformPasst(f, d, betrieb) && variantenPassen(v, f, liste, d, betrieb));
+  return freigabenFuer(v.id, liste).find((f) => f.pruefsumme && freigabeBestaetigt(f) && !f.vermerk_ausgesetzt && fassungPasst(f, d) && rechtsformPasst(f, d, betrieb) && variantenPassen(v, f, liste, d, betrieb));
 }
 
 /**

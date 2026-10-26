@@ -108,9 +108,9 @@ describe("E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben", () =>
     }
   });
 
-  it("je Rolle so viele Einträge mit Vermerk wie vor E-196 (Rechtsanwalt 165, Steuerberater 34, Sifa 27, Lebensmittel 14)", () => {
+  it("je Rolle so viele Einträge mit Vermerk wie vor E-196 – E-201: dazu Künstlersozialabgabe (Rechtsanwalt) und Lohnsteuerbescheinigung (Steuerberater)", () => {
     const zahl = (r: string) => pflichten.filter((p) => pruefVermerk(p.version, p.pruefung, AM) && p.pruefung!.geprueft_von!.includes(r)).length;
-    expect(ROLLEN.map(zahl)).toEqual([165, 34, 27, 14]);
+    expect(ROLLEN.map(zahl)).toEqual([166, 35, 27, 14]);
     // die 17 von E-196 zurückgestuften Einträge zeigen den Vermerk wieder – ihre Version ist die bestätigte
     for (const id of ["steuern.buchfuehrungspflicht", "steuern.e_bilanz", "steuern.oss_erklaerung", "steuern.euer", "steuern.feststellungserklaerung", "gesellschaft.jahresabschluss_personenhandel",
       "arbeitsschutz.arbeitsmedizinische_vorsorge", "gesellschaft.gesellschaftsvertrag_notar", "gesellschaft.handelsregister_anmeldung", "gesellschaft.transparenzregister", "gesellschaft.geschaeftsbriefe_pflichtangaben",
@@ -134,10 +134,13 @@ describe("E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben", () =>
     };
     expect(v("arbeitsschutz.biostoffe")).toContain("von einer Fachkraft für Arbeitssicherheit (ohne arbeitsmedizinische Angaben)");
     expect(v("arbeitsschutz.laerm")).toContain("(ohne arbeitsmedizinische Angaben)");
-    expect(v("steuern.e_rechnung_versand_2027")).toMatch(/^Teilweise fachlich durchgesehen von einem Steuerberater \(Stand 23\.10\.2026; noch offen: /);
-    expect(v("personal.arbeitszeit_neuregelung")).toMatch(/^Inhalt teilweise fachlich geprüft von einem Rechtsanwalt/);
-    // arbeitsmedizinische Vorsorge: Kern ist ärztlich – Vermerk nur mit der Einschränkung und als „teilweise“ (Vorsorgefristen offen)
-    expect(v("arbeitsschutz.arbeitsmedizinische_vorsorge")).toMatch(/^Inhalt teilweise fachlich geprüft von einem Rechtsanwalt \(nur die rechtliche Seite, ohne medizinische Inhalte\)/);
+    // E-201: die offenen Punkte haben die Prüfer am 26.10.2026 erneut geprüft und als erledigt bestätigt – kein „teilweise“ mehr
+    expect(v("steuern.e_rechnung_versand_2027")).toBe("Fachlich durchgesehen von einem Steuerberater (Stand 26.10.2026) – ohne Gewähr für den Einzelfall.");
+    expect(v("personal.arbeitszeit_neuregelung")).toMatch(/^Inhalt fachlich geprüft von einem Rechtsanwalt, Stand 26\.10\.2026\./);
+    expect(v("datenschutz.dsb_streichung")).toMatch(/^Inhalt fachlich geprüft von einem Rechtsanwalt, Stand 26\.10\.2026\./);
+    // arbeitsmedizinische Vorsorge: Kern ist ärztlich – Vermerk nur mit der Einschränkung (vom Rechtsanwalt bestätigt)
+    expect(v("arbeitsschutz.arbeitsmedizinische_vorsorge")).toMatch(/^Inhalt fachlich geprüft von einem Rechtsanwalt \(nur die rechtliche Seite, ohne medizinische Inhalte\), Stand 26\.10\.2026/);
+    for (const p of pflichten) expect(p.pruefung?.offen ?? [], p.id).toEqual([]);
   });
 
   it("kein Vermerk und kein Katalogfeld nennt eine Person", () => {

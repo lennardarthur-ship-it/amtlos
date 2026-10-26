@@ -252,9 +252,9 @@ describe("Rechtstexte auf Android (E-190)", () => {
     expect(DATENSCHUTZ.abschnitte[0]!.text).toContain("nur auf deinem iPhone");
     expect(datenschutzFreigegeben(false)).toBe(true);
   });
-  it("Android zeigt einen eigenen Entwurf – nicht freigegeben, ohne Apple, mit Google Play und Ordner-Sicherung", () => {
-    expect(DATENSCHUTZ_ANDROID.freigegeben).toBe(false);
-    expect(datenschutzFreigegeben(true)).toBe(false);
+  it("Android zeigt einen eigenen Hinweis – seit E-201 freigegeben, ohne Apple, mit Google Play und Ordner-Sicherung", () => {
+    expect(DATENSCHUTZ_ANDROID.freigegeben).toBe(true);
+    expect(datenschutzFreigegeben(true)).toBe(true);
     const t = datenschutzAbschnitte(false, true).map((a) => `${a.titel} ${a.text}`).join("\n");
     expect(t).not.toMatch(IOS_WOERTER_RE);
     expect(t).toMatch(/Google Play/);

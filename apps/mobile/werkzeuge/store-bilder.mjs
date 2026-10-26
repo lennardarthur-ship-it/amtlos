@@ -87,7 +87,33 @@ const tab = async (name) => {
   await warte(900);
 };
 const roh = {};
+// E-201 (Bedingung des Rechtsanwalts): kein Prüfvermerk mit der Rolle eines Prüfers auf Store- und Website-Bildern – dort
+// stünde er für die ganze App. Jede Aufnahme prüft den sichtbaren Bereich.
+const ROLLE = /Rechtsanw|Steuerberater|Fachkraft für Arbeitssicherheit|Lebensmittelfachbeauftragt/;
 const foto = async (name) => {
+  // Rolle im sichtbaren Bild? Je Fundstelle die Zeilen der Wörter (Range) – im Bildausschnitt und nicht verdeckt (z. B. vom
+  // festen Knopf unten), geprüft am obersten Element an der Stelle des Worts
+  const gezeigt = await p.evaluate((quelle) => {
+    const re = new RegExp(quelle, "g");
+    const aus = [];
+    const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n = w.nextNode(); n; n = w.nextNode()) {
+      const el = n.parentElement;
+      if (!el || getComputedStyle(el).visibility === "hidden") continue;
+      for (const m of (n.textContent ?? "").matchAll(re)) {
+        const r = document.createRange();
+        r.setStart(n, m.index);
+        r.setEnd(n, m.index + m[0].length);
+        for (const z of r.getClientRects()) {
+          if (z.width <= 0 || z.bottom <= 0 || z.top >= innerHeight || z.right <= 0 || z.left >= innerWidth) continue;
+          const oben = document.elementFromPoint(Math.min(Math.max(z.left + z.width / 2, 0), innerWidth - 1), Math.min(Math.max(z.top + z.height / 2, 0), innerHeight - 1));
+          if (oben && (oben === el || el.contains(oben) || oben.contains(el))) aus.push((n.textContent ?? "").slice(Math.max(0, m.index - 60), m.index + 60));
+        }
+      }
+    }
+    return aus;
+  }, ROLLE.source);
+  if (gezeigt.length) throw new Error(`Aufnahme „${name}“ zeigt die Rolle eines Prüfers (E-201) – Ausschnitt oder Demo-Stand ändern: …${gezeigt[0]}…`);
   roh[name] = await p.screenshot();
 };
 

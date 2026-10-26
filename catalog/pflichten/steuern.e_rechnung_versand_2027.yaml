@@ -91,8 +91,6 @@ pruefung:
   status: freigegeben
   geprueft_von:
     - steuern
-  geprueft_am: '2026-10-23'
+  geprueft_am: '2026-10-26'
   geprueft_version: 3
-  bestaetigt_am: '2026-10-23'
-  offen:
-    - "Übergangsfristen vor dem Start erneut zu prüfen"
+  bestaetigt_am: '2026-10-26'

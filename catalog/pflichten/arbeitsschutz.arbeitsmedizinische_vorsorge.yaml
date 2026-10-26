@@ -58,9 +58,7 @@ pruefung:
   status: freigegeben
   geprueft_von:
     - recht
-  geprueft_am: '2026-10-23'
+  geprueft_am: '2026-10-26'
   geprueft_version: 6
-  bestaetigt_am: '2026-10-23'
+  bestaetigt_am: '2026-10-26'
   einschraenkung: "nur die rechtliche Seite, ohne medizinische Inhalte"
-  offen:
-    - "Fristen je Vorsorgeart und Bewertung bei Kosmetik mit Blutkontakt (ärztliche Bestätigung)"

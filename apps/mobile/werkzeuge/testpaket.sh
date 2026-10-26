@@ -139,14 +139,12 @@ Im Store-Build gibt es diesen Knopf nicht.
 
 FACHLICHE PRÜFUNG
 
-Den Katalog und die Vorlagen haben Fachleute durchgesehen (Rechtsanwalt, Steuerberater, Fachkraft für
-Arbeitssicherheit, Lebensmittelfachbeauftragter). Die App zeigt einen Prüfvermerk nur, wo eine schriftliche Bestätigung
-des Prüfers genau diese Fassung abdeckt (Stand 25.10.2026: 226 der 228 Pflichten; zwei neue Einträge warten
-auf die Prüfung) – mit der Rolle, nie mit Namen, z. B. „Inhalt fachlich geprüft von einem Rechtsanwalt, Stand …“;
-Einschränkungen stehen dabei („ohne arbeitsmedizinische Angaben“), offene Punkte als „teilweise geprüft“.
-Alle 43 Vorlagen sind schriftlich bestätigt (per Mail; die Mails bewahrt der Anbieter auf). Keinen Vermerk zeigen
-zurzeit die Rechnung für GmbH & Co. KG / UG & Co. KG und beim Storno einer Schlussrechnung mit Abschlägen (seit der
-Prüfung geändert) sowie die Handelsregister-Vorlage außer für GmbH, OHG und KG (nur diese geprüft).
+Katalog und Vorlagen sind fachlich durchgesehen. Die App zeigt einen Prüfvermerk nur, wo eine schriftliche Bestätigung
+des Prüfers genau diese Fassung abdeckt (Stand 26.10.2026: alle 228 Pflichten) – mit der Rolle, nie mit Namen;
+Einschränkungen stehen dabei (z. B. „ohne arbeitsmedizinische Angaben“). Die Rolle steht nur in der App beim Vermerk,
+nicht in Store-Texten, auf Store-Bildern oder in der Werbung. Bei den Vorlagen fehlt der Vermerk zurzeit, wo sich eine
+Variante seit der Prüfung geändert hat (einzelne Varianten der Rechnung), wo eine Bestätigung der neu gerechneten
+Prüfsumme aussteht (sieben Arbeitsschutz-Vorlagen) und bei der Handelsregister-Vorlage außer für GmbH, OHG und KG.
 Der Vermerk gilt je Variante (Rechtsform, Land, Rechnungsart): Jede Änderung hebt ihn für die betroffene Variante auf,
 bis erneut geprüft ist. Rechtsberatung im Einzelfall ist die App nicht.
 
@@ -154,8 +152,8 @@ bis erneut geprüft ist. Rechtsberatung im Einzelfall ist die App nicht.
 RECHTLICHES IN DER APP („Über {{MARKE}}“)
 
 - Impressum: Anbieter, Anschrift, Vertretung, E-Mail; Handelsregister und USt-IdNr. folgen nach der Eintragung der UG.
-- Datenschutzhinweis: auf dem iPhone vom Rechtsanwalt freigegeben (Fassung ohne Synchronisation). Auf Android steht
-  eine eigene Fassung (Google Play, Sicherung in einen Ordner) – noch ein Entwurf, als solcher gekennzeichnet.
+- Datenschutzhinweis: auf dem iPhone und auf Android (eigene Fassung: Google Play, Sicherung in einen Ordner) fachlich
+  freigegeben, jeweils die Fassung ohne Synchronisation.
 - Nutzungsbedingungen: inhaltlich freigegeben, in Kraft erst nach der Eintragung der UG – bis dahin als Entwurf
   gekennzeichnet; auf dem iPhone gilt Apples Standard-Lizenzvertrag, Android zeigt bis dahin keinen Link.
 

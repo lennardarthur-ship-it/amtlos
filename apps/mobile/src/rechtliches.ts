@@ -30,6 +30,8 @@ export const LINKS = {
   website: MARKE.website,
   /** Datenschutzerklärung im Netz (Pflichtangabe im App Store) */
   datenschutz: MARKE.datenschutz,
+  /** Android-Abschnitt derselben Seite – Datenschutz-URL in der Play Console (E-201, Rechtsanwalt: direkt verlinken) */
+  datenschutzAndroid: `${MARKE.datenschutz}#android`,
   /** Support-Seite oder E-Mail-Link (Pflichtangabe im App Store) */
   support: MARKE.hilfe,
   /**
@@ -114,25 +116,28 @@ export const DATENSCHUTZ_SYNC = {
 };
 
 /**
- * ENTWURF – NICHT FREIGEGEBEN (E-190, PRUEFLISTE T-177). Datenschutzhinweis der Android-App: gleicher Aufbau wie der von
- * Rechtsanwalt freigegebene iPhone-Text (oben, unverändert), nur dort geändert, wo die Android-App technisch etwas anderes
- * tut – Google Play statt App Store (Kauf über das Google-Konto, Kaufbelege von Google Play bei RevenueCat), automatische
- * Sicherung in einen selbst gewählten Ordner (Speicherzugriffs-Framework von Android) statt iCloud, Android-Schlüsselspeicher
- * statt Schlüsselbund, keine Gerätesicherung durch Android (`allowBackup: false`). Die rechtliche Einordnung (Google und
- * der Anbieter des Cloud-Ordners als eigene Verantwortliche) ist aus dem iPhone-Text übertragen und von Rechtsanwalt zu
- * prüfen – Gegenüberstellung in docs/datenschutz-android-entwurf.md. Die App zeigt ihn nur auf Android, mit dem Hinweis
- * „Entwurf“; der Store-Check meldet ihn als offen; die Website zeigt ihn erst nach der Freigabe.
+ * Datenschutzhinweis der Android-App (E-190): gleicher Aufbau wie der von Rechtsanwalt freigegebene iPhone-Text (oben,
+ * unverändert), nur dort geändert, wo die Android-App technisch etwas anderes tut – Google Play statt App Store (Kauf über
+ * das Google-Konto, Kaufbelege von Google Play bei RevenueCat), automatische Sicherung in einen selbst gewählten Ordner
+ * (Speicherzugriffs-Framework von Android) statt iCloud, Android-Schlüsselspeicher statt Schlüsselbund, keine
+ * Gerätesicherung durch Android (`allowBackup: false`); Gegenüberstellung in docs/datenschutz-android-entwurf.md.
  */
+// Freigegeben von Rechtsanwalt 26.10.2026 für den Build ohne Sync (E-201; Mail beim Gründer) – für die Fassung, die dem
+// freigegebenen iPhone-Text (892aa8818e0e) mit genau den im Entwurf aufgeführten Android-Änderungen entspricht, mit seiner
+// Formulierung zum Sicherungsordner (Abschnitte „Sicherungen“ sowie „Empfänger und Drittland“, wörtlich übernommen).
+// Prüfsumme dieser Fassung: SHA-256 über „## Titel\n\nText\n“ aller Abschnitte, 12 Zeichen = DATENSCHUTZ_ANDROID_PRUEFSUMME
+// (test/e201-rueckmeldungen.test.ts rechnet nach). Bei Textänderung erneut vorlegen; der Sync-Zusatz ist nicht freigegeben.
+export const DATENSCHUTZ_ANDROID_PRUEFSUMME = "c6b45a804f10";
 export const DATENSCHUTZ_ANDROID = {
-  freigegeben: false,
+  freigegeben: true,
   abschnitte: [
     { titel: "Kurz gesagt", text: `${MARKE.name} speichert deine Angaben nur auf deinem Smartphone – verschlüsselt, ohne Konto und ohne Server von ${MARKE.name}. Wir sehen deine Unterlagen, Kunden und Mitarbeiter nicht. ${MARKE.name} macht keine eigenen Analysen und zeigt keine Werbung; nur für ${MARKE.proName} wertet unser Dienstleister RevenueCat die Käufe für die Abo-Verwaltung aus.` },
     { titel: "Was auf dem Smartphone liegt", text: `Betrieb, Unterlagen, Rechnungen, Belege mit Fotos und Dateien, Mitarbeiter- und Kundendaten sowie deine Antworten im Pflichten-Check. Die Daten sind mit AES-256 verschlüsselt; der Schlüssel liegt im Android-Schlüsselspeicher dieses Smartphones. Die Gerätesicherung von Android nimmt diese Daten nicht mit. Diese Daten verarbeitest du selbst – ${MARKE.name} erhält sie nicht. Wenn du die App löschst, sind die Daten weg – außer in einer Sicherung, die du selbst erstellt hast.` },
-    { titel: "Sicherungen", text: `Eine Sicherung ist eine Datei, die ${MARKE.name} mit deinem Passwort verschlüsselt. Du entscheidest, wo du sie ablegst. Die automatische Sicherung legt dieselbe verschlüsselte Datei in einem Ordner ab, den du einmal über die Ordnerauswahl von Android wählst (z. B. auf dem Smartphone, in Google Drive oder Nextcloud); ${MARKE.name} erhält dabei nur Zugriff auf diesen Ordner. Liegt der Ordner bei einem Cloud-Anbieter, ist dieser für die Speicherung eigener Verantwortlicher; es gelten seine Datenschutzbestimmungen.` },
+    { titel: "Sicherungen", text: `Eine Sicherung ist eine Datei, die ${MARKE.name} mit deinem Passwort verschlüsselt. Du entscheidest, wo du sie ablegst. Die automatische Sicherung legt dieselbe verschlüsselte Datei in einem Ordner ab, den du einmal über die Ordnerauswahl von Android wählst (z. B. auf dem Smartphone, in Google Drive oder Nextcloud); ${MARKE.name} erhält dabei nur Zugriff auf diesen Ordner. Liegt der Ordner bei einem Cloud-Anbieter, gelten für die Speicherung die Vereinbarungen zwischen dir und diesem Anbieter; die Datei ist mit deinem Passwort verschlüsselt, und wir haben keinen Zugriff darauf.` },
     { titel: "Erinnerungen", text: `Erinnerungen an Fristen plant das Smartphone selbst als lokale Benachrichtigungen. Dafür wird nichts an ${MARKE.name} gesendet; Push-Mitteilungen über einen Server nutzt die App nicht.` },
     { titel: MARKE.proName, text: `Käufe laufen über dein Google-Konto bei Google Play; für Google Play und die Bezahlung ist Google eigener Verantwortlicher. Damit die App weiß, ob Pro aktiv ist, verarbeitet RevenueCat, Inc. (USA) als unser Auftragsverarbeiter eine zufällige App-Kennung und deine Kaufbelege von Google Play – keine Unterlagen, keine Namen. RevenueCat wertet die Käufe für die Abo-Verwaltung aus (z. B. Verlängerung, Kündigung, Probezeitraum); eigene Analysen macht ${MARKE.name} damit nicht.` },
     { titel: "Rechtsgrundlagen", text: `Abo-Status prüfen und das Abo verwalten: Art. 6 Abs. 1 lit. b DSGVO (Vertrag über ${MARKE.proName}). Speichern und Lesen auf deinem Smartphone, soweit für die App nötig (Schlüsselspeicher, Einstellungen): § 25 Abs. 2 Nr. 2 TDDDG. Automatische Sicherung in einen Ordner nur, wenn du sie einschaltest.` },
-    { titel: "Empfänger und Drittland", text: `RevenueCat, Inc., USA (Auftragsverarbeiter nach Art. 28 DSGVO, nur Kennung und Kaufbelege). ${DRITTLAND_REVENUECAT} Google ist für Google Play und Käufe eigener Verantwortlicher, für einen Cloud-Ordner der Anbieter, den du wählst. Sonst erhält niemand Daten aus der App – außer dem, was du selbst teilst.` },
+    { titel: "Empfänger und Drittland", text: `RevenueCat, Inc., USA (Auftragsverarbeiter nach Art. 28 DSGVO, nur Kennung und Kaufbelege). ${DRITTLAND_REVENUECAT} Google ist für Google Play und Käufe eigener Verantwortlicher. Wo du deine Sicherung ablegst, entscheidest du; wir übermitteln sie nicht. Sonst erhält niemand Daten aus der App – außer dem, was du selbst teilst.` },
     { titel: "Speicherdauer", text: "Auf dem Smartphone: bis du die Daten in der App löschst oder die App entfernst. Bei RevenueCat: solange dein Abo besteht. Spätestens vier Monate nach Ende deines Abos lassen wir die Daten zu deiner App-Kennung bei RevenueCat löschen – früher, wenn du die Löschung verlangst. Die Zeit danach brauchen wir für Erstattungen und Rückbuchungen über Google Play. Endet unser Vertrag, löscht RevenueCat die Daten oder gibt sie auf unsere Anforderung zurück; Sicherungskopien nach den Sicherungs- und Archivierungsroutinen von RevenueCat." },
     { titel: "Musst du Daten angeben?", text: `Nein. Die App funktioniert ohne Angaben an ${MARKE.name}. Nur für ${MARKE.proName} ist die Prüfung des Kaufs über RevenueCat nötig – ohne sie lässt sich Pro nicht nutzen.` },
     { titel: "Keine automatisierte Entscheidung", text: "Es gibt keine automatisierte Entscheidung und kein Profiling im Sinne von Art. 22 DSGVO. Der Pflichten-Check rechnet auf deinem Smartphone und zeigt, welche Pflichten nach deinen Angaben in Frage kommen – er entscheidet nichts über dich." },
@@ -141,7 +146,7 @@ export const DATENSCHUTZ_ANDROID = {
   ],
 };
 
-/** Sync-Zusatz in der Android-Fassung (Entwurf wie DATENSCHUTZ_ANDROID): nur die Gerätewörter und Google statt Apple. */
+/** Sync-Zusatz in der Android-Fassung (nicht freigegeben, wie auf dem iPhone): nur die Gerätewörter und Google statt Apple. */
 const androidWorte = (a: { titel: string; text: string }) => ({ titel: a.titel, text: a.text.replace(/iPhone/g, "Smartphone").replace("Apple ist für App Store, Käufe und iCloud eigener Verantwortlicher.", "Google ist für Google Play und Käufe eigener Verantwortlicher.") });
 
 /** Gilt der Datenschutzhinweis der laufenden App als freigegeben? (Android: Entwurf bis zur Freigabe, E-190) */

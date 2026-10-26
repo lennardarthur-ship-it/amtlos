@@ -12,29 +12,26 @@ gruende:
   technik: Technische Grenze des Auslösers oder der Abbildung (Technik), kein Prüfpunkt.
   auflage_erfuellt: Auflage der Freigabe, die die angezeigte Fassung schon erfüllt (Beträge bzw. Zusatz entfernt, bis eine Fundstelle vorliegt).
   entwurf: Eintrag im Entwurf (E-195); die Prüfung läuft mit dem Prüfpaket vom 25.10.2026.
+  nachgeprueft: Der Prüfer hat den offenen Punkt am 26.10.2026 erneut geprüft und per Mail als erledigt bestätigt (E-201); erneute Vorlage zu den in PRUEFLISTE genannten Terminen.
+  beantwortet: Frage zum Entwurf, die der Prüfer mit seiner Freigabe am 26.10.2026 beantwortet hat (E-201).
   neu_geprueft: Neuer Eintrag mit der Bitte um vollständige Prüfung; der Prüfer hat ihn danach freigegeben (Unterschrift siehe Register).
-offen:
+offen: []
+erledigt:
 - id: arbeitsschutz.arbeitsmedizinische_vorsorge
   punkt: Fristen je Vorsorgeart nach AMR 2.1 und Bewertung Kosmetik m
-  rolle: recht
-  thema: Fristen je Vorsorgeart und Bewertung bei Kosmetik mit Blutkontakt (ärztliche Bestätigung)
+  grund: nachgeprueft
 - id: datenschutz.dsb_streichung
   punkt: 'Rechtsstand 21.10.2026: nur Ankündigung (Modernisierungsagen'
-  rolle: recht
-  thema: Stand des Gesetzesvorhabens vor dem Start erneut zu prüfen
+  grund: nachgeprueft
 - id: personal.arbeitszeit_neuregelung
   punkt: 'Freigabe Rechtsanwalt Runde 2 (23.10.2026): als Radar ohne F'
-  rolle: recht
-  thema: vor dem Start und nach dem Kabinettsbeschluss erneut vorzulegen
+  grund: nachgeprueft
 - id: steuern.e_rechnung_versand_2027
   punkt: 'Steuerberater 22.10.2026: Übergangsfristen am 22.10.2026 unv'
-  rolle: steuern
-  thema: Übergangsfristen vor dem Start erneut zu prüfen
+  grund: nachgeprueft
 - id: steuern.e_rechnung_versand_2028
   punkt: 'Steuerberater 22.10.2026: Übergangsfristen am 22.10.2026 unv'
-  rolle: steuern
-  thema: Übergangsfristen vor dem Start erneut zu prüfen
-erledigt:
+  grund: nachgeprueft
 - id: branche.beauty_hygieneplan
   punkt: Prüfvermerk Rechtsanwalt 22.10.2026 (Nummer am Wortlaut prüf
   grund: freigabe
@@ -172,13 +169,13 @@ erledigt:
   grund: nicht_angezeigt
 - id: personal.kuenstlersozialabgabe
   punkt: 'Abgabesatz ändert sich jährlich: 4,9 % gilt nur für 2026; fü'
-  grund: entwurf
+  grund: beantwortet
 - id: personal.kuenstlersozialabgabe
   punkt: Ausnahmen in § 24 Abs. 2 KSVG (höchstens drei Veranstaltunge
-  grund: entwurf
+  grund: beantwortet
 - id: personal.kuenstlersozialabgabe
   punkt: Kanal „post“ nach dem Wortlaut „Vordruck“ (§ 27 Abs. 1 KSVG)
-  grund: entwurf
+  grund: beantwortet
 - id: steuern.kleinunternehmer_grenze_offene_rechnungen
   punkt: neu am 22.10.2026, Prüfung durch Steuerberater ausstehend (S
   grund: freigabe

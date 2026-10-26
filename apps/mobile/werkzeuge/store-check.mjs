@@ -142,6 +142,10 @@ pruefe(s.bilder.every((x) => fs.existsSync(path.join(webBilder, `${x.bildschirm}
 
 // Fachliche Freigabe
 const pl =fs.readFileSync(path.join(APP, "../../PRUEFLISTE.md"), "utf8");
+// E-201 (Bedingung des Rechtsanwalts für die Rollenangabe): keine Rolle eines Prüfers in Store-Texten, Bildzeilen und Werbung –
+// dort stünde sie für die ganze App. Die Rolle steht nur im Vermerk bei der bestätigten Fassung in der App.
+const ROLLE_WERBUNG = /Rechtsanw|Steuerberater|Fachkraft für Arbeitssicherheit|Lebensmittelfachbeauftragt|\bSifa\b/;
+pruefe(!ROLLE_WERBUNG.test(JSON.stringify(storeJson)), "Store-Texte und Bildzeilen ohne Rolle eines Prüfers (E-201: die Rolle steht nur im Vermerk bei der bestätigten Fassung)");
 pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche Freigabe der Vorlagen (PRUEFLISTE T-52 ff.) – vor dem Livegang durch Fachleute");
 // E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben (Bestätigung per Mail; E-198: die Mail bewahrt der Gründer auf,
 // im Repository steht nur der Nachweis mit Art, Datum, Rolle und Umfang) – was noch auf Bestätigung oder Nachprüfung wartet
@@ -189,6 +193,9 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
   const geaendert = freigaben.filter(([k, u]) => u !== "null" && (!frei[k] || !heute[k] || Object.keys(frei[k]).some((g) => frei[k][g] !== heute[k][g])));
   const gruppen = [...new Set(geaendert.flatMap(([k]) => Object.keys(frei[k] ?? {}).filter((g) => frei[k][g] !== heute[k]?.[g]).map((g) => `${k}: ${g}`)))].sort();
   pruefe(freigaben.length > 0 && !ohneBestaetigung.length && !geaendert.length, `Vorlagen: heutige Fassung schriftlich bestätigt (E-197, Nachweis ohne Mail im Projekt, E-198)${ohneBestaetigung.length || geaendert.length ? ` – ${ohneBestaetigung.length} von ${freigaben.length} Freigaben ohne Bestätigung; ${geaendert.length} ohne Vermerk in seit der Bestätigung geänderten Varianten (${gruppen.join(", ") || "–"}) (Nachprüfliste, PRUEFLISTE T-204)` : ""}`);
+  // E-201: Vermerk auf Bitte des Prüfers ausgesetzt (Bestätigung der neu gerechneten Prüfsumme ausstehend)
+  const ausgesetzt = [...geprueft.matchAll(/^ {2}(\w+): \{ stand:[^\n]*vermerk_ausgesetzt: "/gm)].map((m) => m[1]);
+  pruefe(!ausgesetzt.length, `Vorlagen: kein Vermerk ausgesetzt (E-201)${ausgesetzt.length ? ` – ${ausgesetzt.length} Freigaben ohne Vermerk, bis der Prüfer die neu gerechnete Prüfsumme bestätigt (${ausgesetzt.join(", ")}; PRUEFLISTE T-216)` : ""}`);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -227,6 +234,7 @@ const pruefeA = (bed, text) => (bed ? okA : offenA).push(text);
   pruefeA(["READ_MEDIA_IMAGES", "READ_EXTERNAL_STORAGE", "SCHEDULE_EXACT_ALARM", "RECORD_AUDIO"].every((x) => (app.android?.blockedPermissions ?? []).includes(`android.permission.${x}`)), "Android: Medien-, Speicher-, Wecker- und Mikrofon-Berechtigungen gesperrt (keine Play-Erklärungen nötig)");
   pruefeA(play.titel.length <= 30 && play.kurzbeschreibung.length <= 80 && play.beschreibung.length <= 4000 && play.neu.length <= 500, `Play-Texte in den Grenzen (Titel ${play.titel.length}/30, Kurzbeschreibung ${play.kurzbeschreibung.length}/80, Beschreibung ${play.beschreibung.length}/4000)`);
   pruefeA(!/iPhone|iCloud|Face ID|Apple-Account|stdeula/.test(JSON.stringify([play.titel, play.kurzbeschreibung, play.beschreibung, play.neu, play.bilder])), "Play-Texte ohne Apple-Wörter");
+  pruefeA(!ROLLE_WERBUNG.test(JSON.stringify(play)), "Play-Texte und Bildzeilen ohne Rolle eines Prüfers (E-201)");
 }
 
 const nurAndroid = process.argv.includes("--android");
