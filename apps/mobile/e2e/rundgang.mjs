@@ -7,6 +7,7 @@
  * der Teil ohne Pro (Neues gesperrt; erneut teilen, Storno, Kasse und Kassenbuch frei).
  * E-200: Hinweis nach dem Ende von Pro (Aufzeichnungs- und Aufbewahrungspflichten laufen weiter), „Alle Daten löschen“ erst
  * nach dem kostenlosen Export „Daten für die Betriebsprüfung“ (ZIP geprüft) und der Bestätigung, dass er gespeichert ist.
+ * E-202: ein Kassensturz; der Export enthält Kassenstuerze.csv samt Feldbeschreibung (Sachentnahmen nur mit Daten).
  *
  *   cd apps/mobile && CI=1 npx expo export --platform web --output-dir /tmp/expo-web
  *   node e2e/rundgang.mjs /tmp/expo-web /tmp/bilder        # DUNKEL=1 für Dunkelmodus, BREITE=375 für 375 pt, CHROMIUM_PFAD optional
@@ -296,6 +297,19 @@ try {
   pruefe((await sichtbar("Korrigieren")) && !(await sichtbar("Tagesabschluss speichern")), "gespeicherter Tag ist nicht festgeschrieben");
   await zurueck();
   await warte(800);
+  // E-202: ein Kassensturz (Zählprotokoll) – er gehört in den Export für die Betriebsprüfung (Kassenstuerze.csv)
+  await tippe(knopf("Kassensturz jetzt"));
+  await warte(900);
+  await feld("Gezählter Bestand").fill("200,00");
+  await feld("Gezählt von bzw. anwesend").fill("Sam Muster");
+  await tippe(p.getByRole("button", { name: /^Kassensturz speichern/ }).locator("visible=true").last());
+  await warte(900);
+  pruefe(await sichtbar("Kassensturz gespeichert"), "Kassensturz nicht gespeichert");
+  // nach dem Speichern schließt die Seite selbst; nur zurück, wenn sie noch offen ist
+  if (await knopf("Kassensturz jetzt").count() === 0) {
+    await zurueck();
+    await warte(800);
+  }
   await zurueck();
   await warte(800);
   await neu();
@@ -680,7 +694,12 @@ try {
   const pruefInhalt = unzipSync(new Uint8Array(fs.readFileSync(pruefZip)));
   const pruefNamen = Object.keys(pruefInhalt);
   pruefe(/Betriebspruefung/.test(zipLaden.suggestedFilename()), `Dateiname des Exports: ${zipLaden.suggestedFilename()}`);
-  for (const n of ["Rechnungen.csv", "Belege.csv", "Kassenabschluesse.csv", "Aenderungsprotokoll.csv", "Feldbeschreibung.txt"]) pruefe(pruefNamen.includes(n), `Export ohne ${n}`);
+  for (const n of ["Rechnungen.csv", "Belege.csv", "Kassenabschluesse.csv", "Kassenstuerze.csv", "Aenderungsprotokoll.csv", "Feldbeschreibung.txt"]) pruefe(pruefNamen.includes(n), `Export ohne ${n}`);
+  // E-202: Kassenstürze mit Zählprotokoll und Beschreibung der Spalten; Sachentnahmen nur, wenn welche erfasst sind (hier keine – Salon)
+  const sturz = strFromU8(pruefInhalt["Kassenstuerze.csv"] ?? new Uint8Array());
+  const feldtext = strFromU8(pruefInhalt["Feldbeschreibung.txt"]);
+  pruefe(sturz.includes("Gezählter Bestand") && sturz.includes("200,00") && sturz.includes("Sam Muster"), `Kassenstürze im Export unvollständig: ${sturz.slice(0, 200)}`);
+  pruefe(feldtext.includes("Kassenstuerze.csv") && feldtext.includes("Endbestand letzter Abschluss") && !pruefNamen.includes("Sachentnahmen.csv") && !feldtext.includes("Sachentnahmen.csv"), "Feldbeschreibung ohne Kassenstürze oder mit Sachentnahmen ohne Daten");
   // der Beleg im Rundgang ist eine empfangene E-Rechnung (Original unverändert); die Rechnung an eine Privatperson hat keine XRechnung
   pruefe(pruefNamen.some((n) => n.startsWith("E-Rechnungen/eingehend/")) && strFromU8(pruefInhalt["Belege.csv"]).includes("E-Rechnungen/eingehend/"), "Export ohne empfangene E-Rechnung bzw. ohne Pfad in der Belegliste");
   pruefe(!pruefNamen.some((n) => /EXTF|stand\.json|\.pdf$/.test(n) && !n.startsWith("Belege/")), `Export enthält mehr als verlangt: ${pruefNamen.join(", ")}`);

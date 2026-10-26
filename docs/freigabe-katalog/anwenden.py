@@ -304,14 +304,17 @@ def vorlagen_nachweis_pruefen():
     ts = open(os.path.join(d, "geprueft.ts"), encoding="utf-8").read()
     teil = {m.group(1): json.loads(m.group(2)) for m in re.finditer(r'^ {2}"([\w#]+)": (\{[^\n]*\}),$', open(os.path.join(d, "geprueft-teilsummen.ts"), encoding="utf-8").read(), re.M)}
     heute = {m.group(1) for m in re.finditer(r'^ {2}"([\w#]+)": \{ summe: "[0-9a-f]{64}"', open(os.path.join(d, "pruefstaende.ts"), encoding="utf-8").read(), re.M)}
-    fehler, schluessel, vorlage = [], [], None
+    fehler, schluessel, vorlage, weitere = [], [], None, 0
     for zeile in ts.splitlines():
         m = re.match(r" {2}(\w+): \{", zeile)
         if m:
-            vorlage = m.group(1)
+            vorlage, weitere = m.group(1), 0
         if "stand:" not in zeile or "pruefsumme:" not in zeile:
             continue
-        k = vorlage if re.match(r" {2}\w+: \{ stand:", zeile) else f"{vorlage}#1"
+        # E-202: mehrere weitere Freigaben je Vorlage (je eine Zeile) – „#1“, „#2“ usw. in der Reihenfolge der Zeilen
+        if not re.match(r" {2}\w+: \{ stand:", zeile):
+            weitere += 1
+        k = vorlage if re.match(r" {2}\w+: \{ stand:", zeile) else f"{vorlage}#{weitere}"
         schluessel.append(k)
         stand = re.search(r'stand: "([\d-]+)"', zeile).group(1)
         rolle = re.search(r'stand: "[\d-]+", rolle: "(\w+)"', zeile)

@@ -2321,3 +2321,19 @@
       version: 1
       quelle: Freigabe per Mail vom 26.10.2026 mit ausgefüllter Datei der neuen Einträge (beim Gründer)
       stand: '2026-10-26'
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-26'
+    rolle: recht
+    umfang: 'Zweite Antwort vom 26.10.2026: Künstlersozialabgabe v2 inhaltlich bestätigt; eine Satzzeichen-Korrektur vorab freigegeben (Punkt
+      statt Semikolon nach „(§ 26 KSVG)“, danach „Er gilt jeweils für ein Kalenderjahr; …“) – v3 unterscheidet sich von v2 nur darin (nachgeprüft)'
+    aufbewahrung: beim Gründer
+  felder_fehlen: []
+  hinweis: 'E-202: zweite Antwort des Rechtsanwalts vom 26.10.2026 (Mail beim Gründer)'
+  eintraege:
+    personal.kuenstlersozialabgabe:
+      version: 3
+      quelle: Vorabfreigabe der Satzzeichen-Korrektur per Mail vom 26.10.2026 (beim Gründer)
+      stand: '2026-10-26'

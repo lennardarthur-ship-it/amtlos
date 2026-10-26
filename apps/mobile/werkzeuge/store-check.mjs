@@ -187,8 +187,22 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
   const frei = Object.fromEntries([...teilsummen.matchAll(/^ {2}"([\w#]+)": (\{[^\n]*\}),$/gm)].map((m) => [m[1], JSON.parse(m[2])]));
   // Freigaben (weitere Fassungen als „#1“ usw.) mit Tag der schriftlichen Bestätigung
   const freigaben = [];
-  for (const m of geprueft.matchAll(/^ {2}(\w+): \{ stand: "[\d-]+", rolle: "\w+", bestaetigt_am: ("[\d-]+"|null)/gm)) freigaben.push([m[1], m[2]]);
-  for (const m of geprueft.matchAll(/^ {2}(\w+): \{[^\n]*\n(?: {4}[^\n]*\n)*? {4}weitere: \[\{ stand: "[\d-]+", rolle: "\w+", bestaetigt_am: ("[\d-]+"|null)/gm)) freigaben.push([`${m[1]}#1`, m[2]]);
+  // E-202: mehrere weitere Freigaben je Vorlage (je eine Zeile, „#1“, „#2“ … in der Reihenfolge der Zeilen)
+  {
+    let vorlage = null;
+    let n = 0;
+    for (const z of geprueft.split("\n")) {
+      const kopf = /^ {2}(\w+): \{ stand: "[\d-]+", rolle: "\w+", bestaetigt_am: ("[\d-]+"|null)/.exec(z);
+      if (kopf) {
+        [vorlage, n] = [kopf[1], 0];
+        freigaben.push([kopf[1], kopf[2]]);
+        continue;
+      }
+      if (/^ {2}\w+: \{/.test(z)) [vorlage, n] = [null, 0];
+      const w = /^ {4}(?:weitere: \[)?\{ stand: "[\d-]+", rolle: "\w+", bestaetigt_am: ("[\d-]+"|null)/.exec(z);
+      if (w && vorlage) freigaben.push([`${vorlage}#${++n}`, w[1]]);
+    }
+  }
   const ohneBestaetigung = freigaben.filter(([, u]) => u === "null").map(([k]) => k);
   // E-200: eine Variante gilt als bestätigt, wenn irgendeine bestätigte Freigabe derselben Vorlage (auch eine Nachprüfung
   // einzelner Varianten, „#1“) für sie die heutige Teilsumme hat
@@ -240,6 +254,10 @@ const pruefeA = (bed, text) => (bed ? okA : offenA).push(text);
   pruefeA(k.zielgruppe === true, "Zielgruppe und Inhalte (18 und älter, nicht für Kinder) in der Play Console angegeben");
   pruefeA(k.finanzfunktionen === true, "Erklärung zu Finanzfunktionen in der Play Console abgegeben (Rechnungen/Kassenbuch – Einordnung prüfen, PRUEFLISTE T-179)");
   pruefeA(k.appZugriff === true, "„App-Zugriff“ in der Play Console: Hinweise für die Prüfung (store/de-android.json → app_zugriff) und Lizenztester eingetragen");
+  // E-202 (Rechtsanwalt, 26.10.2026): Seine Freigabe des Android-Datenschutzhinweises setzt voraus, dass der Release-Build
+  // keine Verbindung zu Google-Diensten aufbaut (Firebase aus expo-notifications) – sonst die Bibliothek entfernen oder den
+  // Hinweis vor dem Start erweitern und erneut freigeben lassen. Startblocker, bis am Release-Build nachgewiesen.
+  pruefeA(k.releaseOhneGoogleDienste === true, "Startblocker Firebase: Release-Build baut keine Verbindung zu Google-Diensten auf (zusammengeführtes Manifest, ./gradlew :app:dependencies, Netzwerkmitschnitt beim ersten Start – z. B. kein firebaseinstallations.googleapis.com); sonst firebase-messaging entfernen oder den Datenschutzhinweis erweitern und erneut freigeben lassen (store/de-android.json → konsole.releaseOhneGoogleDienste; Voraussetzung der Freigabe des Rechtsanwalts, PRUEFLISTE T-219, T-226)");
   // im Code erledigt – meldet nur, wenn etwas kaputtgeht
   pruefeA(app.android?.package === MARKE.technisch.bundleId, `Android-Paket ${app.android?.package} = Marke (${MARKE.technisch.bundleId})`);
   pruefeA(app.android?.allowBackup === false && app.android?.adaptiveIcon?.monochromeImage && fs.existsSync(path.join(APP, app.android.adaptiveIcon.monochromeImage)), "Android: keine Gerätesicherung (allowBackup false), adaptives Symbol mit Monochrom-Fassung");

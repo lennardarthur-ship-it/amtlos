@@ -646,7 +646,7 @@ const haut = (gruppe: string, anlass: string, handschuhe: string, norm: string, 
   gruppe,
   titel: anlass,
   werte: { anlass, schutz: extra.schutz ?? HAUT_SCHUTZ, handschuhe, handschuh_norm: norm, reinigung: extra.reinigung ?? HAUT_REINIGUNG, pflege: extra.pflege ?? HAUT_PFLEGE, ...(extra.desinfektion ? { desinfektion: extra.desinfektion } : {}) },
-  quelle: "TRGS 401 – fachlich zu prüfen",
+  quelle: "TRGS 401",
 });
 const DESINF_BEHANDLUNG = "vor und nach jeder Behandlung und nach dem Ausziehen der Handschuhe";
 export const HAUTSCHUTZ_WEITERE: Vorschlag[] = [
@@ -863,6 +863,13 @@ export const HYGIENE_VERWEIS_HACCP = "Eigenkontrollen nach HACCP (Kontrollpunkte
 /** Zeilen, die nur in Beauty-Betriebe gehören (Instrumentenaufbereitung, Haut, Kundschaft) – für den Hinweis im Lebensmittelbetrieb. */
 const BEAUTY_ZEILE = /Instrument|Haut|\bKund(?:e|en|in|innen)\b|Steril|Lanzett|Nagelhaut|Nagelstudio|Fußpflege|Haarwasch|Behandlungs|\bBlut/i;
 
+/** E-202: Gruppen der Vorschläge für Lebensmittelbetriebe im Hygieneplan (alle übrigen gehören zu Beauty-Betrieben). */
+export const HYGIENE_LM_GRUPPEN: readonly string[] = ["Gastronomie / Café", "Bäckerei", "Foodtruck / mobiler Verkauf"];
+/** E-202: „Was“ der Lebensmittel-Zeilen – erkennt sie im Plan eines Beauty-Betriebs auch ohne Themenbereich. */
+const wasVon = (v: Vorschlag) => (typeof v.werte.was === "string" ? v.werte.was : v.titel);
+const BEAUTY_WAS = new Set(HYGIENE.map(wasVon));
+const LM_ZEILE = new Set([...HYGIENE_LEBENSMITTEL, ...HYGIENE_BAECKEREI, ...HYGIENE_FOODTRUCK].map(wasVon).filter((w) => !BEAUTY_WAS.has(w)));
+
 /** Bayern-spezifischer Zusatz in einem Baustein (R11, Kosmetik #16): nur drucken, wenn der Betrieb in Bayern liegt */
 const NUR_BAYERN = /\s*\(Bayern: [^)]*\)/g;
 /** „Wer“ aus den Bausteinen (Beschäftigte, Reinigungskraft, Arbeitgeber …) – ohne Beschäftigte steht dort die verantwortliche Person */
@@ -980,9 +987,16 @@ export const hygieneplan: Vorlage = {
     },
   ],
   ausProfil: { mit_beschaeftigten: "beschaeftigte.gesamt" },
-  // Nachkontrolle Rechtsanwalt: im Lebensmittelbetrieb keine Beauty-Zeilen; die Themenbereiche vollständig
+  // E-202: Die Vorschläge passen zur Fassung – Friseur/Kosmetik nie Zeilen eines Lebensmittelbetriebs, ein
+  // Lebensmittelbetrieb nur die Zeilen der Gruppen „Gastronomie / Café“, „Bäckerei“ und „Foodtruck / mobiler Verkauf“
+  vorschlagPasst: (feldId, v, d) => feldId !== "eintraege" || (text(d, "art") === "lebensmittel") === HYGIENE_LM_GRUPPEN.includes(v.gruppe ?? ""),
+  // Nachkontrolle Rechtsanwalt: im Lebensmittelbetrieb keine Beauty-Zeilen; die Themenbereiche vollständig.
+  // E-202: umgekehrt im Beauty-Betrieb keine Zeilen eines Lebensmittelbetriebs (sie tragen einen Themenbereich)
   hinweise(d) {
-    if (text(d, "art") !== "lebensmittel") return [];
+    if (text(d, "art") !== "lebensmittel") {
+      const lm = liste(d, "eintraege").filter((x) => text(x, "was") && (text(x, "thema") || LM_ZEILE.has(text(x, "was")))).map((x) => text(x, "was"));
+      return lm.length ? [`Friseur, Kosmetik, Nagelstudio, Fußpflege: ${lm.length === 1 ? "Der Eintrag" : "Die Einträge"} „${lm.join("“, „")}“ ${lm.length === 1 ? "gehört" : "gehören"} in einen Lebensmittelbetrieb – entferne ${lm.length === 1 ? "ihn" : "sie"} oder wähle oben „Lebensmittelbetrieb“, wenn das der Plan eines Lebensmittelbetriebs ist.`] : [];
+    }
     const e = liste(d, "eintraege").filter((x) => text(x, "was"));
     const r: string[] = [];
     const beauty = e.filter((x) => BEAUTY_ZEILE.test(["was", "wann", "womit", "wie"].map((k) => text(x, k)).join(" "))).map((x) => text(x, "was"));

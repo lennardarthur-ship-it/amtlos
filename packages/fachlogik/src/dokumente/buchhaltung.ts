@@ -369,6 +369,10 @@ export function stornoSchlussSatz(schlussNummer: string, ab: Abschlag[]): string
   const und = liste.length > 1 ? `${liste.slice(0, -1).join(", ")} und ${liste.at(-1)}` : (liste[0] ?? "");
   return `Storniert wird nur der Restbetrag der Schlussrechnung Nr. ${schlussNummer}. ${liste.length > 1 ? "Die Abschlagsrechnungen" : "Die Abschlagsrechnung"} ${und} ${liste.length > 1 ? "bleiben" : "bleibt"} bestehen.`;
 }
+/** Satz unter dem Betreff einer Stornorechnung: „Diese Rechnung storniert die Rechnung Nr. … vom ….“ */
+export function stornoBetreffSatz(nummer: string, datum: string): string {
+  return `Diese Rechnung storniert die Rechnung Nr. ${nummer}${datum ? ` vom ${datumDe(datum)}` : ""}.`;
+}
 export function abschlaegeAus(d: Daten): Abschlag[] {
   if (stornoSchlussD(d)) return abschlaegeListe(d).map((a) => ({ ...a, netto_cent: 0 - a.netto_cent, ust_cent: 0 - a.ust_cent }));
   if (!schlussD(d)) return [];
@@ -579,6 +583,10 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     kleinunternehmer: ku,
     hinweis: [befreiung, ...text(d, "hinweis").split("\n").filter((h) => !(storno && h.trim() === ZAHLUNGS_HINWEIS))].filter(Boolean).join("\n") || null,
     ...(storno ? { art: "storno" as const, storniert_nummer: storno } : {}),
+    // E-202 (Steuerberater, 26.10.2026): Datum der stornierten Rechnung im Verweis (BT-26) und beim Storno einer
+    // Schlussrechnung als Anmerkung (BT-22) dieselben Sätze wie auf dem PDF – nicht die Anmerkung der Schlussrechnung
+    ...(storno && isoAus(text(d, "storno_zu_datum")) ? { storniert_datum: isoAus(text(d, "storno_zu_datum")) } : {}),
+    ...(storno && stornoSchlussD(d) && abschlaegeAus(d).length ? { storno_anmerkung: `${stornoBetreffSatz(storno, text(d, "storno_zu_datum"))} ${stornoSchlussSatz(storno, abschlaegeAus(d))}`.replace(/\u00a0/g, " ") } : {}),
     steuerart,
     befreiungsgrund: befreiung || null,
     // R12: Skonto (BT-20) – nicht für schon Bezahltes
@@ -1017,7 +1025,7 @@ export const rechnung: Vorlage = {
       betreff: titel,
       // der Leistungszeitraum steht im Informationsblock („Leistungsdatum“ bzw. „Leistungszeitraum“), nicht noch einmal unter dem Betreff
       // C-6: Ersatzrechnung – Bezug auf die stornierte Rechnung, wenn er nicht schon in den Hinweisen steht
-      unterBetreff: storno ? `Diese Rechnung storniert die Rechnung Nr. ${storno}${text(d, "storno_zu_datum") ? ` vom ${datumDe(text(d, "storno_zu_datum"))}` : ""}.` : ersetztNummer(d) && !/ersetzt/i.test(text(d, "hinweis")) ? `Diese Rechnung ersetzt die stornierte Rechnung Nr. ${ersetztNummer(d)}.` : undefined,
+      unterBetreff: storno ? stornoBetreffSatz(storno, text(d, "storno_zu_datum")) : ersetztNummer(d) && !/ersetzt/i.test(text(d, "hinweis")) ? `Diese Rechnung ersetzt die stornierte Rechnung Nr. ${ersetztNummer(d)}.` : undefined,
       betrieb: b,
       stand: datumDe(datum),
       // Schweizer UID (CHE-…) heißt „UID/MWST-Nr.“, nicht USt-IdNr.

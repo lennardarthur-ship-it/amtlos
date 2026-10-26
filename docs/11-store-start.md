@@ -195,6 +195,11 @@ Drei-Tasten-Navigation. Dann Release in „Produktion“ (gestaffelt, z. B. 20 %
   (`DATENSCHUTZ_ANDROID`) ist seit 26.10.2026 freigegeben (E-201) und steht auf `datenschutz.html` im Abschnitt
   „Android“ – in der Play Console direkt `…/datenschutz.html#android` eintragen (`LINKS.datenschutzAndroid`,
   `store/de-android.json` → `datenschutz`). Die Angaben im Formular „Datensicherheit“ müssen zum Hinweis passen (T-219).
+  **Startblocker Firebase (E-202):** Die Freigabe des Rechtsanwalts setzt voraus, dass der Release-Build keine Verbindung
+  zu Google-Diensten aufbaut (`expo-notifications` bringt `firebase-messaging` mit). Am Release-Build prüfen
+  (zusammengeführtes Manifest, `./gradlew :app:dependencies`, Netzwerkmitschnitt beim ersten Start); sonst die Bibliothek
+  entfernen oder den Hinweis erweitern und erneut freigeben lassen. Danach `konsole.releaseOhneGoogleDienste: true`
+  (T-219, T-226). Die In-App-Bewertung muss der Hinweis nicht nennen.
   Nutzungsbedingungen mit Android-Teil: T-178/T-220.
 - **Inhaltseinstufung (IARC), Zielgruppe (18+), Werbung (keine), App-Zugriff (Hinweise für die Prüfung, Lizenztester),
   Erklärung zu Finanzfunktionen:** Vorschläge in `store/de-android.json` und `docs/play-datensicherheit.md`; nach dem

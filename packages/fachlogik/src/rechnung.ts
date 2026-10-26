@@ -153,6 +153,13 @@ export interface RechnungsDaten {
   leistungszeitraum?: { von: string; bis: string } | null;
   steller: Steller; kunde: KundeDaten; positionen: Position[]; kleinunternehmer: boolean; hinweis?: string | null;
   art?: "rechnung" | "storno"; storniert_nummer?: string | null;
+  /** E-202: Datum der stornierten Rechnung (ISO) – in der XRechnung im Verweis (BT-26) */
+  storniert_datum?: string | null;
+  /**
+   * E-202: Storno einer Schlussrechnung mit Abschlägen – Anmerkung (BT-22) mit denselben Sätzen wie auf dem PDF („Diese
+   * Rechnung storniert …“ und „Storniert wird nur der Restbetrag … bleiben bestehen.“) statt der Anmerkung zu den Abschlägen
+   */
+  storno_anmerkung?: string | null;
   /** Grund für 0 %: Steuerschuldnerschaft des Empfängers, innergemeinschaftliche Lieferung, Steuerbefreiung oder Nullsteuersatz (E-129, steuerart.ts) */
   steuerart?: Steuerart;
   /** Bestellnummer des Käufers (BT-13) */

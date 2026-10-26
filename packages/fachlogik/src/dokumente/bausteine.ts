@@ -308,7 +308,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Hohe Temperatur und Feuchte sowie Schadstoffe in der Atemluft durch unzureichende Küchenlüftung; Brandlast im Abluftsystem.",
    "massnahme": "Abluftanlage mit ausreichend dimensionierter Haube und Aerosolabscheidern; Gasgeräte mit der Lüftung koppeln.\nKüchenlüftung vor den Kochgeräten einschalten; Aerosolabscheider nach Herstellerangabe und Verschmutzung reinigen; Abluftleitungen regelmäßig reinigen lassen (VDI 2052)."
   },
-  "quelle": "DGUV Regel 110-003; VDI 2052 – fachlich zu prüfen"
+  "quelle": "DGUV Regel 110-003; VDI 2052"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -318,7 +318,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Eingeschlossenwerden und Kälteeinwirkung in Kühl- und Tiefkühlräumen.",
    "massnahme": "Kühlraumtüren von innen entriegelbar; Ausgänge mit Sicherheitsbeleuchtung oder nachleuchtender Markierung.\nVor dem Abschließen prüfen, dass sich niemand mehr im Kühlraum befindet.\nWarme Kleidung bzw. Kälteschutzkleidung bei längerem Aufenthalt.\nBegehbare Tiefkühlräume mit einer Notrufeinrichtung ausstatten."
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.1 – fachlich zu prüfen"
+  "quelle": "DGUV Regel 110-003, Abschn. 3.1"
  },
  {
   "gruppe": "Gastronomie / Café",

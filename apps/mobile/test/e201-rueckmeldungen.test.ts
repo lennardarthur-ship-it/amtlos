@@ -84,9 +84,10 @@ describe("E-201: Lebensmittelfachbeauftragter – Rolle nur bei der Lebensmittel
 
 describe("E-201: Rückmeldungen Rechtsanwalt und Steuerberater im Katalog", () => {
   const p = (id: string) => pflichten.find((x) => x.id === id)!;
-  it("Künstlersozialabgabe v2 (Wortlaut des Rechtsanwalts) und Lohnsteuerbescheinigung v1 freigegeben, Stand 26.10.2026", () => {
+  it("Künstlersozialabgabe v2/v3 (Wortlaut des Rechtsanwalts) und Lohnsteuerbescheinigung v1 freigegeben, Stand 26.10.2026", () => {
     const ksk = p("personal.kuenstlersozialabgabe") as unknown as { version: number; erklaerung: { de: string }; rechtsgrundlage: string[]; pruefung: PruefungRoh };
-    expect(ksk.version).toBe(2);
+    // E-202: v3 – nur Punkt statt Semikolon nach „(§ 26 KSVG)“ (vom Rechtsanwalt vorab freigegeben)
+    expect(ksk.version).toBe(3);
     expect(ksk.erklaerung.de).toContain("Er gilt jeweils für ein Kalenderjahr; den aktuellen Satz veröffentlicht die Künstlersozialkasse.");
     expect(ksk.erklaerung.de).toContain("(§ 25 KSVG). Zahlungen an eine GmbH, UG, OHG oder KG zählen nach Auffassung der Künstlersozialkasse nicht dazu.");
     expect(ksk.erklaerung.de).not.toMatch(/4,9 %|5,0 %/);
@@ -114,21 +115,21 @@ describe("E-201: Rückmeldungen Rechtsanwalt und Steuerberater im Katalog", () =
 
 describe("E-201: Fachkraft für Arbeitssicherheit – Vorlagen", () => {
   const AUSGESETZT = ["unterweisung", "pruefprotokoll_elektro", "betriebsanweisung", "expositionsverzeichnis", "hautschutzplan", "gefaehrdungsbeurteilung", "betriebsanweisung_biostoffe"];
-  it("sieben Vorlagen ohne Vermerk bis zur Bestätigung der neuen Prüfsumme – die Freigabe bleibt eingetragen", () => {
+  // E-202: Die Fachkraft für Arbeitssicherheit hat die Zuordnung am selben Tag bestätigt – die sieben Vorlagen zeigen den
+  // Vermerk wieder (Stand 26.10.2026); ein ausgesetzter Vermerk bleibt als Möglichkeit erhalten
+  it("sieben Vorlagen: Vermerk seit der Bestätigung der Zuordnung wieder da (E-202) – keine Freigabe mehr ausgesetzt", () => {
     const cafe = { ...LEERER_STAND.betrieb, name: "Café Sonne", bundesland: "Berlin" };
     for (const id of AUSGESETZT) {
       const f = VORLAGEN_GEPRUEFT[id]!;
-      expect(f.vermerk_ausgesetzt, id).toMatch(/^Bestätigung der neuen Prüfsumme ausstehend/);
+      expect(f.vermerk_ausgesetzt, id).toBeUndefined();
       expect(freigabeBestaetigt(f), id).toBe(true);
       expect(f.rolle, id).toBe("arbeitsschutz");
-      expect(pruefHinweisFuer(vorlageFuer(id)!, {}, cafe), id).toBe(PRUEFHINWEIS);
-      expect(pruefHinweisFuer(vorlageFuer(id)!, {}), id).toBe(PRUEFHINWEIS);
+      expect(pruefHinweisFuer(vorlageFuer(id)!, {}, cafe), id).toMatch(/von einer Fachkraft für Arbeitssicherheit.*\(Stand 26\.10\.2026\)/);
     }
-    // nur diese sieben sind ausgesetzt
-    expect(Object.keys(VORLAGEN_GEPRUEFT).filter((id) => freigabenFuer(id).some((f) => f.vermerk_ausgesetzt)).sort()).toEqual([...AUSGESETZT].sort());
-    // ein Café sieht den Vermerk auf 35 von 43 Vorlagen (nicht Handelsregister, nicht die sieben)
+    expect(Object.keys(VORLAGEN_GEPRUEFT).filter((id) => freigabenFuer(id).some((f) => f.vermerk_ausgesetzt))).toEqual([]);
+    // ein Café sieht den Vermerk auf 42 von 43 Vorlagen (nicht Handelsregister, das nur für GmbH, OHG, KG bestätigt ist)
     expect(VORLAGEN.length).toBe(43);
-    expect(VORLAGEN.filter((v) => pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}, cafe) !== PRUEFHINWEIS).length).toBe(35);
+    expect(VORLAGEN.filter((v) => pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}, cafe) !== PRUEFHINWEIS).length).toBe(42);
   });
   it("Einschränkung nur bei Prüfprotokoll, Gefährdungsbeurteilung und Betriebsanweisung Biostoffe", () => {
     expect(VORLAGEN_GEPRUEFT.pruefprotokoll_elektro!.einschraenkung).toBe("ohne die elektrotechnischen Grenzwerte");

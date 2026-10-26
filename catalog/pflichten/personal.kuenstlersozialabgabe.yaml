@@ -1,16 +1,17 @@
 # Externe Prüfung 25.10.2026 (E-195): fehlte im Katalog – Entwurf des Gründers. v2 (E-201, 26.10.2026): die zwei Änderungen und der
-# optionale Satz des Rechtsanwalts wörtlich übernommen (von ihm vorab freigegeben)
+# optionale Satz des Rechtsanwalts wörtlich übernommen (von ihm vorab freigegeben). v3 (E-202, 26.10.2026): Punkt statt Semikolon
+# nach „(§ 26 KSVG)“ – vom Rechtsanwalt vorab freigegeben, sonst unverändert
 # Auslöser vorläufig über Website/Social Media (Eigenwerbung), bis es eine eigene Frage gibt (PRUEFLISTE T-197)
 schema_version: 1
 id: personal.kuenstlersozialabgabe
-version: 2
+version: 3
 katalog_nr: D.51
 titel:
   de: Künstlersozialabgabe prüfen
 kurz:
   de: Beauftragst du selbstständige Kreative, etwa für Grafik, Fotos oder Texte deiner Werbung, kann Künstlersozialabgabe anfallen – Meldung an die Künstlersozialkasse bis 31. März.
 erklaerung:
-  de: 'Künstlersozialabgabe zahlen typische Verwerter wie Verlage oder Werbeagenturen (§ 24 Abs. 1 KSVG), außerdem Unternehmen, die für ihre eigene Werbung oder Öffentlichkeitsarbeit selbstständige Künstler oder Publizisten beauftragen oder deren Werke für ihr Unternehmen nutzen, um damit Einnahmen zu erzielen (§ 24 Abs. 2 KSVG). In diesen Fällen gilt die Pflicht nur, wenn die Entgelte im Kalenderjahr zusammen mehr als 1.000 € betragen (§ 24 Abs. 2 KSVG). Bemessungsgrundlage sind alle Entgelte an selbstständige Künstler und Publizisten im Kalenderjahr, auch an solche, die selbst nicht über die Künstlersozialkasse versichert sind; nicht dazu zählen die gesondert ausgewiesene Umsatzsteuer, Zahlungen an Verwertungsgesellschaften und steuerfreie Aufwandsentschädigungen (§ 25 KSVG). Zahlungen an eine GmbH, UG, OHG oder KG zählen nach Auffassung der Künstlersozialkasse nicht dazu. Den Abgabesatz legt das Bundesarbeitsministerium jedes Jahr per Verordnung fest (§ 26 KSVG); Er gilt jeweils für ein Kalenderjahr; den aktuellen Satz veröffentlicht die Künstlersozialkasse. Die Summe der Entgelte des Vorjahres meldest du bis zum 31. März auf dem Vordruck der Künstlersozialkasse (§ 27 Abs. 1 KSVG); danach zahlst du monatliche Vorauszahlungen, jeweils innerhalb von zehn Tagen nach Monatsende, sofern sie mehr als 40 € betragen (§ 27 Abs. 2, 3 KSVG). Die Entgelte zeichnest du laufend auf und bewahrst die Aufzeichnungen mindestens fünf Jahre nach Ablauf des Jahres auf, in dem sie fällig wurden (§ 28 KSVG). Die Deutsche Rentenversicherung prüft die Abgabe bei ihren Betriebsprüfungen mit (§ 28p Abs. 1a SGB IV).'
+  de: 'Künstlersozialabgabe zahlen typische Verwerter wie Verlage oder Werbeagenturen (§ 24 Abs. 1 KSVG), außerdem Unternehmen, die für ihre eigene Werbung oder Öffentlichkeitsarbeit selbstständige Künstler oder Publizisten beauftragen oder deren Werke für ihr Unternehmen nutzen, um damit Einnahmen zu erzielen (§ 24 Abs. 2 KSVG). In diesen Fällen gilt die Pflicht nur, wenn die Entgelte im Kalenderjahr zusammen mehr als 1.000 € betragen (§ 24 Abs. 2 KSVG). Bemessungsgrundlage sind alle Entgelte an selbstständige Künstler und Publizisten im Kalenderjahr, auch an solche, die selbst nicht über die Künstlersozialkasse versichert sind; nicht dazu zählen die gesondert ausgewiesene Umsatzsteuer, Zahlungen an Verwertungsgesellschaften und steuerfreie Aufwandsentschädigungen (§ 25 KSVG). Zahlungen an eine GmbH, UG, OHG oder KG zählen nach Auffassung der Künstlersozialkasse nicht dazu. Den Abgabesatz legt das Bundesarbeitsministerium jedes Jahr per Verordnung fest (§ 26 KSVG). Er gilt jeweils für ein Kalenderjahr; den aktuellen Satz veröffentlicht die Künstlersozialkasse. Die Summe der Entgelte des Vorjahres meldest du bis zum 31. März auf dem Vordruck der Künstlersozialkasse (§ 27 Abs. 1 KSVG); danach zahlst du monatliche Vorauszahlungen, jeweils innerhalb von zehn Tagen nach Monatsende, sofern sie mehr als 40 € betragen (§ 27 Abs. 2, 3 KSVG). Die Entgelte zeichnest du laufend auf und bewahrst die Aufzeichnungen mindestens fünf Jahre nach Ablauf des Jahres auf, in dem sie fällig wurden (§ 28 KSVG). Die Deutsche Rentenversicherung prüft die Abgabe bei ihren Betriebsprüfungen mit (§ 28p Abs. 1a SGB IV).'
 rechtsgrundlage:
 - §§ 23 bis 25 KSVG
 - § 26 KSVG mit der Künstlersozialabgabe-Verordnung
@@ -89,5 +90,5 @@ pruefung:
   geprueft_von:
     - recht
   geprueft_am: '2026-10-26'
-  geprueft_version: 2
+  geprueft_version: 3
   bestaetigt_am: '2026-10-26'

@@ -127,6 +127,11 @@ export const DATENSCHUTZ_SYNC = {
 // Formulierung zum Sicherungsordner (Abschnitte „Sicherungen“ sowie „Empfänger und Drittland“, wörtlich übernommen).
 // Prüfsumme dieser Fassung: SHA-256 über „## Titel\n\nText\n“ aller Abschnitte, 12 Zeichen = DATENSCHUTZ_ANDROID_PRUEFSUMME
 // (test/e201-rueckmeldungen.test.ts rechnet nach). Bei Textänderung erneut vorlegen; der Sync-Zusatz ist nicht freigegeben.
+// E-202: zweite Bestätigung des Rechtsanwalts vom 26.10.2026 für genau diese Prüfsumme (Mail beim Gründer) – unter der
+// Voraussetzung, dass der Release-Build keine Verbindung zu Google-Diensten aufbaut (Firebase aus expo-notifications;
+// sonst Bibliothek entfernen oder Hinweis erweitern). Startblocker in werkzeuge/store-check.mjs (Google Play), PRUEFLISTE
+// T-226. Die In-App-Bewertung muss der Hinweis nicht nennen.
+export const DATENSCHUTZ_ANDROID_ZWEITE_BESTAETIGUNG = { datum: "2026-10-26", rolle: "recht", pruefsumme: "c6b45a804f10", voraussetzung: "Release-Build ohne Verbindung zu Google-Diensten (Firebase)", aufbewahrung: "beim Gründer" } as const;
 export const DATENSCHUTZ_ANDROID_PRUEFSUMME = "c6b45a804f10";
 export const DATENSCHUTZ_ANDROID = {
   freigegeben: true,

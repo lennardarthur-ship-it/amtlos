@@ -667,6 +667,32 @@ export const PROTOKOLL_SPALTEN: readonly Spalte[] = [
   { name: "Grund bzw. Inhalt", beschreibung: "Grund und die Werte bis zur Änderung" },
 ];
 
+/**
+ * E-202 (Steuerberater, 26.10.2026): Kassenstürze (Zählprotokolle) als eigene Liste im Export für die Betriebsprüfung –
+ * Aufzeichnungen nach § 147 Abs. 1 AO, nicht nur im Offenen Archiv.
+ */
+export const KASSENSTURZ_SPALTEN: readonly Spalte[] = [
+  { name: "Nr.", beschreibung: "laufende Nummer der Zählung, nach Zeitpunkt" },
+  { name: "Zeitpunkt", beschreibung: "Zeitpunkt der Zählung (TT.MM.JJJJ, HH:MM, deutsche Zeit)" },
+  { name: "Standort", beschreibung: "Betriebsstätte bzw. Kasse, falls angegeben" },
+  { name: "Gezählter Bestand", beschreibung: `gezählter Bargeldbestand (${EURO})` },
+  { name: "Stückelung", beschreibung: "Anzahl je Schein und Münze (Wert: Anzahl), falls einzeln gezählt; die Summe ergibt den gezählten Bestand" },
+  { name: "Endbestand letzter Abschluss", beschreibung: `Bargeldbestand laut letztem Tagesabschluss vor der Zählung (${EURO}) – zur Erläuterung; Barbelege und Bewegungen seit diesem Abschluss sind nicht berücksichtigt` },
+  { name: "Anwesend", beschreibung: "wer gezählt hat bzw. wer anwesend war" },
+  { name: "Notiz", beschreibung: "Bemerkung zur Zählung" },
+];
+
+/** E-202 (Steuerberater, 26.10.2026): Sachentnahmen (unentgeltliche Wertabgaben) als eigene Liste im Export für die Betriebsprüfung. */
+export const SACHENTNAHME_SPALTEN: readonly Spalte[] = [
+  { name: "Datum", beschreibung: "Tag der Buchung (TT.MM.JJJJ), z. B. Jahreswert zum 31.12. oder monatlich je ein Zwölftel" },
+  { name: "Bemessungsgrundlage 7 %", beschreibung: `Wert der Entnahme zum ermäßigten Steuersatz, netto (${EURO})` },
+  { name: "Umsatzsteuer 7 %", beschreibung: `darauf entfallende Umsatzsteuer (${EURO})` },
+  { name: "Bemessungsgrundlage 19 %", beschreibung: `Wert der Entnahme zum Regelsteuersatz, netto (${EURO})` },
+  { name: "Umsatzsteuer 19 %", beschreibung: `darauf entfallende Umsatzsteuer (${EURO})` },
+  { name: "Bezeichnung", beschreibung: "Angabe des Betriebs, z. B. Pauschbetrag mit Jahr, Personen und Gewerbeklasse" },
+  { name: "Erfasst am", beschreibung: "Zeitpunkt der Erfassung in der App (TT.MM.JJJJ, HH:MM, deutsche Zeit)" },
+];
+
 /** Spalten der Liste der ungültig markierten Belege (E-200: auch Feldbeschreibung). */
 export const UNGUELTIG_SPALTEN: readonly Spalte[] = [
   { name: `${MARKE.name}-Belegnr.`, beschreibung: "Belegnummer der App" },

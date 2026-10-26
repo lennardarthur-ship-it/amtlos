@@ -44,19 +44,20 @@ const alsKlartext = (t: string) => t.replace(/\uE000/g, "[bitte ergänzen]");
 
 /**
  * R12 (Coach #10): Bausteine für Online-Kurse per Videokonferenz und für Zahlungsdienstleister – mit Anbieter,
- * Drittland und Garantie (Art. 13 Abs. 1 lit. f, Art. 44 ff. DSGVO). Nicht aus der Recherche, sondern von Hand –
- * fachlich zu prüfen. `{drittland}` füllt `drittlandSatz`.
+ * Drittland und Garantie (Art. 13 Abs. 1 lit. f, Art. 44 ff. DSGVO). Nicht aus der Recherche, sondern von Hand. E-202:
+ * vom Rechtsanwalt am 26.10.2026 bestätigt (Vermerk „fachlich zu prüfen“ entfallen); beim Zahlungsdienstleister seine vorab
+ * freigegebene Fassung „in der Regel in eigener Verantwortung“. `{drittland}` füllt `drittlandSatz`.
  */
 const DSE_R12: Record<string, { titel: string; text: string; quelle?: string }> = {
   videokonferenz: {
     titel: "Online-Kurse und Beratungen per Videokonferenz",
     text: "Für Online-Kurse und Beratungen nutzen wir den Dienst {video_anbieter}, {video_anschrift}. Dabei werden Ihr Name bzw. Anzeigename, Ihre E-Mail-Adresse, Bild- und Tondaten, Chat-Nachrichten sowie technische Daten (z. B. IP-Adresse, Gerät, Zeitpunkt der Teilnahme) verarbeitet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Durchführung des gebuchten Kurses bzw. der Beratung). Der Anbieter verarbeitet die Daten in unserem Auftrag auf Grundlage eines Vertrags zur Auftragsverarbeitung nach Art. 28 DSGVO. {drittland} Wir zeichnen nichts auf, ohne Sie vorher zu fragen. Kamera und Mikrofon können Sie jederzeit selbst ausschalten.",
-    quelle: "Art. 6, 13, 28, 44 ff. DSGVO – fachlich zu prüfen",
+    quelle: "Art. 6, 13, 28, 44 ff. DSGVO",
   },
   zahlungsdienstleister: {
     titel: "Zahlungsdienstleister",
-    text: "Bezahlen Sie online, geben wir die für die Zahlung nötigen Daten (z. B. Name, Betrag, Rechnungsnummer und gegebenenfalls Ihre E-Mail-Adresse) an den Zahlungsdienstleister {zahlung_anbieter}, {zahlung_anschrift}, weiter. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Abwicklung der Zahlung); soweit der Zahlungsdienstleister gesetzliche Pflichten erfüllt (z. B. zur Verhinderung von Geldwäsche), Art. 6 Abs. 1 lit. c DSGVO. Der Zahlungsdienstleister verarbeitet die Daten in eigener Verantwortung; es gelten zusätzlich seine Datenschutzhinweise. {drittland}",
-    quelle: "Art. 6, 13, 44 ff. DSGVO – fachlich zu prüfen",
+    text: "Bezahlen Sie online, geben wir die für die Zahlung nötigen Daten (z. B. Name, Betrag, Rechnungsnummer und gegebenenfalls Ihre E-Mail-Adresse) an den Zahlungsdienstleister {zahlung_anbieter}, {zahlung_anschrift}, weiter. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Abwicklung der Zahlung); soweit der Zahlungsdienstleister gesetzliche Pflichten erfüllt (z. B. zur Verhinderung von Geldwäsche), Art. 6 Abs. 1 lit. c DSGVO. Der Zahlungsdienstleister verarbeitet die Daten in der Regel in eigener Verantwortung; es gelten zusätzlich seine Datenschutzhinweise. {drittland}",
+    quelle: "Art. 6, 13, 44 ff. DSGVO",
   },
 };
 const DSE_ALLE: Record<string, { titel: string; text: string; quelle?: string }> = { ...DSE, ...DSE_R12 };

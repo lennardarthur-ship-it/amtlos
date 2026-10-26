@@ -48,7 +48,8 @@ describe("Gefährdungsbeurteilung (Reinigung #11, Tischlerei #5, #17, #18)", () 
     expect(r.length).toBe(11);
     expect(h.length).toBe(5);
     for (const x of [...r, ...h]) expect(x.quelle).not.toMatch(/Nutzertest/);
-    expect([...r, ...h].filter((x) => /fachlich zu prüfen$/.test(x.quelle!)).length).toBe(2);
+    // E-202: von der Fachkraft für Arbeitssicherheit bestätigt – Vermerk gestrichen
+    expect([...r, ...h].filter((x) => /fachlich zu prüfen$/.test(x.quelle!)).length).toBe(0);
     expect(h.some((x) => /Hartholzstaub/.test(x.titel) && /TRGS 553/.test(x.quelle!))).toBe(true);
     expect(r.some((x) => /§ 8 ArbSchG/.test(String(x.werte.massnahme)))).toBe(true);
   });

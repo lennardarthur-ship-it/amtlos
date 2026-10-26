@@ -57,6 +57,8 @@ const LANG = "Fachgerechte Reinigung und Desinfektion der Arbeitsflächen einsch
  * erzeugten Werte; Listen hier haben realistische Längen.
  */
 const REALISTISCH = {
+  // E-202: Bereich eines Salons statt des Platzhalters „Bereich 1“ (Fassung Friseur/Kosmetik)
+  hygieneplan: { bereich: "Friseursalon und Kosmetik" },
   nachweis_arbeitsbedingungen: {
     name: "Jana Becker", anschrift: "Lindenstraße 12\n80469 München", branche: "friseur_kosmetik", beginn: "2026-11-01", taetigkeit: "Friseurin",
     entgelt_art: "monat", entgelt_betrag: "2.650,00", wochenstunden: "38,5", tage_pro_woche: "5", verteilung: "Dienstag bis Samstag nach Dienstplan",
@@ -187,7 +189,7 @@ const EXTRA = {
   // E-167: Unterweisung Gefahrstoffe – Hinweis zur Unterschrift über der Teilnahmeliste
   unterweisung: [["voll-gefahrstoffe", (v) => ({ ...voll(v), thema: "Unterweisung Gefahrstoffe", themen: ["gefahrstoffe_inhalt_der_betriebsanweisun", "friseurchemikalien_faerbe_blondier_dauer", "hautschutz_hautschutzplan_richtige_schut"], ba_nummer: "BA-01, BA-02", verstaendnis: "Fragen zu den Inhalten", teilnehmer: [{ name: "Jana Becker" }, { name: "Lea Kim" }, { name: "Mehmet Aydın" }], unterschriften_papier: true })]],
   nachweis_arbeitsbedingungen: [["voll-textform", (v) => ({ ...voll(v), branche: "keine" })]],
-  hygieneplan: [["voll-lebensmittel", (v) => hygieneEintraege(v, { ...voll(v), art: "lebensmittel", bereich: "Backstube, Theke und Gastraum", erstellt_von: "Mara Lindner" })], ["leer-lebensmittel", (v) => ({ ...F.leereDaten(v, B_LM, HEUTE), art: "lebensmittel" })]],
+  hygieneplan: [["voll-lebensmittel", (v) => hygieneEintraege(v, { ...voll(v), art: "lebensmittel", bereich: "Backstube, Theke und Gastraum", erstellt_von: "Mara Lindner" })], ["leer-lebensmittel", (v) => ({ ...F.leereDaten(v, B_LM, HEUTE), art: "lebensmittel" })], ["auswahl-lebensmittel", (v) => hygieneEintraege(v, { ...auswahl(v), art: "lebensmittel", bereich: "Backstube, Theke und Gastraum", erstellt_von: "Mara Lindner" })]],
 };
 function vollErzeugt(v) {
   const BB = betriebFuer(v, "voll");
@@ -228,6 +230,10 @@ function auswahl(v) {
   const d = voll(v);
   for (const a of v.abschnitte)
     for (const f of a.felder) {
+      // E-202: Beim Hygieneplan bestimmt „Art des Betriebs“ die Fassung – „auswahl“ bleibt in der Fassung Friseur/Kosmetik
+      // (vorher schaltete die Auswahl auf „Lebensmittelbetrieb“ um, und das PDF „auswahl“ zeigte den Plan eines
+      // Lebensmittelbetriebs mit dem Namen des Salons); die Fassung Lebensmittelbetrieb steht in „auswahl-lebensmittel“
+      if (v.id === "hygieneplan" && f.id === "art") continue;
       // Durchsicht Sifa 23.10.2026: Biostoffe mit Blutkontakt sind mindestens Schutzstufe 2 – die Auswahl bleibt dabei
       if (v.id === "betriebsanweisung_biostoffe" && f.id === "schutzstufe") continue;
       // leere Textfelder mit Vorschlägen (z. B. Beschäftigungsbeschränkungen, B-266): mit den Vorschlägen, damit der Abschnitt erscheint

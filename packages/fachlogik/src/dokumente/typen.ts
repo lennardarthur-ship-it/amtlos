@@ -253,6 +253,12 @@ export interface Vorlage {
    */
   hinweise?(daten: Daten, betrieb: Betrieb, extra?: { kleinunternehmer?: boolean | null; /** R11: Handwerk oder Bau laut Pflichten-Check */ handwerk?: boolean }): string[];
   /**
+   * E-202: Passt ein Vorschlag einer Liste zu diesen Angaben? Die App bietet nur passende Vorschläge an (Hygieneplan: in
+   * der Fassung Friseur/Kosmetik nie Zeilen eines Lebensmittelbetriebs und umgekehrt). Ohne Angabe passen alle. Eine
+   * Funktion – gehört nicht zur Prüfsumme und ändert keinen gedruckten Text.
+   */
+  vorschlagPasst?(feldId: string, vorschlag: Vorschlag, daten: Daten): boolean;
+  /**
    * Nachkontrolle Rechtsanwalt (21.10.2026): Form, in der die Unterlage auszuhändigen ist (NachwG: Schriftform in den
    * Branchen nach § 2a SchwarzArbG, sonst Textform). Die App zeigt den Text als Kasten am Anfang des Ablaufs und im
    * Abschluss vor dem Teilen. `offen`: die Angabe, die die Form bestimmt, fehlt noch.

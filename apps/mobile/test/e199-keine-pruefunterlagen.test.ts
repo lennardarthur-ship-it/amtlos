@@ -63,7 +63,8 @@ describe("E-199: keine Prüfunterlagen und keine Namen im Repository", () => {
     expect(ts).not.toMatch(/\b(blatt|beleg|zitat|nachweis_text): "/);
     // jede Bestätigung mit Aufbewahrung beim Gründer
     expect(reg.match(/^ {4}aufbewahrung: beim Gründer$/gm)!.length).toBe(reg.match(/^ {2}nachweis:$/gm)!.length);
-    expect(ts.match(/aufbewahrung: "beim Gründer" \}/g)!.length).toBe(ts.match(/nachweis: \{ art: "/g)!.length);
+    // E-202: auch die weiteren Nachweise (`weitere_nachweise`) je mit Aufbewahrung beim Gründer
+    expect(ts.match(/aufbewahrung: "beim Gründer" \}/g)!.length).toBe(ts.match(/\{ art: "/g)!.length);
   });
 
   it("Werkzeuge für Prüfunterlagen schreiben nur außerhalb des Repositorys", () => {

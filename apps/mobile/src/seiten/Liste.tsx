@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { betragUnplausibel, cent, satzZahl, einheitFuerMenge, gruppenAusBranchen, mengeUngueltig, mobilerVerkauf, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
+import { betragUnplausibel, cent, satzZahl, einheitFuerMenge, gruppenAusBranchen, mengeUngueltig, mobilerVerkauf, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, passendeVorschlaege, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { ChipLeiste, Fuss, HinzufuegenKnopf, Kaestchen, Karte, Knopf, Symbol, T, TextKnopf, Wahl, textAus } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -176,7 +176,8 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
   const f = useFarben();
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const feld = u ? feldIn(u.vorlage, feldId) : undefined;
-  const alle = feld?.vorschlaege ?? [];
+  // E-202: nur Vorschläge, die zur Fassung der Unterlage passen (Hygieneplan Friseur/Kosmetik nie mit Zeilen eines Lebensmittelbetriebs)
+  const alle = feld && u ? passendeVorschlaege(vorlageFuer(u.vorlage), feld, u.daten) : [];
   const gruppen = [...new Set(alle.map((v) => v.gruppe).filter((g): g is string => Boolean(g)))];
   // Branche aus dem Pflichten-Check: passende Gruppen zuerst („Passend für dich“), damit beim Maler keine Friseurchemikalien stehen
   const meine = passendeGruppen(Array.isArray(z.stand.profil["taetigkeit.branchen"]) ? (z.stand.profil["taetigkeit.branchen"] as string[]) : [], z.stand.betrieb.name, z.stand.profil);
@@ -297,9 +298,12 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
-  const daten = z.stand.unterlagen.find((u) => u.id === id)?.daten;
+  const unterlage = z.stand.unterlagen.find((u) => u.id === id);
+  const daten = unterlage?.daten;
   const eintraege = eintraegeVon(daten, feld);
   const titel = anzeigeTitel(feld, eintraege);
+  // E-202: Zahl der zur Fassung passenden Vorschläge
+  const vorschlaegeZahl = unterlage ? passendeVorschlaege(vorlageFuer(unterlage.vorlage), feld, unterlage.daten).length : (feld.vorschlaege?.length ?? 0);
   const oeffnen = (i: number, neu = false) => nav.oeffnen(`eintrag-${id}-${feld.id}-${i}`, () => <EintragSeite id={id} feldId={feld.id} index={i} neu={neu} />, true);
   const mitarbeiter = feld.ausMitarbeitern ? personenSortiert(z.stand.mitarbeiter) : [];
   const gleich = (a: string, b: string) => a.trim().toLocaleLowerCase("de") === b.trim().toLocaleLowerCase("de");
@@ -340,7 +344,7 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
       ) : (
         <T v="klein" leise>{TEXT.liste_leer}</T>
       )}
-      {feld.vorschlaege?.length ? <Knopf ton symbol="checklist" text={TEXT.aus_vorschlaegen(feld.vorschlaege.length)} onPress={() => nav.oeffnen(`vorschlaege-${id}-${feld.id}`, () => <VorschlagSeite id={id} feldId={feld.id} />, true)} /> : null}
+      {vorschlaegeZahl ? <Knopf ton symbol="checklist" text={TEXT.aus_vorschlaegen(vorschlaegeZahl)} onPress={() => nav.oeffnen(`vorschlaege-${id}-${feld.id}`, () => <VorschlagSeite id={id} feldId={feld.id} />, true)} /> : null}
       {fehlend.length ? <Knopf ton symbol="person.2" text={TEXT.alle_mitarbeiter(fehlend.length)} onPress={() => eintragen(fehlend)} /> : null}
       {/* einzelne Mitarbeiter antippen statt Namen tippen (R10) */}
       {fehlend.length > 1 ? (

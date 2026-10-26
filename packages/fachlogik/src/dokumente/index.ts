@@ -31,7 +31,7 @@ export { SIFA_PRUEFUNG, type SifaEintrag } from "./sifa.js";
 export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } from "./html.js";
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
 export { NACHWG_AUSSCHLUSSFRIST_BEISPIEL, NACHWG_AUSSCHLUSSFRIST_UEBERSTUNDEN, NACHWG_SCHRIFTFORM_HINWEIS, NACHWG_SCHRIFTFORM_PDF, mindestlohnAm, mindesturlaub, minijobGrenzeAm, stundenlohn } from "./personal.js";
-export { HYGIENE_LEBENSMITTEL, HYGIENE_THEMEN_LEBENSMITTEL, HYGIENE_THEMEN_NEU, HYGIENE_VERWEIS_HACCP } from "./branchen.js";
+export { HYGIENE_LEBENSMITTEL, HYGIENE_LM_GRUPPEN, HYGIENE_THEMEN_LEBENSMITTEL, HYGIENE_THEMEN_NEU, HYGIENE_VERWEIS_HACCP } from "./branchen.js";
 // Prüfbericht Lebensmittelhygiene (22.10.2026): Allergenliste mit Arten und Zusatzstoffen, IfSG-Ergänzungen, Schulungsnachweis § 4 LMHV
 export { ALLERGENE_HILFE, IFSG_HAUSHALT, IFSG_WER, ohneLatein } from "./branchen.js";
 export { SCHULUNG_HILFE, SCHULUNG_THEMEN } from "./schulung.js";
@@ -129,6 +129,15 @@ export const VORLAGEN: Vorlage[] = [
 
 export function vorlageFuer(id: string): Vorlage | undefined {
   return VORLAGEN.find((v) => v.id === id);
+}
+
+/**
+ * E-202: Vorschläge einer Liste, die zu den Angaben der Unterlage passen (`Vorlage.vorschlagPasst`) – z. B. beim
+ * Hygieneplan in der Fassung Friseur/Kosmetik keine Zeilen eines Lebensmittelbetriebs. Ohne Regel alle.
+ */
+export function passendeVorschlaege(v: Vorlage | undefined, feld: { id: string; vorschlaege?: Vorschlag[] }, d: Daten): Vorschlag[] {
+  const alle = feld.vorschlaege ?? [];
+  return v?.vorschlagPasst ? alle.filter((x) => v.vorschlagPasst!(feld.id, x, d)) : alle;
 }
 
 /**

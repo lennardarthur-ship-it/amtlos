@@ -92,7 +92,8 @@ describe("Vorlagen R12", () => {
     const gb = (v("gefaehrdungsbeurteilung").abschnitte.flatMap((a) => a.felder).find((x) => x.id === "gefaehrdungen") as ListenFeld).vorschlaege!;
     for (const [gruppe, n] of [["Kfz-Werkstatt", 12], ["Bäckerei", 6], ["Transport / Kurier", 10]] as const) expect(gb.filter((x) => x.gruppe === gruppe).length, gruppe).toBe(n);
     expect(gb.find((x) => x.titel.startsWith("Abgase von Dieselmotoren"))!.quelle).toBe("TRGS 554; § 10a GefStoffV");
-    expect(gb.filter((x) => x.gruppe === "Kfz-Werkstatt").some((x) => /fachlich zu prüfen/.test(x.quelle ?? ""))).toBe(true);
+    // E-202: alle Kfz-Bausteine von der Fachkraft für Arbeitssicherheit bestätigt – kein „fachlich zu prüfen“ mehr
+    expect(gb.filter((x) => x.gruppe === "Kfz-Werkstatt").some((x) => /fachlich zu prüfen/.test(x.quelle ?? ""))).toBe(false);
     const themen = (v("unterweisung").abschnitte.flatMap((a) => a.felder).find((x) => x.id === "themen") as { optionen: { wert: string; gruppen?: string[] }[] }).optionen;
     expect(themen.filter((t) => t.gruppen?.includes("transport")).map((t) => t.wert)).toContain("fahrer_eignung");
     const sprache = v("unterweisung").abschnitte.flatMap((a) => a.felder).find((x) => x.id === "sprache") as { vorschlaege: string[] };
@@ -109,7 +110,9 @@ describe("Vorlagen R12", () => {
     expect(h).toContain("72 Stunden");
     expect(h).toContain("auch Beschäftigte");
     expect(h).toContain("Information nach Art. 13 DSGVO zur Videoüberwachung");
-    expect(h).toContain("fachlich zu prüfen");
+    // E-202 (Rechtsanwalt): kein Prüfvermerk auf dem Aushang für Kundschaft – der Schlusssatz entfällt im Druck
+    expect(h).not.toContain("fachlich zu prüfen");
+    expect(h).not.toContain("Orientierungshilfe Videoüberwachung");
   });
   it("Anamnese neutral: Kurs, Speicherdauer, Datenschutzinformation, leer ohne Datum, elektronisch (Coach #8/#9)", () => {
     expect(v("anamnese_einwilligung").bereich).toBe("datenschutz");

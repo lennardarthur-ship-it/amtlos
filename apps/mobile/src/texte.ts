@@ -618,7 +618,7 @@ export const T = {
   e200_pruef_zeile_text: "Listen, Änderungsprotokoll, E-Rechnungen und Originalbelege – kostenlos",
   e200_pruef_titel: "Daten für die Betriebsprüfung",
   e200_pruef_unter: "Kostenlos, auch ohne Pro",
-  e200_pruef_text: `Ein ZIP mit den Listen deiner Rechnungen, Belege und Kassenabschlüsse (CSV), dem Änderungsprotokoll, allen E-Rechnungen (gestellt und empfangen, XML), den Originaldateien deiner Belege und einer Beschreibung aller Spalten – lesbar ohne ${MARKE.name}, über alle Jahre.`,
+  e200_pruef_text: `Ein ZIP mit den Listen deiner Rechnungen, Belege, Kassenabschlüsse, Kassenstürze und Sachentnahmen (CSV), dem Änderungsprotokoll, allen E-Rechnungen (gestellt und empfangen, XML), den Originaldateien deiner Belege und einer Beschreibung aller Spalten – lesbar ohne ${MARKE.name}, über alle Jahre.`,
   e200_pruef_umfang: (r: number, b: number, k: number, d: number) => `${r === 1 ? "1 Rechnung" : `${r} Rechnungen`} · ${b === 1 ? "1 Beleg" : `${b} Belege`} · ${k === 1 ? "1 Kassenabschluss" : `${k} Kassenabschlüsse`} · ${d === 1 ? "1 Originaldatei" : `${d} Originaldateien`}`,
   e200_pruef_hinweis: `Die Datei ist nicht verschlüsselt. Speichere sie außerhalb dieses ${W.geraet}s und bewahre sie auf, solange die Aufbewahrungsfristen laufen. Die Sicherung als Datei ersetzt sie nicht – die lässt sich nur mit ${MARKE.name} öffnen.`,
   e200_pruef_knopf: "Exportieren",

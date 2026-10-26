@@ -4,6 +4,7 @@
  * lesbar) noch die PDFs allein; nötig sind maschinell auswertbare Listen und die Originale. Das ZIP enthält genau:
  *
  * - die Listen als CSV: Rechnungen (und Gutschriften), Belege (und ungültig markierte Belege), Kassenabschlüsse,
+ *   Kassenstürze (Zählprotokolle) und Sachentnahmen (E-202, Steuerberater 26.10.2026: Aufzeichnungen nach § 147 Abs. 1 AO),
  * - das Änderungsprotokoll,
  * - die E-Rechnungen als XML – ausgehend (das bei der Festschreibung festgehaltene Original, sonst aus den
  *   festgeschriebenen Daten) und eingehend (als Beleg erfasste XML-Dateien),
@@ -13,7 +14,7 @@
  * Nicht enthalten (bewusst): der DATEV-Buchungsstapel (Pro, Paket für die Steuerberatung), die Sicherungsdatei, PDFs.
  * Reine Funktion; die Dateien liest der Aufrufer (entschlüsselt) und übergibt sie.
  */
-import { KU_HINWEIS, belegNummern, eRechnungAus, xrechnungUbl, type Beleg } from "@amtlos/fachlogik";
+import { KU_HINWEIS, belegNummern, eRechnungAus, entnahmeSteuer, xrechnungUbl, type Beleg, type Kassensturz, type Sachentnahme } from "@amtlos/fachlogik";
 import { MARKE } from "@amtlos/marke";
 import { APP_VERSION } from "../version";
 import { utf8 } from "./sicherung";
@@ -21,7 +22,9 @@ import { absenderFuer, type Stand } from "./speicher";
 import {
   BELEG_SPALTEN,
   KASSEN_SPALTEN,
+  KASSENSTURZ_SPALTEN,
   PROTOKOLL_SPALTEN,
+  SACHENTNAHME_SPALTEN,
   UNGUELTIG_SPALTEN,
   aenderungsprotokoll,
   belegDateiname,
@@ -51,6 +54,8 @@ export const PRUEFEXPORT = {
   belege: "Belege.csv",
   ungueltig: "Belege_ungueltig.csv",
   kasse: "Kassenabschluesse.csv",
+  kassenstuerze: "Kassenstuerze.csv",
+  sachentnahmen: "Sachentnahmen.csv",
   protokoll: "Aenderungsprotokoll.csv",
   feldbeschreibung: "Feldbeschreibung.txt",
   xmlAus: "E-Rechnungen/ausgehend/",
@@ -68,6 +73,9 @@ export interface PruefexportErgebnis {
   rechnungen: number;
   belege: number;
   kasse: number;
+  /** E-202 */
+  kassenstuerze: number;
+  sachentnahmen: number;
   xmlAusgehend: number;
   xmlEingehend: number;
   /** Originaldateien (Belege, Kasse), die im Export liegen */
@@ -96,6 +104,32 @@ function gesamtZeitraum(s: Stand, heute: string): Zeitraum {
   return { von: "1900-01-01", bis, name: "gesamt" };
 }
 
+/** E-202: Stückelung lesbar – „500 €: 2 · 0,50 €: 3“, große Werte zuerst (ohne Semikolon, damit das Feld ohne Anführungszeichen bleibt). */
+const stueckelungText = (st: Record<string, number> | null | undefined) =>
+  Object.entries(st ?? {})
+    .filter(([, n]) => n > 0)
+    .sort(([a], [b]) => Number(b) - Number(a))
+    .map(([w, n]) => `${Number(w) % 100 ? betragDe(Number(w)) : String(Number(w) / 100)} €: ${n}`)
+    .join(" · ");
+
+/** E-202: Liste der Kassenstürze (Spalten KASSENSTURZ_SPALTEN), nach Zeitpunkt. */
+export function kassenstuerzeCsv(l: readonly Kassensturz[], staetten: readonly { id: string; name: string }[] = []): string {
+  const name = (st: string | null | undefined) => (st ? (staetten.find((x) => x.id === st)?.name ?? st) : "");
+  const sortiert = [...l].sort((a, b) => a.zeitpunkt.localeCompare(b.zeitpunkt));
+  return csv(kopfAus(KASSENSTURZ_SPALTEN), sortiert.map((k, i) => [String(i + 1), ZEIT_BERLIN.format(new Date(k.zeitpunkt)), name(k.standort), betragDe(k.gezaehlt_cent), stueckelungText(k.stueckelung), typeof k.vortag_cent === "number" ? betragDe(k.vortag_cent) : "", k.anwesend ?? "", k.notiz ?? ""]));
+}
+
+/** E-202: Liste der Sachentnahmen (Spalten SACHENTNAHME_SPALTEN), nach Datum, mit Summenzeile. */
+export function sachentnahmenCsv(l: readonly Sachentnahme[]): string {
+  const sortiert = [...l].sort((a, b) => a.datum.localeCompare(b.datum));
+  const zeile = (n7: number, n19: number) => [betragDe(n7), betragDe(entnahmeSteuer(n7, 7)), betragDe(n19), betragDe(entnahmeSteuer(n19, 19))];
+  const summe = sortiert.reduce((a, e) => ({ n7: a.n7 + e.netto7_cent, u7: a.u7 + entnahmeSteuer(e.netto7_cent, 7), n19: a.n19 + e.netto19_cent, u19: a.u19 + entnahmeSteuer(e.netto19_cent, 19) }), { n7: 0, u7: 0, n19: 0, u19: 0 });
+  return csv(kopfAus(SACHENTNAHME_SPALTEN), [
+    ...sortiert.map((e) => [datumDe(e.datum), ...zeile(e.netto7_cent, e.netto19_cent), e.text ?? "", ZEIT_BERLIN.format(new Date(e.erstellt))]),
+    [`Summe (${anzahl(sortiert.length, "Sachentnahme", "Sachentnahmen")})`, betragDe(summe.n7), betragDe(summe.u7), betragDe(summe.n19), betragDe(summe.u19), "", ""],
+  ]);
+}
+
 /** Die Feldbeschreibung: Format, Inhalt des ZIP und je CSV-Datei jede Spalte mit Beschreibung. */
 export function feldbeschreibung(s: Stand, o: { jetzt: string; dateien: { name: string; zweck: string; spalten?: readonly Spalte[]; zusatz?: string }[]; ordner: { name: string; zweck: string }[] }): string {
   const zeilen: string[] = [
@@ -103,13 +137,13 @@ export function feldbeschreibung(s: Stand, o: { jetzt: string; dateien: { name: 
     `Betrieb: ${s.betrieb.name.trim() || "ohne Namen"}`,
     `Steuernummer: ${s.betrieb.steuernummer.trim() || "nicht angegeben"}${s.betrieb.ust_idnr.trim() ? ` · USt-IdNr.: ${s.betrieb.ust_idnr.trim()}` : ""}`,
     `Erstellt: ${ZEIT_BERLIN.format(new Date(o.jetzt))} (deutsche Zeit) mit ${MARKE.name} ${APP_VERSION}`,
-    `Umfang: alle auf diesem Gerät erfassten Rechnungen, Belege und Kassenabschlüsse – über alle Jahre.`,
+    `Umfang: alle auf diesem Gerät erfassten Rechnungen, Belege, Kassenabschlüsse, Kassenstürze und Sachentnahmen – über alle Jahre.`,
     "",
     "Format der Tabellen (*.csv)",
     "- Zeichensatz UTF-8 mit BOM, Trennzeichen Semikolon, Zeilenende CRLF; Felder mit Semikolon, Anführungszeichen oder Zeilenumbruch in doppelten Anführungszeichen (Anführungszeichen darin verdoppelt).",
     "- Erste Zeile: Spaltenköpfe (Namen wie unten). Beträge in Euro mit Tausenderpunkt und Dezimalkomma (z. B. 1.234,56), negativ mit Minus. Datum TT.MM.JJJJ, Zeitpunkte TT.MM.JJJJ, HH:MM in deutscher Zeit.",
     "- Text, der mit =, +, @ oder - beginnt (außer Beträgen), steht mit einem vorangestellten Hochkomma, damit Tabellenprogramme ihn nicht als Formel lesen.",
-    "- Am Ende der Rechnungs-, Beleg- und Kassenliste stehen Summenzeilen (erste Spalte „Summe …“); sie sind keine eigenen Datensätze.",
+    "- Am Ende der Rechnungs-, Beleg-, Kassen- und Sachentnahmeliste stehen Summenzeilen (erste Spalte „Summe …“); sie sind keine eigenen Datensätze.",
     "",
     "Inhalt",
     ...o.dateien.map((d) => `- ${d.name}: ${d.zweck}`),
@@ -204,6 +238,9 @@ export function pruefexport(s: Stand, dateien: Record<string, Uint8Array>, jetzt
   if (s.belegArchiv.length)
     inhalt[PRUEFEXPORT.ungueltig] = utf8(csv(kopfAus(UNGUELTIG_SPALTEN), s.belegArchiv.map((b) => [nummern.get(b.id) ?? "", datumDe(b.datum), b.lieferant, betragDe(betrag(b)), b.ungueltig ? ZEIT_BERLIN.format(new Date(b.ungueltig)) : "", b.ungueltig_grund ?? "", b.datei ? (belegPfade.get(b.id) ?? "nein (Datei nicht lesbar)") : "nein"])));
   if (s.kasse.length) inhalt[PRUEFEXPORT.kasse] = utf8(kassenCsv(s, z));
+  // E-202: Kassenstürze (Zählprotokolle) und Sachentnahmen als eigene Listen
+  if (s.kassenstuerze.length) inhalt[PRUEFEXPORT.kassenstuerze] = utf8(kassenstuerzeCsv(s.kassenstuerze, s.betriebsstaetten));
+  if (s.sachentnahmen.length) inhalt[PRUEFEXPORT.sachentnahmen] = utf8(sachentnahmenCsv(s.sachentnahmen));
   // das Änderungsprotokoll immer – auch leer (nur Kopfzeile), damit erkennbar ist, dass es nichts zu protokollieren gab
   inhalt[PRUEFEXPORT.protokoll] = utf8(csv(kopfAus(PROTOKOLL_SPALTEN), aenderungsprotokoll(s, z)));
 
@@ -213,6 +250,8 @@ export function pruefexport(s: Stand, dateien: Record<string, Uint8Array>, jetzt
     { name: PRUEFEXPORT.belege, zweck: `${anzahl(s.belege.length, "Beleg", "Belege")} mit Belegnummer der App, Beträgen, Konto und Zahltag; Summe am Ende.`, spalten: BELEG_SPALTEN },
     ...(s.belegArchiv.length ? [{ name: PRUEFEXPORT.ungueltig, zweck: `${anzahl(s.belegArchiv.length, "als ungültig markierter Beleg", "als ungültig markierte Belege")} mit Grund (erklären Lücken in den Belegnummern).`, spalten: UNGUELTIG_SPALTEN }] : []),
     ...(s.kasse.length ? [{ name: PRUEFEXPORT.kasse, zweck: `${anzahl(s.kasse.length, "Tagesabschluss", "Tagesabschlüsse")} (Z-Bons) mit Umsatz je Steuersatz, Zahlungsarten, Bewegungen, Bargeldbestand und Korrekturen; Summe am Ende.`, spalten: KASSEN_SPALTEN }] : []),
+    ...(s.kassenstuerze.length ? [{ name: PRUEFEXPORT.kassenstuerze, zweck: `${anzahl(s.kassenstuerze.length, "Kassensturz", "Kassenstürze")} (Zählprotokolle des Bargeldbestands) mit gezähltem Bestand, Stückelung und Anwesenden, nach Zeitpunkt.`, spalten: KASSENSTURZ_SPALTEN }] : []),
+    ...(s.sachentnahmen.length ? [{ name: PRUEFEXPORT.sachentnahmen, zweck: `${anzahl(s.sachentnahmen.length, "Sachentnahme", "Sachentnahmen")} (unentgeltliche Wertabgaben, z. B. nach den Pauschbeträgen) mit Bemessungsgrundlage und Umsatzsteuer je Steuersatz, nach Datum; Summe am Ende.`, spalten: SACHENTNAHME_SPALTEN }] : []),
     { name: PRUEFEXPORT.protokoll, zweck: "Änderungen nach der Festschreibung, Korrekturen, Löschungen, ungültig markierte Belege, Nacherfassungen und nach dem Teilen gelöschte Rechnungsentwürfe (deren Nummer vergeben bleibt), nach Zeitpunkt.", spalten: PROTOKOLL_SPALTEN },
     { name: PRUEFEXPORT.feldbeschreibung, zweck: "diese Beschreibung." },
   ];
@@ -233,6 +272,8 @@ export function pruefexport(s: Stand, dateien: Record<string, Uint8Array>, jetzt
     rechnungen: rechnungen.length,
     belege: s.belege.length + s.belegArchiv.length,
     kasse: s.kasse.length,
+    kassenstuerze: s.kassenstuerze.length,
+    sachentnahmen: s.sachentnahmen.length,
     xmlAusgehend,
     xmlEingehend,
     originale,

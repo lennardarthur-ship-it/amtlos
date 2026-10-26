@@ -102,7 +102,10 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     ...(r.art !== "storno" && r.ersetzt_nummer ? [r.ersetzt_nummer] : []),
     ...abschlaege.map((a) => a.nummer).filter(Boolean),
   ];
-  const abschlagNotiz = abschlaege.length
+  // E-202: beim Storno einer Schlussrechnung die Sätze vom PDF (was storniert wird, welche Abschläge bestehen bleiben)
+  const abschlagNotiz = r.art === "storno" && r.storno_anmerkung
+    ? r.storno_anmerkung
+    : abschlaege.length
     ? `Abgesetzte Abschlagsrechnungen (§ 14 Abs. 5 Satz 2 UStG): ${abschlaege.map((a) => `Nr. ${a.nummer}${a.datum ? ` vom ${a.datum.slice(8, 10)}.${a.datum.slice(5, 7)}.${a.datum.slice(0, 4)}` : ""}: Entgelt ${betrag(a.netto_cent)} EUR, Umsatzsteuer ${a.satz === null ? "–" : `${a.satz} %`} ${betrag(a.ust_cent)} EUR`).join("; ")}. Bereits gezahlt: ${betrag(abschlagsSumme(abschlaege).brutto_cent)} EUR.`
     : null;
   // BT-30/BT-33: nur für den Betrieb als Verkäufer (bei einer Gutschrift ist der Leistende der Verkäufer)
@@ -125,7 +128,8 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     // Bestellnummer des Käufers (BT-13) – in UBL nach InvoicePeriod, vor BillingReference
     ...(r.bestellnummer ? { "cac:OrderReference": { "cbc:ID": r.bestellnummer } } : {}),
     // BG-3: Storno → stornierte Rechnung; Ersatzrechnung → ersetzte Rechnung; Schlussrechnung → jede Abschlagsrechnung
-    ...(verweise.length ? { "cac:BillingReference": verweise.map((n) => ({ "cac:InvoiceDocumentReference": { "cbc:ID": n } })) } : {}),
+    // E-202: beim Storno mit dem Datum der stornierten Rechnung (BT-26)
+    ...(verweise.length ? { "cac:BillingReference": verweise.map((n, i) => ({ "cac:InvoiceDocumentReference": { "cbc:ID": n, ...(i === 0 && r.art === "storno" && r.storniert_nummer && r.storniert_datum ? { "cbc:IssueDate": r.storniert_datum } : {}) } })) } : {}),
     "cac:AccountingSupplierParty": {
       "cac:Party": {
         "cbc:EndpointID": verkaeufer.email ?? "", "cbc:EndpointID@schemeID": "EM",

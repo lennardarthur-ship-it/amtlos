@@ -589,7 +589,7 @@ export const videoHinweis: Vorlage = {
   abschnitte: [
     {
       titel: "Überwachung",
-      hilfe: "Das Schild hängt gut sichtbar, bevor man den überwachten Bereich betritt. Die zweite Seite hängst du daneben aus oder hältst sie bereit (z. B. an der Kasse). Muster nach der Datenschutzkonferenz – fachlich zu prüfen.",
+      hilfe: "Das Schild hängt gut sichtbar, bevor man den überwachten Bereich betritt. Die zweite Seite hängst du daneben aus oder hältst sie bereit (z. B. an der Kasse). Muster nach der Datenschutzkonferenz.",
       felder: [
         { id: "bereich", art: "text", label: "Überwachter Bereich", hilfe: "z. B. Werkstatthof, Verkaufsraum, Eingang", pflicht: true, vorschlaege: ["Eingangsbereich", "Verkaufsraum", "Werkstatthof und Parkplatz", "Lager"] },
         { id: "zwecke", art: "mehrzeilig", label: "Zwecke", pflicht: true, vorschlaege: ["Schutz vor Einbruch, Diebstahl und Sachbeschädigung", "Aufklärung von Straftaten", "Schutz der Beschäftigten und Kunden vor Übergriffen"] },
@@ -634,7 +634,9 @@ export const videoHinweis: Vorlage = {
       titel: "Videoüberwachung",
       betrieb: b,
       gestalt: "aushang",
-      inhalt: schild + `<h2 class="neue-seite">Information nach Art. 13 DSGVO zur Videoüberwachung</h2><div class="klein">${zweite}</div>` + nachsatz("Muster nach der Orientierungshilfe Videoüberwachung der Datenschutzkonferenz – fachlich zu prüfen."),
+      // E-202 (Rechtsanwalt, 26.10.2026): kein Prüfvermerk auf einem Aushang für Kundschaft – der Schlusssatz entfällt im Druck.
+      // Quelle (nur hier, nicht gedruckt): Muster nach der Orientierungshilfe Videoüberwachung der Datenschutzkonferenz.
+      inhalt: schild + `<h2 class="neue-seite">Information nach Art. 13 DSGVO zur Videoüberwachung</h2><div class="klein">${zweite}</div>`,
     });
   },
 };

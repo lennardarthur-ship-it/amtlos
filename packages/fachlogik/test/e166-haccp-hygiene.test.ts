@@ -220,9 +220,10 @@ describe("Branchengruppen: Foodtruck und Praxis", () => {
     expect(gb.length).toBe(9);
     const t = JSON.stringify(gb);
     for (const s of ["TRBA 250", "§ 11 Abs. 3 BioStoffV", "Abwurfbehälter", "TRGS 525", "TRGS 401", "Strahlenschutz"]) expect(t, s).toContain(s);
-    // E-167: Prüfstand der Durchsicht – nur „offen“ behält „fachlich zu prüfen“ (Stichverletzung, Desinfektionsmittel)
+    // E-167: Prüfstand der Durchsicht – nur „offen“ behält „fachlich zu prüfen“. E-202: die Fachkraft für Arbeitssicherheit
+    // hat 40 der 41 Bausteine bestätigt – nur B-105 (Nadelstichverletzungen, arbeitsmedizinisch) bleibt markiert
     expect(gb.find((x) => /Röntgen/.test(x.titel))!.quelle).toMatch(/StrlSchV/);
-    expect(gb.filter((x) => /fachlich zu prüfen$/.test(x.quelle ?? "")).map((x) => x.titel.slice(0, 20))).toEqual(["Stich- und Schnittve", "Desinfektionsmittel:", "Gewalt und Aggressio", "Narkosegase und Lach", "Mutterschutz bei Bio"]);
+    expect(gb.filter((x) => /fachlich zu prüfen$/.test(x.quelle ?? "")).map((x) => x.titel.slice(0, 20))).toEqual(["Stich- und Schnittve"]);
     const themen = (feld("unterweisung", "themen") as { optionen: Option[] }).optionen.filter((o) => o.gruppen?.includes("praxis"));
     expect(themen.map((o) => o.wert)).toEqual(["praxis_biostoffe", "praxis_nadelstich", "praxis_desinfektion"]);
   });

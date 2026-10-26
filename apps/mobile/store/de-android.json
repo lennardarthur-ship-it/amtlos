@@ -8,7 +8,8 @@
     "inhaltseinstufung": false,
     "zielgruppe": false,
     "finanzfunktionen": false,
-    "appZugriff": false
+    "appZugriff": false,
+    "releaseOhneGoogleDienste": false
   },
   "titel": "{{MARKE}}: Pflichten-Check",
   "kurzbeschreibung": "Welche Pflichten hat dein Betrieb? Mit Termin, Quelle und Erinnerung erledigen.",
