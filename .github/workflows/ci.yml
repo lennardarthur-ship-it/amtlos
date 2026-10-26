@@ -305,8 +305,10 @@ jobs:
             if [ -z "$b" ] || [ ! -f "$b" ]; then echo "::error title=KoSIT::kein Bericht für $f"; fehler=1; continue; fi
             # E-208: auch Warnungen der Schematron-Prüfung sind Fehler – z. B. PEPPOL-EN16931-R120 (Menge × Preis ≠
             # Zeilenbetrag) lässt KoSIT als „acceptable“ durch, Peppol-Zugangspunkte und Eingangsportale weisen sie ab
-            if grep -q 'level="warning"' "$b"; then
-              echo "::error title=KoSIT-Warnung $(basename "$f")::$(grep -oE 'level="warning"[^>]*code="[^"]*"' "$b" | grep -oE 'code="[^"]*"' | head -5 | tr '\n' ' ')"
+            # nur Meldungen zählen: der Bericht enthält das Szenario selbst, und dessen <s:customLevel level="warning">
+            # stünde sonst in jedem Bericht
+            if grep -qE '<rep:message[^>]*level="warning"' "$b"; then
+              echo "::error title=KoSIT-Warnung $(basename "$f")::$(grep -oE '<rep:message[^>]*level="warning"[^>]*code="[^"]*"' "$b" | grep -oE 'code="[^"]*"' | head -5 | tr '\n' ' ')"
               fehler=1
             elif grep -q "<rep:accept" "$b"; then echo "✓ $f"; else
               echo "::error title=KoSIT $(basename "$f")::$(grep -o 'id="[^"]*"[^>]*level="error"' "$b" | head -5 | tr '\n' ' ') $(grep -o '<rep:message[^>]*>[^<]*' "$b" | grep -i error | head -3 | sed 's/<[^>]*>//g' | tr '\n' ' ')"
