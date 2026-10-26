@@ -25,8 +25,8 @@ const freigabe = (version: number): PruefungRoh => ({ status: "freigegeben", gep
 const alleBestaetigt = regelwerte.map((r) => ({ ...r, pruefung: freigabe(r.version) }));
 
 describe("E-211 Inventar: Regelwerte im Bündel und ihre Verwendung", () => {
-  it("35 Regelwert-Versionen im Bündel, mit Prüfstand; keine ist bisher bestätigt", () => {
-    expect(regelwerte).toHaveLength(35);
+  it("36 Regelwert-Versionen im Bündel, mit Prüfstand; keine ist bisher bestätigt", () => {
+    expect(regelwerte).toHaveLength(36);
     for (const r of regelwerte) expect(r.pruefung, r.id).toBeTruthy();
     expect(regelwerte.filter(regelwertBestaetigt)).toHaveLength(0);
   });
@@ -37,10 +37,10 @@ describe("E-211 Inventar: Regelwerte im Bündel und ihre Verwendung", () => {
     expect(regelwertVerweise(pflicht("datenschutz.avv"))).toEqual([]);
   });
 
-  it("Zahlen: 19 Pflichten verweisen auf 17 Regelwert-Versionen, alle offen", () => {
+  it("Zahlen: 19 Pflichten verweisen auf 18 Regelwert-Versionen (E-206: Neugründer ab 2027), alle offen", () => {
     const mit = pflichten.filter((p) => offeneRegelwerte(p, regelwerte, HEUTE).length);
     expect(mit).toHaveLength(19);
-    expect(new Set(mit.flatMap((p) => offeneRegelwerte(p, regelwerte, HEUTE).map((r) => `${r.id}@${r.version}`))).size).toBe(17);
+    expect(new Set(mit.flatMap((p) => offeneRegelwerte(p, regelwerte, HEUTE).map((r) => `${r.id}@${r.version}`))).size).toBe(18);
     expect(pflichten.filter((p) => offeneRegelwerte(p, alleBestaetigt, HEUTE).length)).toHaveLength(0);
   });
 });
@@ -95,8 +95,9 @@ describe("E-211 Vermerk einer Pflicht mit nicht bestätigtem Regelwert", () => {
 });
 
 describe("E-211 Summen: „fachlich geprüft“ erst mit bestätigten Regelwerten", () => {
-  const ganz = (p: P) => ({ ...p, pruefung: { ...p.pruefung, einschraenkung: null, offen: [] } });
-  it("heute „teil“ (drei Einträge mit Einschränkung) – nie „alle“, solange Regelwerte offen sind", () => {
+  // E-206: drei Einträge warten auf die erneute Bestätigung – für die Summe hier als ganz geprüft angenommen
+  const ganz = (p: P) => ({ ...p, pruefung: { ...p.pruefung, status: "freigegeben", geprueft_version: p.version, geprueft_am: "2026-10-26", bestaetigt_am: "2026-10-26", einschraenkung: null, offen: [] } });
+  it("heute „teil“ (Einträge mit Einschränkung bzw. in Nachprüfung) – nie „alle“, solange Regelwerte offen sind", () => {
     expect(katalogGeprueft()).toBe("teil");
     expect(checkHinweis()).toBe(T.check_hinweis_teil);
     // auch ohne die Einschränkungen nicht „alle“: eigener Hinweis mit den Schwellenwerten
@@ -121,7 +122,7 @@ describe("E-211 Startblocker in store-check", () => {
     }
     const zeile = aus.split("\n").find((z) => z.includes("Regelwerte"))!;
     expect(zeile).toMatch(/^ {2}✗ Startblocker Regelwerte: /);
-    expect(zeile).toContain("17 von Pflichten verwendete Regelwert-Versionen noch nicht fachlich bestätigt");
+    expect(zeile).toContain("18 von Pflichten verwendete Regelwert-Versionen noch nicht fachlich bestätigt");
     expect(zeile).toContain("steuern.ustg19.grenze_vorjahr@1");
     expect(zeile).toContain("online.vsbg.schwelle_beschaeftigte@1");
   }, 60_000);
