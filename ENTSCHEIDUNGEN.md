@@ -1519,6 +1519,12 @@ Steuerberater, Rechtsanwalt und Fachkraft für Arbeitssicherheit haben am 26.10.
 
 Tests: `packages/fachlogik/test/e202-rueckmeldungen.test.ts` und `apps/mobile/test/e202-rueckmeldungen.test.ts` (neu); angepasst `vorlagen-geprueft` (Fachlogik und App), `e201-rueckmeldungen`, `e199-keine-pruefunterlagen`, `e166-haccp-hygiene`, `r11-vorlagen`, `r12-ux`; Rundgang mit Kassensturz und Prüfung des ZIP. PRUEFLISTE T-223 bis T-230; Nachträge zu T-208, T-210, T-211, T-216, T-217, T-219, T-222.
 
+
+### E-203 · Abschlussmeldungen 26.10.2026: Arbeitsschutz abgeschlossen, Storno-XRechnung bestätigt, Restbetrag in Zahlen (2026-10-26)
+
+- **Fachkraft für Arbeitssicherheit:** hat die PDFs der drei geänderten Vorlagen mit ihrer Fassung verglichen (Text unverändert) und die neuen Prüfsummen (Unterweisungsnachweis 5e067208bfb6, Hautschutzplan 708e703a9f76, Gefährdungsbeurteilung b7e6e8a27845) zur Akte genommen. Ihr Auftrag ist damit abgeschlossen; offen bleibt nur B-105 für einen Betriebsarzt (T-224). Nachweis per Mail (beim Gründer).
+- **Steuerberater:** hat die geänderten Dateien verglichen – PDFs von Schlussrechnung und Storno sowie die XRechnung der Schlussrechnung unverändert, in der XRechnung des Stornos genau BT-22 und BT-26 geändert; so in Ordnung. Die Ergänzung des Exports um Kassenstürze und Sachentnahmen ist richtig. Seine Anregung (ohne Einfluss auf die Freigabe) ist umgesetzt: Die Anmerkung (BT-22) des Stornos einer Schlussrechnung nennt in der XML zusätzlich den stornierten Restbetrag in Zahlen („… der Schlussrechnung Nr. … – Entgelt −4.000,00 €, Umsatzsteuer −760,00 €.“), damit der Empfänger seine Vorsteuerkorrektur aus der XML erkennt; das PDF bleibt unverändert, die Prüfsumme der Rechnung ebenso. Offen: DATEV-Testimport bis 20.11.2026 (T-221). Nachweis per Mail (beim Gründer).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

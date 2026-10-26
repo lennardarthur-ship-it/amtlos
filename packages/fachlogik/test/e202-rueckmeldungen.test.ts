@@ -74,7 +74,8 @@ describe("E-202: XRechnung des Stornos einer Schlussrechnung (Steuerberater, vor
   it("BT-22 = die Sätze vom PDF (nicht „Abgesetzte Abschlagsrechnungen … Bereits gezahlt“ der Schlussrechnung)", () => {
     const x = xml(STORNO);
     const notizen = [...x.matchAll(/<cbc:Note>([^<]*)<\/cbc:Note>/g)].map((m) => m[1]);
-    expect(notizen).toEqual([SATZ]);
+    // E-203: in der XML zusätzlich der stornierte Restbetrag in Zahlen (Anregung des Steuerberaters)
+    expect(notizen).toEqual([SATZ.replace("Schlussrechnung Nr. 2026-035.", "Schlussrechnung Nr. 2026-035 – Entgelt −4.000,00 €, Umsatzsteuer −760,00 €.")]);
     expect(x).not.toContain("Abgesetzte Abschlagsrechnungen");
     expect(x).not.toContain("Bereits gezahlt");
     // gleicher Wortlaut wie auf dem PDF: Satz unter dem Betreff und Schlusssatz

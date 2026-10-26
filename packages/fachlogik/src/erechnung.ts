@@ -103,8 +103,12 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     ...abschlaege.map((a) => a.nummer).filter(Boolean),
   ];
   // E-202: beim Storno einer Schlussrechnung die Sätze vom PDF (was storniert wird, welche Abschläge bestehen bleiben)
+  // Anregung des Steuerberaters (26.10.2026): den stornierten Restbetrag auch in Zahlen nennen – der Empfänger erkennt seine
+  // Vorsteuerkorrektur dann direkt aus der XML (nur XRechnung; das PDF nennt die Beträge in den Summenzeilen)
+  const rest = abschlagsSumme(abschlaege);
+  const euroDe = (c: number) => `${(c / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace("-", "−")} €`;
   const abschlagNotiz = r.art === "storno" && r.storno_anmerkung
-    ? r.storno_anmerkung
+    ? r.storno_anmerkung.replace(/(Storniert wird nur der Restbetrag der Schlussrechnung Nr\. [^ ]+?)\.(?= )/, `$1 – Entgelt ${euroDe(-Math.abs(s.netto_cent - rest.netto_cent))}, Umsatzsteuer ${euroDe(-Math.abs(s.ust_cent - rest.ust_cent))}.`)
     : abschlaege.length
     ? `Abgesetzte Abschlagsrechnungen (§ 14 Abs. 5 Satz 2 UStG): ${abschlaege.map((a) => `Nr. ${a.nummer}${a.datum ? ` vom ${a.datum.slice(8, 10)}.${a.datum.slice(5, 7)}.${a.datum.slice(0, 4)}` : ""}: Entgelt ${betrag(a.netto_cent)} EUR, Umsatzsteuer ${a.satz === null ? "–" : `${a.satz} %`} ${betrag(a.ust_cent)} EUR`).join("; ")}. Bereits gezahlt: ${betrag(abschlagsSumme(abschlaege).brutto_cent)} EUR.`
     : null;
