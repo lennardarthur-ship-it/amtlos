@@ -4,7 +4,7 @@
 #    Regelbesteuerung; Texte nur aus bestätigtem Wortlaut (grenze_ueberschritten v7, naechstes_jahr v6); braucht die Bestätigung des Steuerberaters (T-310)
 schema_version: 1
 id: steuern.kleinunternehmer_warnung_80
-version: 7
+version: 8
 katalog_nr: C.23
 titel:
   de: Kleinunternehmergrenze zu 80 % erreicht
@@ -24,6 +24,8 @@ erklaerung:
     Wert zu hoch sein. Einnahmen außerhalb von Amtlos sind nicht enthalten.
 rechtsgrundlage:
 - § 19 UStG
+- § 19 Abs. 1 Satz 1 UStG
+- Abschnitt 19.1 UStAE
 kategorie: steuern
 ausloeser:
   all:
@@ -141,7 +143,11 @@ fachlich_zu_pruefen:
 - 'E-222 (externer Prüfer 12c, v7): neuer Zweig außerhalb des Gründungsjahrs – Einnahmen laut Amtlos (mit Ersatzregel wie bisher) ab 20.000 € bis unter 23.750 € (steuern.ustg19.grenze_vorjahr × 0.8 … × 0.95), nur wenn Vorjahr laut Profil bzw. App nicht über 25.000 € (sonst gilt „Grenze überschritten“); Kurztext und Erklärung um die Grenze von 25.000 € und die Folge ergänzt, Sätze wörtlich aus steuern.kleinunternehmer_grenze_ueberschritten v7 (kurz) und steuern.kleinunternehmer_naechstes_jahr v6 (Erklärung). Zu prüfen: Auslöser und Text (PRUEFLISTE T-310)'
 - 'Steuerberater 22.10.2026, Runde 2 (freigegeben, v5): vorsichtige Zählung für eine Warnung vertretbar – offene Rechnungen ab Rechnungsdatum (Ersatzregel) und Sachentnahmen (§ 3 Abs. 1b UStG) bestätigt. Umgesetzt (v6) nach seiner Empfehlung: Text zu steuerfreien Umsätzen und Anlagenverkäufen; steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App jetzt heraus. Zu prüfen: nur der neue Textteil (Versionssprung hebt die Freigabe in der App auf). Server: kennt keine Zahlungseingänge und zählt alle Rechnungen nach Rechnungsdatum (wie die Ersatzregel)'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
+- 'E-226: Fundstelle für die Regel, dass schon der Umsatz steuerpflichtig ist, mit dem die Grenze von 100.000 € überschritten wird, laut Steuerberater 27.10.2026: § 19 Abs. 1 Satz 1 UStG (Satz 1 enthält beide Grenzen), Abschnitt 19.1 UStAE (BMF-Schreiben vom 18.03.2025) – in der Rechtsgrundlage ergänzt (v8), Text unverändert'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - steuern
+  geprueft_am: '2026-10-27'
+  geprueft_version: 8
+  bestaetigt_am: '2026-10-27'

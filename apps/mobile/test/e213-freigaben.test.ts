@@ -166,7 +166,8 @@ describe("E-213 B) Pflichten erneut bestätigt", () => {
     // E-216: dazu die Voranmeldung v8 (Steuerberater, T-282)
     // E-217: alle vier am 27.10.2026 bestätigt (T-278, T-282)
     // E-222: Kleinunternehmer-Warnungen v7 warten auf den Steuerberater (T-310); E-223: zwei neue Einträge im Entwurf (T-313)
-    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual(["online.preisermaessigung", "online.werbe_email_einwilligung", "steuern.kleinunternehmer_warnung_80", "steuern.kleinunternehmer_warnung_95"]);
+    // E-226: alle vier am 27.10.2026 freigegeben (T-310, T-313)
+    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual([]);
   });
 });
 

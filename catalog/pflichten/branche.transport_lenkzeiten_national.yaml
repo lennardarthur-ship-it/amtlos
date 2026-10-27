@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kurier #2): Lenk- und Ruhezeiten im Inland für Fahrzeuge über 2,8 bis 3,5 t
 schema_version: 1
 id: branche.transport_lenkzeiten_national
-version: 5
+version: 6
 katalog_nr: H.5
 titel:
   de: Lenk- und Ruhezeiten bei Transportern über 2,8 t
@@ -39,8 +39,7 @@ kosten: null
 sanktion:
   text:
     de: 'Bußgeld bis 30.000 € für dich als Unternehmer, wenn du nicht dafür sorgst, dass die Lenk- und Ruhezeiten eingehalten werden, keine Vordrucke aushändigst oder die Aufzeichnungen nicht prüfst, aufbewahrst oder vorlegst (§ 21 Abs. 1 Nr. 1, 1a, 2 FPersV in Verbindung mit § 8 Abs. 1 Nr. 1 Buchst. a, Abs. 2 FPersG); für Fahrer bis 5.000 € (§ 21 Abs. 2 Nr. 1, 2 FPersV).'
-  schwere: mittel
-dringend_ohne_termin: true
+  schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -64,10 +63,11 @@ quellen:
 fachlich_zu_pruefen:
 - 'Prüfvermerk Rechtsanwalt 22.10.2026: § 1 Abs. 1 Nr. 1, Abs. 6 FPersV und Sanktion bestätigt, Handwerkerausnahme § 1 Abs. 2 Nr. 3 FPersV ergänzt (nicht im Auslöser); § 21a ArbZG gilt erst ab 3,5 t – für diese Klasse nicht'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'E-226: Einstufung der Folgen wieder „hoch“ auf Anweisung des Rechtsanwalts vom 27.10.2026 (v6, Text der Folgen unverändert) – die vorläufige Senkung der Vorprüfung ist damit aufgehoben; das Feld „dringend ohne Termin“ entfällt (bei „hoch“ dieselbe Wirkung auf „Heute“, der Validator verlangt es)'
 pruefung:
   status: freigegeben
   geprueft_von:
     - recht
-  geprueft_am: '2026-10-23'
-  geprueft_version: 5
-  bestaetigt_am: '2026-10-23'
+  geprueft_am: '2026-10-27'
+  geprueft_version: 6
+  bestaetigt_am: '2026-10-27'

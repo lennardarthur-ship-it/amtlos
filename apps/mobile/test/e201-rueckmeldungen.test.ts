@@ -107,7 +107,8 @@ describe("E-201: Rückmeldungen Rechtsanwalt und Steuerberater im Katalog", () =
     // Dauerfristverlängerung (Anregung des Steuerberaters, T-268) – Vermerk erst nach der Bestätigung (T-282)
     // E-217: alle vier am 27.10.2026 bestätigt (Voranmeldung als v9, NIS2 als neue Fassungen) – keiner mehr ohne Vermerk
     // E-222: Kleinunternehmer-Warnungen v7 (T-310); E-223: zwei neue Einträge im Entwurf (T-313) – Vermerk erst nach der Bestätigung
-    const NEU: string[] = ["online.preisermaessigung", "online.werbe_email_einwilligung", "steuern.kleinunternehmer_warnung_80", "steuern.kleinunternehmer_warnung_95"];
+    // E-226: alle vier am 27.10.2026 freigegeben (T-310, T-313) – 230 von 230 mit Vermerk
+    const NEU: string[] = [];
     for (const x of pflichten) {
       // E-213: die von E-206 geänderten Einträge sind seit dem 26.10.2026 erneut bestätigt (die Voranmeldung bis v7)
       if (E206.includes(x.id)) expect(x.pruefung?.bestaetigt_am, x.id).toBe("2026-10-26");

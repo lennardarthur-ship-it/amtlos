@@ -209,11 +209,12 @@ describe("E-217 B2) NIS2 nach den Vorgaben des Rechtsanwalts", () => {
 
 describe("E-217: alle Einträge mit Vermerk", () => {
   // E-222: Kleinunternehmer-Warnungen v7 warten auf den Steuerberater (T-310) – 35 → 33; E-223: zwei neue Einträge im Entwurf
-  it("230 Einträge; Rechtsanwalt 166, Steuerberater 33 (E-222, E-223)", () => {
+  // E-226: Warnungen bestätigt und die zwei neuen Einträge freigegeben – 230 von 230 mit Vermerk
+  it("230 Einträge; Rechtsanwalt 168, Steuerberater 35 (E-226)", () => {
     expect(pflichten).toHaveLength(230);
-    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual(["online.preisermaessigung", "online.werbe_email_einwilligung", "steuern.kleinunternehmer_warnung_80", "steuern.kleinunternehmer_warnung_95"]);
+    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual([]);
     const zahl = (r: string) => pflichten.filter((p) => pruefVermerk(p.version, p.pruefung, AM) && p.pruefung!.geprueft_von!.includes(r)).length;
-    expect([zahl("recht"), zahl("steuern")]).toEqual([166, 33]);
+    expect([zahl("recht"), zahl("steuern")]).toEqual([168, 35]);
   });
   it("PRUEFLISTE: T-278, T-282 und T-287 erledigt", () => {
     for (const t of ["T-278", "T-282", "T-287"]) expect(PRUEFLISTE.find((z) => z.startsWith(`| ${t} |`)), t).toMatch(/Erledigt 27\.10\.2026.*E-217/);

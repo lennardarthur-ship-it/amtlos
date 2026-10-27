@@ -25,7 +25,7 @@
  *
  * R11 (interne Prüfrunde Steuern – nicht von der Steuerberatung bestätigt, PRUEFLISTE T-117):
  * - Rechnungen mit Umsatzsteuer werden immer übernommen, auch in einem Zeitraum, der sonst als Kleinunternehmer-Zeitraum
- *   gilt (Überschreiten der 100.000 €, § 19 Abs. 1 Satz 2 UStG n. F.; sonst schuldet man die Steuer nach § 14c, Kz 69).
+ *   gilt (Überschreiten der 100.000 €, § 19 Abs. 1 Satz 1 UStG, Abschnitt 19.1 UStAE; sonst schuldet man die Steuer nach § 14c, Kz 69).
  *   Vorsteuer dann erst aus Belegen ab der ersten solchen Rechnung.
  * - Vorsteuer aus Gutschriften zählt unabhängig von Soll/Ist ab Leistung und Gutschrift (§ 15 Abs. 1 Nr. 1 UStG; § 20
  *   betrifft nur die eigenen Umsätze).
@@ -641,7 +641,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     .map((u) => zuordnen(u, v, betrieb, korr))
     .filter((x) => x.tag && x.tag >= z.von && x.tag <= z.bis);
   const kuZeitraum = kuImZeitraum(alle.map((x) => x.u), kleinunternehmer) ?? false;
-  // R11: Rechnungen mit Umsatzsteuer immer übernehmen – auch im Kleinunternehmer-Zeitraum (§ 19 Abs. 1 Satz 2 n. F., § 14c)
+  // R11: Rechnungen mit Umsatzsteuer immer übernehmen – auch im Kleinunternehmer-Zeitraum (§ 19 Abs. 1 Satz 1 UStG, Abschnitt 19.1 UStAE; § 14c)
   const mitUst = alle.filter((x) => !kuRechnung(x.u));
   const kuGemischt = kuZeitraum && mitUst.length > 0;
   const ku = kuZeitraum && !kuGemischt;

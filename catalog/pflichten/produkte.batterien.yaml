@@ -1,7 +1,7 @@
 # Katalog G.72 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.batterien
-version: 6
+version: 7
 katalog_nr: G.72
 titel:
   de: Batterien registrieren (BattDG)
@@ -40,8 +40,7 @@ kosten: null
 sanktion:
   text:
     de: 'Bußgeld bis 100.000 €, wenn du dich nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig registrierst oder Batterien ohne Registrierung bereitstellst (§ 60 Abs. 1 Nr. 1, Abs. 2 Nr. 23, Abs. 3 in Verbindung mit § 4 Abs. 1 BattDG).'
-  schwere: mittel
-dringend_ohne_termin: true
+  schwere: hoch
 automatisierung: hinweis
 aenderungsnotiz:
   de: Gilt erst, wenn du die Geräte oder Batterien selbst erstmals in Deutschland in Verkehr bringst – nicht beim Einkauf im deutschen
@@ -62,10 +61,11 @@ quellen:
 fachlich_zu_pruefen:
 - 'Prüfvermerk Rechtsanwalt 22.10.2026: Herstellerbegriff und Installateur mit Inlandseinkauf als Vertreiber bestätigt; Vertreiberpflichten (Rücknahme von Gerätebatterien) als eigener Hinweis – eigener Eintrag produkte.geraetebatterien_ruecknahme (E-223: Notiz nachgezogen)'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'E-226: Einstufung der Folgen wieder „hoch“ auf Anweisung des Rechtsanwalts vom 27.10.2026 (v7, Text der Folgen unverändert) – die vorläufige Senkung der Vorprüfung ist damit aufgehoben; das Feld „dringend ohne Termin“ entfällt (bei „hoch“ dieselbe Wirkung auf „Heute“, der Validator verlangt es)'
 pruefung:
   status: freigegeben
   geprueft_von:
     - recht
-  geprueft_am: '2026-10-23'
-  geprueft_version: 6
-  bestaetigt_am: '2026-10-23'
+  geprueft_am: '2026-10-27'
+  geprueft_version: 7
+  bestaetigt_am: '2026-10-27'
