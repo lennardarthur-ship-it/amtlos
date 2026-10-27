@@ -52,7 +52,10 @@ function pruefe(bed, text) {
   if (!bed) throw new Error(`Befund: ${text}`);
 }
 /** Die oberste Ebene eines Stapels ist die zuletzt eingehängte; Elemente darunter sind verdeckt. */
-const knopf = (name) => p.getByRole("button", { name, exact: true }).locator("visible=true").last();
+// E-225: ohne Pro tragen „Rechnung“ und „Beleg“ auf Heute „· Pro“ – beide Fassungen finden
+const PRO_ZUSATZ = new Set(["Rechnung", "Beleg"]);
+const knopfName = (name) => (PRO_ZUSATZ.has(name) ? new RegExp(`^${name}( · Pro)?$`) : name);
+const knopf = (name) => p.getByRole("button", { name: knopfName(name), exact: true }).locator("visible=true").last();
 const feld = (label) => p.getByLabel(label, { exact: true }).locator("visible=true").last();
 /** Tippen nach Scrollen in die Mitte – sonst liegt die Tab-Leiste über Elementen am unteren Rand. */
 async function tippe(l) {
@@ -81,7 +84,7 @@ try {
   await p.goto(ADRESSE);
   await warte(2500);
   // Start auf „Heute“ (E-142): Bühne mit Rechnung und Beleg, auf dem Blatt die Einladung zum Check
-  pruefe((await sichtbar("Welche Pflichten kommen für dich in Frage?")) && (await p.getByRole("button", { name: "Rechnung", exact: true }).count()) > 0, "„Heute“ mit Einladung und schnellen Wegen fehlt beim Start");
+  pruefe((await sichtbar("Welche Pflichten kommen für dich in Frage?")) && (await p.getByRole("button", { name: knopfName("Rechnung"), exact: true }).count()) > 0, "„Heute“ mit Einladung und schnellen Wegen fehlt beim Start");
   await foto("start-pflichten");
   await neu();
   await warte(800);
