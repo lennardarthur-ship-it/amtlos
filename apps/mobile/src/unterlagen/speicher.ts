@@ -75,6 +75,22 @@ export interface Unterlage {
    * Zusammenführen vereint; „Doch verschickt – festschreiben“ lässt bei mehreren verschiedenen Fassungen wählen.
    */
   geteiltOffen?: GeteilteFassung[];
+  /**
+   * E-218 (Steuerberater 27.10.2026): Angaben zum Storno einer Rechnung mit EU-Umsatz, die nicht gedruckt werden und
+   * sich auch nach der Festschreibung noch eintragen lassen – Tag, an dem der Fehler erkannt wurde (§ 18a Abs. 10 UStG;
+   * ohne Angabe das Datum des Stornos), und der Grund für ältere Stornos ohne Grund in den Daten (T-273 (4)). Gehört wie
+   * `bezahlt` nicht zum Inhalt; beim Zusammenführen gilt die zuletzt geänderte Angabe (`geaendert`).
+   */
+  euStorno?: EuStornoAngaben;
+}
+
+/** E-218: Angaben zum Storno einer Rechnung mit EU-Umsatz (siehe `Unterlage.euStorno`). */
+export interface EuStornoAngaben {
+  grund?: EuStornoGrund;
+  /** Tag (YYYY-MM-DD), an dem der Fehler erkannt wurde – nicht nach dem Datum des Stornos */
+  erkannt?: string;
+  /** Zeitpunkt der letzten Änderung (ISO) */
+  geaendert: string;
 }
 
 /** E-193 (4): eine auf Android ausgegebene Fassung, deren Versand (noch) nicht bestätigt ist. */
@@ -426,7 +442,20 @@ function unterlageAus(u: Record<string, unknown>): Unterlage {
   const offen = geteiltOffenAus(u.geteiltOffen);
   if (offen.length) r.geteiltOffen = offen;
   else delete r.geteiltOffen;
+  // E-218: nur lesbare Angaben (Grund, Tag), mit Zeitpunkt
+  const eu = euStornoAus(u.euStorno);
+  if (eu) r.euStorno = eu;
+  else delete r.euStorno;
   return r;
+}
+
+const ISO_TAG = /^\d{4}-\d{2}-\d{2}$/;
+function euStornoAus(roh: unknown): EuStornoAngaben | null {
+  if (!istObjekt(roh) || !istIso(roh.geaendert)) return null;
+  const grund = roh.grund === "rechnung" || roh.grund === "betrag" ? roh.grund : undefined;
+  const erkannt = typeof roh.erkannt === "string" && ISO_TAG.test(roh.erkannt) ? roh.erkannt : undefined;
+  // auch ohne Angaben (zurückgenommen) – sonst brächte das Zusammenführen die ältere Angabe zurück
+  return { ...(grund ? { grund } : {}), ...(erkannt ? { erkannt } : {}), geaendert: roh.geaendert };
 }
 
 function geteiltOffenAus(roh: unknown): GeteilteFassung[] {
@@ -990,9 +1019,10 @@ export type EuStornoGrund = "rechnung" | "betrag";
 /**
  * Storno (E-127): eine festgeschriebene Rechnung wird nicht geändert, sondern durch eine Stornorechnung mit neuer
  * Nummer und negativen Beträgen aufgehoben; die Stornorechnung verweist auf Nummer und Datum der ursprünglichen.
- * E-214: `euGrund` – Grund bei Rechnungen mit EU-Umsatz (die Seite fragt danach).
+ * E-214: `euGrund` – Grund bei Rechnungen mit EU-Umsatz (die Seite fragt danach). E-218: `erkannt` – Tag, an dem der
+ * Fehler erkannt wurde (bei „Fehler in der Rechnung“; ohne Angabe bzw. am Tag des Stornos nicht gespeichert).
  */
-export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId(), euGrund?: EuStornoGrund): [Stand, Unterlage | null] {
+export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId(), euGrund?: EuStornoGrund, erkannt?: string | null): [Stand, Unterlage | null] {
   const alt = s.unterlagen.find((u) => u.id === id);
   const v = alt ? vorlageFuer(alt.vorlage) : undefined;
   if (!alt || !v?.storno || !alt.festgeschrieben || alt.storniertDurch || alt.daten.storno_zu || alt.konfliktKopieVon) return [s, null];
@@ -1007,8 +1037,38 @@ export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId(), eu
   if (alt.daten.schluss === true) daten[STORNO_ABSCHLAEGE] = true;
   daten.datum = heute(jetzt);
   if (v.fortlaufend) daten[v.fortlaufend] = naechste(s, v.id, v.fortlaufend, jetzt);
-  const u: Unterlage = { id: neu, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString(), stornoZuId: id };
+  const mitErkannt = euGrund === "rechnung" && erkannt && ISO_TAG.test(erkannt) && erkannt < String(daten.datum);
+  const u: Unterlage = { id: neu, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString(), stornoZuId: id, ...(mitErkannt ? { euStorno: { erkannt, geaendert: jetzt.toISOString() } } : {}) };
   return [{ ...s, unterlagen: [u, ...s.unterlagen.map((x) => (x.id === id ? { ...x, storniertDurch: neu } : x))] }, u];
+}
+
+/**
+ * E-218 (Steuerberater 27.10.2026): Angaben zum Storno einer Rechnung mit EU-Umsatz nachtragen – auch nach der
+ * Festschreibung, weil sie nicht gedruckt werden. `erkannt`: Tag, an dem der Fehler erkannt wurde (nicht nach dem Datum
+ * des Stornos; null: wieder das Datum des Stornos). `grund`: nur für Stornos ohne Grund in den Daten (ältere Stornos,
+ * T-273 (4)) – ein beim Stornieren gewählter Grund bleibt. Ungültiges ändert nichts.
+ */
+export function euStornoSetzen(s: Stand, id: string, angaben: { grund?: EuStornoGrund; erkannt?: string | null }, jetzt: Date): Stand {
+  const u = s.unterlagen.find((x) => x.id === id);
+  if (!u || u.vorlage !== "rechnung" || typeof u.daten.storno_zu !== "string" || !u.stornoZuId || u.konfliktKopieVon) return s;
+  const datum = String(u.daten.datum ?? "");
+  const alt = u.euStorno;
+  let grund = alt?.grund;
+  let erkannt = alt?.erkannt;
+  if (angaben.grund !== undefined) {
+    if (u.daten[EU_STORNO_GRUND] === "rechnung" || u.daten[EU_STORNO_GRUND] === "betrag") return s;
+    if (angaben.grund !== "rechnung" && angaben.grund !== "betrag") return s;
+    grund = angaben.grund;
+  }
+  if (angaben.erkannt !== undefined) {
+    if (angaben.erkannt === null || angaben.erkannt === datum) erkannt = undefined;
+    else if (ISO_TAG.test(angaben.erkannt) && angaben.erkannt < datum) erkannt = angaben.erkannt;
+    else return s;
+  }
+  if (grund === alt?.grund && erkannt === alt?.erkannt) return s;
+  // auch ohne Angaben mit Zeitpunkt – so setzt sich das Zurücknehmen beim Zusammenführen durch
+  const eu: EuStornoAngaben = { ...(grund ? { grund } : {}), ...(erkannt ? { erkannt } : {}), geaendert: jetzt.toISOString() };
+  return { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...x, euStorno: eu } : x)) };
 }
 
 /**
@@ -1577,6 +1637,12 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
   if (quelle.bezahltGeaendert) r.bezahltGeaendert = quelle.bezahltGeaendert;
   // R12: die Zahlungen gehören zum Zahlungsvermerk – sie kommen aus derselben Fassung wie `bezahlt`
   if (quelle.zahlungen?.length) r.zahlungen = quelle.zahlungen;
+  // E-218: Angaben zum EU-Storno – die zuletzt geänderte (bei gleichem Zeitpunkt der Inhalt, auf allen Geräten gleich)
+  const el = lokal.euStorno;
+  const ea = andere.euStorno;
+  const eu = el && ea ? (el.geaendert > ea.geaendert ? el : ea.geaendert > el.geaendert ? ea : JSON.stringify(el) >= JSON.stringify(ea) ? el : ea) : (el ?? ea);
+  delete r.euStorno;
+  if (eu) r.euStorno = eu;
   return kopie ? { u: r, kopie } : { u: r };
 }
 

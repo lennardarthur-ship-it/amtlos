@@ -26,6 +26,8 @@ export type KontenvorgabeKonto =
   | "erloesOss"
   | "erloesAusfuhr"
   | "erloesKz43"
+  | "anzahlungenErhalten"
+  | "anzahlungEuEuer"
   | "homeoffice"
   | "anlageMaschinen"
   | "anlageBga"
@@ -71,6 +73,8 @@ export const KONTENVORGABE_FELDER: readonly { id: KontenvorgabeKonto; titel: str
   { id: "erloesOss", titel: "Erlöse OSS (Steuer des Bestimmungslands)", hilfe: "Fernverkäufe und Leistungen an Privatpersonen im EU-Ausland (§ 18j UStG), z. B. 8320/4320 „Erlöse aus im anderen EU-Land steuerpflichtigen Lieferungen“." },
   { id: "erloesAusfuhr", titel: "Erlöse Ausfuhrlieferungen (§ 4 Nr. 1 Buchst. a UStG, Kz 43)", hilfe: "Steuerfreie Ausfuhrlieferungen in ein Drittland – Konto mit Kz-43-Funktion im Kontenrahmen der Kanzlei. Standard SKR03 8120 / SKR04 4120 (vom Steuerberater bestätigt)." },
   { id: "erloesKz43", titel: "Erlöse sonstige steuerfreie Umsätze (§ 4 Nr. 2–7 UStG, Kz 43)", hilfe: "Übrige steuerfreie Umsätze mit Vorsteuerabzug, z. B. Umsätze für die Seeschifffahrt und Luftfahrt (§ 4 Nr. 2 UStG). Standard SKR03 8150 / SKR04 4150 „Sonstige steuerfreie Umsätze § 4 Nr. 2–7 UStG“." },
+  { id: "anzahlungenErhalten", titel: "Erhaltene Anzahlungen auf Bestellungen (Bilanz)", hilfe: "Bilanzierende Betriebe: bezahlte Anzahlungen auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland – ohne Steuerschlüssel, mit der Schlussrechnung verrechnet. Standard SKR03 1710 / SKR04 3250 (vom Steuerberater genannt)." },
+  { id: "anzahlungEuEuer", titel: "Anzahlungen auf EU-Umsätze: Erlöskonto ohne Umsatzsteuer (EÜR)", hilfe: "Einnahmen-Überschuss-Rechnung: bezahlte Anzahlungen auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland sind mit der Zahlung Einnahme, gehören aber nicht in die Voranmeldung – ein Erlöskonto ohne Umsatzsteuerfunktion; mit der Schlussrechnung umgebucht. Kein Standard: das Konto legt die Kanzlei fest. Ohne Eintrag fehlen diese Buchungen im Stapel." },
   { id: "homeoffice", titel: "Homeoffice-Pauschale / Arbeitszimmer" },
   { id: "anlageMaschinen", titel: "Anlagen: Maschinen" },
   { id: "anlageBga", titel: "Anlagen: Betriebs- und Geschäftsausstattung" },

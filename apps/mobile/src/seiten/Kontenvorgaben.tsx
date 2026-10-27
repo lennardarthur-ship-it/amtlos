@@ -25,6 +25,11 @@ function standardKonto(id: KontenvorgabeKonto, kr: "SKR03" | "SKR04"): string {
       return k.erloese.ausfuhr;
     case "erloesKz43":
       return k.erloese.befreit43;
+    // E-218: Bilanz 1710/3250; EÜR ohne Standard ("")
+    case "anzahlungenErhalten":
+      return k.anzahlungenErhalten;
+    case "anzahlungEuEuer":
+      return k.anzahlungEuEuer;
     case "anlageMaschinen":
       return k.anlagen.maschinen;
     case "anlageBga":

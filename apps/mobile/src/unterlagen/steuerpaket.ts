@@ -20,6 +20,8 @@ import {
   kontenvorgabenGesetzt,
   STEUERART_NULLSATZ,
   zahlungsBuchungenRechnung,
+  euAnzahlungBuchung,
+  type Buchung,
   buchungenAusBelegen,
   buchungenAusRechnungen,
   buchungslisteCsv,
@@ -72,6 +74,7 @@ import {
   vorlageFuer,
   type Kontenrahmen,
   type Kontenvorgaben,
+  type Konten,
   type RechnungsDaten,
   belegTeilabzug,
   datevDebitorenKreditoren,
@@ -85,7 +88,7 @@ import {
 import { APP_VERSION } from "../version";
 import { T as TEXT } from "../texte";
 import { utf8 } from "./sicherung";
-import { GUTSCHRIFT_HINWEIS, euBerichtigungen, euMeldeArtVon, istGutschrift, kuImZeitraum, periodeText, zuordnungsTage } from "./ustAusRechnungen";
+import { GUTSCHRIFT_HINWEIS, euBerichtigungen, euMeldeArtVon, istGutschrift, kuImZeitraum, periodeText, schlussZuAbschlag, zuordnungsTage } from "./ustAusRechnungen";
 import { BELEG_KONFLIKT_GRUND, absenderFuer, neueId, nichtZaehlend, type ProtokollEintrag, type Stand, type Unterlage } from "./speicher";
 import { kassenAbdeckung } from "./kasse";
 import { MARKE } from "@amtlos/marke";
@@ -1201,6 +1204,106 @@ export function kontenvorgabenText(v: Kontenvorgaben | undefined, k: ReturnType<
 /** Folgetag (ISO) */
 const tagDanach = (iso: string) => new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10)) + 1)).toISOString().slice(0, 10);
 
+/** E-218: Buchungen für Anzahlungen auf EU-Umsätze und was dabei auffällt (LIESMICH). */
+interface EuAnzahlungen {
+  buchungen: Buchung[];
+  /** Schlussrechnungen (und ihr Storno), deren Anzahlungen verrechnet werden – bei Bilanz mit vollem Entgelt gebucht */
+  schluesse: Set<string>;
+  /** EÜR ohne Erlöskonto ohne Umsatzsteuerfunktion (Kontenvorgabe): Buchungen, die deshalb im Stapel fehlen */
+  fehlend: { text: string; datum: string; cent: number; nummer: string }[];
+  /** Nummern der Abschlagsrechnungen mit Skonto vor der Meldung der Lieferung bzw. Leistung (im Zeitraum) */
+  skontoVorMeldung: string[];
+}
+
+/**
+ * E-218 (Steuerberater 27.10.2026, T-274): Anzahlungen bzw. Abschläge auf innergemeinschaftliche Lieferungen und
+ * EU-Leistungen im Stapel – nicht mehr zum Zahltag auf dem Erlöskonto (8125/8336 bzw. 4125/4336).
+ * - Bilanz: bezahlte Anzahlung zum Zahltag Forderungen an „Erhaltene Anzahlungen auf Bestellungen“ (SKR03 1710 / SKR04
+ *   3250) ohne Steuerschlüssel; mit der Schlussrechnung das volle Entgelt auf das Erlöskonto (Feld 116 nach § 18b UStG,
+ *   `vollesEntgelt`) und die Anzahlungen gegen die Forderung verrechnet.
+ * - EÜR: Einnahme mit der Zahlung (§ 11 EStG) auf das Erlöskonto ohne Umsatzsteuerfunktion aus den Kontenvorgaben (kein
+ *   Standard), mit dem Datum der Schlussrechnung auf das Erlöskonto umgebucht (Feld 116 nach § 18b UStG). Ohne Konto
+ *   fehlen diese Buchungen und LIESMICH nennt sie. Eine Zahlung nach dem Datum der Schlussrechnung steht direkt auf dem
+ *   Erlöskonto (Feld 116 wie die Schlussrechnung).
+ * - Skonto auf die Anzahlung vor der Meldung (Zahltag nicht nach dem Tag der Schlussrechnung nach § 18b): zum Zahltag
+ *   gegen das Anzahlungskonto, ohne Steuer; bei Bilanz mindert es mit der Schlussrechnung die Erlöse (Skontokonto, Feld
+ *   116 der Schlussrechnung), bei EÜR wird nur der Rest umgebucht. Danach wie jedes Skonto im Zeitraum der Zahlung.
+ */
+function euAnzahlungsBuchungen(s: Stand, z: Zeitraum, o: { bilanz: boolean; istEuer: boolean; tage: Map<string, string | null>; ku: boolean; kontenrahmen: Kontenrahmen; bo: { vorgaben?: Kontenvorgaben }; k: Konten; mitPk: (u: Unterlage, r: AusgangsRechnungFuerBuchung) => AusgangsRechnungFuerBuchung; stornoImStapel: Set<string> }): EuAnzahlungen {
+  const aus: Buchung[] = [];
+  const fehlend: EuAnzahlungen["fehlend"] = [];
+  const schluesse = new Set<string>();
+  const skontoVor = new Set<string>();
+  const konto = o.bilanz ? o.k.anzahlungenErhalten : o.k.anzahlungEuEuer;
+  const rf = (u: Unterlage) => o.mitPk(u, rechnungFuerBuchung(u, s.betrieb, { tage: o.tage, betriebKu: o.ku }));
+  const eu = (u: Unterlage) => !istGutschrift(u) && !!euMeldeArtVon(u, s.betrieb);
+  const buchen = (art: "zahlung" | "skonto" | "verrechnung" | "umbuchung", r: AusgangsRechnungFuerBuchung, b: { id: string; datum: string; betrag_cent: number }, text: string) => {
+    if (!b.betrag_cent) return;
+    if (konto) aus.push(euAnzahlungBuchung(art, r, b, konto, o.kontenrahmen, o.bo));
+    else fehlend.push({ text, datum: b.datum, cent: b.betrag_cent, nummer: r.nummer });
+  };
+  const summe = (l: { brutto_cent: number }[]) => l.reduce((a, x) => a + x.brutto_cent, 0);
+  const alle = gestellteRechnungen(s);
+  const abschlaege = alle.filter((u) => u.daten.abschlag === true && !istStorno(u) && eu(u));
+  // je Abschlag: Zahlungen (Tag, Brutto je Steuersatz einschließlich Skonto, Skonto) und die Schlussrechnung
+  const info = abschlaege.map((u) => {
+    const r = rf(u);
+    const schluss = schlussZuAbschlag(s.unterlagen, u);
+    const zahlungen = u.zahlungen?.length
+      ? zahlungsAnteile(restGruppen(r), u.zahlungen).map((a) => ({ id: a.zahlung.id, datum: a.zahlung.datum, anteil: a.erhalten.map((e, i) => ({ satz: e.satz, brutto_cent: e.brutto_cent + a.minderung[i]!.brutto_cent, netto_cent: e.netto_cent + a.minderung[i]!.netto_cent, ust_cent: e.ust_cent + a.minderung[i]!.ust_cent })), skonto: summe(a.minderung) }))
+      : u.bezahlt
+        ? [{ id: "bezahlt", datum: u.bezahlt, anteil: restGruppen(r).map((g) => ({ satz: g.satz, brutto_cent: g.netto_cent + g.ust_cent, netto_cent: g.netto_cent, ust_cent: g.ust_cent })), skonto: 0 }]
+        : [];
+    return { u, r, schluss, datum: schluss ? String(schluss.daten.datum) : null, tag: schluss ? (o.tage.get(schluss.id) ?? null) : null, zahlungen };
+  });
+  const vorMeldung = (p: { datum: string }, tag: string | null) => !tag || p.datum <= tag;
+  for (const a of info) {
+    for (const p of a.zahlungen) {
+      if (!imZeitraum(p.datum, z)) continue;
+      const nachSchluss = !!a.datum && p.datum > a.datum;
+      // EÜR: nach dem Datum der Schlussrechnung direkt auf das Erlöskonto (die Umbuchung ist schon gebucht)
+      if (!o.bilanz && nachSchluss) aus.push(...buchungenAusRechnungen([{ ...a.r, datum: p.datum, steuerperiode: a.tag, guid_zusatz: p.id, anteil: p.anteil }], o.kontenrahmen, o.bo));
+      else buchen("zahlung", a.r, { id: p.id, datum: p.datum, betrag_cent: summe(p.anteil) }, "Anzahlung (Einnahme, § 11 EStG) zum Zahltag");
+      if (!p.skonto) continue;
+      const vor = vorMeldung(p, a.tag);
+      if (vor) skontoVor.add(a.r.nummer);
+      if (vor && !nachSchluss) buchen("skonto", a.r, { id: p.id, datum: p.datum, betrag_cent: p.skonto }, "Skonto auf die Anzahlung (mindert das Anzahlungskonto)");
+      else aus.push(...skontoBuchungenRechnung(a.r, [{ id: p.id, datum: p.datum, brutto_cent: p.skonto, ...(vor && a.tag ? { steuerperiode: a.tag } : {}) }], o.kontenrahmen, o.bo));
+    }
+  }
+  // Stornos von bezahlten Abschlägen: die Anzahlungsbuchung als Generalumkehr
+  for (const st of alle.filter((u) => o.stornoImStapel.has(u.id))) {
+    const r = rf(st);
+    buchen("zahlung", r, { id: "storno", datum: o.istEuer ? st.bezahlt! : r.datum, betrag_cent: summe(restGruppen(r).map((g) => ({ brutto_cent: g.netto_cent + g.ust_cent }))) }, "Storno der Anzahlung");
+  }
+  // Schlussrechnungen (und ihr Storno) mit Datum im Zeitraum: Verrechnung (Bilanz) bzw. Umbuchung (EÜR)
+  for (const sr of alle.filter((u) => eu(u) && u.daten.schluss === true && u.daten.abschlag !== true && imZeitraum(String(u.daten.datum), z))) {
+    const orig = istStorno(sr) ? alle.find((x) => x.id === sr.stornoZuId) : sr;
+    if (!orig) continue;
+    const r = rf(sr);
+    const nummern = new Set((rechnungFuerBuchung(orig, s.betrieb).abschlaege ?? []).map((x) => x.nummer.trim()).filter(Boolean));
+    const zug = info.filter((a) => nummern.has(String(a.u.daten.nummer ?? "").trim()));
+    const origDatum = String(orig.daten.datum);
+    const origTag = o.tage.get(orig.id) ?? null;
+    // Skonto vor der Meldung, gezahlt bis zum Datum der Schlussrechnung
+    const skVor = zug.reduce((x, a) => x + a.zahlungen.filter((p) => p.datum <= origDatum && vorMeldung(p, origTag)).reduce((y, p) => y + p.skonto, 0), 0);
+    for (const a of zug) if (a.zahlungen.some((p) => p.skonto && p.datum <= origDatum && vorMeldung(p, origTag))) skontoVor.add(a.r.nummer);
+    if (o.bilanz) {
+      if (!r.abschlaege?.length) continue;
+      schluesse.add(sr.id);
+      buchen("verrechnung", r, { id: "schluss", datum: r.datum, betrag_cent: summe(r.abschlaege.map((x) => ({ brutto_cent: x.netto_cent + x.ust_cent }))) - skVor }, "Verrechnung der Anzahlungen");
+      if (skVor) {
+        const sk = skontoBuchungenRechnung({ ...r, abschlaege: [] }, [{ id: "schluss", datum: r.datum, brutto_cent: skVor, guid_zusatz: "anzahlungen", ...(r.steuerperiode ? { steuerperiode: r.steuerperiode } : {}) }], o.kontenrahmen, o.bo);
+        aus.push(...(istStorno(sr) ? sk.map((b): Buchung => ({ ...b, art: "storno", generalumkehr: true, buchungstext: `Storno ${b.buchungstext}`.slice(0, 60) })) : sk));
+      }
+    } else {
+      const umbuchen = zug.reduce((x, a) => x + a.zahlungen.filter((p) => p.datum <= origDatum).reduce((y, p) => y + summe(p.anteil) - (vorMeldung(p, origTag) ? p.skonto : 0), 0), 0);
+      buchen("umbuchung", r, { id: "schluss", datum: r.datum, betrag_cent: umbuchen }, "Umbuchung der Anzahlungen auf das Erlöskonto");
+    }
+  }
+  return { buchungen: aus, schluesse, fehlend, skontoVorMeldung: [...skontoVor] };
+}
+
 /**
  * ZIP des Pakets (R9 Performance): Fotos, PDFs und andere schon komprimierte Dateien unkomprimiert ablegen (Level 0) –
  * sie werden mit Level 6 kaum kleiner, das Komprimieren kostete aber rund 90 % der Zeit. Texte (CSV, XML, TXT) wie
@@ -1255,12 +1358,16 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const gutscheine = new Set(alle.filter((u) => gutscheinZuNullU(u, s.betrieb)).map((u) => u.id));
   // R12: nach Zahlung mit einzelnen Zahlungen – je Zahlung gebucht (unten), nicht als Ganzes
   const jeZahlung = (u: Unterlage) => nachZahlung(u) && !istStorno(u) && !!u.zahlungen?.length;
-  const imStapel = gestellteRechnungen(s).filter((u) => !gutscheine.has(u.id) && !jeZahlung(u) && (nachZahlung(u) ? !!u.bezahlt && imZeitraum(u.bezahlt, z) : imZeitraum(String(u.daten.datum), z) && !abschlagStornoOhneZahlung(u)));
+  // E-218 (Steuerberater 27.10.2026, T-274): Anzahlungen auf EU-Umsätze (und ihr Storno) nicht auf das Erlöskonto –
+  // eigene Buchungen unten (`euAnz`)
+  const euAbschlag = (u: Unterlage) => abschlagU(u) && !istGutschrift(u) && !!euMeldeArtVon(u, s.betrieb);
+  const imStapelAlle = gestellteRechnungen(s).filter((u) => !gutscheine.has(u.id) && !jeZahlung(u) && (nachZahlung(u) ? !!u.bezahlt && imZeitraum(u.bezahlt, z) : imZeitraum(String(u.daten.datum), z) && !abschlagStornoOhneZahlung(u)));
+  const imStapel = imStapelAlle.filter((u) => !euAbschlag(u));
   const ohneZahlung = alle.filter((u) => nachZahlung(u) && !u.bezahlt && !u.zahlungen?.length);
   const ohneZahlungAbschlag = ohneZahlung.filter(abschlagU).length;
   // R12: Zahlungen mit Skonto bzw. Minderung (§ 17 UStG) und Teilzahlungen
   const zahlungsBuchungen = gestellteRechnungen(s)
-    .filter((u) => !gutscheine.has(u.id) && !istGutschrift(u) && !istStorno(u) && u.zahlungen?.length)
+    .filter((u) => !gutscheine.has(u.id) && !istGutschrift(u) && !istStorno(u) && u.zahlungen?.length && !euAbschlag(u))
     .flatMap((u) => {
       const r = mitPk(u, rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku }));
       const anteile = zahlungsAnteile(restGruppen(r), u.zahlungen!).filter((a) => imZeitraum(a.zahlung.datum, z));
@@ -1271,6 +1378,7 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
       const erloese = jeZahlung(u) ? buchungenAusRechnungen(anteile.map((a) => ({ ...r, datum: a.zahlung.datum, steuerperiode: eu116 ?? a.zahlung.datum, guid_zusatz: a.zahlung.id, anteil: a.erhalten.map((e, i) => ({ satz: e.satz, brutto_cent: e.brutto_cent + a.minderung[i]!.brutto_cent, netto_cent: e.netto_cent + a.minderung[i]!.netto_cent, ust_cent: e.ust_cent + a.minderung[i]!.ust_cent })) })), sb.kontenrahmen, bo) : [];
       return [...erloese, ...skontoBuchungenRechnung(r, minderungen, sb.kontenrahmen, bo)];
     });
+  const euAnz = euAnzahlungsBuchungen(s, z, { bilanz, istEuer, tage, ku, kontenrahmen: sb.kontenrahmen, bo, k, mitPk, stornoImStapel: new Set(imStapelAlle.filter((u) => euAbschlag(u) && istStorno(u)).map((u) => u.id)) });
   // StB-Prüfung (A-4): bilanzierende Betriebe – Zahlungseingänge Bank an Forderungen nur mit der Kontenvorgabe
   // „Zahlungseingänge buchen“. Nachtrag 22.10.2026 (Steuerberatungskanzlei): Standard AUS – Kanzleien buchen die Bank
   // aus dem Kontoauszug; sonst stünden die Zahlungen doppelt im Mandanten. Bar an der Kasse kassierte Rechnungen bucht
@@ -1292,8 +1400,9 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const skontoBelege = s.belege.filter((b) => b.skonto_cent && imZeitraum(zahltag(b), z));
   // Gutschriften gehen als Aufwand in den Stapel (R10), Rechnungen als Erlös
   const buchungen = [
-    ...buchungenAusRechnungen(imStapel.map((u) => ({ ...mitPk(u, rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku })), ...(nachZahlung(u) ? { datum: u.bezahlt! } : {}) })), sb.kontenrahmen, bo),
+    ...buchungenAusRechnungen(imStapel.map((u) => ({ ...mitPk(u, rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku })), ...(nachZahlung(u) ? { datum: u.bezahlt! } : {}), ...(bilanz && euAnz.schluesse.has(u.id) ? { vollesEntgelt: true } : {}) })), sb.kontenrahmen, bo),
     ...zahlungsBuchungen,
+    ...euAnz.buchungen,
     ...zahlungsEingaenge,
     ...buchungenAusBelegen(belege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab, kreditoren }),
     ...skontoBuchungenBelege(skontoBelege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab, kreditoren }),
@@ -1395,7 +1504,8 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   // E-214: Stornos „Fehler in der Rechnung“ bei EU-Umsätzen – Storno bzw. Datum im Zeitraum; Anzahlungen auf EU-Umsätze
   const berichtigungen = euBerichtigungen(s.unterlagen, s.betrieb).filter((b) => imZeitraum(b.stornoDatum, z) || imZeitraum(b.tag, z));
   const euAbschlaege = gestellteRechnungen(s).filter((u) => u.daten.abschlag === true && euMeldeArtVon(u, s.betrieb) && ((u.bezahlt && imZeitraum(u.bezahlt, z)) || imZeitraum(String(u.daten.datum), z) || (u.zahlungen ?? []).some((x) => imZeitraum(x.datum, z))));
-  const skontoZm = gestellteRechnungen(s).filter((u) => (u.zahlungen ?? []).some((x) => x.minderung_cent && imZeitraum(x.datum, z)) && zmBetroffen(rechnungFuerBuchung(u, s.betrieb)));
+  // E-218: Skonto auf Anzahlungen vor der Meldung steht in einem eigenen Satz (mindert mit der Schlussrechnung)
+  const skontoZm = gestellteRechnungen(s).filter((u) => (u.zahlungen ?? []).some((x) => x.minderung_cent && imZeitraum(x.datum, z)) && zmBetroffen(rechnungFuerBuchung(u, s.betrieb)) && !(euAbschlag(u) && euAnz.skontoVorMeldung.includes(String(u.daten.nummer ?? ""))));
   // „Wichtig“: an fester Stelle direkt nach den Mandantendaten, jeder Punkt nur einmal (R10)
   const wichtig = [
     ...(kassenSatz ? kassenSatz.split("\r\n") : []),
@@ -1431,8 +1541,19 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
       : []),
     ...(kasseImZeitraum.some((k) => k.gutscheine?.some((g) => g.art === "mehrzweck")) ? [`Mehrzweck-Gutscheine (§ 3 Abs. 15 UStG): Verkauf an „sonstige Verbindlichkeiten“ (${k.gutscheinVerbindlichkeit}), Einlösung Verbindlichkeit an Erlöse${vorgaben?.konten?.gutscheinVerbindlichkeit ? "" : " – Konto bitte mit der Kanzlei abstimmen (z. B. eigenes Unterkonto, Kontenvorgaben)"}. Einzweck-Gutscheine sind beim Verkauf als Erlös gebucht, ihre Einlösung nicht noch einmal.`] : []),
     ...(se.anzahl ? [ku ? `Sachentnahmen (unentgeltliche Wertabgaben, netto ${betrag(se.netto7 + se.netto19)} €): als Kleinunternehmer nicht im Stapel – bitte mit der Kanzlei klären.` : `Sachentnahmen (unentgeltliche Wertabgaben, § 3 Abs. 1b UStG): 7 % netto ${betrag(se.netto7)} €, 19 % netto ${betrag(se.netto19)} € – im Stapel ${kapital ? "Verrechnungskonto Gesellschafter" : "Privatentnahme"} an ${k.sachentnahme[7]}/${k.sachentnahme[19]} (brutto, Konten bitte prüfen). Die Werte hat der Betrieb aus den BMF-Pauschbeträgen selbst eingetragen.`] : []),
-    ...berichtigungen.map((b) => `Storno ${b.stornoNr} zu Rechnung ${b.rechnungNr}${b.ersatzNr ? ` (Ersatzrechnung ${b.ersatzNr})` : ""}: Fehler in der Rechnung mit EU-Umsatz – Zusammenfassende Meldung und Voranmeldung für ${periodeText(b.monat)} bzw. ${periodeText(b.quartal)}${b.ersatzTag && b.ersatzTag.slice(0, 7) !== b.monat && b.ersatzTag.slice(0, 7) < b.stornoDatum.slice(0, 7) ? ` (Ersatzrechnung: ${periodeText(b.ersatzTag.slice(0, 7))})` : ""} berichtigen (ZM innerhalb eines Monats, § 18a Abs. 10 UStG). Im Stapel zum Datum des Stornos gebucht, Feld „Datum Zuord. Steuerperiode“ = ${datumDe(b.tag)} (ursprünglicher Zeitraum).`),
-    ...(euAbschlaege.length ? [`Anzahlungen bzw. Abschläge auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland (${euAbschlaege.map((u) => String(u.daten.nummer ?? "")).join(", ")}): Sie gehören nicht in Kz 41/21 und nicht in die Zusammenfassende Meldung – gemeldet wird erst die Lieferung bzw. Leistung mit dem vollen Entgelt (Schlussrechnung, § 18b Satz 2 und 3 UStG). Im Stapel stehen sie wie andere Abschläge zum Zahltag auf dem Erlöskonto – bitte umbuchen bzw. das Konto mit der Kanzlei abstimmen.`] : []),
+    ...berichtigungen.map((b) => `Storno ${b.stornoNr} zu Rechnung ${b.rechnungNr}${b.ersatzNr ? ` (Ersatzrechnung ${b.ersatzNr})` : ""}: Fehler in der Rechnung mit EU-Umsatz – Zusammenfassende Meldung und Voranmeldung für ${periodeText(b.monat)} bzw. ${periodeText(b.quartal)}${b.ersatzTag && b.ersatzTag.slice(0, 7) !== b.monat && b.ersatzTag.slice(0, 7) < b.stornoDatum.slice(0, 7) ? ` (Ersatzrechnung: ${periodeText(b.ersatzTag.slice(0, 7))})` : ""} berichtigen, falls schon abgegeben – die ZM innerhalb eines Monats ab Erkennen des Fehlers (${datumDe(b.erkannt)}, also bis ${datumDe(b.zmFrist)}, § 18a Abs. 10 UStG), die Voranmeldung für denselben Zeitraum wie die ZM (das Finanzamt gleicht Kz 41 bzw. 21 und die ZM je Zeitraum ab; eine Korrektur in der laufenden Voranmeldung genügt nicht). Im Stapel zum Datum des Stornos gebucht, Feld „Datum Zuord. Steuerperiode“ = ${datumDe(b.tag)} (Tag, der den ursprünglichen Zeitraum bestimmt, § 18b UStG).${b.tag.slice(0, 4) !== b.stornoDatum.slice(0, 4) && imZeitraum(b.stornoDatum, z) ? ` Der ursprüngliche Zeitraum liegt in einem anderen Geschäftsjahr (${b.tag.slice(0, 4)}) als die Buchung (${b.stornoDatum.slice(0, 4)}) – die Umsatzsteuer gehört in die berichtigte Voranmeldung für ${periodeText(b.monat)}, nicht in die laufende; bitte im Testimport prüfen, wie DATEV Feld 116 aus dem Vorjahr zuordnet.` : ""}`),
+    ...(euAbschlaege.length || euAnz.buchungen.length || euAnz.fehlend.length
+      ? [
+          `Anzahlungen bzw. Abschläge auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland${euAbschlaege.length ? ` (${euAbschlaege.map((u) => String(u.daten.nummer ?? "")).join(", ")})` : ""}: Sie gehören nicht in Kz 41/21 und nicht in die Zusammenfassende Meldung – gemeldet wird erst die Lieferung bzw. Leistung mit dem vollen Entgelt (Schlussrechnung, § 18b Satz 2 und 3 UStG). ${
+            bilanz
+              ? `Im Stapel: bezahlte Anzahlung zum Zahltag Forderungen an „Erhaltene Anzahlungen auf Bestellungen“ (${k.anzahlungenErhalten}) ohne Steuerschlüssel; mit der Schlussrechnung das volle Entgelt auf ${k.erloese.igl} bzw. ${k.erloese.eu} (Feld „Datum Zuord. Steuerperiode“ nach § 18b UStG) und die Anzahlungen ${k.anzahlungenErhalten} an Forderungen verrechnet.`
+              : k.anzahlungEuEuer
+                ? `Einnahmen-Überschuss-Rechnung: Die Anzahlung ist mit der Zahlung Einnahme (§ 11 EStG) – im Stapel zum Zahltag Forderungen an ${k.anzahlungEuEuer} (Erlöskonto ohne Umsatzsteuerfunktion, Kontenvorgabe), mit dem Datum der Schlussrechnung umgebucht auf ${k.erloese.igl} bzw. ${k.erloese.eu} (Feld „Datum Zuord. Steuerperiode“ nach § 18b UStG).`
+                : `Einnahmen-Überschuss-Rechnung: Die Anzahlung ist mit der Zahlung Einnahme (§ 11 EStG), darf aber nicht auf ein Erlöskonto mit Umsatzsteuerfunktion. Das Erlöskonto ohne Umsatzsteuerfunktion ist in den Kontenvorgaben nicht festgelegt („Anzahlungen auf EU-Umsätze: Erlöskonto ohne Umsatzsteuer (EÜR)“, gibt die Kanzlei vor) – deshalb FEHLEN diese Buchungen im Stapel: ${euAnz.fehlend.map((f) => `${f.text} am ${datumDe(f.datum)} über ${betrag(f.cent)} € (RE ${f.nummer})`).join("; ") || "keine in diesem Zeitraum"}. Bitte das Konto in den Kontenvorgaben eintragen und das Paket neu erstellen oder diese Buchungen von Hand ergänzen.`
+          }`,
+          ...(euAnz.skontoVorMeldung.length ? [`Skonto auf Anzahlungen vor der Meldung der Lieferung bzw. Leistung (${euAnz.skontoVorMeldung.join(", ")}): mindert keinen früheren Zeitraum, sondern das mit der Schlussrechnung gemeldete Entgelt (§ 10 Abs. 1 UStG). Im Stapel zum Zahltag ohne Steuerschlüssel gegen ${bilanz ? k.anzahlungenErhalten : k.anzahlungEuEuer || "das Anzahlungskonto"}${bilanz ? `, mit der Schlussrechnung auf ${k.skontiGewaehrtIgl}/${k.skontiGewaehrtRc} mit Feld „Datum Zuord. Steuerperiode“ der Schlussrechnung` : ", umgebucht wird nur der verbleibende Betrag"}. Gibt es die Schlussrechnung noch nicht, mindert das Skonto noch keine Meldung.`] : []),
+        ]
+      : []),
     ...(skontoZm.length ? [`Skonto auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland (${skontoZm.map((u) => String(u.daten.nummer ?? "")).join(", ")}): Die Bemessungsgrundlage hat sich geändert (§ 17, § 18b Satz 4 UStG) – Kz 41 bzw. 21 und die Zusammenfassende Meldung des Zeitraums, in dem das Skonto abgezogen wurde (Zahltag), sind gemindert; die ursprüngliche Meldung bleibt. Im Stapel auf eigenen Skontokonten (${k.skontiGewaehrtIgl}/${k.skontiGewaehrtRc}, bitte prüfen) mit USt-IdNr.`] : []),
     ...(xmlNeu.length ? [`${xmlNeu.length} ${xmlNeu.length === 1 ? "E-Rechnung wurde" : "E-Rechnungen wurden"} vor der Speicherung des Originals festgeschrieben (${xmlNeu.slice(0, 10).join(", ")}) – die XML-Datei ist aus den festgeschriebenen Daten neu erzeugt, nicht die versandte Datei.`] : []),
     ...(protokollZeilen.length || ungueltig.length ? [`Änderungen nach der Festschreibung, Löschungen und ungültig markierte Belege stehen in ${[protokollZeilen.length ? `Aenderungsprotokoll_${z.name}.csv` : "", ungueltig.length ? `Belege_ungueltig_${z.name}.csv` : ""].filter(Boolean).join(" und ")} – so erklären sich Lücken in den ${MARKE.name}-Belegnummern.`] : []),
