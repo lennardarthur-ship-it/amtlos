@@ -44,9 +44,10 @@ describe("E-210: Lücken im Text von Impressum und Datenschutzerklärung", () =>
     const a = lies("src/seiten/Abschluss.tsx");
     // PDF teilen und drucken laufen beide über `ausgabe`
     const ausgabe = a.slice(a.indexOf("const ausgabe = async"), a.indexOf("const [eFehlt"));
-    expect(ausgabe).toMatch(/lueckenFrage\(v, u\.daten, betriebFuerDokument\(absenderFuer\(z\.stand, u\), z\.pro\)\)[\s\S]*if \(luecken && !\(await bestaetigen\(luecken\)\)\) return;[\s\S]*pdfTeilenMitHash/);
+    // E-220 (8b): Betrieb wie gedruckt (festgeschrieben der festgehaltene, sonst „Mein Betrieb“ nach der Pro-Regel)
+    expect(ausgabe).toMatch(/lueckenFrage\(v, u\.daten, druckBetrieb\(z\.stand, u, z\.pro\)\)[\s\S]*if \(luecken && !\(await bestaetigen\(luecken\)\)\) return;[\s\S]*pdfTeilenMitHash/);
     const text = a.slice(a.indexOf("symbol: \"doc.on.doc\""), a.indexOf("symbol: \"plus.circle\""));
-    expect(text).toMatch(/lueckenFrage\(v, d, z\.stand\.betrieb\)[\s\S]*bestaetigen\(luecken\)[\s\S]*Share\.share/);
+    expect(text).toMatch(/lueckenFrage\(v, d, absenderFuer\(z\.stand, u\)\)[\s\S]*bestaetigen\(luecken\)[\s\S]*Share\.share/);
     expect(a.match(/TEXT\.e210_luecken_hinweis\(luecken\)/g)).toHaveLength(2);
   });
 });

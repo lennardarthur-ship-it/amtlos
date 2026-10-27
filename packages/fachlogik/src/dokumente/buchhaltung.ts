@@ -121,12 +121,20 @@ export const istNullsatzText = (t: string | null | undefined) => NULLSATZ_IM_TEX
 /** Ist die Unterlage eine Gutschrift (Abrechnung durch den Leistungsempfänger)? */
 /**
  * Kleinbetragsrechnung (§ 33 UStDV, R11): Gesamtbetrag bis 250 € brutto – Name und Anschrift des Empfängers sind dann
- * keine Pflichtangabe; auf der Rechnung genügen Entgelt und Steuer in einer Summe mit dem Steuersatz. Nicht bei Storno,
- * Gutschrift, Steuerschuldnerschaft des Empfängers oder innergemeinschaftlicher Lieferung (§ 33 Satz 3 UStDV).
+ * keine Pflichtangabe; auf der Rechnung genügen Entgelt und Steuer in einer Summe mit dem Steuersatz. Nicht bei Storno
+ * und Gutschrift. § 33 Satz 3 UStDV: „Die Sätze 1 und 2 gelten nicht für Rechnungen über Leistungen im Sinne der
+ * §§ 3c, 6a und 13b des Gesetzes.“ – also nicht bei Steuerschuldnerschaft des Empfängers (auch „§ 13b“ im
+ * Befreiungshinweis, wie `steuerartAus`), innergemeinschaftlicher Lieferung und Fernverkauf. E-220: Fernverkauf = OSS
+ * eingeschaltet (Steuer des Bestimmungslands, § 3c UStG); vorsorglich auch jede Privatperson im EU-Ausland ohne OSS
+ * (Fernverkauf unter der Schwelle des § 3c Abs. 4 UStG – ob § 33 Satz 3 dann greift, klärt T-299). Die App trennt
+ * Waren und Dienstleistungen nicht; die vollen Angaben nach § 14 Abs. 4 UStG sind in jedem Fall zulässig.
  */
 export const KLEINBETRAG_CENT = 25000;
 export function kleinbetrag(d: Daten): boolean {
-  if (text(d, "storno_zu") || auswahl(d, "hinweise").some((h) => h === "gutschrift" || h === "reverse_charge" || h === "igl")) return false;
+  if (text(d, "storno_zu") || auswahl(d, "hinweise").includes("gutschrift")) return false;
+  const art = steuerartAus(d);
+  if (art === "reverse_charge" || art === "igl") return false;
+  if ((ja(d, "oss") && !kuFuer(d)) || euPrivatLand(d)) return false;
   const pos = positionen(d);
   if (!pos.length) return false;
   const brutto = summen(pos.map((x) => x.p), kuFuer(d)).brutto_cent;

@@ -52,6 +52,8 @@ export { RECHTSFORMEN } from "./bausteine.js";
 export { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN, arbeitsminuten, arbeitszeitPruefung, monatAus, monatSchluessel, stunden } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent, euroPreis, fassungText, preisCent, zahl } from "./html.js";
+/** E-220: zentrale HTML-Maskierung (& < > " ') für jedes HTML außerhalb der Vorlagen (Kontrollmappe usw.) */
+export { esc as htmlMaskieren } from "./html.js";
 export { PRUEF_ROLLEN, VORLAGEN_GEPRUEFT, freigabeBestaetigt, freigabenFuer, geprueftVermerk, sha256, type PruefRolle, type VorlagenFreigabe, type VorlagenNachweis } from "./geprueft.js";
 export { PRUEFSTAENDE } from "./pruefstaende.js";
 // StB-Prüfung Steuerberatungskanzlei (21.10.2026): Rechnungen, Voranmeldung, OSS und ZM

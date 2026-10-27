@@ -13,6 +13,7 @@ import { mitVorlagenHinweis } from "../rechtshinweis";
 import { drucken, pdfTeilenMitHash } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer, lueckenFrage } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
+import { ausgabeHtml, druckBetrieb, druckFesthalten, nachgebildet } from "../unterlagen/ausgabe";
 import { absenderFuer, geteiltOffenLetzte, geteilteVersionen, heute, zahlungPruefen, type EuStornoGrund } from "../unterlagen/speicher";
 import { einMonatNach, euBerichtigungSchluessel, euFehlerErkannt, euMeldeArtVon, euStornoGrund, euStornoGrundFest, euStornoTag, periodeText } from "../unterlagen/ustAusRechnungen";
 import { euroText, faelligAm, offenBrutto, rechnungBrutto } from "../unterlagen/ablage";
@@ -24,7 +25,7 @@ import { BetriebTeilSeite } from "./Absender";
 import { handwerkLaut, ohneZahlungsweg } from "./rechnungHinweise";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { useProSperre } from "./Pro";
-import { ausgabeErlaubt, ausgabeGrund, betriebFuerDokument, eRechnungErlaubt, erstellenErlaubt } from "../pro/regeln";
+import { ausgabeErlaubt, ausgabeGrund, eRechnungErlaubt, erstellenErlaubt } from "../pro/regeln";
 import { Ansage, useAnsage } from "./felder";
 import { GEWERBE_VORLAGE } from "../gewerbe/felder";
 import { GewerbeOnlineSeite } from "./GewerbeOnline";
@@ -88,7 +89,7 @@ export function useTeilen(id: string) {
     setFehler(null);
     if (v.kundendokument && fehltFuer(z.stand, u).length) return setFehler(TEXT.erst_vollstaendig);
     // E-210: Lücken im Text („[bitte ergänzen]“) – nachfragen, bevor ein unvollständiges Impressum hinausgeht
-    const luecken = lueckenFrage(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro));
+    const luecken = lueckenFrage(v, u.daten, druckBetrieb(z.stand, u, z.pro));
     if (luecken && !(await bestaetigen(luecken))) return;
     // E-188: eine noch nie ausgegebene Rechnung bzw. Vorlage nur mit Pro; erneutes Teilen, Stornos und Kassenbuch gehen immer
     if (!ausgabeErlaubt(u, z.pro) && !sperre(ausgabeGrund(u), undefined, { entwurf: true })) return;
@@ -97,18 +98,20 @@ export function useTeilen(id: string) {
     // Synchronisation), wird nicht festgeschrieben
     const pdfDaten = u.daten;
     try {
-      // R12 GoBD: festgeschrieben mit den festgehaltenen Absenderdaten; beim ersten Teilen werden die jetzigen festgehalten
-      const absender = absenderFuer(z.stand, u);
-      const html = dokumentHtml(v, pdfDaten, betriebFuerDokument(absender, z.pro));
+      // R12 GoBD: festgeschrieben mit den festgehaltenen Absenderdaten; beim ersten Teilen werden die jetzigen festgehalten.
+      // E-220 (8b): festgehalten wird, was gedruckt wird (Absender nach der Pro-Regel und das HTML); festgeschrieben genau
+      // das damals gedruckte Dokument
+      const absender = druckBetrieb(z.stand, u, z.pro);
+      const html = u.festgeschrieben ? ausgabeHtml(z.stand, u, z.pro) : dokumentHtml(v, pdfDaten, absender);
       const erg = art === "teilen" ? await pdfTeilenMitHash(html, pdfDateiname(v, u.daten, heute()), v.querformat) : { ok: await drucken(html, pdfDateiname(v, u.daten, heute()), v.querformat) };
       // abgebrochen: nichts festschreiben, nichts vom Freikontingent verbrauchen
       if (!erg.ok) return;
       const sha = "sha256" in erg ? erg.sha256 : undefined;
       // E-193 (4): Android meldet einen Abbruch des Teilen-Menüs (und des Druckdialogs) nicht – erst nach „Ja“ festschreiben;
       // bei „Nein“ bleibt der Entwurf, die ausgegebene Fassung wird vermerkt (später „Doch verschickt – festschreiben“)
-      if (!(await versandBestaetigt(u, v, art === "drucken"))) return z.teilenOffen(id, { daten: pdfDaten, art: art === "drucken" ? "druck" : "pdf", ...(sha ? { pdfSha256: sha } : {}), absender });
+      if (!(await versandBestaetigt(u, v, art === "drucken"))) return z.teilenOffen(id, { daten: pdfDaten, art: art === "drucken" ? "druck" : "pdf", ...(sha ? { pdfSha256: sha } : {}), absender, druck: druckFesthalten(html, absender.logo, new Date().toISOString()) });
       const erstesMal = !u.ausgegeben;
-      if (!z.ausgeben(id, pdfDaten, sha, absender)) return melden(TEXT.pdf_geaendert, "info");
+      if (!z.ausgeben(id, pdfDaten, sha, absender, false, html)) return melden(TEXT.pdf_geaendert, "info");
       if (erstesMal && v.festschreiben) z.erfolg();
     } catch {
       setFehler(TEXT.pdf_fehler);
@@ -125,7 +128,8 @@ export function useTeilen(id: string) {
     setFehler(null);
     // E-156/E-188: Erstellen gehört zu Pro – eine schon einmal geteilte E-Rechnung geht immer wieder hinaus
     if (!eRechnungErlaubt(u, z.pro) && !sperre("e_rechnung")) return;
-    const absender = absenderFuer(z.stand, u);
+    // E-220 (8b): wie beim PDF – festgehalten werden der gedruckte Absender und das Dokument (auch wenn zuerst die XRechnung hinausgeht)
+    const absender = druckBetrieb(z.stand, u, z.pro);
     const { daten, fehlt } = eRechnungAus(u.daten, absender);
     const alle = [...new Set([...fehltFuer(z.stand, u), ...fehlt])];
     setEFehlt(alle);
@@ -135,8 +139,9 @@ export function useTeilen(id: string) {
       // R12 GoBD: eine festgeschriebene Rechnung gibt ihr festgehaltenes Original weiter
       if (!(await dateiTeilen(`E-Rechnung-${dateinamenTeil(daten.nummer, 60) || "ohne-Nummer"}.xml`, u.festgeschrieben && u.xml ? u.xml : xrechnungUbl(daten, KU_HINWEIS), "application/xml"))) return;
       // E-193 (4): auf Android erst nach „Ja, festschreiben“ (wie beim PDF)
-      if (!(await versandBestaetigt(u, v, false))) return z.teilenOffen(id, { daten: xmlDaten, art: "xml", absender });
-      if (!z.ausgeben(id, xmlDaten, undefined, absender, true)) melden(TEXT.pdf_geaendert, "info");
+      const html = u.festgeschrieben ? undefined : dokumentHtml(v, xmlDaten, absender);
+      if (!(await versandBestaetigt(u, v, false))) return z.teilenOffen(id, { daten: xmlDaten, art: "xml", absender, ...(html ? { druck: druckFesthalten(html, absender.logo, new Date().toISOString()) } : {}) });
+      if (!z.ausgeben(id, xmlDaten, undefined, absender, true, html)) melden(TEXT.pdf_geaendert, "info");
     } catch {
       setFehler(TEXT.e_rechnung_fehler);
     }
@@ -166,13 +171,13 @@ function VorschauSeite({ id }: { id: string }) {
   const v = u ? vorlageFuer(u.vorlage) : undefined;
   if (!u || !v) return <Unterseite titel="">{null}</Unterseite>;
   // E-210: Lücken im Text auch in der Vorschau ansagen
-  const luecken = u.festgeschrieben ? 0 : offeneLuecken(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro));
+  const luecken = u.festgeschrieben ? 0 : offeneLuecken(v, u.daten, druckBetrieb(z.stand, u, z.pro));
   return (
     <Unterseite titel={TEXT.vorschau}>
       {/* das Dokument als Blatt Papier mit Rand und Schatten (E-144) */}
       <View style={{ flex: 1, padding: 16 }}>
         <View style={{ flex: 1, borderRadius: RADIUS.blatt, overflow: "hidden", backgroundColor: "#ffffff", shadowColor: "#120e3a", shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 6 }}>
-          <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro))} quer={v.querformat} />
+          <Vorschau html={ausgabeHtml(z.stand, u, z.pro)} quer={v.querformat} />
         </View>
       </View>
       <Fuss ueber={teilen.fehler ? <Ansage text={teilen.fehler} farbe={f.frist} /> : luecken ? <Ansage text={TEXT.e210_luecken_hinweis(luecken)} farbe={f.frist} /> : teilen.kontingent ? <T v="caption" leise>{teilen.kontingent.text}</T> : festschreibenHinweis(v, Boolean(u.festgeschrieben)) ? <T v="caption" leise>{festschreibenHinweis(v, Boolean(u.festgeschrieben))}</T> : null}>
@@ -222,8 +227,10 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const imFormular = new Set(jeSchritt.flat());
   // Prüfungen außerhalb der Schritte: einem Schritt zuordnen, wenn ein Feld dort so heißt; sonst „Mein Betrieb“ bzw. ohne Sprung
   const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: x === NUMMER_DOPPELT ? nummerSchritt : schrittFuer(v, x), betrieb: x.includes("Mein Betrieb") }));
-  const html = dokumentHtml(v, d, betriebFuerDokument(absenderFuer(z.stand, u), z.pro));
-  const luecken = offeneLuecken(v, d, betriebFuerDokument(absenderFuer(z.stand, u), z.pro));
+  // E-220 (8b): festgeschrieben das damals gedruckte Dokument (bzw. nachgebildet mit dem festgehaltenen Absender)
+  const html = ausgabeHtml(z.stand, u, z.pro);
+  const luecken = offeneLuecken(v, d, druckBetrieb(z.stand, u, z.pro));
+  const nachbild = nachgebildet(u);
   const ergebnis = v.ergebnis?.(d) ?? [];
   const fertig = alle.length === 0;
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(iso));
@@ -328,6 +335,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             {geteilt ? <Hinweis art="erfolg" symbol="checkmark.circle" text={TEXT.geteilt_text(datumDe(u.festgeschrieben!))} /> : <Hinweis symbol="lock" text={TEXT.festgeschrieben_text(datumDe(u.festgeschrieben!), Boolean(v.storno))} />}
             {storno ? <Hinweis art="erfolg" text={TEXT.storniert_durch(String(storno.daten.nummer ?? ""))} /> : null}
             {typeof d.storno_zu === "string" && d.storno_zu ? <Hinweis text={TEXT.storniert_zu(d.storno_zu)} /> : null}
+            {nachbild ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.e220_nachgebildet(nachbild.nachgetragen ? zeitDe(nachbild.nachgetragen) : null, u.pdfSha256 ?? null)}</T> : null}
             {v.storno && !u.storniertDurch ? <Zahlung id={id} /> : null}
           </View>
         ) : null}
@@ -419,9 +427,9 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             { symbol: "printer", titel: TEXT.mitPro(TEXT.drucken, ausgabeErlaubt(u, z.pro)), los: () => void druckenLos() },
             // E-210: mit Lücken erst nach Rückfrage
             ...(v.alsText ? [{ symbol: "doc.on.doc", titel: TEXT.als_text, los: () => void (async () => {
-              const luecken = lueckenFrage(v, d, z.stand.betrieb);
+              const luecken = lueckenFrage(v, d, absenderFuer(z.stand, u));
               if (luecken && !(await bestaetigen(luecken))) return;
-              await Share.share({ message: v.alsText!(d, z.stand.betrieb) });
+              await Share.share({ message: v.alsText!(d, absenderFuer(z.stand, u)) });
             })().catch(() => undefined) }] : []),
             {
               symbol: "plus.circle",

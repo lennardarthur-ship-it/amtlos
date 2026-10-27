@@ -14,6 +14,7 @@ import { istErledigt } from "../pflichten/check";
 import { useAuswertung } from "./Pflichten";
 import { useOeffnen, useStarten } from "./starten";
 import { pdfBytes } from "../unterlagen/pdf";
+import { ausgabeHtml, fassungHtml } from "../unterlagen/ausgabe";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
 import { HAUPT_STAETTE, alleStaetten, heute, personenSortiert, staetteVon } from "../unterlagen/speicher";
 import { PersonSeite } from "./Betrieb";
@@ -202,7 +203,11 @@ export function KontrollmappeSeite() {
         // R12: Kassenbuch aus den Tagesabschlüssen hat keine gespeicherte Unterlage; frühere Fassungen ihre eigenen Daten
         const daten = e.daten ?? u?.daten;
         if (!daten || !v) continue;
-        const bytes = await pdfBytes(dokumentHtml(v, daten, b), pdfDateiname(v, daten, tag), v.querformat);
+        // E-220 (8b): festgeschriebene Unterlagen und frühere Fassungen genau wie ausgegeben (bzw. mit ihrem festgehaltenen
+        // Absender), nicht mit „Mein Betrieb“ von heute
+        const fassung = e.daten && u ? u.fassungen?.find((f) => f.daten === e.daten || JSON.stringify(f.daten) === JSON.stringify(e.daten)) : undefined;
+        const html = fassung && u ? fassungHtml(z.stand, u.vorlage, fassung, z.pro) : u && !e.daten ? ausgabeHtml(z.stand, u, z.pro) : dokumentHtml(v, daten, b);
+        const bytes = await pdfBytes(html, pdfDateiname(v, daten, tag), v.querformat);
         if (!bytes) throw new Error("pdf");
         teile.push(bytes);
         drin.push(e);

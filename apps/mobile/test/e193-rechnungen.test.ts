@@ -221,7 +221,8 @@ describe("4: Android – Teilen abgebrochen zählt nicht als verschickt", () => 
     expect(lies("seiten/versand.ts")).toContain("if (!v.festschreiben || u.festgeschrieben) return true;");
     const a = lies("seiten/Abschluss.tsx");
     expect(a).toContain('if (!(await versandBestaetigt(u, v, art === "drucken"))) return z.teilenOffen(id, { daten: pdfDaten, art: art === "drucken" ? "druck" : "pdf"');
-    expect(a).toContain('if (!(await versandBestaetigt(u, v, false))) return z.teilenOffen(id, { daten: xmlDaten, art: "xml", absender });');
+    // E-220 (8b): mit dem gedruckten Dokument (festgehalten, falls die Fassung später festgeschrieben wird)
+    expect(a).toContain('if (!(await versandBestaetigt(u, v, false))) return z.teilenOffen(id, { daten: xmlDaten, art: "xml", absender, ...(html ? { druck: druckFesthalten(html, absender.logo, new Date().toISOString()) } : {}) });');
     expect(a).toContain("z.geteiltFestschreiben(id)");
     expect(lies("seiten/Kasse.tsx")).toContain("versandBestaetigt(");
     // iPhone: das Teilen-Menü von React Native meldet den Abbruch (E-127) – unverändert

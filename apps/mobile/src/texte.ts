@@ -168,6 +168,9 @@ export const T = {
   festgeschrieben_titel: "Festgeschrieben",
   geteilt_titel: "Rechnung geteilt",
   geteilt_text: (datum: string) => `Geteilt am ${datum}. Ab jetzt bleibt die Rechnung unverändert – korrigieren geht per Stornorechnung.`,
+  // E-220 (8b): vor dieser Version festgeschrieben – kein festgehaltenes Dokument, die Ansicht ist nachgebildet
+  e220_nachgebildet: (nachgetragen: string | null, pdfSha256: string | null) =>
+    `Vor dem Update festgeschrieben: Die Ansicht ist aus den festgeschriebenen Daten nachgebildet${nachgetragen ? ` – mit den Angaben aus „Mein Betrieb“ vom ${nachgetragen}, nicht unbedingt denen beim Teilen` : ""}. Maßgeblich ist das damals geteilte PDF${pdfSha256 ? ` (Prüfwert SHA-256 ${pdfSha256.slice(0, 16)}…)` : ""}.`,
   festgeschrieben_text: (datum: string, storno: boolean) => `Festgeschrieben am ${datum}. Änderungen und Löschen sind nicht mehr möglich${storno ? " – korrigieren lässt sie sich nur per Stornorechnung." : "."}`,
   festgeschrieben_kurz: "festgeschrieben",
   storniert: "storniert",

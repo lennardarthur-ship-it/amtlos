@@ -13,6 +13,7 @@ import { Vorschau } from "../ui/Vorschau";
 import { belegFoto } from "../unterlagen/belegfoto";
 import { kassenMonat, kassenMonate, offeneLadenkasse, ruhetage } from "../unterlagen/kasse";
 import { pdfTeilen } from "../unterlagen/pdf";
+import { druckHtml } from "../unterlagen/druck";
 import { utf8 } from "../unterlagen/sicherung";
 import { dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { kassenbuchAnzeige } from "../unterlagen/kassenbuchAnzeige";
@@ -206,7 +207,8 @@ function KassenbuchSeite({ monat, standort }: { monat: string; standort: string 
   if (!daten) return <Unterseite titel={TEXT.r12g_kassenbuch_titel(monatText(monat))}>{null}</Unterseite>;
   const gleich = fest && JSON.stringify(fest.daten) === JSON.stringify(daten);
   // StB GoBD (D-9): „aus den Tagesabschlüssen, nur lesbar“ mit Fassung und Erstellungszeitpunkt auf jeder Seite
-  const html = dokumentHtml(v, kassenbuchAnzeige(z.stand, daten, fest, standort), z.stand.betrieb);
+  // E-220 (8b): unverändert festgeschrieben – genau das damals geteilte Kassenbuch (mit dem damaligen Absender)
+  const html = gleich && fest?.druck ? druckHtml(fest.druck, fest.absender) : dokumentHtml(v, kassenbuchAnzeige(z.stand, daten, fest, standort), z.stand.betrieb);
   const teilen = async () => {
     setLaedt(true);
     try {
@@ -214,7 +216,7 @@ function KassenbuchSeite({ monat, standort }: { monat: string; standort: string 
       if (!ok) return;
       // E-193 (4): Android meldet einen Abbruch des Teilens nicht – erst nach „Ja, festschreiben“
       if (!(await versandBestaetigt({ festgeschrieben: gleich && fest ? fest.festgeschrieben : undefined }, v, false))) return;
-      z.kassenbuchFestschreiben(monat, standort, daten, bytesToHex(sha256(utf8(JSON.stringify(daten)))));
+      z.kassenbuchFestschreiben(monat, standort, daten, bytesToHex(sha256(utf8(JSON.stringify(daten)))), z.stand.betrieb, html);
       melden(TEXT.r12g_kassenbuch_geteilt);
     } catch {
       melden(TEXT.pdf_fehler, "info");
