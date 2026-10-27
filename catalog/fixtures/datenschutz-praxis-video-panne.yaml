@@ -21,9 +21,9 @@ erwartet:
   datenschutz.dsfa: gilt
   datenschutz.videoueberwachung: gilt
   it_sicherheit.nis2_pruefen: gilt_nicht
-  # Vorprüfung 21.10.2026 (T-105): 8 Beschäftigte, nicht IT – Registrierung und Meldepflichten ausgeblendet
-  it_sicherheit.nis2_registrierung: gilt_nicht
-  it_sicherheit.nis2_meldepflichten: gilt_nicht
+  # E-217 (Rechtsanwalt 27.10.2026, T-287): ausdrückliches NIS2 „ja“ gilt unabhängig von der Größe (vorher T-105: 8 Beschäftigte ausgeblendet)
+  it_sicherheit.nis2_registrierung: gilt
+  it_sicherheit.nis2_meldepflichten: gilt
   ki.kompetenz: gilt_nicht
   datenschutz.datenpanne_meldung: gilt
   # Prüfvermerk Rechtsanwalt 22.10.2026: Benachrichtigung der Betroffenen (Art. 34 DSGVO) als eigene Pflicht

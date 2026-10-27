@@ -129,23 +129,47 @@ const NIS2 = ["it_agentur_freelancer", "sonstige", ...NIS2_NEU];
 const SATZ_BILANZ = "Liegt deine Bilanzsumme bei höchstens 10 Mio. €, bist du trotzdem nicht erfasst.";
 
 describe("E-217 B2) NIS2 nach den Vorgaben des Rechtsanwalts", () => {
-  it("(a) unter 50 statt unter 10: 30 Beschäftigte mit Umsatz bis 10 Mio. € – nicht erfasst, auch bei „ja“; ab 50 erfasst", () => {
+  const JA = { "nis2.betroffen": "ja", "nis2.betroffen_seit": "2026-01-01" };
+  it("(a) unter 50 statt unter 10: ohne Antwort zu NIS2 mit 30 Beschäftigten und Umsatz bis 10 Mio. € nicht betroffen; ab 50 „hängt ab“", () => {
     for (const b of ["sonstige", "handwerk", "gastronomie_lebensmittel"]) {
-      const a = auswertung(basis(b, 30, { "umsatz.vorjahr": 4_000_000, "nis2.betroffen": "ja", "nis2.betroffen_seit": "2026-01-01" }), STICHTAG);
+      const a = auswertung(basis(b, 30, { "umsatz.vorjahr": 4_000_000 }), STICHTAG);
       for (const id of [REG_ID, MELDE_ID]) expect(sichtbar(a, id), `${b} ${id}`).toBe(false);
-      const gross = auswertung(basis(b, 50, { "umsatz.vorjahr": 4_000_000, "nis2.betroffen": "ja", "nis2.betroffen_seit": "2026-01-01" }), STICHTAG);
-      for (const id of [REG_ID, MELDE_ID]) expect(gilt(gross, id), `${b} 50 ${id}`).toBe(true);
+      const gross = auswertung(basis(b, 50, { "umsatz.vorjahr": 4_000_000 }), STICHTAG);
+      for (const id of [REG_ID, MELDE_ID]) expect(haengtAb(gross, id), `${b} 50 ${id}`).toBeDefined();
     }
   });
-  it("(a) außerhalb der NIS2-Branchen unter 50 ohne Umsatz nicht erfasst (Handwerk 30)", () => {
-    const a = auswertung(basis("handwerk", 30, { "nis2.betroffen": "ja", "nis2.betroffen_seit": "2026-01-01" }), STICHTAG);
+  it("(a) außerhalb der NIS2-Branchen unter 50 ohne Antwort und ohne Umsatz nicht betroffen (Handwerk 30)", () => {
+    const a = auswertung(basis("handwerk", 30), STICHTAG);
     for (const id of [REG_ID, MELDE_ID, PRUEF_ID]) expect(sichtbar(a, id), id).toBe(false);
   });
-  it("(b) IT wie „Andere“: unter 50 mit Umsatz bis 10 Mio. € nicht erfasst; ohne Umsatz „hängt ab“ mit Frage nach dem Umsatz", () => {
-    const klein = auswertung(basis("it_agentur_freelancer", 5, { "umsatz.vorjahr": 400_000, "nis2.betroffen": "ja", "nis2.betroffen_seit": "2026-01-01" }), STICHTAG);
+  it("(b) IT wie „Andere“: ohne Antwort zu NIS2 unter 50 mit Umsatz bis 10 Mio. € nicht betroffen; ohne Umsatz „hängt ab“ mit Frage nach dem Umsatz", () => {
+    const klein = auswertung(basis("it_agentur_freelancer", 5, { "umsatz.vorjahr": 400_000 }), STICHTAG);
     for (const id of [REG_ID, MELDE_ID]) expect(sichtbar(klein, id), id).toBe(false);
     const offen = auswertung(basis("it_agentur_freelancer", 5), STICHTAG);
     for (const id of [REG_ID, MELDE_ID]) expect(haengtAb(offen, id)?.offeneFragen, id).toEqual(expect.arrayContaining(["nis2.betroffen", "umsatz.vorjahr"]));
+  });
+  it("T-287: NIS2 „ja“ gilt unabhängig von Größe, Umsatz und Branche (größenunabhängige Fälle über die Frage); „nein“ nie", () => {
+    for (const b of BRANCHEN) {
+      const ja = auswertung(basis(b, 2, { "umsatz.vorjahr": 150_000, ...JA }), STICHTAG);
+      for (const id of [REG_ID, MELDE_ID]) expect(gilt(ja, id), `${b} ja ${id}`).toBe(true);
+      const nein = auswertung(basis(b, 2, { "umsatz.vorjahr": 150_000, "nis2.betroffen": "nein" }), STICHTAG);
+      for (const id of [REG_ID, MELDE_ID, PRUEF_ID]) expect(sichtbar(nein, id), `${b} nein ${id}`).toBe(false);
+    }
+    // kleiner IT-Betrieb (z. B. DNS-Dienst) mit „ja“: beide gelten, Registrierung mit Termin drei Monate ab Betroffenheit
+    const it = auswertung(basis("it_agentur_freelancer", 3, { "umsatz.vorjahr": 400_000, ...JA }), STICHTAG);
+    const reg = it.gilt.find((p) => p.id === REG_ID)!;
+    expect(reg.naechsterTermin ?? reg.vergangeneTermine?.[0] ?? null).toBeTruthy();
+    expect(gilt(it, MELDE_ID)).toBe(true);
+  });
+  it("T-287: „Weiß ich nicht“ – unter 50 ohne Umsatz in einer NIS2-Branche: „NIS2 prüfen“ mit der Frage; mit Umsatz bis 10 Mio. € Registrierung und Meldepflichten nicht betroffen", () => {
+    for (const b of NIS2) {
+      const offen = auswertung(basis(b, 5, { "nis2.betroffen": "unklar" }), STICHTAG);
+      expect(sichtbar(offen, PRUEF_ID), b).toBe(true);
+      for (const id of [REG_ID, MELDE_ID]) expect(sichtbar(offen, id), `${b} ${id}`).toBe(false);
+      const klein = auswertung(basis(b, 5, { "nis2.betroffen": "unklar", "umsatz.vorjahr": 900_000 }), STICHTAG);
+      // Registrierung und Meldepflichten nicht betroffen; „NIS2 prüfen“ bleibt in den NIS2-Branchen (v5, unverändert)
+      for (const id of [REG_ID, MELDE_ID]) expect(sichtbar(klein, id), `${b} klein ${id}`).toBe(false);
+    }
   });
   it("(c) Gesundheit und Pflege, Transport und Logistik, Gastronomie und Lebensmittel: ohne Umsatz „hängt ab“ (Rückfrage NIS2 und Umsatz), bis 10 Mio. € nicht erfasst, darüber erfasst", () => {
     for (const b of NIS2_NEU) {
@@ -154,8 +178,8 @@ describe("E-217 B2) NIS2 nach den Vorgaben des Rechtsanwalts", () => {
       expect(sichtbar(offen, PRUEF_ID), b).toBe(true);
       const klein = auswertung(basis(b, 5, { "umsatz.vorjahr": 900_000 }), STICHTAG);
       for (const id of [REG_ID, MELDE_ID, PRUEF_ID]) expect(sichtbar(klein, id), `${b} ${id}`).toBe(false);
-      const ueber = auswertung(basis(b, 5, { "umsatz.vorjahr": 12_000_000, "nis2.betroffen": "ja", "nis2.betroffen_seit": "2026-01-01" }), STICHTAG);
-      for (const id of [REG_ID, MELDE_ID]) expect(gilt(ueber, id), `${b} ${id}`).toBe(true);
+      const ueber = auswertung(basis(b, 5, { "umsatz.vorjahr": 12_000_000 }), STICHTAG);
+      for (const id of [REG_ID, MELDE_ID]) expect(haengtAb(ueber, id)?.offeneFragen, `${b} ${id}`).toEqual(expect.arrayContaining(["nis2.betroffen"]));
     }
   });
   it("übrige Branchen unter 50 ohne Umsatz weiter nicht erfasst (kein Industrie-Eintrag in der Branchenliste, Handwerk nicht ausdrücklich Herstellung)", () => {
@@ -173,10 +197,11 @@ describe("E-217 B2) NIS2 nach den Vorgaben des Rechtsanwalts", () => {
     for (const t of [SATZ_BILANZ]) expect(EN.some((x) => x.de.includes(t)), t).toBe(true);
   });
   it("neue Versionen vom Rechtsanwalt bestätigt (Mail 27.10.2026, ohne erneute Vorlage)", () => {
-    for (const [id, v] of [[REG_ID, 6], [MELDE_ID, 5], [PRUEF_ID, 5]] as const) {
+    for (const [id, v] of [[REG_ID, 7], [MELDE_ID, 6], [PRUEF_ID, 5]] as const) {
       const p = pflicht(id);
       expect(p.version, id).toBe(v);
       expect(block("recht", id, v), id).toBeDefined();
+      expect(block("recht", id, v)!.nachweis.umfang.replace(/\s+/g, " "), id).toContain("NIS2 ja ⇒ unabhängig von der Größe, wie in seiner Antwort");
       expect(pruefVermerk(p.version, p.pruefung, AM), id).toMatch(/Rechtsanwalt, Stand 27\.10\.2026/);
     }
   });
@@ -189,7 +214,7 @@ describe("E-217: alle Einträge mit Vermerk", () => {
     const zahl = (r: string) => pflichten.filter((p) => pruefVermerk(p.version, p.pruefung, AM) && p.pruefung!.geprueft_von!.includes(r)).length;
     expect([zahl("recht"), zahl("steuern")]).toEqual([166, 35]);
   });
-  it("PRUEFLISTE: T-278 und T-282 erledigt", () => {
-    for (const t of ["T-278", "T-282"]) expect(PRUEFLISTE.find((z) => z.startsWith(`| ${t} |`)), t).toMatch(/Erledigt 27\.10\.2026.*E-217/);
+  it("PRUEFLISTE: T-278, T-282 und T-287 erledigt", () => {
+    for (const t of ["T-278", "T-282", "T-287"]) expect(PRUEFLISTE.find((z) => z.startsWith(`| ${t} |`)), t).toMatch(/Erledigt 27\.10\.2026.*E-217/);
   });
 });
