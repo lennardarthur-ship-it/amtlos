@@ -20,7 +20,7 @@
  */
 import type { Betrieb } from "@amtlos/fachlogik";
 import { dringlichkeit, type Auswertung } from "../pflichten/check";
-import type { Unterlage } from "../unterlagen/speicher";
+import type { Stand, Unterlage } from "../unterlagen/speicher";
 
 /** Pflichten, die ohne Pro mit Titel, Kurztext und Termin erscheinen (E-188). */
 export const PFLICHTEN_FREI = 3;
@@ -47,6 +47,33 @@ const istStorno = (u: Pick<Unterlage, "daten">) => typeof u.daten.storno_zu === 
 export const erstellenErlaubt = (pro: boolean) => pro;
 /** Kasse: neue Kassendaten erfassen nur mit Pro (Ansehen, Korrigieren, Kassenbuch teilen gehen immer). */
 export const kasseErfassenErlaubt = erstellenErlaubt;
+
+type NeuStand = Pick<Stand, "unterlagen" | "belege" | "kasse" | "kassenstuerze" | "sachentnahmen">;
+
+/**
+ * E-219: Legt der Schritt von `vorher` zu `nachher` neue Pro-Daten an – und welche Pro-Funktion fehlt dann? Neu ist, was
+ * es vorher (mit dieser ID) nicht gab: eine Unterlage (Rechnung → „rechnungen“, sonst „pdf“), ein Beleg („belege“), ein
+ * Kassentag, Kassensturz oder eine Sachentnahme („kasse“). Frei bleiben (null): Ändern und Korrigieren von Vorhandenem,
+ * ein Storno (GoBD) und das Kassenbuch erfasster Tage. Gerechnet über den ganzen Stand – damit fängt diese eine Prüfung
+ * jeden Weg zum Anlegen ab (Liste, Kopie, Ersatzrechnung, E-Rechnung empfangen …), auch einen, den es heute noch nicht gibt.
+ */
+export function neuanlageGrund(vorher: NeuStand, nachher: NeuStand): ProFunktion | null {
+  const neu = <T extends { id: string }>(a: readonly T[], b: readonly T[]) => {
+    const alt = new Set(a.map((x) => x.id));
+    return b.filter((x) => !alt.has(x.id));
+  };
+  for (const u of neu(vorher.unterlagen, nachher.unterlagen)) if (!istStorno(u) && !u.stornoZuId && !IMMER_FREI.has(u.vorlage)) return ausgabeGrund(u);
+  if (neu(vorher.belege, nachher.belege).length) return "belege";
+  if (neu(vorher.kasse, nachher.kasse).length || neu(vorher.kassenstuerze, nachher.kassenstuerze).length || neu(vorher.sachentnahmen, nachher.sachentnahmen).length) return "kasse";
+  return null;
+}
+
+/**
+ * E-219: Darf der Schritt so gespeichert werden? Mit Pro immer; ohne Pro nur, wenn er nichts Neues anlegt
+ * (`neuanlageGrund`). Die Handlungen des Zustands (`zustand.tsx`) prüfen damit jede Neuanlage – auch wenn eine Seite
+ * vergisst, vorher den Bezahlschirm zu zeigen.
+ */
+export const neuanlageErlaubt = (vorher: NeuStand, nachher: NeuStand, pro: boolean) => pro || neuanlageGrund(vorher, nachher) === null;
 
 /**
  * Darf diese Unterlage jetzt geteilt oder gedruckt werden? Mit Pro immer. Ohne Pro: was schon einmal ausgegeben wurde

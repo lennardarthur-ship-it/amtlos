@@ -95,25 +95,28 @@ QR-Code neu scannen. Hilft das nicht: Ordner „node_modules“ löschen und „
 RUNDGANG DURCH DIE APP
 
 Unten vier Tabs – Heute · Pflichten · Unterlagen · Mein Betrieb – und rechts der Knopf „+“ für alles Neue.
+Ohne Pro geht nur der Pflichten-Check mit den ersten 3 Pflichten (siehe „Kostenlos und Pro“); was hier mit (Pro)
+markiert ist, braucht Pro – in dieser Testversion „Pro testweise einschalten“.
 
 - Pflichten-Check (Tab „Pflichten“): ein paar Fragen zum Betrieb – Rechtsform (auch OHG und KG), Branche,
   Beschäftigte, Kasse, Website … –, dann zeigt die App, welche Pflichten nach deinen Angaben in Frage kommen,
-  mit Termin, Kurztext und Abhaken. „Erinnerungen“ einschalten (Mitteilungen erlauben): Die App erinnert 3 Tage vor
-  jedem Termin, ganz ohne Server.
-- Heute: der Pflichten-Kompass – wie viele Pflichten jetzt dran sind und wie viele schon erledigt; darunter was als Nächstes dran ist, die Kontrollmappe, offene Rechnungen, die Kasse des Tages, Belege.
+  mit Termin, Kurztext und Abhaken (ohne Pro die ersten 3). „Erinnerungen“ einschalten (Pro, Mitteilungen erlauben):
+  Die App erinnert 3 Tage vor jedem Termin, ganz ohne Server.
+- Heute: der Pflichten-Kompass – wie viele Pflichten jetzt dran sind und wie viele schon erledigt; darunter was als Nächstes dran ist, die Kontrollmappe, offene Rechnungen, die Kasse des Tages, Belege (Pro).
 - „+“: „Rechnung“, „Beleg“ oder unter „Wofür brauchst du eine Unterlage?“ den Anlass wählen (z. B. „Ich stelle
-  jemanden ein“). Schritt für Schritt ausfüllen, unten „Weiter“; am Ende das Dokument ansehen und „PDF teilen“.
+  jemanden ein“). Schritt für Schritt ausfüllen, unten „Weiter“; am Ende das Dokument ansehen und „PDF teilen“ (Pro).
   Jede Unterlage hat ihren eigenen Aufbau (Brief, Vertrag, Aushang, Nachweis, Vordruck, Handbuch).
-- Rechnungen: Pflichtangaben, Storno, Gutschrift, Abschlag, GiroCode zum Scannen mit der Banking-App; an Firmen
-  auch als E-Rechnung (XRechnung). Nach dem Teilen „Zahlung eingegangen“ vermerken.
-- Belege: Foto, Datei oder E-Rechnung (XRechnung/ZUGFeRD aus der Dateien-App) – E-Rechnungen füllen sich selbst aus.
-- Kasse: Tagesabschluss aus dem Z-Bon, Kassenbuch, Kassensturz mit Zählprotokoll.
-- Steuern: Umsatzsteuer-Voranmeldung und EÜR übernehmen die Werte aus Rechnungen, Belegen und Kasse („Aus Rechnungen
+- Rechnungen (Pro): Pflichtangaben, Storno, Gutschrift, Abschlag, GiroCode zum Scannen mit der Banking-App; an Firmen
+  auch als E-Rechnung (XRechnung); stornieren geht immer. Nach dem Teilen „Zahlung eingegangen“ vermerken.
+- Belege: Foto, Datei oder E-Rechnung (XRechnung/ZUGFeRD aus der Dateien-App) – E-Rechnungen füllen sich selbst aus (Pro).
+- Kasse: Tagesabschluss aus dem Z-Bon, Kassenbuch, Kassensturz mit Zählprotokoll (Pro; das Kassenbuch erfasster Tage
+  bleibt immer teilbar).
+- Steuern (Pro): Umsatzsteuer-Voranmeldung und EÜR übernehmen die Werte aus Rechnungen, Belegen und Kasse („Aus Rechnungen
   und Belegen übernehmen“); „Mein Betrieb → Paket für die Steuerberatung“ erzeugt ein ZIP mit DATEV-Buchungsstapel,
   Listen und Belegen. Die Werte trägst du selbst in ELSTER ein.
-- Unterlagen: alles, was du angelegt hast – mit Summe der offenen Rechnungen, Filtern und Suche.
+- Unterlagen: alles, was du angelegt hast – mit Summe der offenen Rechnungen, Filtern und Suche (bleibt immer sichtbar).
 - Mein Betrieb: Betrieb (Name, Adresse, Rechtsform, verantwortliche Person), Steuer und Bank, Briefkopf (Logo und
-  Hausfarbe), Mitarbeiter, Kunden, Betriebsstätten; „Kontrollmappe“ bündelt die Nachweise für eine Kontrolle.
+  Hausfarbe, Pro), Mitarbeiter, Kunden, Betriebsstätten; „Kontrollmappe“ bündelt die Nachweise für eine Kontrolle (Pro).
 - Deine Daten (Mein Betrieb): alles liegt verschlüsselt nur auf dem Smartphone, auf Wunsch mit Face ID bzw.
   Fingerabdruck gesperrt. „Daten sichern“ erstellt eine mit deinem Passwort verschlüsselte Datei, „Sicherung
   wiederherstellen“ spielt sie zurück. Android: „Automatisch in einen Ordner sichern“ (Pro) – einmal einen Ordner

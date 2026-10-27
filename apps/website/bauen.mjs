@@ -99,7 +99,7 @@ const jsonLd = {
   operatingSystem: "iOS, Android",
   applicationCategory: "BusinessApplication",
   inLanguage: "de",
-  description: "Welche Pflichten hat dein Betrieb – und hast du alles erledigt? Pflichten-Check mit Terminen, Erinnerung, 43 Vorlagen und Kontrollmappe für kleine Betriebe in Deutschland; dazu Rechnungen und Kasse. Daten verschlüsselt auf dem Smartphone (iPhone und Android), ohne Konto.",
+  description: "Welche Pflichten hat dein Betrieb – und hast du alles erledigt? Pflichten-Check mit Terminen, Erinnerung, 43 Vorlagen und Kontrollmappe für kleine Betriebe in Deutschland; dazu Rechnungen und Kasse. Pflichten-Check kostenlos ausprobieren, alles Weitere mit Pro. Daten verschlüsselt auf dem Smartphone (iPhone und Android), ohne Konto.",
   ...(url ? { url: `${url}/`, image: `${url}/bilder/og.jpg` } : {}),
   ...(appStoreId ? { downloadUrl: appStoreUrl, offers: { "@type": "Offer", price: "0", priceCurrency: "EUR", url: appStoreUrl } } : {}),
 };

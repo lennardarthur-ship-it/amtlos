@@ -16,7 +16,7 @@ import { istKleinunternehmer } from "../unterlagen/steuerpaket";
 import { gemischteUmsaetze, nurSteuerfreieUmsaetze, vorsteuerquoteAus } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
 import { erstellenErlaubt } from "../pro/regeln";
-import { ProSeite } from "./Pro";
+import { ProSeite, useProSperre } from "./Pro";
 import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, GrosserBetrag, datumKurz } from "./gemeinsam";
 import { useAnsage } from "./felder";
@@ -32,11 +32,21 @@ const MIME: Record<string, string> = { jpg: "image/jpeg", jpeg: "image/jpeg", pn
 /**
  * Beleg erfassen (E-133): Foto, Datei (PDF, Bild, E-Rechnung) oder von Hand. Eine E-Rechnung (XRechnung, ZUGFeRD)
  * füllt den Beleg selbst aus; die Originaldatei wird unverändert und verschlüsselt aufbewahrt.
+ *
+ * E-219: Die Sperre (E-188: neue Belege nur mit Pro) sitzt hier, im Hook selbst – nicht nur auf der Seite „Beleg
+ * erfassen“. Die Karte am Ende von „Unterlagen“ nutzt den Hook direkt und legte so ohne Pro beliebig viele Belege an.
+ * Ohne Pro öffnet jede Möglichkeit den Bezahlschirm mit Anlass, bevor Kamera oder Dateiauswahl aufgehen; nach dem Kauf
+ * geht es gleich weiter.
  */
 export function useBelegErfassen() {
   const z = useAmtlos();
   const nav = useNav();
   const melden = useMeldung();
+  const sperre = useProSperre();
+  const mitPro = (los: () => void | Promise<void>) => () => {
+    if (erstellenErlaubt(z.pro)) return void los();
+    sperre("belege", () => void los());
+  };
   // Startwert für „Vorsteuer abziehbar“: aus der Antwort im Pflichten-Check
   const ku = z.stand.profil["ust.kleinunternehmer"] === true;
   // R11: Rechnungsdatum der E-Rechnung in der Kleinunternehmerzeit („Mein Betrieb“) – Vorsteuer aus
@@ -50,8 +60,8 @@ export function useBelegErfassen() {
   };
   return {
     kameraVerweigert,
-    hand: () => anlegen(leererBeleg("hand", null, ku)),
-    foto: async (kamera: boolean) => {
+    hand: mitPro(() => anlegen(leererBeleg("hand", null, ku))),
+    foto: (kamera: boolean) => mitPro(async () => {
       try {
         const bytes = await belegFoto(kamera);
         if (!bytes) return;
@@ -61,8 +71,8 @@ export function useBelegErfassen() {
         if ((e as Error).message === "kamera") setKameraVerweigert(true);
         else melden(TEXT.beleg_fehler, "info");
       }
-    },
-    datei: async () => {
+    })(),
+    datei: mitPro(async () => {
       try {
         const d = await dateiWaehlenBytes(["application/pdf", "application/xml", "text/xml", "image/*"]);
         if (!d) return;
@@ -84,18 +94,20 @@ export function useBelegErfassen() {
       } catch {
         melden(TEXT.beleg_fehler, "info");
       }
-    },
+    }),
   };
 }
 
 /** Möglichkeiten zum Erfassen als Karte – auf „Vorlagen“ und in der Ablage. */
 export function BelegErfassen({ kompakt }: { kompakt?: boolean }) {
   const e = useBelegErfassen();
+  // E-219: ohne Pro steht an jeder Möglichkeit „· Pro“ (wie „Tagesabschluss erfassen · Pro“)
+  const pro = erstellenErlaubt(useAmtlos().pro);
   const zeilen = [
-    ...(istNativ ? [{ symbol: "camera", titel: TEXT.beleg_foto, text: TEXT.beleg_foto_text, los: () => void e.foto(true) }] : []),
-    { symbol: "doc.text", titel: TEXT.beleg_datei, text: TEXT.beleg_datei_text, los: () => void e.datei() },
-    ...(istNativ ? [{ symbol: "photo", titel: TEXT.beleg_aus_fotos, text: undefined as string | undefined, los: () => void e.foto(false) }] : []),
-    { symbol: "pencil", titel: TEXT.beleg_hand, text: kompakt ? undefined : TEXT.beleg_hand_text, los: e.hand },
+    ...(istNativ ? [{ symbol: "camera", titel: TEXT.mitPro(TEXT.beleg_foto, pro), text: TEXT.beleg_foto_text, los: () => e.foto(true) }] : []),
+    { symbol: "doc.text", titel: TEXT.mitPro(TEXT.beleg_datei, pro), text: TEXT.beleg_datei_text, los: e.datei },
+    ...(istNativ ? [{ symbol: "photo", titel: TEXT.mitPro(TEXT.beleg_aus_fotos, pro), text: undefined as string | undefined, los: () => e.foto(false) }] : []),
+    { symbol: "pencil", titel: TEXT.mitPro(TEXT.beleg_hand, pro), text: kompakt ? undefined : TEXT.beleg_hand_text, los: e.hand },
   ];
   return (
     <View>

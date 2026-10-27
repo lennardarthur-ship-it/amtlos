@@ -324,7 +324,7 @@ export const T = {
     { symbol: "checklist", titel: "Welche Pflichten hat dein Betrieb?", text: "Ein Check mit ein paar Fragen zeigt, welche Pflichten nach deinen Angaben in Frage kommen – die ersten 3 kostenlos, alle mit Termin und Erinnerung mit Pro." },
     { symbol: "checkmark.circle", titel: "Hast du alles erledigt?", text: "Abhaken, was erledigt ist, und auf einen Blick sehen, was noch offen ist – und was bei einer Kontrolle fehlt (Pro)." },
     { symbol: "doc.text", titel: "Die passende Unterlage gleich dazu", text: "Zur Pflicht die Vorlage: 43 Vorlagen, Schritt für Schritt ausgefüllt – vom Hygieneplan bis zur Datenschutzerklärung (Pro)." },
-    { symbol: "eurosign.circle", titel: "Dazu: Rechnungen, Belege, Kasse", text: "Rechnungen, auch als E-Rechnung (Pro), Belege und Kasse (Pro) – und die Umsätze für deine Umsatzsteuer-Voranmeldung mit einem Tipp (Pro)." },
+    { symbol: "eurosign.circle", titel: "Dazu: Rechnungen, Belege, Kasse", text: "Rechnungen und E-Rechnung (Pro), Belege und Kasse (Pro) – und die Umsätze für deine Umsatzsteuer-Voranmeldung mit einem Tipp (Pro)." },
     { symbol: "lock.shield", titel: "Alles bleibt bei dir", text: `Verschlüsselt auf deinem ${W.geraet} – ein Konto brauchst du nicht.` },
   ],
   start_rechnung: "Rechnung schreiben",

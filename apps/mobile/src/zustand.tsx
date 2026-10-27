@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import * as StoreReview from "expo-store-review";
 import { AppState } from "react-native";
 import { sollFragen } from "./pro/bewertung";
+import { neuanlageErlaubt } from "./pro/regeln";
 import { aboStand, kaufAktiv, proAktiv, proBeobachten, testmodus, type AboStand } from "./pro/kauf";
 import { archivLoeschen, archivierteSchluessel, autoSchluesselLoeschen, schluesselArchivieren, schluesselHolen, schluesselLoeschen, schluesselbundMoeglich } from "./unterlagen/schluesselbund";
 import { allesAbsagen } from "./pflichten/erinnerungen";
@@ -68,7 +69,8 @@ interface Zustand {
   tab: Tab;
   tabWechseln(t: Tab): void;
   betriebSpeichern(b: Betrieb): void;
-  anlegen(vorlageId: string): Unterlage;
+  /** E-219: ohne Pro null – eine neue Unterlage gehört zu Pro (die Seite zeigt vorher den Bezahlschirm) */
+  anlegen(vorlageId: string): Unterlage | null;
   aendern(id: string, daten: Daten): void;
   /** Felder setzen – auf Basis des aktuellen Stands (auch aus Unterseiten heraus sicher) */
   setzen(id: string, werte: Daten): void;
@@ -122,11 +124,11 @@ interface Zustand {
   /** R12: Zahlungseingang mit Betrag (und ggf. Skonto/Minderung) vermerken */
   zahlungVermerken(id: string, z: Omit<Zahlung, "id">): void;
   /** R12: Tagesabschluss der Kasse speichern (festgeschrieben, sofort gespeichert) */
-  kasseSpeichern(inhalt: KassenInhalt): Kassenabschluss;
+  kasseSpeichern(inhalt: KassenInhalt): Kassenabschluss | null;
   /** R12: Kassenabschluss korrigieren – nur mit Grund */
   kasseKorrigieren(id: string, inhalt: KassenInhalt, grund: string): void;
   /** R12 GoBD: Kassensturz mit Zählprotokoll speichern (unveränderlich, sofort gespeichert) */
-  kassensturzSpeichern(k: Omit<Kassensturz, "id" | "zeitpunkt">): Kassensturz;
+  kassensturzSpeichern(k: Omit<Kassensturz, "id" | "zeitpunkt">): Kassensturz | null;
   /** R12 GoBD: Sachentnahme (unentgeltliche Wertabgabe) speichern bzw. löschen (protokolliert) */
   sachentnahmeSpeichern(e: Omit<Sachentnahme, "id" | "erstellt">): void;
   sachentnahmeLoeschen(id: string): void;
@@ -495,6 +497,10 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   }, [setzen]);
 
   const pro = storePro || (testmodus && stand.proTest);
+  // E-219: Pro-Stand für die Prüfung jeder Neuanlage – nach einem Kauf gilt er sofort (proAktualisieren, proTestSetzen),
+  // damit „nach dem Kauf geht es gleich los“ nicht am noch nicht gezeichneten Stand scheitert
+  const proJetzt = useRef(pro);
+  proJetzt.current = pro;
   // E-200: zuletzt mit Pro gesehen (Tag) – endet Pro, zeigt die App den Hinweis zu den Aufbewahrungspflichten. Wie
   // `letzteSicherung` gerätegebunden und ohne „geaendert“ (sonst gälte der Stand als ungesichert bzw. nicht exportiert).
   useEffect(() => {
@@ -511,12 +517,21 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   );
 
   // alle Abhängigkeiten sind selbst stabil (useCallback ohne wechselnde Werte) – die Handlungen bleiben dieselben
+  /**
+   * E-219: eine Prüfung für jede Handlung, die etwas anlegt (Unterlage, Kopie, Beleg, Kassentag, Kassensturz,
+   * Sachentnahme): ohne Pro wird eine Neuanlage nicht gespeichert (`neuanlageErlaubt`, über den ganzen Stand gerechnet) –
+   * auch wenn eine Seite vergäße, vorher den Bezahlschirm zu zeigen. Storno, Kassenbuch, Korrekturen und Wiederherstellen
+   * laufen bewusst nicht hier durch (E-188: gehen immer).
+   */
+  const neuGeprueft = useCallback((nachher: Stand): boolean => neuanlageErlaubt(aktuell.current, nachher, proJetzt.current), []);
+
   const aktionen = useMemo<AmtlosAktionen>(
     () => ({
       tabWechseln,
       betriebSpeichern: (b) => setzen(betriebSetzen(aktuell.current, b)),
       anlegen: (vorlageId) => {
         const [s, u] = anlegen(aktuell.current, vorlageId, new Date());
+        if (!neuGeprueft(s)) return null;
         setzen(s);
         return u;
       },
@@ -570,6 +585,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       },
       kopieren: (id) => {
         const [s, u] = kopieren(aktuell.current, id, new Date());
+        if (!neuGeprueft(s)) return null;
         setzen(s);
         return u;
       },
@@ -621,6 +637,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       zahlungVermerken: (id, zahlung) => setzen(zahlungVermerken(aktuell.current, id, zahlung)),
       kasseSpeichern: (inhalt) => {
         const [s0, k] = kasseSpeichern(aktuell.current, inhalt, new Date());
+        if (!neuGeprueft(s0)) return null;
         let s = s0;
         // R12 GoBD: bar kassierte Rechnungen aus Amtlos – Zahlungseingang an der Rechnung gleich mit vermerken
         for (const r of k.rechnungen_bar ?? []) s = zahlungVermerken(s, r.id, { datum: k.datum, betrag_cent: r.betrag_cent });
@@ -635,8 +652,15 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       },
       appSperreSetzen: (an) => setzen({ ...aktuell.current, appSperre: an }),
       cloudSicherungSetzen: (an) => setzen({ ...aktuell.current, cloudSicherung: an }),
-      proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
-      proTestSetzen: (an) => setzen({ ...aktuell.current, proTest: an }),
+      proAktualisieren: (aktiv) => {
+        // E-219: nach einem Kauf gilt Pro sofort – „danach“ auf dem Bezahlschirm legt gleich an
+        if (aktiv) proJetzt.current = true;
+        return void (aktiv === undefined ? proAktiv().then(setStorePro) : setStorePro(aktiv));
+      },
+      proTestSetzen: (an) => {
+        if (an && testmodus) proJetzt.current = true;
+        setzen({ ...aktuell.current, proTest: an });
+      },
       pruefexportBestaetigen: () => {
         // wie „gesichert“: ändert den Inhalt nicht (kein „geaendert“) – gilt, bis sich der Stand ändert
         aktuell.current = { ...aktuell.current, pruefexport: new Date().toISOString() };
@@ -671,7 +695,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       belegSetzen: (b, grund) => {
         const vorher = aktuell.current;
         const neu = belegSetzen(vorher, b, new Date(), grund);
-        if (neu === vorher) return false;
+        if (neu === vorher || !neuGeprueft(neu)) return false;
         setzen(neu);
         if (grund) schreiben();
         return true;
@@ -682,12 +706,15 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       },
       kassensturzSpeichern: (k) => {
         const [s, neu] = kassensturzSpeichern(aktuell.current, k, new Date());
+        if (!neuGeprueft(s)) return null;
         setzen(s);
         schreiben();
         return neu;
       },
       sachentnahmeSpeichern: (e) => {
-        setzen(sachentnahmeSpeichern(aktuell.current, e, new Date()));
+        const s = sachentnahmeSpeichern(aktuell.current, e, new Date());
+        if (!neuGeprueft(s)) return;
+        setzen(s);
         schreiben();
       },
       sachentnahmeLoeschen: (id) => {
@@ -795,7 +822,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         return true;
       },
     }),
-    [setzen, schreiben, planen, sichern, setStand, laden, ladefehlerAufheben, beiseitegelegteVersuchen],
+    [setzen, schreiben, planen, sichern, setStand, laden, ladefehlerAufheben, beiseitegelegteVersuchen, neuGeprueft],
   );
   return (
     <AktionenKontext.Provider value={aktionen}>

@@ -808,6 +808,15 @@ try {
   await zurueck();
   await warte(800);
   pruefe(!(await sichtbar("Rechnungsnummer")), "ohne Pro wurde trotzdem eine Rechnung angelegt");
+  // E-219 (Befund des externen Prüfers): auch die Karte „Beleg erfassen“ am Ende von „Unterlagen“ – dort entstand ohne
+  // Pro bisher ein Beleg nach dem anderen
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await warte(800);
+  await tippe(p.getByRole("button", { name: /^Von Hand eintragen · Pro/ }).locator("visible=true").last());
+  await bezahlschirm("Belege erfassen – mit Pro", "pro-beleg-unterlagen");
+  pruefe(!(await sichtbar("Lieferant oder Geschäft")), "ohne Pro wurde über „Unterlagen“ trotzdem ein Beleg angelegt");
+  await zurueck();
+  await warte(800);
 
   // Vorlagen: eine schon geteilte teilt man immer wieder; ein vorhandener Entwurf bleibt, sein PDF gehört zu Pro
   await p.getByRole("tab", { name: "Unterlagen" }).click();

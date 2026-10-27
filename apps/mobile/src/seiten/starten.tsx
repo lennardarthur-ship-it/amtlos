@@ -30,7 +30,9 @@ export function useStarten() {
   const ziel = useZiel();
   return (vorlageId: string) => {
     const los = () => {
+      // E-219: der Zustand legt ohne Pro nichts an (zweite Sicherung hinter der Sperre unten)
       const u = anlegen(vorlageId);
+      if (!u) return void nav.oeffnen("pro", () => <ProSeite grund={ausgabeGrund({ vorlage: vorlageId })} danach={los} />, true);
       ziel((n) => n.oeffnen(`ablauf-${u.id}`, () => <Ablauf id={u.id} neu />, true));
     };
     if (erstellenErlaubt(pro)) return los();

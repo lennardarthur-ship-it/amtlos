@@ -410,7 +410,8 @@ export function KassenTagSeite({ id }: { id?: string }) {
       setGrund("");
       return;
     }
-    z.kasseSpeichern(inhalt);
+    // E-219: der Zustand speichert ohne Pro keinen neuen Tag – dann der Bezahlschirm, die Eingaben bleiben stehen
+    if (!z.kasseSpeichern(inhalt)) return erfassen(() => undefined);
     melden(TEXT.r12_gespeichert(datumDe(form.datum), euro(s.brutto)));
     z.erfolg();
     nav.zurueck();
@@ -617,7 +618,7 @@ function KassensturzSeite() {
     if (gezaehlt === null || gezaehlt < 0) return setFehler(TEXT.betrag_falsch);
     // E-188: einen neuen Kassensturz speichern gehört zu Pro – die Eingaben bleiben stehen, bis Pro aktiv ist
     if (!kasseErfassenErlaubt(z.pro)) return erfassen(() => undefined);
-    z.kassensturzSpeichern({ gezaehlt_cent: gezaehlt, ...(stueck ? { stueckelung } : {}), ...(letzter ? { vortag_cent: letzter.ende } : {}), ...(anwesend.trim() ? { anwesend: anwesend.trim() } : {}), ...(notiz.trim() ? { notiz: notiz.trim() } : {}) });
+    if (!z.kassensturzSpeichern({ gezaehlt_cent: gezaehlt, ...(stueck ? { stueckelung } : {}), ...(letzter ? { vortag_cent: letzter.ende } : {}), ...(anwesend.trim() ? { anwesend: anwesend.trim() } : {}), ...(notiz.trim() ? { notiz: notiz.trim() } : {}) })) return erfassen(() => undefined);
     melden(TEXT.r12g_kassensturz_gespeichert(euro(gezaehlt)));
     nav.zurueck();
   };

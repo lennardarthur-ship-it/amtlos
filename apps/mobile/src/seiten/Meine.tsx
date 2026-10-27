@@ -7,7 +7,8 @@ import { useNav } from "../ui/navigation";
 import { RADIUS, useFarben } from "../ui/thema";
 import { belegeFiltern, euroText, rechnungBrutto, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
 import { heute, sortiert, type Stand, type Unterlage } from "../unterlagen/speicher";
-import { useStandWahl } from "../zustand";
+import { useAmtlosStatus, useStandWahl } from "../zustand";
+import { erstellenErlaubt } from "../pro/regeln";
 import { BelegErfassen, BelegSeite, BelegZeile, UngueltigeBelege } from "./Belege";
 import { BuehnenListe, BuehnenMarke, Gruppe, Leer } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
@@ -93,6 +94,8 @@ export function Meine() {
   const belegOeffnen = useCallback((id: string) => nav.oeffnen(`beleg-${id}`, () => <BelegSeite id={id} />, true), [nav]);
   const starten = useStarten();
   const mappe = useKontrollmappeOeffnen();
+  // E-219: Neues anlegen gehört zu Pro – ohne Pro sagen es die Knöpfe gleich („· Pro“)
+  const neuErlaubt = erstellenErlaubt(useAmtlosStatus().pro);
   const [filter, setFilter] = useState<Filter>("alle");
   const [suche, setSuche] = useState("");
   // viele Unterlagen: in Schritten zeigen, damit die Liste flüssig bleibt
@@ -168,8 +171,8 @@ export function Meine() {
   const kopf = leer ? (
     <Leer text={TEXT.meine_leer} unter={TEXT.meine_leer_text}>
       <View style={{ gap: 10 }}>
-        <Knopf symbol="plus" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
-        <Knopf ton symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
+        <Knopf symbol="plus" text={TEXT.mitPro(TEXT.rechnung_schreiben, neuErlaubt)} onPress={() => starten("rechnung")} />
+        <Knopf ton symbol="doc.viewfinder" text={TEXT.mitPro(TEXT.beleg_erfassen, neuErlaubt)} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
         <TextKnopf symbol="doc.text" text={TEXT.zu_den_unterlagen} onPress={erstellen.oeffnen} stil={{ alignSelf: "center" }} />
         {/* R12 (UX #7): die Kontrollmappe auch im leeren Tab – ein neuer Betrieb sucht sie hier */}
         <Karte stil={{ marginTop: 8 }}>
