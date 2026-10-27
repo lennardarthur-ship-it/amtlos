@@ -42,6 +42,11 @@ import {
   euerFuer,
   kennzahlBefreiung,
   steuerschuldBetrag,
+  steuerschuldText,
+  ist13b,
+  igErwerbOhneKonto,
+  ustIdnrEuAusland,
+  type IgErwerbOhneKonto,
   VORSTEUER_AUFTEILEN,
   istKapitalgesellschaft,
   kategorieFuer,
@@ -883,7 +888,8 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
       b.bezahlt ? datumDe(b.bezahlt) : `${datumDe(b.datum)} (${ZAHLTAG_FEHLT})`,
       dateinamen.get(b.id) ?? "",
       (b.notiz ?? "").replace(/\s+/g, " "),
-      b.steuerschuld ? `§ 13b (${b.steuerschuld === "eu" ? "sonstige Leistung EU" : "Bauleistung Inland"}), Steuer ${betrag(steuerschuldBetrag(b))}` : "",
+      // E-222: innergemeinschaftlicher Erwerb mit Erwerbsteuer (Kz 89/93) statt § 13b
+      b.steuerschuld === "ige" ? `innergemeinschaftlicher Erwerb, Steuer ${betrag(steuerschuldBetrag(b))}${b.lieferant_ust_idnr ? `, USt-IdNr. Lieferant ${b.lieferant_ust_idnr}` : ""}` : b.steuerschuld ? `§ 13b (${steuerschuldText(b.steuerschuld)}), Steuer ${betrag(steuerschuldBetrag(b))}` : "",
       imStapel ? (b.zahlung === "privat" && kapitalgesellschaft(s) ? "ja – Verrechnungskonto Gesellschafter" : "ja") : "nein – Lohnbuchhaltung",
       // R12 GoBD: Erfassung, Festschreibung, Änderungen
       zeitDe(b.erstellt),
@@ -1025,7 +1031,7 @@ function gutscheinZuNullU(u: Unterlage, betrieb: Betrieb): boolean {
 
 /** LIESMICH (R11): wohin die § 13b-Belege im Stapel gebucht sind – mit bzw. ohne Vorsteuerabzug. */
 function steuerschuldSatz(belege: Beleg[], kontenrahmen: Kontenrahmen, ku: boolean): string {
-  const l = belege.filter((b) => b.steuerschuld);
+  const l = belege.filter(ist13b);
   const mit = l.filter((b) => b.vorsteuer && !ku).length;
   const ohne = l.length - mit;
   const k = KONTEN_13B[kontenrahmen];
@@ -1034,6 +1040,20 @@ function steuerschuldSatz(belege: Beleg[], kontenrahmen: Kontenrahmen, ku: boole
     ohne ? `ohne Vorsteuerabzug${ku ? " (Kleinunternehmer)" : ""} auf ${k.ohne.bau} bzw. ${k.ohne.eu} (nur Umsatzsteuer)` : "",
   ].filter(Boolean);
   return `${l.length} ${l.length === 1 ? "Beleg" : "Belege"} mit Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG) – im Stapel ${teile.join(", ")}. Kontonummern bitte gegen den Kontenrahmen prüfen.`;
+}
+
+/**
+ * E-222: LIESMICH – wohin die innergemeinschaftlichen Erwerbe im Stapel gebucht sind (Erwerbskonten, Standard nur 19 % mit
+ * Vorsteuer und UNSICHER) und welche Zeilen mangels Konto FEHLEN; Kleinunternehmer: Erwerbsschwelle.
+ */
+function igErwerbSatz(belege: Beleg[], k: ReturnType<typeof kontenFuer>, fehlend: IgErwerbOhneKonto[], ku: boolean): string {
+  const l = belege.filter((b) => b.steuerschuld === "ige");
+  const konten = [...new Set([k.igErwerb.mit[19], k.igErwerb.mit[7], k.igErwerb.ohne[19], k.igErwerb.ohne[7]].filter(Boolean))];
+  const fehlt = fehlend.length
+    ? ` Für ${fehlend.length === 1 ? "diese Buchung ist" : "diese Buchungen ist"} kein Erwerbskonto festgelegt (Kontenvorgaben „Innergemeinschaftlicher Erwerb …“, gibt die Kanzlei vor) – deshalb FEHLEN sie im Stapel: ${fehlend.map((f) => `${f.beleg.lieferant.trim() || "ohne Lieferant"} am ${datumDe(f.beleg.datum)} über ${betrag(f.betrag_cent)} € zu ${f.satz} % ${f.vorsteuer ? "mit" : "ohne"} Vorsteuerabzug`).join("; ")}. Bitte das Konto in den Kontenvorgaben eintragen und das Paket neu erstellen oder diese Buchungen von Hand ergänzen.`
+    : "";
+  const kuSatz = ku ? " Kleinunternehmer: Ob die Erwerbe zu versteuern sind, hängt von der Erwerbsschwelle bzw. dem Verzicht darauf ab (§ 1a Abs. 3, 4 UStG) – die Voranmeldung der App übernimmt sie deshalb nicht; bitte prüfen." : "";
+  return `${l.length} ${l.length === 1 ? "Beleg" : "Belege"} mit innergemeinschaftlichem Erwerb (Kz 89/93, Vorsteuer Kz 61) – im Stapel mit dem Betrag ohne Umsatzsteuer ohne BU auf Erwerbskonten mit Steuerautomatik${konten.length ? ` (${konten.join(", ")})` : ""}; Standard nur für 19 % mit Vorsteuerabzug (SKR03 ${kontenFuer("SKR03").igErwerb.mit[19]} / SKR04 ${kontenFuer("SKR04").igErwerb.mit[19]}, noch nicht von der Steuerberatung bestätigt). Kontonummern und Automatik bitte im Testimport prüfen.${fehlt}${kuSatz}`;
 }
 
 /** Grund, warum eine Rechnung keine E-Rechnung im Paket hat – Privatkunde (nur die E-Mail fehlt) oder fehlende Angaben. */
@@ -1129,7 +1149,12 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
   // als § 13b erfasst: Konto steht im Stapel nur für SKR03 fest (3120/3123), Kleinunternehmer ohne Vorsteuer
   dazu(
     `Belege mit Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG) – Kz 46/47 bzw. 84/85${istKleinunternehmer(s) ? " (Kleinunternehmer: ohne Vorsteuerabzug)" : ", Vorsteuer Kz 67"}. Bitte Art der Leistung und Konto prüfen:`,
-    belege.filter((b) => b.steuerschuld).map((b) => bz(b, ` · ${b.steuerschuld === "eu" ? "sonstige Leistung EU" : "Bauleistung Inland"} · Steuer ${betrag(steuerschuldBetrag(b))} €`)),
+    belege.filter(ist13b).map((b) => bz(b, ` · ${steuerschuldText(b.steuerschuld!)} · Steuer ${betrag(steuerschuldBetrag(b))} €`)),
+  );
+  // E-222: innergemeinschaftliche Erwerbe – USt-IdNr. des Lieferanten (anderes EU-Land), Kleinunternehmer: Erwerbsschwelle
+  dazu(
+    `Belege mit innergemeinschaftlichem Erwerb (Waren aus dem EU-Ausland) – Kz 89 bzw. 93${istKleinunternehmer(s) ? " (Kleinunternehmer: in der Voranmeldung der App nicht übernommen – hängt von der Erwerbsschwelle ab, § 1a Abs. 3 UStG)" : ", Vorsteuer Kz 61"}. Bitte prüfen, ob der Lieferant mit USt-IdNr. steuerfrei geliefert hat, und das Konto:`,
+    belege.filter((b) => b.steuerschuld === "ige").map((b) => bz(b, ` · Steuer ${betrag(steuerschuldBetrag(b))} € · USt-IdNr. Lieferant ${b.lieferant_ust_idnr || "fehlt"}${b.lieferant_ust_idnr && !ustIdnrEuAusland(b.lieferant_ust_idnr) ? " (nicht aus einem anderen EU-Land)" : ""}`)),
   );
 
   // R11 (Kosmetik #11): Wechsel von der Kleinunternehmerregelung – Vorsteuerberichtigung nur als Frage (unsicher, § 44 UStDV)
@@ -1431,7 +1456,10 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const warnungen = kassenWarnungen(s.kasse, s.belege);
   const negativ = warnungen.negativ.filter((d) => imZeitraum(d.datum, z)).map((d) => d.datum);
   const differenzen = warnungen.differenzen.filter((d) => imZeitraum(d.datum, z));
-  const mit13b = belege.filter((b) => b.steuerschuld).length;
+  const mit13b = belege.filter(ist13b).length;
+  // E-222: innergemeinschaftliche Erwerbe und Zeilen, die mangels Erwerbskonto im Stapel fehlen
+  const mitIge = belege.some((b) => b.steuerschuld === "ige");
+  const igeFehlend = mitIge ? igErwerbOhneKonto(belege, sb.kontenrahmen, { ...bo, kapitalgesellschaft: kapital, kleinunternehmer: ku }) : [];
   const rechtsform = rechtsformFuer(s);
   const dfv = s.profil["ust.dauerfristverlaengerung"] === true;
   const inhalt: Record<string, Uint8Array> = {};
@@ -1514,6 +1542,7 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
     ...(kapital && belege.some((b) => b.zahlung === "privat") ? [`Privat ausgelegte Belege der Gesellschaft stehen im Stapel auf dem Verrechnungskonto Gesellschafter (${k.verrechnungGesellschafter}) – ein Verrechnungskonto je Gesellschafter bitte in den Kontenvorgaben festlegen oder umbuchen (siehe Fragen).`] : []),
     // R11: Konten je nach Vorsteuerabzug – der Satz beschreibt, was im Stapel tatsächlich steht
     ...(mit13b ? [steuerschuldSatz(belege, sb.kontenrahmen, ku)] : []),
+    ...(mitIge ? [igErwerbSatz(belege, k, igeFehlend, ku)] : []),
     ...(ohneZahlung.length
       ? [
           istEuer

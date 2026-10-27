@@ -45,7 +45,7 @@
  *   nicht abziehbare Teil brutto ohne Steuerschlüssel auf demselben Aufwandskonto (Automatikkonto: BU 40). § 13b-Belege
  *   entsprechend auf die Konten „mit“ bzw. „ohne Vorsteuer“.
  */
-import { belegKennung, belegSkonto, belegTeilabzug, kategorieFuer, vorsteuerAufteilung, vorsteuerVerhaeltnis, zahltag, type AnlageArt, type Beleg } from "./belege.js";
+import { belegKennung, belegSkonto, belegTeilabzug, kategorieFuer, satz13b, vorsteuerAufteilung, vorsteuerVerhaeltnis, zahltag, type AnlageArt, type Beleg } from "./belege.js";
 import { formImNamen } from "./dokumente/betrieb.js";
 import type { Kontenvorgaben } from "./kontenvorgaben.js";
 import { restGruppen, summen, type Abschlag, type Position } from "./rechnung.js";
@@ -170,6 +170,17 @@ export const ossLandKennzeichen = (land: string) => {
 /** Mitgliedstaaten der EU außer Deutschland (ISO 3166-1; Griechenland als GR) – für Erlöskonten und Hinweise. */
 export const EU_LAENDER = ["AT", "BE", "BG", "CY", "CZ", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK"] as const;
 export const istEuAusland = (land: string | null | undefined) => !!land && (EU_LAENDER as readonly string[]).includes(land.toUpperCase());
+/**
+ * E-222: USt-IdNr. aus einem anderen EU-Land (Länderpräfix eines Mitgliedstaats außer DE; Griechenland „EL“) – Voraussetzung
+ * dafür, dass der Lieferant steuerfrei liefert und beim Betrieb ein innergemeinschaftlicher Erwerb entsteht. Nur die Form,
+ * keine Prüfung beim BZSt.
+ */
+export function ustIdnrEuAusland(idnr: string | null | undefined): boolean {
+  const n = (idnr ?? "").replace(/[\s.-]/g, "").toUpperCase();
+  const m = /^([A-Z]{2})[0-9A-Z+*]{2,12}$/.exec(n);
+  if (!m) return false;
+  return istEuAusland(m[1] === "EL" ? "GR" : m[1]!);
+}
 
 /**
  * BU-Schlüssel, der die Steuerautomatik eines Automatikkontos aufhebt („keine Steuer“) – gesetzt, wenn ein Beleg keinen
@@ -308,12 +319,21 @@ export const BUCHUNGSKONTEN: Record<
      * festgelegt, dann fehlen diese Buchungen im Stapel und LIESMICH nennt sie (Kontenvorgabe `anzahlungEuEuer`).
      */
     anzahlungEuEuer: string;
+    /**
+     * E-222: innergemeinschaftlicher Erwerb (Beleg mit `steuerschuld: "ige"`) – Automatikkonten für Erwerbsteuer (Kz 89/93)
+     * und, mit Vorsteuerabzug, Vorsteuer (Kz 61), gebucht mit der Bemessungsgrundlage. Standard nur für 19 % mit
+     * Vorsteuerabzug: SKR03 3425 / SKR04 5425 „Innergemeinschaftlicher Erwerb 19 % Vorsteuer und 19 % Umsatzsteuer“ –
+     * UNSICHER: Nummer aus dem Prüfauftrag, steht in keiner Quelle des Projekts (PRUEFLISTE T-307, Testimport T-221). 7 %
+     * und ohne Vorsteuerabzug ohne Standard (keine erfundene Nummer): leer = nicht festgelegt, dann fehlen diese
+     * Buchungen im Stapel und LIESMICH nennt sie (Kontenvorgaben `igErwerb19`, `igErwerb7`, `igErwerbOhneVst19`, `igErwerbOhneVst7`).
+     */
+    igErwerb: { mit: { 19: string; 7: string }; ohne: { 19: string; 7: string } };
   }
 > = {
   // Forderungen/Verbindlichkeiten ohne Kontokorrent (1410/1610 bzw. 1210/3310), damit beim Bankabruf kein OPOS nötig ist
-  SKR03: { bank: "1200", verrechnungGesellschafter: "0731", homeoffice: "4288", anlagen: { maschinen: "0400", bga: "0420", kfz: "0320", software: "0027" }, forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338", nullsatz: "8290", oss: "8320", ausfuhr: "8120", befreit43: "8150" }, gutschrift: "3100", gutscheinVerbindlichkeit: "1700", kassendifferenzAufwand: "4900", kassendifferenzErtrag: "", sachentnahme: { 19: "8910", 7: "8915" }, skontiGewaehrtIgl: "8743", skontiGewaehrtRc: "8741", anzahlungenErhalten: "1710", anzahlungEuEuer: "" },
+  SKR03: { bank: "1200", verrechnungGesellschafter: "0731", homeoffice: "4288", anlagen: { maschinen: "0400", bga: "0420", kfz: "0320", software: "0027" }, forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338", nullsatz: "8290", oss: "8320", ausfuhr: "8120", befreit43: "8150" }, gutschrift: "3100", gutscheinVerbindlichkeit: "1700", kassendifferenzAufwand: "4900", kassendifferenzErtrag: "", sachentnahme: { 19: "8910", 7: "8915" }, skontiGewaehrtIgl: "8743", skontiGewaehrtRc: "8741", anzahlungenErhalten: "1710", anzahlungEuEuer: "", igErwerb: { mit: { 19: "3425", 7: "" }, ohne: { 19: "", 7: "" } } },
   // UNSICHER: verrechnungGesellschafter 3560 – SKR04-Gegenstück zu 0731 laut Kanzlei folgt
-  SKR04: { bank: "1800", verrechnungGesellschafter: "3560", homeoffice: "6348", anlagen: { maschinen: "0440", bga: "0650", kfz: "0520", software: "0135" }, forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", privatentnahmen: "2100", geldtransit: "1460", skontiGewaehrt: { 19: "4736", 7: "4731", 0: "4730" }, skontiErhalten: { 19: "5736", 7: "5731", 0: "5730" }, erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338", nullsatz: "4290", oss: "4320", ausfuhr: "4120", befreit43: "4150" }, gutschrift: "5900", gutscheinVerbindlichkeit: "3500", kassendifferenzAufwand: "6300", kassendifferenzErtrag: "", sachentnahme: { 19: "4620", 7: "4610" }, skontiGewaehrtIgl: "4743", skontiGewaehrtRc: "4741", anzahlungenErhalten: "3250", anzahlungEuEuer: "" },
+  SKR04: { bank: "1800", verrechnungGesellschafter: "3560", homeoffice: "6348", anlagen: { maschinen: "0440", bga: "0650", kfz: "0520", software: "0135" }, forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", privatentnahmen: "2100", geldtransit: "1460", skontiGewaehrt: { 19: "4736", 7: "4731", 0: "4730" }, skontiErhalten: { 19: "5736", 7: "5731", 0: "5730" }, erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338", nullsatz: "4290", oss: "4320", ausfuhr: "4120", befreit43: "4150" }, gutschrift: "5900", gutscheinVerbindlichkeit: "3500", kassendifferenzAufwand: "6300", kassendifferenzErtrag: "", sachentnahme: { 19: "4620", 7: "4610" }, skontiGewaehrtIgl: "4743", skontiGewaehrtRc: "4741", anzahlungenErhalten: "3250", anzahlungEuEuer: "", igErwerb: { mit: { 19: "5425", 7: "" }, ohne: { 19: "", 7: "" } } },
 };
 
 /** Wirksame Konten eines Stapels: Kontenrahmen plus Kontenvorgaben der Kanzlei. */
@@ -345,6 +365,8 @@ export function kontenFuer(kontenrahmen: Kontenrahmen, vorgaben?: Kontenvorgaben
     anzahlungenErhalten: w(v.anzahlungenErhalten, k.anzahlungenErhalten),
     // E-218: kein Standard – nur eine gesetzte, gültige Vorgabe
     anzahlungEuEuer: w(v.anzahlungEuEuer, k.anzahlungEuEuer),
+    // E-222: innergemeinschaftlicher Erwerb – Standard nur 19 % mit Vorsteuerabzug (UNSICHER), sonst nur mit Vorgabe
+    igErwerb: { mit: { 19: w(v.igErwerb19, k.igErwerb.mit[19]), 7: w(v.igErwerb7, k.igErwerb.mit[7]) }, ohne: { 19: w(v.igErwerbOhneVst19, k.igErwerb.ohne[19]), 7: w(v.igErwerbOhneVst7, k.igErwerb.ohne[7]) } },
     erloese: { ...k.erloese, nullsatz: w(v.erloesNullsatz, k.erloese.nullsatz), oss: w(v.erloesOss, k.erloese.oss), ausfuhr: w(v.erloesAusfuhr, k.erloese.ausfuhr), befreit43: w(v.erloesKz43, k.erloese.befreit43) },
     anlagen: { maschinen: w(v.anlageMaschinen, k.anlagen.maschinen), bga: w(v.anlageBga, k.anlagen.bga), kfz: w(v.anlageKfz, k.anlagen.kfz), software: w(v.anlageSoftware, k.anlagen.software) },
   };
@@ -782,9 +804,11 @@ export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen,
     const teil = mitVst && belegTeilabzug(b) ? vorsteuerAufteilung(b) : null;
     for (const s of b.steuer) {
       if (!s.brutto_cent) continue;
-      const zeile = (betrag: number, vst: boolean, guidZusatz: string, text = buchungstext): Buchung => {
+      const zeile = (betrag: number, vst: boolean, guidZusatz: string, text = buchungstext): Buchung | null => {
         // § 13b: Automatikkonto für die Steuer (und ggf. die Vorsteuer); sonst das Sachkonto der Kategorie
-        const sachkonto = b.steuerschuld ? KONTEN_13B[kontenrahmen][vst ? "mit" : "ohne"][b.steuerschuld] : belegSachkonto(b, s.satz, kontenrahmen, k, o);
+        // E-222: innergemeinschaftlicher Erwerb auf das Erwerbskonto des Satzes – ohne festgelegtes Konto keine Zeile (igErwerbOhneKonto)
+        const sachkonto = b.steuerschuld === "ige" ? igErwerbKonto(k, s.satz, vst) : b.steuerschuld ? KONTEN_13B[kontenrahmen][vst ? "mit" : "ohne"][b.steuerschuld] : belegSachkonto(b, s.satz, kontenrahmen, k, o);
+        if (!sachkonto) return null;
         return {
           datum: b.datum,
           betrag_cent: Math.abs(betrag),
@@ -805,11 +829,55 @@ export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen,
       if (teil && t && t.abziehbar_cent < t.ust_cent && (s.satz > 0 || b.steuerschuld)) {
         // Teilabzug: abziehbarer Teil mit Vorsteuer, Rest ohne – zwei Zeilen mit eigener GUID
         const g = teilenNachVorsteuer(s.brutto_cent, s.satz, t.abziehbar_cent, !!b.steuerschuld);
-        if (g.mit) aus.push(zeile(g.mit, true, "", kuerze(`${buchungstext} VSt-Anteil`, 60)));
-        if (g.ohne) aus.push(zeile(g.ohne, false, "|nicht-abziehbar", kuerze(`${buchungstext} ohne VSt`, 60)));
+        const mit = g.mit ? zeile(g.mit, true, "", kuerze(`${buchungstext} VSt-Anteil`, 60)) : null;
+        const ohne = g.ohne ? zeile(g.ohne, false, "|nicht-abziehbar", kuerze(`${buchungstext} ohne VSt`, 60)) : null;
+        if (mit) aus.push(mit);
+        if (ohne) aus.push(ohne);
         continue;
       }
-      aus.push(zeile(s.brutto_cent, mitVst, ""));
+      const z = zeile(s.brutto_cent, mitVst, "");
+      if (z) aus.push(z);
+    }
+  }
+  return aus;
+}
+
+/** E-222: Erwerbskonto eines innergemeinschaftlichen Erwerbs nach Satz (0 % wie § 13b: 19 %) und Vorsteuerabzug – "" ohne Konto. */
+export function igErwerbKonto(k: Konten, satz: number, vst: boolean): string {
+  const s = satz13b(satz);
+  const je = k.igErwerb[vst ? "mit" : "ohne"];
+  return s === 19 || s === 7 ? je[s] : "";
+}
+
+/** E-222: Teil eines innergemeinschaftlichen Erwerbs, der mangels Konto nicht im Stapel steht (für LIESMICH). */
+export interface IgErwerbOhneKonto {
+  beleg: Beleg;
+  satz: number;
+  betrag_cent: number;
+  vorsteuer: boolean;
+}
+
+/**
+ * E-222: Innergemeinschaftliche Erwerbe, für die kein Erwerbskonto festgelegt ist (7 %, ohne Vorsteuerabzug, andere
+ * Sätze) – diese Zeilen fehlen im Stapel (`buchungenAusBelegen`); LIESMICH nennt sie mit Tag und Betrag.
+ */
+export function igErwerbOhneKonto(belege: Beleg[], kontenrahmen: Kontenrahmen, o?: BelegBuchungsOptionen): IgErwerbOhneKonto[] {
+  const k = kontenFuer(kontenrahmen, o?.vorgaben);
+  const aus: IgErwerbOhneKonto[] = [];
+  for (const b of belege) {
+    if (b.steuerschuld !== "ige" || !belegImStapel(b, o)) continue;
+    const mitVst = b.vorsteuer && !o?.kleinunternehmer;
+    const teil = mitVst && belegTeilabzug(b) ? vorsteuerAufteilung(b) : null;
+    for (const s of b.steuer) {
+      if (!s.brutto_cent) continue;
+      const t = teil?.find((x) => x.satz === s.satz);
+      if (teil && t && t.abziehbar_cent < t.ust_cent) {
+        const g = teilenNachVorsteuer(s.brutto_cent, s.satz, t.abziehbar_cent, true);
+        if (g.mit && !igErwerbKonto(k, s.satz, true)) aus.push({ beleg: b, satz: satz13b(s.satz), betrag_cent: g.mit, vorsteuer: true });
+        if (g.ohne && !igErwerbKonto(k, s.satz, false)) aus.push({ beleg: b, satz: satz13b(s.satz), betrag_cent: g.ohne, vorsteuer: false });
+        continue;
+      }
+      if (!igErwerbKonto(k, s.satz, mitVst)) aus.push({ beleg: b, satz: satz13b(s.satz), betrag_cent: s.brutto_cent, vorsteuer: mitVst });
     }
   }
   return aus;
@@ -1082,6 +1150,7 @@ export function pruefpunkteBuchungen(): string[] {
     "BU-Schlüssel 40 („keine Steuer“ bei Automatikkonten) wird nur auf Automatikkonten gesetzt, wenn ein Beleg keinen Vorsteuerabzug erlaubt. StB-Prüfung (A-2): Kleinunternehmer buchen Wareneingang auf SKR03 3200 / SKR04 5200 ohne Schlüssel statt 3400/5400 mit BU 40.",
     "StB-Prüfung (A-1): Belegbuchungen (Eingangsbelege, Gutschriften, Kassenfehlbeträge) mit dem Zahlungskonto (Verbindlichkeiten, Kasse, Bank, Privat bzw. Verrechnungskonto) in Feld 7 „Konto“ im Haben und dem Sachkonto mit BU-Schlüssel in Feld 8 „Gegenkonto“ – im Testimport prüfen, ob Rewe den Schlüssel so annimmt.",
     "§ 13b-Eingangsleistungen (R11): mit Vorsteuerabzug SKR03 3120 (Bauleistung eines im Inland ansässigen Unternehmers) bzw. 3123 (sonstige Leistung eines im übrigen Gemeinschaftsgebiet ansässigen Unternehmers), SKR04 5920/5923; ohne Vorsteuerabzug (Kleinunternehmer, Belege mit „Vorsteuer abziehbar“ aus) SKR03 3140/3143, SKR04 5940/5943 – alle als Automatikkonten für die Umsatzsteuer (und ggf. Vorsteuer) 19 %. Im Prüfbericht der Steuerberatung vom 21./22.10.2026 schriftlich als richtig bestätigt (B-3, Frage 4; PRUEFLISTE T-201, E-197); 7-%-Fälle und § 13b-Lieferungen (Schrott, Mobilfunk) sind nicht abgebildet.",
+    "E-222 innergemeinschaftlicher Erwerb (Beleg „Waren aus dem EU-Ausland“): Bemessungsgrundlage ohne BU auf ein Automatikkonto für Erwerbsteuer und Vorsteuer – Standard nur 19 % mit Vorsteuerabzug SKR03 3425 / SKR04 5425 „Innergemeinschaftlicher Erwerb 19 % Vorsteuer und 19 % Umsatzsteuer“ (UNSICHER, Nummer nicht aus einer Quelle des Projekts); 7 % und ohne Vorsteuerabzug ohne Standard (Kontenvorgaben igErwerb7, igErwerbOhneVst19, igErwerbOhneVst7) – ohne Konto fehlen diese Zeilen im Stapel, LIESMICH nennt sie. Zeitpunkt: Belegdatum (§ 13 Abs. 1 Nr. 6 UStG: Rechnung, spätestens Ablauf des Monats nach dem Erwerb). Bitte Konten, Automatik und Feld „EU-Land u. UStID“ im Testimport prüfen (T-307).",
     "Gutschriften (§ 14 Abs. 2 Satz 2 UStG) werden als Aufwand auf „bezogene Leistungen“ (SKR03 3100, SKR04 5900) an Verbindlichkeiten gebucht, mit BU 9/8 bei ausgewiesener Steuer – passendes Aufwandskonto je nach Leistung mit der Steuerberatung klären.",
     "Personal-Belege stehen nur in der Belegliste, nicht im Stapel. StB-Prüfung (B-6): privat ausgelegte Belege und Barbelege vor dem ersten Kassenabschluss einer Kapitalgesellschaft auf das Verrechnungskonto Gesellschafter, Standard SKR03 0731 „Verbindlichkeiten gegenüber Gesellschaftern – Restlaufzeit bis 1 Jahr“ (korrigierter Bericht vom 22.10.2026; 0755 ist das Konto für offene Ausschüttungen); SKR04 vorläufig 3560 – UNSICHER, das SKR04-Gegenstück zu 0731 nennt die Kanzlei nach dem Testimport; kanzleiabhängig über die Kontenvorgaben.",
     "Felder 115 „Leistungsdatum“ und 116 „Datum Zuord. Steuerperiode“ (TTMMJJJJ) sind bei Ausgangsrechnungen gefüllt; Feld 40 „EU-Land u. UStID (Bestimmung)“ bei igL und EU-Leistungen – Format und Feldnummern prüfen.",

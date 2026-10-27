@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
-import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegGezahlt, belegSummen, belegTeilabzug, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, vorsteuerAnteilAus, vorsteuerAufteilung, zeitDe, type Beleg } from "@amtlos/fachlogik";
+import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegGezahlt, belegSummen, belegTeilabzug, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, ustIdnrEuAusland, vorsteuerAnteilAus, vorsteuerAufteilung, zeitDe, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { regelwert } from "../pflichten/check";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -310,6 +310,14 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
           <View>
             <Wahl label={TEXT.beleg_steuerschuld_art} wert={b.steuerschuld} aendern={(w) => setze({ steuerschuld: w })} optionen={STEUERSCHULD_ARTEN} />
             <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.beleg_steuerschuld_betrag(euro(steuerschuldBetrag(b)))}</T>
+            {/* E-222: innergemeinschaftlicher Erwerb – USt-IdNr. des Lieferanten aus einem anderen EU-Land; Kleinunternehmer: Erwerbsschwelle */}
+            {b.steuerschuld === "ige" ? (
+              <View>
+                <Feld label={TEXT.beleg_ige_ust_idnr} hilfe={TEXT.beleg_ige_ust_idnr_hilfe} wert={b.lieferant_ust_idnr ?? ""} aendern={(w) => setze({ lieferant_ust_idnr: w.replace(/\s+/g, "").toUpperCase() || null })} optional autoCapitalize="characters" />
+                {!ustIdnrEuAusland(b.lieferant_ust_idnr) ? <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{TEXT.beleg_ige_ohne_idnr}</T> : null}
+                {ku ? <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{TEXT.beleg_ige_ku}</T> : null}
+              </View>
+            ) : null}
           </View>
         ) : null}
         <AuswahlZeile label={TEXT.beleg_kategorie} wert={b.kategorie} aendern={(w) => setze({ kategorie: w })} optionen={KATEGORIEN.map((x) => ({ wert: x.id, text: x.titel }))} />

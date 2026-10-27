@@ -208,11 +208,12 @@ describe("E-217 B2) NIS2 nach den Vorgaben des Rechtsanwalts", () => {
 });
 
 describe("E-217: alle Einträge mit Vermerk", () => {
-  it("228 von 228; Rechtsanwalt 166, Steuerberater 35", () => {
+  // E-222: die Kleinunternehmer-Warnungen 80 %/95 % v7 (Grenze von 25.000 €) warten auf den Steuerberater (T-310) – 35 → 33
+  it("228 von 228; Rechtsanwalt 166, Steuerberater 35 – seit E-222 226 und Steuerberater 33", () => {
     expect(pflichten).toHaveLength(228);
-    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id)).toEqual([]);
+    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual(["steuern.kleinunternehmer_warnung_80", "steuern.kleinunternehmer_warnung_95"]);
     const zahl = (r: string) => pflichten.filter((p) => pruefVermerk(p.version, p.pruefung, AM) && p.pruefung!.geprueft_von!.includes(r)).length;
-    expect([zahl("recht"), zahl("steuern")]).toEqual([166, 35]);
+    expect([zahl("recht"), zahl("steuern")]).toEqual([166, 33]);
   });
   it("PRUEFLISTE: T-278, T-282 und T-287 erledigt", () => {
     for (const t of ["T-278", "T-282", "T-287"]) expect(PRUEFLISTE.find((z) => z.startsWith(`| ${t} |`)), t).toMatch(/Erledigt 27\.10\.2026.*E-217/);

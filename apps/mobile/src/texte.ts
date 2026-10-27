@@ -1038,9 +1038,16 @@ export const T = {
   r11_tage_nach: (t: number) => (Math.abs(t) === 1 ? "Tag" : t < 0 ? "Tagen" : "Tage"),
   r11_alle_uebernehmen: (n: number) => (n === 1 ? "1 übernehmen" : `Alle ${n} übernehmen`),
   // R10 Steuer
-  beleg_steuerschuld: "Ich schulde die Umsatzsteuer (§ 13b UStG)",
-  beleg_steuerschuld_hilfe: "Rechnung ohne Umsatzsteuer mit dem Hinweis „Steuerschuldnerschaft des Leistungsempfängers“ – z. B. ein Abo bei einem Anbieter aus dem EU-Ausland oder die Bauleistung eines Subunternehmers. Den Betrag ohne Umsatzsteuer eintragen; die Steuer meldest du in der Voranmeldung selbst an (gilt auch für Kleinunternehmer).",
+  // E-222: auch der innergemeinschaftliche Erwerb (Waren aus dem EU-Ausland)
+  beleg_steuerschuld: "Ich schulde die Umsatzsteuer (§ 13b UStG oder Erwerb aus dem EU-Ausland)",
+  beleg_steuerschuld_hilfe: "Rechnung ohne Umsatzsteuer mit dem Hinweis „Steuerschuldnerschaft des Leistungsempfängers“ – z. B. ein Abo bei einem Anbieter aus dem EU-Ausland oder die Bauleistung eines Subunternehmers (gilt auch für Kleinunternehmer). Oder Waren von einem Unternehmen aus einem anderen EU-Land, das dir mit deiner USt-IdNr. steuerfrei liefert (innergemeinschaftlicher Erwerb). Den Betrag ohne Umsatzsteuer eintragen; die Steuer meldest du in der Voranmeldung selbst an.",
   beleg_steuerschuld_art: "Art der Leistung",
+  beleg_ige_ust_idnr: "USt-IdNr. des Lieferanten",
+  beleg_ige_ust_idnr_hilfe: "steht auf der Rechnung des Lieferanten, z. B. FR12345678901",
+  beleg_ige_ohne_idnr: "Ein innergemeinschaftlicher Erwerb setzt einen Lieferanten aus einem anderen EU-Land voraus, der mit USt-IdNr. steuerfrei liefert. Ohne USt-IdNr. aus einem anderen EU-Land bitte prüfen, ob die Rechnung nicht doch ausländische Umsatzsteuer enthält.",
+  beleg_ige_ku: "Als Kleinunternehmer hängt es von der Erwerbsschwelle ab, ob du Erwerbe aus dem EU-Ausland versteuerst (§ 1a Abs. 3 UStG) – bitte mit der Steuerberatung klären. Die Voranmeldung übernimmt solche Belege nicht.",
+  ust_ige_belege: (n: number) => `${n} ${n === 1 ? "Beleg" : "Belege"} mit innergemeinschaftlichem Erwerb übernommen – Kz 89 bzw. 93, Vorsteuer Kz 61.`,
+  ust_ku_ige: (n: number) => `${n} ${n === 1 ? "Beleg" : "Belege"} mit innergemeinschaftlichem Erwerb nicht übernommen: Als Kleinunternehmer hängt es von der Erwerbsschwelle ab, ob du die Erwerbe versteuerst (§ 1a Abs. 3 UStG) – bitte mit der Steuerberatung klären und gegebenenfalls von Hand eintragen.`,
   beleg_steuerschuld_betrag: (steuer: string) => `Selbst anzumeldende Umsatzsteuer: ${steuer}`,
   beleg_kaeufer_fremd: "Diese E-Rechnung ist an einen anderen Käufer gerichtet – Vorsteuer ausgeschaltet. Siehe Notiz.",
   ust_13b_belege: (n: number) => `${n} ${n === 1 ? "Beleg" : "Belege"} mit Steuerschuldnerschaft (§ 13b) übernommen – Kz 46/47 bzw. 84/85, Vorsteuer Kz 67.`,

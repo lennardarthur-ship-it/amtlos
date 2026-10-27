@@ -1,15 +1,20 @@
 # Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt; Auslöser seit v5 nach Zahlungseingängen (vereinnahmte Entgelte)
 # v6 (Steuerberater, Runde 2, Empfehlung): Text zu steuerfreien Umsätzen und Anlagenverkäufen; Auslöser unverändert (mit Ersatzregel)
+# v7 (E-222, externer Prüfer 12c): außerhalb des Gründungsjahrs auch 80 % von 25.000 € (steuern.ustg19.grenze_vorjahr) – darüber ab 1. Januar
+#    Regelbesteuerung; Texte nur aus bestätigtem Wortlaut (grenze_ueberschritten v7, naechstes_jahr v6); braucht die Bestätigung des Steuerberaters (T-310)
 schema_version: 1
 id: steuern.kleinunternehmer_warnung_80
-version: 6
+version: 7
 katalog_nr: C.23
 titel:
   de: Kleinunternehmergrenze zu 80 % erreicht
 kurz:
-  de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen mindestens 80 % der Kleinunternehmergrenze; die Grenze liegt bei 100.000 €, im Gründungsjahr bei 25.000 €.
+  de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen mindestens 80 % einer Kleinunternehmergrenze – 25.000 € (darüber ist ab 1. Januar des nächsten Jahres die Regelbesteuerung vorgesehen) oder 100.000 € im laufenden Jahr, im Gründungsjahr 25.000 €.
 erklaerung:
-  de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Maßgeblich ist der Umsatz nach vereinnahmten
+  de: Überschreitest du im laufenden Jahr 100.000 € (im Gründungsjahr 25.000 €), ist schon der Umsatz, mit dem du die Grenze
+    überschreitest, steuerpflichtig. Die Kleinunternehmerregelung setzt außerdem voraus, dass dein Umsatz im Vorjahr höchstens
+    25.000 € betrug. Überschreitest du diese Grenze in diesem Jahr, ohne über 100.000 € zu kommen, gilt die Regelung bis zum
+    Jahresende weiter, ab 1. Januar des nächsten Jahres ist die Regelbesteuerung vorgesehen. Maßgeblich ist der Umsatz nach vereinnahmten
     Entgelten – die Zahlungen, die du netto erhältst, nicht die Rechnungen nach Rechnungsdatum. Amtlos zählt dafür die
     Zahlungseingänge auf deine Rechnungen in Amtlos (netto) und deine Kasseneinnahmen laut Tagesabschlüssen; Leistungen an
     Unternehmen im Ausland zählen nicht mit. Hast du bei einer Rechnung keinen Zahlungseingang vermerkt, zählt Amtlos sie
@@ -70,6 +75,43 @@ ausloeser:
           wert:
             regelwert: steuern.ustg19.grenze_laufendes_jahr
             faktor: 0.95
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: false
+      - feld: abgeleitet.noch_nicht_gestartet
+        op: ==
+        wert: false
+      - not:
+          all:
+          - feld: profil.umsatz.vorjahr
+            op: vorhanden
+          - feld: profil.umsatz.vorjahr
+            op: '>'
+            wert:
+              regelwert: steuern.ustg19.grenze_vorjahr
+      - not:
+          all:
+          - feld: finanzen.umsatz.bezahlt_vorjahr
+            op: vorhanden
+          - feld: finanzen.umsatz.bezahlt_vorjahr
+            op: '>'
+            wert:
+              regelwert: steuern.ustg19.grenze_vorjahr
+      - all:
+        - *id001
+        - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
+          op: '>='
+          wert:
+            regelwert: steuern.ustg19.grenze_vorjahr
+            faktor: 0.8
+          label:
+            de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen in diesem Jahr mindestens 20.000 €; liegt dein Umsatz in diesem Jahr über 25.000 €, ist ab 1. Januar des nächsten Jahres die Regelbesteuerung vorgesehen.
+        - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
+          op: '<'
+          wert:
+            regelwert: steuern.ustg19.grenze_vorjahr
+            faktor: 0.95
 frist:
   typ: dauerhaft
 wiederholung:
@@ -84,6 +126,8 @@ sanktion:
   schwere: mittel
 automatisierung: hinweis
 einordnung: hinweis
+aenderungsnotiz:
+  de: 'Neu: Warnung auch, wenn deine Einnahmen in diesem Jahr 80 % der Grenze von 25.000 € erreichen – darüber ist ab 1. Januar des nächsten Jahres die Regelbesteuerung vorgesehen.'
 aktion:
   art: abhaken
 status_recht: in_kraft
@@ -94,12 +138,10 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
 fachlich_zu_pruefen:
+- 'E-222 (externer Prüfer 12c, v7): neuer Zweig außerhalb des Gründungsjahrs – Einnahmen laut Amtlos (mit Ersatzregel wie bisher) ab 20.000 € bis unter 23.750 € (steuern.ustg19.grenze_vorjahr × 0.8 … × 0.95), nur wenn Vorjahr laut Profil bzw. App nicht über 25.000 € (sonst gilt „Grenze überschritten“); Kurztext und Erklärung um die Grenze von 25.000 € und die Folge ergänzt, Sätze wörtlich aus steuern.kleinunternehmer_grenze_ueberschritten v7 (kurz) und steuern.kleinunternehmer_naechstes_jahr v6 (Erklärung). Zu prüfen: Auslöser und Text (PRUEFLISTE T-310)'
 - 'Steuerberater 22.10.2026, Runde 2 (freigegeben, v5): vorsichtige Zählung für eine Warnung vertretbar – offene Rechnungen ab Rechnungsdatum (Ersatzregel) und Sachentnahmen (§ 3 Abs. 1b UStG) bestätigt. Umgesetzt (v6) nach seiner Empfehlung: Text zu steuerfreien Umsätzen und Anlagenverkäufen; steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App jetzt heraus. Zu prüfen: nur der neue Textteil (Versionssprung hebt die Freigabe in der App auf). Server: kennt keine Zahlungseingänge und zählt alle Rechnungen nach Rechnungsdatum (wie die Ersatzregel)'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - steuern
-  geprueft_am: '2026-10-23'
-  geprueft_version: 6
-  bestaetigt_am: '2026-10-23'
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

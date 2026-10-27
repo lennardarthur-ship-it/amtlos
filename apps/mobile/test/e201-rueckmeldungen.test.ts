@@ -105,7 +105,8 @@ describe("E-201: Rückmeldungen Rechtsanwalt und Steuerberater im Katalog", () =
     // E-215: neue Fassung nach der Empfehlung des Rechtsanwalts (T-278); E-216: Voranmeldung v8 mit dem Satz zur
     // Dauerfristverlängerung (Anregung des Steuerberaters, T-268) – Vermerk erst nach der Bestätigung (T-282)
     // E-217: alle vier am 27.10.2026 bestätigt (Voranmeldung als v9, NIS2 als neue Fassungen) – keiner mehr ohne Vermerk
-    const NEU: string[] = [];
+    // E-222: Kleinunternehmer-Warnungen v7 (Grenze von 25.000 €) – Vermerk erst nach der Bestätigung (T-310)
+    const NEU: string[] = ["steuern.kleinunternehmer_warnung_80", "steuern.kleinunternehmer_warnung_95"];
     for (const x of pflichten) {
       // E-213: die von E-206 geänderten Einträge sind seit dem 26.10.2026 erneut bestätigt (die Voranmeldung bis v7)
       if (E206.includes(x.id)) expect(x.pruefung?.bestaetigt_am, x.id).toBe("2026-10-26");
@@ -139,9 +140,10 @@ describe("E-201: Fachkraft für Arbeitssicherheit – Vorlagen", () => {
     }
     expect(Object.keys(VORLAGEN_GEPRUEFT).filter((id) => freigabenFuer(id).some((f) => f.vermerk_ausgesetzt))).toEqual([]);
     // ein Café sieht den Vermerk auf 42 von 43 Vorlagen (nicht Handelsregister, das nur für GmbH, OHG, KG bestätigt ist;
-    // E-208: die Rechnung fehlte, bis der Steuerberater die geänderte Fassung bestätigte – seit E-213 wieder 42)
+    // E-208: die Rechnung fehlte, bis der Steuerberater die geänderte Fassung bestätigte – seit E-213 wieder 42;
+    // E-222: die Voranmeldung fehlt, bis der Steuerberater den geänderten Hinweis zu innergemeinschaftlichen Erwerben bestätigt – 41)
     expect(VORLAGEN.length).toBe(43);
-    expect(VORLAGEN.filter((v) => pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}, cafe) !== PRUEFHINWEIS).length).toBe(42);
+    expect(VORLAGEN.filter((v) => pruefHinweisFuer(v, v.id === "hygieneplan" ? { art: "lebensmittel" } : {}, cafe) !== PRUEFHINWEIS).length).toBe(41);
   });
   it("Einschränkung nur bei Prüfprotokoll, Gefährdungsbeurteilung und Betriebsanweisung Biostoffe", () => {
     expect(VORLAGEN_GEPRUEFT.pruefprotokoll_elektro!.einschraenkung).toBe("ohne die elektrotechnischen Grenzwerte");

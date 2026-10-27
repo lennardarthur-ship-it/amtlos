@@ -46,7 +46,10 @@ const STEUERN_23 = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldun
 // Steuerberater die neue Fassung bestätigt (PRUEFLISTE T-245), zeigt die Rechnung in keiner Variante einen Vermerk.
 // E-213: die Rechnung ist seit dem 26.10.2026 wieder bestätigt (Steuerberater) – keine Vorlage mehr ohne Vermerk wegen E-208
 const OHNE_VERMERK_E208: string[] = [];
-const MIT_VERMERK: string[] = ALLE.filter((id) => !OHNE_VERMERK_E208.includes(id));
+// E-222: Hinweis der Voranmeldung zu innergemeinschaftlichen Erwerben geändert (gedruckt in allen Varianten, dazu die Hilfe
+// im Formular) – ohne Vermerk, bis der Steuerberater die neue Fassung bestätigt (PRUEFLISTE T-308)
+const OHNE_VERMERK_E222 = ["ust_voranmeldung"];
+const MIT_VERMERK: string[] = ALLE.filter((id) => !OHNE_VERMERK_E208.includes(id) && !OHNE_VERMERK_E222.includes(id));
 /** E-202: neue, vorab freigegebene Fassungen (Prüfsumme nach dem Streichen von „fachlich zu prüfen“ bzw. Satzänderungen) */
 const NEUE_FASSUNG = ["unterweisung", "hautschutzplan", "gefaehrdungsbeurteilung", "datenschutzerklaerung_website", "video_hinweisschild"];
 const CAFE: Betrieb = { ...LEERER_BETRIEB, name: "Café Sonne", bundesland: "Berlin" };
@@ -157,7 +160,7 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
       const alleGruppen = Object.keys(f0(k).teilsummen!).sort();
       // E-210: Impressum der GmbH & Co. KG bzw. UG & Co. KG – Vertretung durch die Komplementärin (Vermerk nur dieser Varianten entfallen)
       // E-208: bei allen drei Freigaben der Rechnung zusätzlich der gemeinsame Teil (Einzelpreis bei Bruttopreisen)
-      const soll = k === "rechnung" ? [...CO_KG, "storno_schluss", "basis"] : k === "impressum" ? [...CO_KG] : k === "rechnung#1" ? ["storno_schluss", "basis"] : k === "rechnung#2" ? ["basis"] : ["unterweisung", "hautschutzplan", "gefaehrdungsbeurteilung"].includes(k) ? ["basis"] : ["datenschutzerklaerung_website", "video_hinweisschild"].includes(k) ? alleGruppen : [];
+      const soll = k === "ust_voranmeldung" ? alleGruppen : k === "rechnung" ? [...CO_KG, "storno_schluss", "basis"] : k === "impressum" ? [...CO_KG] : k === "rechnung#1" ? ["storno_schluss", "basis"] : k === "rechnung#2" ? ["basis"] : ["unterweisung", "hautschutzplan", "gefaehrdungsbeurteilung"].includes(k) ? ["basis"] : ["datenschutzerklaerung_website", "video_hinweisschild"].includes(k) ? alleGruppen : [];
       expect(g, k).toEqual([...soll].sort());
     }
   });
