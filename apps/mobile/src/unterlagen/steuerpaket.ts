@@ -20,6 +20,9 @@ import {
   kontenvorgabenGesetzt,
   STEUERART_NULLSATZ,
   zahlungsBuchungenRechnung,
+  guthabenBuchungenRechnung,
+  fremdGezahlt,
+  fremdKursdifferenz,
   euAnzahlungBuchung,
   type Buchung,
   buchungenAusBelegen,
@@ -95,10 +98,10 @@ import {
 import { APP_VERSION } from "../version";
 import { T as TEXT } from "../texte";
 import { utf8 } from "./sicherung";
-import { GUTSCHRIFT_HINWEIS, euBerichtigungen, euMeldeArtVon, istGutschrift, kuImZeitraum, nurSteuerfreieUmsaetze, periodeText, schlussZuAbschlag, zuordnungsTage } from "./ustAusRechnungen";
+import { GUTSCHRIFT_HINWEIS, euBerichtigungen, euMeldeArtVon, istGutschrift, kuImZeitraum, nurSteuerfreieUmsaetze, periodeText, schlussZuAbschlag, zuordnungsTage, uneinbringlichBetraege } from "./ustAusRechnungen";
 import { ERWERBSSCHWELLE_REGELWERT, igeOhneErwerbsbesteuerung } from "./erwerbsschwelle";
 import { regelwert } from "../pflichten/check";
-import { BELEG_KONFLIKT_GRUND, absenderFuer, neueId, nichtZaehlend, type ProtokollEintrag, type Stand, type Unterlage } from "./speicher";
+import { BELEG_KONFLIKT_GRUND, absenderFuer, neueId, nichtZaehlend, type ProtokollEintrag, type Stand, type Unterlage, guthabenKonten } from "./speicher";
 import { kassenAbdeckung } from "./kasse";
 import { MARKE } from "@amtlos/marke";
 
@@ -1088,6 +1091,75 @@ export function grundOhneXml(fehlt: string[], kundeUstId: string | null | undefi
   return `Angaben fehlen: ${fehlt.join(", ")}`;
 }
 
+/** E-229: Spalten der Guthabenliste (Überzahlungen, Rückzahlungen, Verrechnungen) – Steuerberater-Paket und offenes Archiv. */
+export const GUTHABEN_SPALTEN: readonly Spalte[] = [
+  { name: "Kunde", beschreibung: "Name des Kunden laut Rechnung" },
+  { name: "Rechnung mit Überzahlung", beschreibung: "Nummer der Rechnung, auf die mehr gezahlt wurde als offen" },
+  { name: "Vorgang", beschreibung: "Überzahlung (Geldeingang, kein Umsatz), Rückzahlung an den Kunden oder Verrechnung mit einer anderen Rechnung" },
+  { name: "Datum", beschreibung: "Tag des Geldeingangs, der Rückzahlung bzw. der Verrechnung (TT.MM.JJJJ)" },
+  { name: "Betrag", beschreibung: "Euro mit Dezimalkomma; Rückzahlung und Verrechnung negativ" },
+  { name: "Verrechnet mit Rechnung", beschreibung: "Nummer der Rechnung, auf die das Guthaben als Zahlung angerechnet wurde" },
+  { name: "Rest der Überzahlung", beschreibung: "noch nicht zurückgezahlter bzw. verrechneter Teil zum Ende des Zeitraums" },
+  { name: "Erfasst (UTC)", beschreibung: "Zeitpunkt der Erfassung in der App (ISO 8601, UTC)" },
+];
+
+/**
+ * E-229 (Steuerberater 27.10.2026, T-304 a): Guthabenkonten der Kunden als Liste – je Überzahlung eine Zeile, darunter
+ * ihre Rückzahlungen und Verrechnungen; Vorgänge mit Datum im Zeitraum (der Rest gilt zum Ende des Zeitraums).
+ */
+export function guthabenZeilen(s: Stand, z: Zeitraum): string[][] {
+  const zeilen: string[][] = [];
+  for (const k of guthabenKonten(s)) {
+    for (const p of k.posten) {
+      const nr = String(p.u.daten.nummer ?? "");
+      const bis = (d: string) => d <= z.bis;
+      const rest = p.eintrag.betrag_cent - p.rueckzahlungen.filter((x) => bis(x.datum)).reduce((a, x) => a + x.betrag_cent, 0) - p.verrechnungen.filter((x) => bis(x.zahlung.datum)).reduce((a, x) => a + x.zahlung.betrag_cent, 0);
+      if (imZeitraum(p.eintrag.datum, z)) zeilen.push([k.name, nr, "Überzahlung (Geldeingang, kein Umsatz)", datumDe(p.eintrag.datum), betrag(p.eintrag.betrag_cent), "", betrag(rest), p.eintrag.erfasst]);
+      for (const r of p.rueckzahlungen) if (imZeitraum(r.datum, z)) zeilen.push([k.name, nr, "Rückzahlung an den Kunden", datumDe(r.datum), betrag(-r.betrag_cent), "", "", r.erfasst]);
+      for (const v of p.verrechnungen) if (imZeitraum(v.zahlung.datum, z)) zeilen.push([k.name, nr, "Verrechnung (Zahlung der anderen Rechnung)", datumDe(v.zahlung.datum), betrag(-v.zahlung.betrag_cent), String(v.u.daten.nummer ?? ""), "", ""]);
+    }
+  }
+  return zeilen;
+}
+
+/** E-229: Spalten der Liste uneinbringlicher Forderungen. */
+export const UNEINBRINGLICH_SPALTEN: readonly Spalte[] = [
+  { name: "Rechnung", beschreibung: "Rechnungsnummer" },
+  { name: "Kunde", beschreibung: "Name des Kunden laut Rechnung" },
+  { name: "Rechnungsdatum", beschreibung: "TT.MM.JJJJ" },
+  { name: "Uneinbringlich seit", beschreibung: "Tag, an dem die Forderung uneinbringlich wurde (TT.MM.JJJJ)" },
+  { name: "Grund", beschreibung: "Insolvenz des Kunden, Vollstreckung erfolglos, Forderung bestritten oder anderer Grund" },
+  { name: "Erläuterung", beschreibung: "Text des Betriebs" },
+  { name: "Offen brutto", beschreibung: "am Tag der Uneinbringlichkeit offener Betrag (Euro)" },
+  { name: "davon Umsatzsteuer", beschreibung: "Umsatzsteuer im offenen Betrag (steuerpflichtige Teile, Euro)" },
+  { name: "Danach eingegangen", beschreibung: "Zahlungen nach der Uneinbringlichkeit (Tag: Betrag)" },
+  { name: "Vermerkt (UTC)", beschreibung: "Zeitpunkt des Vermerks in der App (ISO 8601, UTC)" },
+];
+
+const UNEINBRINGLICH_GRUND_TEXT: Record<string, string> = { insolvenz: "Insolvenz des Kunden", vollstreckung: "Vollstreckung erfolglos", bestritten: "Forderung bestritten", sonstiges: "anderer Grund" };
+
+/** E-229 (T-304 c): uneinbringliche Forderungen mit offenem Betrag am Tag und später Eingegangenem. */
+export function uneinbringlicheForderungen(s: Stand) {
+  return gestellteRechnungen(s)
+    .filter((u) => u.uneinbringlich?.datum)
+    .map((u) => {
+      const { daten } = eRechnungAus(u.daten, absenderFuer(s, u));
+      const ub = uneinbringlichBetraege(u, absenderFuer(s, u));
+      const offenAmTag = ub ? ub.offen : restGruppen(daten).map((g) => ({ satz: g.satz, brutto_cent: g.netto_cent + g.ust_cent, netto_cent: g.netto_cent, ust_cent: g.ust_cent }));
+      const offen = offenAmTag.reduce((a, g) => a + g.brutto_cent, 0);
+      const ust = offenAmTag.reduce((a, g) => a + (g.satz && g.satz > 0 ? g.ust_cent : 0), 0);
+      const spaeter = (ub?.spaeter ?? []).map((x) => ({ datum: x.datum, brutto_cent: x.gruppen.reduce((a, g) => a + g.brutto_cent, 0), ust_cent: x.gruppen.reduce((a, g) => a + (g.satz && g.satz > 0 ? g.ust_cent : 0), 0) }));
+      return { u, nummer: daten.nummer, kunde: daten.kunde.name, rechnungsdatum: daten.rechnungsdatum, tag: u.uneinbringlich!.datum!, grund: UNEINBRINGLICH_GRUND_TEXT[u.uneinbringlich!.grund ?? "sonstiges"] ?? "anderer Grund", text: u.uneinbringlich!.text ?? "", offen, ust, je: offenAmTag, spaeter, vermerkt: u.uneinbringlich!.geaendert };
+    });
+}
+
+/** E-229: Zeilen der Liste uneinbringlicher Forderungen (vermerkt bis zum Ende des Zeitraums oder später Eingegangenes im Zeitraum). */
+export function uneinbringlichZeilen(s: Stand, z: Zeitraum): string[][] {
+  return uneinbringlicheForderungen(s)
+    .filter((x) => x.tag <= z.bis)
+    .map((x) => [x.nummer, x.kunde, datumDe(x.rechnungsdatum), datumDe(x.tag), x.grund, x.text, betrag(x.offen), betrag(x.ust), x.spaeter.map((p) => `${datumDe(p.datum)}: ${betrag(p.brutto_cent)}`).join(", "), x.vermerkt]);
+}
+
 /**
  * Fragen an den Betrieb, die sich aus den Daten ergeben – nur Sachverhalte, keine steuerliche Bewertung. Abschnitte ohne
  * Einträge entfallen; ohne Fragen ein Satz „Keine offenen Punkte“.
@@ -1107,7 +1179,7 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
   // E-221 Befund 3: Rechnungen in fremder Währung – Originalbetrag, Euro-Betrag und Kurs zum Prüfen
   dazu(
     "Belege aus Rechnungen in fremder Währung (umgerechnet nach § 16 Abs. 6 UStG; ohne Euro-Betrag zählen sie noch nirgends mit): Stimmen Euro-Betrag und Kurs?",
-    belege.filter((b) => b.fremd).map((b) => bz(b, ` · Original ${fremdBetragText(b.fremd!.steuer.reduce((a, x) => a + x.brutto_cent, 0), b.fremd!.waehrung)}${b.fremd!.kurs ? ` · Kurs 1 € = ${String(b.fremd!.kurs).replace(".", ",")} ${b.fremd!.waehrung}${b.fremd!.kurs_datum ? ` (${datumDe(b.fremd!.kurs_datum)})` : ""}` : " · ohne Kurs"}${belegSummen(b).brutto_cent ? "" : " · EURO-BETRAG FEHLT"}`)),
+    belege.filter((b) => b.fremd).map((b) => bz(b, ` · Original ${fremdBetragText(b.fremd!.steuer.reduce((a, x) => a + x.brutto_cent, 0), b.fremd!.waehrung)}${b.fremd!.kurs ? ` · Kurs 1 € = ${String(b.fremd!.kurs).replace(".", ",")} ${b.fremd!.waehrung}${b.fremd!.kurs_datum ? ` (${datumDe(b.fremd!.kurs_datum)})` : ""}` : " · ohne Kurs"}${belegSummen(b).brutto_cent ? "" : " · EURO-BETRAG FEHLT"}${fremdGezahlt(b) ? ` · gezahlt laut Kontoauszug ${betrag(fremdGezahlt(b)!)} €` : ""}`)),
   );
   dazu(`Belege ohne Belegnummer des Lieferanten – im Buchungsstapel steht die ${MARKE.name}-Belegnummer. Hat der Beleg eine Nummer?`, belege.filter((b) => !belegnummerNormal(b.nummer)).map((b) => bz(b)));
   const offen = gestellteRechnungen(s)
@@ -1449,8 +1521,10 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
         .filter((u) => !gutscheine.has(u.id) && !istGutschrift(u) && !barKassiert.has(u.id))
         .flatMap((u) => {
           const r = mitPk(u, rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku }));
-          const zl = !istStorno(u) && u.zahlungen?.length ? u.zahlungen.filter((x) => imZeitraum(x.datum, z)).map((x) => ({ id: x.id, datum: x.datum, betrag_cent: x.betrag_cent })) : u.bezahlt && imZeitraum(u.bezahlt, z) ? [{ id: "bezahlt", datum: u.bezahlt, betrag_cent: zahlbetrag(r) }] : [];
-          return zahlungsBuchungenRechnung(r, zl, sb.kontenrahmen, bo);
+          // E-229: eine Verrechnung mit dem Guthaben des Kunden bewegt kein Geld – keine Bankbuchung; Überzahlung und
+          // Rückzahlung dagegen schon (Bank an bzw. von Forderungen, das Guthaben steht bis dahin auf dem Debitor)
+          const zl = !istStorno(u) && u.zahlungen?.length ? u.zahlungen.filter((x) => imZeitraum(x.datum, z) && !x.guthaben).map((x) => ({ id: x.id, datum: x.datum, betrag_cent: x.betrag_cent })) : u.bezahlt && imZeitraum(u.bezahlt, z) ? [{ id: "bezahlt", datum: u.bezahlt, betrag_cent: zahlbetrag(r) }] : [];
+          return [...zahlungsBuchungenRechnung(r, zl, sb.kontenrahmen, bo), ...guthabenBuchungenRechnung(r, (u.guthaben ?? []).filter((e) => imZeitraum(e.datum, z)), sb.kontenrahmen, bo)];
         })
     : [];
   // R12: Kassenabschlüsse; Barbelege gegen Kasse erst ab dem ersten Abschluss in Amtlos
@@ -1564,6 +1638,15 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const ungueltig = s.belegArchiv.filter((b) => imZeitraum(b.datum, z));
   if (ungueltig.length) inhalt[`Belege_ungueltig_${z.name}.csv`] = utf8(csv(kopfAus(UNGUELTIG_SPALTEN), ungueltig.map((b) => [nummern.get(b.id) ?? "", datumDe(b.datum), b.lieferant, betrag(belegSummen(b).brutto_cent), b.ungueltig ? zeitDe(b.ungueltig) : "", b.ungueltig_grund ?? "", b.datei ? "ja (beim Betrieb)" : "nein"])));
   const se = sachentnahmenFuer(s.sachentnahmen, z.von, z.bis);
+  // E-229: Guthaben der Kunden (Überzahlungen, Rückzahlungen, Verrechnungen) und uneinbringliche Forderungen
+  const guthabenListe = guthabenZeilen(s, z);
+  if (guthabenListe.length) inhalt[`Guthaben_${z.name}.csv`] = utf8(csv(kopfAus(GUTHABEN_SPALTEN), guthabenListe));
+  const uneinbringlichAlle = uneinbringlicheForderungen(s);
+  const uneinbringlichHier = uneinbringlichAlle.filter((x) => imZeitraum(x.tag, z) || x.spaeter.some((p) => imZeitraum(p.datum, z)));
+  const uneinbringlichListe = uneinbringlichZeilen(s, z);
+  if (uneinbringlichListe.length) inhalt[`Uneinbringlich_${z.name}.csv`] = utf8(csv(kopfAus(UNEINBRINGLICH_SPALTEN), uneinbringlichListe));
+  // E-229 (T-303): Belege in fremder Währung mit gezahltem Euro-Betrag – Kursdifferenz (bei EÜR Teil der Betriebsausgabe)
+  const kursdifferenzen = belege.filter((b) => fremdKursdifferenz(b));
   // E-214: Stornos „Fehler in der Rechnung“ bei EU-Umsätzen – Storno bzw. Datum im Zeitraum; Anzahlungen auf EU-Umsätze
   const berichtigungen = euBerichtigungen(s.unterlagen, s.betrieb).filter((b) => imZeitraum(b.stornoDatum, z) || imZeitraum(b.tag, z));
   const euAbschlaege = gestellteRechnungen(s).filter((u) => u.daten.abschlag === true && euMeldeArtVon(u, s.betrieb) && ((u.bezahlt && imZeitraum(u.bezahlt, z)) || imZeitraum(String(u.daten.datum), z) || (u.zahlungen ?? []).some((x) => imZeitraum(x.datum, z))));
@@ -1619,6 +1702,34 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
         ]
       : []),
     ...(skontoZm.length ? [`Skonto auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland (${skontoZm.map((u) => String(u.daten.nummer ?? "")).join(", ")}): Die Bemessungsgrundlage hat sich geändert (§ 17, § 18b Satz 4 UStG) – Kz 41 bzw. 21 und die Zusammenfassende Meldung des Zeitraums, in dem das Skonto abgezogen wurde (Zahltag), sind gemindert; die ursprüngliche Meldung bleibt. Im Stapel auf eigenen Skontokonten (${k.skontiGewaehrtIgl}/${k.skontiGewaehrtRc}, bitte prüfen) mit USt-IdNr.`] : []),
+    // E-229 (Steuerberater 27.10.2026, T-304 a): Überzahlungen sind kein Umsatz – Guthaben auf dem Debitor bis zur Rückzahlung bzw. Verrechnung
+    ...(guthabenListe.length
+      ? [
+          `Überzahlungen von Kunden (Guthaben_${z.name}.csv): Mehr erhalten als offen – der offene Betrag gilt als bezahlt, der Rest ist Guthaben des Kunden. Eine Überzahlung ist kein Umsatz und ändert die Umsatzsteuer nicht (solange sie keine Vorauszahlung für eine neue Leistung ist). ${
+            bilanz && zahlungenBuchen
+              ? `Im Stapel Bank (${k.bank}) an ${forderungsKonto} zum Tag der Überzahlung, eine Rückzahlung ${forderungsKonto} an Bank – das Guthaben steht bis dahin im Haben des Forderungs- bzw. Debitorenkontos (der Saldo oben ist um offene Guthaben niedriger als die offenen Forderungen).`
+              : `Im Stapel keine eigene Buchung: Der ganze Geldeingang kommt mit dem Kontoauszug auf ${forderungsKonto}, das Guthaben bleibt dort im Haben stehen, bis es zurücküberwiesen (Kontoauszug) oder verrechnet wird.`
+          } Eine Verrechnung mit einer anderen Rechnung desselben Kunden steht dort als Zahlung zum Tag der Verrechnung (Ist-Versteuerung und EÜR: Entgelt ab diesem Tag) – ohne Geldbewegung, deshalb ohne Bankbuchung.`,
+        ]
+      : []),
+    // E-229 (T-304 c): uneinbringliche Forderungen (§ 17 Abs. 2 Nr. 1 UStG) – Buchungen fehlen mangels Konto
+    ...(uneinbringlichHier.length
+      ? [
+          `Forderungen uneinbringlich (§ 17 Abs. 2 Nr. 1 UStG, Uneinbringlich_${z.name}.csv): ${uneinbringlichHier.map((x) => `RE ${x.nummer} (${x.kunde || "ohne Namen"}) seit ${datumDe(x.tag)}, ${x.grund}${imZeitraum(x.tag, z) ? `, offen ${betrag(x.offen)} € brutto, davon Umsatzsteuer ${betrag(x.ust)} €` : ""}${x.spaeter.filter((p) => imZeitraum(p.datum, z)).map((p) => `; danach am ${datumDe(p.datum)} noch ${betrag(p.brutto_cent)} € eingegangen (Umsatzsteuer ${betrag(p.ust_cent)} € erneut zu berichtigen)`).join("")}`).join("; ")}. ${
+            ist
+              ? "Ist-Versteuerung: Die Umsatzsteuer ist erst mit der Zahlung entstanden – keine Umsatzsteuerberichtigung, die Voranmeldung der App ändert sich nicht."
+              : "Soll-Versteuerung: Die Voranmeldung der App mindert Umsatz und Steuer des offenen Betrags im Zeitraum der Uneinbringlichkeit und berichtigt erneut, wenn danach noch Geld eingeht."
+          } Ein Konto für Forderungsverluste ist in ${MARKE.name} nicht festgelegt – deshalb FEHLEN die Ausbuchung${ist ? "" : " und die Umsatzsteuerberichtigung"} im Stapel; bitte von Hand buchen.`,
+        ]
+      : []),
+    // E-229 (T-303): fremde Währung – gezahlter Euro-Betrag und Kursdifferenz
+    ...(kursdifferenzen.length
+      ? [
+          `Belege in fremder Währung mit gezahltem Euro-Betrag laut Kontoauszug (${kursdifferenzen.map((b) => `${belegKennung(b, nummern.get(b.id) ?? "")}: umgerechnet ${betrag(fremdGezahlt(b)! - fremdKursdifferenz(b)!)} €, gezahlt ${betrag(fremdGezahlt(b)!)} €, Differenz ${betrag(fremdKursdifferenz(b)!)} €`).join("; ")}): Im Stapel steht der umgerechnete Betrag (Vorsteuer nach § 16 Abs. 6 UStG). ${
+            bilanz ? "Bilanz: Die Kursdifferenz bucht die Kanzlei." : "Einnahmen-Überschuss-Rechnung: Betriebsausgabe ist der gezahlte Euro-Betrag (§ 11 Abs. 2 EStG) – so rechnet die EÜR der App. Die Differenz steht nicht im Stapel (kein Konto für Kursdifferenzen festgelegt) – bitte buchen."
+          }`,
+        ]
+      : []),
     ...(xmlNeu.length ? [`${xmlNeu.length} ${xmlNeu.length === 1 ? "E-Rechnung wurde" : "E-Rechnungen wurden"} vor der Speicherung des Originals festgeschrieben (${xmlNeu.slice(0, 10).join(", ")}) – die XML-Datei ist aus den festgeschriebenen Daten neu erzeugt, nicht die versandte Datei.`] : []),
     ...(protokollZeilen.length || ungueltig.length ? [`Änderungen nach der Festschreibung, Löschungen und ungültig markierte Belege stehen in ${[protokollZeilen.length ? `Aenderungsprotokoll_${z.name}.csv` : "", ungueltig.length ? `Belege_ungueltig_${z.name}.csv` : ""].filter(Boolean).join(" und ")} – so erklären sich Lücken in den ${MARKE.name}-Belegnummern.`] : []),
     // StB-Prüfung (B-2): Nullsteuersatz auf eigenem Erlöskonto mit Kz 87 (nicht 8100/4100 = Kz 48)
@@ -1678,6 +1789,8 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
       `- Buchungsliste_${z.name}.csv: dieselben Buchungen zum Lesen (Semikolon, UTF-8), mit stabiler Buchungs-GUID je Buchung und Kennzeichen „Generalumkehr“.`,
       `- Rechnungen_${z.name}.csv: ${rechnungen.length} gestellte Rechnungen mit Steuerart, Netto, USt, Brutto, Fälligkeit, Zahlungseingang und offenem Betrag; Summen je Steuersatz am Ende.`,
       ...(gutschriften.length ? [`- Gutschriften_${z.name}.csv: ${gutschriften.length} ${gutschriften.length === 1 ? "Gutschrift" : "Gutschriften"}, die der Betrieb als Leistungsempfänger ausgestellt hat – nicht in der Rechnungsliste; im Buchungsstapel als Aufwand (bezogene Leistungen).`] : []),
+      ...(guthabenListe.length ? [`- Guthaben_${z.name}.csv: Überzahlungen von Kunden (Guthaben, kein Umsatz) mit Rückzahlungen und Verrechnungen im Zeitraum und dem Rest zum ${datumDe(z.bis)}.`] : []),
+      ...(uneinbringlichListe.length ? [`- Uneinbringlich_${z.name}.csv: als uneinbringlich vermerkte Forderungen (§ 17 Abs. 2 Nr. 1 UStG) mit Tag, Grund, offenem Betrag samt Umsatzsteuer und danach noch Eingegangenem.`] : []),
       ...(kasseImZeitraum.length ? [`- Kassenabschluesse_${z.name}.csv: ${kasseImZeitraum.length} Tagesabschlüsse (Z-Bons) mit Umsatz je Steuersatz, Zahlungsarten, Entnahmen/Einlagen, Bargeldbestand und Korrekturen.`] : []),
       `- Belege_${z.name}.csv: ${belege.length} Belege mit ${MARKE.name}-Belegnummer, Kategorie, Konto, Vorsteuer und Zahltag; Summe am Ende.`,
       `- Fragen_${z.name}.txt: ${fragen.anzahl ? `${fragen.anzahl} ${fragen.anzahl === 1 ? "Punkt" : "Punkte"} zum Klären (nur Sachverhalte aus den Daten)` : "keine offenen Punkte gefunden"}.`,

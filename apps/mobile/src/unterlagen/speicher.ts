@@ -111,6 +111,51 @@ export interface Unterlage {
    * `bezahlt` nicht zum Inhalt; beim Zusammenführen gilt die zuletzt geänderte Angabe (`geaendert`).
    */
   euStorno?: EuStornoAngaben;
+  /**
+   * E-229 (Steuerberater 27.10.2026, T-304 a): Guthaben des Kunden aus dieser Rechnung – Überzahlungen (mehr erhalten als
+   * offen) und Rückzahlungen daraus. Eine Überzahlung ist kein Umsatz und ändert die Umsatzsteuer nicht (solange sie keine
+   * Vorauszahlung für eine neue Leistung ist); die Verrechnung mit einer anderen Rechnung desselben Kunden steht dort als
+   * Zahlung mit Verweis (`Zahlung.guthaben`). Gehört wie `zahlungen` zum Zahlungsvermerk (nicht zum Inhalt) und kommt
+   * beim Zusammenführen aus derselben Fassung.
+   */
+  guthaben?: GuthabenEintrag[];
+  /**
+   * E-229 (T-304 c): Forderung uneinbringlich (§ 17 Abs. 2 Nr. 1 UStG) – Tag und Grund; nicht gedruckt, nicht Inhalt.
+   * Bei Soll-Versteuerung mindert der dann offene Betrag Umsatz und Steuer im Zeitraum dieses Tags; geht danach noch
+   * Geld ein, wird im Zeitraum der Zahlung erneut berichtigt. Bei Ist-Versteuerung keine Berichtigung. Zurückgenommen:
+   * Angabe ohne Tag (mit Zeitpunkt), damit das Zurücknehmen beim Zusammenführen gilt.
+   */
+  uneinbringlich?: UneinbringlichAngaben;
+}
+
+/** E-229: ein Eintrag im Guthaben des Kunden an einer Rechnung (siehe `Unterlage.guthaben`). */
+export interface GuthabenEintrag {
+  id: string;
+  /** „ueberzahlung“: mehr erhalten als offen (Geldeingang); „rueckzahlung“: an den Kunden zurücküberwiesen (Geldausgang) */
+  art: "ueberzahlung" | "rueckzahlung";
+  /** Tag des Geldeingangs bzw. der Rückzahlung (YYYY-MM-DD) */
+  datum: string;
+  betrag_cent: number;
+  /** Überzahlung: ID des Zahlungseingangs derselben Überweisung an dieser Rechnung (fehlt, wenn nichts mehr offen war) */
+  zahlung?: string;
+  /** Rückzahlung: ID der Überzahlung, aus der zurückgezahlt wurde */
+  bezug?: string;
+  /** Zeitpunkt der Erfassung (ISO) */
+  erfasst: string;
+}
+
+export type UneinbringlichGrund = "insolvenz" | "vollstreckung" | "bestritten" | "sonstiges";
+export const UNEINBRINGLICH_GRUENDE: UneinbringlichGrund[] = ["insolvenz", "vollstreckung", "bestritten", "sonstiges"];
+
+/** E-229: Angaben zur uneinbringlichen Forderung (siehe `Unterlage.uneinbringlich`). */
+export interface UneinbringlichAngaben {
+  /** Tag, an dem die Forderung uneinbringlich geworden ist (YYYY-MM-DD) – fehlt: zurückgenommen */
+  datum?: string;
+  grund?: UneinbringlichGrund;
+  /** Erläuterung (bei „sonstiges“ Pflicht, mindestens 10 Zeichen) */
+  text?: string;
+  /** Zeitpunkt der letzten Änderung (ISO) – entscheidet beim Zusammenführen */
+  geaendert: string;
 }
 
 /** E-218: Angaben zum Storno einer Rechnung mit EU-Umsatz (siehe `Unterlage.euStorno`). */
@@ -498,7 +543,38 @@ function unterlageAus(u: Record<string, unknown>): Unterlage {
   const eu = euStornoAus(u.euStorno);
   if (eu) r.euStorno = eu;
   else delete r.euStorno;
+  // E-229: Guthaben und Uneinbringlichkeit – nur Lesbares
+  const gh = guthabenAus(u.guthaben);
+  if (gh.length) r.guthaben = gh;
+  else delete r.guthaben;
+  const ue = uneinbringlichAus(u.uneinbringlich);
+  if (ue) r.uneinbringlich = ue;
+  else delete r.uneinbringlich;
   return r;
+}
+
+const ISO_TAG_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** E-229: Guthaben-Einträge lesen – Unlesbares fällt weg; sortiert nach Tag (dann ID). */
+export function guthabenAus(roh: unknown): GuthabenEintrag[] {
+  if (!Array.isArray(roh)) return [];
+  const aus: GuthabenEintrag[] = [];
+  for (const x of roh as unknown[]) {
+    if (!istObjekt(x)) continue;
+    const betrag = Number(x.betrag_cent);
+    if (typeof x.id !== "string" || !x.id || (x.art !== "ueberzahlung" && x.art !== "rueckzahlung") || typeof x.datum !== "string" || !ISO_TAG_RE.test(x.datum) || !Number.isInteger(betrag) || betrag <= 0) continue;
+    if (x.art === "rueckzahlung" && (typeof x.bezug !== "string" || !x.bezug)) continue;
+    aus.push({ id: x.id, art: x.art, datum: x.datum, betrag_cent: betrag, ...(typeof x.zahlung === "string" && x.zahlung ? { zahlung: x.zahlung } : {}), ...(typeof x.bezug === "string" && x.bezug ? { bezug: x.bezug } : {}), erfasst: istIso(x.erfasst) ? x.erfasst : ANFANG });
+  }
+  return aus.sort((a, b) => a.datum.localeCompare(b.datum) || a.id.localeCompare(b.id));
+}
+
+/** E-229: Angaben zur Uneinbringlichkeit lesen. */
+function uneinbringlichAus(roh: unknown): UneinbringlichAngaben | null {
+  if (!istObjekt(roh) || !istIso(roh.geaendert)) return null;
+  if (typeof roh.datum !== "string" || !ISO_TAG_RE.test(roh.datum)) return { geaendert: roh.geaendert };
+  const grund = UNEINBRINGLICH_GRUENDE.find((g) => g === roh.grund) ?? "sonstiges";
+  return { datum: roh.datum, grund, ...(typeof roh.text === "string" && roh.text.trim() ? { text: roh.text.trim().slice(0, 500) } : {}), geaendert: roh.geaendert };
 }
 
 /** R12 GoBD / E-220: Absender-Schnappschuss nur mit Text-Angaben (fehlende wie in „Mein Betrieb“ leer). */
@@ -1136,7 +1212,8 @@ export type EuStornoGrund = "rechnung" | "betrag";
 export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId(), euGrund?: EuStornoGrund, erkannt?: string | null): [Stand, Unterlage | null] {
   const alt = s.unterlagen.find((u) => u.id === id);
   const v = alt ? vorlageFuer(alt.vorlage) : undefined;
-  if (!alt || !v?.storno || !alt.festgeschrieben || alt.storniertDurch || alt.daten.storno_zu || alt.konfliktKopieVon) return [s, null];
+  // E-229: eine als uneinbringlich vermerkte Forderung erst zurücknehmen, dann stornieren (sonst doppelt gemindert)
+  if (!alt || !v?.storno || !alt.festgeschrieben || alt.storniertDurch || alt.daten.storno_zu || alt.konfliktKopieVon || alt.uneinbringlich?.datum) return [s, null];
   const daten = JSON.parse(JSON.stringify(alt.daten)) as Daten;
   const negativ = (p: unknown) => (typeof p === "string" && p.trim() ? (p.trim().startsWith("-") ? p.trim().slice(1) : `-${p.trim()}`) : p);
   if (Array.isArray(daten.positionen)) daten.positionen = (daten.positionen as Record<string, unknown>[]).map((e) => ({ ...e, preis: negativ(e.preis) })) as Daten[string];
@@ -1342,12 +1419,14 @@ export const betriebFehlt = (b: Betrieb) => !b.name.trim();
 
 /**
  * Zahlungseingang einer Rechnung setzen bzw. entfernen (E-129): der ganze Betrag an diesem Tag. Einzelne Zahlungen
- * (R12) fallen dabei weg – „bezahlt“ heißt hier: vollständig.
+ * (R12) fallen dabei weg – „bezahlt“ heißt hier: vollständig. E-229: Entfernen nimmt auch das Guthaben aus Überzahlungen
+ * dieser Rechnung weg – nicht, solange davon schon etwas zurückgezahlt oder verrechnet ist (dann bleibt alles, wie es ist).
  */
 export function bezahltSetzen(s: Stand, id: string, datum: string | null, jetzt = new Date()): Stand {
   // eigener Zeitstempel: beim Zusammenführen gewinnt so auch das Entfernen einer Zahlung
   const g = jetzt.toISOString();
-  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? (({ zahlungen: _z, ...rest }) => ({ ...rest, bezahlt: datum, bezahltGeaendert: g }))(u) : (({ bezahlt: _weg, zahlungen: _z, ...rest }) => ({ ...rest, bezahltGeaendert: g }))(u)) : u)) };
+  if (!datum && guthabenVerwendet(s, id)) return s;
+  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? (({ zahlungen: _z, ...rest }) => ({ ...rest, bezahlt: datum, bezahltGeaendert: g }))(u) : (({ bezahlt: _weg, zahlungen: _z, guthaben: _gh, ...rest }) => ({ ...rest, bezahltGeaendert: g }))(u)) : u)) };
 }
 
 /** Rechnungsbetrag brutto (Storno negativ) – für Zahlungen; StB-Prüfung (C-4): bei einer Schlussrechnung der Rest nach den Abschlägen. */
@@ -1370,24 +1449,30 @@ export function offenerBetrag(s: Stand, u: Unterlage): number {
 }
 
 /**
- * E-221 Befund 5: Warum ein Zahlungseingang so nicht vermerkt wird.
- * - „ueberzahlt“: mehr erhalten (samt Skonto/Minderung) als offen – nie still kürzen; die Überzahlung gehört nicht zu
- *   dieser Rechnung (zurückzahlen bzw. mit der Steuerberatung klären), vermerkt wird höchstens der offene Betrag.
+ * E-221 Befund 5, E-229: Warum ein Zahlungseingang so nicht vermerkt wird.
+ * - „ueberzahlt“: Skonto bzw. Minderung zusammen mit dem Betrag über dem offenen Betrag, oder eine Erstattung (Storno)
+ *   über dem offenen Betrag. E-229 (Steuerberater 27.10.2026): Mehr Geld als offen wird nicht mehr abgelehnt – der
+ *   offene Betrag gilt als bezahlt, der Rest wird Guthaben des Kunden (`ueberzahlung`).
  * - „skonto_ohne_zahlung“: Skonto wird beim Bezahlen abgezogen – ohne Zahlung kein Skonto.
  * - „skonto_zu_hoch“: mehr als das vereinbarte Skonto (Prozent laut Rechnung vom Rechnungsbetrag, abzüglich schon
  *   vermerkten Skontos) – ein darüber hinaus akzeptierter Abzug ist eine Minderung.
  * Kein Fehler, aber `ohneVereinbarung`: Skonto, obwohl auf der Rechnung keins steht – die App fragt ausdrücklich nach
- * (eine Obergrenze ohne Vereinbarung gibt es nicht; T-304).
+ * (eine Obergrenze ohne Vereinbarung gibt es nicht; vom Steuerberater bestätigt, T-304).
  * - „nichts_erhalten“: die Rechnung wäre ohne jeden Zahlungseingang ganz durch Skonto/Minderung erledigt. Das ist kein
- *   Skonto, sondern Uneinbringlichkeit oder Erlass (§ 17 Abs. 2 Nr. 1 UStG) bzw. bei falscher Rechnung ein Storno – eine
- *   Abschreibung kennt die App nicht (PRUEFLISTE T-304).
+ *   Skonto, sondern Uneinbringlichkeit (§ 17 Abs. 2 Nr. 1 UStG, eigene Funktion `uneinbringlichSetzen`), Erlass oder
+ *   bei falscher Rechnung ein Storno.
+ * - „guthaben“: Verrechnung mit einem Guthaben, das es so nicht gibt (anderer Kunde, nicht genug Rest, vor der
+ *   Überzahlung, mit Skonto oder über dem offenen Betrag).
  */
-export type ZahlungsFehler = "betrag" | "ueberzahlt" | "skonto_ohne_zahlung" | "skonto_zu_hoch" | "nichts_erhalten";
+export type ZahlungsFehler = "betrag" | "ueberzahlt" | "skonto_ohne_zahlung" | "skonto_zu_hoch" | "nichts_erhalten" | "guthaben";
 
-/** E-221: Zahlungseingang prüfen, bevor er vermerkt wird – `offen` vorher, `skontoHoechstens` noch zulässiges Skonto. */
-export function zahlungPruefen(s: Stand, id: string, z: Omit<Zahlung, "id">): { fehler: ZahlungsFehler | null; offen: number; skontoHoechstens: number | null; ohneVereinbarung: boolean } {
+/**
+ * E-221/E-229: Zahlungseingang prüfen, bevor er vermerkt wird – `offen` vorher, `skontoHoechstens` noch zulässiges
+ * Skonto, `ueberzahlung` der Teil des Betrags über dem offenen Betrag (wird Guthaben des Kunden).
+ */
+export function zahlungPruefen(s: Stand, id: string, z: Omit<Zahlung, "id">): { fehler: ZahlungsFehler | null; offen: number; skontoHoechstens: number | null; ohneVereinbarung: boolean; ueberzahlung: number } {
   const u = s.unterlagen.find((x) => x.id === id);
-  if (!u || u.vorlage !== "rechnung") return { fehler: "betrag", offen: 0, skontoHoechstens: null, ohneVereinbarung: false };
+  if (!u || u.vorlage !== "rechnung") return { fehler: "betrag", offen: 0, skontoHoechstens: null, ohneVereinbarung: false, ueberzahlung: 0 };
   const brutto = bruttoVon(s, u);
   const bisher = zahlungenVon(s, u);
   const offen = u.bezahlt && !u.zahlungen?.length ? 0 : zahlungsStand(brutto, bisher).offen;
@@ -1396,9 +1481,17 @@ export function zahlungPruefen(s: Stand, id: string, z: Omit<Zahlung, "id">): { 
   const betrag = z.betrag_cent;
   const minderung = z.minderung_cent ?? 0;
   const istSkonto = minderung > 0 && (z.art ?? "skonto") === "skonto";
-  const ergebnis = (fehler: ZahlungsFehler | null) => ({ fehler, offen, skontoHoechstens, ohneVereinbarung: istSkonto && skontoHoechstens === null });
+  // E-229: Überzahlung nur bei einer Rechnung (nicht bei einer Erstattung), ohne Skonto/Minderung und nicht aus einem Guthaben
+  const ueberzahlung = brutto > 0 && !minderung && !z.guthaben && Number.isInteger(betrag) && betrag > offen ? betrag - offen : 0;
+  const ergebnis = (fehler: ZahlungsFehler | null) => ({ fehler, offen, skontoHoechstens, ohneVereinbarung: istSkonto && skontoHoechstens === null, ueberzahlung: fehler ? 0 : ueberzahlung });
   if (!Number.isInteger(betrag) || betrag < 0 || !Number.isInteger(minderung) || minderung < 0 || betrag + minderung === 0) return ergebnis("betrag");
-  if (betrag + minderung > offen) return ergebnis("ueberzahlt");
+  if (z.guthaben) {
+    const q = s.unterlagen.find((x) => x.id === z.guthaben!.rechnung);
+    const e = q?.guthaben?.find((x) => x.id === z.guthaben!.eintrag && x.art === "ueberzahlung");
+    if (!q || !e || q.id === u.id || minderung || betrag > offen || z.datum < e.datum || betrag > guthabenRest(s, q.id, e.id) || kundeSchluessel(q) !== kundeSchluessel(u) || !kundeSchluessel(u)) return ergebnis("guthaben");
+    return ergebnis(null);
+  }
+  if (betrag + minderung > offen && !ueberzahlung) return ergebnis("ueberzahlt");
   if (istSkonto) {
     if (!betrag) return ergebnis("skonto_ohne_zahlung");
     if (skontoHoechstens !== null && minderung > skontoHoechstens) return ergebnis("skonto_zu_hoch");
@@ -1411,22 +1504,149 @@ export function zahlungPruefen(s: Stand, id: string, z: Omit<Zahlung, "id">): { 
 /**
  * R12: Zahlungseingang mit Betrag vermerken – optional mit Skonto bzw. Minderung (§ 17 UStG). Ist danach nichts mehr
  * offen, gilt die Rechnung ab diesem Tag als bezahlt; sonst bleibt der Rest offen (Teilzahlung). E-221: Was
- * `zahlungPruefen` ablehnt, wird nicht (auch nicht gekürzt) vermerkt – der Stand bleibt unverändert.
+ * `zahlungPruefen` ablehnt, wird nicht (auch nicht gekürzt) vermerkt – der Stand bleibt unverändert. E-229: Mehr als
+ * offen – der offene Betrag wird als Zahlung vermerkt, der Rest als Überzahlung (Guthaben des Kunden) an dieser Rechnung.
  */
 export function zahlungVermerken(s: Stand, id: string, z: Omit<Zahlung, "id">, jetzt = new Date(), zid = neueId()): Stand {
   const u = s.unterlagen.find((x) => x.id === id);
   if (!u || u.vorlage !== "rechnung") return s;
-  const neu: Zahlung = { id: zid, datum: z.datum, betrag_cent: Math.max(0, Math.round(z.betrag_cent)), ...(z.minderung_cent ? { minderung_cent: Math.max(0, Math.round(z.minderung_cent)), art: z.art ?? "skonto" } : {}) };
+  const neu: Zahlung = { id: zid, datum: z.datum, betrag_cent: Math.max(0, Math.round(z.betrag_cent)), ...(z.minderung_cent ? { minderung_cent: Math.max(0, Math.round(z.minderung_cent)), art: z.art ?? "skonto" } : {}), ...(z.guthaben ? { guthaben: { rechnung: z.guthaben.rechnung, eintrag: z.guthaben.eintrag } } : {}) };
   if (!neu.betrag_cent && !neu.minderung_cent) return s;
-  if (zahlungPruefen(s, id, neu).fehler) return s;
+  const p = zahlungPruefen(s, id, neu);
+  if (p.fehler) return s;
+  const g = jetzt.toISOString();
+  const angerechnet: Zahlung = { ...neu, betrag_cent: neu.betrag_cent - p.ueberzahlung };
   // eine ältere Vollzahlung ohne Liste wird zur ersten Zahlung
-  const zahlungen = [...zahlungenVon(s, u), neu];
+  const zahlungen = angerechnet.betrag_cent || angerechnet.minderung_cent ? [...zahlungenVon(s, u), angerechnet] : zahlungenVon(s, u);
   const alle = zahlungenAus(zahlungen);
   const offen = zahlungsStand(bruttoVon(s, u), alle).offen;
+  const guthaben = p.ueberzahlung ? [...(u.guthaben ?? []), { id: `${zid}-ue`, art: "ueberzahlung" as const, datum: neu.datum, betrag_cent: p.ueberzahlung, ...(angerechnet.betrag_cent ? { zahlung: zid } : {}), erfasst: g }] : u.guthaben;
+  const { bezahlt: _b, guthaben: _gh, ...rest } = u;
+  const letzter = alle.length ? alle[alle.length - 1]!.datum : neu.datum;
+  return { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...rest, ...(alle.length ? { zahlungen: alle } : {}), ...(guthaben?.length ? { guthaben } : {}), bezahltGeaendert: g, ...(offen === 0 ? { bezahlt: alle.length ? letzter : (u.bezahlt ?? neu.datum) } : {}) } : x)) };
+}
+
+/** E-229: Schlüssel des Kunden einer Rechnung – Name ohne Groß-/Kleinschreibung und doppelte Leerzeichen. */
+export const kundeSchluessel = (u: Unterlage) => String(u.daten.kunde_name ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+
+/** E-229: Verrechnungen eines Guthabens – Zahlungen an anderen Rechnungen mit Verweis auf diese Überzahlung. */
+export function guthabenVerrechnungen(s: Stand, rechnungId: string, eintragId: string): { u: Unterlage; zahlung: Zahlung }[] {
+  const aus: { u: Unterlage; zahlung: Zahlung }[] = [];
+  for (const x of s.unterlagen) for (const z of x.zahlungen ?? []) if (z.guthaben?.rechnung === rechnungId && z.guthaben.eintrag === eintragId) aus.push({ u: x, zahlung: z });
+  return aus;
+}
+
+/** E-229: Rest einer Überzahlung nach Rückzahlungen und Verrechnungen (kann bei widersprüchlichen Daten negativ sein). */
+export function guthabenRest(s: Stand, rechnungId: string, eintragId: string): number {
+  const u = s.unterlagen.find((x) => x.id === rechnungId);
+  const e = u?.guthaben?.find((x) => x.id === eintragId && x.art === "ueberzahlung");
+  if (!u || !e) return 0;
+  const zurueck = (u.guthaben ?? []).filter((x) => x.art === "rueckzahlung" && x.bezug === e.id).reduce((a, x) => a + x.betrag_cent, 0);
+  const verrechnet = guthabenVerrechnungen(s, rechnungId, eintragId).reduce((a, x) => a + x.zahlung.betrag_cent, 0);
+  return e.betrag_cent - zurueck - verrechnet;
+}
+
+/** E-229: Ist vom Guthaben aus Überzahlungen dieser Rechnung schon etwas zurückgezahlt oder verrechnet? */
+export function guthabenVerwendet(s: Stand, rechnungId: string): boolean {
+  const u = s.unterlagen.find((x) => x.id === rechnungId);
+  return (u?.guthaben ?? []).some((e) => e.art === "rueckzahlung" || (e.art === "ueberzahlung" && guthabenVerrechnungen(s, rechnungId, e.id).length > 0));
+}
+
+/** E-229: eine Überzahlung im Guthabenkonto des Kunden – mit Rückzahlungen, Verrechnungen und Rest. */
+export interface GuthabenPosten {
+  u: Unterlage;
+  eintrag: GuthabenEintrag;
+  rueckzahlungen: GuthabenEintrag[];
+  verrechnungen: { u: Unterlage; zahlung: Zahlung }[];
+  rest: number;
+}
+
+/**
+ * E-229: Guthabenkonto je Kunde – alle Überzahlungen an gültigen Rechnungen (ohne Konfliktkopien), gruppiert nach dem
+ * Kunden (`kundeSchluessel`), ältere zuerst. `nurOffen`: nur Überzahlungen mit Rest.
+ */
+export function guthabenKonten(s: Stand, nurOffen = false): { kunde: string; name: string; posten: GuthabenPosten[]; rest: number }[] {
+  const aus = nichtZaehlend(s.unterlagen);
+  const je = new Map<string, { kunde: string; name: string; posten: GuthabenPosten[]; rest: number }>();
+  for (const u of s.unterlagen) {
+    if (u.vorlage !== "rechnung" || aus.has(u.id)) continue;
+    for (const e of u.guthaben ?? []) {
+      if (e.art !== "ueberzahlung") continue;
+      const rest = guthabenRest(s, u.id, e.id);
+      if (nurOffen && rest <= 0) continue;
+      const k = kundeSchluessel(u);
+      const konto = je.get(k) ?? { kunde: k, name: String(u.daten.kunde_name ?? "").trim(), posten: [], rest: 0 };
+      konto.posten.push({ u, eintrag: e, rueckzahlungen: (u.guthaben ?? []).filter((x) => x.art === "rueckzahlung" && x.bezug === e.id), verrechnungen: guthabenVerrechnungen(s, u.id, e.id), rest });
+      konto.rest += rest;
+      je.set(k, konto);
+    }
+  }
+  for (const k of je.values()) k.posten.sort((a, b) => a.eintrag.datum.localeCompare(b.eintrag.datum) || a.eintrag.id.localeCompare(b.eintrag.id));
+  return [...je.values()].sort((a, b) => a.name.localeCompare(b.name, "de"));
+}
+
+/**
+ * E-229: Guthaben zurücküberweisen – Rückzahlung (Geldausgang) mit Tag, höchstens der Rest, nicht vor der Überzahlung.
+ * Kein Umsatz, keine Umsatzsteuer.
+ */
+export function guthabenZurueckzahlen(s: Stand, rechnungId: string, eintragId: string, datum: string, betrag_cent: number, jetzt = new Date(), rid = neueId()): Stand {
+  const u = s.unterlagen.find((x) => x.id === rechnungId);
+  const e = u?.guthaben?.find((x) => x.id === eintragId && x.art === "ueberzahlung");
+  if (!u || !e || !ISO_TAG_RE.test(datum) || datum < e.datum || !Number.isInteger(betrag_cent) || betrag_cent <= 0 || betrag_cent > guthabenRest(s, rechnungId, eintragId)) return s;
   const g = jetzt.toISOString();
-  const { bezahlt: _b, ...rest } = u;
-  const letzter = alle[alle.length - 1]!.datum;
-  return { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...rest, zahlungen: alle, bezahltGeaendert: g, ...(offen === 0 ? { bezahlt: letzter } : {}) } : x)) };
+  const neu: GuthabenEintrag = { id: rid, art: "rueckzahlung", datum, betrag_cent, bezug: e.id, erfasst: g };
+  return { ...s, unterlagen: s.unterlagen.map((x) => (x.id === rechnungId ? { ...x, guthaben: guthabenAus([...(x.guthaben ?? []), neu]), bezahltGeaendert: g } : x)) };
+}
+
+/**
+ * E-229: Guthaben mit einer offenen Rechnung desselben Kunden verrechnen – an der Zielrechnung eine Zahlung zum Tag der
+ * Verrechnung mit Verweis auf die Überzahlung (höchstens Rest und offener Betrag). Das Geld kam am Tag der Überzahlung;
+ * als Entgelt der Zielrechnung zählt es ab der Verrechnung (Ist-Versteuerung, EÜR – PRUEFLISTE T-332).
+ */
+export function guthabenVerrechnen(s: Stand, quelleId: string, eintragId: string, zielId: string, datum: string, betrag_cent: number, jetzt = new Date(), zid = neueId()): Stand {
+  return zahlungVermerken(s, zielId, { datum, betrag_cent, guthaben: { rechnung: quelleId, eintrag: eintragId } }, jetzt, zid);
+}
+
+/** E-229: Offene Rechnungen desselben Kunden, mit denen ein Guthaben verrechnet werden kann. */
+export function verrechenbareRechnungen(s: Stand, quelleId: string): Unterlage[] {
+  const q = s.unterlagen.find((x) => x.id === quelleId);
+  if (!q || !kundeSchluessel(q)) return [];
+  const aus = nichtZaehlend(s.unterlagen);
+  return s.unterlagen.filter((u) => u.id !== quelleId && u.vorlage === "rechnung" && u.festgeschrieben && !aus.has(u.id) && !u.storniertDurch && !(typeof u.daten.storno_zu === "string" && u.daten.storno_zu) && kundeSchluessel(u) === kundeSchluessel(q) && offenerBetrag(s, u) > 0);
+}
+
+/** E-229: offener Betrag (brutto) einer Rechnung an einem Tag – Zahlungen und Minderungen bis einschließlich dieses Tags. */
+export function offenAmTag(s: Stand, u: Unterlage, tag: string): number {
+  return zahlungsStand(bruttoVon(s, u), zahlungenVon(s, u).filter((z) => z.datum <= tag)).offen;
+}
+
+/** E-229: Uneinbringlichkeit gilt (Tag gesetzt, nicht zurückgenommen). */
+export const istUneinbringlich = (u: Unterlage) => Boolean(u.uneinbringlich?.datum);
+
+/**
+ * E-229 (T-304 c): Kann die Forderung aus dieser Rechnung als uneinbringlich vermerkt werden? Festgeschriebene,
+ * gültige Rechnung (keine Stornorechnung, nicht storniert, keine Gutschrift), mit offenem Betrag.
+ */
+export function uneinbringlichMoeglich(s: Stand, u: Unterlage): boolean {
+  if (u.vorlage !== "rechnung" || !u.festgeschrieben || u.storniertDurch || u.konfliktKopieVon || nichtZaehlend(s.unterlagen).has(u.id)) return false;
+  if ((typeof u.daten.storno_zu === "string" && u.daten.storno_zu) || (Array.isArray(u.daten.hinweise) && u.daten.hinweise.some((h) => h === "gutschrift"))) return false;
+  return offenerBetrag(s, u) > 0 || istUneinbringlich(u);
+}
+
+/**
+ * E-229 (Steuerberater 27.10.2026, T-304 c): Forderung uneinbringlich vermerken (§ 17 Abs. 2 Nr. 1 UStG) – Tag (nicht
+ * vor dem Rechnungsdatum, nicht in der Zukunft) und Grund (bei „sonstiges“ mit Erläuterung, mindestens 10 Zeichen); am
+ * Tag muss noch etwas offen sein. `null` nimmt den Vermerk zurück (bleibt als Angabe ohne Tag mit Zeitpunkt).
+ */
+export function uneinbringlichSetzen(s: Stand, id: string, angaben: { datum: string; grund: UneinbringlichGrund; text?: string } | null, jetzt = new Date()): Stand {
+  const u = s.unterlagen.find((x) => x.id === id);
+  if (!u || !uneinbringlichMoeglich(s, u)) return s;
+  const g = jetzt.toISOString();
+  if (!angaben) return istUneinbringlich(u) ? { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...x, uneinbringlich: { geaendert: g } } : x)) } : s;
+  const text = (angaben.text ?? "").replace(/\s+/g, " ").trim();
+  if (!ISO_TAG_RE.test(angaben.datum) || angaben.datum > heute(jetzt) || angaben.datum < String(u.daten.datum ?? "") || !UNEINBRINGLICH_GRUENDE.includes(angaben.grund) || (angaben.grund === "sonstiges" && !grundGenuegt(text))) return s;
+  if (offenAmTag(s, u, angaben.datum) <= 0) return s;
+  return { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...x, uneinbringlich: { datum: angaben.datum, grund: angaben.grund, ...(text ? { text: text.slice(0, 500) } : {}), geaendert: g } } : x)) };
 }
 
 /** R12: neuer Kassenabschluss – gespeichert ist er festgeschrieben (GoBD). */
@@ -1752,7 +1972,7 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
     const zd = JSON.stringify(zweite.daten);
     const enthalten = (basis.festgeschrieben === zweite.festgeschrieben && JSON.stringify(basis.daten) === zd) || (basis.fassungen ?? []).some((f) => f.festgeschrieben === zweite.festgeschrieben && JSON.stringify(f.daten) === zd);
     if (zweite.festgeschrieben && !zweite.konfliktKopieVon && !enthalten) {
-      const { storniertDurch: _s, bezahlt: _b, bezahltGeaendert: _bg, zahlungen: _z, ...rest } = zweite;
+      const { storniertDurch: _s, bezahlt: _b, bezahltGeaendert: _bg, zahlungen: _z, guthaben: _g, uneinbringlich: _ue, ...rest } = zweite;
       kopie = { ...rest, id: `${lokal.id}-konflikt-${kurzHash(zd)}`, konfliktKopieVon: lokal.id };
     }
   } else if (fl && fa) {
@@ -1762,7 +1982,7 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
     basis = lokal.festgeschrieben! < andere.festgeschrieben! ? lokal : andere.festgeschrieben! < lokal.festgeschrieben! ? andere : dl <= da ? lokal : andere;
     const zweite = basis === lokal ? andere : lokal;
     if (dl !== da) {
-      const { storniertDurch: _s, bezahlt: _b, bezahltGeaendert: _bg, zahlungen: _z, ...rest } = zweite;
+      const { storniertDurch: _s, bezahlt: _b, bezahltGeaendert: _bg, zahlungen: _z, guthaben: _g, uneinbringlich: _ue, ...rest } = zweite;
       kopie = { ...rest, id: `${lokal.id}-konflikt-${kurzHash(JSON.stringify(zweite.daten))}`, konfliktKopieVon: lokal.id };
     }
   } else basis = fl !== fa ? (fl ? lokal : andere) : lokal.geaendert >= andere.geaendert ? lokal : andere;
@@ -1819,10 +2039,18 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
   delete r.bezahlt;
   delete r.bezahltGeaendert;
   delete r.zahlungen;
+  delete r.guthaben;
   if (quelle.bezahlt) r.bezahlt = quelle.bezahlt;
   if (quelle.bezahltGeaendert) r.bezahltGeaendert = quelle.bezahltGeaendert;
-  // R12: die Zahlungen gehören zum Zahlungsvermerk – sie kommen aus derselben Fassung wie `bezahlt`
+  // R12: die Zahlungen gehören zum Zahlungsvermerk – sie kommen aus derselben Fassung wie `bezahlt`; E-229 ebenso das Guthaben
   if (quelle.zahlungen?.length) r.zahlungen = quelle.zahlungen;
+  if (quelle.guthaben?.length) r.guthaben = quelle.guthaben;
+  // E-229: Uneinbringlichkeit – die zuletzt geänderte Angabe (wie E-218), Zurücknehmen eingeschlossen
+  const ul = lokal.uneinbringlich;
+  const ua = andere.uneinbringlich;
+  const ue = ul && ua ? (ul.geaendert > ua.geaendert ? ul : ua.geaendert > ul.geaendert ? ua : JSON.stringify(ul) >= JSON.stringify(ua) ? ul : ua) : (ul ?? ua);
+  delete r.uneinbringlich;
+  if (ue) r.uneinbringlich = ue;
   // E-218: Angaben zum EU-Storno – die zuletzt geänderte (bei gleichem Zeitpunkt der Inhalt, auf allen Geräten gleich)
   const el = lokal.euStorno;
   const ea = andere.euStorno;

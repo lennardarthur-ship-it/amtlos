@@ -9,7 +9,8 @@ import { type Ton, DatumFeld, Feld, Fuss, Initialen, Karte, Knopf, Schalter, Suc
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, RADIUS, useFarben, weich } from "../ui/thema";
-import { allesLoeschenErlaubt, aufbewahrungspflichtig, betriebFehlt, neueId, personenSortiert, pruefexportAktuell, PERSONEN_LISTE } from "../unterlagen/speicher";
+import { allesLoeschenErlaubt, aufbewahrungspflichtig, betriebFehlt, guthabenKonten, neueId, personenSortiert, pruefexportAktuell, PERSONEN_LISTE } from "../unterlagen/speicher";
+import { euroText } from "../unterlagen/ablage";
 import { AboEndeHinweis } from "./AboEnde";
 import { PruefexportSeite } from "./Pruefexport";
 import { entsperren, sperreMoeglich } from "../unterlagen/sperre";
@@ -95,6 +96,10 @@ function PersonenSeite({ art }: { art: PersonenArt }) {
   const s = suche.trim().toLocaleLowerCase("de");
   const liste = s ? alle.filter((p) => `${p.name} ${p.anschrift ?? ""} ${p.taetigkeit ?? ""}`.toLocaleLowerCase("de").includes(s)) : alle;
   const oeffnen = (id: string, neu = false) => nav.oeffnen(`person-${id}`, () => <PersonSeite art={art} id={id} neu={neu} />, true);
+  // E-229: Guthaben der Kunden aus Überzahlungen (je Kunde nach Name, wie an der Rechnung)
+  const konten = art === "kunde" ? guthabenKonten(z.stand, true) : [];
+  const guthaben = new Map(konten.map((k) => [k.kunde, k.rest]));
+  const guthabenVon = (name: string) => guthaben.get(name.replace(/\s+/g, " ").trim().toLowerCase()) ?? 0;
   const anlegen = () => {
     const id = neueId();
     z.personSetzen(art, { id, name: "" });
@@ -112,11 +117,20 @@ function PersonenSeite({ art }: { art: PersonenArt }) {
         {liste.length ? (
           <Karte stil={{ marginTop: 14 }}>
             {liste.map((p, i) => (
-              <Zeile key={p.id} links={<Initialen name={p.name} />} titel={p.name} text={(art === "mitarbeiter" ? p.taetigkeit : p.anschrift)?.split("\n")[0] || undefined} onPress={() => oeffnen(p.id)} letzte={i === liste.length - 1} />
+              <Zeile key={p.id} links={<Initialen name={p.name} />} titel={p.name} text={[(art === "mitarbeiter" ? p.taetigkeit : p.anschrift)?.split("\n")[0], guthabenVon(p.name) > 0 ? TEXT.e229_guthaben_kunde(euroText(guthabenVon(p.name))) : ""].filter(Boolean).join(" · ") || undefined} onPress={() => oeffnen(p.id)} letzte={i === liste.length - 1} />
             ))}
           </Karte>
         ) : !s ? (
           <T v="klein" leise stil={{ marginTop: 14 }}>{art === "mitarbeiter" && ausCheckBeschaeftigte(z.stand.profil) ? TEXT.r11_mitarbeiter_bruecke_text(ausCheckBeschaeftigte(z.stand.profil)) : TEXT.personen_leer[art]}</T>
+        ) : null}
+        {konten.length ? (
+          <Karte stil={{ marginTop: 14 }}>
+            <T v="klein" fett accessibilityRole="header">{TEXT.e229_guthaben_titel}</T>
+            {konten.map((k) => (
+              <T key={k.kunde} v="klein">{`${k.name || "–"}: ${euroText(k.rest)} (${k.posten.map((p) => String(p.u.daten.nummer ?? "")).join(", ")})`}</T>
+            ))}
+            <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.e229_guthaben_kunde_hilfe}</T>
+          </Karte>
         ) : null}
         <Knopf ton symbol="plus" text={TEXT.person_hinzufuegen[art]} onPress={anlegen} stil={{ marginTop: 16 }} />
       </Inhalt>

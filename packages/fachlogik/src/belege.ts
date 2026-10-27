@@ -184,6 +184,13 @@ export interface BelegFremd {
   kurs?: number | null;
   /** Tag bzw. Monat, für den der Kurs gilt (ISO-Tag) */
   kurs_datum?: string | null;
+  /**
+   * E-229 (Steuerberater 27.10.2026, T-303): tatsächlich gezahlter Euro-Betrag laut Kontoauszug (Cent). Bei der
+   * Einnahmen-Überschuss-Rechnung ist er die Betriebsausgabe (Abfluss, § 11 Abs. 2 EStG) – nicht der umgerechnete
+   * Rechnungsbetrag; die Vorsteuer bleibt der umgerechnete Betrag (§ 16 Abs. 6 UStG). Bei Bilanzierenden genügt der
+   * umgerechnete Betrag, die Kursdifferenz bucht die Kanzlei.
+   */
+  gezahlt_eur_cent?: number | null;
 }
 
 const WAEHRUNG = /^[A-Z]{3}$/;
@@ -208,6 +215,7 @@ export function fremdAus(w: unknown): BelegFremd | null {
     ...(ganz(r.ust_eur_cent) !== null ? { ust_eur_cent: ganz(r.ust_eur_cent) } : {}),
     ...(kursGueltig(r.kurs) ? { kurs: r.kurs } : {}),
     ...(typeof r.kurs_datum === "string" && /^\d{4}-\d{2}-\d{2}$/.test(r.kurs_datum) ? { kurs_datum: r.kurs_datum } : {}),
+    ...(ganz(r.gezahlt_eur_cent) !== null && (r.gezahlt_eur_cent as number) > 0 ? { gezahlt_eur_cent: r.gezahlt_eur_cent as number } : {}),
   };
 }
 
@@ -420,8 +428,24 @@ export function belegSkonto(b: Pick<Beleg, "steuer" | "skonto_cent"> & { steuers
   ).filter((x) => x.brutto_cent);
 }
 
-/** Tatsächlich gezahlter Betrag eines Belegs (brutto abzüglich Skonto). */
-export const belegGezahlt = (b: Pick<Beleg, "steuer" | "skonto_cent" | "vorsteuer"> & { steuerschuld?: Steuerschuld | null }) => belegSummen(b).brutto_cent - (b.steuerschuld ? 0 : (b.skonto_cent ?? 0));
+/**
+ * Tatsächlich gezahlter Betrag eines Belegs (brutto abzüglich Skonto). E-229: bei einer Rechnung in fremder Währung der
+ * eingetragene Euro-Betrag laut Kontoauszug (`fremd.gezahlt_eur_cent`), wenn vorhanden.
+ */
+export const belegGezahlt = (b: Pick<Beleg, "steuer" | "skonto_cent" | "vorsteuer"> & { steuerschuld?: Steuerschuld | null; fremd?: BelegFremd | null }) => fremdGezahlt(b) ?? belegSummen(b).brutto_cent - (b.steuerschuld ? 0 : (b.skonto_cent ?? 0));
+
+/** E-229: gezahlter Euro-Betrag eines Belegs in fremder Währung (laut Kontoauszug) – null ohne Angabe. */
+export const fremdGezahlt = (b: { fremd?: BelegFremd | null }): number | null => (b.fremd && typeof b.fremd.gezahlt_eur_cent === "number" && b.fremd.gezahlt_eur_cent > 0 ? b.fremd.gezahlt_eur_cent : null);
+
+/**
+ * E-229: Kursdifferenz eines Belegs in fremder Währung – gezahlter Euro-Betrag abzüglich des umgerechneten Betrags (nach
+ * Skonto); positiv: mehr gezahlt. null ohne gezahlten Betrag oder ohne umgerechneten Euro-Betrag.
+ */
+export function fremdKursdifferenz(b: Pick<Beleg, "steuer" | "skonto_cent" | "vorsteuer"> & { steuerschuld?: Steuerschuld | null; fremd?: BelegFremd | null }): number | null {
+  const g = fremdGezahlt(b);
+  const umgerechnet = belegSummen(b).brutto_cent - (b.steuerschuld ? 0 : (b.skonto_cent ?? 0));
+  return g === null || !umgerechnet ? null : g - umgerechnet;
+}
 
 /**
  * Belegnummer des Lieferanten in einer Form, die DATEV (Belegfeld 1), Dateinamen und Listen gleich zeigen: Umlaute
@@ -656,8 +680,11 @@ export function ausgabenFuer(belege: Beleg[], jahr: string): { zeilen: EuerAusga
       anlagen.push(b);
       continue;
     }
-    // ohne Vorsteuerabzug ist der Bruttobetrag die Betriebsausgabe, mit Teilabzug brutto abzüglich abziehbarer Vorsteuer
-    const betrag = s.brutto_cent - skBrutto - (s.vorsteuer_cent - skAbziehbar);
+    // ohne Vorsteuerabzug ist der Bruttobetrag die Betriebsausgabe, mit Teilabzug brutto abzüglich abziehbarer Vorsteuer.
+    // E-229 (Steuerberater 27.10.2026): Rechnung in fremder Währung – Betriebsausgabe ist der tatsächlich gezahlte
+    // Euro-Betrag laut Kontoauszug (§ 11 Abs. 2 EStG) abzüglich der (umgerechneten) abziehbaren Vorsteuer
+    const gezahlt = fremdGezahlt(b) ?? s.brutto_cent - skBrutto;
+    const betrag = gezahlt - (s.vorsteuer_cent - skAbziehbar);
     const z = nach.get(k.id) ?? { kategorie: k, netto_cent: 0, anzahl: 0 };
     z.netto_cent += betrag;
     z.anzahl++;

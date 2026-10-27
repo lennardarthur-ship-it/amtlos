@@ -15,7 +15,7 @@ import { pdfAusgabe, pdfEinlesen } from "../unterlagen/pdfOriginal";
 import { NUMMER_DOPPELT, fehltFuer, lueckenFrage, vaOhneEuroFrage } from "../unterlagen/pruefung";
 import { dateiTeilen, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { ausgabeHtml, druckBetrieb, druckFesthalten, nachgebildet } from "../unterlagen/ausgabe";
-import { absenderFuer, geteiltOffenLetzte, geteilteVersionen, heute, zahlungPruefen, type EuStornoGrund } from "../unterlagen/speicher";
+import { UNEINBRINGLICH_GRUENDE, absenderFuer, geteiltOffenLetzte, geteilteVersionen, guthabenRest, guthabenVerrechnungen, guthabenVerwendet, heute, offenAmTag, uneinbringlichMoeglich, verrechenbareRechnungen, zahlungPruefen, type EuStornoGrund, type GuthabenEintrag, type UneinbringlichGrund } from "../unterlagen/speicher";
 import { einMonatNach, euBerichtigungSchluessel, euFehlerErkannt, euMeldeArtVon, euStornoGrund, euStornoGrundFest, euStornoTag, periodeText } from "../unterlagen/ustAusRechnungen";
 import { euroText, faelligAm, offenBrutto, rechnungBrutto } from "../unterlagen/ablage";
 import { useAmtlos } from "../zustand";
@@ -577,6 +577,11 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
                 gefahr
                 text={TEXT.stornieren}
                 onPress={() => {
+                  // E-229: uneinbringliche Forderung erst zurücknehmen (sonst doppelt gemindert)
+                  if (u.uneinbringlich?.datum) {
+                    melden(TEXT.e229_uneinbringlich_storno, "info");
+                    return;
+                  }
                   if (euFrage && !euGrund) {
                     melden(TEXT.e214_grund_fehlt, "info");
                     return;
@@ -693,11 +698,16 @@ function Zahlung({ id }: { id: string }) {
       {zahlungen.length ? (
         <View accessibilityLabel={TEXT.r12_zahlung_titel} style={{ gap: 2 }}>
           {zahlungen.map((x) => (
-            <T key={x.id} v="klein" leise>{TEXT.r12_zahlungen_liste(datumDe(x.datum), euroText(x.betrag_cent), x.minderung_cent ? TEXT.r12_minderung_kurz(euroText(x.minderung_cent), x.art ?? "skonto") : "")}</T>
+            <T key={x.id} v="klein" leise>{TEXT.r12_zahlungen_liste(datumDe(x.datum), euroText(x.betrag_cent), x.minderung_cent ? TEXT.r12_minderung_kurz(euroText(x.minderung_cent), x.art ?? "skonto") : x.guthaben ? TEXT.e229_aus_guthaben_zeile(String(z.stand.unterlagen.find((q) => q.id === x.guthaben!.rechnung)?.daten.nummer ?? "")) : "")}</T>
           ))}
         </View>
       ) : null}
-      {u.bezahlt || zahlungen.length ? <TextKnopf symbol="xmark" text={zahlungen.length ? TEXT.r12_zahlungen_entfernen : TEXT.zahlung_entfernen} onPress={() => z.bezahltSetzen(id, null)} /> : null}
+      {/* E-229: Guthaben aus Überzahlungen dieser Rechnung – zurücküberweisen oder verrechnen */}
+      {(u.guthaben ?? []).some((e) => e.art === "ueberzahlung") ? <GuthabenAbschnitt id={id} /> : null}
+      {u.bezahlt || zahlungen.length ? (guthabenVerwendet(z.stand, id) ? <T v="caption" leise>{TEXT.e229_entfernen_gesperrt}</T> : <TextKnopf symbol="xmark" text={zahlungen.length ? TEXT.r12_zahlungen_entfernen : TEXT.zahlung_entfernen} onPress={() => z.bezahltSetzen(id, null)} />) : null}
+      {/* E-229: auch nach vollständiger Zahlung kann noch Geld kommen (doppelt überwiesen) – wird Guthaben */}
+      {u.bezahlt && !erstattung ? (betragOffen ? <BetragErhalten id={id} offen={0} fertig={() => setBetragOffen(false)} /> : <TextKnopf symbol="eurosign" text={TEXT.e229_nochmal_erhalten} onPress={() => setBetragOffen(true)} />) : null}
+      {u.uneinbringlich?.datum ? <T v="klein" fett>{TEXT.e229_uneinbringlich_seit(datumDe(u.uneinbringlich.datum), TEXT.e229_uneinbringlich_gruende[u.uneinbringlich.grund ?? "sonstiges"])}</T> : null}
       {!u.bezahlt ? (
         <View style={{ gap: 4 }}>
           {/* nach dem Teilen ist „bezahlt“ der nächste Schritt (B1) – als Hauptknopf; überfällig zuerst die Erinnerung */}
@@ -708,8 +718,135 @@ function Zahlung({ id }: { id: string }) {
           {erstattung ? null : betragOffen || zahlungen.length ? <BetragErhalten id={id} offen={offen} fertig={() => setBetragOffen(false)} /> : <TextKnopf symbol="eurosign" text={TEXT.r12_betrag_erhalten} onPress={() => setBetragOffen(true)} />}
         </View>
       ) : null}
+      {!erstattung && uneinbringlichMoeglich(z.stand, u) ? <Uneinbringlich id={id} /> : null}
       <T v="caption" leise>{TEXT.bezahlt_hilfe}</T>
     </Karte>
+  );
+}
+
+/** E-229 (Steuerberater 27.10.2026, T-304 a): Guthaben des Kunden aus Überzahlungen an dieser Rechnung. */
+function GuthabenAbschnitt({ id }: { id: string }) {
+  const z = useAmtlos();
+  const u = z.stand.unterlagen.find((x) => x.id === id);
+  if (!u) return null;
+  const datumDe = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`;
+  return (
+    <View accessibilityLabel={TEXT.e229_guthaben_titel} style={{ gap: 4 }}>
+      <T v="klein" fett accessibilityRole="header">{TEXT.e229_guthaben_titel}</T>
+      {(u.guthaben ?? []).filter((e) => e.art === "ueberzahlung").map((e) => {
+        const rest = guthabenRest(z.stand, id, e.id);
+        return (
+          <View key={e.id} style={{ gap: 2 }}>
+            <T v="klein">{TEXT.e229_guthaben_zeile(datumDe(e.datum), euroText(e.betrag_cent), euroText(Math.max(0, rest)))}</T>
+            {(u.guthaben ?? []).filter((x) => x.art === "rueckzahlung" && x.bezug === e.id).map((x) => <T key={x.id} v="caption" leise>{TEXT.e229_rueckzahlung_zeile(datumDe(x.datum), euroText(x.betrag_cent))}</T>)}
+            {guthabenVerrechnungen(z.stand, id, e.id).map((x) => <T key={x.zahlung.id} v="caption" leise>{TEXT.e229_verrechnet_zeile(datumDe(x.zahlung.datum), euroText(x.zahlung.betrag_cent), String(x.u.daten.nummer ?? ""))}</T>)}
+            {rest > 0 ? <GuthabenVerwenden id={id} eintrag={e} rest={rest} /> : null}
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+/** E-229: Rest einer Überzahlung zurücküberweisen oder mit einer offenen Rechnung desselben Kunden verrechnen. */
+function GuthabenVerwenden({ id, eintrag, rest }: { id: string; eintrag: GuthabenEintrag; rest: number }) {
+  const z = useAmtlos();
+  const melden = useMeldung();
+  const [modus, setModus] = useState<"" | "zurueck" | "verrechnen">("");
+  const [datum, setDatum] = useState<string>(heute());
+  const [text, setText] = useState(BETRAG_FELD.format(rest / 100));
+  const ziele = verrechenbareRechnungen(z.stand, id);
+  const [ziel, setZiel] = useState<string | null>(ziele[0]?.id ?? null);
+  const zielU = ziele.find((x) => x.id === ziel);
+  const hoechstens = modus === "verrechnen" && zielU ? Math.min(rest, offenBrutto(zielU, z.stand.betrieb)) : rest;
+  const betrag = centAus(text);
+  const passt = betrag !== null && betrag > 0 && betrag <= hoechstens && datum >= eintrag.datum && datum <= heute();
+  if (!modus)
+    return (
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
+        <TextKnopf text={TEXT.e229_zurueck} onPress={() => setModus("zurueck")} />
+        <TextKnopf text={TEXT.e229_verrechnen} onPress={() => setModus("verrechnen")} />
+      </View>
+    );
+  if (modus === "verrechnen" && !ziele.length) return <Hinweis text={TEXT.e229_verrechnen_keine} />;
+  return (
+    <View style={{ gap: 6, marginTop: 4 }}>
+      <T v="klein" fett accessibilityRole="header">{modus === "zurueck" ? TEXT.e229_zurueck_titel : TEXT.e229_verrechnen_titel}</T>
+      {modus === "verrechnen" ? <Auswahl label={TEXT.e229_verrechnen_rechnung} wert={ziel} aendern={(w) => setZiel(w)} optionen={ziele.map((x) => ({ wert: x.id, text: TEXT.r12g_rechnung_zeile(String(x.daten.nummer ?? ""), String(x.daten.kunde_name ?? ""), euroText(offenBrutto(x, z.stand.betrieb))) }))} /> : null}
+      <DatumFeld label={modus === "zurueck" ? TEXT.e229_zurueck_datum : TEXT.e229_verrechnen_datum} wert={datum} aendern={(d) => d && setDatum(d)} />
+      <Feld label={TEXT.r12_zahlung_betrag} wert={text} aendern={setText} keyboardType="decimal-pad" placeholder="0,00" fehler={text.trim() && (betrag === null || betrag > hoechstens) ? TEXT.e229_betrag_hoechstens(euroText(hoechstens)) : null} />
+      {modus === "verrechnen" ? <T v="caption" leise>{TEXT.e229_verrechnen_hilfe}</T> : null}
+      <Knopf
+        ton
+        symbol="checkmark"
+        text={modus === "zurueck" ? TEXT.e229_zurueck_vermerken : TEXT.e229_verrechnen_vermerken}
+        deaktiviert={!passt || (modus === "verrechnen" && !zielU)}
+        onPress={() => {
+          if (!passt || betrag === null) return;
+          if (modus === "zurueck") {
+            z.guthabenZurueckzahlen(id, eintrag.id, datum, betrag);
+            melden(TEXT.e229_zurueck_vermerkt(euroText(betrag)));
+          } else if (zielU) {
+            z.guthabenVerrechnen(id, eintrag.id, zielU.id, datum, betrag);
+            melden(TEXT.e229_verrechnet(euroText(betrag), String(zielU.daten.nummer ?? "")));
+          }
+          setModus("");
+        }}
+      />
+      <TextKnopf text={TEXT.abbrechen} onPress={() => setModus("")} />
+    </View>
+  );
+}
+
+/** E-229 (Steuerberater 27.10.2026, T-304 c): Forderung uneinbringlich vermerken (§ 17 Abs. 2 Nr. 1 UStG) bzw. zurücknehmen. */
+function Uneinbringlich({ id }: { id: string }) {
+  const z = useAmtlos();
+  const melden = useMeldung();
+  const [offen, setOffen] = useState(false);
+  const [datum, setDatum] = useState<string>(heute());
+  const [grund, setGrund] = useState<UneinbringlichGrund | null>(null);
+  const [text, setText] = useState("");
+  const u = z.stand.unterlagen.find((x) => x.id === id);
+  if (!u) return null;
+  if (u.uneinbringlich?.datum)
+    return (
+      <View style={{ gap: 4 }}>
+        {u.uneinbringlich.text ? <T v="caption" leise>{u.uneinbringlich.text}</T> : null}
+        <T v="caption" leise>{TEXT.e229_uneinbringlich_spaeter}</T>
+        <TextKnopf
+          text={TEXT.e229_uneinbringlich_zuruecknehmen}
+          onPress={() => {
+            z.uneinbringlichSetzen(id, null);
+            melden(TEXT.e229_uneinbringlich_zurueckgenommen, "info");
+          }}
+        />
+      </View>
+    );
+  if (!offen) return <TextKnopf symbol="exclamationmark.triangle" text={TEXT.e229_uneinbringlich} onPress={() => setOffen(true)} />;
+  const offenBetrag = offenAmTag(z.stand, u, datum);
+  const passt = Boolean(grund) && datum <= heute() && datum >= String(u.daten.datum ?? "") && offenBetrag > 0 && (grund !== "sonstiges" || text.replace(/\s+/g, " ").trim().length >= 10);
+  return (
+    <View style={{ gap: 6, marginTop: 6 }}>
+      <T v="klein" fett accessibilityRole="header">{TEXT.e229_uneinbringlich_titel}</T>
+      <T v="caption" leise>{TEXT.e229_uneinbringlich_text(euroText(offenBetrag))}</T>
+      <DatumFeld label={TEXT.e229_uneinbringlich_datum} wert={datum} aendern={(d) => d && setDatum(d)} />
+      <Wahl label={TEXT.e229_uneinbringlich_grund} wert={grund} aendern={setGrund} optionen={UNEINBRINGLICH_GRUENDE.map((g) => ({ wert: g, text: TEXT.e229_uneinbringlich_gruende[g] }))} />
+      <Feld label={TEXT.e229_uneinbringlich_erlaeuterung} hilfe={TEXT.e229_uneinbringlich_erlaeuterung_hilfe} optional={grund !== "sonstiges"} wert={text} aendern={setText} mehrzeilig />
+      <Knopf
+        ton
+        gefahr
+        symbol="checkmark"
+        text={TEXT.e229_uneinbringlich_vermerken}
+        deaktiviert={!passt}
+        onPress={() => {
+          if (!passt || !grund) return;
+          z.uneinbringlichSetzen(id, { datum, grund, ...(text.trim() ? { text } : {}) });
+          melden(TEXT.e229_uneinbringlich_vermerkt, "info");
+          setOffen(false);
+        }}
+      />
+      <TextKnopf text={TEXT.abbrechen} onPress={() => setOffen(false)} />
+    </View>
   );
 }
 
@@ -725,7 +862,7 @@ function BetragErhalten({ id, offen, fertig }: { id: string; offen: number; fert
   const melden = useMeldung();
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const [datum, setDatum] = useState<string>(heute());
-  const sk = u && !u.zahlungen?.length ? skontoFuer(u.daten, z.stand.betrieb.bundesland) : null;
+  const sk = u && !u.zahlungen?.length && offen > 0 ? skontoFuer(u.daten, z.stand.betrieb.bundesland) : null;
   const skBetrag = sk && u ? skontoBetrag(rechnungBrutto(u, z.stand.betrieb), sk.prozent) : 0;
   const inFrist = Boolean(sk && datum <= sk.bis);
   const [text, setText] = useState(() => BETRAG_FELD.format((sk && heute() <= sk.bis ? offen - skBetrag : offen) / 100));
@@ -739,13 +876,14 @@ function BetragErhalten({ id, offen, fertig }: { id: string; offen: number; fert
   // E-221 Befund 5: nie still kürzen – Überzahlung, Skonto ohne Zahlung, mehr als das vereinbarte Skonto und „ganz
   // gemindert, nichts erhalten“ werden abgelehnt (zahlungPruefen); gespeichert wird genau, was gemeldet wird
   const pruefung = betrag === null ? null : zahlungPruefen(z.stand, id, zahlung);
-  const fehlerText = !pruefung?.fehler || pruefung.fehler === "betrag" ? null : pruefung.fehler === "ueberzahlt" ? TEXT.e221_ueberzahlt(euroText((betrag ?? 0) - offen), euroText(offen)) : pruefung.fehler === "skonto_zu_hoch" ? TEXT.e221_skonto_zu_hoch(euroText(pruefung.skontoHoechstens ?? 0)) : pruefung.fehler === "skonto_ohne_zahlung" ? TEXT.e221_skonto_ohne_zahlung : TEXT.e221_nichts_erhalten;
+  const fehlerText = !pruefung?.fehler || pruefung.fehler === "betrag" ? null : pruefung.fehler === "ueberzahlt" ? TEXT.e221_ueberzahlt(euroText((betrag ?? 0) + minderung - offen), euroText(offen)) : pruefung.fehler === "skonto_zu_hoch" ? TEXT.e221_skonto_zu_hoch(euroText(pruefung.skontoHoechstens ?? 0)) : pruefung.fehler === "skonto_ohne_zahlung" ? TEXT.e221_skonto_ohne_zahlung : TEXT.e221_nichts_erhalten;
   const speichern = async () => {
     if (betrag === null || !pruefung || pruefung.fehler) return;
     // ohne vereinbartes Skonto ausdrücklich nachfragen (eine Obergrenze gibt es dann nicht)
     if (pruefung.ohneVereinbarung && !(await bestaetigen({ titel: TEXT.e221_skonto_ohne_vereinbarung_titel, text: TEXT.e221_skonto_ohne_vereinbarung_text(euroText(minderung)), ja: TEXT.e221_skonto_ohne_vereinbarung_ja }))) return;
     z.zahlungVermerken(id, zahlung);
-    melden(TEXT.r12_zahlung_vermerkt(euroText(betrag)));
+    // E-229: der Teil über dem offenen Betrag bleibt Guthaben des Kunden – die Meldung sagt es
+    melden(pruefung.ueberzahlung ? TEXT.e229_ueberzahlung_vermerkt(euroText(betrag), euroText(pruefung.ueberzahlung)) : TEXT.r12_zahlung_vermerkt(euroText(betrag)));
     z.erfolg();
     fertig();
   };
@@ -753,7 +891,9 @@ function BetragErhalten({ id, offen, fertig }: { id: string; offen: number; fert
     <View style={{ gap: 6, marginTop: 6 }}>
       <T v="klein" fett accessibilityRole="header">{TEXT.r12_zahlung_titel}</T>
       <DatumFeld label={TEXT.r12_zahlung_datum} wert={datum} aendern={(d) => d && setDatum(d)} />
-      <Feld label={TEXT.r12_zahlung_betrag} wert={text} aendern={setText} keyboardType="decimal-pad" placeholder="0,00" fehler={text.trim() && betrag === null ? TEXT.betrag_falsch : betrag !== null && betrag > offen ? TEXT.r12_ueberzahlt : null} />
+      <Feld label={TEXT.r12_zahlung_betrag} wert={text} aendern={setText} keyboardType="decimal-pad" placeholder="0,00" fehler={text.trim() && betrag === null ? TEXT.betrag_falsch : null} />
+      {/* E-229 (Steuerberater 27.10.2026): mehr als offen – nicht ablehnen, der Rest wird Guthaben des Kunden */}
+      {pruefung && !pruefung.fehler && pruefung.ueberzahlung ? <Hinweis text={TEXT.e229_ueberzahlung(euroText(pruefung.ueberzahlung), euroText(offen))} /> : null}
       {pruefung?.fehler === "ueberzahlt" && offen > 0 ? <TextKnopf text={TEXT.e221_nur_offen(euroText(offen))} onPress={() => setText(BETRAG_FELD.format(offen / 100))} /> : null}
       {sk ? <T v="caption" leise>{inFrist ? TEXT.r12_skonto_passt(euroText(skBetrag), datumDe(sk.bis)) : TEXT.r12_skonto_spaet(datumDe(sk.bis))}</T> : null}
       {differenz > 0 && betrag !== null ? (

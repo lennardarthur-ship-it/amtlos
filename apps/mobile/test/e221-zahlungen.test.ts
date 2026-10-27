@@ -2,7 +2,8 @@
  * E-221 Befund 5: Teilzahlungen wurden still gekürzt – bei einer Überzahlung meldete die App den vollen Betrag als
  * vermerkt, gespeichert war weniger (`Math.min(betrag, offen)`); eine Rechnung ließ sich mit 0 € Zahlung und 100 %
  * „Skonto“ ausbuchen. Jetzt: Überzahlung abgelehnt (mit „Nur den offenen Betrag vermerken“), Skonto nur mit Zahlung und
- * höchstens wie vereinbart, „nichts erhalten, alles gemindert“ nie – auch nicht über die Kasse.
+ * höchstens wie vereinbart, „nichts erhalten, alles gemindert“ nie – auch nicht über die Kasse. E-229: Überzahlung wird
+ * Guthaben des Kunden (Steuerberater 27.10.2026), nicht mehr abgelehnt.
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -24,19 +25,24 @@ function re(skonto = true): Stand {
 }
 
 describe("E-221 Befund 5: Zahlungseingang nie still kürzen", () => {
-  it("Überzahlung: abgelehnt, nichts gespeichert (vorher still auf den offenen Betrag gekürzt)", () => {
+  it("Überzahlung: nie still gekürzt – E-229 (Steuerberater 27.10.2026): nicht mehr abgelehnt, der Rest wird Guthaben des Kunden", () => {
     const s = re();
     expect(offenerBetrag(s, s.unterlagen[0]!)).toBe(22600);
-    expect(zahlungPruefen(s, "r1", { datum: "2026-04-02", betrag_cent: 25000 })).toMatchObject({ fehler: "ueberzahlt", offen: 22600 });
-    expect(zahlungVermerken(s, "r1", { datum: "2026-04-02", betrag_cent: 25000 })).toBe(s);
+    expect(zahlungPruefen(s, "r1", { datum: "2026-04-02", betrag_cent: 25000 })).toMatchObject({ fehler: null, offen: 22600, ueberzahlung: 2400 });
+    const ueber = zahlungVermerken(s, "r1", { datum: "2026-04-02", betrag_cent: 25000 });
+    expect(ueber.unterlagen[0]!.zahlungen).toEqual([expect.objectContaining({ betrag_cent: 22600 })]);
+    expect(ueber.unterlagen[0]!.guthaben).toEqual([expect.objectContaining({ art: "ueberzahlung", betrag_cent: 2400 })]);
     // genau der offene Betrag geht – gespeichert wird, was gemeldet wird
     const voll = zahlungVermerken(s, "r1", { datum: "2026-04-02", betrag_cent: 22600 });
     expect(voll.unterlagen[0]!.zahlungen).toEqual([expect.objectContaining({ betrag_cent: 22600 })]);
+    expect(voll.unterlagen[0]!.guthaben).toBeUndefined();
     expect(voll.unterlagen[0]!.bezahlt).toBe("2026-04-02");
-    // nach einer Teilzahlung zählt der Rest
+    // nach einer Teilzahlung zählt der Rest; Skonto/Minderung über den Rest bleibt abgelehnt
     const teil = zahlungVermerken(s, "r1", { datum: "2026-04-02", betrag_cent: 20000 });
-    expect(zahlungPruefen(teil, "r1", { datum: "2026-04-10", betrag_cent: 2700 }).fehler).toBe("ueberzahlt");
+    expect(zahlungPruefen(teil, "r1", { datum: "2026-04-10", betrag_cent: 2700 })).toMatchObject({ fehler: null, ueberzahlung: 100 });
     expect(zahlungPruefen(teil, "r1", { datum: "2026-04-10", betrag_cent: 2600 }).fehler).toBeNull();
+    expect(zahlungPruefen(teil, "r1", { datum: "2026-04-10", betrag_cent: 2500, minderung_cent: 200, art: "minderung" }).fehler).toBe("ueberzahlt");
+    expect(zahlungVermerken(teil, "r1", { datum: "2026-04-10", betrag_cent: 2500, minderung_cent: 200, art: "minderung" })).toBe(teil);
   });
 
   it("0 € Zahlung und 100 % „Skonto“: abgelehnt (vorher ausgebucht)", () => {
@@ -80,6 +86,7 @@ describe("E-221 Befund 5: Zahlungseingang nie still kürzen", () => {
     expect(a).toContain("pruefung.ohneVereinbarung && !(await bestaetigen(");
     expect(a).toContain("TEXT.e221_nur_offen(");
     const k = lies("seiten/Kasse.tsx");
-    expect(k).toContain('zahlungPruefen(z.stand, r.id, { datum: tag, betrag_cent: r.betrag_cent }).fehler === "ueberzahlt"');
+    expect(k).toContain("const p = zahlungPruefen(z.stand, r.id, { datum: tag, betrag_cent: r.betrag_cent });");
+    expect(k).toContain('return p.fehler === "ueberzahlt" || p.ueberzahlung > 0;');
   });
 });
