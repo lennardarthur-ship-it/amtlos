@@ -39,6 +39,11 @@ function standardKonto(id: KontenvorgabeKonto, kr: "SKR03" | "SKR04"): string {
       return k.igErwerb.ohne[19];
     case "igErwerbOhneVst7":
       return k.igErwerb.ohne[7];
+    // E-232: Forderungsverluste je Steuersatz (Kursdifferenzen über `default`)
+    case "forderungsverlust19":
+      return k.forderungsverlust[19];
+    case "forderungsverlust7":
+      return k.forderungsverlust[7];
     case "anlageMaschinen":
       return k.anlagen.maschinen;
     case "anlageBga":

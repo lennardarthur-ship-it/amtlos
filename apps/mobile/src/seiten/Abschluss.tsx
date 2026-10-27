@@ -20,7 +20,7 @@ import { einMonatNach, euBerichtigungSchluessel, euFehlerErkannt, euMeldeArtVon,
 import { euroText, faelligAm, offenBrutto, rechnungBrutto } from "../unterlagen/ablage";
 import { useAmtlos } from "../zustand";
 import { versandBestaetigt } from "./versand";
-import { bestaetigen } from "../ui/bestaetigen";
+import { bestaetigen, hinweisen } from "../ui/bestaetigen";
 import { AbsenderSeite } from "./Betrieb";
 import { BetriebTeilSeite } from "./Absender";
 import { handwerkLaut, ohneZahlungsweg } from "./rechnungHinweise";
@@ -122,12 +122,17 @@ export function useTeilen(id: string) {
       const sha = erg.sha256;
       if (erg.nachgereicht && !z.pdfOriginalSetzen(id, erg.nachgereicht)) z.dateiVerwerfen(erg.nachgereicht.datei);
       if (erg.originalFehlt) melden(TEXT.e228_original_fehlt, "info");
-      if (u.festgeschrieben) return void z.ausgeben(id, pdfDaten, sha, absender, false, html);
+      // E-232 (T-328 c): über 10 MB – nicht aufbewahrt, der Nutzer muss das geteilte PDF selbst aufbewahren
+      if (erg.zuGross) await hinweisen(TEXT.e232_pdf_selbst_titel, TEXT.e232_pdf_selbst(erg.zuGross.groesse));
+      if (u.festgeschrieben) {
+        if (erg.zuGross) z.pdfSelbstVermerken(id, erg.zuGross);
+        return void z.ausgeben(id, pdfDaten, sha, absender, false, html);
+      }
       // E-193 (4): Android meldet einen Abbruch des Teilen-Menüs (und des Druckdialogs) nicht – erst nach „Ja“ festschreiben;
       // bei „Nein“ bleibt der Entwurf, die ausgegebene Fassung wird vermerkt (später „Doch verschickt – festschreiben“)
-      if (!(await versandBestaetigt(u, v, art === "drucken"))) return z.teilenOffen(id, { daten: pdfDaten, art: art === "drucken" ? "druck" : "pdf", ...(sha ? { pdfSha256: sha } : {}), absender, druck: druckFesthalten(html, absender.logo, new Date().toISOString()), ...(erg.neu ? { pdf: erg.neu } : {}) });
+      if (!(await versandBestaetigt(u, v, art === "drucken"))) return z.teilenOffen(id, { daten: pdfDaten, art: art === "drucken" ? "druck" : "pdf", ...(sha ? { pdfSha256: sha } : {}), absender, druck: druckFesthalten(html, absender.logo, new Date().toISOString()), ...(erg.neu ? { pdf: erg.neu } : erg.zuGross ? { pdfSelbst: erg.zuGross } : {}) });
       const erstesMal = !u.ausgegeben;
-      if (!z.ausgeben(id, pdfDaten, sha, absender, false, html, erg.neu)) {
+      if (!z.ausgeben(id, pdfDaten, sha, absender, false, html, erg.neu, erg.zuGross)) {
         if (erg.neu) z.dateiVerwerfen(erg.neu.datei);
         return melden(TEXT.pdf_geaendert, "info");
       }
@@ -208,6 +213,13 @@ function PdfOriginalZeile({ id }: { id: string }) {
       setLaedt(false);
     }
   };
+  // E-232 (T-328 c): zu groß zum Aufbewahren – deutlich sagen, dass das geteilte PDF selbst aufzubewahren ist
+  if (u.pdfSelbst)
+    return (
+      <View style={{ marginTop: 4 }}>
+        <Hinweis art="warnung" text={TEXT.e232_pdf_selbst_vermerk(zeit(u.pdfSelbst.am), u.pdfSelbst.groesse)} />
+      </View>
+    );
   if (u.pdf)
     return (
       <View style={{ marginTop: 4 }}>
@@ -808,11 +820,14 @@ function Uneinbringlich({ id }: { id: string }) {
   const [text, setText] = useState("");
   const u = z.stand.unterlagen.find((x) => x.id === id);
   if (!u) return null;
+  // E-232 (Steuerberater zu T-333 b): EU-Umsatz (Zusammenfassende Meldung) bzw. OSS – „bitte mit der Steuerberatung klären“
+  const euOss = u.daten.oss === true ? "oss" : euMeldeArtVon(u, z.stand.betrieb) ? "zm" : null;
   if (u.uneinbringlich?.datum)
     return (
       <View style={{ gap: 4 }}>
         {u.uneinbringlich.text ? <T v="caption" leise>{u.uneinbringlich.text}</T> : null}
         <T v="caption" leise>{TEXT.e229_uneinbringlich_spaeter}</T>
+        {euOss ? <Hinweis text={TEXT.e232_uneinbringlich_eu_oss(euOss)} /> : null}
         <TextKnopf
           text={TEXT.e229_uneinbringlich_zuruecknehmen}
           onPress={() => {
@@ -829,6 +844,7 @@ function Uneinbringlich({ id }: { id: string }) {
     <View style={{ gap: 6, marginTop: 6 }}>
       <T v="klein" fett accessibilityRole="header">{TEXT.e229_uneinbringlich_titel}</T>
       <T v="caption" leise>{TEXT.e229_uneinbringlich_text(euroText(offenBetrag))}</T>
+      {euOss ? <Hinweis text={TEXT.e232_uneinbringlich_eu_oss(euOss)} /> : null}
       <DatumFeld label={TEXT.e229_uneinbringlich_datum} wert={datum} aendern={(d) => d && setDatum(d)} />
       <Wahl label={TEXT.e229_uneinbringlich_grund} wert={grund} aendern={setGrund} optionen={UNEINBRINGLICH_GRUENDE.map((g) => ({ wert: g, text: TEXT.e229_uneinbringlich_gruende[g] }))} />
       <Feld label={TEXT.e229_uneinbringlich_erlaeuterung} hilfe={TEXT.e229_uneinbringlich_erlaeuterung_hilfe} optional={grund !== "sonstiges"} wert={text} aendern={setText} mehrzeilig />

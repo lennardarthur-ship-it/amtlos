@@ -7,6 +7,9 @@ import { ANDROID, W } from "./plattform";
 /** Empfänger der Zahlungserinnerung ist eine Firma, Behörde oder Einrichtung (Rechtsform oder typisches Wort im Namen). */
 const ERINNERUNG_FIRMA = /\b(GmbH|mbH|AG|UG|KG|OHG|GbR|SE|PartG|Ltd\.?|Inc\.?|e\.\s?K\.|e\.\s?V\.|eG)(?=$|[\s&,.)])|\b(Hausverwaltung|Verwaltung|Praxis|Kanzlei|Büro|Gesellschaft|Verein|Genossenschaft|Stadt|Gemeinde|Landkreis|Amt|Behörde|Schule|Kita|Klinik|Stiftung|Werkstatt|Agentur|Studio|Hotel|Restaurant|Café)\b/;
 
+/** E-232: Dateigröße in MB mit einer Nachkommastelle („12,4 MB“) */
+const mbText = (bytes: number) => `${(bytes / (1024 * 1024)).toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} MB`;
+
 export const T = {
   app: MARKE.name,
   ladefehler_titel: "Deine Daten ließen sich nicht öffnen",
@@ -189,6 +192,12 @@ export const T = {
           ? "Die gewählte Datei ist kein PDF (oder größer als 10 MB) – nichts aufbewahrt."
           : "Für diese Unterlage ist schon ein Original-PDF aufbewahrt.",
   e228_original_fehlt: "Das aufbewahrte Original-PDF liegt auf diesem Gerät (noch) nicht vor – z. B. bis die Synchronisation es geladen hat. Weitergegeben wurde eine neu erzeugte Wiedergabe.",
+  // E-232 (Steuerberater zu T-328 c): PDF über 10 MB – die App bewahrt es nicht auf, der Nutzer muss es selbst aufbewahren
+  e232_pdf_selbst_titel: "PDF bitte selbst aufbewahren",
+  e232_pdf_selbst: (groesse: number) =>
+    `Dieses PDF ist ${mbText(groesse)} groß – über der Grenze von 10 MB. Die App bewahrt es deshalb nicht auf, auch nicht in Synchronisation und Sicherung. Du musst das geteilte PDF selbst aufbewahren (z. B. den Anhang der gesendeten Mail), denn es ist das Doppel, das aufzubewahren ist (bei Rechnungen § 14b UStG, § 147 Abs. 1 Nr. 4 AO). Die App behält nur das festgehaltene Dokument und den Prüfwert; ein später neu erzeugtes PDF ist nur eine Wiedergabe.`,
+  e232_pdf_selbst_vermerk: (am: string, groesse: number) =>
+    `Original-PDF NICHT in der App aufbewahrt: Das PDF vom ${am} war ${mbText(groesse)} groß (Grenze 10 MB). Bitte bewahre das geteilte PDF selbst auf (z. B. den Anhang der gesendeten Mail) – es ist das Doppel, das aufzubewahren ist (bei Rechnungen § 14b UStG, § 147 Abs. 1 Nr. 4 AO). Erneutes Teilen, Paket und Archiv geben eine neu erzeugte Wiedergabe weiter.`,
   festgeschrieben_text: (datum: string, storno: boolean) => `Festgeschrieben am ${datum}. Änderungen und Löschen sind nicht mehr möglich${storno ? " – korrigieren lässt sie sich nur per Stornorechnung." : "."}`,
   festgeschrieben_kurz: "festgeschrieben",
   storniert: "storniert",
@@ -659,10 +668,10 @@ export const T = {
   pro_zeile_frei: "Pflichten-Check kostenlos – alles Weitere mit Pro",
   // E-200: Daten für die Betriebsprüfung (§ 147 Abs. 6 AO) – kostenlos, auch ohne und nach Pro
   e200_pruef_zeile: "Daten für Betriebsprüfung exportieren",
-  e200_pruef_zeile_text: "Listen, Änderungsprotokoll, E-Rechnungen und Originalbelege – kostenlos",
+  e200_pruef_zeile_text: "Listen, Änderungsprotokoll, E-Rechnungen, Rechnungs-PDFs und Originalbelege – kostenlos",
   e200_pruef_titel: "Daten für die Betriebsprüfung",
   e200_pruef_unter: "Kostenlos, auch ohne Pro",
-  e200_pruef_text: `Ein ZIP mit den Listen deiner Rechnungen, Belege, Kassenabschlüsse, Kassenstürze und Sachentnahmen (CSV), dem Änderungsprotokoll, allen E-Rechnungen (gestellt und empfangen, XML), den Originaldateien deiner Belege und einer Beschreibung aller Spalten – lesbar ohne ${MARKE.name}, über alle Jahre.`,
+  e200_pruef_text: `Ein ZIP mit den Listen deiner Rechnungen, Belege, Kassenabschlüsse, Kassenstürze und Sachentnahmen (CSV), dem Änderungsprotokoll, allen E-Rechnungen (gestellt und empfangen, XML), den aufbewahrten Original-PDFs deiner Rechnungen, den Originaldateien deiner Belege und einer Beschreibung aller Spalten – lesbar ohne ${MARKE.name}, über alle Jahre.`,
   e200_pruef_umfang: (r: number, b: number, k: number, d: number) => `${r === 1 ? "1 Rechnung" : `${r} Rechnungen`} · ${b === 1 ? "1 Beleg" : `${b} Belege`} · ${k === 1 ? "1 Kassenabschluss" : `${k} Kassenabschlüsse`} · ${d === 1 ? "1 Originaldatei" : `${d} Originaldateien`}`,
   e200_pruef_hinweis: `Die Datei ist nicht verschlüsselt. Speichere sie außerhalb dieses ${W.geraet}s und bewahre sie auf, solange die Aufbewahrungsfristen laufen. Die Sicherung als Datei ersetzt sie nicht – die lässt sich nur mit ${MARKE.name} öffnen.`,
   e200_pruef_knopf: "Exportieren",
@@ -799,7 +808,7 @@ export const T = {
   e221_umrechnen: (fremd: string, eur: string) => `In Euro umrechnen: ${fremd} = ${eur}`,
   // E-229 (Steuerberater 27.10.2026, T-303): gezahlter Euro-Betrag laut Kontoauszug
   e229_gezahlt_eur: "Gezahlt in Euro (laut Kontoauszug)",
-  e229_gezahlt_eur_hilfe: "Einnahmen-Überschuss-Rechnung: Als Betriebsausgabe zählt der Euro-Betrag, der tatsächlich abgebucht wurde (§ 11 EStG) – nicht der umgerechnete Rechnungsbetrag. Die Vorsteuer bleibt der umgerechnete Betrag. Mit Bilanz genügt der umgerechnete Betrag; die Kursdifferenz bucht die Kanzlei.",
+  e229_gezahlt_eur_hilfe: "Einnahmen-Überschuss-Rechnung: Als Betriebsausgabe zählt der Euro-Betrag, der tatsächlich abgebucht wurde (§ 11 EStG) – nicht der umgerechnete Rechnungsbetrag. Die Vorsteuer bleibt der umgerechnete Betrag. Mit Bilanz genügt der umgerechnete Betrag. Ist der gezahlte Betrag eingetragen, steht die Kursdifferenz im Steuerberater-Paket als eigene Buchung (Aufwendungen bzw. Erträge aus Kursdifferenzen).",
   e229_kursdifferenz: (b: string) => `Kursdifferenz zum umgerechneten Betrag: ${b}`,
   erechnung_unlesbar: `Die XML-Datei ist keine lesbare E-Rechnung. ${MARKE.name} hat sie als Datei abgelegt – bitte ergänze die Angaben von Hand.`,
   belege_titel: "Belege",
@@ -1449,7 +1458,7 @@ export const T = {
   e221_skonto_ohne_vereinbarung_text: (b: string) => `Auf der Rechnung ist kein Skonto vereinbart. Hat der Kunde ${b} abgezogen und du akzeptierst das, mindert sich die Umsatzsteuer im Zeitraum der Zahlung (§ 17 UStG). Als Skonto vermerken?`,
   e221_skonto_ohne_vereinbarung_ja: "Ja, als Skonto vermerken",
   // E-229 (Steuerberater 27.10.2026, T-304): Überzahlung als Guthaben des Kunden, uneinbringliche Forderung
-  e229_ueberzahlung: (mehr: string, offen: string) => `Das sind ${mehr} mehr als offen (${offen}). Die Rechnung gilt dann als bezahlt, die ${mehr} bleiben als Guthaben des Kunden stehen – du kannst sie zurücküberweisen oder mit der nächsten Rechnung verrechnen. Eine Überzahlung ist kein Umsatz und ändert die Umsatzsteuer nicht. War das Geld eine Vorauszahlung für eine neue Leistung, ist es eine Anzahlung – dann bitte eine Abschlagsrechnung stellen oder mit deiner Steuerberatung klären.`,
+  e229_ueberzahlung: (mehr: string, offen: string) => `Das sind ${mehr} mehr als offen (${offen}). Die Rechnung gilt dann als bezahlt, die ${mehr} bleiben als Guthaben des Kunden stehen – du kannst sie zurücküberweisen oder mit der nächsten Rechnung verrechnen. Eine Überzahlung ist kein Umsatz und ändert die Umsatzsteuer nicht. War das Geld eine Vorauszahlung für eine neue Leistung, ist es eine Anzahlung – dann bitte eine Abschlagsrechnung stellen oder mit deiner Steuerberatung klären; bei Ist-Versteuerung zählt dann schon der Tag des Geldeingangs für die Umsatzsteuer.`,
   e229_ueberzahlung_vermerkt: (b: string, mehr: string) => `Zahlung über ${b} vermerkt – davon ${mehr} als Guthaben des Kunden`,
   e229_nochmal_erhalten: "Weiteres Geld erhalten (Überzahlung) …",
   e229_guthaben_titel: "Guthaben des Kunden",
@@ -1476,7 +1485,9 @@ export const T = {
   e229_guthaben_kunde_hilfe: "Aus Überzahlungen – an der jeweiligen Rechnung zurücküberweisen oder mit einer offenen Rechnung verrechnen.",
   e229_uneinbringlich: "Forderung uneinbringlich …",
   e229_uneinbringlich_titel: "Forderung uneinbringlich",
-  e229_uneinbringlich_text: (offen: string) => `Kommt das Geld (${offen}) voraussichtlich nicht mehr, ist die Forderung uneinbringlich (§ 17 Abs. 2 Nr. 1 UStG). Bei Soll-Versteuerung mindert der offene Betrag Umsatz und Umsatzsteuer im Zeitraum, in dem die Forderung uneinbringlich wurde; geht später doch Geld ein, wird im Zeitraum der Zahlung erneut berichtigt. Bei Ist-Versteuerung ändert sich die Umsatzsteuer nicht. Im Steuerberater-Paket steht die Forderung zum Ausbuchen – das Konto legt die Kanzlei fest.`,
+  e229_uneinbringlich_text: (offen: string) => `Kommt das Geld (${offen}) voraussichtlich nicht mehr, ist die Forderung uneinbringlich (§ 17 Abs. 2 Nr. 1 UStG). Bei Soll-Versteuerung mindert der offene Betrag Umsatz und Umsatzsteuer im Zeitraum, in dem die Forderung uneinbringlich wurde; geht später doch Geld ein, wird im Zeitraum der Zahlung erneut berichtigt. Bei Ist-Versteuerung ändert sich die Umsatzsteuer nicht. Mit Bilanz bucht das Steuerberater-Paket die Forderung aus (Forderungsverluste 19 % bzw. 7 %); sonst steht sie dort in einer Liste.`,
+  // E-232 (Steuerberater zu T-333 b): EU-Umsatz bzw. OSS – Meldung bzw. Erklärung ggf. zu berichtigen
+  e232_uneinbringlich_eu_oss: (art: "zm" | "oss") => `${art === "oss" ? "OSS-Rechnung: Die OSS-Erklärung" : "Innergemeinschaftliche Lieferung bzw. Leistung an ein Unternehmen im EU-Ausland: Die Zusammenfassende Meldung"} muss womöglich berichtigt werden – ${MARKE.name} tut das nicht. Bitte mit der Steuerberatung klären.`,
   e229_uneinbringlich_datum: "Uneinbringlich seit",
   e229_uneinbringlich_grund: "Grund",
   e229_uneinbringlich_gruende: { insolvenz: "Insolvenz des Kunden", vollstreckung: "Vollstreckung erfolglos", bestritten: "Forderung bestritten", sonstiges: "Anderer Grund" } as Record<"insolvenz" | "vollstreckung" | "bestritten" | "sonstiges", string>,

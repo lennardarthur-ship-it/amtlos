@@ -19,7 +19,7 @@ import { syncZusammenfuehren } from "./konto/sync";
 import { dateienImStand, doppeltePerson, korrigieren, personenZusammenfuehren, staetteLoeschen, staetteSetzen, unterlageStaette, type Betriebsstaette } from "./unterlagen/speicher";
 import { personenkontenVergeben } from "./unterlagen/steuerpaket";
 import { belegeFestschreiben, kassenbuchFestschreiben, kassensturzSpeichern, sachentnahmeLoeschen, sachentnahmeSpeichern } from "./unterlagen/speicher";
-import { pdfOriginalSetzen, type PdfOriginal } from "./unterlagen/speicher";
+import { pdfOriginalSetzen, pdfSelbstVermerken, type PdfOriginal, type PdfSelbst } from "./unterlagen/speicher";
 import { LEERER_STAND, StandFehler, geteilteFassungFestschreiben, teilenOffenVermerken, type GeteilteFassung, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, type EuStornoGrund, euStornoSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage, guthabenZurueckzahlen, guthabenVerrechnen, uneinbringlichSetzen, type UneinbringlichGrund } from "./unterlagen/speicher";
 
 /**
@@ -88,12 +88,14 @@ interface Zustand {
    * PDF neu erzeugen. Die Festschreibung wird sofort gespeichert (G3).
    */
   /** E-220 (8b): `absender` wie gedruckt (nach der Pro-Regel), `html` das gedruckte Dokument – beides wird festgehalten */
-  ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean, html?: string, pdf?: PdfOriginal): boolean;
+  ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean, html?: string, pdf?: PdfOriginal, pdfSelbst?: PdfSelbst): boolean;
   /**
    * E-228: aufbewahrtes PDF einer festgeschriebenen Unterlage nachträglich setzen (eingelesen bzw. neu erzeugt mit gleichem
    * Prüfwert, oder das erste PDF nach der XRechnung) – false, wenn es nicht passt (dann bleibt alles, wie es war).
    */
   pdfOriginalSetzen(id: string, pdf: PdfOriginal): boolean;
+  /** E-232 (T-328 c): PDF zu groß zum Aufbewahren – an der festgeschriebenen Unterlage vermerken */
+  pdfSelbstVermerken(id: string, selbst: PdfSelbst): void;
   /** E-228: eine eben abgelegte Datei wieder entfernen, wenn der Stand nicht auf sie zeigt (Festschreiben verworfen) */
   dateiVerwerfen(name: string): void;
   /** E-193 (4): Android – geteilt, aber „Nein, noch nicht“ verschickt: die ausgegebene Fassung merken, nicht festschreiben */
@@ -572,9 +574,9 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       personenZusammenfuehren: (art, bleibt, weg) => setzen(personenZusammenfuehren(aktuell.current, art, bleibt, weg)),
       profilSetzen: (werte, bl) => setzen(profilSetzen(aktuell.current, werte, bl)),
       erledigtSetzen: (pid, datum, termin) => setzen(erledigtSetzen(aktuell.current, pid, datum, termin)),
-      ausgeben: (id, daten, pdfSha256, absender, eRechnung, html, pdf) => {
+      ausgeben: (id, daten, pdfSha256, absender, eRechnung, html, pdf, pdfSelbst) => {
         if (!ausgabeMoeglich(aktuell.current, id, daten)) return false;
-        setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256, absender, eRechnung, html, pdf));
+        setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256, absender, eRechnung, html, pdf, pdfSelbst));
         // Festschreibung sofort speichern, nicht erst nach der Wartezeit (G3)
         schreiben();
         return true;
@@ -585,6 +587,12 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         setzen(neu);
         schreiben();
         return true;
+      },
+      pdfSelbstVermerken: (id, selbst) => {
+        const neu = pdfSelbstVermerken(aktuell.current, id, selbst);
+        if (neu === aktuell.current) return;
+        setzen(neu);
+        schreiben();
       },
       dateiVerwerfen: (name) => {
         if (!dateienImStand(aktuell.current).includes(name)) dateiEntfernen(name);

@@ -73,6 +73,8 @@ import {
   zeitDe,
   standortVon,
   skontoBuchungenBelege,
+  kursdifferenzBuchungenBelege,
+  forderungsverlustBuchungen,
   skontoBuchungenRechnung,
   tageText,
   zahlungsAnteile,
@@ -244,7 +246,7 @@ export function rechnungFuerBuchung(u: Unterlage, betrieb: Betrieb, o: { tage?: 
  * Einnahmen aus Rechnungen mit vermerktem Zahlungseingang (Zufluss, § 11 Abs. 1 EStG); Stornos negativ. Positionen zu
  * 0 % einer Rechnung mit Steuerart „igl“, „reverse_charge“ oder „befreit“ zählen als steuerfrei (eigene EÜR-Zeile).
  */
-export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
+export function einnahmenAusRechnungen(s: Stand, o: { euer?: boolean } = {}): Einnahme[] {
   // R12: Rechnungen mit einzelnen Zahlungen – je Zahlung der erhaltene Betrag (Skonto bzw. Minderung fließt nie zu)
   const mitZahlungen: Einnahme[] = umsatzRechnungen(s)
     .filter((u) => u.zahlungen?.length && !istStorno(u))
@@ -252,8 +254,10 @@ export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
       const { daten } = eRechnungAus(u.daten, absenderFuer(s, u));
       const frei = daten.steuerart && daten.steuerart !== "standard" && daten.steuerart !== "nullsatz";
       const nichtSteuerbar = daten.kleinunternehmer && (daten.steuerart === "reverse_charge" || !!euUnternehmenLand(u.daten) || !!drittlandLand(u.daten));
-      // Schlussrechnung: nur der Rest nach Abzug der Abschläge fließt zu (restGruppen, C-4)
-      return zahlungsAnteile(restGruppen(daten), u.zahlungen!).map((a) => {
+      // Schlussrechnung: nur der Rest nach Abzug der Abschläge fließt zu (restGruppen, C-4). E-232 (Steuerberater
+      // 27.10.2026, T-332): EÜR – eine Verrechnung mit dem Guthaben einer Überzahlung ist kein Zufluss (das Geld kam am
+      // Tag der Überzahlung, `guthabenEuer`); sie bleibt für die Aufteilung der übrigen Zahlungen stehen
+      return zahlungsAnteile(restGruppen(daten), u.zahlungen!).filter((a) => !(o.euer && a.zahlung.guthaben)).map((a) => {
         const netto = a.erhalten.reduce((x, g) => x + g.netto_cent, 0);
         // OSS: im Inland nicht steuerbar – Zeile „… nicht umsatzsteuerbare Betriebseinnahmen“ (Nachtrag 22.10.2026)
         const oss = daten.oss ? a.erhalten.filter((g) => g.satz).reduce((x, g) => x + g.netto_cent, 0) : 0;
@@ -275,6 +279,29 @@ export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
       const nichtSteuerbar = daten.kleinunternehmer && (daten.steuerart === "reverse_charge" || euUnternehmenLand(u.daten) || drittlandLand(u.daten)) ? sm.netto_cent : 0;
       return { tag: u.bezahlt!, netto_cent: vz * sm.netto_cent, ust_cent: vz * sm.ust_cent, steuerfrei_cent: vz * frei, nicht_steuerbar_cent: vz * nichtSteuerbar, kleinunternehmer: daten.kleinunternehmer };
     })];
+}
+
+/**
+ * E-232 (Steuerberater 27.10.2026, T-332 a): Überzahlungen von Kunden in der EÜR – Betriebseinnahme am Tag des
+ * Geldeingangs (§ 11 Abs. 1 EStG), eine Rückzahlung Betriebsausgabe am Tag der Zahlung (§ 11 Abs. 2 EStG). Die spätere
+ * Verrechnung mit einer Rechnung ist kein neuer Zufluss (`einnahmenAusRechnungen` mit `euer`). Umsatzsteuer (Ist): erst mit
+ * der Verrechnung (Voranmeldung, unverändert).
+ */
+export function guthabenEuer(s: Stand, jahr: string): { ueberzahlung_cent: number; rueckzahlung_cent: number; ueberzahlungen: number; rueckzahlungen: number } {
+  const r = { ueberzahlung_cent: 0, rueckzahlung_cent: 0, ueberzahlungen: 0, rueckzahlungen: 0 };
+  for (const u of umsatzRechnungen(s)) {
+    for (const e of u.guthaben ?? []) {
+      if (!e.datum.startsWith(`${jahr}-`) || !(e.betrag_cent > 0)) continue;
+      if (e.art === "ueberzahlung") {
+        r.ueberzahlung_cent += e.betrag_cent;
+        r.ueberzahlungen++;
+      } else {
+        r.rueckzahlung_cent += e.betrag_cent;
+        r.rueckzahlungen++;
+      }
+    }
+  }
+  return r;
 }
 
 /** Gutschriften mit Zahlungsvermerk im Jahr – Ausgaben des Betriebs (bezogene Leistungen), R10. */
@@ -471,7 +498,7 @@ export const EUER_KU_DAVON = "Nicht steuerbare Umsätze sowie Umsätze nach § 1
 export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
   // StB-Prüfung (E-4): keine EÜR für bilanzierende Betriebe – gesperrt mit Hinweis „Bilanz statt EÜR“
   if (bilanzierendeGewinnermittlung(s)) return { einnahmen: [], ausgaben: [], anlagen: 0, rechnungen: 0, belege: 0, unbezahlt: 0, gutschriften: 0, hinweis: EUER_GESPERRT, kassentage: 0, kasseFehlend: null, gesperrt: true };
-  const einnahmen = einnahmenAusRechnungen(s);
+  const einnahmen = einnahmenAusRechnungen(s, { euer: true });
   const e = euerFuer(einnahmen, s.belege, jahr);
   const ku = einnahmen.some((x) => x.kleinunternehmer && x.tag.startsWith(`${jahr}-`));
   const ein: Record<string, string>[] = [];
@@ -488,6 +515,10 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
     // ohne Beispiel: die Zeile sammelt igL, § 13b-Umsätze, Steuerbefreiungen (z. B. Heilbehandlungen) und OSS-Fernverkäufe
     if (e.einnahmen_steuerfrei_cent) ein.push({ datum: "", text: "Steuerfreie und nicht steuerbare Umsätze aus Rechnungen", kategorie: EUER_ZEILE_STEUERFREI, betrag: betrag(e.einnahmen_steuerfrei_cent) });
   }
+  // E-232 (Steuerberater 27.10.2026, T-332 a): Überzahlungen am Tag des Geldeingangs – noch kein Umsatz (die Umsatzsteuer
+  // entsteht bei Ist erst mit der Verrechnung); Zeile der Anlage EÜR: PRUEFLISTE T-343
+  const gh = guthabenEuer(s, jahr);
+  if (gh.ueberzahlung_cent) ein.push({ datum: "", text: `Überzahlungen von Kunden (Guthaben, ${gh.ueberzahlungen} ${gh.ueberzahlungen === 1 ? "Eingang" : "Eingänge"}) – Einnahme am Tag des Geldeingangs; die spätere Verrechnung mit einer Rechnung zählt nicht noch einmal`, kategorie: EUER_ZEILE_STEUERFREI, betrag: betrag(gh.ueberzahlung_cent) });
   if (e.ust_vereinnahmt_cent) ein.push({ datum: "", text: "Vereinnahmte Umsatzsteuer", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: betrag(e.ust_vereinnahmt_cent) });
   // R12: Kasseneinnahmen laut Tagesabschlüssen – Zufluss am Tag des Abschlusses, eigene Zeilen
   const kuKasse = istKleinunternehmer(s);
@@ -523,6 +554,8 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
     const abziehbar = Math.round((z.netto_cent * z.kategorie.abziehbar) / 100);
     return { datum: "", text: `${z.kategorie.titel} (${belegeText}): abziehbar ${z.kategorie.abziehbar} % von ${betrag(z.netto_cent)} €; nicht abziehbar ${betrag(z.netto_cent - abziehbar)} € – in der Anlage EÜR in die Spalte „nicht abziehbar“`, kategorie: z.kategorie.euer, betrag: betrag(abziehbar) };
   });
+  // E-232 (T-332 a): Rückzahlung eines Guthabens an den Kunden – Betriebsausgabe am Tag der Zahlung
+  if (gh.rueckzahlung_cent) aus.push({ datum: "", text: `Rückzahlungen von Überzahlungen an Kunden (${gh.rueckzahlungen} ${gh.rueckzahlungen === 1 ? "Zahlung" : "Zahlungen"})`, kategorie: "Übrige unbeschränkt abziehbare Betriebsausgaben", betrag: betrag(gh.rueckzahlung_cent) });
   const fehl = -diffJahr.filter((d) => d.cent < 0).reduce((a, d) => a + d.cent, 0);
   if (fehl) aus.push({ datum: "", text: "Kassendifferenzen laut Zählung (Fehlbeträge)", kategorie: "Übrige unbeschränkt abziehbare Betriebsausgaben", betrag: betrag(fehl) });
   // Gutschriften (bezahlt im Jahr) sind Ausgaben: bezogene Leistungen; ausgewiesene Steuer des Leistenden als Vorsteuer, außer als Kleinunternehmer
@@ -1534,6 +1567,16 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const ab = kasseAb(s.kasse);
   const kasseImZeitraum = s.kasse.filter((k) => imZeitraum(k.datum, z));
   const skontoBelege = s.belege.filter((b) => b.skonto_cent && imZeitraum(zahltag(b), z));
+  // E-232 (Steuerberater 27.10.2026, T-331): Kursdifferenz bei Belegen in fremder Währung – eigene Zeile zum Zahltag
+  const kursBelege = s.belege.filter((b) => fremdKursdifferenz(b) && imZeitraum(zahltag(b), z));
+  const kursIgeNicht = new Set(igeNichtGebucht(s, kursBelege, ku).map((b) => b.id));
+  // E-232 (T-333): bilanzierende Betriebe – Ausbuchung uneinbringlicher Forderungen (Forderungsverluste mit
+  // Umsatzsteuer-Automatik) zum Tag der Uneinbringlichkeit; nicht bei Kleinunternehmer-, OSS- und Abschlagsrechnungen
+  const ausbuchungen = bilanz
+    ? uneinbringlicheForderungen(s)
+        .filter((x) => imZeitraum(x.tag, z) && x.berichtigbar)
+        .map((x) => ({ x, ...forderungsverlustBuchungen(mitPk(x.u, rechnungFuerBuchung(x.u, s.betrieb, { tage, betriebKu: ku })), x.tag, x.je, sb.kontenrahmen, bo) }))
+    : [];
   // Gutschriften gehen als Aufwand in den Stapel (R10), Rechnungen als Erlös
   const buchungen = [
     ...buchungenAusRechnungen(imStapel.map((u) => ({ ...mitPk(u, rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku })), ...(nachZahlung(u) ? { datum: u.bezahlt! } : {}), ...(bilanz && euAnz.schluesse.has(u.id) ? { vollesEntgelt: true } : {}) })), sb.kontenrahmen, bo),
@@ -1542,6 +1585,8 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
     ...zahlungsEingaenge,
     ...buchungenAusBelegen(belege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab, kreditoren, igeNichtBuchen: igeNichtIds }),
     ...skontoBuchungenBelege(skontoBelege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab, kreditoren }),
+    ...kursdifferenzBuchungenBelege(kursBelege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab, kreditoren, igeNichtBuchen: kursIgeNicht }),
+    ...ausbuchungen.flatMap((a) => a.buchungen),
     ...kassenBuchungen(kasseImZeitraum, sb.kontenrahmen, { ...bo, kleinunternehmer: ku, kapitalgesellschaft: kapital }),
     // R12 GoBD: Kassendifferenzen (Kassenbuch = Kassenkonto) und Sachentnahmen
     ...kassenDifferenzBuchungen(kassenWarnungen(s.kasse, s.belege).differenzen.filter((d) => imZeitraum(d.datum, z)), sb.kontenrahmen, { ...bo, kleinunternehmer: ku }),
@@ -1653,10 +1698,30 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const uneinbringlichOhne = uneinbringlichHier.filter((x) => !uneinbringlichBerichtigt(x));
   const uneinbringlichOhneGrund = (x: (typeof uneinbringlichAlle)[number]) =>
     x.u.daten.kleinunternehmer === true ? "Kleinunternehmer-Rechnung" : x.u.daten.oss === true ? "OSS-Rechnung" : x.u.daten.abschlag === true ? "Abschlagsrechnung, mit der Zahlung versteuert" : "Kleinunternehmer-Zeitraum – ob und wo die Umsatzsteuer zu berichtigen ist, bitte prüfen";
+  // E-232 (T-333): EU-Umsätze (ZM) und OSS-Rechnungen unter den uneinbringlichen – Hinweis „bitte mit der Steuerberatung klären“
+  const uneinbringlichEuOss = uneinbringlichHier.filter((x) => x.u.daten.oss === true || !!euMeldeArtVon(x.u, s.betrieb));
+  const uneinbringlichStapelText = (() => {
+    // E-232 (Steuerberater 27.10.2026, T-333 a): Bilanz – Ausbuchung im Stapel; EÜR (Soll) vorerst nur diese Begleitdatei
+    if (!bilanz) return `Einnahmen-Überschuss-Rechnung: keine Ausbuchung (es ist nichts zugeflossen)${uneinbringlichMit.length ? " – die Umsatzsteuerberichtigung steht nicht im Stapel, sondern nur in dieser Liste; bitte von Hand buchen" : ""}.`;
+    const gebucht = ausbuchungen.filter((a) => a.buchungen.length);
+    const teile = [
+      gebucht.length ? `Im Stapel ausgebucht zum Tag der Uneinbringlichkeit (Bruttobetrag gegen ${forderungsKonto}, Konten „Forderungsverluste“ mit Umsatzsteuer-Automatik ${k.forderungsverlust[19]} für 19 %, ${k.forderungsverlust[7]} für 7 %, ohne Steuerschlüssel – die Umsatzsteuer wird im Buchungszeitraum berichtigt): ${gebucht.map((a) => `RE ${a.x.nummer} ${a.buchungen.map((b) => `${betrag(b.betrag_cent)} € (${b.ust_satz} %)`).join(" + ")}`).join("; ")}. Der Saldo ${forderungsKonto} ist um diese Beträge niedriger als die offenen Forderungen laut Rechnungsliste.${ist ? " Ist-Versteuerung: Die Voranmeldung der App berichtigt nicht (die Steuer war ohne Zahlung nicht entstanden) – bitte im Testimport prüfen, wie DATEV die Automatik der Forderungsverluste zuordnet." : ""}` : "",
+      ausbuchungen.some((a) => a.ohneKonto.length) ? `Ohne Konto (andere Steuersätze, z. B. 0 %), deshalb NICHT im Stapel – bitte von Hand ausbuchen: ${ausbuchungen.filter((a) => a.ohneKonto.length).map((a) => `RE ${a.x.nummer} ${a.ohneKonto.map((g) => `${betrag(g.brutto_cent)} € (${g.satz ?? 0} %)`).join(" + ")}`).join("; ")}.` : "",
+      (() => {
+        const ohne = uneinbringlichHier.filter((x) => imZeitraum(x.tag, z) && !x.berichtigbar);
+        return ohne.length ? `Nicht ausgebucht (Kleinunternehmer-, OSS- bzw. Abschlagsrechnung) – bitte von Hand buchen: ${ohne.map((x) => `RE ${x.nummer} ${betrag(x.offen)} €`).join("; ")}.` : "";
+      })(),
+      (() => {
+        const danach = uneinbringlichHier.flatMap((x) => x.spaeter.filter((p) => imZeitraum(p.datum, z)).map((p) => `RE ${x.nummer} am ${datumDe(p.datum)} ${betrag(p.brutto_cent)} €`));
+        return danach.length ? `Nach der Uneinbringlichkeit noch eingegangen (${danach.join("; ")}): Dafür bucht der Stapel nichts zurück – bitte von der Kanzlei buchen (Rückgängigmachen der Ausbuchung bzw. Umsatzsteuer).` : "";
+      })(),
+    ];
+    return teile.filter(Boolean).join(" ");
+  })();
   const uneinbringlichListe = uneinbringlichZeilen(s, z);
   if (uneinbringlichListe.length) inhalt[`Uneinbringlich_${z.name}.csv`] = utf8(csv(kopfAus(UNEINBRINGLICH_SPALTEN), uneinbringlichListe));
   // E-229 (T-303): Belege in fremder Währung mit gezahltem Euro-Betrag – Kursdifferenz (bei EÜR Teil der Betriebsausgabe)
-  const kursdifferenzen = belege.filter((b) => fremdKursdifferenz(b));
+  const kursdifferenzen = kursBelege.filter((b) => !kursIgeNicht.has(b.id) && belegImStapel(b, { kapitalgesellschaft: kapital }));
   // E-214: Stornos „Fehler in der Rechnung“ bei EU-Umsätzen – Storno bzw. Datum im Zeitraum; Anzahlungen auf EU-Umsätze
   const berichtigungen = euBerichtigungen(s.unterlagen, s.betrieb).filter((b) => imZeitraum(b.stornoDatum, z) || imZeitraum(b.tag, z));
   const euAbschlaege = gestellteRechnungen(s).filter((u) => u.daten.abschlag === true && euMeldeArtVon(u, s.betrieb) && ((u.bezahlt && imZeitraum(u.bezahlt, z)) || imZeitraum(String(u.daten.datum), z) || (u.zahlungen ?? []).some((x) => imZeitraum(x.datum, z))));
@@ -1715,11 +1780,11 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
     // E-229 (Steuerberater 27.10.2026, T-304 a): Überzahlungen sind kein Umsatz – Guthaben auf dem Debitor bis zur Rückzahlung bzw. Verrechnung
     ...(guthabenListe.length
       ? [
-          `Überzahlungen von Kunden (Guthaben_${z.name}.csv): Mehr erhalten als offen – der offene Betrag gilt als bezahlt, der Rest ist Guthaben des Kunden. Eine Überzahlung ist kein Umsatz und ändert die Umsatzsteuer nicht (solange sie keine Vorauszahlung für eine neue Leistung ist). ${
+          `Überzahlungen von Kunden (Guthaben_${z.name}.csv): Mehr erhalten als offen – der offene Betrag gilt als bezahlt, der Rest ist Guthaben des Kunden. Eine Überzahlung ist kein Umsatz und ändert die Umsatzsteuer nicht (solange sie keine Vorauszahlung für eine neue Leistung ist – dann zählt bei Ist-Versteuerung schon der Tag des Geldeingangs). ${
             bilanz && zahlungenBuchen
               ? `Im Stapel Bank (${k.bank}) an ${forderungsKonto} zum Tag der Überzahlung, eine Rückzahlung ${forderungsKonto} an Bank – das Guthaben steht bis dahin im Haben des Forderungs- bzw. Debitorenkontos (der Saldo oben ist um offene Guthaben niedriger als die offenen Forderungen).`
               : `Im Stapel keine eigene Buchung: Der ganze Geldeingang kommt mit dem Kontoauszug auf ${forderungsKonto}, das Guthaben bleibt dort im Haben stehen, bis es zurücküberwiesen (Kontoauszug) oder verrechnet wird.`
-          } Eine Verrechnung mit einer anderen Rechnung desselben Kunden steht dort als Zahlung zum Tag der Verrechnung (Ist-Versteuerung und EÜR: Entgelt ab diesem Tag) – ohne Geldbewegung, deshalb ohne Bankbuchung.`,
+          } Eine Verrechnung mit einer anderen Rechnung desselben Kunden steht dort als Zahlung zum Tag der Verrechnung – ohne Geldbewegung, deshalb ohne Bankbuchung. Umsatzsteuer bei Ist-Versteuerung: Entgelt erst mit der Verrechnung (Tag der Verrechnung). ${bilanz ? "Bilanz: Am Bilanzstichtag stehen offene Guthaben im Haben des Debitors; die Umgliederung nimmt die Kanzlei vor." : `EÜR (§ 11 EStG): Einnahme ist der Geldeingang am Tag der Überzahlung, eine Rückzahlung Ausgabe am Tag der Zahlung; die Verrechnung ist kein neuer Zufluss – so rechnet die EÜR der App.${ist ? " Im Stapel steht das Entgelt der verrechneten Rechnung (wegen der Umsatzsteuer) zum Tag der Verrechnung; als Einnahme gehört der Betrag aber in den Zeitraum der Überzahlung – bitte so buchen, dass er nicht doppelt bzw. im falschen Jahr zählt." : ""}`}`,
         ]
       : []),
     // E-229 (T-304 c): uneinbringliche Forderungen (§ 17 Abs. 2 Nr. 1 UStG) – Buchungen fehlen mangels Konto
@@ -1733,15 +1798,15 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
                   // E-229: keine Berichtigung bei Kleinunternehmer-Rechnungen, OSS und Abschlägen; im Kleinunternehmer-Zeitraum nur der Hinweis (T-335)
                   uneinbringlichOhne.length ? `Ohne Umsatzsteuerberichtigung in der Voranmeldung der App: ${uneinbringlichOhne.map((x) => `RE ${x.nummer} (${uneinbringlichOhneGrund(x)})`).join(", ")}.` : "",
                 ].filter(Boolean).join(" ")
-          } Ein Konto für Forderungsverluste ist in ${MARKE.name} nicht festgelegt – deshalb FEHLEN die Ausbuchung${uneinbringlichMit.length ? " und die Umsatzsteuerberichtigung" : ""} im Stapel; bitte von Hand buchen.`,
+          } ${uneinbringlichStapelText}`,
+          // E-232 (Steuerberater zu T-333 b): EU-Umsätze (ZM) und OSS – Meldung bzw. Erklärung ggf. zu berichtigen
+          ...(uneinbringlichEuOss.length ? [`Uneinbringlich mit innergemeinschaftlicher Lieferung bzw. Leistung an ein Unternehmen im EU-Ausland oder OSS (${uneinbringlichEuOss.map((x) => `RE ${x.nummer}: ${x.u.daten.oss === true ? "OSS-Erklärung" : "Zusammenfassende Meldung"}`).join("; ")}): ${MARKE.name} berichtigt Zusammenfassende Meldung und OSS-Erklärung nicht – ob sie zu berichtigen sind, bitte mit der Steuerberatung klären.`] : []),
         ]
       : []),
     // E-229 (T-303): fremde Währung – gezahlter Euro-Betrag und Kursdifferenz
     ...(kursdifferenzen.length
       ? [
-          `Belege in fremder Währung mit gezahltem Euro-Betrag laut Kontoauszug (${kursdifferenzen.map((b) => `${belegKennung(b, nummern.get(b.id) ?? "")}: umgerechnet ${betrag(fremdGezahlt(b)! - fremdKursdifferenz(b)!)} €, gezahlt ${betrag(fremdGezahlt(b)!)} €, Differenz ${betrag(fremdKursdifferenz(b)!)} €`).join("; ")}): Im Stapel steht der umgerechnete Betrag (Vorsteuer nach § 16 Abs. 6 UStG). ${
-            bilanz ? "Bilanz: Die Kursdifferenz bucht die Kanzlei." : "Einnahmen-Überschuss-Rechnung: Betriebsausgabe ist der gezahlte Euro-Betrag (§ 11 Abs. 2 EStG) – so rechnet die EÜR der App. Die Differenz steht nicht im Stapel (kein Konto für Kursdifferenzen festgelegt) – bitte buchen."
-          }`,
+          `Belege in fremder Währung mit gezahltem Euro-Betrag laut Kontoauszug (${kursdifferenzen.map((b) => `${belegKennung(b, nummern.get(b.id) ?? "")}: umgerechnet ${betrag(fremdGezahlt(b)! - fremdKursdifferenz(b)!)} €, gezahlt ${betrag(fremdGezahlt(b)!)} € am ${datumDe(zahltag(b))}, Differenz ${betrag(fremdKursdifferenz(b)!)} €`).join("; ")}): Aufwandskonto und Vorsteuer stehen im Stapel mit dem umgerechneten Betrag (§ 16 Abs. 6 UStG); die Differenz steht als eigene Zeile zum Zahltag ohne Steuerschlüssel gegen das Konto des Belegs – mehr gezahlt auf „Aufwendungen aus Kursdifferenzen“ (${k.kursAufwand}), weniger gezahlt auf „Erträge aus Kursdifferenzen“ (${k.kursErtrag}). Zusammen ergibt das den gezahlten Betrag: Die Verbindlichkeit ist mit der Zahlung laut Kontoauszug ausgeglichen, die Kasse zählt den gezahlten Betrag${bilanz ? "" : ", und die EÜR rechnet mit dem gezahlten Euro-Betrag (§ 11 Abs. 2 EStG) wie die EÜR der App"}.${bilanz ? " Am Bilanzstichtag noch offene Verbindlichkeiten in fremder Währung bewertet die Kanzlei (§ 256a HGB)." : ""}`,
         ]
       : []),
     ...(xmlNeu.length ? [`${xmlNeu.length} ${xmlNeu.length === 1 ? "E-Rechnung wurde" : "E-Rechnungen wurden"} vor der Speicherung des Originals festgeschrieben (${xmlNeu.slice(0, 10).join(", ")}) – die XML-Datei ist aus den festgeschriebenen Daten neu erzeugt, nicht die versandte Datei.`] : []),

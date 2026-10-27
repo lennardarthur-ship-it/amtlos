@@ -9,9 +9,14 @@
  * - die E-Rechnungen als XML – ausgehend (das bei der Festschreibung festgehaltene Original, sonst aus den
  *   festgeschriebenen Daten) und eingehend (als Beleg erfasste XML-Dateien),
  * - die Originaldateien der Belege (auch ungültig markierter) und der Kasse (Z-Bons, Eigenbelege),
+ * - E-232 (Steuerberater zu T-328 d): die aufbewahrten Original-PDFs der gestellten Rechnungen (E-228) – sie sind die
+ *   aufzubewahrenden Doppel (§ 14b UStG, § 147 Abs. 1 Nr. 4 AO); nur Dateien, deren SHA-256 zum Original passt. Rechnungen
+ *   ohne aufbewahrtes Original (PDF über 10 MB, vor E-228 festgeschrieben, nur als E-Rechnung geteilt) nennt die
+ *   Feldbeschreibung – ein neu erzeugtes PDF wäre nur eine Wiedergabe und kommt nicht hinein,
  * - eine Feldbeschreibung der CSV-Spalten, erzeugt aus denselben Spaltendefinitionen wie die Kopfzeilen.
  *
- * Nicht enthalten (bewusst): der DATEV-Buchungsstapel (Pro, Paket für die Steuerberatung), die Sicherungsdatei, PDFs.
+ * Nicht enthalten (bewusst): der DATEV-Buchungsstapel (Pro, Paket für die Steuerberatung), die Sicherungsdatei, neu
+ * erzeugte PDFs und PDFs von Nachweisen.
  * Reine Funktion; die Dateien liest der Aufrufer (entschlüsselt) und übergibt sie.
  */
 import { KU_HINWEIS, belegNummern, eRechnungAus, entnahmeSteuer, xrechnungUbl, type Beleg, type Kassensturz, type Sachentnahme } from "@amtlos/fachlogik";
@@ -19,6 +24,7 @@ import { MARKE } from "@amtlos/marke";
 import { APP_VERSION } from "../version";
 import { utf8 } from "./sicherung";
 import { absenderFuer, type Stand } from "./speicher";
+import { pdfPruefwert } from "./pdfOriginal";
 import {
   BELEG_SPALTEN,
   KASSEN_SPALTEN,
@@ -66,6 +72,8 @@ export const PRUEFEXPORT = {
   feldbeschreibung: "Feldbeschreibung.txt",
   xmlAus: "E-Rechnungen/ausgehend/",
   xmlEin: "E-Rechnungen/eingehend/",
+  /** E-232: aufbewahrte Original-PDFs der gestellten Rechnungen (Dateiname = Rechnungsnummer, wie die XRechnung) */
+  pdfAus: "Rechnungen/",
   belegDateien: "Belege/",
   ungueltigDateien: "Belege/ungueltig/",
   kasseDateien: "Kasse/",
@@ -84,16 +92,22 @@ export interface PruefexportErgebnis {
   sachentnahmen: number;
   xmlAusgehend: number;
   xmlEingehend: number;
+  /** E-232: Original-PDFs gestellter Rechnungen im Export */
+  pdfAusgehend: number;
   /** Originaldateien (Belege, Kasse), die im Export liegen */
   originale: number;
   /** Originaldateien, die im Stand genannt sind, aber nicht gelesen werden konnten */
   fehlend: string[];
 }
 
-/** Namen aller Dateien, die der Export braucht: Belege (auch ungültig markierte) und Kasse (Z-Bons, Eigenbelege). */
-export function pruefexportDateien(s: Pick<Stand, "belege" | "belegArchiv" | "kasse">): string[] {
+/**
+ * Namen aller Dateien, die der Export braucht: Belege (auch ungültig markierte), Kasse (Z-Bons, Eigenbelege) und – E-232 –
+ * die aufbewahrten Original-PDFs der festgeschriebenen Rechnungen.
+ */
+export function pruefexportDateien(s: Pick<Stand, "belege" | "belegArchiv" | "kasse"> & Partial<Pick<Stand, "unterlagen">>): string[] {
   const kasse = s.kasse.flatMap((k) => [k.datei, ...k.bewegungen.map((b) => b.datei), ...(k.historie ?? []).map((h) => h.datei)]);
-  return [...new Set([...s.belege, ...s.belegArchiv].map((b) => b.datei).concat(kasse).filter((n): n is string => typeof n === "string" && n !== ""))];
+  const pdfs = (s.unterlagen ?? []).filter((u) => u.vorlage === "rechnung" && u.festgeschrieben).map((u) => u.pdf?.datei);
+  return [...new Set([...s.belege, ...s.belegArchiv].map((b) => b.datei).concat(kasse, pdfs).filter((n): n is string => typeof n === "string" && n !== ""))];
 }
 
 const anzahl = (n: number, eins: string, viele: string) => `${n} ${n === 1 ? eins : viele}`;
@@ -234,6 +248,26 @@ export function pruefexport(s: Stand, dateien: Record<string, Uint8Array>, jetzt
     xmlAusgehend++;
   }
 
+  // E-232 (Steuerberater zu T-328 d): die aufbewahrten Original-PDFs der Ausgangsrechnungen – byte-genau, nur wenn der
+  // SHA-256 passt; ohne Original wird nichts neu erzeugt (die Feldbeschreibung nennt die Rechnung mit Grund)
+  let pdfAusgehend = 0;
+  const ohnePdf: string[] = [];
+  for (const u of rechnungen) {
+    const nummer = String(u.daten.nummer ?? "") || "ohne Nummer";
+    if (!u.pdf) {
+      ohnePdf.push(`${nummer} (${u.pdfSelbst ? "PDF über 10 MB, vom Betrieb selbst aufbewahrt" : u.pdfFolgt ? "nur als E-Rechnung geteilt" : "vor der Aufbewahrung der Original-PDFs festgeschrieben bzw. nicht aufbewahrt"})`);
+      continue;
+    }
+    const bytes = dateien[u.pdf.datei];
+    if (!bytes || pdfPruefwert(bytes) !== u.pdf.sha256) {
+      fehlend.push(u.pdf.datei);
+      ohnePdf.push(`${nummer} (Original-PDF auf dem Gerät nicht lesbar)`);
+      continue;
+    }
+    ablegen(`${PRUEFEXPORT.pdfAus}${sicher(String(u.daten.nummer ?? "") || u.id)}.pdf`, bytes);
+    pdfAusgehend++;
+  }
+
   // Listen
   const gutschriften = rechnungen.filter(istGutschrift);
   inhalt[PRUEFEXPORT.rechnungen] = utf8(rechnungenCsv(s, z));
@@ -269,6 +303,7 @@ export function pruefexport(s: Stand, dateien: Record<string, Uint8Array>, jetzt
     { name: PRUEFEXPORT.feldbeschreibung, zweck: "diese Beschreibung." },
   ];
   const ordner = [
+    { name: PRUEFEXPORT.pdfAus, zweck: `${anzahl(pdfAusgehend, "Original-PDF", "Original-PDFs")} der gestellten Rechnungen – das zuerst geteilte bzw. gedruckte PDF, unverändert (SHA-256 wie beim ersten Teilen; aufzubewahrendes Doppel nach § 14b UStG, § 147 Abs. 1 Nr. 4 AO). Dateiname = Rechnungsnummer.${ohnePdf.length ? ` Ohne Original-PDF im Export: ${ohnePdf.slice(0, 20).join("; ")}${ohnePdf.length > 20 ? " …" : ""}.` : ""}` },
     { name: PRUEFEXPORT.xmlAus, zweck: `${anzahl(xmlAusgehend, "E-Rechnung", "E-Rechnungen")} (XRechnung, UBL) der gestellten Rechnungen; bei festgeschriebenen Rechnungen die bei der Festschreibung festgehaltene Datei. Dateiname = Rechnungsnummer.${ohneXml.length ? ` Ohne E-Rechnung (Angaben fehlen bzw. Privatkunde): ${ohneXml.slice(0, 20).join("; ")}${ohneXml.length > 20 ? " …" : ""}.` : ""}` },
     { name: PRUEFEXPORT.xmlEin, zweck: `${anzahl(xmlEingehend, "empfangene E-Rechnung", "empfangene E-Rechnungen")} (XML) – die Originaldateien dieser Belege, unverändert. Dateiname beginnt mit der Belegnummer der App (Spalte „Datei“ in ${PRUEFEXPORT.belege}).` },
     { name: PRUEFEXPORT.belegDateien, zweck: `Originaldateien der Belege (Fotos, PDFs), unverändert; Dateiname beginnt mit der Belegnummer der App. Ungültig markierte Belege im Unterordner ungueltig/. Zusammen mit der Kasse ${anzahl(originale, "Originaldatei", "Originaldateien")}.` },
@@ -289,6 +324,7 @@ export function pruefexport(s: Stand, dateien: Record<string, Uint8Array>, jetzt
     sachentnahmen: s.sachentnahmen.length,
     xmlAusgehend,
     xmlEingehend,
+    pdfAusgehend,
     originale,
     fehlend,
   };

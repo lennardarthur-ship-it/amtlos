@@ -17,3 +17,14 @@ export function bestaetigen(o: { titel: string; text?: string; ja: string; nein?
     ], { cancelable: true, onDismiss: () => fertig(false) }),
   );
 }
+
+/**
+ * E-232: wichtiger Hinweis, den man bestätigen muss („Verstanden“) – auf dem Gerät der System-Dialog, im Web `alert`.
+ */
+export function hinweisen(titel: string, text: string): Promise<void> {
+  if (Platform.OS === "web") {
+    (globalThis as unknown as { alert?: (t: string) => void }).alert?.(`${titel}\n\n${text}`);
+    return Promise.resolve();
+  }
+  return new Promise((fertig) => Alert.alert(titel, text, [{ text: TEXT.e200_abo_verstanden, onPress: () => fertig() }], { cancelable: true, onDismiss: () => fertig() }));
+}

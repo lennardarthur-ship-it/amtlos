@@ -188,7 +188,8 @@ export interface BelegFremd {
    * E-229 (Steuerberater 27.10.2026, T-303): tatsächlich gezahlter Euro-Betrag laut Kontoauszug (Cent). Bei der
    * Einnahmen-Überschuss-Rechnung ist er die Betriebsausgabe (Abfluss, § 11 Abs. 2 EStG) – nicht der umgerechnete
    * Rechnungsbetrag; die Vorsteuer bleibt der umgerechnete Betrag (§ 16 Abs. 6 UStG). Bei Bilanzierenden genügt der
-   * umgerechnete Betrag, die Kursdifferenz bucht die Kanzlei.
+   * umgerechnete Betrag. E-232 (T-331): Ist er eingetragen, steht die Kursdifferenz als eigene Zeile im Stapel
+   * (`kursdifferenzBuchungenBelege`, Aufwendungen bzw. Erträge aus Kursdifferenzen) – bei EÜR und Bilanz.
    */
   gezahlt_eur_cent?: number | null;
 }

@@ -93,13 +93,13 @@ describe("E-229 (T-304 c): Forderung uneinbringlich", () => {
     expect(u1(s).festgeschrieben).toBe(u1(re()).festgeschrieben);
   });
 
-  it("Steuerberater-Paket: Liste und LIESMICH – Ausbuchung und Berichtigung FEHLEN im Stapel (kein Konto erfunden)", () => {
+  it("Steuerberater-Paket (EÜR): Liste und LIESMICH – keine Ausbuchung, Berichtigung nur in der Liste (E-232: Bilanz siehe e232-steuerberater)", () => {
     const s = uneinbringlichSetzen(re(), "r1", { datum: "2026-05-15", grund: "insolvenz" }, t("2026-06-01"));
     const p = steuerpaket(s, { von: "2026-05-01", bis: "2026-05-31", name: "2026-05" }, SB, {}, "2026-06-02T10:00:00.000Z");
     expect(datei(p, "Uneinbringlich_2026-05.csv")).toContain("2026-001;Muster GmbH;10.02.2026;15.05.2026;Insolvenz des Kunden;;226,00;26,00;");
     const l = datei(p, "LIESMICH.txt");
     expect(l).toContain("Forderungen uneinbringlich (§ 17 Abs. 2 Nr. 1 UStG, Uneinbringlich_2026-05.csv): RE 2026-001 (Muster GmbH) seit 15.05.2026, Insolvenz des Kunden, offen 226,00 € brutto, davon Umsatzsteuer 26,00 €");
-    expect(l).toContain("deshalb FEHLEN die Ausbuchung und die Umsatzsteuerberichtigung im Stapel");
+    expect(l).toContain("Einnahmen-Überschuss-Rechnung: keine Ausbuchung (es ist nichts zugeflossen) – die Umsatzsteuerberichtigung steht nicht im Stapel, sondern nur in dieser Liste; bitte von Hand buchen.");
     expect(datei(p, "Buchungsliste_2026-05.csv").split("\r\n").length).toBeLessThanOrEqual(2);
     expect(datei(offenesArchiv(s, {}, "2026-06-02T10:00:00.000Z"), "Uneinbringlich.csv")).toContain("15.05.2026;Insolvenz des Kunden");
   });
