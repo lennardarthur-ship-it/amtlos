@@ -8,7 +8,7 @@
 import { kassenbuchAnzeige } from "./kassenbuchAnzeige";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib/cjs/index";
 import { kassenSortiert, kassenSummen, kassenVermerk, zeitDe, type Kassenabschluss, type Kassensturz } from "@amtlos/fachlogik";
-import { BEREICHE, BESCHAEFTIGUNGSARTEN, belegNummern, cent, dateinamenTeil, kassenStandorte, kassenbuchDaten, standortVon, monatAus, monatsName, unterlagenName, vorlageFuer, type Beleg, type Bereich, type Daten, type Person, type Vorlage } from "@amtlos/fachlogik";
+import { BEREICHE, BESCHAEFTIGUNGSARTEN, htmlMaskieren, belegNummern, cent, dateinamenTeil, kassenStandorte, kassenbuchDaten, standortVon, monatAus, monatsName, unterlagenName, vorlageFuer, type Beleg, type Bereich, type Daten, type Person, type Vorlage } from "@amtlos/fachlogik";
 import { euroText as euro } from "./ablage";
 import { fehltFuer } from "./pruefung";
 import { HAUPT_STAETTE, NACHWEIS_MONATE, geteiltAm, heute as heuteBerlin, kassenbuchFest, nichtZaehlend, staetteVon, type Stand, type Unterlage } from "./speicher";
@@ -393,7 +393,7 @@ export function tagesabschluesseHtml(l: readonly Kassenabschluss[], betrieb: str
     .map((k) => {
       const sm = kassenSummen(k);
       const tse = [k.tse_seriennr ? `TSE ${k.tse_seriennr}` : "", k.tse_von || k.tse_bis ? `TA ${k.tse_von ?? ""}–${k.tse_bis ?? ""}` : ""].filter(Boolean).join(", ");
-      return `<tr><td>${datumDe(k.datum)}${k.standort ? `<br>${esc(k.standort)}` : ""}</td><td>${k.geschlossen ? "geschlossen" : esc(k.zbon ?? (k.kassenbericht ? "Kassenbericht" : ""))}</td><td>${esc(tse)}</td><td class="r">${euroPlain(sm.brutto)}</td><td class="r">${euroPlain(sm.karte)}</td><td class="r">${euroPlain(sm.bar)}</td><td>${esc(kassenVermerk(k))}</td></tr>`;
+      return `<tr><td>${esc(datumDe(k.datum))}${k.standort ? `<br>${esc(k.standort)}` : ""}</td><td>${k.geschlossen ? "geschlossen" : esc(k.zbon ?? (k.kassenbericht ? "Kassenbericht" : ""))}</td><td>${esc(tse)}</td><td class="r">${euroPlain(sm.brutto)}</td><td class="r">${euroPlain(sm.karte)}</td><td class="r">${euroPlain(sm.bar)}</td><td>${esc(kassenVermerk(k))}</td></tr>`;
     })
     .join("");
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Tagesabschlüsse</title><meta name="amtlos-gestalt" content="nachweis"><meta name="amtlos-fuss-links" content="${esc(`${betrieb.trim() || "Betrieb"} · Tagesabschlüsse`)}"><meta name="amtlos-fuss-rechts" content="${esc(`Stand ${datumDe(heute)}`)}">${MAPPE_STIL}</head><body>
@@ -471,7 +471,7 @@ export function lohnkontoEintraege(s: Pick<Stand, "unterlagen" | "mitarbeiter">,
 export function entsorgungEintraege(belege: readonly Beleg[], betrieb: string, heute = heuteBerlin()): MappenEintrag[] {
   const l = entsorgungsbelege(belege, heute);
   if (!l.length) return [];
-  const zeilen = l.map((b) => `<tr><td>${datumDe(b.datum)}</td><td>${esc(b.lieferant)}</td><td>${esc(b.nummer ?? "")}</td><td>${esc(b.notiz ?? "")}</td><td class="r">${euro(b.steuer.reduce((a, x) => a + x.brutto_cent, 0))}</td></tr>`).join("");
+  const zeilen = l.map((b) => `<tr><td>${esc(datumDe(b.datum))}</td><td>${esc(b.lieferant)}</td><td>${esc(b.nummer ?? "")}</td><td>${esc(b.notiz ?? "")}</td><td class="r">${euro(b.steuer.reduce((a, x) => a + x.brutto_cent, 0))}</td></tr>`).join("");
   const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Entsorgungsbelege</title><meta name="amtlos-gestalt" content="nachweis"><meta name="amtlos-fuss-links" content="${esc(`${betrieb.trim() || "Betrieb"} · Entsorgungsbelege`)}"><meta name="amtlos-fuss-rechts" content="${esc(`Stand ${datumDe(heute)}`)}">
 <style>body{font-family:"Amtlos Sans",Helvetica,Arial,sans-serif;color:#1f2a33;font-size:10pt;margin:0}h1{font-family:"Amtlos Serif",Georgia,serif;font-size:20pt;margin:0 0 2mm}p{color:#5b6670;margin:0 0 6mm}table{width:100%;border-collapse:collapse}th{font-size:8.5pt;text-align:left;color:#5b6670;border-bottom:.4mm solid #1f2a33;padding:0 2mm 1.5mm}td{padding:2mm;border-bottom:.3mm solid #d6dbe0;vertical-align:top}.r{text-align:right;white-space:nowrap}</style></head><body>
 <h1>Entsorgungsbelege</h1><p>${esc(betrieb.trim() || "Betrieb")} · aus den erfassten Belegen der letzten fünf Jahre · ${l.length} ${l.length === 1 ? "Beleg" : "Belege"}</p>
@@ -577,7 +577,8 @@ export function fehltInMappe(offen: readonly PflichtMitVorlagen[], eintraege: re
   return r;
 }
 
-const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+// E-220: dieselbe Maskierung wie in den Vorlagen (& < > " ')
+const esc = (t: string) => htmlMaskieren(String(t ?? ""));
 export const datumDe = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`;
 const bereichTitel = (b: Bereich) => BEREICHE.find((x) => x.id === b)?.titel ?? "";
 
@@ -615,16 +616,16 @@ export function deckblattHtml(betrieb: string, heute: string, eintraege: (Mappen
   const zeilen = eintraege
     .map((e, i) => {
       const zusatz = eintragZusatz(e);
-      return `<tr><td class="nr">${i + 1}</td><td><div class="t">${esc(e.titel)}</div><div class="b">${esc([bereichTitel(e.bereich), zusatz].filter(Boolean).join(" · "))}</div></td><td class="d">${datumDe(e.datum)}</td><td class="s">${e.seite ?? ""}</td></tr>`;
+      return `<tr><td class="nr">${i + 1}</td><td><div class="t">${esc(e.titel)}</div><div class="b">${esc([bereichTitel(e.bereich), zusatz].filter(Boolean).join(" · "))}</div></td><td class="d">${esc(datumDe(e.datum))}</td><td class="s">${e.seite ?? ""}</td></tr>`;
     })
     .join("");
   const p = extra.personal ?? [];
   const personal = p.length
-    ? `<h2 class="papier">Personalübersicht (${p.length} ${p.length === 1 ? "Person" : "Personen"})</h2><table class="personal"><thead><tr><th>Name</th><th>Geburtsdatum</th><th>Beginn</th><th>Art</th><th>Std./Woche</th><th>Entgelt</th><th>Sofortmeldung bestätigt am</th><th>Aufenthaltstitel gültig bis</th></tr></thead><tbody>${p.map((x) => `<tr><td class="t">${esc(x.name)}</td><td>${x.geburtsdatum}</td><td>${x.beginn}</td><td>${esc(x.art)}</td><td>${esc(x.wochenstunden)}</td><td>${esc(x.entgelt)}</td><td>${x.sofortmeldung}</td><td>${x.aufenthaltBis}</td></tr>`).join("")}</tbody></table>`
+    ? `<h2 class="papier">Personalübersicht (${p.length} ${p.length === 1 ? "Person" : "Personen"})</h2><table class="personal"><thead><tr><th>Name</th><th>Geburtsdatum</th><th>Beginn</th><th>Art</th><th>Std./Woche</th><th>Entgelt</th><th>Sofortmeldung bestätigt am</th><th>Aufenthaltstitel gültig bis</th></tr></thead><tbody>${p.map((x) => `<tr><td class="t">${esc(x.name)}</td><td>${esc(x.geburtsdatum)}</td><td>${esc(x.beginn)}</td><td>${esc(x.art)}</td><td>${esc(x.wochenstunden)}</td><td>${esc(x.entgelt)}</td><td>${esc(x.sofortmeldung)}</td><td>${esc(x.aufenthaltBis)}</td></tr>`).join("")}</tbody></table>`
     : "";
   const dp = extra.dienstplan;
-  const dienstplan = dp && (dp.namen.length || dp.text.trim()) ? `<h2 class="papier">Dienstplan heute (${datumDe(heute)})</h2>${dp.namen.length ? `<p class="dienst">${dp.namen.map(esc).join(", ")}</p>` : ""}${dp.text.trim() ? `<p class="dienst">${esc(dp.text.trim()).replace(/\n/g, "<br>")}</p>` : ""}` : "";
-  const papierZeilen = papier.map((t) => (typeof t === "string" ? esc(t) : `${esc(t.titel)}${t.am ? ` – vorhanden (bestätigt am ${datumDe(t.am)})` : ""}`));
+  const dienstplan = dp && (dp.namen.length || dp.text.trim()) ? `<h2 class="papier">Dienstplan heute (${esc(datumDe(heute))})</h2>${dp.namen.length ? `<p class="dienst">${dp.namen.map(esc).join(", ")}</p>` : ""}${dp.text.trim() ? `<p class="dienst">${esc(dp.text.trim()).replace(/\n/g, "<br>")}</p>` : ""}` : "";
+  const papierZeilen = papier.map((t) => (typeof t === "string" ? esc(t) : `${esc(t.titel)}${t.am ? ` – vorhanden (bestätigt am ${esc(datumDe(t.am))})` : ""}`));
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Kontrollmappe</title>
 <meta name="amtlos-gestalt" content="nachweis"><meta name="amtlos-fuss-links" content="${esc(`${name} · Kontrollmappe`)}"><meta name="amtlos-fuss-rechts" content="${esc(`Stand ${datumDe(heute)}`)}">
 <style>
@@ -651,7 +652,7 @@ body.eng h1{margin:3mm 0 1mm;font-size:22pt}body.eng .stand{margin-bottom:6mm}bo
 <h1>Nachweise des Betriebs</h1>
 <p class="betrieb">${esc(name)}</p>
 ${extra.staette ? `<p class="staette">Betriebsstätte: ${esc(extra.staette)}</p>` : ""}
-<p class="stand">Zusammengestellt am ${datumDe(heute)} · ${eintraege.length} ${eintraege.length === 1 ? "Unterlage" : "Unterlagen"}</p>
+<p class="stand">Zusammengestellt am ${esc(datumDe(heute))} · ${eintraege.length} ${eintraege.length === 1 ? "Unterlage" : "Unterlagen"}</p>
 ${dienstplan}${personal}${dienstplan || personal ? '<h2 class="papier">Inhalt</h2>' : "<h2>Inhalt</h2>"}
 <table><thead><tr><th></th><th>Unterlage</th><th>Datum</th><th class="s">Seite</th></tr></thead><tbody>${zeilen}</tbody></table>
 ${papierZeilen.length ? `<h2 class="papier">Außerdem im Betrieb vorhanden (nicht in dieser Mappe)</h2><ul class="papier">${papierZeilen.map((t) => `<li>${t}</li>`).join("")}</ul>` : ""}

@@ -5,15 +5,15 @@
  */
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
-import { dokumentHtml, pdfDateiname, vorlageFuer, type Daten } from "@amtlos/fachlogik";
-import { betriebFuerDokument } from "../pro/regeln";
+import { pdfDateiname, vorlageFuer, type Daten } from "@amtlos/fachlogik";
+import { fassungHtml } from "../unterlagen/ausgabe";
 import { T as TEXT } from "../texte";
 import { Feld, Fuss, Hinweis, Karte, Knopf, T, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, useFarben } from "../ui/thema";
 import { pdfTeilen } from "../unterlagen/pdf";
-import { heute } from "../unterlagen/speicher";
+import { heute, type Fassung } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Ansage } from "./felder";
 import { Inhalt, datumKurz } from "./gemeinsam";
@@ -69,8 +69,9 @@ export function FassungenKarte({ id }: { id: string }) {
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const v = u ? vorlageFuer(u.vorlage) : undefined;
   if (!u || !v || !u.fassungen?.length) return null;
-  const teilen = async (daten: Daten) => {
-    const ok = await pdfTeilen(dokumentHtml(v, daten, betriebFuerDokument(z.stand.betrieb, z.pro)), pdfDateiname(v, daten, heute()), v.querformat).catch(() => false);
+  // E-220 (8b): eine frühere Fassung mit ihrem eigenen Absender bzw. genau wie damals gedruckt – nicht mit „Mein Betrieb“ von heute
+  const teilen = async (f2: Fassung) => {
+    const ok = await pdfTeilen(fassungHtml(z.stand, u.vorlage, f2, z.pro), pdfDateiname(v, f2.daten, heute()), v.querformat).catch(() => false);
     if (!ok) melden(TEXT.pdf_fehler, "info");
   };
   const grund = (d: Daten) => (typeof d.fassung_grund === "string" && d.fassung_grund.trim() ? d.fassung_grund.trim() : null);
@@ -81,7 +82,7 @@ export function FassungenKarte({ id }: { id: string }) {
       <Karte>
         <Zeile symbol={u.festgeschrieben ? "lock" : "pencil"} ton={u.festgeschrieben ? "amt" : "bald"} titel={TEXT.r12p_fassung_aktuell(nr, u.festgeschrieben ? datumKurz(u.festgeschrieben) : null)} text={grund(u.daten) ?? undefined} />
         {[...u.fassungen].reverse().map((f2, i) => (
-          <Zeile key={f2.festgeschrieben} symbol="doc.text" ton="leise" titel={TEXT.r12p_fassung_frueher(nr - 1 - i, datumKurz(f2.festgeschrieben), datumKurz(f2.ersetzt))} text={grund(f2.daten) ?? TEXT.r12p_fassung_pdf} onPress={() => void teilen(f2.daten)} letzte={i === u.fassungen!.length - 1} />
+          <Zeile key={f2.festgeschrieben} symbol="doc.text" ton="leise" titel={TEXT.r12p_fassung_frueher(nr - 1 - i, datumKurz(f2.festgeschrieben), datumKurz(f2.ersetzt))} text={grund(f2.daten) ?? TEXT.r12p_fassung_pdf} onPress={() => void teilen(f2)} letzte={i === u.fassungen!.length - 1} />
         ))}
       </Karte>
       <T v="caption" leise stil={{ marginTop: 6, marginLeft: 4 }}>{TEXT.r12p_fassungen_hilfe}</T>

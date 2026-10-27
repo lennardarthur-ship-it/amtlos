@@ -84,7 +84,8 @@ interface Zustand {
    * Hat sich die Unterlage seitdem geändert (z. B. durch die Synchronisation), wird nicht festgeschrieben – false:
    * PDF neu erzeugen. Die Festschreibung wird sofort gespeichert (G3).
    */
-  ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean): boolean;
+  /** E-220 (8b): `absender` wie gedruckt (nach der Pro-Regel), `html` das gedruckte Dokument – beides wird festgehalten */
+  ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean, html?: string): boolean;
   /** E-193 (4): Android – geteilt, aber „Nein, noch nicht“ verschickt: die ausgegebene Fassung merken, nicht festschreiben */
   teilenOffen(id: string, f: Omit<GeteilteFassung, "am">): void;
   /**
@@ -131,7 +132,7 @@ interface Zustand {
   sachentnahmeSpeichern(e: Omit<Sachentnahme, "id" | "erstellt">): void;
   sachentnahmeLoeschen(id: string): void;
   /** R12 GoBD: Kassenbuch aus den Tagesabschlüssen beim Teilen festschreiben */
-  kassenbuchFestschreiben(monat: string, standort: string, daten: Daten, sha256: string): void;
+  kassenbuchFestschreiben(monat: string, standort: string, daten: Daten, sha256: string, absender?: Betrieb, html?: string): void;
   /** R12 GoBD: Belege festschreiben (nach dem Steuerberater-Paket) */
   belegeFestschreiben(ids: string[]): void;
   /** R12 Personal: festgeschriebenen Nachweis korrigieren – neue Fassung mit Grund, die alte bleibt (sofort gespeichert) */
@@ -543,9 +544,9 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       personenZusammenfuehren: (art, bleibt, weg) => setzen(personenZusammenfuehren(aktuell.current, art, bleibt, weg)),
       profilSetzen: (werte, bl) => setzen(profilSetzen(aktuell.current, werte, bl)),
       erledigtSetzen: (pid, datum, termin) => setzen(erledigtSetzen(aktuell.current, pid, datum, termin)),
-      ausgeben: (id, daten, pdfSha256, absender, eRechnung) => {
+      ausgeben: (id, daten, pdfSha256, absender, eRechnung, html) => {
         if (!ausgabeMoeglich(aktuell.current, id, daten)) return false;
-        setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256, absender, eRechnung));
+        setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256, absender, eRechnung, html));
         // Festschreibung sofort speichern, nicht erst nach der Wartezeit (G3)
         schreiben();
         return true;
@@ -694,8 +695,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         setzen(sachentnahmeLoeschen(aktuell.current, id, new Date()));
         schreiben();
       },
-      kassenbuchFestschreiben: (monat, standort, daten, sha) => {
-        setzen(kassenbuchFestschreiben(aktuell.current, monat, standort, daten, sha, new Date()));
+      kassenbuchFestschreiben: (monat, standort, daten, sha, absender, html) => {
+        setzen(kassenbuchFestschreiben(aktuell.current, monat, standort, daten, sha, new Date(), undefined, absender, html));
         schreiben();
       },
       belegLoeschen: (id, grund) => {

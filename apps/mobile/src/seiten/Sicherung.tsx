@@ -12,13 +12,13 @@ import { bestaetigen } from "../ui/bestaetigen";
 import { ANDROID } from "../plattform";
 import { autoSchluesselHolen, autoSchluesselLoeschen, autoSchluesselSpeichern } from "../unterlagen/schluesselbund";
 import { dateiTeilenBytes, sicherungTeilen, sicherungWaehlen, zufall, type GewaehlteSicherung } from "../unterlagen/sicherungDatei";
-import { dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
+import { pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
+import { ausgabeHtml } from "../unterlagen/ausgabe";
 import { offenesArchiv } from "../unterlagen/archiv";
 import { pdfBytes } from "../unterlagen/pdf";
 import { gestellteRechnungen } from "../unterlagen/steuerpaket";
-import { betriebFuerDokument } from "../pro/regeln";
 import { letzteVollsicherung, nachweisText, vollsicherungFaellig } from "../unterlagen/sicherungNachweis";
-import { absenderFuer, dateienImStand, heute, sicherungFaellig, ungesichert, zusammenfuehren, type Stand } from "../unterlagen/speicher";
+import { dateienImStand, heute, sicherungFaellig, ungesichert, zusammenfuehren, type Stand } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BuehnenBlatt } from "./gemeinsam";
 import { useProSperre } from "./Pro";
@@ -179,7 +179,7 @@ export function OffenesArchiv() {
       if (v)
         for (const [i, u] of rechnungen.entries()) {
           setFortschritt(TEXT.r12g_archiv_fortschritt(i + 1, rechnungen.length));
-          const bytes = await pdfBytes(dokumentHtml(v, u.daten, betriebFuerDokument(absenderFuer(s, u), z.pro)), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
+          const bytes = await pdfBytes(ausgabeHtml(s, u, z.pro), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
           if (bytes) rechnungsPdfs[u.id] = bytes;
         }
       setFortschritt(null);

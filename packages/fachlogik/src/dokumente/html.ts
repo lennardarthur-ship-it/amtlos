@@ -28,7 +28,12 @@ export const LINIE = '<span class="fuellen"></span>';
  */
 export const KOPF_LINIE = "\u0001";
 
-export const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+/**
+ * Zentrale Maskierung für jedes HTML der Vorlagen (Text und Attributwerte): & < > " ' (E-220: auch das Apostroph, damit
+ * ein Wert auch in einem Attribut mit einfachen Anführungszeichen nichts aufbricht). Jede Eingabe des Nutzers und jede
+ * Angabe aus „Mein Betrieb“ geht hier durch (Test e220-html-escaping für jedes Feld jeder Vorlage).
+ */
+export const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
 /** ISO-Datum (YYYY-MM-DD) → TT.MM.JJJJ; leer bleibt leer. */
 export const datumDe = (d: string | null | undefined) => (d && /^\d{4}-\d{2}-\d{2}/.test(d) ? d.slice(0, 10).split("-").reverse().join(".") : "");

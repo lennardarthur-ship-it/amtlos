@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
-import { betriebFuerDokument } from "../pro/regeln";
+import { pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
+import { ausgabeHtml } from "../unterlagen/ausgabe";
 import { pdfBytes } from "../unterlagen/pdf";
 import { View } from "react-native";
 import { T as TEXT } from "../texte";
@@ -10,7 +10,7 @@ import { Unterseite, useNav } from "../ui/navigation";
 import { kassenAbdeckung } from "../unterlagen/kasse";
 import { bilanzierendeGewinnermittlung, gestellteRechnungen, kassenHinweisMit, kassenLage, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
-import { absenderFuer, heute } from "../unterlagen/speicher";
+import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Inhalt } from "./gemeinsam";
 import { useProSperre } from "./Pro";
@@ -95,7 +95,7 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
       if (v)
         for (const [i, u] of rechnungenImZeitraum.entries()) {
           setFortschritt(TEXT.steuerpaket_fortschritt_pdfs(i + 1, rechnungenImZeitraum.length));
-          const bytes = await pdfBytes(dokumentHtml(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro)), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
+          const bytes = await pdfBytes(ausgabeHtml(z.stand, u, z.pro), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
           if (bytes) rechnungsPdfs[u.id] = bytes;
         }
       setFortschritt(TEXT.steuerpaket_fortschritt_zip);

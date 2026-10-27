@@ -837,14 +837,15 @@ try {
   await knopf("Schließen").click();
   await warte(900);
 
-  // Rechnung 2026-001 (mit Pro geteilt): erneut teilen frei (ohne Hausfarbe), E-Rechnung und Kopie mit Pro, Storno immer
+  // Rechnung 2026-001 (mit Pro geteilt): erneut teilen frei, E-Rechnung und Kopie mit Pro, Storno immer. E-220 (8b): erneut
+  // geteilt wird genau die ausgegebene Rechnung – mit dem Briefkopf (Hausfarbe), mit dem sie hinausging, auch ohne Pro
   await tippe(p.getByRole("button", { name: /2026-001 · / }).locator("visible=true").first());
   await warte(1200);
   pruefe((await knopf("PDF teilen").count()) > 0 && !(await sichtbar("PDF teilen · Pro")), "geteilte Rechnung lässt sich ohne Pro nicht erneut teilen");
   const [rechnungPdf] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
   await rechnungPdf.waitForLoadState();
   const rechnungHtml = await rechnungPdf.content();
-  pruefe(rechnungHtml.includes("Haarschnitt") && !rechnungHtml.includes("--akzent:#702434"), "Rechnung ohne Pro nicht erneut geteilt oder mit Hausfarbe (Briefkopf gehört zu Pro)");
+  pruefe(rechnungHtml.includes("Haarschnitt") && rechnungHtml.includes("--akzent:#702434"), "Rechnung ohne Pro nicht erneut geteilt oder nicht wie ausgegeben (Briefkopf von damals fehlt)");
   await rechnungPdf.close();
   await warte(600);
   await foto("rechnung-erneut");

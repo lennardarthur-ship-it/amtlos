@@ -9,6 +9,8 @@ import { sha256 } from "@noble/hashes/sha2";
 import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils";
 import { partnerIdAus } from "../partner/partner";
 import { istKompakt, kompaktAufloesen } from "./kompakt";
+import { druckFesthalten, type DruckFassung } from "./druck";
+export type { DruckFassung } from "./druck";
 import { zustimmungAus, type Zustimmung } from "../rechtliches";
 
 export interface Unterlage {
@@ -58,6 +60,21 @@ export interface Unterlage {
    * immer diese Angaben, auch wenn sich Anschrift oder Bank später ändern (§ 14b UStG, Doppel der Rechnung).
    */
   absender?: Betrieb;
+  /**
+   * E-220 (8b): `absender` sind genau die gedruckten Angaben (nach der Pro-Regel für Logo und Hausfarbe). Ältere
+   * Schnappschüsse (ohne Merker) enthalten das Logo auch dann, wenn es ohne Pro nicht gedruckt wurde.
+   */
+  absenderGedruckt?: boolean;
+  /**
+   * E-220 (8b): Absender nicht bei der Festschreibung festgehalten, sondern beim ersten Laden mit dieser Version aus
+   * „Mein Betrieb“ übernommen (Zeitpunkt) – vorher zeigte die Unterlage immer die heutigen Angaben.
+   */
+  absenderNachgetragen?: string;
+  /**
+   * E-220 (8b): das bei der Festschreibung gedruckte HTML (druck.ts) – Wiedergabe genau wie ausgegeben, auch wenn eine
+   * spätere App-Version die Vorlage anders setzt (unterlagen/ausgabe.ts).
+   */
+  druck?: DruckFassung;
   /** R12 GoBD: XRechnung (UBL) der festgeschriebenen Rechnung, wie sie ausgegeben wurde – das Paket nimmt dieses Original */
   xml?: string;
   /**
@@ -100,6 +117,8 @@ export interface GeteilteFassung {
   daten: Daten;
   pdfSha256?: string;
   absender?: Betrieb;
+  /** E-220 (8b): HTML dieser Ausgabe (für „Doch verschickt – festschreiben“) – nicht Teil des Prüfwerts */
+  druck?: DruckFassung;
   /** E-200: SHA-256 (hex) über Inhalt und Absender dieser Ausgabe (`fassungHash`) – beim Vermerken festgehalten */
   inhaltSha256?: string;
 }
@@ -152,6 +171,11 @@ export interface Fassung {
   grund?: string;
   /** wann sie durch eine Korrektur ersetzt wurde (ISO) */
   ersetzt: string;
+  /** E-220 (8b): Absender, festgehaltenes HTML und Merker dieser Fassung (wie an der Unterlage) */
+  absender?: Betrieb;
+  absenderGedruckt?: boolean;
+  absenderNachgetragen?: string;
+  druck?: DruckFassung;
 }
 
 /** R12: Betriebsstätte (Filiale). Betriebsstätte 1 ist der Betrieb selbst (Anschrift aus „Mein Betrieb“, ID „haupt“). */
@@ -433,8 +457,15 @@ function unterlageAus(u: Record<string, unknown>): Unterlage {
   else delete r.fassungen;
   if (typeof u.betriebsstaette !== "string" || !u.betriebsstaette) delete r.betriebsstaette;
   // R12 GoBD: Absender-Schnappschuss nur als Objekt mit Text, XML nur als Text
-  if (istObjekt(u.absender)) r.absender = { ...LEERER_BETRIEB, ...Object.fromEntries(Object.entries(u.absender).filter(([, w]) => typeof w === "string")) } as Betrieb;
+  if (istObjekt(u.absender)) r.absender = betriebSchnappschuss(u.absender);
   else delete r.absender;
+  // E-220 (8b): Merker und festgehaltenes HTML nur lesbar; Fassungen mit eigenem Absender und HTML
+  if (u.absenderGedruckt !== true || !r.absender) delete r.absenderGedruckt;
+  if (!istIso(u.absenderNachgetragen) || !r.absender) delete r.absenderNachgetragen;
+  const druck = druckAus(u.druck);
+  if (druck) r.druck = druck;
+  else delete r.druck;
+  if (r.fassungen) r.fassungen = r.fassungen.map(fassungSauber);
   if (typeof u.xml !== "string" || !u.xml.startsWith("<")) delete r.xml;
   if (!(istObjekt(u.kassenbuch) && typeof u.kassenbuch.monat === "string" && typeof u.kassenbuch.standort === "string")) delete r.kassenbuch;
   if (typeof u.inhaltSha256 !== "string") delete r.inhaltSha256;
@@ -447,6 +478,42 @@ function unterlageAus(u: Record<string, unknown>): Unterlage {
   if (eu) r.euStorno = eu;
   else delete r.euStorno;
   return r;
+}
+
+/** R12 GoBD / E-220: Absender-Schnappschuss nur mit Text-Angaben (fehlende wie in „Mein Betrieb“ leer). */
+const betriebSchnappschuss = (b: Record<string, unknown>): Betrieb => ({ ...LEERER_BETRIEB, ...Object.fromEntries(Object.entries(b).filter(([, w]) => typeof w === "string")) }) as Betrieb;
+
+/** E-220 (8b): festgehaltenes HTML lesen – Zeitpunkt und Teile als Text, sonst nichts. */
+function druckAus(roh: unknown): DruckFassung | null {
+  if (!istObjekt(roh) || !istIso(roh.am) || !Array.isArray(roh.teile) || !roh.teile.length || !roh.teile.every((t) => typeof t === "string")) return null;
+  return { am: roh.am, teile: roh.teile as string[] };
+}
+function fassungSauber(f: Fassung): Fassung {
+  const r: Fassung = { ...f };
+  const roh = f as unknown as Record<string, unknown>;
+  if (istObjekt(roh.absender)) r.absender = betriebSchnappschuss(roh.absender);
+  else delete r.absender;
+  if (roh.absenderGedruckt !== true || !r.absender) delete r.absenderGedruckt;
+  if (!istIso(roh.absenderNachgetragen) || !r.absender) delete r.absenderNachgetragen;
+  const d = druckAus(roh.druck);
+  if (d) r.druck = d;
+  else delete r.druck;
+  return r;
+}
+
+/**
+ * E-220 (8b): Festgeschriebene Unterlagen (und ihre früheren Fassungen) ohne Absender-Schnappschuss – vor E-220 hatten
+ * ihn nur Rechnungen – bekommen beim Laden „Mein Betrieb“ von jetzt, mit Zeitpunkt (`absenderNachgetragen`). Ab dann
+ * ändern spätere Änderungen an „Mein Betrieb“ ihre Wiedergabe nicht mehr; was vorher galt, lässt sich nicht mehr
+ * feststellen (die App sagt es bei der Unterlage dazu).
+ */
+export function absenderNachtragen(u: Unterlage, betrieb: Betrieb, jetzt: Date): Unterlage {
+  if (!u.festgeschrieben) return u;
+  const iso = jetzt.toISOString();
+  const fassungen = u.fassungen?.map((f) => (f.absender ? f : { ...f, absender: { ...betrieb }, absenderNachgetragen: iso }));
+  const geaendert = fassungen?.some((f, i) => f !== u.fassungen![i]);
+  if (u.absender && !geaendert) return u;
+  return { ...u, ...(u.absender ? {} : { absender: { ...betrieb }, absenderNachgetragen: iso }), ...(geaendert ? { fassungen } : {}) };
 }
 
 const ISO_TAG = /^\d{4}-\d{2}-\d{2}$/;
@@ -462,7 +529,7 @@ function geteiltOffenAus(roh: unknown): GeteilteFassung[] {
   if (!Array.isArray(roh)) return [];
   return (roh as unknown[])
     .filter((x): x is Record<string, unknown> => istObjekt(x) && istIso(x.am) && (x.art === "pdf" || x.art === "druck" || x.art === "xml") && istObjekt(x.daten))
-    .map((x) => ({ am: x.am as string, art: x.art as GeteilteFassung["art"], daten: x.daten as Daten, ...(typeof x.pdfSha256 === "string" && x.pdfSha256 ? { pdfSha256: x.pdfSha256 } : {}), ...(istObjekt(x.absender) ? { absender: { ...LEERER_BETRIEB, ...Object.fromEntries(Object.entries(x.absender).filter(([, w]) => typeof w === "string")) } as Betrieb } : {}), ...(typeof x.inhaltSha256 === "string" && /^[0-9a-f]{64}$/.test(x.inhaltSha256) ? { inhaltSha256: x.inhaltSha256 } : {}) }))
+    .map((x) => ({ am: x.am as string, art: x.art as GeteilteFassung["art"], daten: x.daten as Daten, ...(typeof x.pdfSha256 === "string" && x.pdfSha256 ? { pdfSha256: x.pdfSha256 } : {}), ...(istObjekt(x.absender) ? { absender: { ...LEERER_BETRIEB, ...Object.fromEntries(Object.entries(x.absender).filter(([, w]) => typeof w === "string")) } as Betrieb } : {}), ...(typeof x.inhaltSha256 === "string" && /^[0-9a-f]{64}$/.test(x.inhaltSha256) ? { inhaltSha256: x.inhaltSha256 } : {}), ...(druckAus(x.druck) ? { druck: druckAus(x.druck)! } : {}) }))
     // E-200: vollständig – keine Ausgabe fällt weg
     .sort((a, b) => a.am.localeCompare(b.am));
 }
@@ -497,6 +564,7 @@ export function standAus(json: string | null): Stand {
   }
   if (!istObjekt(geparst)) throw new StandFehler("unlesbar");
   const roh = migrieren(geparst) as Partial<Stand>;
+  const geladen = new Date();
   const betrieb = { ...LEERER_BETRIEB };
   for (const k of Object.keys(LEERER_BETRIEB) as (keyof Betrieb)[]) {
     const w = (roh.betrieb as Record<string, unknown> | undefined)?.[k];
@@ -512,7 +580,7 @@ export function standAus(json: string | null): Stand {
   for (const u of [...liste(r.unterlagen), ...liste(fremdRoh.unterlagen)]) {
     if (typeof u.id !== "string" || gesehen.has(u.id)) continue;
     gesehen.add(u.id);
-    if (typeof u.vorlage === "string" && vorlageFuer(u.vorlage) && istObjekt(u.daten)) unterlagen.push(unterlageAus(u));
+    if (typeof u.vorlage === "string" && vorlageFuer(u.vorlage) && istObjekt(u.daten)) unterlagen.push(absenderNachtragen(unterlageAus(u), betrieb, geladen));
     else fremdeUnterlagen.push(u);
   }
   const belege: Beleg[] = [];
@@ -842,11 +910,17 @@ export function korrigieren(s: Stand, id: string, grund: string, jetzt: Date): S
   if (!u || !u.festgeschrieben || !vorlageFuer(u.vorlage)?.korrektur || !grund.trim() || u.konfliktKopieVon) return s;
   const iso = jetzt.toISOString();
   const alterGrund = typeof u.daten.fassung_grund === "string" && u.daten.fassung_grund.trim() ? u.daten.fassung_grund.trim() : undefined;
-  const fassung: Fassung = { daten: u.daten, festgeschrieben: u.festgeschrieben, ...(u.ausgegeben ? { ausgegeben: u.ausgegeben } : {}), ...(u.pdfSha256 ? { pdfSha256: u.pdfSha256 } : {}), ...(alterGrund ? { grund: alterGrund } : {}), ersetzt: iso };
+  const fassung: Fassung = { daten: u.daten, festgeschrieben: u.festgeschrieben, ...(u.ausgegeben ? { ausgegeben: u.ausgegeben } : {}), ...(u.pdfSha256 ? { pdfSha256: u.pdfSha256 } : {}), ...(alterGrund ? { grund: alterGrund } : {}), ersetzt: iso, ...druckAngaben(u) };
   const fassungen = [...(u.fassungen ?? []), fassung];
   const daten: Daten = { ...u.daten, fassung_nr: String(fassungen.length + 1), fassung_ersetzt: heute(new Date(u.festgeschrieben)), fassung_grund: grund.trim(), fassung_stand: heute(jetzt) };
-  const { festgeschrieben: _f, pdfSha256: _p, ...rest } = u;
+  // E-220 (8b): der Entwurf zeigt wieder „Mein Betrieb“ von heute; Absender und HTML gehören zur abgelösten Fassung
+  const { festgeschrieben: _f, pdfSha256: _p, absender: _a, absenderGedruckt: _g, absenderNachgetragen: _n, druck: _d, ...rest } = u;
   return { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...rest, daten, geaendert: iso, fassungen } : x)) };
+}
+
+/** E-220 (8b): Absender, Merker und festgehaltenes HTML einer festgeschriebenen Unterlage – für ihre Fassung in der Historie. */
+function druckAngaben(u: Pick<Unterlage, "absender" | "absenderGedruckt" | "absenderNachgetragen" | "druck">): Pick<Fassung, "absender" | "absenderGedruckt" | "absenderNachgetragen" | "druck"> {
+  return { ...(u.absender ? { absender: u.absender } : {}), ...(u.absenderGedruckt ? { absenderGedruckt: true } : {}), ...(u.absenderNachgetragen ? { absenderNachgetragen: u.absenderNachgetragen } : {}), ...(u.druck ? { druck: u.druck } : {}) };
 }
 
 /** R12: Tag (YYYY-MM-DD), an dem die Fassung festgeschrieben bzw. zuletzt geteilt wurde. */
@@ -867,11 +941,11 @@ export function ausgabeMoeglich(s: Stand, id: string, daten?: Daten): boolean {
  * Als PDF geteilt oder gedruckt: merken, und Vorlagen mit `festschreiben` festschreiben. Mit `daten` (Inhalt des PDFs)
  * nur, wenn die Unterlage noch genau diesen Inhalt hat – sonst bleibt der Stand unverändert (siehe `ausgabeMoeglich`).
  */
-export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean): Stand {
+export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean, druck?: string | DruckFassung): Stand {
   if (!ausgabeMoeglich(s, id, daten)) return s;
   // E-156: als E-Rechnung geteilt – vermerken (danach immer wieder teilbar, auch ohne Pro)
   if (eRechnung) {
-    const mit = ausgeben(s, id, jetzt, daten, pdfSha256, absender);
+    const mit = ausgeben(s, id, jetzt, daten, pdfSha256, absender, false, druck);
     return { ...mit, unterlagen: mit.unterlagen.map((u) => (u.id === id && !u.eRechnungGeteilt ? { ...u, eRechnungGeteilt: jetzt.toISOString() } : u)) };
   }
   const vorher = s.unterlagen.find((u) => u.id === id);
@@ -884,10 +958,14 @@ export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSh
       if (u.ausgegeben && (!fest || u.festgeschrieben)) return u;
       const festschreiben = fest && !u.festgeschrieben;
       if (!festschreiben) return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString() };
-      // R12 GoBD: Absenderdaten und XRechnung so festhalten, wie sie jetzt ausgegeben werden (§ 14b UStG)
+      // R12 GoBD: Absenderdaten und XRechnung so festhalten, wie sie jetzt ausgegeben werden (§ 14b UStG). E-220 (8b): bei
+      // jeder festgeschriebenen Unterlage, mit dem gedruckten HTML (Aufrufer: Absender nach der Pro-Regel, wie gedruckt)
       const betrieb = absender ?? s.betrieb;
       const e = v?.eRechnung ? eRechnungAus(u.daten, betrieb) : null;
-      return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString(), festgeschrieben: jetzt.toISOString(), ...(pdfSha256 ? { pdfSha256 } : {}), ...(v?.eRechnung ? { absender: { ...betrieb } } : {}), ...(e && !e.fehlt.length ? { xml: xrechnungUbl(e.daten, KU_HINWEIS) } : {}) };
+      const iso = jetzt.toISOString();
+      const d = typeof druck === "string" ? druckFesthalten(druck, betrieb.logo, iso) : druck;
+      const { absenderNachgetragen: _n, druck: _d, ...ohne } = u;
+      return { ...ohne, ausgegeben: u.ausgegeben ?? iso, festgeschrieben: iso, ...(pdfSha256 ? { pdfSha256 } : {}), absender: { ...betrieb }, ...(absender ? { absenderGedruckt: true } : {}), ...(d ? { druck: d } : {}), ...(e && !e.fehlt.length ? { xml: xrechnungUbl(e.daten, KU_HINWEIS) } : {}) };
     }),
   };
   // R12 GoBD: eine abgegebene (geteilte) Voranmeldung schreibt die Belege ihres Zeitraums fest
@@ -908,7 +986,7 @@ export function teilenOffenVermerken(s: Stand, id: string, jetzt: Date, f: Omit<
     ...s,
     unterlagen: s.unterlagen.map((u) => {
       if (u.id !== id || u.festgeschrieben || !vorlageFuer(u.vorlage)?.festschreiben) return u;
-      const g: GeteilteFassung = { am: jetzt.toISOString(), art: f.art, daten: f.daten, ...(f.pdfSha256 ? { pdfSha256: f.pdfSha256 } : {}), ...(f.absender ? { absender: { ...f.absender } } : {}) };
+      const g: GeteilteFassung = { am: jetzt.toISOString(), art: f.art, daten: f.daten, ...(f.pdfSha256 ? { pdfSha256: f.pdfSha256 } : {}), ...(f.absender ? { absender: { ...f.absender } } : {}), ...(f.druck ? { druck: f.druck } : {}) };
       // E-200: Prüfwert über Inhalt und Absender gleich festhalten; der Vermerk wird nur angehängt, nie gekürzt
       return { ...u, geteiltOffen: [...(u.geteiltOffen ?? []), { ...g, inhaltSha256: fassungHash(g) }] };
     }),
@@ -967,7 +1045,7 @@ export function geteilteFassungFestschreiben(s: Stand, id: string, jetzt: Date, 
   const geaendert = JSON.stringify(f.daten) !== JSON.stringify(u.daten);
   const erste = u.ausgegeben ?? u.geteiltOffen![0]!.am;
   const vorher: Stand = { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...x, daten: f.daten, ...(geaendert ? { geaendert: jetzt.toISOString() } : {}) } : x)) };
-  const fest = ausgeben(vorher, id, jetzt, f.daten, f.pdfSha256, f.absender, f.art === "xml");
+  const fest = ausgeben(vorher, id, jetzt, f.daten, f.pdfSha256, f.absender, f.art === "xml", f.druck);
   return { ...fest, unterlagen: fest.unterlagen.map((x) => (x.id === id && x.festgeschrieben ? { ...x, ausgegeben: erste } : x)) };
 }
 
@@ -1317,15 +1395,22 @@ export function sachentnahmeLoeschen(s: Stand, id: string, jetzt = new Date()): 
  * festgeschriebenes Kassenbuch für Monat und Standort mit anderem Inhalt (Tagesabschluss inzwischen korrigiert),
  * kommt die bisherige Fassung in die Historie und die neue gilt (Fassung 2 …). Gleicher Inhalt: nichts ändert sich.
  */
-export function kassenbuchFestschreiben(s: Stand, monat: string, standort: string, daten: Daten, sha256: string, jetzt = new Date(), id = neueId()): Stand {
+export function kassenbuchFestschreiben(s: Stand, monat: string, standort: string, daten: Daten, sha256: string, jetzt = new Date(), id = neueId(), absender?: Betrieb, html?: string): Stand {
   const iso = jetzt.toISOString();
+  // E-220 (8b): Absender und gedrucktes HTML festhalten (wie bei jeder festgeschriebenen Unterlage)
+  const betrieb = absender ?? s.betrieb;
+  const druck = { absender: { ...betrieb }, ...(absender ? { absenderGedruckt: true } : {}), ...(html ? { druck: druckFesthalten(html, betrieb.logo, iso) } : {}) };
   const alt = s.unterlagen.find((u) => u.vorlage === "kassenbuch" && u.kassenbuch?.monat === monat && u.kassenbuch.standort === standort && !u.konfliktKopieVon);
   if (alt && alt.festgeschrieben && JSON.stringify(alt.daten) === JSON.stringify(daten)) return s;
   if (alt && alt.festgeschrieben) {
-    const fassung: Fassung = { daten: alt.daten, festgeschrieben: alt.festgeschrieben, ...(alt.ausgegeben ? { ausgegeben: alt.ausgegeben } : {}), ...(alt.inhaltSha256 ? { pdfSha256: alt.inhaltSha256 } : {}), grund: "Tagesabschlüsse seit der Festschreibung korrigiert bzw. ergänzt", ersetzt: iso };
-    return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === alt.id ? { ...u, daten, geaendert: iso, festgeschrieben: iso, ausgegeben: iso, inhaltSha256: sha256, fassungen: [...(u.fassungen ?? []), fassung] } : u)) };
+    const fassung: Fassung = { daten: alt.daten, festgeschrieben: alt.festgeschrieben, ...(alt.ausgegeben ? { ausgegeben: alt.ausgegeben } : {}), ...(alt.inhaltSha256 ? { pdfSha256: alt.inhaltSha256 } : {}), grund: "Tagesabschlüsse seit der Festschreibung korrigiert bzw. ergänzt", ersetzt: iso, ...druckAngaben(alt) };
+    return { ...s, unterlagen: s.unterlagen.map((u) => {
+      if (u.id !== alt.id) return u;
+      const { absenderGedruckt: _g, absenderNachgetragen: _n, druck: _d, ...ohne } = u;
+      return { ...ohne, daten, geaendert: iso, festgeschrieben: iso, ausgegeben: iso, inhaltSha256: sha256, fassungen: [...(u.fassungen ?? []), fassung], ...druck };
+    }) };
   }
-  const u: Unterlage = { id, vorlage: "kassenbuch", daten, erstellt: iso, geaendert: iso, ausgegeben: iso, festgeschrieben: iso, kassenbuch: { monat, standort }, inhaltSha256: sha256 };
+  const u: Unterlage = { id, vorlage: "kassenbuch", daten, erstellt: iso, geaendert: iso, ausgegeben: iso, festgeschrieben: iso, kassenbuch: { monat, standort }, inhaltSha256: sha256, ...druck };
   return { ...s, unterlagen: [u, ...s.unterlagen] };
 }
 
@@ -1615,6 +1700,17 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
   const eRechnung = frueher(lokal.eRechnungGeteilt, andere.eRechnungGeteilt);
   if (eRechnung) r.eRechnungGeteilt = eRechnung;
   if (fl && fa && sl === sa) r.festgeschrieben = frueher(lokal.festgeschrieben, andere.festgeschrieben);
+  // E-220 (8b): gleicher Inhalt auf beiden Seiten – das festgehaltene Dokument bzw. ein echter Absender-Schnappschuss geht
+  // nicht verloren (z. B. Fassung aus einer älteren App-Version ohne `druck`, oder beim Laden nachgetragener Absender)
+  if (fl && fa && sl === sa && JSON.stringify(basis.daten) === JSON.stringify(zweite.daten)) {
+    const echt = (x: Unterlage) => Boolean(x.absender && !x.absenderNachgetragen);
+    if ((!r.druck && zweite.druck) || (!r.druck && !zweite.druck && !echt(r) && echt(zweite))) {
+      delete r.druck;
+      delete r.absenderGedruckt;
+      delete r.absenderNachgetragen;
+      Object.assign(r, druckAngaben(zweite));
+    }
+  }
   // E-193 (4): unbestätigte Ausgaben beider Seiten (nach Zeitpunkt) – keine geht verloren
   const offen = new Map<string, GeteilteFassung>();
   for (const g of [...(lokal.geteiltOffen ?? []), ...(andere.geteiltOffen ?? [])]) if (!offen.has(g.am)) offen.set(g.am, g);
