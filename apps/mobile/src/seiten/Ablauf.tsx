@@ -93,6 +93,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
       ? [
           r.kleinunternehmer ? (r.kuVoranmeldungPflicht ? TEXT.e227_ku_va_pflicht : r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku) : TEXT.aus_rechnungen_ok(r.anzahl),
           r.kuGemischt ? TEXT.ust_ku_gemischt : "",
+          r.uneinbringlichNicht.length ? TEXT.e229_uneinbringlich_ku(r.uneinbringlichNicht.length) : "",
           r.igeKu ? TEXT.e227_ige_nicht(r.igeKu, r.erwerbsschwelle?.status !== "nein") : "",
           r.igeBelege ? (r.kleinunternehmer ? TEXT.e227_ige_ku_uebernommen(r.igeBelege) : TEXT.ust_ige_belege(r.igeBelege)) : "",
           r.igeOhneEuro ? TEXT.e224_ige_ohne_euro(r.igeOhneEuro) : "",
@@ -138,6 +139,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           {/* E-227: Kleinunternehmer mit Erwerbsbesteuerung – Voranmeldung für diesen Zeitraum (§ 18 Abs. 4a UStG) */}
           {r.kleinunternehmer ? (r.kuVoranmeldungPflicht ? <Hinweis art="warnung" text={TEXT.e227_ku_va_pflicht} /> : <T v="caption" farbe={f.bald}>{r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku}</T>) : <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>}
           {r.kuGemischt ? <T v="caption" farbe={f.bald}>{TEXT.ust_ku_gemischt}</T> : null}
+          {/* E-229: Rechnung mit Umsatzsteuer im Kleinunternehmer-Zeitraum uneinbringlich – nicht berichtigt (T-335) */}
+          {r.uneinbringlichNicht.length ? <Hinweis art="warnung" text={TEXT.e229_uneinbringlich_ku(r.uneinbringlichNicht.length)} /> : null}
           {kasse ? <Hinweis art={kasse.warnung ? "warnung" : "info"} symbol="banknote" text={kasse.text} /> : null}
           {r.kasseTage ? <T v="caption" farbe={f.amtTief}>{TEXT.r12_kasse_uebernommen(r.kasseTage)}</T> : null}
           {r.minderungen ? <T v="caption" farbe={f.amtTief}>{TEXT.r12_minderungen(r.minderungen)}</T> : null}

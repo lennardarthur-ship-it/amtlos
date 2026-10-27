@@ -1490,6 +1490,8 @@ export const T = {
   e229_uneinbringlich_zurueckgenommen: "Vermerk „uneinbringlich“ zurückgenommen",
   e229_uneinbringlich_storno: "Die Forderung ist als uneinbringlich vermerkt. Zum Stornieren bitte zuerst den Vermerk zurücknehmen.",
   e229_uneinbringlich_pdf: (nummer: string, datum: string, netto: string) => `Rechnung ${nummer}: Forderung seit ${datum} uneinbringlich – Umsatz um ${netto} € (netto) und die Steuer darauf gemindert (§ 17 Abs. 2 Nr. 1 UStG).`,
+  e229_uneinbringlich_ku_pdf: (nummer: string, datum: string, netto: string) => `Rechnung ${nummer} (mit Umsatzsteuer gestellt): Forderung seit ${datum} uneinbringlich, offen ${netto} € netto – in diesem Kleinunternehmer-Zeitraum von ${MARKE.name} nicht berichtigt. Ob und wo die Umsatzsteuer zu berichtigen ist, bitte mit der Steuerberatung klären.`,
+  e229_uneinbringlich_ku: (n: number) => `${n === 1 ? "Eine Rechnung mit Umsatzsteuer ist" : `${n} Rechnungen mit Umsatzsteuer sind`} in diesem Kleinunternehmer-Zeitraum uneinbringlich geworden – ${MARKE.name} berichtigt hier nichts. Ob und wo die Umsatzsteuer zu berichtigen ist, bitte mit der Steuerberatung klären (steht auch auf der Voranmeldung).`,
   e229_uneinbringlich_zahlung_pdf: (nummer: string, datum: string, netto: string) => `Rechnung ${nummer}: am ${datum} nach der Uneinbringlichkeit noch eingegangen – Umsatz um ${netto} € (netto) und die Steuer darauf erneut berichtigt (§ 17 Abs. 2 Nr. 1 UStG).`,
   // Beleg mit Skonto
   r12_beleg_skonto: "Skonto abgezogen (brutto)",

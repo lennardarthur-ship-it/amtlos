@@ -98,7 +98,7 @@ import {
 import { APP_VERSION } from "../version";
 import { T as TEXT } from "../texte";
 import { utf8 } from "./sicherung";
-import { GUTSCHRIFT_HINWEIS, euBerichtigungen, euMeldeArtVon, istGutschrift, kuImZeitraum, nurSteuerfreieUmsaetze, periodeText, schlussZuAbschlag, zuordnungsTage, uneinbringlichBetraege } from "./ustAusRechnungen";
+import { GUTSCHRIFT_HINWEIS, euBerichtigungen, euMeldeArtVon, istGutschrift, kuImZeitraum, nurSteuerfreieUmsaetze, periodeText, schlussZuAbschlag, zuordnungsTage, uneinbringlichBetraege, uneinbringlichStand } from "./ustAusRechnungen";
 import { ERWERBSSCHWELLE_REGELWERT, igeOhneErwerbsbesteuerung } from "./erwerbsschwelle";
 import { regelwert } from "../pflichten/check";
 import { BELEG_KONFLIKT_GRUND, absenderFuer, neueId, nichtZaehlend, type ProtokollEintrag, type Stand, type Unterlage, guthabenKonten } from "./speicher";
@@ -1144,12 +1144,15 @@ export function uneinbringlicheForderungen(s: Stand) {
     .filter((u) => u.uneinbringlich?.datum)
     .map((u) => {
       const { daten } = eRechnungAus(u.daten, absenderFuer(s, u));
-      const ub = uneinbringlichBetraege(u, absenderFuer(s, u));
+      // auch ohne Berichtigung in der Voranmeldung (Kleinunternehmer, OSS, Abschlag) der am Tag wirklich offene Betrag
+      const ub = uneinbringlichStand(u, absenderFuer(s, u));
       const offenAmTag = ub ? ub.offen : restGruppen(daten).map((g) => ({ satz: g.satz, brutto_cent: g.netto_cent + g.ust_cent, netto_cent: g.netto_cent, ust_cent: g.ust_cent }));
+      // berichtigt die Soll-Voranmeldung der App diese Rechnung überhaupt (nicht: Kleinunternehmer-Rechnung, OSS, Abschlag)?
+      const berichtigbar = uneinbringlichBetraege(u, absenderFuer(s, u)) !== null;
       const offen = offenAmTag.reduce((a, g) => a + g.brutto_cent, 0);
       const ust = offenAmTag.reduce((a, g) => a + (g.satz && g.satz > 0 ? g.ust_cent : 0), 0);
       const spaeter = (ub?.spaeter ?? []).map((x) => ({ datum: x.datum, brutto_cent: x.gruppen.reduce((a, g) => a + g.brutto_cent, 0), ust_cent: x.gruppen.reduce((a, g) => a + (g.satz && g.satz > 0 ? g.ust_cent : 0), 0) }));
-      return { u, nummer: daten.nummer, kunde: daten.kunde.name, rechnungsdatum: daten.rechnungsdatum, tag: u.uneinbringlich!.datum!, grund: UNEINBRINGLICH_GRUND_TEXT[u.uneinbringlich!.grund ?? "sonstiges"] ?? "anderer Grund", text: u.uneinbringlich!.text ?? "", offen, ust, je: offenAmTag, spaeter, vermerkt: u.uneinbringlich!.geaendert };
+      return { u, nummer: daten.nummer, kunde: daten.kunde.name, rechnungsdatum: daten.rechnungsdatum, tag: u.uneinbringlich!.datum!, grund: UNEINBRINGLICH_GRUND_TEXT[u.uneinbringlich!.grund ?? "sonstiges"] ?? "anderer Grund", text: u.uneinbringlich!.text ?? "", offen, ust, je: offenAmTag, spaeter, vermerkt: u.uneinbringlich!.geaendert, berichtigbar };
     });
 }
 
@@ -1643,6 +1646,13 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   if (guthabenListe.length) inhalt[`Guthaben_${z.name}.csv`] = utf8(csv(kopfAus(GUTHABEN_SPALTEN), guthabenListe));
   const uneinbringlichAlle = uneinbringlicheForderungen(s);
   const uneinbringlichHier = uneinbringlichAlle.filter((x) => imZeitraum(x.tag, z) || x.spaeter.some((p) => imZeitraum(p.datum, z)));
+  // berichtigt die Voranmeldung der App? Nur Soll außerhalb der Kleinunternehmerzeit und nicht bei Kleinunternehmer-
+  // Rechnungen, OSS und Abschlägen (E-229) – der Text im LIESMICH muss zur Rechnung der App passen
+  const uneinbringlichBerichtigt = (x: (typeof uneinbringlichAlle)[number]) => !ist && !ku && x.berichtigbar;
+  const uneinbringlichMit = uneinbringlichHier.filter(uneinbringlichBerichtigt);
+  const uneinbringlichOhne = uneinbringlichHier.filter((x) => !uneinbringlichBerichtigt(x));
+  const uneinbringlichOhneGrund = (x: (typeof uneinbringlichAlle)[number]) =>
+    x.u.daten.kleinunternehmer === true ? "Kleinunternehmer-Rechnung" : x.u.daten.oss === true ? "OSS-Rechnung" : x.u.daten.abschlag === true ? "Abschlagsrechnung, mit der Zahlung versteuert" : "Kleinunternehmer-Zeitraum – ob und wo die Umsatzsteuer zu berichtigen ist, bitte prüfen";
   const uneinbringlichListe = uneinbringlichZeilen(s, z);
   if (uneinbringlichListe.length) inhalt[`Uneinbringlich_${z.name}.csv`] = utf8(csv(kopfAus(UNEINBRINGLICH_SPALTEN), uneinbringlichListe));
   // E-229 (T-303): Belege in fremder Währung mit gezahltem Euro-Betrag – Kursdifferenz (bei EÜR Teil der Betriebsausgabe)
@@ -1715,11 +1725,15 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
     // E-229 (T-304 c): uneinbringliche Forderungen (§ 17 Abs. 2 Nr. 1 UStG) – Buchungen fehlen mangels Konto
     ...(uneinbringlichHier.length
       ? [
-          `Forderungen uneinbringlich (§ 17 Abs. 2 Nr. 1 UStG, Uneinbringlich_${z.name}.csv): ${uneinbringlichHier.map((x) => `RE ${x.nummer} (${x.kunde || "ohne Namen"}) seit ${datumDe(x.tag)}, ${x.grund}${imZeitraum(x.tag, z) ? `, offen ${betrag(x.offen)} € brutto, davon Umsatzsteuer ${betrag(x.ust)} €` : ""}${x.spaeter.filter((p) => imZeitraum(p.datum, z)).map((p) => `; danach am ${datumDe(p.datum)} noch ${betrag(p.brutto_cent)} € eingegangen (Umsatzsteuer ${betrag(p.ust_cent)} € erneut zu berichtigen)`).join("")}`).join("; ")}. ${
+          `Forderungen uneinbringlich (§ 17 Abs. 2 Nr. 1 UStG, Uneinbringlich_${z.name}.csv): ${uneinbringlichHier.map((x) => `RE ${x.nummer} (${x.kunde || "ohne Namen"}) seit ${datumDe(x.tag)}, ${x.grund}${imZeitraum(x.tag, z) ? `, offen ${betrag(x.offen)} € brutto, davon Umsatzsteuer ${betrag(x.ust)} €` : ""}${x.spaeter.filter((p) => imZeitraum(p.datum, z)).map((p) => `; danach am ${datumDe(p.datum)} noch ${betrag(p.brutto_cent)} € eingegangen${uneinbringlichBerichtigt(x) ? ` (Umsatzsteuer ${betrag(p.ust_cent)} € erneut zu berichtigen)` : ""}`).join("")}`).join("; ")}. ${
             ist
               ? "Ist-Versteuerung: Die Umsatzsteuer ist erst mit der Zahlung entstanden – keine Umsatzsteuerberichtigung, die Voranmeldung der App ändert sich nicht."
-              : "Soll-Versteuerung: Die Voranmeldung der App mindert Umsatz und Steuer des offenen Betrags im Zeitraum der Uneinbringlichkeit und berichtigt erneut, wenn danach noch Geld eingeht."
-          } Ein Konto für Forderungsverluste ist in ${MARKE.name} nicht festgelegt – deshalb FEHLEN die Ausbuchung${ist ? "" : " und die Umsatzsteuerberichtigung"} im Stapel; bitte von Hand buchen.`,
+              : [
+                  uneinbringlichMit.length ? `Soll-Versteuerung: Die Voranmeldung der App mindert Umsatz und Steuer des offenen Betrags im Zeitraum der Uneinbringlichkeit und berichtigt erneut, wenn danach noch Geld eingeht${uneinbringlichOhne.length ? ` (${uneinbringlichMit.map((x) => `RE ${x.nummer}`).join(", ")})` : ""}.` : "",
+                  // E-229: keine Berichtigung bei Kleinunternehmer-Rechnungen, OSS und Abschlägen; im Kleinunternehmer-Zeitraum nur der Hinweis (T-335)
+                  uneinbringlichOhne.length ? `Ohne Umsatzsteuerberichtigung in der Voranmeldung der App: ${uneinbringlichOhne.map((x) => `RE ${x.nummer} (${uneinbringlichOhneGrund(x)})`).join(", ")}.` : "",
+                ].filter(Boolean).join(" ")
+          } Ein Konto für Forderungsverluste ist in ${MARKE.name} nicht festgelegt – deshalb FEHLEN die Ausbuchung${uneinbringlichMit.length ? " und die Umsatzsteuerberichtigung" : ""} im Stapel; bitte von Hand buchen.`,
         ]
       : []),
     // E-229 (T-303): fremde Währung – gezahlter Euro-Betrag und Kursdifferenz

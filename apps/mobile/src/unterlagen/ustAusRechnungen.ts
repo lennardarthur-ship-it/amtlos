@@ -473,6 +473,9 @@ export function perioden(unterlagen: Unterlage[], betrieb: Betrieb, v: Versteuer
   // E-227: innergemeinschaftliche Erwerbe nach `igeSteuerTag` – auch in der Kleinunternehmerzeit (Voranmeldung nach
   // § 18 Abs. 4a UStG, wenn die Erwerbe zu versteuern sind)
   for (const b of belege) if (b.steuerschuld === "ige" && !b.ungueltig) for (const p of periodenVon(igeSteuerTag(b))) set.add(p);
+  // E-229: Zeitraum, in dem eine Forderung uneinbringlich wurde (Soll: Berichtigung dort) – sonst ließe er sich ohne weitere
+  // Rechnungen oder Belege gar nicht übernehmen; auch in der Kleinunternehmerzeit (dort nur der Hinweis, T-335)
+  if (v === "soll") for (const u of festeRechnungen(unterlagen)) { const ub = uneinbringlichBetraege(u, betrieb); if (ub) for (const p of periodenVon(ub.tag)) set.add(p); }
   return [...set].sort((a, b) => b.localeCompare(a) || (a.includes("Q") ? 1 : -1));
 }
 
@@ -594,6 +597,11 @@ export interface UstUebernahme {
    */
   uneinbringlich: { nummer: string; netto_cent: number; tag: string }[];
   uneinbringlichZahlungen: { nummer: string; netto_cent: number; tag: string }[];
+  /**
+   * E-229 im Kleinunternehmer-Zeitraum: Rechnungen mit Umsatzsteuer, deren Forderung im Zeitraum uneinbringlich wurde – von
+   * der App nicht berichtigt (offener Betrag netto, steuerpflichtige Teile), Zeile auf dem PDF und Warnung (T-335)
+   */
+  uneinbringlichNicht: { nummer: string; netto_cent: number; tag: string }[];
   /** StB-Prüfung (5.2): Nummern der Rechnungen ohne erkennbares Leistungsdatum (nach Rechnungsdatum zugeordnet) */
   ersatzNummern: string[];
   /** StB-Prüfung (5.2): OSS-Rechnungen im Zeitraum – nicht übernommen (OSS-Erklärung beim BZSt) */
@@ -662,9 +670,27 @@ export interface SatzTeil {
  * die danach noch eingegangenen Zahlungen (erhaltener Teil je Steuersatz). null, wenn die Rechnung nicht (mehr) als
  * uneinbringlich vermerkt ist oder keine Berichtigung trägt (Kleinunternehmer, OSS, Abschlag, Storno).
  */
-export function uneinbringlichBetraege(u: Unterlage, betrieb: Betrieb): { tag: string; daten: RechnungsDaten; offen: SatzTeil[]; spaeter: { datum: string; zahlung: string; gruppen: SatzTeil[] }[] } | null {
+export function uneinbringlichBetraege(u: Unterlage, betrieb: Betrieb): UneinbringlichStand | null {
+  if (kuRechnung(u) || istOssRechnung(u) || u.daten.abschlag === true) return null;
+  return uneinbringlichStand(u, betrieb);
+}
+
+/** E-229: Beträge einer als uneinbringlich vermerkten Forderung (siehe `uneinbringlichBetraege`). */
+export interface UneinbringlichStand {
+  tag: string;
+  daten: RechnungsDaten;
+  offen: SatzTeil[];
+  spaeter: { datum: string; zahlung: string; gruppen: SatzTeil[] }[];
+}
+
+/**
+ * E-229: am Tag der Uneinbringlichkeit offener Betrag und später Eingegangenes – für jede als uneinbringlich vermerkte
+ * Rechnung, auch ohne Berichtigung in der Voranmeldung (Kleinunternehmer, OSS, Abschlag: Listen im Paket und Archiv
+ * nennen den Betrag, der am Tag wirklich offen war). null ohne Vermerk, bei Stornorechnungen und stornierten Rechnungen.
+ */
+export function uneinbringlichStand(u: Unterlage, betrieb: Betrieb): UneinbringlichStand | null {
   const tag = u.uneinbringlich?.datum;
-  if (!tag || kuRechnung(u) || istStornoU(u) || istOssRechnung(u) || u.storniertDurch || u.daten.abschlag === true) return null;
+  if (!tag || istStornoU(u) || u.storniertDurch) return null;
   const daten = eRechnungAus(u.daten, betrieb).daten;
   const gruppen = restGruppen(daten);
   const anteile = zahlungsAnteile(gruppen, u.zahlungen ?? []);
@@ -726,12 +752,23 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   const kasseFehlend = kasse?.abschluesse.length ? fehlendeTage(kasse.abschluesse, z.von, z.bis, kasse.ruhetage ?? [], kasse.heute) : null;
   if (ku) {
     const pflicht = !!schwelle && schwelle.status === "ja" && igeImZeitraum > 0;
+    // E-229: im Kleinunternehmer-Zeitraum berichtigt die App nicht – eine Rechnung mit Umsatzsteuer (z. B. aus der Zeit vor
+    // dem Wechsel), deren Forderung hier uneinbringlich wird, steht aber auf der Voranmeldung (PRUEFLISTE T-335)
+    const nicht: UstUebernahme["uneinbringlichNicht"] = [];
+    if (v === "soll")
+      for (const u of festeRechnungen(unterlagen)) {
+        const ub = uneinbringlichBetraege(u, betrieb);
+        if (!ub || ub.tag < z.von || ub.tag > z.bis) continue;
+        const netto = ub.offen.reduce((a, g) => a + (g.satz && g.satz > 0 ? g.netto_cent : 0), 0);
+        if (netto) nicht.push({ nummer: ub.daten.nummer, netto_cent: netto, tag: ub.tag });
+      }
+    const nichtText = nicht.map((x) => TEXT.e229_uneinbringlich_ku_pdf(x.nummer, datumDe(x.tag), betragText(x.netto_cent)));
     return {
-      werte: { zeitraum: periodeText(periode), ...rcWerte(false), ...igeWerte, ...(pflicht || rc.anzahl || rc.ohne_euro ? { annahmen: igeAnnahmen.filter(Boolean).join("\n"), unvollstaendig: unvollstaendigText(igeOhneEuro, rc.ohne_euro) } : {}) },
+      werte: { zeitraum: periodeText(periode), ...rcWerte(false), ...igeWerte, ...(pflicht || rc.anzahl || rc.ohne_euro || nicht.length ? { annahmen: [...igeAnnahmen.filter(Boolean), ...nichtText].join("\n"), unvollstaendig: unvollstaendigText(igeOhneEuro, rc.ohne_euro) } : {}) },
       anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl,
       igeBelege: igeZaehlt ? rc.ige_anzahl : 0, igeKu: igeZaehlt ? 0 : igeImZeitraum, igeAndere: igeZaehlt ? rc.ige_andere_cent : 0, igeOhneEuro, rcOhneEuro: rc.ohne_euro,
       erwerbsschwelle: schwelle, kuVoranmeldungPflicht: pflicht,
-      kasseTage: 0, kasseFehlend: null, minderungen: 0, uneinbringlich: [], uneinbringlichZahlungen: [], ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [],
+      kasseTage: 0, kasseFehlend: null, minderungen: 0, uneinbringlich: [], uneinbringlichZahlungen: [], uneinbringlichNicht: nicht, ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [],
     };
   }
   // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit;
@@ -868,6 +905,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     minderungen,
     uneinbringlich,
     uneinbringlichZahlungen,
+    uneinbringlichNicht: [],
     ersatzNummern: ersatzListe.map((x) => x.nummer),
     oss: ossImZeitraum,
     berichtigungen: ber.hier,
