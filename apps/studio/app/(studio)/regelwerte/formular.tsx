@@ -41,8 +41,8 @@ export function RegelwertFormular({ start, aktion, knopf, einheitFest, mitId }: 
             {Object.entries(EINHEITEN).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
         </Feld>
-        <Feld id="gueltig_ab" label="Gültig ab">
-          <input id="gueltig_ab" name="gueltig_ab" type="date" required defaultValue={start.gueltig_ab ?? ""} className="feld" />
+        <Feld id="gueltig_ab" label="Gültig ab (leer = ohne Stichtag)">
+          <input id="gueltig_ab" name="gueltig_ab" type="date" defaultValue={start.gueltig_ab ?? ""} className="feld" />
         </Feld>
         <Feld id="gueltig_bis" label="Gültig bis (leer = offen)">
           <input id="gueltig_bis" name="gueltig_bis" type="date" defaultValue={start.gueltig_bis ?? ""} className="feld" />

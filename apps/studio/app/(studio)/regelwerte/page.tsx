@@ -68,7 +68,7 @@ export default async function Regelwerte({ searchParams }: { searchParams: Promi
                   {r.wert} {r.einheit}
                 </td>
                 <td>
-                  {r.gueltig_ab} bis {r.gueltig_bis ?? "offen"}
+                  {r.gueltig_ab === "-infinity" ? "ohne Stichtag" : r.gueltig_ab} bis {r.gueltig_bis ?? "offen"}
                 </td>
                 <td>{STATUS[r.pruef_status]}</td>
                 <td>{r.freigaben}</td>

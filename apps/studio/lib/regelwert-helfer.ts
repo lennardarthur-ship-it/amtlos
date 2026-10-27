@@ -1,7 +1,7 @@
 /** Regelwert-Formular ↔ Dokument (ohne React, testbar). */
 export type Quelle = { titel?: string; url?: string; abgerufen?: string | null; fundstelle?: string };
 export interface RegelwertDaten {
-  id?: string; bezeichnung?: { de?: string; en?: string }; einheit?: string; wert?: number; gueltig_ab?: string; gueltig_bis?: string | null;
+  id?: string; bezeichnung?: { de?: string; en?: string }; einheit?: string; wert?: number; gueltig_ab?: string | null; gueltig_bis?: string | null;
   status_recht?: string; rechtsgrundlage?: string[]; katalog_nr?: string; quellen?: Quelle[]; fachlich_zu_pruefen?: string[];
 }
 
@@ -31,7 +31,8 @@ export function ausFormular(f: FormData, id: string, einheitFest?: string): Reco
     bezeichnung: en ? { de: text(f.get("bezeichnung_de")), en } : { de: text(f.get("bezeichnung_de")) },
     einheit: einheitFest ?? text(f.get("einheit")),
     wert: zahlAusText(text(f.get("wert"))),
-    gueltig_ab: text(f.get("gueltig_ab")),
+    // E-213: leer = ohne Stichtag (null), sonst bekäme eine solche Version beim Bearbeiten ein erfundenes Anfangsdatum
+    gueltig_ab: text(f.get("gueltig_ab")) || null,
     gueltig_bis: text(f.get("gueltig_bis")) || null,
     status_recht: text(f.get("status_recht")),
     rechtsgrundlage: zeilen(f.get("rechtsgrundlage")),

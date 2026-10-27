@@ -111,12 +111,19 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
     await expect(neueRegelwertversion(studio, k.redakteurin!, { ...basis, einheit: "anzahl" })).rejects.toThrow(/Einheit/);
     await expect(neueRegelwertversion(studio, k.redakteurin!, { ...basis, gueltig_bis: "2020-01-01" })).rejects.toThrow(/liegt vor/);
     await expect(neueRegelwertversion(studio, k.stb!, basis)).rejects.toThrow(/Redaktion/);
+    // die nächste Version nach der importierten (der Katalog führt seit E-213 Version 2), nie die übergebene
     const r = await neueRegelwertversion(studio, k.redakteurin!, { ...basis, version: 42, fachlich_zu_pruefen: ["Test"] });
-    expect(r.version).toBe(2);
+    expect(r.version).toBe(v1!.version + 1);
     expect((await regelwertVersionen(studio, "steuern.ustg19.grenze_gruendungsjahr")).map((v) => [v.version, v.pruef_status])).toEqual([
-      [2, "in_pruefung"],
-      [1, "zurueckgezogen"],
+      [v1!.version + 1, "in_pruefung"],
+      [v1!.version, "zurueckgezogen"],
     ]);
+    // E-213: ohne Stichtag (gueltig_ab null) – in der Datenbank '-infinity', in den Daten bleibt null
+    const o = await neueRegelwertversion(studio, k.redakteurin!, { ...basis, id: "test.ohne_stichtag", gueltig_ab: null, bezeichnung: { de: "Test" } });
+    const [ov] = await regelwertVersionen(studio, "test.ohne_stichtag");
+    expect([o.version, ov!.daten.gueltig_ab]).toEqual([1, null]);
+    const { regelwertUebersicht } = await import("../src/studio.js");
+    expect((await regelwertUebersicht(studio)).find((x) => x.regelwert_id === "test.ohne_stichtag")?.gueltig_ab).toBe("-infinity");
     // Neuer Regelwert mit eigener Einheit
     const n = await neueRegelwertversion(studio, k.redakteurin!, { ...basis, id: "test.neuer_wert", einheit: "anzahl", wert: 10, bezeichnung: { de: "Test" } });
     expect(n.version).toBe(1);

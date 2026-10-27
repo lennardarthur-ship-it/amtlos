@@ -25,4 +25,10 @@ describe("Regelwert-Formular", () => {
       fachlich_zu_pruefen: ["Datum prüfen"],
     });
   });
+
+  it("leeres „Gültig ab“ bleibt ohne Stichtag (E-213)", () => {
+    const f = new FormData();
+    for (const [k, v] of Object.entries({ bezeichnung_de: "Wert", wert: "1", einheit: "EUR", gueltig_ab: "", gueltig_bis: "", status_recht: "in_kraft" })) f.set(k, v);
+    expect(ausFormular(f, "test.wert").gueltig_ab).toBeNull();
+  });
 });

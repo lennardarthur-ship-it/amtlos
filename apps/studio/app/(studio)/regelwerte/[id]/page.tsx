@@ -55,7 +55,7 @@ export default async function RegelwertSeite({ params, searchParams }: { params:
                 <tr key={v.id}>
                   <td>{v.version}</td>
                   <td>{d.wert}</td>
-                  <td>{d.gueltig_ab} bis {d.gueltig_bis ?? "offen"}</td>
+                  <td>{d.gueltig_ab ?? "ohne Stichtag"} bis {d.gueltig_bis ?? "offen"}</td>
                   <td>{d.status_recht}</td>
                   <td>{STATUS[v.pruef_status]}</td>
                   <td>{v.freigaben}</td>
