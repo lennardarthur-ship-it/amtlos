@@ -64,6 +64,16 @@
  *   Rechnung mit eigenem Leistungsdatum).
  * - Skonto bzw. Minderung auf EU-Umsätze mindert Kz 41 bzw. 21 und die ZM im Zeitraum der Zahlung (§ 17, § 18b Satz 4
  *   UStG), auch bei Ist-Versteuerung; die ursprüngliche Meldung bleibt.
+ *
+ * E-218 (Steuerberater, 27.10.2026, zu T-273):
+ * - „Fehler in der Rechnung“ bestätigt; war die Voranmeldung bzw. ZM des ursprünglichen Zeitraums schon abgegeben, ist
+ *   sie zu berichtigen – die Voranmeldung für denselben Zeitraum wie die ZM (das Finanzamt gleicht Kz 41 und ZM je
+ *   Zeitraum ab), eine Korrektur in der laufenden Voranmeldung genügt nicht. Die Monatsfrist der ZM-Berichtigung
+ *   (§ 18a Abs. 10 UStG) läuft ab dem Tag, an dem der Fehler erkannt wurde (`euFehlerErkannt`, Eingabe beim Storno,
+ *   vorbelegt mit dem Datum des Stornos).
+ * - Skonto auf eine Anzahlung auf einen EU-Umsatz, abgezogen bevor die Lieferung bzw. Leistung gemeldet ist: keine
+ *   eigene Minderung in einem früheren Zeitraum, sondern Minderung des mit der Schlussrechnung gemeldeten Entgelts
+ *   (§ 10 Abs. 1 UStG, `euMinderungsTage`); nur ein Skonto nach der Meldung mindert im Zeitraum der Zahlung.
  */
 import { sachentnahmenFuer, type Sachentnahme } from "@amtlos/fachlogik";
 import { eRechnungAus, fehlendeTage, istEuAusland, kassenUmsatz, kennzahlBefreiung, restGruppen, steuerschuldFuer, summen, ustZeitraum, vorsteuerFuer, zahlungsAnteile, type Beleg, type Betrieb, type Kassenabschluss, type RechnungsDaten } from "@amtlos/fachlogik";
@@ -130,7 +140,11 @@ function betragsSchluessel(u: Unterlage, betrieb: Betrieb): string {
  * „betrag“: Betrag hat sich geändert (die ursprüngliche Meldung war richtig).
  */
 export { EU_STORNO_GRUND, type EuStornoGrund } from "./speicher";
-export const euStornoGrund = (u: Unterlage): EuStornoGrund | null => (u.daten[EU_STORNO_GRUND] === "rechnung" || u.daten[EU_STORNO_GRUND] === "betrag" ? u.daten[EU_STORNO_GRUND] : null);
+export const euStornoGrund = (u: Unterlage): EuStornoGrund | null => (u.daten[EU_STORNO_GRUND] === "rechnung" || u.daten[EU_STORNO_GRUND] === "betrag" ? u.daten[EU_STORNO_GRUND] : (u.euStorno?.grund ?? null));
+/** E-218: Grund steht in den Daten der Stornorechnung (beim Stornieren gewählt) – dann lässt er sich nicht mehr ändern. */
+export const euStornoGrundFest = (u: Unterlage) => u.daten[EU_STORNO_GRUND] === "rechnung" || u.daten[EU_STORNO_GRUND] === "betrag";
+/** E-218 (Steuerberater 27.10.2026): Tag, an dem der Fehler erkannt wurde – ohne Angabe das Datum des Stornos. */
+export const euFehlerErkannt = (u: Unterlage) => u.euStorno?.erkannt ?? String(u.daten.datum);
 
 const kundeVon = (u: Unterlage) => (typeof u.daten.kunde_name === "string" ? u.daten.kunde_name.trim().toLocaleLowerCase("de") : "");
 const istStornoU = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";
@@ -324,9 +338,10 @@ export interface EuBerichtigung {
   monat: string;
   quartal: string;
   stornoDatum: string;
+  /** E-218: Tag, an dem der Fehler erkannt wurde (Eingabe beim Storno, vorbelegt mit dem Datum des Stornos) */
+  erkannt: string;
   /**
-   * ZM berichtigen „innerhalb eines Monats“, nachdem der Fehler erkannt wurde (§ 18a Abs. 10 UStG) – die App rechnet
-   * vom Datum des Stornos
+   * ZM berichtigen „innerhalb eines Monats“, nachdem der Fehler erkannt wurde (§ 18a Abs. 10 UStG) – E-218: ab `erkannt`
    */
   zmFrist: string;
   /** als berichtigt vermerkt am (`Stand.erledigt`) */
@@ -352,10 +367,28 @@ export function euBerichtigungen(unterlagen: Unterlage[], betrieb: Betrieb, erle
     if (!orig || !art || !tag) continue;
     const ersatz = feste.find((x) => !istStornoU(x) && (x.ersetzt === orig.id || (nr(orig) !== "" && typeof x.daten.ersetzt_nummer === "string" && x.daten.ersetzt_nummer.trim() === nr(orig).trim())));
     const stornoDatum = String(st.daten.datum);
+    const erkannt = euFehlerErkannt(st);
     const [monat, quartal] = periodenVon(tag) as [string, string];
-    aus.push({ stornoId: st.id, stornoNr: nr(st), rechnungNr: nr(orig), ersatzNr: ersatz ? nr(ersatz) : null, art, tag, ersatzTag: ersatz ? (korr.get(ersatz.id) ?? zuordnenEinfach(ersatz, "soll", betrieb).tag) : null, monat, quartal, stornoDatum, zmFrist: einMonatNach(stornoDatum), erledigt: erledigt[euBerichtigungSchluessel(st.id)] ?? null });
+    aus.push({ stornoId: st.id, stornoNr: nr(st), rechnungNr: nr(orig), ersatzNr: ersatz ? nr(ersatz) : null, art, tag, ersatzTag: ersatz ? (korr.get(ersatz.id) ?? zuordnenEinfach(ersatz, "soll", betrieb).tag) : null, monat, quartal, stornoDatum, erkannt, zmFrist: einMonatNach(erkannt), erledigt: erledigt[euBerichtigungSchluessel(st.id)] ?? null });
   }
   return aus.sort((a, b) => a.stornoDatum.localeCompare(b.stornoDatum) || a.stornoNr.localeCompare(b.stornoNr));
+}
+
+/** E-218: Schlüssel in `Stand.erledigt`, mit dem der einmalige Hinweis auf ältere Stornos ohne Grund ausgeblendet ist. */
+export const EU_STORNO_ALT_HINWEIS = "eu-storno-grund-hinweis";
+
+/**
+ * E-218 (Steuerberater 27.10.2026, T-273 (4)): geteilte Stornos innergemeinschaftlicher Lieferungen ohne Grund (ältere
+ * Daten von vor E-214) – für den einmaligen Hinweis, den Grund nachzutragen (`euStornoSetzen`). Ohne Grund gilt bei
+ * Lieferungen „Betrag hat sich geändert“.
+ */
+export function euStornosOhneGrund(unterlagen: Unterlage[], betrieb: Betrieb): Unterlage[] {
+  const feste = festeRechnungen(unterlagen);
+  return feste.filter((st) => {
+    if (!istStornoU(st) || !st.stornoZuId || euStornoGrund(st)) return false;
+    const orig = feste.find((x) => x.id === st.stornoZuId);
+    return !!orig && euArtVon(orig, betrieb) === "L";
+  });
 }
 
 /** E-214: Berichtigungen, deren ursprünglicher Zeitraum in `periode` liegt (Monat bzw. Quartal), und Stornos dieses Zeitraums, die anderswo zählen. */
@@ -378,8 +411,43 @@ export function euStornoTag(unterlagen: Unterlage[], betrieb: Betrieb, st: Unter
   return grund === "rechnung" ? zuordnenEinfach(orig, "soll", betrieb).tag : String(st.daten.datum);
 }
 
-/** Text für Voranmeldung bzw. ZM: „Storno 2026-0042 (Fehler in Rechnung 2026-0017) berichtigt diesen Zeitraum“ */
-export const berichtigungText = (b: EuBerichtigung) => `Storno ${b.stornoNr} (Fehler in Rechnung ${b.rechnungNr}${b.ersatzNr ? `, ersetzt durch ${b.ersatzNr}` : ""}) berichtigt den Zeitraum der ursprünglichen Meldung.`;
+/**
+ * Text für Voranmeldung bzw. ZM: „Storno 2026-0042 (Fehler in Rechnung 2026-0017) berichtigt diesen Zeitraum“ – E-218
+ * (Steuerberater 27.10.2026): Berichtigung in genau diesem Zeitraum, nicht in der laufenden Voranmeldung.
+ */
+export const berichtigungText = (b: EuBerichtigung) => `Storno ${b.stornoNr} (Fehler in Rechnung ${b.rechnungNr}${b.ersatzNr ? `, ersetzt durch ${b.ersatzNr}` : ""}) berichtigt den Zeitraum der ursprünglichen Meldung – war sie schon abgegeben, ist sie für diesen Zeitraum zu berichtigen (Voranmeldung im selben Zeitraum wie die ZM, nicht in der laufenden Voranmeldung).`;
+
+/**
+ * E-218: Schlussrechnung, die eine Abschlagsrechnung absetzt (ihre Nummer steht unter „Abgesetzte Abschlagsrechnungen“) –
+ * geteilt, keine Stornorechnung und nicht storniert. Ohne Nummer keine Zuordnung.
+ */
+export function schlussZuAbschlag(unterlagen: Unterlage[], abschlag: Unterlage): Unterlage | undefined {
+  const nr = typeof abschlag.daten.nummer === "string" ? abschlag.daten.nummer.trim() : "";
+  if (!nr || abschlag.daten.abschlag !== true) return undefined;
+  const setztAb = (x: Unterlage) => x.daten.schluss === true && Array.isArray(x.daten.abschlaege) && (x.daten.abschlaege as unknown[]).some((a) => !!a && typeof a === "object" && typeof (a as { nummer?: unknown }).nummer === "string" && (a as { nummer: string }).nummer.trim() === nr);
+  return festeRechnungen(unterlagen)
+    .filter((x) => x.id !== abschlag.id && !istStornoU(x) && !x.storniertDurch && x.daten.abschlag !== true && setztAb(x))
+    .sort((a, b) => (a.festgeschrieben ?? "").localeCompare(b.festgeschrieben ?? ""))[0];
+}
+
+/**
+ * E-218 (Steuerberater 27.10.2026, T-273 (5) geändert): Tag, an dem ein Skonto bzw. eine Minderung Kz 41/21 und die ZM
+ * mindert. Sonst der Zahltag (§ 17, § 18b Satz 4 UStG). Bei einer Abschlagsrechnung auf einen EU-Umsatz: Wird das Skonto
+ * abgezogen, bevor die Lieferung bzw. Leistung gemeldet ist (Zahltag nicht nach dem Tag, nach dem die Schlussrechnung
+ * gemeldet wird), entsteht keine eigene Minderung in einem früheren Zeitraum – es mindert das Entgelt, das mit der
+ * Schlussrechnung gemeldet wird (§ 10 Abs. 1 UStG), also deren Tag; gibt es die Schlussrechnung noch nicht, mindert es
+ * noch nirgends (null). Erst ein Skonto nach der Meldung mindert im Zeitraum der Zahlung.
+ */
+export function euMinderungsTage(unterlagen: Unterlage[], betrieb: Betrieb): (u: Unterlage, zahltag: string) => string | null {
+  const korr = korrekturen(unterlagen, betrieb);
+  return (u, zahltag) => {
+    if (u.daten.abschlag !== true || istStornoU(u) || !euArtVon(u, betrieb)) return zahltag;
+    const schluss = schlussZuAbschlag(unterlagen, u);
+    const gemeldet = schluss ? zuordnen(schluss, "soll", betrieb, korr).tag : null;
+    if (!gemeldet) return null;
+    return zahltag <= gemeldet ? gemeldet : zahltag;
+  };
+}
 
 /** Monate und Quartale mit zuordenbaren Rechnungen – neueste zuerst. */
 export function perioden(unterlagen: Unterlage[], betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = [], kasse: Kassenabschluss[] = []): string[] {
@@ -575,6 +643,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   });
   const imZ = (tag: string) => tag >= z.von && tag <= z.bis;
   let minderungen = 0;
+  const minderungsTag = euMinderungsTage(unterlagen, betrieb);
   for (const u of festeRechnungen(unterlagen)) {
     if (kuRechnung(u) || istStornoU(u) || istOssRechnung(u) || !u.zahlungen?.length) continue;
     // E-208: ZM-Umsätze zählen auch bei Ist ganz im Zeitraum nach § 18b UStG (oben), nicht je Zahlung – E-214: ein
@@ -585,13 +654,17 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     const anteile = zahlungsAnteile(restGruppen(daten), u.zahlungen);
     let mindert = false;
     for (const a of anteile) {
-      if (!imZ(a.zahlung.datum)) continue;
       // Ist: je Zahlung der erhaltene Betrag; Soll: die Minderung (§ 17 UStG) im Zeitraum der Zahlung
-      if (v === "ist" && !euIst) posten.push({ daten, gruppen: a.erhalten.map((x) => ({ satz: x.satz, netto_cent: x.netto_cent })) });
-      else if (a.minderung.some((x) => x.brutto_cent)) {
-        posten.push({ daten, gruppen: a.minderung.map((x) => ({ satz: x.satz, netto_cent: -x.netto_cent })) });
-        mindert = true;
+      if (v === "ist" && !euIst) {
+        if (imZ(a.zahlung.datum)) posten.push({ daten, gruppen: a.erhalten.map((x) => ({ satz: x.satz, netto_cent: x.netto_cent })) });
+        continue;
       }
+      if (!a.minderung.some((x) => x.brutto_cent)) continue;
+      // E-218: Skonto auf eine Anzahlung auf einen EU-Umsatz vor dessen Meldung mindert mit der Schlussrechnung
+      const tag = minderungsTag(u, a.zahlung.datum);
+      if (!tag || !imZ(tag)) continue;
+      posten.push({ daten, gruppen: a.minderung.map((x) => ({ satz: x.satz, netto_cent: -x.netto_cent })) });
+      mindert = true;
     }
     if (mindert) minderungen++;
   }

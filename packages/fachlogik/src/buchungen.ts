@@ -143,6 +143,11 @@ export interface AusgangsRechnungFuerBuchung {
   guid_zusatz?: string;
   /** StB-Prüfung (C-4): Schlussrechnung – abgesetzte Abschläge; gebucht wird nur der Rest je Steuersatz (`restGruppen`) */
   abschlaege?: Abschlag[];
+  /**
+   * E-218 (T-274): Schlussrechnung über einen EU-Umsatz, deren Anzahlungen nicht auf dem Erlöskonto stehen (Bilanz:
+   * erhaltene Anzahlungen; EÜR: Konto ohne Umsatzsteuerfunktion) – gebucht wird das volle Entgelt statt des Rests.
+   */
+  vollesEntgelt?: boolean;
   /** StB-Prüfung (5.2): OSS – Leistung an eine Privatperson im EU-Ausland mit der Steuer des Bestimmungslands */
   oss?: { land: string; satz: number } | null;
   /**
@@ -289,12 +294,26 @@ export const BUCHUNGSKONTEN: Record<
      */
     skontiGewaehrtIgl: string;
     skontiGewaehrtRc: string;
+    /**
+     * E-218 (Steuerberater 27.10.2026, T-274): „Erhaltene Anzahlungen auf Bestellungen“ – bilanzierende Betriebe buchen
+     * bezahlte Anzahlungen auf innergemeinschaftliche Lieferungen bzw. EU-Leistungen hierauf, ohne Steuerschlüssel, und
+     * verrechnen sie mit der Schlussrechnung. SKR03 1710 / SKR04 3250 (vom Steuerberater genannt; im DATEV-Testimport
+     * T-221 zu prüfen), Kontenvorgabe `anzahlungenErhalten`.
+     */
+    anzahlungenErhalten: string;
+    /**
+     * E-218 (T-274): EÜR – Erlöskonto OHNE Umsatzsteuerfunktion für Anzahlungen auf innergemeinschaftliche Lieferungen
+     * bzw. EU-Leistungen (Einnahme mit der Zahlung, § 11 EStG; nicht in der Voranmeldung), umgebucht mit der
+     * Schlussrechnung. Kein Standard – das Konto gibt der Steuerberater im Testimport vor (T-221); leer = nicht
+     * festgelegt, dann fehlen diese Buchungen im Stapel und LIESMICH nennt sie (Kontenvorgabe `anzahlungEuEuer`).
+     */
+    anzahlungEuEuer: string;
   }
 > = {
   // Forderungen/Verbindlichkeiten ohne Kontokorrent (1410/1610 bzw. 1210/3310), damit beim Bankabruf kein OPOS nötig ist
-  SKR03: { bank: "1200", verrechnungGesellschafter: "0731", homeoffice: "4288", anlagen: { maschinen: "0400", bga: "0420", kfz: "0320", software: "0027" }, forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338", nullsatz: "8290", oss: "8320", ausfuhr: "8120", befreit43: "8150" }, gutschrift: "3100", gutscheinVerbindlichkeit: "1700", kassendifferenzAufwand: "4900", kassendifferenzErtrag: "", sachentnahme: { 19: "8910", 7: "8915" }, skontiGewaehrtIgl: "8743", skontiGewaehrtRc: "8741" },
+  SKR03: { bank: "1200", verrechnungGesellschafter: "0731", homeoffice: "4288", anlagen: { maschinen: "0400", bga: "0420", kfz: "0320", software: "0027" }, forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338", nullsatz: "8290", oss: "8320", ausfuhr: "8120", befreit43: "8150" }, gutschrift: "3100", gutscheinVerbindlichkeit: "1700", kassendifferenzAufwand: "4900", kassendifferenzErtrag: "", sachentnahme: { 19: "8910", 7: "8915" }, skontiGewaehrtIgl: "8743", skontiGewaehrtRc: "8741", anzahlungenErhalten: "1710", anzahlungEuEuer: "" },
   // UNSICHER: verrechnungGesellschafter 3560 – SKR04-Gegenstück zu 0731 laut Kanzlei folgt
-  SKR04: { bank: "1800", verrechnungGesellschafter: "3560", homeoffice: "6348", anlagen: { maschinen: "0440", bga: "0650", kfz: "0520", software: "0135" }, forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", privatentnahmen: "2100", geldtransit: "1460", skontiGewaehrt: { 19: "4736", 7: "4731", 0: "4730" }, skontiErhalten: { 19: "5736", 7: "5731", 0: "5730" }, erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338", nullsatz: "4290", oss: "4320", ausfuhr: "4120", befreit43: "4150" }, gutschrift: "5900", gutscheinVerbindlichkeit: "3500", kassendifferenzAufwand: "6300", kassendifferenzErtrag: "", sachentnahme: { 19: "4620", 7: "4610" }, skontiGewaehrtIgl: "4743", skontiGewaehrtRc: "4741" },
+  SKR04: { bank: "1800", verrechnungGesellschafter: "3560", homeoffice: "6348", anlagen: { maschinen: "0440", bga: "0650", kfz: "0520", software: "0135" }, forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", privatentnahmen: "2100", geldtransit: "1460", skontiGewaehrt: { 19: "4736", 7: "4731", 0: "4730" }, skontiErhalten: { 19: "5736", 7: "5731", 0: "5730" }, erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338", nullsatz: "4290", oss: "4320", ausfuhr: "4120", befreit43: "4150" }, gutschrift: "5900", gutscheinVerbindlichkeit: "3500", kassendifferenzAufwand: "6300", kassendifferenzErtrag: "", sachentnahme: { 19: "4620", 7: "4610" }, skontiGewaehrtIgl: "4743", skontiGewaehrtRc: "4741", anzahlungenErhalten: "3250", anzahlungEuEuer: "" },
 };
 
 /** Wirksame Konten eines Stapels: Kontenrahmen plus Kontenvorgaben der Kanzlei. */
@@ -323,6 +342,9 @@ export function kontenFuer(kontenrahmen: Kontenrahmen, vorgaben?: Kontenvorgaben
     // ein Überschuss auf dem Erlöskonto 19 % gilt wie „ohne Vorgabe“ (mit Umsatzsteuer)
     kassendifferenzErtrag: v.kassendifferenzErtrag && /^\d{4}$/.test(v.kassendifferenzErtrag) && v.kassendifferenzErtrag !== k.erloese[19] ? v.kassendifferenzErtrag : "",
     homeoffice: w(v.homeoffice, k.homeoffice),
+    anzahlungenErhalten: w(v.anzahlungenErhalten, k.anzahlungenErhalten),
+    // E-218: kein Standard – nur eine gesetzte, gültige Vorgabe
+    anzahlungEuEuer: w(v.anzahlungEuEuer, k.anzahlungEuEuer),
     erloese: { ...k.erloese, nullsatz: w(v.erloesNullsatz, k.erloese.nullsatz), oss: w(v.erloesOss, k.erloese.oss), ausfuhr: w(v.erloesAusfuhr, k.erloese.ausfuhr), befreit43: w(v.erloesKz43, k.erloese.befreit43) },
     anlagen: { maschinen: w(v.anlageMaschinen, k.anlagen.maschinen), bga: w(v.anlageBga, k.anlagen.bga), kfz: w(v.anlageKfz, k.anlagen.kfz), software: w(v.anlageSoftware, k.anlagen.software) },
   };
@@ -436,7 +458,7 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
     const kunde = kuerze(r.kunde, NAME_IM_TEXT);
     const buchungstext = kuerze(storno ? `Storno ${r.nummer}${r.storniert_nummer ? ` zu RE ${r.storniert_nummer}` : ""} ${kunde}` : `RE ${r.nummer} ${kunde}`, 60);
     // Schlussrechnung (C-4): nur der Rest nach Abzug der Abschläge – die Abschläge stehen schon mit ihrer Zahlung im Stapel
-    const gruppen = r.anteil ? r.anteil.map((a) => ({ satz: a.satz, netto_cent: a.netto_cent, ust_cent: a.ust_cent })) : restGruppen(r);
+    const gruppen = r.anteil ? r.anteil.map((a) => ({ satz: a.satz, netto_cent: a.netto_cent, ust_cent: a.ust_cent })) : r.vollesEntgelt ? summen(r.positionen, r.kleinunternehmer).gruppen : restGruppen(r);
     for (const g of gruppen) {
       const brutto = g.netto_cent + g.ust_cent;
       if (!brutto) continue;
@@ -523,7 +545,7 @@ export const zmBetroffen = (r: Pick<AusgangsRechnungFuerBuchung, "steuerart" | "
  * schuldet, auf eigene Konten (UNSICHER, PRUEFLISTE) und mit der USt-IdNr. des Empfängers – sonst mindert DATEV
  * Kz 41/60/21 und die Zusammenfassende Meldung nicht. StB-Prüfung (A-1): diese Reihenfolge ist richtig.
  */
-export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde" | "kleinunternehmer" | "positionen"> & Partial<Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land" | "kunde_ust_idnr" | "abschlaege" | "oss" | "personenkonto">>, minderungen: { id: string; datum: string; brutto_cent: number }[], kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): Buchung[] {
+export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde" | "kleinunternehmer" | "positionen"> & Partial<Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land" | "kunde_ust_idnr" | "abschlaege" | "oss" | "personenkonto">>, minderungen: { id: string; datum: string; brutto_cent: number; steuerperiode?: string; guid_zusatz?: string }[], kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): Buchung[] {
   const k = kontenFuer(kontenrahmen, o?.vorgaben);
   const gruppen = restGruppen(r);
   const sonder = skontoSonderfall(r);
@@ -551,12 +573,53 @@ export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id
         ust_satz: r.kleinunternehmer ? null : a.satz,
         art: "einnahme",
         quelle_id: r.id,
-        guid: buchungsGuid(`${r.id}|skonto|${m.id}`, a.satz),
-        steuerperiode: m.datum,
+        guid: buchungsGuid(`${r.id}|skonto|${m.id}${m.guid_zusatz ? `|${m.guid_zusatz}` : ""}`, a.satz),
+        // E-218: Skonto auf eine EU-Anzahlung vor der Meldung – Zeitraum der Schlussrechnung
+        steuerperiode: m.steuerperiode ?? m.datum,
       });
     }
   }
   return aus;
+}
+
+/**
+ * E-218 (Steuerberater 27.10.2026, T-274): Buchungen für Anzahlungen auf innergemeinschaftliche Lieferungen bzw.
+ * EU-Leistungen – sie dürfen nicht zum Zahltag auf dem Erlöskonto (8125/8336 bzw. 4125/4336) stehen, weil sie nicht in
+ * Kz 41/21 und nicht in die ZM gehören (§ 18b Satz 2 und 3 UStG). `anzahlungskonto`: bei Bilanz „Erhaltene Anzahlungen
+ * auf Bestellungen“, bei EÜR das Erlöskonto ohne Umsatzsteuerfunktion (Kontenvorgabe). Alle ohne Steuerschlüssel.
+ * - „zahlung“: bezahlte Anzahlung zum Zahltag – Forderungen (Feld 7, Soll) an Anzahlungskonto, ohne Feld 116.
+ * - „skonto“: Skonto auf die Anzahlung, abgezogen vor der Meldung der Lieferung bzw. Leistung – Anzahlungskonto an
+ *   Forderungen zum Zahltag (keine Minderung in einem früheren Zeitraum; sie mindert das Entgelt der Schlussrechnung).
+ * - „verrechnung“ (Bilanz): mit der Schlussrechnung Anzahlungskonto an Forderungen – die Schlussrechnung steht mit dem
+ *   vollen Entgelt auf dem Erlöskonto.
+ * - „umbuchung“ (EÜR): mit der Schlussrechnung Anzahlungskonto an Erlöskonto der Schlussrechnung, mit Feld 116 nach
+ *   § 18b UStG und USt-IdNr.
+ * Bei einer Stornorechnung (Schlussrechnung) als Generalumkehr auf derselben Seite.
+ */
+export function euAnzahlungBuchung(art: "zahlung" | "skonto" | "verrechnung" | "umbuchung", r: AusgangsRechnungFuerBuchung, b: { id: string; datum: string; betrag_cent: number }, anzahlungskonto: string, kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): Buchung {
+  const k = kontenFuer(kontenrahmen, o?.vorgaben);
+  const ford = r.personenkonto || k.forderungen;
+  const storno = r.art === "storno";
+  const kunde = kuerze(r.kunde, NAME_IM_TEXT);
+  const text = { zahlung: `Anzahlung RE ${r.nummer} ${kunde}`, skonto: `Skonto Anzahlung RE ${r.nummer} ${kunde}`, verrechnung: `${storno ? "Storno " : ""}Verrechn. Anzahlungen RE ${r.nummer} ${kunde}`, umbuchung: `${storno ? "Storno " : ""}Umbuch. Anzahlungen RE ${r.nummer} ${kunde}` }[art];
+  const ustid = r.kunde_ust_idnr ? r.kunde_ust_idnr.replace(/\s/g, "").toUpperCase() : null;
+  const negativ = b.betrag_cent < 0;
+  return {
+    datum: b.datum,
+    betrag_cent: Math.abs(b.betrag_cent),
+    soll_haben: negativ ? "H" : "S",
+    konto: art === "zahlung" ? ford : anzahlungskonto,
+    gegenkonto: art === "zahlung" ? anzahlungskonto : art === "umbuchung" ? erloeskonto(k, 0, r) : ford,
+    bu_schluessel: "",
+    belegfeld1: belegfeld1Aus(r.nummer),
+    buchungstext: kuerze(text, 60),
+    ust_satz: 0,
+    art: storno ? "storno" : art === "zahlung" ? "einnahme" : "umbuchung",
+    quelle_id: r.id,
+    guid: buchungsGuid(`${r.id}|anzahlung-${art}|${b.id}`, 0),
+    ...(art === "umbuchung" ? { leistungsdatum: r.leistungsdatum ?? null, steuerperiode: r.steuerperiode ?? null, eu_ustid: ustid } : {}),
+    ...(storno ? { generalumkehr: true } : {}),
+  };
 }
 
 /**

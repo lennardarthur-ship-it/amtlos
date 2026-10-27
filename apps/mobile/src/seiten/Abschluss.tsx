@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Pressable, Share, View } from "react-native";
 import { GMBH_ANGABEN, KG_ANGABEN, KU_HINWEIS, betragUnplausibel, offeneLuecken, pruefHinweisFuer, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Daten, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Auswahl, DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
+import { Auswahl, DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Wahl, Zeile, textAus } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { BLATT_OBEN, HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
@@ -14,7 +14,7 @@ import { drucken, pdfTeilenMitHash } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer, lueckenFrage } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
 import { absenderFuer, geteiltOffenLetzte, geteilteVersionen, heute, type EuStornoGrund } from "../unterlagen/speicher";
-import { einMonatNach, euBerichtigungSchluessel, euMeldeArtVon, euStornoGrund, euStornoTag, periodeText } from "../unterlagen/ustAusRechnungen";
+import { einMonatNach, euBerichtigungSchluessel, euFehlerErkannt, euMeldeArtVon, euStornoGrund, euStornoGrundFest, euStornoTag, periodeText } from "../unterlagen/ustAusRechnungen";
 import { euroText, faelligAm, offenBrutto, rechnungBrutto } from "../unterlagen/ablage";
 import { useAmtlos } from "../zustand";
 import { versandBestaetigt } from "./versand";
@@ -202,6 +202,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const [loeschGrund, setLoeschGrund] = useState("");
   // E-214: Grund des Stornos bei Rechnungen mit EU-Umsatz (Steuerberater 26.10.2026)
   const [euGrund, setEuGrund] = useState<EuStornoGrund | null>(null);
+  // E-218: Tag, an dem der Fehler erkannt wurde – vorbelegt mit heute (= Datum des Stornos)
+  const [euErkannt, setEuErkannt] = useState<string | null>(null);
   if (stempel !== stempelVorher.current) {
     stempelNeu.current = stempel;
     stempelVorher.current = stempel;
@@ -233,6 +235,9 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const euTag = euGrundSt ? euStornoTag(z.stand.unterlagen, z.stand.betrieb, u) : null;
   const euZeitraum = euTag ? `${periodeText(euTag.slice(0, 7))} (bzw. ${periodeText(`${euTag.slice(0, 4)}-Q${Math.floor((Number(euTag.slice(5, 7)) - 1) / 3) + 1}`)})` : "";
   const euErledigt = z.stand.erledigt[euBerichtigungSchluessel(u.id)];
+  // E-218 (T-273 (4)): älteres Storno einer innergemeinschaftlichen Lieferung ohne Grund – Grund nachtragen
+  const euStornoOrig = d.storno_zu && u.stornoZuId ? z.stand.unterlagen.find((x) => x.id === u.stornoZuId) : undefined;
+  const euGrundNachtragen = !!euStornoOrig && !euStornoGrundFest(u) && euMeldeArtVon(euStornoOrig, z.stand.betrieb) === "L";
   // Rechnung an jemanden: auf der Bühne Stand und Empfänger – der Betrag steht groß auf dem Papier darunter (A13)
   const kunde = typeof d.kunde_name === "string" ? d.kunde_name.trim() : "";
   const kurzDatum = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.`;
@@ -440,7 +445,14 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           {/* E-214: Folgen des Stornos einer Rechnung mit EU-Umsatz – Berichtigung des ursprünglichen Zeitraums */}
           {euGrundSt && euTag ? (
             <View style={{ gap: 6, marginBottom: 10 }}>
-              <Hinweis art={euGrundSt === "rechnung" && !euErledigt ? "warnung" : "info"} text={euGrundSt === "rechnung" ? TEXT.e214_berichtigen_hinweis(euZeitraum, datumDe(einMonatNach(String(d.datum)))) : TEXT.e214_berichtigen_betrag(euZeitraum)} />
+              <Hinweis art={euGrundSt === "rechnung" && !euErledigt ? "warnung" : "info"} text={euGrundSt === "rechnung" ? TEXT.e214_berichtigen_hinweis(euZeitraum, textAus(einMonatNach(euFehlerErkannt(u)))) : TEXT.e214_berichtigen_betrag(euZeitraum)} />
+              {/* E-218: Tag des Erkennens – auch nach der Festschreibung änderbar (wird nicht gedruckt) */}
+              {euGrundSt === "rechnung" ? (
+                <DatumFeld label={TEXT.e218_erkannt} hilfe={TEXT.e218_erkannt_hilfe} wert={euFehlerErkannt(u)} ohneHeute aendern={(x) => {
+                  if (x && x > String(d.datum)) melden(TEXT.e218_erkannt_fehler, "info");
+                  else z.euStornoSetzen(u.id, { erkannt: x });
+                }} />
+              ) : null}
               {euGrundSt === "rechnung" && fest ? (
                 euErledigt ? (
                   <View>
@@ -465,6 +477,21 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
               ]}
             />
           ) : null}
+          {euFrage && euGrund === "rechnung" ? <DatumFeld label={TEXT.e218_erkannt} hilfe={TEXT.e218_erkannt_hilfe} wert={euErkannt ?? heute()} aendern={setEuErkannt} /> : null}
+          {euGrundNachtragen ? (
+            <View style={{ marginBottom: 10 }}>
+              <Auswahl<EuStornoGrund>
+                label={TEXT.e214_storno_grund}
+                hilfe={TEXT.e218_alt_grund_hilfe}
+                wert={euGrundSt}
+                aendern={(g) => z.euStornoSetzen(u.id, { grund: g })}
+                optionen={[
+                  { wert: "rechnung", text: TEXT.e214_grund_rechnung },
+                  { wert: "betrag", text: TEXT.e214_grund_betrag },
+                ]}
+              />
+            </View>
+          ) : null}
           {fest ? (
             v.storno && !u.storniertDurch && !d.storno_zu ? (
               <TextKnopf
@@ -476,9 +503,13 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
                     melden(TEXT.e214_grund_fehlt, "info");
                     return;
                   }
+                  if (euFrage && euGrund === "rechnung" && euErkannt && euErkannt > heute()) {
+                    melden(TEXT.e218_erkannt_fehler, "info");
+                    return;
+                  }
                   void bestaetigen({ titel: TEXT.storno_wirklich, text: TEXT.storno_text, ja: TEXT.storno_ja }).then((ok) => {
                     if (!ok) return;
-                    const neu = z.stornieren(id, euFrage ? euGrund ?? undefined : undefined);
+                    const neu = z.stornieren(id, euFrage ? euGrund ?? undefined : undefined, euFrage && euGrund === "rechnung" ? euErkannt : null);
                     if (neu) {
                       melden(TEXT.storno_angelegt, "info");
                       nav.oeffnen(`ablauf-${neu.id}`, () => <Ablauf id={neu.id} amEnde />, true);

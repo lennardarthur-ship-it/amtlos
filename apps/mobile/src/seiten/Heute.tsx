@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { Hinweis, Karte, Knopf, T, Zeile, textAus, useGrosseSchrift } from "../ui/bausteine";
+import { Hinweis, Karte, Knopf, T, TextKnopf, Zeile, textAus, useGrosseSchrift } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { SCHRIFT, useFarben } from "../ui/thema";
 import { zeitzoneAbweichend } from "../ui/zeit";
@@ -26,7 +26,7 @@ import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { PartnerHinweis } from "./Partner";
 import { freiePflichten } from "../pro/regeln";
 import { AboEndeHinweis } from "./AboEnde";
-import { euBerichtigungen, periodeText } from "../unterlagen/ustAusRechnungen";
+import { EU_STORNO_ALT_HINWEIS, euBerichtigungen, euStornosOhneGrund, periodeText } from "../unterlagen/ustAusRechnungen";
 
 
 // Formatter einmal anlegen (R9 Performance)
@@ -42,7 +42,7 @@ const MONAT = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", mont
 export function Heute() {
   // nur die Teile des Stands, die „Heute“ zeigt (R9 Performance)
   const z = useAmtlosStatus();
-  const { tabWechseln } = useAktionen();
+  const { tabWechseln, erledigtSetzen } = useAktionen();
   const f = useFarben();
   const erledigt = useStandWahl((s) => s.erledigt);
   const unterlagen = useStandWahl((s) => s.unterlagen);
@@ -77,6 +77,8 @@ export function Heute() {
   const ueberfaellig = useMemo(() => unterlagen.filter((u) => (ueberJe.get(u.id) ?? 0) > 0).sort((x, y) => (ueberJe.get(y.id) ?? 0) - (ueberJe.get(x.id) ?? 0)).slice(0, 2), [unterlagen, ueberJe]);
   // E-214: Stornos „Fehler in der Rechnung“ bei EU-Umsätzen – ZM und Voranmeldung des ursprünglichen Zeitraums berichtigen
   const berichtigen = useMemo(() => euBerichtigungen(unterlagen, betrieb, erledigt).filter((b) => !b.erledigt), [unterlagen, betrieb, erledigt]);
+  // E-218 (T-273 (4)): einmaliger Hinweis auf ältere Stornos innergemeinschaftlicher Lieferungen ohne Grund
+  const ohneGrund = useMemo(() => (erledigt[EU_STORNO_ALT_HINWEIS] ? [] : euStornosOhneGrund(unterlagen, betrieb)), [unterlagen, betrieb, erledigt]);
   const hatRechnungen = unterlagen.some((u) => u.vorlage === "rechnung" && u.festgeschrieben);
   const zuletzt = useMemo(() => sortiert({ unterlagen } as Stand).slice(0, 3), [unterlagen]);
   const jetzt = new Date();
@@ -150,6 +152,12 @@ export function Heute() {
           {berichtigen.map((b, i, l) => (
             <Zeile key={b.stornoId} symbol="exclamationmark.triangle" ton={b.zmFrist < tag ? "frist" : "bald"} titel={TEXT.e214_berichtigen_titel(`${periodeText(b.monat)} bzw. ${periodeText(b.quartal)}`)} text={TEXT.e214_berichtigen_text(b.stornoNr, b.rechnungNr, textAus(b.zmFrist))} onPress={() => oeffnen(b.stornoId)} letzte={i === l.length - 1} />
           ))}
+        </Karte>
+      ) : null}
+      {ohneGrund.length ? (
+        <Karte stil={{ marginBottom: 18 }}>
+          <Zeile symbol="questionmark.circle" ton="bald" titel={TEXT.e218_alt_grund_titel(ohneGrund.length)} text={TEXT.e218_alt_grund_text(ohneGrund.map((u) => String(u.daten.nummer ?? "")).join(", "))} onPress={() => oeffnen(ohneGrund[0]!.id)} letzte={false} />
+          <TextKnopf symbol="xmark" leise text={TEXT.e218_alt_grund_aus} onPress={() => erledigtSetzen(EU_STORNO_ALT_HINWEIS, tag)} />
         </Karte>
       ) : null}
       {/* R12: Betriebe mit Kasse oder Laden – der Tagesabschluss gehört zum Tag */}

@@ -17,10 +17,12 @@
  * ursprüngliche Meldung bleibt; Storno mit Ersatzrechnung nach dem Grund des Stornos (siehe ustAusRechnungen.ts) – bei
  * „Fehler in der Rechnung“ zählen beide im ursprünglichen Zeitraum, dessen ZM innerhalb eines Monats zu berichtigen ist
  * (§ 18a Abs. 10 UStG, `berichtigungen`).
+ * E-218 (Steuerberater, 27.10.2026): Skonto auf eine Anzahlung, abgezogen bevor die Lieferung bzw. Leistung gemeldet ist,
+ * mindert die Meldung der Schlussrechnung (§ 10 Abs. 1 UStG), nicht einen früheren Zeitraum (`euMinderungsTage`).
  */
 import { eRechnungAus, restGruppen, ustZeitraum, zahlungsAnteile, type Betrieb, type RechnungsDaten } from "@amtlos/fachlogik";
 import type { Unterlage } from "./speicher";
-import { euBerichtigungenFuer, euMeldeArt, istGutschrift, meldeGruppen, periodeText, zuordnungsTage, type EuBerichtigung, type Versteuerung } from "./ustAusRechnungen";
+import { euBerichtigungenFuer, euMeldeArt, euMinderungsTage, istGutschrift, meldeGruppen, periodeText, zuordnungsTage, type EuBerichtigung, type Versteuerung } from "./ustAusRechnungen";
 
 const betragText = (cent: number) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cent / 100);
 const quartal = (tag: string) => `${tag.slice(0, 4)}-Q${Math.floor((Number(tag.slice(5, 7)) - 1) / 3) + 1}`;
@@ -94,6 +96,7 @@ function zmPosten(unterlagen: Unterlage[], betrieb: Betrieb): ZmPosten[] {
   const aus: ZmPosten[] = [];
   // E-208: Lieferung im Zeitraum der Rechnung, spätestens im Monat nach der Lieferung, Storno im eigenen Zeitraum; sonstige
   // Leistung im Zeitraum der Ausführung – beides berechnet `zuordnungsTage` (wie in der Voranmeldung, § 18b UStG)
+  const minderungsTag = euMinderungsTage(unterlagen, betrieb);
   for (const p of posten(unterlagen, betrieb, "soll")) {
     const art = euMeldeArt(p.daten);
     if (!art) continue;
@@ -102,7 +105,9 @@ function zmPosten(unterlagen: Unterlage[], betrieb: Betrieb): ZmPosten[] {
     if (p.daten.art === "storno" || !p.u.zahlungen?.length) continue;
     for (const a of zahlungsAnteile(restGruppen(p.daten), p.u.zahlungen)) {
       const m = a.minderung.filter((x) => x.satz === 0).reduce((s, x) => s + x.netto_cent, 0);
-      if (m) aus.push({ ...p, art, tag: a.zahlung.datum, netto_cent: -m, minderung: true });
+      // E-218: Skonto auf eine Anzahlung vor der Meldung mindert mit der Schlussrechnung (noch keine: noch nicht)
+      const tag = m ? minderungsTag(p.u, a.zahlung.datum) : null;
+      if (tag) aus.push({ ...p, art, tag, netto_cent: -m, minderung: true });
     }
   }
   return aus;
