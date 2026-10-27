@@ -165,7 +165,8 @@ describe("E-213 B) Pflichten erneut bestätigt", () => {
     // E-215: drei Einträge nach der Empfehlung des Rechtsanwalts neu gefasst – Vermerk erst nach seiner Bestätigung (T-278)
     // E-216: dazu die Voranmeldung v8 (Steuerberater, T-282)
     // E-217: alle vier am 27.10.2026 bestätigt (T-278, T-282)
-    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual([]);
+    // E-223: zwei neue Einträge im Entwurf (T-313)
+    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual(["online.preisermaessigung", "online.werbe_email_einwilligung"]);
   });
 });
 

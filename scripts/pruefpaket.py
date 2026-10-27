@@ -5,6 +5,8 @@ Anwältin, Anwalt oder Steuerberatung – mit Auslösern in Klartext, Fristen, R
 offenen Prüfpunkten aus dem Katalog. Die gelb hinterlegten Spalten füllt die prüfende Person aus.
 
     python3 scripts/pruefpaket.py <ziel.xlsx>     # außerhalb des Repositorys (E-199)
+    python3 scripts/pruefpaket.py <ziel.xlsx> --nur online.preisermaessigung,online.werbe_email_einwilligung
+                                                  # E-223: nur diese Einträge (z. B. neue Entwürfe), ohne Blatt Regelwerte
 """
 import glob
 import os
@@ -14,6 +16,11 @@ from datetime import date
 
 WURZEL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(WURZEL, "docs/freigabe-katalog"))
+NUR = None
+if "--nur" in sys.argv:
+    _i = sys.argv.index("--nur")
+    NUR = set(sys.argv[_i + 1].split(","))
+    del sys.argv[_i:_i + 2]
 from ziel import ziel_ausserhalb  # noqa: E402  (E-199: Prüfunterlagen nicht ins Repository)
 ZIEL = ziel_ausserhalb(sys.argv[1] if len(sys.argv) > 1 else None, "Aufruf: python3 scripts/pruefpaket.py <ziel.xlsx>")
 import yaml  # noqa: E402
@@ -132,6 +139,8 @@ def pflichten():
     zeilen = []
     for pfad in sorted(glob.glob(os.path.join(WURZEL, "catalog", "pflichten", "*.yaml"))):
         d = yaml.safe_load(open(pfad, encoding="utf-8"))
+        if NUR is not None and d["id"] not in NUR:
+            continue
         s = d.get("sanktion") or {}
         zeilen.append({
             "prio": PRIO.get(s.get("schwere"), "B"),
@@ -195,7 +204,10 @@ def tabelle(ws, spalten, zeilen, eingabe_ab):
 
 def main():
     p = pflichten()
-    rw = regelwerte()
+    if NUR is not None:
+        fehlt = NUR - {z["id"] for z in p}
+        assert not fehlt, f"unbekannte Einträge: {sorted(fehlt)}"
+    rw = regelwerte() if NUR is None else []
     wb = Workbook()
 
     an = wb.active
@@ -233,8 +245,9 @@ def main():
     an.cell(row=start + 5, column=1, value="Pflichten gesamt").font = Font(name=SCHRIFT, bold=True)
     an.cell(row=start + 5, column=2, value=f"=COUNTA(Pflichten!C2:C{n})").font = Font(name=SCHRIFT, bold=True)
     m = len(rw) + 1
-    an.cell(row=start + 6, column=1, value="Regelwerte geprüft").font = Font(name=SCHRIFT, size=11)
-    an.cell(row=start + 6, column=2, value=f'=COUNTA(Regelwerte!J2:J{m})&" von "&COUNTA(Regelwerte!B2:B{m})').font = Font(name=SCHRIFT, size=11)
+    if rw:
+        an.cell(row=start + 6, column=1, value="Regelwerte geprüft").font = Font(name=SCHRIFT, size=11)
+        an.cell(row=start + 6, column=2, value=f'=COUNTA(Regelwerte!J2:J{m})&" von "&COUNTA(Regelwerte!B2:B{m})').font = Font(name=SCHRIFT, size=11)
     for r in range(start, start + 7):
         an.cell(row=r, column=2).alignment = Alignment(horizontal="left")
 
@@ -247,6 +260,10 @@ def main():
         ("Status", "status", 20), ("Ergebnis", None, 14), ("Korrektur / Anmerkung", None, 50), ("Geprüft von", None, 18), ("Datum", None, 12),
     ], p, 17)
 
+    if not rw:
+        wb.save(ZIEL)
+        print(f"{len(p)} Pflichten → {ZIEL}")
+        return
     ws2 = wb.create_sheet("Regelwerte")
     tabelle(ws2, [
         ("Katalog-Nr.", "nr", 10), ("ID", "id", 34), ("Bezeichnung", "bezeichnung", 48), ("Wert", "wert", 12), ("Einheit", "einheit", 9),

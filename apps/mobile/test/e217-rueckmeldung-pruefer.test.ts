@@ -208,9 +208,9 @@ describe("E-217 B2) NIS2 nach den Vorgaben des Rechtsanwalts", () => {
 });
 
 describe("E-217: alle Einträge mit Vermerk", () => {
-  it("228 von 228; Rechtsanwalt 166, Steuerberater 35", () => {
-    expect(pflichten).toHaveLength(228);
-    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id)).toEqual([]);
+  it("228 von 228; Rechtsanwalt 166, Steuerberater 35 (E-223: dazu zwei neue Einträge im Entwurf, ohne Vermerk)", () => {
+    expect(pflichten).toHaveLength(230);
+    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual(["online.preisermaessigung", "online.werbe_email_einwilligung"]);
     const zahl = (r: string) => pflichten.filter((p) => pruefVermerk(p.version, p.pruefung, AM) && p.pruefung!.geprueft_von!.includes(r)).length;
     expect([zahl("recht"), zahl("steuern")]).toEqual([166, 35]);
   });

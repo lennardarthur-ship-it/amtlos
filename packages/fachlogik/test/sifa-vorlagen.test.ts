@@ -1,6 +1,7 @@
 /** E-167 (Sifa-Durchsicht 22.10.2026, Blätter „A“ und „B“): neue Vorlagen, Prüffristen, Zuordnung der Bausteine. */
 import { describe, expect, it } from "vitest";
-import { ANLAESSE, KURZ, SIFA_PRUEFUNG, VORLAGEN, dokumentHtml, leereDaten, naechstePruefung, vorlageFuer, type Betrieb, type Feld, type ListenFeld, type Vorlage } from "../src/index.js";
+import { SIFA_PRUEFUNG } from "../src/dokumente/sifa.js";
+import { ANLAESSE, KURZ, VORLAGEN, dokumentHtml, leereDaten, naechstePruefung, vorlageFuer, type Betrieb, type Feld, type ListenFeld, type Vorlage } from "../src/index.js";
 
 const B: Betrieb = { name: "Tischlerei Holm", strasse: "Weg 2", plz: "72764", ort: "Reutlingen", verantwortlich: "Ole Holm", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "Baden-Württemberg" };
 const glatt = (h: string) => h.replace(/&nbsp;|\u00a0|\u202f/g, " ");

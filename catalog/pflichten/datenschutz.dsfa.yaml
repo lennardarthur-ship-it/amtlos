@@ -52,7 +52,6 @@ quellen:
   url: https://gdpr-text.com/es/read/article-83
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - 'Muss-Liste der DSK als Verweis im Text (Prüfvermerk Rechtsanwalt 22.10.2026); Ortung nicht als Auslöser ergänzt (vom Prüfvermerk nicht verlangt; die DSFA-Pflicht bei Ortung steht in datenschutz.ortung) – als Auslöser vorschlagen; Link zur Muss-Liste nicht geprüft'
 pruefung:
   status: freigegeben

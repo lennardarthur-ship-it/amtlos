@@ -787,19 +787,19 @@
     {
       "pfad": "abgeleitet.ist_kapitalgesellschaft",
       "typ": "bool",
-      "herleitung": "rechtsform in {ug, gmbh}",
+      "herleitung": "rechtsform in {ug, gmbh} – E-223: bei „Andere“ (sonstige) unbekannt",
       "ab": 2
     },
     {
       "pfad": "abgeleitet.ist_kapitalgesellschaft_oder_co_kg",
       "typ": "bool",
-      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg} – keine natürliche Person haftet unbeschränkt (§ 264a HGB, § 15a Abs. 1 S. 3 InsO). OHG und KG nicht: dort haftet mindestens ein Gesellschafter persönlich unbeschränkt (§ 126 HGB, § 161 Abs. 1 HGB); ist kein persönlich haftender Gesellschafter eine natürliche Person, ist die GmbH & Co. KG zu wählen (E-176)",
+      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg} – keine natürliche Person haftet unbeschränkt (§ 264a HGB, § 15a Abs. 1 S. 3 InsO). OHG und KG nicht: dort haftet mindestens ein Gesellschafter persönlich unbeschränkt (§ 126 HGB, § 161 Abs. 1 HGB); ist kein persönlich haftender Gesellschafter eine natürliche Person, ist die GmbH & Co. KG zu wählen (E-176) – E-223: bei „Andere“ (sonstige) unbekannt",
       "ab": 2
     },
     {
       "pfad": "abgeleitet.ist_eingetragene_gesellschaft",
       "typ": "bool",
-      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg, ohg, kg, partg, partg_mbb} oder rechtsform = gbr und gesellschaft.handelsregister = eingetragen (eGbR, § 707 BGB; bei der GbR ohne Registerangabe unbekannt) – juristische Person oder eingetragene Personengesellschaft (§ 20 Abs. 1 GwG)",
+      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg, ohg, kg, partg, partg_mbb} oder rechtsform = gbr und gesellschaft.handelsregister = eingetragen (eGbR, § 707 BGB; bei der GbR ohne Registerangabe unbekannt) – juristische Person oder eingetragene Personengesellschaft (§ 20 Abs. 1 GwG) – E-223: bei „Andere“ (sonstige) unbekannt",
       "ab": 2
     },
     {

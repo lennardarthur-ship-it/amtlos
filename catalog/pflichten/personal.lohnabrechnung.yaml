@@ -40,7 +40,6 @@ quellen:
   url: https://www.gesetze-im-internet.de/de_v/
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Partner noch nicht gewählt (Abschnitt 5, Integration offen)
 - 'Prüfvermerk Rechtsanwalt 22.10.2026: als Hinweis in Ordnung (§§ 95 ff. SGB IV). „Amtlos durch Markennamen ersetzen“: erledigt das Katalog-Bündel (werkzeuge/katalog-buendel.mjs ersetzt „Amtlos“ durch MARKE.name, docs/14-marke.md) – im Katalogtext bleibt „Amtlos“'
 pruefung:

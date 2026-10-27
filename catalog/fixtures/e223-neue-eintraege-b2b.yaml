@@ -1,0 +1,14 @@
+persona: agentur
+beschreibung: E-223 – Agentur nur an Unternehmen, Dienstleistung, ohne Newsletter – beide neuen Entwürfe treffen nicht zu
+stichtag: "2026-10-27"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2021-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.kunden.segmente: [b2b]
+  profil.produkte.arten: [dienstleistung]
+  profil.datenverarbeitung.arten: [kundendaten]
+  profil.bundesland: BE
+erwartet:
+  online.preisermaessigung: gilt_nicht
+  online.werbe_email_einwilligung: gilt_nicht

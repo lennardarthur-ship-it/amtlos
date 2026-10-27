@@ -49,7 +49,7 @@ const pnpm = path.join(ROOT, "node_modules/.pnpm");
 const esb = fs.readdirSync(pnpm).filter((d) => d.startsWith("esbuild@")).sort().at(-1);
 const eintrag = path.join(ROH, "eintrag.ts");
 const gebaut = path.join(ROH, "fachlogik.mjs");
-fs.writeFileSync(eintrag, `export * from "${path.join(DOK, "index.ts")}";\nexport * as BS from "${path.join(DOK, "bausteine.ts")}";\n`);
+fs.writeFileSync(eintrag, `export * from "${path.join(DOK, "index.ts")}";\nexport * as BS from "${path.join(DOK, "bausteine.ts")}";\nexport { SIFA_PRUEFUNG } from "${path.join(DOK, "sifa.ts")}";\n`);
 execFileSync(path.join(pnpm, esb, "node_modules/esbuild/bin/esbuild"), [eintrag, "--bundle", "--platform=node", "--format=esm", `--outfile=${gebaut}`, "--log-level=warning"]);
 const F = await import(gebaut);
 

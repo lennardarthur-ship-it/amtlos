@@ -1,0 +1,63 @@
+# Katalog G.77 · E-223 (Befund des externen Prüfers: Pflicht fehlte) – neu als Entwurf, noch nicht fachlich geprüft
+schema_version: 1
+id: online.werbe_email_einwilligung
+version: 1
+katalog_nr: G.77
+titel:
+  de: Werbe-E-Mails nur mit Einwilligung verschicken
+kurz:
+  de: Werbung per E-Mail, etwa einen Newsletter, schickst du nur an Empfänger, die vorher ausdrücklich eingewilligt haben – ohne
+    Einwilligung nur in den engen Grenzen für eigene Kunden.
+erklaerung:
+  de: 'Werbung mit elektronischer Post ohne vorherige ausdrückliche Einwilligung des Adressaten ist eine unzumutbare Belästigung
+    (§ 7 Abs. 2 Nr. 2 UWG) – gegenüber Verbrauchern wie gegenüber Unternehmen. Ohne Einwilligung darfst du nur werben, wenn alle
+    vier Voraussetzungen des § 7 Abs. 3 UWG erfüllt sind: Du hast die E-Mail-Adresse im Zusammenhang mit dem Verkauf einer Ware
+    oder Dienstleistung vom Kunden erhalten, du wirbst damit für eigene ähnliche Waren oder Dienstleistungen, der Kunde hat nicht
+    widersprochen, und du weist ihn bei der Erhebung der Adresse und bei jeder Verwendung klar und deutlich darauf hin, dass er
+    jederzeit widersprechen kann, ohne dass andere als die Übermittlungskosten nach den Basistarifen entstehen. Jede Werbe-E-Mail
+    braucht außerdem eine gültige Adresse, an die der Empfänger die Aufforderung richten kann, solche Nachrichten einzustellen
+    (§ 7 Abs. 2 Nr. 3 Buchst. c UWG).'
+rechtsgrundlage:
+- § 7 Abs. 2 Nr. 2, Abs. 3 UWG
+kategorie: online
+branchen:
+- onlinehandel
+ausloeser:
+  feld: profil.datenverarbeitung.arten
+  op: enthaelt
+  wert: newsletter
+  label:
+    de: Du verschickst einen Newsletter.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: 'Kein Bußgeld – § 20 UWG erfasst Werbe-E-Mails nicht. Mitbewerber und Verbände können Beseitigung und Unterlassung verlangen
+      (§ 8 Abs. 1, 3 UWG), meist mit einer Abmahnung.'
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gesetz gegen den unlauteren Wettbewerb § 7
+  url: https://www.gesetze-im-internet.de/uwg_2004/__7.html
+  abgerufen: '2026-10-27'
+- titel: Gesetz gegen den unlauteren Wettbewerb § 8
+  url: https://www.gesetze-im-internet.de/uwg_2004/__8.html
+  abgerufen: null
+- titel: Gesetz gegen den unlauteren Wettbewerb § 20 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/uwg_2004/__20.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'E-223: neu als Entwurf – Text nach dem Wortlaut von § 7 Abs. 2 Nr. 2, Nr. 3 Buchst. c und Abs. 3 UWG (gesetze-im-internet.de, 27.10.2026); Auslöser über die bestehende Angabe „Newsletter“ (profil.datenverarbeitung.arten) – andere Werbe-E-Mails ohne Newsletter erfasst die App nicht; Folgen: § 20 Abs. 1 UWG nennt nur Telefonwerbung und automatische Anrufmaschinen (Wortlaut lxgesetze.de, 27.10.2026), daher kein Bußgeld, Ansprüche nach § 8 UWG; Verhältnis zur Einwilligung nach DSGVO (datenschutz.*) nicht erwähnt – bitte ganz prüfen (Rechtsanwalt, PRUEFLISTE T-313)'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -7,6 +7,11 @@
  * Für den Pflichten-Check (E-126) zusätzlich den ganzen Katalog für die Regel-Engine: alle Pflichten und Regelwerte,
  * nur deutsch, ohne die Prüfnotizen der Redaktion → src/pflichten/katalog.json.
  *
+ * E-223: Nichts Internes ins Bündel (es ist nach dem Entpacken der App lesbar): ohne `fachlich_zu_pruefen` (Pflichten UND
+ * Regelwerte), ohne Katalognummer (die App zeigt sie nicht), ohne Wahrscheinlichkeit und Vorbereitung des Radars (nicht angezeigt, nicht geprüft – offene-punkte.yaml
+ * „nicht_angezeigt“) und vom Prüfstand nur, was der Vermerk braucht (Status, Rollen, Daten, Version, Einschränkung,
+ * offene Themen) – keine Namen, keine Notizen. werkzeuge/interna.mjs prüft das Bündel (Test e223, store-check).
+ *
  * Marke (docs/14-marke.md): Die redaktionellen Katalogtexte (catalog/, versioniert und geprüft) nennen die App „Amtlos“.
  * Im Bündel steht stattdessen der sichtbare Name aus packages/marke/marke.json – nach einer Umbenennung neu bündeln.
  *
@@ -58,12 +63,14 @@ const nurDeutsch = (d) => {
   return d;
 };
 const lesenAlle = (o) => fs.readdirSync(o).filter((f) => /\.ya?ml$/.test(f)).sort().map((f) => YAML.parse(fs.readFileSync(path.join(o, f), "utf8")));
-const voll = lesenAlle(ordner).map(({ fachlich_zu_pruefen: _weg, ...p }) => nurDeutsch(p));
-const regelwerte = lesenAlle(path.join(wurzel, "catalog/regelwerte")).flatMap((x) => (Array.isArray(x) ? x : [x])).map(nurDeutsch);
+const { ohneInterna } = await import("./interna.mjs");
+const voll = lesenAlle(ordner).map((p) => nurDeutsch(ohneInterna(p)));
+const regelwerte = lesenAlle(path.join(wurzel, "catalog/regelwerte")).flatMap((x) => (Array.isArray(x) ? x : [x])).map((r) => nurDeutsch(ohneInterna(r)));
 // Rechtsstand des ganzen Katalogs (catalog/rechtsstand.yaml) → katalog.rechtsstand, in der App über rechtsstandText(KATALOG)
 const rechtsstandRoh = YAML.parse(fs.readFileSync(path.join(wurzel, "catalog/rechtsstand.yaml"), "utf8"));
 if (!/^\d{4}-\d{2}-\d{2}$/.test(String(rechtsstandRoh?.datum))) throw new Error("catalog/rechtsstand.yaml: datum (JJJJ-MM-TT) fehlt");
-const rechtsstand = { datum: String(rechtsstandRoh.datum), ...(rechtsstandRoh.hinweis ? { hinweis: String(rechtsstandRoh.hinweis) } : {}) };
+// E-223: nur das Datum – der Hinweis ist eine Notiz der Redaktion (die App zeigt ihn nicht)
+const rechtsstand = { datum: String(rechtsstandRoh.datum) };
 const zielVoll = path.join(hier, "../src/pflichten/katalog.json");
 fs.mkdirSync(path.dirname(zielVoll), { recursive: true });
 fs.writeFileSync(zielVoll, JSON.stringify(mitMarke({ rechtsstand, pflichten: voll, regelwerte })) + "\n");

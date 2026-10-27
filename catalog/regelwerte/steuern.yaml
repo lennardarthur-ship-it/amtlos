@@ -173,7 +173,7 @@
   rechtsgrundlage: ["§ 14 UStG", "§ 27 Abs. 38 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 27, url: "https://www.gesetze-im-internet.de/ustg_1980/__27.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Übergangsregel-Fundstelle (§ 27 Abs. 38 UStG) ergänzt, nicht aus Spezifikation", "gueltig_ab/gueltig_bis als Übergangszeitraum bestätigen"]
+  fachlich_zu_pruefen: ["Übergangsregel-Fundstelle (§ 27 Abs. 38 UStG) ergänzt, nicht aus Spezifikation", "Übergangszeitraum 01.01.2026 bis 31.12.2027 vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 # ---- Bauabschnitt 4 (Finanzen light) ----
@@ -206,7 +206,7 @@
   rechtsgrundlage: ["§ 147 AO", "§ 257 HGB"]
   quellen:
     - { titel: Abgabenordnung § 147, url: "https://www.gesetze-im-internet.de/ao_1977/__147.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlagen ergänzt"]
+  fachlich_zu_pruefen: ["Wert vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt; gültig ab 01.01.2026 ist der Beginn der Datenreihe, nicht das Inkrafttreten – so mitbestätigt, ein früheres Datum wäre eine neue Version (E-213, T-270; Notiz nachgezogen E-223)", "Rechtsgrundlagen ergänzt"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -222,7 +222,7 @@
   rechtsgrundlage: ["§ 147 AO", "§ 257 HGB"]
   quellen:
     - { titel: Abgabenordnung § 147, url: "https://www.gesetze-im-internet.de/ao_1977/__147.html", abgerufen: null }
-  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlagen ergänzt"]
+  fachlich_zu_pruefen: ["Wert vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt; gültig ab 01.01.2026 ist der Beginn der Datenreihe, nicht das Inkrafttreten – so mitbestätigt, ein früheres Datum wäre eine neue Version (E-213, T-270; Notiz nachgezogen E-223)", "Rechtsgrundlagen ergänzt"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -237,7 +237,7 @@
   rechtsgrundlage: ["§ 12 Abs. 1 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 12, url: "https://www.gesetze-im-internet.de/ustg_1980/__12.html", abgerufen: null }
-  fachlich_zu_pruefen: ["[FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen", "gueltig_ab ist Platzhalter"]
+  fachlich_zu_pruefen: ["Steuersatz 19 % (§ 12 Abs. 1 UStG) vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)", "gültig ab 01.01.2026 ist der Beginn der Datenreihe, nicht das Inkrafttreten – so mitbestätigt, ein früheres Datum wäre eine neue Version (T-270)"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -252,5 +252,5 @@
   rechtsgrundlage: ["§ 12 Abs. 2 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 12, url: "https://www.gesetze-im-internet.de/ustg_1980/__12.html", abgerufen: null }
-  fachlich_zu_pruefen: ["[FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen", "Welche Leistungen ermäßigt sind, entscheidet der Nutzer – Hinweis/Hilfe fachlich formulieren", "gueltig_ab ist Platzhalter"]
+  fachlich_zu_pruefen: ["Steuersatz 7 % (§ 12 Abs. 2 UStG) vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)", "Welche Leistungen ermäßigt sind, entscheidet der Nutzer; einen Hilfetext dazu gibt es nicht – ein solcher Text gehört nicht zum Wert und bräuchte eine eigene Prüfung durch den Steuerberater (T-311)", "gültig ab 01.01.2026 ist der Beginn der Datenreihe, nicht das Inkrafttreten – so mitbestätigt, ein früheres Datum wäre eine neue Version (T-270)"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }

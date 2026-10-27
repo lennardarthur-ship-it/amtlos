@@ -1,4 +1,4 @@
-# Werte unverändert aus Spezifikation Abschnitt 4, Katalog B.14 (E-054). Rechtsgrundlagen ergänzt – fachlich zu prüfen.
+# Werte aus Spezifikation Abschnitt 4, Katalog B.14 (E-054), Rechtsgrundlagen ergänzt; Prüfstand je Wert in `pruefung` (E-211, E-213).
 - schema_version: 1
   id: gesellschaft.gmbh.stammkapital_mindest
   version: 2

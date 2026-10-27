@@ -52,7 +52,6 @@ quellen:
   url: https://gesetze.legal/eu/vo_eu_2016_679/83
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - 'Speicherdauer 48–72 Stunden als Regelwert laut Prüfvermerk Rechtsanwalt 22.10.2026 (DSK-Orientierungshilfe, Fundstelle nicht verlinkt)'
 pruefung:
   status: freigegeben

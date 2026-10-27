@@ -180,7 +180,16 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
   const wartend = katalog.pflichten.filter((p) => p.pruefung?.status === "in_pruefung").map((p) => p.id);
   pruefe(!wartend.length, `Katalog: alle freigegebenen Einträge schriftlich bestätigt (E-197, Nachweis ohne Mail im Projekt, E-198)${wartend.length ? ` – ${wartend.length} warten auf die Bestätigung per E-Mail bzw. Nachprüfung (Nachprüfliste beim Gründer, PRUEFLISTE T-200)` : ""}`);
   const entwurf = katalog.pflichten.filter((p) => p.pruefung?.status === "entwurf").map((p) => p.id);
-  pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; Prüfpaket beim Gründer, PRUEFLISTE T-198)` : ""}`);
+  pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; Prüfpaket beim Gründer, PRUEFLISTE T-198; E-223: Entwürfe sind Startblocker, PRUEFLISTE T-313)` : ""}`);
+  // E-223 (a): keine freigegebene Fassung mit offener Prüfmarke; (b): nichts Internes im Bündel (katalog.json, Web-Export und
+  // Website, falls gebaut) – Regeln in werkzeuge/interna.mjs
+  {
+    const { markerBefunde, buendelBefunde, auslieferung } = await import("./interna.mjs");
+    const marken = markerBefunde();
+    pruefe(!marken.length, `Katalog: kein freigegebener Eintrag und kein freigegebener Regelwert mit offener Prüfmarke („[FACHLICH ZU PRÜFEN]“, „TODO“, „Platzhalter“ …; E-223)${marken.length ? ` – ${marken.join("; ")}` : ""}`);
+    const intern = auslieferung().flatMap(({ datei, katalog: k }) => buendelBefunde(fs.readFileSync(datei, "utf8"), { katalog: k }).map((b) => `${path.relative(path.join(APP, "../.."), datei)}: ${b}`));
+    pruefe(!intern.length, `Bündel ohne interne Prüfnotizen, Prüfmarken und Namen (katalog.json, Web-Export und Website, falls gebaut; E-223)${intern.length ? ` – ${intern.slice(0, 5).join("; ")}` : ""}`);
+  }
   // E-211: Regelwerte (Schwellen, Beträge) haben eine eigene Prüfung. Solange ein Wert, auf den eine Pflicht verweist (Auslöser
   // oder Frist), in der heute oder künftig geltenden Version nicht bestätigt ist, sagt der Vermerk der Pflicht das – vor dem
   // Start sollen sie bestätigt sein (Prüfpakete je Rolle: scripts/regelwerte-pruefpaket.py, Übernahme regelwerte-uebernehmen.py).
