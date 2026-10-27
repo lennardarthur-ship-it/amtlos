@@ -84,7 +84,8 @@ const schreibe = (datei, html) => {
 const recht = await rechtliches();
 const RECHTSSTAND = await rechtsstand();
 // Phase 1 (RDG): Hinweis in der Fußzeile jeder Seite
-const FUSS_HINWEIS = `Allgemeine Informationen und Vorlagen – keine Rechts- oder Steuerberatung. ${esc(RECHTSSTAND)}.`;
+// E-234 (Rechtsanwalt 27.10.2026, R4): die Seite nennt das DATEV-Format – Markenhinweis in seinem Wortlaut
+const FUSS_HINWEIS = `Allgemeine Informationen und Vorlagen – keine Rechts- oder Steuerberatung. ${esc(RECHTSSTAND)}. DATEV ist eine eingetragene Marke der DATEV eG. {{MARKE}} ist kein Produkt der DATEV eG und nicht von ihr zertifiziert.`;
 const url = (cfg.url || recht.LINKS.website || "").replace(/\/+$/, "");
 if (url && !/^https:\/\/[^/\s]+\.[^/\s]+$/.test(url)) throw new Error(`Adresse der Website ungültig: „${url}“ (https://…, ohne Pfad)`);
 if (!url) offen.push("Adresse der Website (apps/website/seite.json → url oder LINKS.website in apps/mobile/src/rechtliches.ts) – ohne sie fehlen canonical, og:url, absolutes og:image und sitemap.xml");

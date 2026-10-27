@@ -170,8 +170,19 @@ const HR_FORMEN = ["GmbH", "UG (haftungsbeschränkt)", "e. K.", "OHG", "KG", "Gm
  * (§ 162 Abs. 1 HGB), Vertretungsregelung der Gesellschafter (§ 106 Abs. 2 Nr. 3 HGB) und der Hinweis, dass alle
  * Gesellschafter anmelden (§ 106 Abs. 7 HGB).
  */
-const HR_PERSONENGESELLSCHAFT = ["OHG", "KG", "GmbH & Co. KG"];
-const HR_KG = ["KG", "GmbH & Co. KG"];
+const HR_PERSONENGESELLSCHAFT = ["OHG", "KG", "GmbH & Co. KG", "UG (haftungsbeschränkt) & Co. KG"];
+const HR_KG = ["KG", "GmbH & Co. KG", "UG (haftungsbeschränkt) & Co. KG"];
+/**
+ * E-234 (Rechtsanwalt 27.10.2026, R3): GmbH & Co. KG und UG & Co. KG – die persönlich haftende Gesellschafterin ist die
+ * Komplementär-GmbH bzw. -UG: Firma, Rechtsform, Sitz, Registergericht und Registernummer statt Geburtsdatum und Wohnort
+ * (§ 106 Abs. 2 Nr. 2 Buchst. b HGB); die KG selbst hat keine Geschäftsführung. Die UG & Co. KG wird wie die GmbH & Co. KG
+ * aufgebaut (Hinweis § 106 Abs. 7 HGB, Stellung und Hafteinlage § 162 Abs. 1 HGB, Komplementärin, Vertretungsregelung).
+ */
+const HR_CO_KG = ["GmbH & Co. KG", "UG (haftungsbeschränkt) & Co. KG"];
+/** E-234 (Rechtsanwalt 27.10.2026, R3): Vertretungsregelung der Co. KG, wenn nichts eingetragen ist – sein Beispiel */
+export const HR_VERTRETUNG_CO_KG = "Die Komplementärin vertritt die Gesellschaft allein; die Kommanditisten vertreten nicht.";
+/** E-234 (Rechtsanwalt 27.10.2026, R3): Hinweis bei der UG – sein Wortlaut */
+export const HR_UG_EINZAHLUNG = "Stammkapital vor der Anmeldung voll und in bar einzahlen, Sacheinlagen sind ausgeschlossen (§ 5a Abs. 2 GmbHG).";
 const HR_STELLUNG = [
   { wert: "phg", text: "persönlich haftend" },
   { wert: "kommandit", text: "Kommanditist/in" },
@@ -248,6 +259,9 @@ export const handelsregister: Vorlage = {
     // Rechtsanwalt (23.10.2026): OHG und KG – Gesellschafter mit Stellung und Hafteinlage, Vertretungsregelung, alle melden an
     const personengesellschaft = HR_PERSONENGESELLSCHAFT.includes(rechtsform);
     const kg = HR_KG.includes(rechtsform);
+    // E-234 (Rechtsanwalt 27.10.2026, R3): e. K. ohne Gesellschafter – „Ort der Handelsniederlassung“ (§ 29 HGB), Inhaber/in
+    const ek = rechtsform === "e. K.";
+    const coKg = HR_CO_KG.includes(rechtsform);
     const stellung = (x: Eintrag) => {
       const st = HR_STELLUNG.find((o) => o.wert === text(x, "stellung"))?.text ?? "";
       const he = text(x, "stellung") === "kommandit" && text(x, "hafteinlage") ? `Hafteinlage ${euro(cent(text(x, "hafteinlage")) ?? 0)}` : "";
@@ -265,25 +279,46 @@ export const handelsregister: Vorlage = {
       inhalt:
         `<p class="klein">Für den Termin beim Notar: Die Anmeldung zum Handelsregister reicht der Notar elektronisch ein; dieses Blatt hält die nötigen Angaben bereit.${personengesellschaft ? ` ${esc(HR_ALLE_MELDEN)}` : ""}</p>` +
         abschnitt(
-          "Gesellschaft",
+          ek ? "Unternehmen" : "Gesellschaft",
           felder([
             ["Firma", firma],
             ["Rechtsform", rechtsform],
-            ["Sitz", text(d, "sitz")],
+            [ek ? "Ort der Handelsniederlassung" : "Sitz", text(d, "sitz")],
             ["Inländische Geschäftsanschrift", text(d, "anschrift")],
             ["Gegenstand des Unternehmens", text(d, "gegenstand")],
-            ["Stammkapital", text(d, "kapital") ? euro(cent(text(d, "kapital")) ?? 0) : kapitalgesellschaft ? "" : null],
-          ]),
+            ["Stammkapital", ek ? null : text(d, "kapital") ? euro(cent(text(d, "kapital")) ?? 0) : kapitalgesellschaft ? "" : null],
+          ]) + (rechtsform === "UG (haftungsbeschränkt)" ? nachsatz(HR_UG_EINZAHLUNG) : ""),
+          ek ? { rand: "§ 29 HGB" } : "",
         ) +
-        (personengesellschaft
-          ? abschnitt(kg ? "Gesellschafter (persönlich haftende und Kommanditisten)" : "Gesellschafter", gesellschafterTabelle() + (kg ? nachsatz(HR_HAFTEINLAGE) : ""))
-          : ges.length || kapitalgesellschaft
-            ? abschnitt("Gesellschafter", person(ges, true, 3))
-            : "") +
-        // OHG und KG: Geschäftsführung nur, wenn eingetragen (die Gesellschafter vertreten)
-        (personengesellschaft && !gf.length ? "" : abschnitt(kapitalgesellschaft ? "Geschäftsführung" : "Geschäftsführung bzw. Inhaber/in", person(gf, false, 2))) +
-        // GmbH/UG und OHG/KG: Vertretungsregelung gehört dazu – leer als Linien zum Ausfüllen
-        (text(d, "vertretung") || kapitalgesellschaft || personengesellschaft ? abschnitt(personengesellschaft ? "Vertretungsregelung der Gesellschafter" : "Vertretungsregelung", absatz(text(d, "vertretung")), personengesellschaft ? { rand: "§ 106 Abs. 2 Nr. 3 HGB" } : "") : "") +
+        // Co. KG: die Komplementärin mit ihren Registerangaben aus „Mein Betrieb“ (leer als Linien zum Ausfüllen)
+        (coKg
+          ? abschnitt(
+              "Persönlich haftende Gesellschafterin (Komplementärin)",
+              felder([
+                ["Firma", (b.komplementaer ?? "").trim()],
+                ["Rechtsform", (b.komplementaer_rechtsform ?? "").trim() || (rechtsform.startsWith("UG") ? "UG (haftungsbeschränkt)" : "GmbH")],
+                ["Sitz", (b.komplementaer_sitz ?? "").trim()],
+                ["Registergericht", (b.komplementaer_registergericht ?? "").trim()],
+                ["Registernummer", (b.komplementaer_registernummer ?? "").trim()],
+              ]),
+              { rand: "§ 106 Abs. 2 Nr. 2 Buchst. b HGB" },
+            )
+          : "") +
+        (ek
+          ? ""
+          : personengesellschaft
+            ? abschnitt(coKg ? "Weitere Gesellschafter" : kg ? "Gesellschafter (persönlich haftende und Kommanditisten)" : "Gesellschafter", gesellschafterTabelle() + (kg ? nachsatz(HR_HAFTEINLAGE) : ""))
+            : ges.length || kapitalgesellschaft
+              ? abschnitt("Gesellschafter", person(ges, true, 3))
+              : "") +
+        // OHG und KG: Geschäftsführung nur, wenn eingetragen (die Gesellschafter vertreten); Co. KG: die Geschäftsführer der
+        // Komplementärin nur zur Information; e. K.: Inhaber/in
+        (personengesellschaft && !gf.length
+          ? ""
+          : abschnitt(ek ? "Inhaber/in" : coKg ? "Geschäftsführer der Komplementärin (zur Information)" : kapitalgesellschaft ? "Geschäftsführung" : "Geschäftsführung bzw. Inhaber/in", person(gf, false, ek ? 1 : 2))) +
+        // GmbH/UG und OHG/KG: Vertretungsregelung gehört dazu – leer als Linien zum Ausfüllen; Co. KG ohne Angabe mit dem
+        // Beispiel des Rechtsanwalts
+        (text(d, "vertretung") || kapitalgesellschaft || personengesellschaft ? abschnitt(personengesellschaft ? "Vertretungsregelung der Gesellschafter" : "Vertretungsregelung", absatz(text(d, "vertretung") || (coKg ? HR_VERTRETUNG_CO_KG : "")), personengesellschaft ? { rand: "§ 106 Abs. 2 Nr. 3 HGB" } : "") : "") +
         uebertragung(["Notartermin am", "Notar/in", "Eingetragen am, Registernummer"]),
     });
   },

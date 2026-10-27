@@ -25,6 +25,7 @@ import { KontoAnbieter } from "./konto/konto";
 import { Abdeckung } from "./sicherheit/abdeckung";
 import { PartnerLink } from "./seiten/Partner";
 import { ZustimmungTor } from "./seiten/Zustimmung";
+import { BetatestTor } from "./seiten/Betatest";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -327,9 +328,12 @@ export default function App() {
                   {/* Phase 2.3: amtlos://partner/<code> – nur „Empfohlen von …“, schaltet nichts frei */}
                   <PartnerLink />
                   {/* Vorprüfung Recht: Zustimmung zu den Nutzungsbedingungen – nur aktiv, wenn sie freigegeben sind */}
-                  <ZustimmungTor>
-                    <Rahmen />
-                  </ZustimmungTor>
+                  {/* E-234 (Rechtsanwalt, R5): nur in Betatest-Builds – Testhinweis vor der Nutzung annehmen */}
+                  <BetatestTor>
+                    <ZustimmungTor>
+                      <Rahmen />
+                    </ZustimmungTor>
+                  </BetatestTor>
                 </MeldungAnbieter>
               </Sperre>
               <TastaturLeiste />

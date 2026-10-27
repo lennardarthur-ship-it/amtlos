@@ -67,6 +67,18 @@ if (profil === "production") {
 } else {
   console.log(`  · Profil „${profil}“: RevenueCat-Schlüssel ${rcSchluessel ? "gesetzt" : "nicht gesetzt (Testmodus oder kein Kauf)"}`);
 }
+// E-234 (Rechtsanwalt 27.10.2026, R5): Testhinweis nur in Betatest-Builds – nie im Store-Build; im Betatest-Build mit
+// Testzeitraum (statt „[Datum]“), sonst sperrt die Testversion (src/betatest.ts)
+pruefe(!eas.build?.production?.env?.EXPO_PUBLIC_BETATEST, "Store-Build ohne Betatest-Hinweis (eas.json → build.production.env ohne EXPO_PUBLIC_BETATEST)");
+{
+  const env = { ...(eas.build?.[profil]?.env ?? {}), ...Object.fromEntries(["EXPO_PUBLIC_BETATEST", "EXPO_PUBLIC_BETATEST_VON", "EXPO_PUBLIC_BETATEST_BIS"].filter((k) => process.env[k]).map((k) => [k, process.env[k]])) };
+  if (env.EXPO_PUBLIC_BETATEST === "1") {
+    const tag = (x) => /^\d{4}-\d{2}-\d{2}$/.test(x ?? "") && !Number.isNaN(Date.parse(`${x}T00:00:00Z`)) && new Date(`${x}T00:00:00Z`).toISOString().slice(0, 10) === x;
+    const von = (env.EXPO_PUBLIC_BETATEST_VON ?? "").trim();
+    const bis = (env.EXPO_PUBLIC_BETATEST_BIS ?? "").trim();
+    pruefe(tag(von) && tag(bis) && von <= bis, `Betatest: Testzeitraum für den Testhinweis gesetzt (eas.json → build.${profil}.env EXPO_PUBLIC_BETATEST_VON/EXPO_PUBLIC_BETATEST_BIS, JJJJ-MM-TT; docs/betatest-hinweis.md, PRUEFLISTE T-183)${von || bis ? ` – „${von}“ bis „${bis}“` : ""}`);
+  }
+}
 const app = JSON.parse(lies("app.json")).expo;
 pruefe(app.extra?.eas?.projectId, "EAS-Projekt verknüpft (eas init → app.json extra.eas.projectId)");
 pruefe(app.ios?.config?.usesNonExemptEncryption !== undefined || app.ios?.infoPlist?.ITSAppUsesNonExemptEncryption !== undefined, "Export-Compliance der Verschlüsselung entschieden (ios.config.usesNonExemptEncryption, PRUEFLISTE T-77)");

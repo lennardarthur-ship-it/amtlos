@@ -506,6 +506,20 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Wo sitzen deine Kunden?", en: "Where are your customers?" },
         optionen: { inland: { de: "Deutschland", en: "Germany" }, eu: { de: "Andere EU-Länder", en: "Other EU countries" }, drittland: { de: "Außerhalb der EU", en: "Outside the EU" } },
       },
+      // E-234 (Steuerberater 27.10.2026, S5 b): Einkauf bei Unternehmen im Ausland – EU und Drittländer (§ 13b Abs. 1 und
+      // Abs. 2 Nr. 1 UStG; Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG); Frage in seiner Fassung
+      {
+        feld: "einkauf.ausland_unternehmen",
+        art: "janein",
+        frage: {
+          de: "Kaufst du Waren oder Leistungen bei Unternehmen im Ausland ein (auch Online-Werbung, Software-Abos, Plattformgebühren)?",
+          en: "Do you buy goods or services from businesses abroad (including online advertising, software subscriptions, platform fees)?",
+        },
+        hilfe: {
+          de: "Aus anderen EU-Ländern und von außerhalb der EU – zum Beispiel Online-Werbung, Software-Abos, Plattform- und App-Store-Gebühren oder Waren von Lieferanten im Ausland.",
+          en: "From other EU countries and from outside the EU – for example online advertising, software subscriptions, platform and app store fees or goods from suppliers abroad.",
+        },
+      },
       // Steuerberater 22.10.2026: die USt-IdNr. braucht auch, wer bei Unternehmen in anderen EU-Ländern einkauft (§ 27a UStG)
       {
         feld: "einkauf.eu_unternehmen",

@@ -187,6 +187,8 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
             </View>
           ) : null}
           {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
+          {/* E-234 (Rechtsanwalt, R4): Markenhinweis an der Exportstelle */}
+          <T v="caption" leise stil={{ marginTop: 8 }}>{TEXT.datev_marke}</T>
         </View>
         {kanzleienZuerst ? null : kanzleien}
       </Inhalt>

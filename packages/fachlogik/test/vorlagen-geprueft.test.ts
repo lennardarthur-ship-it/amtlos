@@ -115,7 +115,8 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
       for (const { id, f } of alleFreigaben().filter((x) => x.f.rolle === rolle)) {
         const v = vorlageFuer(id)!;
         const heute = aktuellerPruefstand(v, f).teile;
-        const betrieb: Betrieb = f.rechtsformen ? { ...CAFE, name: "Sonne GmbH", rechtsform: "GmbH" } : CAFE;
+        // E-234: Freigabe nur für bestimmte Rechtsformen – Beispielbetrieb der ersten davon (Handelsregister: GmbH bzw. UG)
+        const betrieb: Betrieb = f.rechtsformen ? { ...CAFE, name: `Sonne ${f.rechtsformen[0]}`, rechtsform: f.rechtsformen[0]! } : CAFE;
         const passt = (x: Omit<VorlagenFreigabe, "weitere">) => freigabeBestaetigt(x) && !x.vermerk_ausgesetzt && pruefGruppenFuer(v, x.teilsummen!, datenFuer(id, x), betrieb).every((g) => aktuellerPruefstand(v, x).teile[g] === x.teilsummen![g]);
         const soll = passt(f);
         expect(soll, `${rolle} ${id}`).toBe(freigabeBestaetigt(f) && !f.vermerk_ausgesetzt && pruefGruppenFuer(v, f.teilsummen!, datenFuer(id, f), betrieb).every((g) => heute[g] === f.teilsummen![g]));
@@ -370,7 +371,9 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
     for (const id of NEUE_FASSUNG) expect(VORLAGEN_GEPRUEFT[id]!.weitere?.map((x) => [x.stand, x.rolle]), id).toEqual([["2026-10-26", VORLAGEN_GEPRUEFT[id]!.rolle]]);
     // E-227: Voranmeldung mit Erwerben aus Belegen und Vermerk „Nicht vollständig“ (Steuerberater 27.10.2026), alle Varianten
     expect(VORLAGEN_GEPRUEFT.ust_voranmeldung!.weitere?.map((x) => [x.stand, x.rolle, x.varianten])).toEqual([["2026-10-27", "steuern", undefined]]);
-    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan" && id !== "rechnung" && id !== "impressum" && id !== "ust_voranmeldung" && !NEUE_FASSUNG.includes(id)) expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
+    // E-234 (Rechtsanwalt 27.10.2026, R3): Handelsregister zusätzlich für die UG
+    expect(VORLAGEN_GEPRUEFT.handelsregister!.weitere?.map((x) => [x.stand, x.rolle, x.rechtsformen])).toEqual([["2026-10-27", "recht", ["UG (haftungsbeschränkt)"]]]);
+    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan" && id !== "rechnung" && id !== "impressum" && id !== "ust_voranmeldung" && id !== "handelsregister" && !NEUE_FASSUNG.includes(id)) expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
   });
 
   it("je Fassung eine eigene Prüfsumme: Beauty unterscheidet sich von der Lebensmittel-Fassung", () => {

@@ -110,6 +110,9 @@ export const CHECK_FELDER = [
   "ust.voranmeldung_rhythmus",
   // E-231 (T-337): Kleinunternehmer – Einkauf bei Unternehmen in anderen EU-Ländern (bestehende Frage), auf die sich die
   // Voranmeldung nach § 18 Abs. 4a UStG stützt; sonst bliebe sie „hängt ab“ mit monatlichem Termin
+  // E-234 (Steuerberater 27.10.2026, S5 b): zuerst die weitere Frage nach dem Einkauf im Ausland (EU und Drittländer, Auslöser
+  // der Voranmeldung nach § 18 Abs. 4a UStG); die Frage nach der EU nur bei „ja“ – sie trägt die USt-IdNr. (gruendung.ust_idnr)
+  "einkauf.ausland_unternehmen",
   "einkauf.eu_unternehmen",
   // E-212 (T-241): bei Betrieben mit Vorjahr die Angaben, die EÜR, Gewerbesteuererklärung und Vorauszahlungen einen
   // Termin geben (vorher nur bei „Genauer machen“) – nur, wo sie entscheiden (`FRAGE_PASST`)
@@ -235,7 +238,8 @@ const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
   "datenverarbeitung.arten": (p) => inBranche(p, "unterricht_sport_coaching", "transport_logistik", ...DSB_BRANCHEN),
   "datenschutz.dsb_gruende": (p) => inBranche(p, ...DSB_BRANCHEN) && Boolean(liste(p, "datenverarbeitung.arten")?.some((x) => DSB_HINWEISE.includes(x))),
   "ust.voranmeldung_rhythmus": (p) => p["ust.kleinunternehmer"] === false,
-  "einkauf.eu_unternehmen": (p) => p["ust.kleinunternehmer"] === true,
+  "einkauf.ausland_unternehmen": (p) => p["ust.kleinunternehmer"] === true,
+  "einkauf.eu_unternehmen": (p) => p["ust.kleinunternehmer"] === true && p["einkauf.ausland_unternehmen"] === true,
   // R11 (Nutzertest Gebäudereinigung #3): ab einer beschäftigten Person für alle – außer Beauty und Gebäudereinigung, die die Branche schon auslöst
   "personal.sofortmeldebranchen": (p) => mitTeam(p) && !inBranche(p, "beauty_kosmetik", "gebaeudereinigung"),
   "ifsg.beschaeftigte": (p) => mitTeam(p) && inBranche(p, "gastronomie_lebensmittel"),
@@ -329,6 +333,9 @@ export function folgeAntworten(feld: string, wert: Profil[string], profil: Profi
   if (feld === "rechtsform" && wert === "freiberuf" && !beantwortet(profil, "taetigkeit.einordnung")) return { "taetigkeit.einordnung": "freiberuf" };
   // R11 (Nutzertest Tischlerei #21): UG/GmbH sind kraft Rechtsform gewerblich – keine Frage „Gewerbe oder freier Beruf?“
   if (feld === "rechtsform" && typeof wert === "string" && KRAFT_RECHTSFORM_GEWERBE.includes(wert) && !beantwortet(profil, "taetigkeit.einordnung")) return { "taetigkeit.einordnung": "gewerbe" };
+  // E-234: kein Einkauf im Ausland ⇒ auch keiner in anderen EU-Ländern; Einkauf in der EU ⇒ Einkauf im Ausland
+  if (feld === "einkauf.ausland_unternehmen" && wert === false && !beantwortet(profil, "einkauf.eu_unternehmen")) return { "einkauf.eu_unternehmen": false };
+  if (feld === "einkauf.eu_unternehmen" && wert === true && !beantwortet(profil, "einkauf.ausland_unternehmen")) return { "einkauf.ausland_unternehmen": true };
   return {};
 }
 /** Reihenfolge im Fragenkatalog – vom Alltäglichen zum Speziellen; entscheidet bei gleicher Wirkung */

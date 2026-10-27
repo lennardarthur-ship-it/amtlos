@@ -2559,3 +2559,20 @@
       version: 4
       quelle: Anweisung per Mail vom 27.10.2026 (beim Gründer)
       stand: '2026-10-27'
+- pruefer: recht
+  umfang: sanktion
+  nachweis:
+    art: blatt
+    datum: '2026-10-27'
+    rolle: recht
+    umfang: 'Frage R1: neuer Eintrag Voranmeldung des Kleinunternehmers (C.37) – nur die Folgen bei Verstoß geprüft und freigegeben, Einstufung
+      „hoch“ bestätigt (ausgefülltes Prüfpaket und Antwortmail vom 27.10.2026); den übrigen Text prüft der Steuerberater'
+    aufbewahrung: beim Gründer
+  felder_fehlen: []
+  hinweis: 'E-234: Antwort des Rechtsanwalts vom 27.10.2026; die Freigabe des Steuerberaters (alles außer Folgen) steht aus – er hat v1
+    mit „anpassen“ beantwortet, v2 umgesetzt, Neugründer-Frage offen (PRUEFLISTE T-345); bis dahin zurückgehalten (nicht_vor_freigabe)'
+  eintraege:
+    steuern.ust_voranmeldung_kleinunternehmer:
+      version: 1
+      quelle: ausgefülltes Prüfpaket C.37 vom 27.10.2026 (beim Gründer)
+      stand: '2026-10-27'

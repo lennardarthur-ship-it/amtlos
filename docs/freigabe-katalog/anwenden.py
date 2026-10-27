@@ -55,6 +55,9 @@ STEUER_GRUENDUNG = {"gruendung.fragebogen_steuerliche_erfassung", "gruendung.ust
 # E-195: elektronische Lohnsteuerbescheinigung (§ 41b EStG, § 93c AO) ist Steuerrecht – Steuerberater, obwohl Kategorie „personal“
 STEUER_PERSONAL = {"personal.lohnsteuerbescheinigung"}
 ARBEITSSCHUTZ_BRANCHE = {"branche.handwerk_gefaehrdung_gewerk", "branche.bau_baustellenverordnung", "branche.beauty_hautschutzplan", "branche.gastro_schankanlage_fluessiggas"}
+# E-234: Voranmeldung des Kleinunternehmers (C.37, E-231) – geteilte Prüfung wie vereinbart: Steuerberater alles außer den
+# Folgen, Rechtsanwalt die Folgen (Folgen wörtlich wie C.24)
+STEUER_FOLGEN_RECHT = {"steuern.ust_voranmeldung_kleinunternehmer"}
 LEBENSMITTEL_RECHT = {"branche.gastro_preisverzeichnis", "branche.gastro_mehrweg", "branche.gastro_ppwr_radar", "branche.gastro_einwegkunststofffonds"}
 # Rollen statt Personen (E-196): Schlüssel in freigaben.yaml und in `pruefung.geprueft_von`
 RECHT, STEUERN, SIFA, LMH = "recht", "steuern", "arbeitsschutz", "hygiene"
@@ -79,6 +82,8 @@ def gebiet(d):
     i, k = d["id"], d["kategorie"]
     if i in RECHT_STATT_ARBEITSSCHUTZ:
         return "recht"
+    if i in STEUER_FOLGEN_RECHT:
+        return "steuer_folgen_recht"
     if i in ARBEITSSCHUTZ_BRANCHE or k == "arbeitsschutz":
         return "arbeitsschutz"
     if k == "steuern" or i in STEUER_GRUENDUNG or i in STEUER_PERSONAL:
@@ -89,7 +94,8 @@ def gebiet(d):
 
 
 BENOETIGT = {"recht": [(RECHT, "alles")], "steuer": [(STEUERN, "alles")], "arbeitsschutz": [(SIFA, "alles")],
-             "lebensmittel": [(LMH, "ohne_sanktion"), (RECHT, "sanktion")]}
+             "lebensmittel": [(LMH, "ohne_sanktion"), (RECHT, "sanktion")],
+             "steuer_folgen_recht": [(STEUERN, "ohne_sanktion"), (RECHT, "sanktion")]}
 
 register = yaml.safe_load(open(os.path.join(ROOT, "docs/freigabe-katalog/freigaben.yaml"), encoding="utf-8"))
 

@@ -24,6 +24,19 @@
         "buildType": "apk"
       }
     },
+    "betatest": {
+      "extends": "production",
+      "channel": "betatest",
+      "env": {
+        "EXPO_PUBLIC_PRO_TESTMODUS": "1",
+        "EXPO_PUBLIC_BETATEST": "1",
+        "EXPO_PUBLIC_BETATEST_VON": "",
+        "EXPO_PUBLIC_BETATEST_BIS": ""
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
     "production": {
       "channel": "production",
       "autoIncrement": true,

@@ -30,7 +30,8 @@ const KU: Profil = { rechtsform: "einzelunternehmen", gruendungsdatum: "2022-01-
 
 describe("E-233 (1): Entwurf C.37 erscheint erst mit der Freigabe", () => {
   it("im Katalog als Entwurf mit nicht_vor_freigabe", () => {
-    expect(C37.pruefung.status).toBe("entwurf");
+    // E-234: Folgen vom Rechtsanwalt freigegeben, Steuerberater steht aus ⇒ in_pruefung (weiter ohne Freigabe)
+    expect(["entwurf", "in_pruefung"]).toContain(C37.pruefung.status);
     expect(C37.nicht_vor_freigabe).toBe(true);
     expect(zurueckgehalten(C37)).toBe(true);
   });
@@ -46,8 +47,10 @@ describe("E-233 (1): Entwurf C.37 erscheint erst mit der Freigabe", () => {
     expect(TEXT.e227_ku_va_pflicht).toContain("§ 18 Abs. 4a UStG");
   });
   it("die Frage nach dem Einkauf im EU-Ausland bleibt im Kern-Check der Kleinunternehmer (USt-IdNr., gruendung.ust_idnr)", () => {
+    // E-234: zuerst die Frage nach dem Einkauf im Ausland, die EU-Frage bei „ja“
     const { "einkauf.eu_unternehmen": _e, ...ohne } = KU;
-    expect(checkFragen(ohne).map((f) => f.feld)).toContain("einkauf.eu_unternehmen");
+    expect(checkFragen(ohne).map((f) => f.feld)).toContain("einkauf.ausland_unternehmen");
+    expect(checkFragen({ ...ohne, "einkauf.ausland_unternehmen": true }).map((f) => f.feld)).toContain("einkauf.eu_unternehmen");
     expect(fs.readFileSync(path.join(WURZEL, "catalog/pflichten/gruendung.ust_idnr.yaml"), "utf8")).toContain("profil.einkauf.eu_unternehmen");
   });
   it("store-check: kein blockierender Entwurf, C.37 als zurückgehalten genannt", () => {
@@ -101,7 +104,9 @@ describe("E-233 (3): PRUEFLISTE eingeordnet", () => {
   });
   it("C.37 in der Prüferrunde, kein Startblocker; T-339 entschieden (ereignisbezogen, erst mit der Freigabe)", () => {
     const z = (t: string) => zeilen.find((x) => x.startsWith(`| ${t} |`)) ?? "";
-    expect(z("T-337")).toMatch(/\[B → Prüferrunde 27\.10\.2026 \(versandt\)\]/);
+    // E-234: T-337 beantwortet, Rest in T-345 (Prüferrunde)
+    expect(z("T-337")).toMatch(/Beantwortet 27\.10\.2026 \(E-234\)/);
+    expect(z("T-345")).toMatch(/\[B → Prüferrunde 27\.10\.2026 \(versandt\)\]/);
     expect(z("T-337")).not.toMatch(/Startblocker:\*\* `steuern/);
     expect(z("T-339")).toMatch(/Selbst geklärt 27\.10\.2026 \(E-233\)/);
   });

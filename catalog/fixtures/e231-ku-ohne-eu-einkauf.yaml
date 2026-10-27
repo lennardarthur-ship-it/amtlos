@@ -1,6 +1,7 @@
 persona: grenzfall
 beschreibung: 'E-231: Kleinunternehmer ohne Einkauf bei Unternehmen in anderen EU-Ländern – Voranmeldung nach § 18 Abs. 4a UStG
-  gilt nicht; regelbesteuerter Betrieb mit EU-Einkauf ebenso nicht (dort gilt die gewöhnliche Voranmeldung)'
+  gilt nicht; regelbesteuerter Betrieb mit EU-Einkauf ebenso nicht (dort gilt die gewöhnliche Voranmeldung). E-234: auch ohne
+  Einkauf bei Unternehmen im Ausland (Auslöser erweitert auf Drittländer)'
 stichtag: '2026-10-27'
 fakten:
   profil.rechtsform: einzelunternehmen
@@ -9,6 +10,7 @@ fakten:
   profil.ust.kleinunternehmer: true
   profil.umsatz.vorjahr: 20000
   profil.einkauf.eu_unternehmen: false
+  profil.einkauf.ausland_unternehmen: false
   profil.bundesland: BY
 erwartet:
   steuern.ust_voranmeldung_kleinunternehmer: gilt_nicht

@@ -547,6 +547,8 @@ export function Betrieb() {
       <View style={{ marginTop: 28, gap: 4, paddingHorizontal: 4 }}>
         <T v="caption" leise>{TEXT.ueber_version(APP_VERSION, VORLAGEN.length, KATALOG.pflichten.length)}</T>
         <T v="caption" leise>{TEXT.ueber}</T>
+        {/* E-234 (Rechtsanwalt, R4): Markenhinweis unter „Über …“ */}
+        <T v="caption" leise>{TEXT.datev_marke}</T>
       </View>
     </BuehnenSeite>
   );

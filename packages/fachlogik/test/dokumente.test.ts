@@ -641,7 +641,8 @@ describe("Dokumentvorlagen", () => {
     expect(hr).toContain("Vertretungsregelung");
     expect(hr).toContain(">Geschäftsführung<");
     expect(hr).toContain("<th>Stammkapital</th>");
-    expect(html("handelsregister", { rechtsform: "e. K." })).toContain("Geschäftsführung bzw. Inhaber/in");
+    // E-234 (Rechtsanwalt, R3): beim e. K. „Inhaber/in“ (keine Geschäftsführung, keine Gesellschafter)
+    expect(html("handelsregister", { rechtsform: "e. K." })).toContain(">Inhaber/in<");
     // Datenschutzerklärung: Zeilenumbrüche bleiben, Website nicht doppelt
     const dse = html("datenschutzerklaerung_website", { website: "www.sonne.example", ergaenzung: "Erste Zeile\nZweite Zeile" });
     expect(dse).toContain("Erste Zeile<br>Zweite Zeile");

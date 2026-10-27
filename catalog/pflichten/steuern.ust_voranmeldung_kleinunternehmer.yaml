@@ -2,32 +2,44 @@
 # Katalogeintrag mit Frist) – neu als Entwurf, noch nicht fachlich geprüft
 # E-233: erscheint erst mit der Freigabe (nicht_vor_freigabe) – bis dahin nicht im Bündel der App, kein Startblocker; der
 # Hinweis der App am Beleg und bei der Übernahme in die Voranmeldung (§ 18 Abs. 4a UStG) bleibt
+# E-234 (Steuerberater 27.10.2026, S5 und Prüfpaket): v2 – Voranmeldungszeitraum nach § 18 Abs. 2 UStG statt „Monate“,
+# Auslöser auf Waren und Leistungen von Unternehmen im Ausland erweitert, Jahreserklärung mit Frist; Folgen unverändert
+# (vom Rechtsanwalt am 27.10.2026 bestätigt, Register). Bleibt zurückgehalten, bis der Steuerberater die Neugründer-Frage
+# beantwortet und v2 freigibt (PRUEFLISTE T-345).
 schema_version: 1
 id: steuern.ust_voranmeldung_kleinunternehmer
-version: 1
+version: 2
 katalog_nr: C.37
 nicht_vor_freigabe: true
 titel:
   de: Umsatzsteuer-Voranmeldung als Kleinunternehmer bei § 13b und Erwerben aus dem EU-Ausland
+# Steuerberater 27.10.2026 (Prüfpaket, Punkt 1): Kurztext in seiner Fassung
 kurz:
   de: Schuldest du als Kleinunternehmer Umsatzsteuer nach § 13b UStG oder auf Erwerbe aus dem EU-Ausland, gibst du für die
-    Monate, in denen diese Steuer entsteht, eine Voranmeldung ab – bis zum 10. des Folgemonats.
+    Voranmeldungszeiträume, in denen diese Steuer entsteht, eine Voranmeldung ab – bis zum 10. Tag nach Ablauf des Zeitraums.
+# Steuerberater 27.10.2026 (Prüfpaket, Punkte 1 bis 3): Beispiele und § 13b Abs. 2 Nr. 1 UStG ergänzt, Voranmeldungszeitraum
+# nach § 18 Abs. 2 UStG mit Frist, „jeden Monat“ durch „für jeden Zeitraum“ ersetzt, Jahreserklärung mit Frist (§ 149 Abs. 2 AO)
 erklaerung:
-  de: 'Auch als Kleinunternehmer schuldest du in zwei Fällen selbst Umsatzsteuer: als Leistungsempfänger nach § 13b UStG – zum
-    Beispiel für sonstige Leistungen eines Unternehmers aus dem übrigen Gemeinschaftsgebiet (§ 13b Abs. 1 UStG) – und auf
-    innergemeinschaftliche Erwerbe (§ 1 Abs. 1 Nr. 5 UStG), wenn deine Erwerbe die Erwerbsschwelle übersteigen oder du auf sie
-    verzichtet hast (§ 1a Abs. 3, 4 UStG). Wer ausschließlich Steuer für solche Umsätze zu entrichten hat, gibt Voranmeldungen
-    und eine Steuererklärung ab (§ 18 Abs. 4a Satz 1 UStG). Voranmeldungen sind nur für die Zeiträume abzugeben, in denen die
-    Steuer für diese Umsätze zu erklären ist (§ 18 Abs. 4a Satz 2 UStG): Für jeden Monat, in dem eine solche Steuer entsteht,
-    übermittelst du die Voranmeldung bis zum 10. des Folgemonats über ELSTER und zahlst die Steuer bis dahin (§ 18 Abs. 1
-    UStG). Eine Vorsteuer ziehst du als Kleinunternehmer nicht ab. Für das Jahr, in dem eine solche Steuer entstanden ist,
-    gibst du außerdem die Umsatzsteuer-Jahreserklärung ab. Amtlos erinnert jeden Monat, weil es die Steuer nur aus deinen
-    Belegen kennt – in Monaten ohne solche Steuer gibst du keine Voranmeldung ab.'
+  de: 'Auch als Kleinunternehmer schuldest du in zwei Fällen selbst Umsatzsteuer: als Leistungsempfänger nach § 13b UStG – vor
+    allem für Leistungen von Unternehmen im Ausland wie Online-Werbung, Software-Abos oder Plattformgebühren, aus dem übrigen
+    Gemeinschaftsgebiet (§ 13b Abs. 1 UStG) und aus Drittländern (§ 13b Abs. 2 Nr. 1 UStG) – und auf innergemeinschaftliche
+    Erwerbe (§ 1 Abs. 1 Nr. 5 UStG), wenn deine Erwerbe die Erwerbsschwelle übersteigen oder du auf sie verzichtet hast (§ 1a
+    Abs. 3, 4 UStG). Wer ausschließlich Steuer für solche Umsätze zu entrichten hat, gibt Voranmeldungen und eine
+    Steuererklärung ab (§ 18 Abs. 4a Satz 1 UStG). Voranmeldungen sind nur für die Voranmeldungszeiträume abzugeben, in denen
+    die Steuer für diese Umsätze zu erklären ist (§ 18 Abs. 4a Satz 2 UStG). Voranmeldungszeitraum ist in der Regel das
+    Kalendervierteljahr, der Kalendermonat, wenn die Steuer des Vorjahres mehr als 9.000 € betrug (§ 18 Abs. 2 UStG): Für
+    jeden Zeitraum, in dem eine solche Steuer entsteht, übermittelst du die Voranmeldung bis zum 10. Tag nach Ablauf des
+    Zeitraums über ELSTER und zahlst die Steuer bis dahin (§ 18 Abs. 1 UStG). Eine Vorsteuer ziehst du als Kleinunternehmer
+    nicht ab. Für jedes Jahr, in dem eine solche Steuer entstanden ist, gibst du außerdem die Umsatzsteuer-Jahreserklärung ab –
+    bis zum 31.07. des Folgejahres (§ 149 Abs. 2 AO; mit Steuerberatung später); für Jahre ohne solche Steuer nicht. Amtlos
+    erinnert für jeden Zeitraum, weil es die Steuer nur aus deinen Belegen kennt – in Zeiträumen ohne solche Steuer gibst du
+    keine Voranmeldung ab.'
 rechtsgrundlage:
 - § 18 Abs. 4a UStG
-- § 18 Abs. 1 UStG
-- § 13b UStG
+- § 18 Abs. 1, 2 UStG
+- § 13b Abs. 1, Abs. 2 Nr. 1 UStG
 - § 1 Abs. 1 Nr. 5, § 1a UStG
+- § 149 Abs. 2 AO
 kategorie: steuern
 ausloeser:
   all:
@@ -36,17 +48,44 @@ ausloeser:
     wert: true
     label:
       de: Du nutzt die Kleinunternehmerregelung.
-  # ohne Angabe „hängt ab“ (E-206: unbekannt blendet keine Pflicht aus) – die App fragt dann nach dem Einkauf im EU-Ausland
-  - feld: profil.einkauf.eu_unternehmen
-    op: ==
-    wert: true
-    label:
-      de: Du kaufst bei Unternehmen in anderen EU-Ländern ein.
+  # Steuerberater 27.10.2026 (S5 b): Waren und Leistungen von Unternehmen im Ausland – EU und Drittländer (§ 13b Abs. 1 und
+  # Abs. 2 Nr. 1 UStG); inländische § 13b-Fälle nur als Hinweis am Beleg. Einkauf in der EU zählt mit (ist Ausland). Ohne
+  # Angabe „hängt ab“ (E-206: unbekannt blendet keine Pflicht aus) – die App fragt Kleinunternehmer danach
+  - any:
+    - feld: profil.einkauf.ausland_unternehmen
+      op: ==
+      wert: true
+      label:
+        de: Du kaufst Waren oder Leistungen bei Unternehmen im Ausland ein (auch Online-Werbung, Software-Abos, Plattformgebühren).
+    - feld: profil.einkauf.eu_unternehmen
+      op: ==
+      wert: true
+      label:
+        de: Du kaufst bei Unternehmen in anderen EU-Ländern ein.
 frist:
   typ: wiederkehrend
-  # Steuerberater 27.10.2026: nur für die Monate, in denen die Steuer entsteht, fällig am 10. des Folgemonats – die
-  # Engine kennt die Monate nicht (die Belege liegen nur auf dem Gerät), daher monatlich mit Hinweis im Text
-  rhythmus: monatlich
+  # Steuerberater 27.10.2026 (S5 a): Voranmeldungszeitraum nach § 18 Abs. 2 UStG – in der Regel das Kalendervierteljahr, der
+  # Kalendermonat bei mehr als 9.000 € Steuer im Vorjahr (Regelwert wie C.24); fällig am 10. Tag nach Ablauf. Ob die
+  # Neugründer-Regel (§ 18 Abs. 2 Satz 4 UStG) hier gilt, klärt er noch – bis dahin vierteljährlich (keine Neugründer-Zweige
+  # wie in C.24). Die Engine kennt die Zeiträume mit solcher Steuer nicht (Belege nur auf dem Gerät) – Erinnerung je Zeitraum
+  # mit Hinweis im Text; nur in Zeiträumen mit Steuer erst mit der Freigabe (T-339)
+  rhythmus:
+    waehle:
+      - wenn:
+          any:
+            - all:
+                - { feld: profil.ust.voranmeldung_rhythmus, op: vorhanden }
+                - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: monatlich }
+            - all:
+                - any:
+                    - { feld: profil.ust.voranmeldung_rhythmus, op: nicht_vorhanden }
+                    - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: unklar }
+                - { feld: profil.ust.zahllast_vorjahr, op: vorhanden }
+                - feld: profil.ust.zahllast_vorjahr
+                  op: ">"
+                  wert: { regelwert: steuern.ust_va.grenze_monatlich }
+        dann: monatlich
+    sonst: quartalsweise
   faellig: { art: tag_nach_periodenende, monate_nach: 1, tag: 10 }
   verschiebung: { regel: naechster_werktag, kalender: bundesland }
   erinnerung: [P7D, P2D]
@@ -75,6 +114,9 @@ quellen:
   - titel: Umsatzsteuergesetz § 13b
     url: https://www.gesetze-im-internet.de/ustg_1980/__13b.html
     abgerufen: null
+  - titel: Abgabenordnung § 149 (Abgabe der Steuererklärungen)
+    url: https://www.gesetze-im-internet.de/ao_1977/__149.html
+    abgerufen: null
   - titel: § 240 AO (Säumniszuschläge), Wortlaut (gesetze.legal)
     url: https://gesetze.legal/bund/ao/240
     abgerufen: '2026-10-22'
@@ -91,17 +133,14 @@ quellen:
     url: https://www.gesetze-im-internet.de/ao_1977/__370.html
     abgerufen: null
 fachlich_zu_pruefen:
-- 'E-231: neu als Entwurf auf Anweisung des Steuerberaters (27.10.2026, T-324) – Text nach dem Wortlaut von § 18 Abs. 4a Satz
-  1 und 2 UStG (gesetze-im-internet.de, 27.10.2026). (1) § 18 Abs. 4a Satz 2 spricht von „Voranmeldungszeiträumen“ (nach Abs.
-  2 grundsätzlich das Kalendervierteljahr); der Steuerberater nannte „Monate“ – Frist so übernommen, bitte bestätigen. (2)
-  Auslöser: Kleinunternehmer und „kauft bei Unternehmen in anderen EU-Ländern ein“ (profil.einkauf.eu_unternehmen) – die Engine
-  kennt die Belege nicht, daher monatliche Erinnerung mit dem Satz „in Monaten ohne solche Steuer keine Voranmeldung“; ohne
-  Angabe zum Einkauf „hängt ab“ (E-206) – dann fragt die App danach; § 13b-Fälle im Inland (z. B. § 13b Abs. 2 Nr. 4 UStG)
-  erfasst der Auslöser nicht – dort bleibt der Hinweis der App am Beleg und bei der Voranmeldung. (3) Jahreserklärung: nur
-  als Satz im Text – der Eintrag „Umsatzsteuer-Jahreserklärung abgeben“ (C.27) gilt nur ohne Kleinunternehmerregelung. (4)
-  Folgen: Wortlaut wie C.24 (Voranmeldung) übernommen, Einstufung „hoch“ wie dort – bitte prüfen (Steuerberater alles außer
-  Folgen, Rechtsanwalt Folgen; PRUEFLISTE T-337)'
+- 'E-234: v2 nach der Antwort des Steuerberaters vom 27.10.2026 (S5 und Prüfpaket: „anpassen“): Voranmeldungszeitraum nach
+  § 18 Abs. 2 UStG (in der Regel Kalendervierteljahr, Kalendermonat bei mehr als 9.000 € Steuer im Vorjahr), Frist 10. Tag
+  nach Ablauf; Auslöser auf Waren und Leistungen von Unternehmen im Ausland erweitert (§ 13b Abs. 1 und Abs. 2 Nr. 1 UStG,
+  neue Frage profil.einkauf.ausland_unternehmen); Jahreserklärung bis 31.07. des Folgejahres (§ 149 Abs. 2 AO), nur für Jahre
+  mit solcher Steuer – Kurztext und Sätze in seiner Fassung. Offen: Ob die Neugründer-Regel (§ 18 Abs. 2 Satz 4 UStG) hier
+  greift, klärt er noch – bis dahin vierteljährlich; danach v2 (bzw. v3 mit Neugründer-Zweig) bitte freigeben (Steuerberater
+  alles außer Folgen; die Folgen hat der Rechtsanwalt am 27.10.2026 bestätigt; PRUEFLISTE T-345)'
 pruefung:
-  status: entwurf
+  status: in_pruefung
   geprueft_von: null
   geprueft_am: null

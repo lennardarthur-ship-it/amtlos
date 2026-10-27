@@ -18,12 +18,14 @@ gruende:
   neu_geprueft: Neuer Eintrag mit der Bitte um vollständige Prüfung; der Prüfer hat ihn danach freigegeben (Unterschrift siehe Register).
   entwurf_e223: Neuer Eintrag im Entwurf (E-223, Befund des externen Prüfers); die App zeigt „noch nicht fachlich geprüft“, die Prüfung läuft mit dem Prüfpaket für die neuen Einträge (PRUEFLISTE T-313).
   entwurf_e231: Neuer Eintrag im Entwurf auf Anweisung des Steuerberaters (E-231); die App zeigt „noch nicht fachlich geprüft“, die Prüfung läuft mit dem Prüfpaket für diesen Eintrag (PRUEFLISTE T-337).
+  entwurf_e234: Entwurf nach der Antwort des Steuerberaters überarbeitet (E-234); bis zur Freigabe zurückgehalten (nicht_vor_freigabe, nicht in der App), Rest in PRUEFLISTE T-345.
 offen: []
 erledigt:
-# E-231: Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG im Entwurf (Steuerberater 27.10.2026, T-324)
+# E-231: Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG im Entwurf (Steuerberater 27.10.2026, T-324);
+# E-234: v2 nach seiner Antwort (S5), Neugründer-Frage offen (T-345)
 - id: steuern.ust_voranmeldung_kleinunternehmer
-  punkt: 'E-231: neu als Entwurf auf Anweisung des Steuerberaters (27.'
-  grund: entwurf_e231
+  punkt: 'E-234: v2 nach der Antwort des Steuerberaters vom 27.10.2026'
+  grund: entwurf_e234
 # weitere eingeordnete Punkte (E-196 ff.); E-233: Notizen, die durch die Freigabe erledigt waren, sind aus dem Katalog und von hier entfernt
 - id: datenschutz.dsb_streichung
   punkt: 'Rechtsstand 21.10.2026: nur Ankündigung (Modernisierungsagen'

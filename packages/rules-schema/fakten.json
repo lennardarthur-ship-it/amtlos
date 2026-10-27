@@ -232,6 +232,12 @@
       "ab": 2
     },
     {
+      "pfad": "profil.einkauf.ausland_unternehmen",
+      "typ": "bool",
+      "herleitung": "Onboarding (E-234, Steuerberater 27.10.2026): kauft Waren oder Leistungen bei Unternehmen im Ausland ein – EU und Drittländer, auch Online-Werbung, Software-Abos, Plattformgebühren (§ 13b Abs. 1 und Abs. 2 Nr. 1 UStG); „nein“ heißt auch kein Einkauf in anderen EU-Ländern",
+      "ab": 2
+    },
+    {
       "pfad": "profil.ust.zm_meldezeitraum",
       "typ": "enum",
       "werte": [

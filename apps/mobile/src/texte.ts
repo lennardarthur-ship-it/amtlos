@@ -856,6 +856,9 @@ export const T = {
   e221_paket_fest: (n: number) => (n === 1 ? "1 Beleg festgeschrieben." : `${n} Belege festgeschrieben.`),
   steuerpaket_fertig: (n: number) => (n === 1 ? "Paket mit 1 Buchung erstellt." : `Paket mit ${n} Buchungen erstellt.`),
   steuerpaket_leer: "In diesem Zeitraum gibt es keine geteilten Rechnungen und keine Belege.",
+  // E-234 (Rechtsanwalt 27.10.2026, R4): Bestimmungshinweis ohne Logo, ohne Eindruck von Partnerschaft oder Zertifizierung –
+  // an der Exportstelle und unter „Über …“, sein Wortlaut
+  datev_marke: `DATEV ist eine eingetragene Marke der DATEV eG. ${MARKE.name} ist kein Produkt der DATEV eG und nicht von ihr zertifiziert.`,
   steuerpaket_hinweis: "Das DATEV-Format ist noch nicht gegen den offiziellen Leitfaden geprüft. Die LIESMICH-Datei im Paket sagt deiner Steuerberatung, was drin ist.",
   steuerpaket_ohne_xml: (n: number) => `${n === 1 ? "1 Rechnung hat" : `${n} Rechnungen haben`} keine E-Rechnung im Paket, weil Angaben fehlen.`,
   // Partnerkanzleien (docs/15): nur sichtbar, wenn eine gültige Kanzlei gelistet ist; feste Listungsgebühr, nie je Mandat
@@ -863,7 +866,8 @@ export const T = {
   kanzlei_finden_text: "Kanzleien, die mit Paketen aus der App arbeiten. Tippe für Kontakt und Paket.",
   kanzlei_transparenz: `Die Kanzleien beraten eigenverantwortlich unter eigenem Namen. ${MARKE.name} vermittelt nicht gegen Provision; Kanzleien zahlen eine feste Gebühr für die Listung.`,
   kanzlei_daten: "Deine Daten gehen nur an die Kanzlei, wenn du sie selbst sendest.",
-  kanzlei_datev: "DATEV",
+  // E-234 (R4): beschreibend statt eines Abzeichens „DATEV“ (kein Eindruck einer Zertifizierung)
+  kanzlei_datev: "Arbeitet mit DATEV",
   kanzlei_laut: "laut Kanzlei",
   kanzlei_leistungen: "Leistungen",
   kanzlei_festpreise: "Festpreise",
@@ -1037,6 +1041,11 @@ export const T = {
   // Vorprüfung Recht (21.10.2026): Verantwortlicher mit Vertretung, Zustimmung zu den Nutzungsbedingungen (§ 305 Abs. 2 BGB)
   vr_vertreten: (v: string) => `Vertreten durch ${v}.`,
   vr_rechtsform: "Rechtsform",
+  // E-234 (Rechtsanwalt 27.10.2026, R5): Testhinweis im Betatest – annehmen vor der Nutzung
+  betatest_teilnehmen: "Ich nehme teil",
+  betatest_gespeichert: "Der Zeitpunkt deiner Zustimmung bleibt nur auf diesem Gerät.",
+  betatest_ohne_zeitraum_titel: "Testversion nicht eingerichtet",
+  betatest_ohne_zeitraum: "In dieser Testversion fehlt der Testzeitraum. Bitte melde dich bei uns – du bekommst eine neue Testversion.",
   vr_titel: "Nutzungsbedingungen",
   vr_titel_neu: "Neue Nutzungsbedingungen",
   vr_text: `Bevor du ${MARKE.name} nutzt: Bitte lies die Nutzungsbedingungen und den Datenschutzhinweis. Ein Konto brauchst du nicht – deine Angaben bleiben auf deinem ${W.geraet}.`,

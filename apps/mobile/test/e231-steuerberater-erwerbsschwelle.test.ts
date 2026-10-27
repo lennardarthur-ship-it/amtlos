@@ -116,14 +116,15 @@ describe("E-231: Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG als 
   // den Auslöser prüfen die Engine-Fixtures (catalog/fixtures/e231-ku-*.yaml) am ganzen Katalog
   const C37 = YAML.parse(fs.readFileSync(path.join(WURZEL, `catalog/pflichten/${ID}.yaml`), "utf8")) as { pruefung: { status: string }; nicht_vor_freigabe: boolean; rechtsgrundlage: string[]; quellen: { url: string }[]; frist: { typ: string; rhythmus: string; faellig: { monate_nach: number; tag: number } }; erklaerung: { de: string } };
 
-  it("im Katalog als Entwurf mit § 18 Abs. 4a UStG, Quelle gesetze-im-internet.de, monatlich fällig am 10. des Folgemonats", () => {
+  // E-234 (Steuerberater 27.10.2026, S5): v2 – Voranmeldungszeitraum statt „Monate“, Status in_pruefung (Folgen vom Rechtsanwalt freigegeben)
+  it("im Katalog als Entwurf mit § 18 Abs. 4a UStG, Quelle gesetze-im-internet.de, fällig am 10. Tag nach Ablauf des Voranmeldungszeitraums", () => {
     const p = C37;
-    expect(p.pruefung.status).toBe("entwurf");
+    expect(["entwurf", "in_pruefung"]).toContain(p.pruefung.status);
     expect(p.nicht_vor_freigabe).toBe(true);
     expect(p.rechtsgrundlage).toContain("§ 18 Abs. 4a UStG");
     expect(p.quellen.some((q) => q.url === "https://www.gesetze-im-internet.de/ustg_1980/__18.html")).toBe(true);
-    expect(p.frist).toMatchObject({ typ: "wiederkehrend", rhythmus: "monatlich", faellig: { monate_nach: 1, tag: 10 } });
-    for (const s of ["§ 18 Abs. 4a Satz 1 UStG", "§ 18 Abs. 4a Satz 2 UStG", "bis zum 10. des Folgemonats", "Umsatzsteuer-Jahreserklärung", "in Monaten ohne solche Steuer gibst du keine Voranmeldung ab"]) expect(p.erklaerung.de).toContain(s);
+    expect(p.frist).toMatchObject({ typ: "wiederkehrend", rhythmus: { sonst: "quartalsweise" }, faellig: { monate_nach: 1, tag: 10 } });
+    for (const s of ["§ 18 Abs. 4a Satz 1 UStG", "§ 18 Abs. 4a Satz 2 UStG", "bis zum 10. Tag nach Ablauf des Zeitraums", "Umsatzsteuer-Jahreserklärung", "in Zeiträumen ohne solche Steuer gibst du keine Voranmeldung ab"]) expect(p.erklaerung.de).toContain(s);
   });
 
   it("E-233: die App zeigt ihn bis zur Freigabe nicht; der Kern-Check fragt Kleinunternehmer weiter nach dem Einkauf im EU-Ausland", () => {
@@ -131,7 +132,8 @@ describe("E-231: Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG als 
     const a = auswertung(KU, "2026-10-27");
     expect([...a.gilt, ...a.unbekannt].map((x) => x.id)).not.toContain(ID);
     const { "einkauf.eu_unternehmen": _e, ...unbekannt } = KU;
-    expect(checkFragen(unbekannt).map((f) => f.feld)).toContain("einkauf.eu_unternehmen");
+    // E-234: zuerst „im Ausland“ (EU und Drittländer), die EU-Frage bei „ja“
+    expect(checkFragen({ ...unbekannt, "einkauf.ausland_unternehmen": true }).map((f) => f.feld)).toContain("einkauf.eu_unternehmen");
     expect(checkFragen({ ...unbekannt, "ust.kleinunternehmer": false }).map((f) => f.feld)).not.toContain("einkauf.eu_unternehmen");
     for (const f of ["e231-ku-voranmeldung-18-4a.yaml", "e231-ku-ohne-eu-einkauf.yaml"]) expect(fs.existsSync(path.join(WURZEL, "catalog/fixtures", f)), f).toBe(true);
   });
