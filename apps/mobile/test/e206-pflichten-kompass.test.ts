@@ -135,12 +135,13 @@ function streng(b: Bedingung, fakten: Record<string, unknown>, nurGeplant: Set<s
  * entscheiden, dann eintragen.
  * - datenschutz.dsb: außerhalb von Gesundheit/Pflege und Kosmetik nur bei Hinweisen (Gesundheitsdaten, Video, Ortung) oder
  *   angegebenen Gründen; in diesen Branchen „hängt ab“, solange die Angaben fehlen;
- * - it_sicherheit.nis2_*: außerhalb der Branchen, die der Katalog NIS2 zuordnet (IT und „Andere“), gilt ein Betrieb unter
+ * - it_sicherheit.nis2_*: außerhalb der Branchen, die der Katalog NIS2 zuordnet (IT und „Andere“, seit E-217 auch Gesundheit und
+ *   Pflege, Transport und Logistik, Gastronomie und Lebensmittel – Rechtsanwalt 27.10.2026), gilt ein Betrieb unter
  *   50 Beschäftigten ohne Umsatzangabe als klein; Registrierung und Meldepflichten folgen nur auf „ja“ – bei „weiß ich nicht“
  *   steht in diesen Branchen „NIS2 prüfen“ mit der Frage (Ausnahme nur, wenn „NIS2 prüfen“ sichtbar ist).
  */
 const DSB_BRANCHEN = ["gesundheit_pflege", "beauty_kosmetik"];
-const NIS2_BRANCHEN = ["it_agentur_freelancer", "sonstige"];
+const NIS2_BRANCHEN = ["it_agentur_freelancer", "sonstige", "gesundheit_pflege", "transport_logistik", "gastronomie_lebensmittel"];
 function vermutung(id: string, antworten: Profil, sichtbar: Set<string>): boolean {
   const branchen = (antworten["taetigkeit.branchen"] as string[] | undefined) ?? [];
   if (id === "datenschutz.dsb") return !branchen.some((b) => DSB_BRANCHEN.includes(b));

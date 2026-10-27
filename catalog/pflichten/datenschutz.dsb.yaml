@@ -101,6 +101,9 @@ quellen:
 fachlich_zu_pruefen:
 - 'Frist „unverzüglich nach Eintritt der Voraussetzung“ (Prüfvermerk Rechtsanwalt 22.10.2026) nur im Text – kein Ereignis dafür'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - recht
+  geprueft_am: '2026-10-27'
+  geprueft_version: 4
+  bestaetigt_am: '2026-10-27'

@@ -14,6 +14,8 @@ export interface Frage {
   frage: T;
   hilfe?: T;
   optionen?: Record<string, T>;
+  /** E-217: Hilfetext unter einzelnen Antwortmöglichkeiten (Schlüssel wie in `optionen`) */
+  optionHilfe?: Record<string, T>;
   muster?: string;
 }
 
@@ -880,6 +882,13 @@ export const SCHRITTE: Schritt[] = [
             en: "You process data commercially in order to pass it on, or for market or opinion research",
           },
           keine: { de: "Nichts davon", en: "None of these" },
+        },
+        // E-217 (Rechtsanwalt 27.10.2026, T-278): Hilfetext unter der Antwort zur Datenschutz-Folgenabschätzung, sein Wortlaut
+        optionHilfe: {
+          dsfa_pflichtig: {
+            de: "Typisch bei umfangreicher Verarbeitung von Gesundheitsdaten oder systematischer Videoüberwachung öffentlich zugänglicher Bereiche (Liste der Datenschutzkonferenz). Eine Anamnese in einem kleinen Studio oder eine einzelne Kamera im Lager reicht dafür meist nicht.",
+            en: "Typical for large-scale processing of health data or systematic video surveillance of publicly accessible areas (list of the German Data Protection Conference). Taking a client's health history in a small studio or a single camera in the storeroom is usually not enough.",
+          },
         },
       },
       {

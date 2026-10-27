@@ -1,14 +1,14 @@
 # Katalog F.64 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: it_sicherheit.nis2_pruefen
-version: 4
+version: 5
 katalog_nr: F.64
 titel:
   de: Prüfen, ob NIS2 für dich gilt
 kurz:
   de: Kläre, ob dein Unternehmen nach Sektor und Größe unter die NIS2-Regeln fällt.
 erklaerung:
-  de: 'NIS2 betrifft Unternehmen bestimmter Sektoren ab einer bestimmten Größe – in der Regel ab 50 Beschäftigten oder mehr als 10 Mio. € Jahresumsatz und Jahresbilanzsumme. Unabhängig von der Größe erfasst sind unter anderem Vertrauensdiensteanbieter, Registries von Top-Level-Domains, DNS-Diensteanbieter und Anbieter öffentlicher Telekommunikationsnetze (§ 28 Abs. 3 BSIG). Wer betroffen ist, muss sich beim BSI registrieren und Sicherheitsvorfälle melden. Beantworte die Frage im Profil, sobald du es weißt.'
+  de: 'NIS2 betrifft Unternehmen bestimmter Sektoren ab einer bestimmten Größe – in der Regel ab 50 Beschäftigten oder mehr als 10 Mio. € Jahresumsatz und Jahresbilanzsumme. Liegt deine Bilanzsumme bei höchstens 10 Mio. €, bist du trotzdem nicht erfasst. Unabhängig von der Größe erfasst sind unter anderem Vertrauensdiensteanbieter, Registries von Top-Level-Domains, DNS-Diensteanbieter und Anbieter öffentlicher Telekommunikationsnetze (§ 28 Abs. 3 BSIG). Wer betroffen ist, muss sich beim BSI registrieren und Sicherheitsvorfälle melden. Beantworte die Frage im Profil, sobald du es weißt.'
 rechtsgrundlage:
 - NIS2-Richtlinie (EU) 2022/2555
 - § 28 BSIG
@@ -42,14 +42,19 @@ ausloeser:
       - any:
         - feld: profil.taetigkeit.branchen
           op: nicht_vorhanden
+        # E-217 (Rechtsanwalt 27.10.2026, T-278): weitere NIS2-Branchen Gesundheit und Pflege, Transport und Logistik,
+        # Lebensmittel (Gastronomie und Lebensmittel) – die Frage NIS2 ja/nein entscheidet
         - not:
             feld: profil.taetigkeit.branchen
             op: enthaelt_eines
             wert:
             - it_agentur_freelancer
             - sonstige
+            - gesundheit_pflege
+            - transport_logistik
+            - gastronomie_lebensmittel
     label:
-      de: Dein Betrieb ist groß genug (mindestens 50 Beschäftigte oder mehr als 10 Mio. € Umsatz) oder in einer Branche, für die NIS2 auch ohne Größenschwelle gelten kann.
+      de: Dein Betrieb ist groß genug (mindestens 50 Beschäftigte oder mehr als 10 Mio. € Umsatz) oder in einer Branche, in der NIS2 gelten kann.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -64,6 +69,8 @@ sanktion:
   schwere: mittel
 automatisierung: hinweis
 einordnung: hinweis
+aenderungsnotiz:
+  de: Auch in Gesundheit und Pflege, Transport und Logistik sowie Gastronomie und Lebensmittel fragt Amtlos jetzt, ob NIS2 für dich gilt, solange du keinen Umsatz angegeben hast.
 aktion:
   art: formular
   ziel: onboarding.daten
@@ -76,11 +83,12 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- 'E-217 (Rechtsanwalt 27.10.2026, T-278): NIS2-Branchen um Gesundheit und Pflege, Transport und Logistik, Gastronomie und Lebensmittel ergänzt; Satz zur Bilanzsumme in der Erklärung'
 - 'Prüfvermerk Rechtsanwalt 22.10.2026: größenunabhängige Sektoren (§ 28 Abs. 3 BSIG) als Liste im Text, Umsatzschwelle 10 Mio. € im Auslöser (Vorjahresumsatz; Bilanzsumme nicht im Profil, ohne Umsatzangabe als klein gewertet); vollständige Sektorenliste nicht hinterlegt; § 28 Abs. 3 BSIG nicht im Wortlaut gelesen'
 pruefung:
   status: freigegeben
   geprueft_von:
     - recht
-  geprueft_am: '2026-10-23'
-  geprueft_version: 4
-  bestaetigt_am: '2026-10-23'
+  geprueft_am: '2026-10-27'
+  geprueft_version: 5
+  bestaetigt_am: '2026-10-27'

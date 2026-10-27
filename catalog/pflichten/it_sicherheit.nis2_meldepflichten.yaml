@@ -2,7 +2,7 @@
 # Rechtsstand 21.10.2026: NIS2UmsuCG seit 6.12.2025 in Kraft, Meldepflichten nach § 32 BSIG
 schema_version: 1
 id: it_sicherheit.nis2_meldepflichten
-version: 4
+version: 5
 katalog_nr: F.64
 titel:
   de: Sicherheitsvorfälle melden (NIS2)
@@ -20,34 +20,37 @@ ausloeser:
     wert: ja
     label:
       de: Dein Unternehmen fällt unter NIS2.
-  # Vorprüfung 21.10.2026 (T-105): für Kleinstbetriebe ausgeblendet – wie die automatische Antwort „nein“ der App, IT-Branche ausgenommen
+  # Vorprüfung 21.10.2026 (T-105): kleine Betriebe ausgeblendet – wie die automatische Antwort „nein“ der App
+  # E-215 (Rechtsanwalt 26.10.2026, T-239): in den NIS2-Branchen ohne Umsatzangabe „hängt ab“ statt ausgeblendet
+  # E-217 (Rechtsanwalt 27.10.2026, T-278): unter 50 statt unter 10 Beschäftigten – darunter nur erfasst, wenn Jahresumsatz
+  # und Jahresbilanzsumme je über 10 Mio. € liegen (die Bilanzsumme steht nicht im Profil, daher der Satz in der Bedingung);
+  # „IT, Agentur, Freelancer“ wie „Andere“ (erfasst sind vor allem MSP/MSSP, Cloud/Rechenzentrum, Online-Marktplätze,
+  # Suchmaschinen, soziale Netzwerke – die Rückfrage entscheidet); weitere NIS2-Branchen Gesundheit und Pflege, Transport und
+  # Logistik, Lebensmittel (Gastronomie und Lebensmittel; erfasst nur Großhandel und industrielle Herstellung – die Rückfrage
+  # entscheidet). Eine Branche für Industrie/Herstellung hat die Branchenliste nicht. Umsatz bis 10 Mio. € ⇒ nicht erfasst.
   - any:
     - feld: profil.beschaeftigte.gesamt
       op: nicht_vorhanden
     - feld: profil.beschaeftigte.gesamt
       op: '>='
-      wert: 10
+      wert: 50
     - all:
       - feld: profil.taetigkeit.branchen
         op: vorhanden
       - feld: profil.taetigkeit.branchen
-        op: enthaelt
-        wert: it_agentur_freelancer
-    # E-215 (Rechtsanwalt 26.10.2026, T-239): unter 50 Beschäftigten erfasst, wenn Jahresumsatz und Jahresbilanzsumme je über
-    # 10 Mio. € liegen – in den Branchen, die der Katalog NIS2 zuordnet (wie it_sicherheit.nis2_pruefen: IT und „Andere“), ohne
-    # Umsatzangabe „hängt ab“ statt ausgeblendet; die Bilanzsumme steht nicht im Profil (IT war schon ausgenommen)
-    - all:
-      - feld: profil.taetigkeit.branchen
-        op: vorhanden
-      - feld: profil.taetigkeit.branchen
-        op: enthaelt
-        wert: sonstige
+        op: enthaelt_eines
+        wert:
+        - it_agentur_freelancer
+        - sonstige
+        - gesundheit_pflege
+        - transport_logistik
+        - gastronomie_lebensmittel
       - not:
           feld: profil.umsatz.vorjahr
           op: '<='
           wert: 10000000
     label:
-      de: Dein Betrieb ist kein Kleinstbetrieb außerhalb der IT-Branche, oder bei „Andere“ lag der Umsatz im Vorjahr über 10 Mio. €.
+      de: Dein Betrieb hat mindestens 50 Beschäftigte, oder er ist in einer Branche, in der NIS2 gelten kann, und der Umsatz im Vorjahr lag über 10 Mio. €. Liegt deine Bilanzsumme bei höchstens 10 Mio. €, bist du trotzdem nicht erfasst.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -62,7 +65,7 @@ sanktion:
   schwere: hoch
 automatisierung: hinweis
 aenderungsnotiz:
-  de: Bei der Branche „Andere“ erscheint der Eintrag jetzt auch unter 10 Beschäftigten als „hängt ab“, solange du keinen Umsatz angegeben hast.
+  de: Erst ab 50 Beschäftigten ohne Weiteres; darunter in IT, Gesundheit und Pflege, Transport und Logistik, Gastronomie und Lebensmittel sowie „Andere“ nur bei mehr als 10 Mio. € Umsatz – ohne Umsatzangabe „hängt ab“.
 status_recht: in_kraft
 gueltig_ab: '2025-12-06'
 gueltig_bis: null
@@ -83,8 +86,12 @@ quellen:
   url: https://www.gesetze-im-internet.de/bsig_2025/__32.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: Meldestufen nach § 32 BSIG, Sanktionsrahmen § 65 BSIG und Ausblendung der Geschäftsleitungspflichten (§ 38 BSIG) bestätigt. Offen: für Kleinstbetriebe (unter 10 Beschäftigte, nicht IT) ausgeblendet (T-105) – Umsatz- und Bilanzschwelle nicht abgebildet'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: Meldestufen nach § 32 BSIG, Sanktionsrahmen § 65 BSIG und Ausblendung der Geschäftsleitungspflichten (§ 38 BSIG) bestätigt'
+- 'E-217 (Rechtsanwalt 27.10.2026, T-278): unter 50 Beschäftigten nur in den NIS2-Branchen (IT, Andere, Gesundheit und Pflege, Transport und Logistik, Gastronomie und Lebensmittel) bei mehr als 10 Mio. € Umsatz, ohne Umsatzangabe „hängt ab“; die Jahresbilanzsumme fragt die App nicht (Technik) – dazu der Satz in der Bedingung'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - recht
+  geprueft_am: '2026-10-27'
+  geprueft_version: 5
+  bestaetigt_am: '2026-10-27'

@@ -49,13 +49,12 @@ describe("E-215 (1b): NIS2 unter 50 Beschäftigten ohne Umsatzangabe", () => {
     const a = auswertung({ ...basis("sonstige", 5), "umsatz.vorjahr": 400000 }, STICHTAG);
     for (const id of ["it_sicherheit.nis2_pruefen", "it_sicherheit.nis2_registrierung", "it_sicherheit.nis2_meldepflichten"]) expect(sichtbar(a, id), id).toBeUndefined();
   });
-  it("außerhalb dieser Branchen bleibt es ohne Umsatz bei „nicht betroffen“ (Handwerk 5, Café 12)", () => {
-    for (const p of [basis("handwerk", 5), basis("gastronomie_lebensmittel", 12)])
+  it("außerhalb dieser Branchen bleibt es ohne Umsatz bei „nicht betroffen“ (Handwerk 5 und 12)", () => {
+    // E-217 (Rechtsanwalt 27.10.2026): Gastronomie und Lebensmittel ist jetzt NIS2-Branche, die Grenze liegt bei 50 statt 10
+    // (Café und Handwerk mit 12 ohne Umsatz: Handwerk nicht betroffen, Café „hängt ab“ – e217)
+    for (const p of [basis("handwerk", 5), basis("handwerk", 12)])
       for (const id of ["it_sicherheit.nis2_pruefen", "it_sicherheit.nis2_registrierung", "it_sicherheit.nis2_meldepflichten"]) {
-        const e = sichtbar(auswertung(p, STICHTAG), id);
-        // Café mit 12: Registrierung/Meldepflichten folgen wie bisher nur auf „ja“ (ohne Angabe „hängt ab“, kein Kleinstbetrieb)
-        if (p["beschaeftigte.gesamt"] === 12 && id !== "it_sicherheit.nis2_pruefen") continue;
-        expect(e, `${p["taetigkeit.branchen"]} ${id}`).toBeUndefined();
+        expect(sichtbar(auswertung(p, STICHTAG), id), `${p["taetigkeit.branchen"]} ${p["beschaeftigte.gesamt"]} ${id}`).toBeUndefined();
       }
   });
 });

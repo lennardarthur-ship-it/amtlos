@@ -51,7 +51,8 @@ const RECHTSFORM_TEXT: Record<string, string> = { gbr: "GbR", ek: "e. K.", ohg: 
  * des Felds (oder mit der Eingabetaste) übernehmen – wo jede Antwort sofort neu rechnet („Kurz klären“).
  */
 export function Antwort({ f, wert, setzen, aufBlur, herkunft }: { f: Frage; wert: Wert | undefined; setzen: (w: Wert, weiter?: boolean) => void; aufBlur?: boolean; /** R12 (Bäckerei #1): woher ein vorbelegter Haken kommt, je Option */ herkunft?: Record<string, string> }) {
-  const roh = Object.entries(f.optionen ?? {}).map(([k, t]) => ({ wert: k, text: t.de }));
+  // E-217: Hilfetext unter einzelnen Antworten (z. B. Datenschutz-Folgenabschätzung)
+  const roh = Object.entries(f.optionen ?? {}).map(([k, t]) => ({ wert: k, text: t.de, ...(f.optionHilfe?.[k] ? { hilfe: f.optionHilfe[k]!.de } : {}) }));
   // R11 (UX #5): bei Mehrfachauswahl „Keine davon“ zuerst – als zwölfte Option lag sie unter dem sichtbaren Bereich
   const optionen = f.art === "mehrfach" ? [...roh.filter((o) => o.wert.startsWith("keine")), ...roh.filter((o) => !o.wert.startsWith("keine"))] : roh;
   switch (f.art) {

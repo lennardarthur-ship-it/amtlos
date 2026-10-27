@@ -25,10 +25,11 @@ export const SATZ_DFV =
 
 describe("T-268: Dauerfristverlängerung in der Umsatzsteuer-Voranmeldung (v8)", () => {
   const va = () => pflicht("steuern.ust_voranmeldung");
-  it("v8 enthält den Satz, mit Änderungsnotiz; der übrige Text von v7 bleibt", () => {
-    expect(va().version).toBe(8);
+  it("v8 enthielt den Satz (E-217: seit v9 in der Fassung des Steuerberaters), mit Änderungsnotiz; der übrige Text von v7 bleibt", () => {
+    // E-217: der Steuerberater hat den Satz korrigiert („auf Antrag“, § 18 Abs. 6 UStG, §§ 46 bis 48 UStDV) – v9
+    expect(va().version).toBe(9);
     const e = va().erklaerung!.de;
-    expect(e).toContain(SATZ_DFV);
+    expect(e).toContain(SATZ_DFV.replace("bleibt möglich", "bleibt auf Antrag möglich").replace("§ 18 Abs. 1 UStG, §§ 46 ff. UStDV", "§ 18 Abs. 6 UStG, §§ 46 bis 48 UStDV"));
     expect(e).toContain("Hast du 2026 oder später gegründet, gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG).");
     expect(e.endsWith("Amtlos bereitet die Zahlen vor; du übermittelst selbst.") || e.endsWith(" bereitet die Zahlen vor; du übermittelst selbst.")).toBe(true);
     expect(va().aenderungsnotiz!.de).toMatch(/Dauerfristverlängerung/);
@@ -44,9 +45,9 @@ describe("T-268: Dauerfristverlängerung in der Umsatzsteuer-Voranmeldung (v8)",
     // beide Quellen-Einträge sind vom Steuerberater bestätigt
     for (const p of [radar, svz]) expect(pruefVermerk(p.version, p.pruefung, AM), p.id).toMatch(/Steuerberater/);
   });
-  it("Freigabe gilt nicht für v8 – kein Vermerk, bis der Steuerberater bestätigt (Register unverändert bei v7)", () => {
-    expect(va().pruefung?.geprueft_version ?? null).not.toBe(8);
-    expect(pruefVermerk(va().version, va().pruefung, AM)).toBeNull();
+  it("v8 wurde nie freigegeben (keine Eigenfreigabe); E-217: der Steuerberater hat v9 bestätigt", () => {
+    expect(va().pruefung?.geprueft_version ?? null).toBe(9);
+    expect(pruefVermerk(va().version, va().pruefung, AM)).toMatch(/Steuerberater/);
     const reg = fs.readFileSync(path.join(WURZEL, "docs/freigabe-katalog/freigaben.yaml"), "utf8");
     expect(reg).not.toMatch(/steuern\.ust_voranmeldung:\n\s+version: 8/);
   });

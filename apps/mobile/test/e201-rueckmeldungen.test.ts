@@ -99,12 +99,13 @@ describe("E-201: Rückmeldungen Rechtsanwalt und Steuerberater im Katalog", () =
     expect(lstb.version).toBe(2);
     expect(pruefVermerk(lstb.version, lstb.pruefung, AM)).toMatch(/^Fachlich durchgesehen von einem Steuerberater \(Stand 26\.10\.2026\)/);
   });
-  it("alle 228 Einträge freigegeben, keine offenen Punkte mehr – außer den drei von E-215 und dem von E-216 geänderten (Nachprüfung PRUEFLISTE T-278, T-282)", () => {
+  it("alle 228 Einträge freigegeben, keine offenen Punkte mehr – E-217: auch die von E-215 und E-216 geänderten sind bestätigt (T-278, T-282)", () => {
     expect(pflichten.length).toBe(228);
     const E206 = ["personal.lohnsteuer_anmeldung", "personal.lohnsteuerbescheinigung"];
     // E-215: neue Fassung nach der Empfehlung des Rechtsanwalts (T-278); E-216: Voranmeldung v8 mit dem Satz zur
     // Dauerfristverlängerung (Anregung des Steuerberaters, T-268) – Vermerk erst nach der Bestätigung (T-282)
-    const NEU = ["datenschutz.dsb", "it_sicherheit.nis2_registrierung", "it_sicherheit.nis2_meldepflichten", "steuern.ust_voranmeldung"];
+    // E-217: alle vier am 27.10.2026 bestätigt (Voranmeldung als v9, NIS2 als neue Fassungen) – keiner mehr ohne Vermerk
+    const NEU: string[] = [];
     for (const x of pflichten) {
       // E-213: die von E-206 geänderten Einträge sind seit dem 26.10.2026 erneut bestätigt (die Voranmeldung bis v7)
       if (E206.includes(x.id)) expect(x.pruefung?.bestaetigt_am, x.id).toBe("2026-10-26");

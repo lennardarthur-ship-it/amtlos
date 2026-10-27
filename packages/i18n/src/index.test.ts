@@ -50,6 +50,11 @@ describe("Onboarding-Fragen passen zum Fakten-Katalog", () => {
         expect(fakt, `Fakt profil.${f.feld} fehlt in fakten.json`).toBeDefined();
         expect(ART[f.art]).toContain(fakt!.typ);
         if (fakt!.werte) expect(Object.keys(f.optionen ?? {}).sort()).toEqual([...fakt!.werte].sort());
+        // E-217: Hilfetexte unter Antworten nur zu vorhandenen Antworten, deutsch und englisch
+        for (const [k, t] of Object.entries(f.optionHilfe ?? {})) {
+          expect(Object.keys(f.optionen ?? {}), k).toContain(k);
+          expect(t.de.length > 0 && t.en.length > 0, k).toBe(true);
+        }
       });
   it("findet den Schritt zu einem fehlenden Fakt", () => {
     expect(schrittFuerFakt("profil.beschaeftigte.gesamt")).toBe("beschaeftigte");

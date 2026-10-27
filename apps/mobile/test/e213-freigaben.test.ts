@@ -150,10 +150,11 @@ describe("E-213 B) Pflichten erneut bestätigt", () => {
   it("Voranmeldung v7 (seit E-216 v8, wartet auf die Bestätigung) und Lohnsteuerbescheinigung v2 (Steuerberater), Lohnsteuer-Anmeldung v7 (Rechtsanwalt), Stand 26.10.2026, ohne offene Punkte", () => {
     // E-216: die Voranmeldung ist inzwischen v8 (Satz zur Dauerfristverlängerung, T-268) – die Bestätigung von v7 bleibt im
     // Register, gilt aber nicht für v8 (T-282)
+    // E-217: v9 (Satz in der Fassung des Steuerberaters) am 27.10.2026 bestätigt
     const va = pflicht("steuern.ust_voranmeldung");
-    expect(va.version).toBe(8);
+    expect(va.version).toBe(9);
     expect(REG.some((b) => b.pruefer === "steuern" && b.nachweis.art === "mail" && b.nachweis.datum === "2026-10-26" && b.eintraege["steuern.ust_voranmeldung"]?.version === 7)).toBe(true);
-    expect(pruefVermerk(va.version, va.pruefung, AM)).toBeNull();
+    expect(pruefVermerk(va.version, va.pruefung, AM)).toMatch(/Steuerberater \(Stand 27\.10\.2026\)/);
     for (const [id, v, wer] of [["personal.lohnsteuerbescheinigung", 2, "Steuerberater"], ["personal.lohnsteuer_anmeldung", 7, "Rechtsanwalt"]] as const) {
       const p = pflicht(id);
       expect(p.version, id).toBe(v);
@@ -163,7 +164,8 @@ describe("E-213 B) Pflichten erneut bestätigt", () => {
     expect(pflicht("personal.lohnsteuerbescheinigung").erklaerung!.de).toContain("gibt es keine Lohnsteuerbescheinigung (§ 41b Abs. 6 EStG)");
     // E-215: drei Einträge nach der Empfehlung des Rechtsanwalts neu gefasst – Vermerk erst nach seiner Bestätigung (T-278)
     // E-216: dazu die Voranmeldung v8 (Steuerberater, T-282)
-    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual(["datenschutz.dsb", "it_sicherheit.nis2_meldepflichten", "it_sicherheit.nis2_registrierung", "steuern.ust_voranmeldung"]);
+    // E-217: alle vier am 27.10.2026 bestätigt (T-278, T-282)
+    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual([]);
   });
 });
 

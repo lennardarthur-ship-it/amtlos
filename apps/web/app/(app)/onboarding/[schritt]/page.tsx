@@ -136,12 +136,24 @@ export default async function OnboardingSchritt({
 function FrageFeld({ frage: f, wert, sprache: s, unbekanntText, jaNein }: { frage: Frage; wert: unknown; sprache: "de" | "en"; unbekanntText: string; jaNein: [string, string] }) {
   const unbekannt = wert === undefined || wert === null;
   const hilfeId = f.hilfe ? `${f.feld}-hilfe` : undefined;
-  const option = (value: string, text: string, typ: "radio" | "checkbox", checked: boolean) => (
-    <label key={value} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-2 hover:bg-blatt">
-      <input type={typ} name={f.feld} value={value} defaultChecked={checked} className="size-5 flex-none accent-amt" />
-      {text}
-    </label>
-  );
+  // E-217: Hilfetext unter einzelnen Antworten (optionHilfe, z. B. Datenschutz-Folgenabschätzung)
+  const option = (value: string, text: string, typ: "radio" | "checkbox", checked: boolean) => {
+    const hilfe = f.optionHilfe?.[value]?.[s];
+    const id = hilfe ? `${f.feld}-${value}-hilfe` : undefined;
+    return (
+      <label key={value} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-2 hover:bg-blatt">
+        <input type={typ} name={f.feld} value={value} defaultChecked={checked} aria-describedby={id} className="size-5 flex-none accent-amt" />
+        {hilfe ? (
+          <span>
+            {text}
+            <span id={id} className="block text-klein text-tinte-leise">{hilfe}</span>
+          </span>
+        ) : (
+          text
+        )}
+      </label>
+    );
+  };
 
   const gezeigt = <input type="hidden" name={`${f.feld}__gezeigt`} value="1" />;
   if (f.art === "auswahl" || f.art === "mehrfach" || f.art === "janein") {

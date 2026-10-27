@@ -2375,3 +2375,67 @@
       version: 7
       quelle: Bestätigung per Mail vom 26.10.2026 (beim Gründer)
       stand: '2026-10-26'
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-27'
+    rolle: steuern
+    umfang: 'Antwort zu PRUEFLISTE T-282: Umsatzsteuer-Voranmeldung v8 bestätigt mit Korrektur der Fundstelle und einer kleinen Ergänzung; den
+      Satz zur Dauerfristverlängerung hat er selbst formuliert („auf Antrag“, § 18 Abs. 6 UStG, §§ 46 bis 48 UStDV) – bestätigt ist v9 mit dem
+      Satz zur Dauerfristverlängerung in seiner Fassung, übriger Inhalt wie v8 (nachgeprüft: v9 unterscheidet sich von v8 nur in diesem Satz
+      und der Änderungsnotiz)'
+    aufbewahrung: beim Gründer
+  felder_fehlen: []
+  hinweis: 'E-217: Antwort des Steuerberaters vom 27.10.2026 (Mail beim Gründer)'
+  eintraege:
+    steuern.ust_voranmeldung:
+      version: 9
+      quelle: Bestätigung per Mail vom 27.10.2026 (beim Gründer)
+      stand: '2026-10-27'
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-27'
+    rolle: recht
+    umfang: 'Antwort zu PRUEFLISTE T-278 (1): Datenschutzbeauftragter v4 bestätigt (Auslöser nach seiner Empfehlung vom 26.10.2026) mit zwei
+      Maßgaben – die 20-Personen-Schwelle (§ 38 Abs. 1 Satz 1 BDSG) gilt in allen Branchen unabhängig von den Fällen des Satzes 2, auch bei
+      „Nichts davon“ (nachgeprüft, Test E-217, keine Änderung nötig); sein Hilfetext unter der Antwort zur Datenschutz-Folgenabschätzung steht
+      in der Frage (kein Katalogtext)'
+    aufbewahrung: beim Gründer
+  felder_fehlen: []
+  hinweis: 'E-217: Antwort des Rechtsanwalts vom 27.10.2026 (Mail beim Gründer)'
+  eintraege:
+    datenschutz.dsb:
+      version: 4
+      quelle: Bestätigung per Mail vom 27.10.2026 (beim Gründer)
+      stand: '2026-10-27'
+- pruefer: recht
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-27'
+    rolle: recht
+    umfang: 'Antwort zu PRUEFLISTE T-278 (2): NIS2-Regel „so noch nicht“; nach seinen Vorgaben umgesetzt gilt sie ohne erneute Vorlage als
+      bestätigt – (a) „unter 50“ statt „unter 10“ Beschäftigte (darunter nur erfasst, wenn Jahresumsatz und Jahresbilanzsumme je über 10 Mio. €),
+      (b) „IT, Agentur, Freelancer“ wie „Andere“, (c) weitere NIS2-Branchen Gesundheit und Pflege, Transport und Logistik, Lebensmittel
+      (Branche „Gastronomie und Lebensmittel“; eine Branche für Industrie/Herstellung hat die App nicht), Umsatz bis 10 Mio. € nicht erfasst,
+      dazu sein Satz „Liegt deine Bilanzsumme bei höchstens 10 Mio. €, bist du trotzdem nicht erfasst.“; größenunabhängige Fälle über die Frage
+      NIS2 ja/nein. Bestätigt: Registrierung v6, Meldepflichten v5 und „NIS2 prüfen“ v5 (dessen Branchenliste und Erklärung gehören dazu)'
+    aufbewahrung: beim Gründer
+  felder_fehlen: []
+  hinweis: 'E-217: Antwort des Rechtsanwalts vom 27.10.2026 (Mail beim Gründer)'
+  eintraege:
+    it_sicherheit.nis2_registrierung:
+      version: 6
+      quelle: Vorabfreigabe der Umsetzung per Mail vom 27.10.2026 (beim Gründer)
+      stand: '2026-10-27'
+    it_sicherheit.nis2_meldepflichten:
+      version: 5
+      quelle: Vorabfreigabe der Umsetzung per Mail vom 27.10.2026 (beim Gründer)
+      stand: '2026-10-27'
+    it_sicherheit.nis2_pruefen:
+      version: 5
+      quelle: Vorabfreigabe der Umsetzung per Mail vom 27.10.2026 (beim Gründer)
+      stand: '2026-10-27'

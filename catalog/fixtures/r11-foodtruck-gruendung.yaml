@@ -31,7 +31,9 @@ erwartet:
   branche.gastro_hygieneschulung: gilt
   branche.gastro_preisverzeichnis: gilt
   branche.gastro_ifsg_bescheinigung: gilt_nicht
-  it_sicherheit.nis2_pruefen: gilt_nicht
+  # E-217 (Rechtsanwalt 27.10.2026, T-278): Lebensmittel ist NIS2-Branche (erfasst nur Großhandel und industrielle Herstellung –
+  # die Frage entscheidet); ohne Umsatzangabe fragt die App deshalb nach NIS2 (mit Kleinunternehmer oder Umsatz bis 10 Mio. € setzt sie „nein“)
+  it_sicherheit.nis2_pruefen: gilt
   branche.gastro_trinkwasser_mobil: gilt
   branche.gastro_rueckverfolgbarkeit: gilt
   branche.gastro_kennzeichnung_vorverpackt: gilt_nicht

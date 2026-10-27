@@ -3179,14 +3179,14 @@ eintraege:
 - de: 'Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Liegt dein Umsatz über der Kleinunternehmergrenze,
     gilt die Pflicht sicher – offen ist dann nur, ob monatlich oder vierteljährlich. Den Rhythmus legt das Finanzamt fest – er steht im Schreiben des Finanzamts. Weißt du ihn nicht und kennt Amtlos die
     Steuer des Vorjahres nicht, rechnet Amtlos vorläufig mit monatlich – das ist der frühere Termin; vierteljährlich wäre zu spät, wenn das Finanzamt monatlich verlangt. Hast du 2026 oder später gegründet,
-    gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG). Eine Dauerfristverlängerung bleibt möglich, auch wenn du als Neugründer monatlich abgibst: Die Voranmeldung
-    ist dann einen Monat später fällig (§ 18 Abs. 1 UStG, §§ 46 ff. UStDV), und du zahlst einmal im Jahr eine Sondervorauszahlung – siehe „Sondervorauszahlung zur Umsatzsteuer leisten“. Amtlos bereitet
+    gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG). Eine Dauerfristverlängerung bleibt auf Antrag möglich, auch wenn du als Neugründer monatlich abgibst: Die Voranmeldung
+    ist dann einen Monat später fällig (§ 18 Abs. 6 UStG, §§ 46 bis 48 UStDV), und du zahlst einmal im Jahr eine Sondervorauszahlung – siehe „Sondervorauszahlung zur Umsatzsteuer leisten“. Amtlos bereitet
     die Zahlen vor; du übermittelst selbst.'
   en: 'Anyone who shows VAT on invoices files an advance return via ELSTER monthly or quarterly, depending on last year''s tax. If your turnover is above the small business limit, the obligation definitely
     applies – the only open question is whether monthly or quarterly. The tax office sets the frequency – it is stated in the tax office''s letter. If you don''t know it and Amtlos does not know last year''s
     tax, Amtlos provisionally assumes monthly – the earlier deadline; quarterly would be too late if the tax office requires monthly returns. If you founded in 2026 or later, from 2027 you file monthly
-    in the founding year and the following year (§ 18(2) sentence 4 UStG). A permanent deadline extension (Dauerfristverlängerung) remains possible, even if you file monthly as a new business: the advance
-    return is then due one month later (§ 18(1) UStG, §§ 46 et seq. UStDV), and you make a special advance payment (Sondervorauszahlung) once a year – see “Make the special advance VAT payment”. Amtlos
+    in the founding year and the following year (§ 18(2) sentence 4 UStG). A permanent deadline extension (Dauerfristverlängerung) remains possible on application, even if you file monthly as a new business: the advance
+    return is then due one month later (§ 18(6) UStG, §§ 46 to 48 UStDV), and you make a special advance payment (Sondervorauszahlung) once a year – see “Make the special advance VAT payment”. Amtlos
     prepares the figures; you submit them yourself.'
 - de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung. Das gilt auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und für
     Gewerbetreibende, denen das Finanzamt keine Buchführungspflicht mitgeteilt hat. Die Anlage EÜR übermittelst du mit der Einkommensteuer- bzw. Feststellungserklärung, also in denselben Fristen (§ 149
@@ -3335,8 +3335,8 @@ eintraege:
 - de: Daten dürfen nur so lange gespeichert werden, wie es für den Zweck nötig ist. Gesetzliche Aufbewahrungsfristen, etwa nach § 147 AO und § 257 HGB, gehen vor (Art. 17 Abs. 3 Buchst. b DSGVO); danach
     löschst du.
   en: Data may only be stored as long as necessary for the purpose. Statutory retention periods, for example under § 147 AO and § 257 HGB, take precedence (Art. 17(3)(b) GDPR); after that, you delete.
-- de: Dein Betrieb ist groß genug (mindestens 50 Beschäftigte oder mehr als 10 Mio. € Umsatz) oder in einer Branche, für die NIS2 auch ohne Größenschwelle gelten kann.
-  en: Your business is large enough (at least 50 employees or more than €10 million turnover) or in a sector to which NIS2 may apply regardless of size.
+- de: Dein Betrieb ist groß genug (mindestens 50 Beschäftigte oder mehr als 10 Mio. € Umsatz) oder in einer Branche, in der NIS2 gelten kann.
+  en: Your business is large enough (at least 50 employees or more than €10 million turnover) or in a sector in which NIS2 may apply.
 - de: Der Vertrag regelt, wie der Dienstleister die Daten nach deinen Weisungen verarbeitet; du schließt ihn vor Beginn der Verarbeitung ab. Einen Auftragsverarbeitungsvertrag brauchst du etwa mit IT-Hoster,
     Cloud-Anbieter, Newsletter-Tool oder Kassen-Cloud. Keinen brauchst du mit Steuerberatung, Rechtsanwälten, Banken, der Post oder einem Lohnbüro mit eigener Fachverantwortung – sie sind selbst Verantwortliche.
     Amtlos führt die Liste deiner Dienstleister und legt die Verträge ab.
@@ -3491,10 +3491,10 @@ eintraege:
   en: Social security notifications can only be made via system-certified programs or completion aids such as sv.net – Amtlos works with a payroll partner for this.
 - de: Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, IT-Hoster, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.
   en: You conclude a data processing agreement (DPA) with service providers that process data for you (e.g. cloud, IT host, newsletter tool).
-- de: NIS2 betrifft Unternehmen bestimmter Sektoren ab einer bestimmten Größe – in der Regel ab 50 Beschäftigten oder mehr als 10 Mio. € Jahresumsatz und Jahresbilanzsumme. Unabhängig von der Größe erfasst
+- de: NIS2 betrifft Unternehmen bestimmter Sektoren ab einer bestimmten Größe – in der Regel ab 50 Beschäftigten oder mehr als 10 Mio. € Jahresumsatz und Jahresbilanzsumme. Liegt deine Bilanzsumme bei höchstens 10 Mio. €, bist du trotzdem nicht erfasst. Unabhängig von der Größe erfasst
     sind unter anderem Vertrauensdiensteanbieter, Registries von Top-Level-Domains, DNS-Diensteanbieter und Anbieter öffentlicher Telekommunikationsnetze (§ 28 Abs. 3 BSIG). Wer betroffen ist, muss sich
     beim BSI registrieren und Sicherheitsvorfälle melden. Beantworte die Frage im Profil, sobald du es weißt.
-  en: NIS2 affects companies in certain sectors above a certain size – usually from 50 employees or more than €10 million in annual turnover and annual balance sheet total. Regardless of size, it covers,
+  en: NIS2 affects companies in certain sectors above a certain size – usually from 50 employees or more than €10 million in annual turnover and annual balance sheet total. If your balance sheet total is no more than €10 million, you are nevertheless not covered. Regardless of size, it covers,
     among others, trust service providers, top-level domain registries, DNS service providers and providers of public telecommunications networks (§ 28(3) BSIG). Anyone covered must register with the BSI
     and report security incidents. Answer the question in your profile as soon as you know.
 - de: Nach Art. 50 KI-Verordnung müssen Menschen erkennen können, dass sie mit einer KI interagieren (Abs. 1, seit 2.8.2026). Anbieter generativer KI-Systeme kennzeichnen deren Ausgaben maschinenlesbar
@@ -4225,8 +4225,8 @@ eintraege:
   en: Now applies to every employer, even before you have entered the wage tax filing period.
 - de: Weißt du den Rhythmus nicht, rechnet Amtlos jetzt vorläufig mit monatlichen Terminen – dem früheren Termin – statt vierteljährlich. Hast du 2026 oder später gegründet, zeigt Amtlos ab 2027 im Gründungsjahr und im Folgejahr monatliche Termine.
   en: If you don't know the frequency, Amtlos now provisionally assumes monthly deadlines – the earlier deadline – instead of quarterly. If you founded in 2026 or later, Amtlos shows monthly deadlines from 2027 in the founding year and the following year.
-- de: 'Ergänzt: Eine Dauerfristverlängerung bleibt auch bei monatlicher Abgabe als Neugründer möglich (mit Sondervorauszahlung).'
-  en: 'Added: a permanent deadline extension (Dauerfristverlängerung) remains possible even if you file monthly as a new business (with a special advance payment).'
+- de: 'Ergänzt: Eine Dauerfristverlängerung bleibt auf Antrag auch bei monatlicher Abgabe als Neugründer möglich (§ 18 Abs. 6 UStG, §§ 46 bis 48 UStDV; mit Sondervorauszahlung).'
+  en: 'Added: a permanent deadline extension (Dauerfristverlängerung) remains possible on application even if you file monthly as a new business (§ 18(6) UStG, §§ 46 to 48 UStDV; with a special advance payment).'
 - de: Hast du 2026 oder später gegründet, gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG).
   en: If you founded in 2026 or later, from 2027 you file monthly in the founding year and the following year (§ 18(2) sentence 4 UStG).
 - de: Erstes Kalenderjahr, in dem Neugründer im Gründungs- und Folgejahr die USt-Voranmeldung wieder monatlich abgeben (§ 18 Abs. 2 Satz 4 UStG; Satz 6 gilt nur für 2021 bis 2026)
@@ -4235,7 +4235,9 @@ eintraege:
   en: You work in health, care or cosmetics.
 - de: In Gesundheit, Pflege und Kosmetik erscheint der Eintrag jetzt als „hängt ab“, solange du nichts zu deiner Datenverarbeitung angegeben hast.
   en: In health, care and cosmetics, this entry now appears as "depends" as long as you have not provided any details about your data processing.
-- de: Dein Betrieb ist kein Kleinstbetrieb außerhalb der IT-Branche, oder bei „Andere“ lag der Umsatz im Vorjahr über 10 Mio. €.
-  en: Your business is not a micro business outside the IT sector, or with "Other" your turnover last year was above €10 million.
-- de: Bei der Branche „Andere“ erscheint der Eintrag jetzt auch unter 10 Beschäftigten als „hängt ab“, solange du keinen Umsatz angegeben hast.
-  en: With the industry "Other", this entry now also appears as "depends" below 10 employees as long as you have not entered your turnover.
+- de: Dein Betrieb hat mindestens 50 Beschäftigte, oder er ist in einer Branche, in der NIS2 gelten kann, und der Umsatz im Vorjahr lag über 10 Mio. €. Liegt deine Bilanzsumme bei höchstens 10 Mio. €, bist du trotzdem nicht erfasst.
+  en: Your business has at least 50 employees, or it is in a sector in which NIS2 may apply and your turnover last year was above €10 million. If your balance sheet total is no more than €10 million, you are nevertheless not covered.
+- de: Erst ab 50 Beschäftigten ohne Weiteres; darunter in IT, Gesundheit und Pflege, Transport und Logistik, Gastronomie und Lebensmittel sowie „Andere“ nur bei mehr als 10 Mio. € Umsatz – ohne Umsatzangabe „hängt ab“.
+  en: Only from 50 employees without further conditions; below that, in IT, health and care, transport and logistics, hospitality and food, and "Other" only with more than €10 million turnover – without a turnover figure, "depends".
+- de: Auch in Gesundheit und Pflege, Transport und Logistik sowie Gastronomie und Lebensmittel fragt Amtlos jetzt, ob NIS2 für dich gilt, solange du keinen Umsatz angegeben hast.
+  en: In health and care, transport and logistics, and hospitality and food, Amtlos now also asks whether NIS2 applies to you as long as you have not entered your turnover.

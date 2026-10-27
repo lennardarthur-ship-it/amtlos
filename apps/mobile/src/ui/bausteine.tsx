@@ -839,14 +839,15 @@ function ListenRahmen({ label, rolle, children }: { label: string; rolle?: "radi
  * Große Antwortkarte (Fragen im Pflichten-Check): eine Karte je Möglichkeit, gewählt mit Rahmen in Indigo und
  * Radiokreis bzw. Kästchen – wie in den besten Frage-Antwort-Apps, mit großen Tippflächen.
  */
-function AntwortKarte({ text, an, rolle, onPress, unter }: { text: string; an: boolean; rolle: "radio" | "checkbox"; onPress: () => void; /** R12: kleine Zeile darunter, z. B. „aus deiner Branche“ */ unter?: string }) {
+function AntwortKarte({ text, an, rolle, onPress, unter, hilfe }: { text: string; an: boolean; rolle: "radio" | "checkbox"; onPress: () => void; /** R12: kleine Zeile darunter, z. B. „aus deiner Branche“ */ unter?: string; /** E-217: Hilfetext zur Antwort, immer sichtbar */ hilfe?: string }) {
   const f = useFarben();
   return (
     <Pressable
       accessibilityRole={rolle}
       accessibilityState={{ checked: an }}
       aria-checked={an}
-      accessibilityLabel={unter ? `${text}, ${unter}` : text}
+      accessibilityLabel={[text, unter].filter(Boolean).join(", ")}
+      accessibilityHint={hilfe}
       onPress={() => {
         if (istNativ) void Haptics.selectionAsync();
         onPress();
@@ -860,6 +861,7 @@ function AntwortKarte({ text, an, rolle, onPress, unter }: { text: string; an: b
       )}
       <View style={{ flex: 1 }}>
         <T fett={an}>{text}</T>
+        {hilfe ? <T v="caption" leise stil={{ marginTop: 4 }}>{hilfe}</T> : null}
         {unter ? <T v="caption" leise stil={{ marginTop: 2 }}>{unter}</T> : null}
       </View>
     </Pressable>
@@ -908,14 +910,14 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
 }
 
 /** Mehrfachauswahl als Chips mit Kästchen (Checkbox-Semantik), z. B. Allergene. */
-export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel, gross }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string; herkunft?: string }[]; hilfe?: string; ohneLabel?: boolean; gross?: boolean }) {
+export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel, gross }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string; herkunft?: string; hilfe?: string }[]; hilfe?: string; ohneLabel?: boolean; gross?: boolean }) {
   if (gross)
     return (
       <View accessibilityLabel={label} style={{ gap: 10, marginTop: ohneLabel ? 8 : 20 }}>
         {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
         {optionen.map((o) => {
           const an = werte.includes(o.wert);
-          return <AntwortKarte key={o.wert} text={o.text} an={an} unter={an ? o.herkunft : undefined} rolle="checkbox" onPress={() => aendern(mehrfachUmschalten(werte, o.wert, optionen))} />;
+          return <AntwortKarte key={o.wert} text={o.text} an={an} unter={an ? o.herkunft : undefined} hilfe={o.hilfe} rolle="checkbox" onPress={() => aendern(mehrfachUmschalten(werte, o.wert, optionen))} />;
         })}
       </View>
     );
