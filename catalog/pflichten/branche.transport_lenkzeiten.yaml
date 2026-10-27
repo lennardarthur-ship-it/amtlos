@@ -1,7 +1,7 @@
 # Katalog H.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.transport_lenkzeiten
-version: 5
+version: 6
 katalog_nr: H.5
 titel:
   de: Lenk- und Ruhezeiten einhalten und mit dem Fahrtenschreiber aufzeichnen
@@ -55,8 +55,7 @@ kosten: null
 sanktion:
   text:
     de: 'Bußgeld bis 30.000 € für dich als Unternehmer, wenn du nicht dafür sorgst, dass deine Fahrer Lenkzeiten, Fahrtunterbrechungen und Ruhezeiten einhalten (§ 8a Abs. 1 Nr. 2, Abs. 4 FPersG); für Fahrer bis 5.000 € (§ 8a Abs. 2 Nr. 1, Abs. 4 FPersG). Verstöße beim Fahrtenschreiber ahndet § 8 FPersG in Verbindung mit der FPersV.'
-  schwere: mittel
-dringend_ohne_termin: true
+  schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -74,10 +73,11 @@ quellen:
 fachlich_zu_pruefen:
 - 'Prüfvermerk Rechtsanwalt 22.10.2026: Geltungsbereich (ab 3,5 t, grenzüberschreitend ab 2,5 t seit 1.7.2026), Ausnahmen (Werkverkehr, Art. 3 Buchst. aa), Auslese- und Aufbewahrungsfristen (§ 2a FPersV), Sanktion § 8a FPersG und Hinweis § 8 FPersG/FPersV übernommen; Ausnahmen nicht im Auslöser'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'E-226: Einstufung der Folgen wieder „hoch“ auf Anweisung des Rechtsanwalts vom 27.10.2026 (v6, Text der Folgen unverändert) – die vorläufige Senkung der Vorprüfung ist damit aufgehoben; das Feld „dringend ohne Termin“ entfällt (bei „hoch“ dieselbe Wirkung auf „Heute“, der Validator verlangt es)'
 pruefung:
   status: freigegeben
   geprueft_von:
     - recht
-  geprueft_am: '2026-10-23'
-  geprueft_version: 5
-  bestaetigt_am: '2026-10-23'
+  geprueft_am: '2026-10-27'
+  geprueft_version: 6
+  bestaetigt_am: '2026-10-27'

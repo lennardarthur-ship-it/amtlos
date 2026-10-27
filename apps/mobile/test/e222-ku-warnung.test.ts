@@ -73,7 +73,8 @@ describe("E-222: Texte aus bestätigtem Wortlaut, neue Version ohne Vermerk", ()
   it("Kurztext nennt beide Grenzen und die Folge; Erklärung mit den Sätzen aus „Grenze überschritten“ und „Ab 1. Januar“", () => {
     for (const id of ["steuern.kleinunternehmer_warnung_80", "steuern.kleinunternehmer_warnung_95"]) {
       const p = pflicht(id);
-      expect(p.version, id).toBe(7);
+      // E-226: v7 vom Steuerberater bestätigt; v8 nur mit ergänzter Fundstelle (§ 19 Abs. 1 Satz 1 UStG, Abschnitt 19.1 UStAE)
+      expect(p.version, id).toBe(8);
       expect(p.kurz.de, id).toContain("25.000 €");
       expect(p.kurz.de, id).toContain("100.000 €");
       // Wortlaut aus steuern.kleinunternehmer_grenze_ueberschritten v7 (kurz) und steuern.kleinunternehmer_naechstes_jahr v6

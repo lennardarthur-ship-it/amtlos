@@ -20,12 +20,13 @@ gruende:
 offen: []
 erledigt:
 # E-223: zwei neue Einträge im Entwurf (Preisermäßigung § 11 PAngV, Werbe-E-Mails § 7 UWG)
+# E-226: vom Rechtsanwalt am 27.10.2026 in seiner Fassung (v2) freigegeben
 - id: online.preisermaessigung
   punkt: 'E-223: neu als Entwurf – Text nach dem Wortlaut von § 11 Abs'
-  grund: entwurf_e223
+  grund: neu_geprueft
 - id: online.werbe_email_einwilligung
   punkt: 'E-223: neu als Entwurf – Text nach dem Wortlaut von § 7 Abs.'
-  grund: entwurf_e223
+  grund: neu_geprueft
 # E-206: monatlicher Rhythmus „je Kalenderjahr“ für Neugründer ab 2027 und Hinweis bei der Angabe „vierteljährlich“ – vom
 # Steuerberater mit v7 am 26.10.2026 bestätigt (E-213, PRUEFLISTE T-237)
 - id: steuern.ust_voranmeldung

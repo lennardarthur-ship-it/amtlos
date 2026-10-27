@@ -1,7 +1,7 @@
-# Katalog G.76 · E-223 (Befund des externen Prüfers: Pflicht fehlte) – neu als Entwurf, noch nicht fachlich geprüft
+# Katalog G.76 · E-223 (Befund des externen Prüfers: Pflicht fehlte) – neu als Entwurf; v2 (E-226): Ergänzungen des Rechtsanwalts wörtlich übernommen, damit freigegeben
 schema_version: 1
 id: online.preisermaessigung
-version: 1
+version: 2
 katalog_nr: G.76
 titel:
   de: Bei Preisermäßigungen den niedrigsten Preis der letzten 30 Tage angeben
@@ -9,12 +9,7 @@ kurz:
   de: Gibst du Verbrauchern eine Preisermäßigung für eine Ware bekannt, nennst du auch den niedrigsten Gesamtpreis, den du in den
     30 Tagen davor verlangt hast.
 erklaerung:
-  de: 'Wer Verbrauchern Gesamtpreise angeben muss, nennt bei jeder Bekanntgabe einer Preisermäßigung für eine Ware den niedrigsten
-    Gesamtpreis, den er innerhalb der letzten 30 Tage vor der Anwendung der Preisermäßigung gegenüber Verbrauchern angewendet hat
-    (§ 11 Abs. 1 PAngV). Bei einer schrittweisen, ohne Unterbrechung ansteigenden Preisermäßigung darf es der niedrigste
-    Gesamtpreis vor Beginn dieser Ermäßigung sein (§ 11 Abs. 2 PAngV). Das gilt nicht für individuelle Preisermäßigungen und
-    nicht für schnell verderbliche Waren oder Waren mit kurzer Haltbarkeit, wenn der Preis wegen drohenden Verderbs oder
-    drohenden Ablaufs der Haltbarkeit gesenkt wird und du das für Verbraucher deutlich machst (§ 11 Abs. 4 PAngV).'
+  de: 'Wer Verbrauchern Gesamtpreise angeben muss, nennt bei jeder Bekanntgabe einer Preisermäßigung für eine Ware den niedrigsten Gesamtpreis, den er innerhalb der letzten 30 Tage vor der Anwendung der Preisermäßigung gegenüber Verbrauchern angewendet hat (§ 11 Abs. 1 PAngV). Eine Ermäßigung in Prozent oder ein durchgestrichener Preis muss sich auf diesen niedrigsten Preis der letzten 30 Tage beziehen (EuGH, Urteil vom 26.9.2024, C-330/23). Bei einer schrittweisen, ohne Unterbrechung ansteigenden Preisermäßigung darf es der niedrigste Gesamtpreis vor Beginn dieser Ermäßigung sein (§ 11 Abs. 2 PAngV). Musst du nur den Grundpreis angeben (§ 4 Abs. 2 PAngV), gilt das entsprechend für den Grundpreis (§ 11 Abs. 3 PAngV). Das gilt nicht für individuelle Preisermäßigungen und nicht für schnell verderbliche Waren oder Waren mit kurzer Haltbarkeit, wenn der Preis wegen drohenden Verderbs oder drohenden Ablaufs der Haltbarkeit gesenkt wird und du das für Verbraucher deutlich machst (§ 11 Abs. 4 PAngV).'
 rechtsgrundlage:
 - § 11 PAngV
 kategorie: online
@@ -47,8 +42,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: 'Bußgeld bis 25.000 €, wenn der niedrigste Gesamtpreis nicht, nicht richtig oder nicht vollständig angegeben ist (§ 20 Nr. 1
-      PAngV in Verbindung mit § 3 Abs. 1 Satz 1 Nr. 2, Abs. 2 WiStrG 1954).'
+    de: 'Bußgeld bis 25.000 €, wenn der niedrigste Gesamtpreis nicht, nicht richtig oder nicht vollständig angegeben ist (§ 20 Nr. 1 PAngV in Verbindung mit § 3 Abs. 1 Satz 1 Nr. 2, Abs. 2 WiStrG 1954). Außerdem können Mitbewerber und Verbände abmahnen (§§ 3a, 8 UWG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -66,7 +60,11 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'E-223: neu als Entwurf – Text nach dem Wortlaut von § 11 Abs. 1, 2 und 4 PAngV (gesetze-im-internet.de, 27.10.2026; Abs. 3 – nur Grundpreis – nicht erwähnt); Auslöser nur mit bestehenden Angaben (Verbraucher und Waren, § 11 gilt nur für Waren; „digital“ nicht aufgenommen); Bußgeld wie bei online.preisangaben (§ 20 Nr. 1 PAngV nennt § 11 Abs. 1 ausdrücklich) – bitte ganz prüfen (Rechtsanwalt, PRUEFLISTE T-313)'
+- 'E-226: Rechtsanwalt 27.10.2026 „anpassen“ – seine drei Ergänzungen wörtlich übernommen (v2): Satz zum Bezug einer Ermäßigung in Prozent bzw. eines durchgestrichenen Preises auf den niedrigsten Preis der letzten 30 Tage (EuGH C-330/23), Satz zum Grundpreis (§ 11 Abs. 3 PAngV, von § 20 Nr. 1 PAngV einbezogen), Abmahnung durch Mitbewerber und Verbände (§§ 3a, 8 UWG) in den Folgen; Auslöser und Einstufung „mittel“ von ihm bestätigt. So übernommen gilt der Eintrag ohne erneute Vorlage als freigegeben (Register freigaben.yaml)'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - recht
+  geprueft_am: '2026-10-27'
+  geprueft_version: 2
+  bestaetigt_am: '2026-10-27'

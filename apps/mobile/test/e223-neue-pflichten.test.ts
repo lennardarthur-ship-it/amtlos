@@ -11,21 +11,22 @@ const SHOP: Profil = { "taetigkeit.branchen": ["onlinehandel"], rechtsform: "ein
 const NEU = ["online.preisermaessigung", "online.werbe_email_einwilligung"];
 
 describe("E-223: neue Einträge im Entwurf", () => {
-  it("im Katalog als Entwurf, mit Rechtsgrundlage und Quelle bei gesetze-im-internet.de", () => {
+  // E-226: vom Rechtsanwalt am 27.10.2026 in seiner Fassung (v2) freigegeben – nicht mehr Entwurf
+  it("im Katalog (seit E-226 freigegeben), mit Rechtsgrundlage und Quelle bei gesetze-im-internet.de", () => {
     for (const id of NEU) {
       const p = KATALOG.pflichten.find((x) => x.id === id) as unknown as { pruefung: { status: string }; rechtsgrundlage: string[]; quellen: { url: string }[] };
-      expect(p.pruefung.status, id).toBe("entwurf");
+      expect(p.pruefung.status, id).toBe("freigegeben");
       expect(p.rechtsgrundlage.length).toBeGreaterThan(0);
       expect(p.quellen.some((q) => q.url.startsWith("https://www.gesetze-im-internet.de/"))).toBe(true);
     }
   });
-  it("Onlineshop an Verbraucher mit Newsletter: beide gelten, ohne Prüfvermerk", () => {
+  it("Onlineshop an Verbraucher mit Newsletter: beide gelten, seit E-226 mit Prüfvermerk", () => {
     const a = auswertung(SHOP, "2026-10-27");
     for (const id of NEU) {
       const p = a.gilt.find((x) => x.id === id);
       expect(p, id).toBeDefined();
-      expect(p!.geprueft).toBe(false);
-      expect(p!.pruefVermerk).toBeNull();
+      expect(p!.geprueft).toBe(true);
+      expect(p!.pruefVermerk).toMatch(/Rechtsanwalt/);
     }
     expect(T.pflichten_quelle).toMatch(/fachlich noch nicht geprüft/);
   });

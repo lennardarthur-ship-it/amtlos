@@ -116,7 +116,8 @@ describe("E-197: Prüfvermerk nur aus schriftlich bestätigten Freigaben", () =>
     // E-216: Umsatzsteuer-Voranmeldung v8 (Satz zur Dauerfristverlängerung) wartet auf den Steuerberater (T-282) – 35 → 34
     // E-217: Voranmeldung v9 (Steuerberater) sowie Datenschutzbeauftragter und NIS2 (Rechtsanwalt) am 27.10.2026 bestätigt – 166/35
     // E-222: Kleinunternehmer-Warnungen 80 %/95 % v7 warten auf den Steuerberater (T-310) – 35 → 33
-    expect(ROLLEN.map(zahl)).toEqual([166, 33, 27, 14]);
+    // E-226: Warnungen bestätigt (Steuerberater 35), zwei neue Einträge in der Fassung des Rechtsanwalts freigegeben (166 → 168)
+    expect(ROLLEN.map(zahl)).toEqual([168, 35, 27, 14]);
     // die 17 von E-196 zurückgestuften Einträge zeigen den Vermerk wieder – ihre Version ist die bestätigte
     for (const id of ["steuern.buchfuehrungspflicht", "steuern.e_bilanz", "steuern.oss_erklaerung", "steuern.euer", "steuern.feststellungserklaerung", "gesellschaft.jahresabschluss_personenhandel",
       "arbeitsschutz.arbeitsmedizinische_vorsorge", "gesellschaft.gesellschaftsvertrag_notar", "gesellschaft.handelsregister_anmeldung", "gesellschaft.transparenzregister", "gesellschaft.geschaeftsbriefe_pflichtangaben",

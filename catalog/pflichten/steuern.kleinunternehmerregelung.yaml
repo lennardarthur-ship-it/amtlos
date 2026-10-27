@@ -1,7 +1,7 @@
 # Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.kleinunternehmerregelung
-version: 3
+version: 4
 katalog_nr: C.23
 titel:
   de: Kleinunternehmergrenzen im Blick behalten
@@ -22,6 +22,8 @@ begriffe:
     de: Wer wenig Umsatz macht, kann ohne Umsatzsteuer abrechnen.
 rechtsgrundlage:
 - § 19 UStG
+- § 19 Abs. 1 Satz 1 UStG
+- Abschnitt 19.1 UStAE
 kategorie: steuern
 ausloeser:
   feld: profil.ust.kleinunternehmer
@@ -52,11 +54,12 @@ quellen:
 - titel: Umsatzsteuergesetz § 19
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
-fachlich_zu_pruefen: []
+fachlich_zu_pruefen:
+- 'E-226: Fundstelle für die Regel, dass schon der Umsatz steuerpflichtig ist, mit dem die Grenze von 100.000 € überschritten wird, laut Steuerberater 27.10.2026: § 19 Abs. 1 Satz 1 UStG (Satz 1 enthält beide Grenzen), Abschnitt 19.1 UStAE (BMF-Schreiben vom 18.03.2025) – in der Rechtsgrundlage ergänzt (v4), Text unverändert'
 pruefung:
   status: freigegeben
   geprueft_von:
     - steuern
-  geprueft_am: '2026-10-23'
-  geprueft_version: 3
-  bestaetigt_am: '2026-10-23'
+  geprueft_am: '2026-10-27'
+  geprueft_version: 4
+  bestaetigt_am: '2026-10-27'

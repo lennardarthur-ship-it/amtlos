@@ -1,7 +1,7 @@
-# Katalog G.77 · E-223 (Befund des externen Prüfers: Pflicht fehlte) – neu als Entwurf, noch nicht fachlich geprüft
+# Katalog G.77 · E-223 (Befund des externen Prüfers: Pflicht fehlte) – neu als Entwurf; v2 (E-226): Änderungen des Rechtsanwalts wörtlich übernommen, damit freigegeben
 schema_version: 1
 id: online.werbe_email_einwilligung
-version: 1
+version: 2
 katalog_nr: G.77
 titel:
   de: Werbe-E-Mails nur mit Einwilligung verschicken
@@ -9,16 +9,10 @@ kurz:
   de: Werbung per E-Mail, etwa einen Newsletter, schickst du nur an Empfänger, die vorher ausdrücklich eingewilligt haben – ohne
     Einwilligung nur in den engen Grenzen für eigene Kunden.
 erklaerung:
-  de: 'Werbung mit elektronischer Post ohne vorherige ausdrückliche Einwilligung des Adressaten ist eine unzumutbare Belästigung
-    (§ 7 Abs. 2 Nr. 2 UWG) – gegenüber Verbrauchern wie gegenüber Unternehmen. Ohne Einwilligung darfst du nur werben, wenn alle
-    vier Voraussetzungen des § 7 Abs. 3 UWG erfüllt sind: Du hast die E-Mail-Adresse im Zusammenhang mit dem Verkauf einer Ware
-    oder Dienstleistung vom Kunden erhalten, du wirbst damit für eigene ähnliche Waren oder Dienstleistungen, der Kunde hat nicht
-    widersprochen, und du weist ihn bei der Erhebung der Adresse und bei jeder Verwendung klar und deutlich darauf hin, dass er
-    jederzeit widersprechen kann, ohne dass andere als die Übermittlungskosten nach den Basistarifen entstehen. Jede Werbe-E-Mail
-    braucht außerdem eine gültige Adresse, an die der Empfänger die Aufforderung richten kann, solche Nachrichten einzustellen
-    (§ 7 Abs. 2 Nr. 3 Buchst. c UWG).'
+  de: 'Werbung mit elektronischer Post ohne vorherige ausdrückliche Einwilligung des Adressaten ist eine unzumutbare Belästigung (§ 7 Abs. 2 Nr. 2 UWG) – gegenüber Verbrauchern wie gegenüber Unternehmen. Ohne Einwilligung darfst du nur werben, wenn alle vier Voraussetzungen des § 7 Abs. 3 UWG erfüllt sind: Du hast die E-Mail-Adresse im Zusammenhang mit dem Verkauf einer Ware oder Dienstleistung vom Kunden erhalten, du wirbst damit für eigene ähnliche Waren oder Dienstleistungen, der Kunde hat nicht widersprochen, und du weist ihn bei der Erhebung der Adresse und bei jeder Verwendung klar und deutlich darauf hin, dass er jederzeit widersprechen kann, ohne dass andere als die Übermittlungskosten nach den Basistarifen entstehen. Jede Werbe-E-Mail braucht außerdem eine gültige Adresse, an die der Empfänger die Aufforderung richten kann, solche Nachrichten einzustellen (§ 7 Abs. 2 Nr. 3 Buchst. c UWG). Die Einwilligung musst du nachweisen können (Art. 7 Abs. 1 DSGVO); üblich ist dafür das Double-Opt-in mit Bestätigungs-E-Mail.'
 rechtsgrundlage:
 - § 7 Abs. 2 Nr. 2, Abs. 3 UWG
+- Art. 6 Abs. 1, Art. 7 DSGVO
 kategorie: online
 branchen:
 - onlinehandel
@@ -38,8 +32,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: 'Kein Bußgeld – § 20 UWG erfasst Werbe-E-Mails nicht. Mitbewerber und Verbände können Beseitigung und Unterlassung verlangen
-      (§ 8 Abs. 1, 3 UWG), meist mit einer Abmahnung.'
+    de: 'Nach dem UWG kein Bußgeld (§ 20 UWG erfasst nur Telefonwerbung). Mitbewerber und Verbände können Beseitigung und Unterlassung verlangen (§ 8 Abs. 1, 3 UWG), meist mit einer Abmahnung; der Empfänger selbst kann Unterlassung verlangen. Fehlt die Einwilligung, kann die Datenschutzaufsicht ein Bußgeld verhängen (Art. 83 Abs. 5 DSGVO), und der Empfänger kann Schadensersatz fordern (Art. 82 DSGVO).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -57,7 +50,11 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - 'E-223: neu als Entwurf – Text nach dem Wortlaut von § 7 Abs. 2 Nr. 2, Nr. 3 Buchst. c und Abs. 3 UWG (gesetze-im-internet.de, 27.10.2026); Auslöser über die bestehende Angabe „Newsletter“ (profil.datenverarbeitung.arten) – andere Werbe-E-Mails ohne Newsletter erfasst die App nicht; Folgen: § 20 Abs. 1 UWG nennt nur Telefonwerbung und automatische Anrufmaschinen (Wortlaut lxgesetze.de, 27.10.2026), daher kein Bußgeld, Ansprüche nach § 8 UWG; Verhältnis zur Einwilligung nach DSGVO (datenschutz.*) nicht erwähnt – bitte ganz prüfen (Rechtsanwalt, PRUEFLISTE T-313)'
+- 'E-226: Rechtsanwalt 27.10.2026 „anpassen“ – Folgen in seiner Fassung ersetzt (nach dem UWG kein Bußgeld; Unterlassung durch Mitbewerber, Verbände und den Empfänger; Bußgeld der Datenschutzaufsicht nach Art. 83 Abs. 5 DSGVO, Schadensersatz nach Art. 82 DSGVO), sein Satz zur Nachweisbarkeit der Einwilligung (Art. 7 Abs. 1 DSGVO, Double-Opt-in) an die Erklärung angefügt, Rechtsgrundlage um „Art. 6 Abs. 1, Art. 7 DSGVO“ ergänzt (v2); Auslöser über „Newsletter“ und Einstufung „mittel“ von ihm bestätigt. So übernommen gilt der Eintrag ohne erneute Vorlage als freigegeben (Register freigaben.yaml)'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - recht
+  geprueft_am: '2026-10-27'
+  geprueft_version: 2
+  bestaetigt_am: '2026-10-27'

@@ -2,7 +2,7 @@
 # v6 (Steuerberater, Runde 2): nur tatsächliche Zahlungseingänge ohne offene Rechnungen (finanzen.umsatz.bezahlt_*), steuerfreie Umsätze herausgerechnet
 schema_version: 1
 id: steuern.kleinunternehmer_grenze_ueberschritten
-version: 7
+version: 8
 katalog_nr: C.23
 titel:
   de: 'Kleinunternehmergrenze überschritten: Umsatzsteuer prüfen'
@@ -21,6 +21,8 @@ erklaerung:
     du sie als Rechnung, kann der angezeigte Wert zu hoch sein. Einnahmen außerhalb von Amtlos sind nicht enthalten.
 rechtsgrundlage:
 - § 19 UStG
+- § 19 Abs. 1 Satz 1 UStG
+- Abschnitt 19.1 UStAE
 - Abschn. 19.2 Abs. 3, 4 UStAE (Fassung vom 18.03.2025)
 kategorie: steuern
 ausloeser:
@@ -130,10 +132,11 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - 'Steuerberater 22.10.2026, Runde 2 – umgesetzt (v6): Umsatzbegriff vereinnahmte Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.). Auslöser über finanzen.umsatz.bezahlt_laufendes_jahr und …_vorjahr: nur tatsächliche Zahlungseingänge auf Rechnungen, Kasse und Sachentnahmen (§ 3 Abs. 1b UStG, bestätigt); offene Rechnungen zählen nicht (§ 14c Abs. 2 UStG) – liegt die Grenze nur mit ihnen darüber, zeigt Amtlos steuern.kleinunternehmer_grenze_offene_rechnungen. Steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App heraus; Anlagenverkäufe kann sie nicht erkennen (Hinweis im Text). Zu prüfen: Wortlaut der Erklärung und Abgrenzung „steuerfrei“ nur mit Hinweis auf die Steuerbefreiung; der Server kennt keine Zahlungseingänge – dort gelten nur die Zweige aus den Profilangaben'
+- 'E-226: Fundstelle für die Regel, dass schon der Umsatz steuerpflichtig ist, mit dem die Grenze von 100.000 € überschritten wird, laut Steuerberater 27.10.2026: § 19 Abs. 1 Satz 1 UStG (Satz 1 enthält beide Grenzen), Abschnitt 19.1 UStAE (BMF-Schreiben vom 18.03.2025) – in der Rechtsgrundlage ergänzt (v8), Text unverändert'
 pruefung:
   status: freigegeben
   geprueft_von:
     - steuern
-  geprueft_am: '2026-10-23'
-  geprueft_version: 7
-  bestaetigt_am: '2026-10-23'
+  geprueft_am: '2026-10-27'
+  geprueft_version: 8
+  bestaetigt_am: '2026-10-27'
