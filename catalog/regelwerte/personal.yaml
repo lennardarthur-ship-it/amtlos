@@ -1,4 +1,4 @@
-# Werte unverändert aus Spezifikation Abschnitt 4, Katalog D und E (E-054). Rechtsgrundlagen ergänzt – fachlich zu prüfen.
+# Werte aus Spezifikation Abschnitt 4, Katalog D und E (E-054), Rechtsgrundlagen ergänzt; Prüfstand je Wert in `pruefung` (E-211, E-213).
 - schema_version: 1
   id: personal.mindestlohn.stunde
   version: 3
@@ -60,7 +60,7 @@
   rechtsgrundlage: ["§ 8 Abs. 1a SGB IV"]
   quellen:
     - { titel: Sozialgesetzbuch IV § 8, url: "https://www.gesetze-im-internet.de/sgb_4/__8.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Dynamische Kopplung an den Mindestlohn – Wert für 2027 bestätigen"]
+  fachlich_zu_pruefen: ["Dynamische Kopplung an den Mindestlohn – 633 € ab 01.01.2027 vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1

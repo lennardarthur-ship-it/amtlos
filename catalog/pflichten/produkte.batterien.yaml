@@ -60,8 +60,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/battdg/__4.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: Herstellerbegriff und Installateur mit Inlandseinkauf als Vertreiber bestätigt; Vertreiberpflichten (Rücknahme von Gerätebatterien) als eigener Hinweis – Eintrag fehlt noch'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: Herstellerbegriff und Installateur mit Inlandseinkauf als Vertreiber bestätigt; Vertreiberpflichten (Rücknahme von Gerätebatterien) als eigener Hinweis – eigener Eintrag produkte.geraetebatterien_ruecknahme (E-223: Notiz nachgezogen)'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: freigegeben

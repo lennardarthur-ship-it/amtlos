@@ -59,8 +59,7 @@ quellen:
 - titel: DSGVO Art. 30
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
   abgerufen: null
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:

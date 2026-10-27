@@ -31,6 +31,16 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
       if (typeof register === "string") f["abgeleitet.ist_eingetragene_gesellschaft"] = register === "eingetragen";
       else delete f["abgeleitet.ist_eingetragene_gesellschaft"];
     }
+    // E-223: „Andere“ (z. B. AG, eG, e. V., Stiftung, ausländische Rechtsform) sagt nur, dass es keine der aufgezählten
+    // Rechtsformen ist – nicht, ob das Unternehmen eine Kapitalgesellschaft, haftungsbeschränkt oder eine juristische Person
+    // bzw. eingetragene Gesellschaft ist. Die drei Gruppen bleiben deshalb unbekannt (E-033): Pflichten, die daran hängen,
+    // zeigt die App als „hängt ab“ statt „trifft nicht zu“ (wie E-206). Vergleiche mit einer bestimmten Rechtsform bleiben
+    // entschieden – „Andere“ ist sicher keine UG.
+    if (rechtsform === "sonstige") {
+      delete f["abgeleitet.ist_kapitalgesellschaft"];
+      delete f["abgeleitet.ist_kapitalgesellschaft_oder_co_kg"];
+      delete f["abgeleitet.ist_eingetragene_gesellschaft"];
+    }
   }
   if (typeof einordnung === "string" && einordnung !== "unklar") f["abgeleitet.ist_gewerbe"] = einordnung === "gewerbe";
   if (typeof gruendung === "string") {

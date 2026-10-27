@@ -116,7 +116,7 @@ async function versionAnlegen(
 ): Promise<{ id: string; neu: boolean }> {
   const vorhanden = await tx.eine<{ id: string; daten: unknown }>(sucheSql, sucheWerte);
   if (vorhanden) {
-    if (kanonisch(vorhanden.daten) !== kanonisch(daten)) {
+    if (!gleicherInhalt(vorhanden.daten, daten)) {
       throw new Error(`${name}: existiert bereits mit anderem Inhalt. Für Änderungen eine neue Version anlegen.`);
     }
     return { id: vorhanden.id, neu: false };
@@ -141,6 +141,21 @@ export async function quellenVerknuepfen(tx: Tx, art: "pflicht_version" | "regel
       [versionId, quelle!.id, q.fundstelle ?? null],
     );
   }
+}
+
+/**
+ * E-223 (Entscheidung zu T-124/T-270): Felder, die nicht zum Inhalt einer Version gehören – interne Notizen der Redaktion
+ * (`fachlich_zu_pruefen`) und der Prüfstand aus dem Register (`pruefung`, von docs/freigabe-katalog/anwenden.py geschrieben;
+ * in der Datenbank entstehen Freigaben nur im Studio, E-039). Wie `NICHT_VERGLICHEN` in anwenden.py: Ändern sie sich, ist
+ * das keine neue Fassung. Der Import vergleicht ohne sie und lässt die gespeicherte Version unverändert (freigegebene
+ * Versionen sind in der Datenbank unveränderlich, Trigger `status_schuetzen`).
+ */
+export const NICHT_INHALT = ["fachlich_zu_pruefen", "pruefung"] as const;
+
+/** Gleicher Inhalt einer Pflicht- bzw. Regelwert-Version, ohne Notizen und Prüfstand (NICHT_INHALT). */
+export function gleicherInhalt(a: unknown, b: unknown): boolean {
+  const ohne = (x: unknown) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).filter(([k]) => !(NICHT_INHALT as readonly string[]).includes(k))) : x);
+  return kanonisch(ohne(a)) === kanonisch(ohne(b));
 }
 
 /** JSON mit sortierten Schlüsseln, damit jsonb-Rundreisen (Schlüsselreihenfolge) nicht als Änderung zählen. */

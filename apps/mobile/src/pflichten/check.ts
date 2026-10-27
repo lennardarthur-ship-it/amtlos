@@ -7,7 +7,7 @@
 import { VORLAGEN, fehlendeAngaben, vorlageFuer, type Betrieb } from "@amtlos/fachlogik";
 // Monatsende-Regel der Fristen: 31.01. + 1 Monat = 28./29.02., 29.02. + 12 Monate = 28.02.
 import { StandardKalender, plusMonate } from "@amtlos/fristen";
-import { SCHRITTE, type Frage } from "@amtlos/i18n";
+import { SCHRITTE, type Frage } from "@amtlos/i18n/fragen";
 import { QUELLFAKTEN, auswerten, entscheidendeSaetze, zuErfragendeFakten, type Ereignis, type Katalog, type Knoten, type Pflicht } from "@amtlos/rules-engine";
 import roh from "./katalog.json";
 import { istGeprueft, offeneRegelwerte, pruefVermerk, type PruefungRoh, type RegelwertRoh } from "./pruefer";
@@ -606,6 +606,24 @@ function bedingung(saetze: string[]): string {
 }
 
 /**
+ * E-223: Gruppen der Rechtsform, die bei „Andere“ unbekannt bleiben (rules-engine, fakten.ts). Ihre Sätze („Dein
+ * Unternehmen ist eine UG oder GmbH“) träfen für „Andere“ nie zu – die Begründung sagt stattdessen, dass es an der
+ * Rechtsform hängt, die die App nicht einzeln kennt. Keine fachliche Aussage, ob die Pflicht gilt.
+ */
+const RECHTSFORM_GRUPPEN = new Set(["abgeleitet.ist_kapitalgesellschaft", "abgeleitet.ist_kapitalgesellschaft_oder_co_kg", "abgeleitet.ist_eingetragene_gesellschaft"]);
+export const ANDERE_RECHTSFORM_GRUND = "Ob das für dich gilt, hängt von deiner Rechtsform ab – „Andere“ kennt die App nicht einzeln. Kläre es mit deinem Steuerberater oder Rechtsanwalt.";
+function rechtsformOffen(k: Knoten): boolean {
+  if (k.art === "vergleich") return k.ergebnis === "unbekannt" && RECHTSFORM_GRUPPEN.has(k.feld);
+  return (k.art === "all" || k.art === "any" || k.art === "not") && k.ergebnis === "unbekannt" && k.kinder.some(rechtsformOffen);
+}
+/** Begründungsbaum ohne die Sätze, die nur wegen der Rechtsform „Andere“ offen sind */
+function ohneRechtsformGruppe(k: Knoten): Knoten {
+  if (k.art === "vergleich") return rechtsformOffen(k) ? { ...k, label: undefined } : k;
+  if (k.art === "all" || k.art === "any" || k.art === "not") return { ...k, kinder: k.kinder.map(ohneRechtsformGruppe), label: rechtsformOffen(k) ? undefined : k.label };
+  return k;
+}
+
+/**
  * R11 (Nutzertest Gründerin #7): Gründungsschritte in zeitlicher Reihenfolge und nach Voraussetzungen – die Voraussetzung
  * (z. B. ELSTER-Konto, ohne eigenen Termin) steht vor dem, was auf sie wartet (Fragebogen). Die übrigen Pflichten bleiben
  * an ihrem Platz; nur die Plätze der Gründungsschritte werden neu belegt.
@@ -658,6 +676,7 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
   const profil = profilMitStand(antworten, stichtag, mitarbeiter);
   const fakten: Record<string, unknown> = { ...Object.fromEntries(Object.entries(profil).filter(([, w]) => w !== null && w !== undefined).map(([k, w]) => [`profil.${k}`, w])), ...Object.fromEntries(Object.entries(finanzen).filter(([k, w]) => k.startsWith("finanzen.") && Number.isFinite(w))) };
   const ereignisse = ereignisseAusStand(profil, stichtag, unterlagen, mitarbeiter);
+  const andere = profil.rechtsform === "sonstige";
   const lohnExtern = profil["personal.lohn_durch"] === "steuerberatung" || profil["personal.lohn_durch"] === "lohnbuero";
   const seit = plusMonate(stichtag, -BESTAND_AB_MONATEN);
   const neuePersonen = mitarbeiter.filter((m) => typeof m.beginn === "string" && ISO.test(m.beginn) && m.beginn > seit && typeof m.name === "string" && m.name.trim()).map((m) => m.name!.trim());
@@ -694,7 +713,9 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       quellen: (p.quellen ?? []).filter((q): q is { titel: string; url: string } => Boolean(q.url)),
       // die Sätze, die das Ergebnis tragen – auch bei zusammengesetzten Auslösern („weil du … und …“)
       // R11 (Nutzertest Tischlerei #2): bei unklaren Pflichten als Bedingung, nicht als Tatsache
-      grund: e.ergebnis === "unbekannt" ? bedingung(entscheidendeSaetze(e.begruendung)) : entscheidendeSaetze(e.begruendung).join(" ") || ("immer" in (p.ausloeser as object) ? IMMER : ""),
+      grund: e.ergebnis === "unbekannt" && andere && rechtsformOffen(e.begruendung)
+        ? [ANDERE_RECHTSFORM_GRUND, bedingung(entscheidendeSaetze(ohneRechtsformGruppe(e.begruendung)))].filter(Boolean).join(" ")
+        : e.ergebnis === "unbekannt" ? bedingung(entscheidendeSaetze(e.begruendung)) : entscheidendeSaetze(e.begruendung).join(" ") || ("immer" in (p.ausloeser as object) ? IMMER : ""),
       vorlage: VORLAGEN_JE_PFLICHT.get(p.id)?.[0] ?? null,
       ...(p.id === ZEIT_JE_PERSON ? { beschaeftigte: zeitPersonen && zeitPersonen.length ? zeitPersonen : null, anzahlPersonen: zeitAnzahl } : {}),
       ...(p.id === AUSWEIS_JE_PERSON ? { beschaeftigte: aktuell.length ? aktuell.map(person) : null } : {}),
@@ -711,7 +732,8 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       offeneFragen: zuErfragendeFakten(e.fehlende_fakten)
         .filter((f) => f.startsWith("profil."))
         .map((f) => f.slice("profil.".length))
-        .filter((f) => FRAGE.has(f)),
+        // E-223: nach „Andere“ fragt die App die Rechtsform nicht noch einmal – genauer kennt sie sie nicht
+        .filter((f) => FRAGE.has(f) && !(andere && f === "rechtsform")),
       geprueft: istGeprueft(p.version, p.pruefung),
       // E-211: mit den Regelwerten (Schwellen, Beträge) der Pflicht, die noch nicht fachlich bestätigt sind
       pruefVermerk: pruefVermerk(p.version, p.pruefung, undefined, offeneRegelwerte(p, REGELWERTE, stichtag)),

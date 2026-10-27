@@ -47,8 +47,7 @@ quellen:
 - titel: HinSchG § 12
   url: https://www.gesetze-im-internet.de/hinschg/__12.html
   abgerufen: '2026-10-21'
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:

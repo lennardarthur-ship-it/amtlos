@@ -57,8 +57,7 @@ quellen:
 - titel: 'DSGVO Art. 83 (gesetze.legal)'
   url: https://gesetze.legal/eu/vo_eu_2016_679/83
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:

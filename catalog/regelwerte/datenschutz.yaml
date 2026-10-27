@@ -1,4 +1,4 @@
-# Werte unverändert aus Spezifikation Abschnitt 4, Katalog F (E-054). Fachlich zu prüfen.
+# Werte aus Spezifikation Abschnitt 4, Katalog F (E-054); Prüfstand je Wert in `pruefung` (E-211, E-213).
 - schema_version: 1
   id: datenschutz.dsb.schwelle_personen
   version: 2

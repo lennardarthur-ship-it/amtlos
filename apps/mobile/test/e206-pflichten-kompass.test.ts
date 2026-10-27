@@ -115,6 +115,8 @@ const UNBEKANNT: Bedingung = { feld: "__e206_unbekannt__", op: "==", wert: true 
 /** Felder, deren Frage „Weiß ich nicht“ anbietet (Optionsschlüssel „unklar“) */
 const MIT_UNKLAR = SCHRITTE.flatMap((s) => s.fragen).filter((f) => f.optionen && "unklar" in f.optionen).map((f) => f.feld);
 
+const RECHTSFORM_GRUPPEN = ["abgeleitet.ist_kapitalgesellschaft", "abgeleitet.ist_kapitalgesellschaft_oder_co_kg", "abgeleitet.ist_eingetragene_gesellschaft"];
+
 function streng(b: Bedingung, fakten: Record<string, unknown>, nurGeplant: Set<string>): Bedingung {
   if ("all" in b) return { ...b, all: b.all.map((x) => streng(x, fakten, nurGeplant)) };
   if ("any" in b) return { ...b, any: b.any.map((x) => streng(x, fakten, nurGeplant)) };
@@ -123,6 +125,8 @@ function streng(b: Bedingung, fakten: Record<string, unknown>, nurGeplant: Set<s
   if ("ereignis" in b) return b.op === "eingetreten" && nurGeplant.has(b.ereignis) ? UNBEKANNT : b;
   // finanzen.* sind keine Fragen, sondern Summen aus Rechnungen und Kasse auf dem Gerät: ohne Einträge gibt es nichts zu warnen
   if (b.feld.startsWith("finanzen.")) return b;
+  // E-223: „Andere“ (AG, eG, e. V. …) sagt nicht, ob das Unternehmen Kapitalgesellschaft, haftungsbeschränkt oder eingetragen ist
+  if (fakten["profil.rechtsform"] === "sonstige" && RECHTSFORM_GRUPPEN.includes(b.feld)) return UNBEKANNT;
   const wert = fakten[b.feld];
   if (wert === "unklar") return UNBEKANNT;
   if ((b.op === "vorhanden" || b.op === "nicht_vorhanden") && (wert === undefined || wert === null)) return UNBEKANNT;
@@ -181,6 +185,9 @@ const PROFILE: Record<string, Profil> = {
   // E-215: Branchen, in denen „ohne Angabe nicht betroffen“ nicht mehr gilt (Datenschutzbeauftragter bzw. NIS2)
   "Pflegedienst GmbH, 15 Beschäftigte, seit 2023": { "taetigkeit.branchen": ["gesundheit_pflege"], rechtsform: "gmbh", gruendungsdatum: "2023-01-01", bundesland: "RP", "beschaeftigte.gesamt": 15 },
   "Andere Branche, 5 Beschäftigte, seit 2021": { "taetigkeit.branchen": ["sonstige"], rechtsform: "einzelunternehmen", gruendungsdatum: "2021-05-01", bundesland: "SH", "beschaeftigte.gesamt": 5 },
+  // E-223: Rechtsform „Andere“ (AG, eG, e. V. …) – bestehend und in Gründung
+  "Rechtsform „Andere“, Onlinehandel, 5 Beschäftigte, seit 2021": { "taetigkeit.branchen": ["onlinehandel"], rechtsform: "sonstige", gruendungsdatum: "2021-05-01", bundesland: "SH", "beschaeftigte.gesamt": 5 },
+  "Rechtsform „Andere“, Café in Gründung, 3 Beschäftigte geplant": { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "sonstige", gruendungsdatum: "2027-02-01", bundesland: "BY", "beschaeftigte.gesamt": 3 },
 };
 const VARIANTEN: Record<string, (p: Profil) => Profil> = {
   "ohne weitere Antworten": (p) => p,

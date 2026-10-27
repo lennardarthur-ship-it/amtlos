@@ -16,8 +16,16 @@ gruende:
   beantwortet: Frage zum Entwurf, die der Prüfer mit seiner Freigabe am 26.10.2026 beantwortet hat (E-201).
   bestaetigt_mit_version: Der Prüfer hat die Fassung mit diesem Punkt am 26.10.2026 per Mail bestätigt (E-213).
   neu_geprueft: Neuer Eintrag mit der Bitte um vollständige Prüfung; der Prüfer hat ihn danach freigegeben (Unterschrift siehe Register).
+  entwurf_e223: Neuer Eintrag im Entwurf (E-223, Befund des externen Prüfers); die App zeigt „noch nicht fachlich geprüft“, die Prüfung läuft mit dem Prüfpaket für die neuen Einträge (PRUEFLISTE T-313).
 offen: []
 erledigt:
+# E-223: zwei neue Einträge im Entwurf (Preisermäßigung § 11 PAngV, Werbe-E-Mails § 7 UWG)
+- id: online.preisermaessigung
+  punkt: 'E-223: neu als Entwurf – Text nach dem Wortlaut von § 11 Abs'
+  grund: entwurf_e223
+- id: online.werbe_email_einwilligung
+  punkt: 'E-223: neu als Entwurf – Text nach dem Wortlaut von § 7 Abs.'
+  grund: entwurf_e223
 # E-206: monatlicher Rhythmus „je Kalenderjahr“ für Neugründer ab 2027 und Hinweis bei der Angabe „vierteljährlich“ – vom
 # Steuerberater mit v7 am 26.10.2026 bestätigt (E-213, PRUEFLISTE T-237)
 - id: steuern.ust_voranmeldung

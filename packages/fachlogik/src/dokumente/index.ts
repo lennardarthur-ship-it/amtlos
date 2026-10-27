@@ -27,7 +27,8 @@ export { ALLERGENE, GETREIDEARTEN, NUSSARTEN, WARNFARBSTOFFE, WEIZENARTEN_FUSSNO
 // E-167 (Sifa-Durchsicht Arbeitsschutz)
 export { ELEKTRO_GRENZWERTE, EXPO_HINWEIS, GHS, PRUEF_VORSCHLAEGE, RISIKO_SKALA, UNTERSCHRIFT_FEHLT, UNTERSCHRIFT_TEXT, UNTERSCHRIFT_THEMEN, mitUnterschriftPflicht, naechstePruefung, risikoEintrag } from "./arbeitsschutz.js";
 export { HAUTSCHUTZ_WEITERE } from "./branchen.js";
-export { SIFA_PRUEFUNG, type SifaEintrag } from "./sifa.js";
+// E-223: SIFA_PRUEFUNG (Zuordnung der Durchsicht Arbeitsschutz mit Ergebnis und Grund je Baustein) ist interne
+// Prüfunterlage und nicht Teil der App – Tests und docs/pruefmappe-arbeitsschutz lesen sie direkt aus ./sifa.js.
 export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } from "./html.js";
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
 export { NACHWG_AUSSCHLUSSFRIST_BEISPIEL, NACHWG_AUSSCHLUSSFRIST_UEBERSTUNDEN, NACHWG_SCHRIFTFORM_HINWEIS, NACHWG_SCHRIFTFORM_PDF, mindestlohnAm, mindesturlaub, minijobGrenzeAm, stundenlohn } from "./personal.js";

@@ -1,4 +1,4 @@
-# Werte unverändert aus Spezifikation Abschnitt 4, Katalog G (E-054). Fachlich zu prüfen.
+# Werte aus Spezifikation Abschnitt 4, Katalog G (E-054); Prüfstand je Wert in `pruefung` (E-211, E-213).
 - schema_version: 1
   id: online.vsbg.schwelle_beschaeftigte
   version: 2

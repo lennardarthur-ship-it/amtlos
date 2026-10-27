@@ -218,7 +218,7 @@ describe("E-176: OHG und KG als eigene Rechtsform", () => {
       expect(f["abgeleitet.ist_kapitalgesellschaft"]).toBe(false);
       expect(f["abgeleitet.ist_kapitalgesellschaft_oder_co_kg"]).toBe(false);
     }
-    // „Andere“ steht nicht mehr für OHG/KG
-    expect(mitAbgeleitetenFakten({ "profil.rechtsform": "sonstige" }, "2026-10-23")["abgeleitet.ist_eingetragene_gesellschaft"]).toBe(false);
+    // „Andere“ steht nicht mehr für OHG/KG – E-223: ob eingetragen (AG, eG, e. V. …), ist damit unbekannt, nicht „nein“
+    expect(mitAbgeleitetenFakten({ "profil.rechtsform": "sonstige" }, "2026-10-23")["abgeleitet.ist_eingetragene_gesellschaft"]).toBeUndefined();
   });
 });

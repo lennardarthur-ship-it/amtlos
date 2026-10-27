@@ -208,10 +208,10 @@ describe("E-217 B2) NIS2 nach den Vorgaben des Rechtsanwalts", () => {
 });
 
 describe("E-217: alle Einträge mit Vermerk", () => {
-  // E-222: die Kleinunternehmer-Warnungen 80 %/95 % v7 (Grenze von 25.000 €) warten auf den Steuerberater (T-310) – 35 → 33
-  it("228 von 228; Rechtsanwalt 166, Steuerberater 35 – seit E-222 226 und Steuerberater 33", () => {
-    expect(pflichten).toHaveLength(228);
-    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual(["steuern.kleinunternehmer_warnung_80", "steuern.kleinunternehmer_warnung_95"]);
+  // E-222: Kleinunternehmer-Warnungen v7 warten auf den Steuerberater (T-310) – 35 → 33; E-223: zwei neue Einträge im Entwurf
+  it("230 Einträge; Rechtsanwalt 166, Steuerberater 33 (E-222, E-223)", () => {
+    expect(pflichten).toHaveLength(230);
+    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual(["online.preisermaessigung", "online.werbe_email_einwilligung", "steuern.kleinunternehmer_warnung_80", "steuern.kleinunternehmer_warnung_95"]);
     const zahl = (r: string) => pflichten.filter((p) => pruefVermerk(p.version, p.pruefung, AM) && p.pruefung!.geprueft_von!.includes(r)).length;
     expect([zahl("recht"), zahl("steuern")]).toEqual([166, 33]);
   });
