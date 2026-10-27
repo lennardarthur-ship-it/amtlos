@@ -87,6 +87,7 @@ import {
   type Konten,
   type RechnungsDaten,
   belegTeilabzug,
+  belegSachkonto,
   datevDebitorenKreditoren,
   gleicherPartner,
   istPersonenkonto,
@@ -99,7 +100,7 @@ import { APP_VERSION } from "../version";
 import { T as TEXT } from "../texte";
 import { utf8 } from "./sicherung";
 import { GUTSCHRIFT_HINWEIS, euBerichtigungen, euMeldeArtVon, istGutschrift, kuImZeitraum, nurSteuerfreieUmsaetze, periodeText, schlussZuAbschlag, zuordnungsTage, uneinbringlichBetraege, uneinbringlichStand } from "./ustAusRechnungen";
-import { ERWERBSSCHWELLE_REGELWERT, igeOhneErwerbsbesteuerung } from "./erwerbsschwelle";
+import { ERWERBSSCHWELLE_REGELWERT, igeOhneErwerbsbesteuerung, igeUnterSchwelle } from "./erwerbsschwelle";
 import { regelwert } from "../pflichten/check";
 import { BELEG_KONFLIKT_GRUND, absenderFuer, neueId, nichtZaehlend, type ProtokollEintrag, type Stand, type Unterlage, guthabenKonten } from "./speicher";
 import { kassenAbdeckung } from "./kasse";
@@ -871,10 +872,21 @@ export function igeNichtGebucht(s: Stand, belege: Beleg[], ku: boolean): Beleg[]
   return igeOhneErwerbsbesteuerung(belege, s.belege, s.profil, regelwert(ERWERBSSCHWELLE_REGELWERT));
 }
 
+/**
+ * E-231 (Steuerberater 27.10.2026, T-323): davon die Erwerbe unter der Erwerbsschwelle ohne Verzicht (Lage „nein“) –
+ * gewöhnliche Einkäufe, im Stapel brutto ohne Steuerschlüssel auf dem Aufwandskonto des Belegs (`igeAlsEinkauf`). Die
+ * übrigen (Lage „offen“) fehlen weiter im Stapel (`igeNichtBuchen`).
+ */
+export function igeAlsEinkauf(s: Stand, belege: Beleg[], ku: boolean): Beleg[] {
+  if (!ku && !nurSteuerfreieUmsaetze(s.unterlagen, s.betrieb)) return [];
+  return igeUnterSchwelle(belege, s.belege, s.profil, regelwert(ERWERBSSCHWELLE_REGELWERT));
+}
+
 export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string> = new Map(), kontenrahmen: Kontenrahmen = s.steuerberatung.kontenrahmen, nummern: Map<string, string> = belegNummern([...s.belege, ...s.belegArchiv]), ku: boolean = istKleinunternehmer(s)): string {
   const summe = { netto: 0, ust: 0, vorsteuer: 0, brutto: 0 };
   const imZ = belegeImZeitraum(s, z);
-  const igeNicht = new Set(igeNichtGebucht(s, imZ, ku).map((b) => b.id));
+  const igeEinkauf = new Set(igeAlsEinkauf(s, imZ, ku).map((b) => b.id));
+  const igeNicht = new Set(igeNichtGebucht(s, imZ, ku).map((b) => b.id).filter((id) => !igeEinkauf.has(id)));
   const zeilen = imZ.map((b) => {
     const sm = belegSummen(b);
     summe.netto += sm.netto_cent;
@@ -886,7 +898,7 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
     // dasselbe Sachkonto wie im Stapel (auch § 13b-Konten, Kontenvorgaben) – seit A-1 im Feld „Gegenkonto“; Belege,
     // die nicht in den Stapel gehen, mit Vermerk
     const imStapel = belegImStapel(b, { kapitalgesellschaft: kapitalgesellschaft(s) });
-    const gebucht = buchungenAusBelegen([b], kontenrahmen, { kleinunternehmer: ku, vorgaben: s.steuerberatung.kontenvorgaben, igeNichtBuchen: igeNicht }).map((x) => x.gegenkonto);
+    const gebucht = buchungenAusBelegen([b], kontenrahmen, { kleinunternehmer: ku, vorgaben: s.steuerberatung.kontenvorgaben, igeNichtBuchen: igeNicht, igeAlsEinkauf: igeEinkauf }).map((x) => x.gegenkonto);
     const konto = [...new Set(gebucht.length ? gebucht : b.steuer.filter((x) => x.brutto_cent).map((x) => konten[x.satz] ?? konten[19] ?? ""))].join(", ");
     const nr = nummern.get(b.id) ?? "";
     return [
@@ -908,8 +920,8 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
       dateinamen.get(b.id) ?? "",
       (b.notiz ?? "").replace(/\s+/g, " "),
       // E-222: innergemeinschaftlicher Erwerb mit Erwerbsteuer (Kz 89/93) statt § 13b
-      b.steuerschuld === "ige" ? `innergemeinschaftlicher Erwerb, Steuer ${betrag(steuerschuldBetrag(b))}${b.lieferant_ust_idnr ? `, USt-IdNr. Lieferant ${b.lieferant_ust_idnr}` : ""}${b.erwerb_datum ? `, Erwerb am ${datumDe(b.erwerb_datum)}` : ""}${igeNicht.has(b.id) ? ", Erwerbsbesteuerung nicht festgestellt (Erwerbsschwelle)" : ""}` : b.steuerschuld ? `§ 13b (${steuerschuldText(b.steuerschuld)}), Steuer ${betrag(steuerschuldBetrag(b))}` : "",
-      igeNicht.has(b.id) ? "nein – Erwerbsschwelle" : imStapel ? (b.zahlung === "privat" && kapitalgesellschaft(s) ? "ja – Verrechnungskonto Gesellschafter" : "ja") : "nein – Lohnbuchhaltung",
+      b.steuerschuld === "ige" ? `innergemeinschaftlicher Erwerb, Steuer ${betrag(steuerschuldBetrag(b))}${b.lieferant_ust_idnr ? `, USt-IdNr. Lieferant ${b.lieferant_ust_idnr}` : ""}${b.erwerb_datum ? `, Erwerb am ${datumDe(b.erwerb_datum)}` : ""}${igeNicht.has(b.id) ? ", Erwerbsbesteuerung nicht festgestellt (Erwerbsschwelle)" : igeEinkauf.has(b.id) ? ", keine Erwerbsbesteuerung (unter der Erwerbsschwelle) – gewöhnlicher Einkauf, ausländische Umsatzsteuer nicht abziehbar" : ""}` : b.steuerschuld ? `§ 13b (${steuerschuldText(b.steuerschuld)}), Steuer ${betrag(steuerschuldBetrag(b))}` : "",
+      igeNicht.has(b.id) ? "nein – Erwerbsschwelle" : igeEinkauf.has(b.id) ? "ja – gewöhnlicher Einkauf (unter der Erwerbsschwelle)" : imStapel ? (b.zahlung === "privat" && kapitalgesellschaft(s) ? "ja – Verrechnungskonto Gesellschafter" : "ja") : "nein – Lohnbuchhaltung",
       // R12 GoBD: Erfassung, Festschreibung, Änderungen
       zeitDe(b.erstellt),
       b.festgeschrieben ? zeitDe(b.festgeschrieben) : "",
@@ -1066,9 +1078,9 @@ function steuerschuldSatz(belege: Beleg[], kontenrahmen: Kontenrahmen, ku: boole
  * Steuerberater 27.10.2026), Buchungsdatum und Feld 116, USt-IdNr. der Lieferanten (Feld 40 bleibt leer), Zeilen ohne
  * Konto (andere Sätze) und Erwerbe ohne festgestellte Erwerbsbesteuerung (Erwerbsschwelle).
  */
-function igErwerbSatz(belege: Beleg[], k: ReturnType<typeof kontenFuer>, fehlend: IgErwerbOhneKonto[], ku: boolean, nicht: Beleg[]): string {
+function igErwerbSatz(belege: Beleg[], k: ReturnType<typeof kontenFuer>, fehlend: IgErwerbOhneKonto[], ku: boolean, nicht: Beleg[], einkauf: Beleg[] = [], kontenrahmen: Kontenrahmen = "SKR03"): string {
   const l = belege.filter((b) => b.steuerschuld === "ige");
-  const nichtIds = new Set(nicht.map((b) => b.id));
+  const nichtIds = new Set([...nicht, ...einkauf].map((b) => b.id));
   const gebucht = l.filter((b) => !nichtIds.has(b.id));
   const konten = [...new Set([k.igErwerb.mit[19], k.igErwerb.mit[7], k.igErwerb.ohne[19], k.igErwerb.ohne[7]].filter(Boolean))];
   const name = (b: Beleg) => b.lieferant.trim() || "ohne Lieferant";
@@ -1079,10 +1091,17 @@ function igErwerbSatz(belege: Beleg[], k: ReturnType<typeof kontenFuer>, fehlend
   const zeitpunkt = ` Buchungsdatum ist das Belegdatum; liegt es nach dem Ende des Monats nach dem Erwerb, steht in Feld 116 „Datum Zuord. Steuerperiode“ der letzte Tag dieses Monats (§ 13 Abs. 1 Nr. 6 UStG)${verschoben.length ? ` – hier bei ${verschoben.map((b) => `${name(b)} (Beleg ${datumDe(b.datum)}, Erwerb ${datumDe(b.erwerb_datum ?? "")}, Feld 116 ${datumDe(igeSteuerTag(b))})`).join("; ")}` : ""}.${gebucht.some((b) => !b.erwerb_datum) ? " Belege ohne Tag des Erwerbs: nach dem Belegdatum." : ""}`;
   const idnr = ` Feld 40 „EU-Land u. UStID“ bleibt leer; USt-IdNr. der Lieferanten: ${l.map((b) => `${name(b)} am ${datumDe(b.datum)}: ${b.lieferant_ust_idnr || "fehlt"}`).join("; ")}.`;
   const schwelle = nicht.length
-    ? ` Erwerbsschwelle (§ 1a Abs. 3 UStG): Bei ${nicht.length === 1 ? "diesem Erwerb" : "diesen Erwerben"} ist laut den Angaben in der App keine Erwerbsbesteuerung festgestellt (${ku ? "Kleinunternehmer" : "nur steuerfreie Umsätze"}, Erwerbe unter der Schwelle bzw. ohne Angabe zum Verzicht) – deshalb FEHLEN sie im Stapel: ${nicht.map((b) => `${name(b)} am ${datumDe(b.datum)} über ${betrag(b.steuer.reduce((a, x) => a + x.brutto_cent, 0))} €`).join("; ")}. Bitte prüfen und von Hand buchen.`
+    ? ` Erwerbsschwelle (§ 1a Abs. 3 UStG): Bei ${nicht.length === 1 ? "diesem Erwerb" : "diesen Erwerben"} ist laut den Angaben in der App keine Erwerbsbesteuerung festgestellt (${ku ? "Kleinunternehmer" : "nur steuerfreie Umsätze"}, Fragen zur Erwerbsschwelle in der App nicht abschließend beantwortet) – deshalb FEHLEN sie im Stapel: ${nicht.map((b) => `${name(b)} am ${datumDe(b.datum)} über ${betrag(b.steuer.reduce((a, x) => a + x.brutto_cent, 0))} €`).join("; ")}. Bitte prüfen und von Hand buchen.`
+    : "";
+  // E-231 (Steuerberater 27.10.2026, T-323): ohne Erwerbsbesteuerung gewöhnlicher Einkauf
+  const einkaufSatz = einkauf.length
+    ? ` Unter der Erwerbsschwelle ohne Verzicht (§ 1a Abs. 3 UStG) – keine Erwerbsbesteuerung: ${einkauf.length === 1 ? "Dieser Erwerb ist ein gewöhnlicher Einkauf" : "Diese Erwerbe sind gewöhnliche Einkäufe"}, die ausländische Umsatzsteuer ist nicht abziehbar; im Stapel mit dem Bruttobetrag ohne Steuerschlüssel auf dem Aufwandskonto des Belegs: ${einkauf.map((b) => `${name(b)} am ${datumDe(b.datum)} über ${betrag(b.steuer.reduce((a, x) => a + x.brutto_cent, 0))} € auf ${belegSachkonto(b, 0, kontenrahmen, k, { kleinunternehmer: true })}`).join("; ")}.`
     : "";
   const kuSatz = ku && gebucht.length ? " Kleinunternehmer mit Erwerbsbesteuerung: Steuer ohne Vorsteuerabzug; für diesen Zeitraum ist eine Voranmeldung abzugeben (§ 18 Abs. 4a UStG)." : "";
-  return `${l.length} ${l.length === 1 ? "Beleg" : "Belege"} mit innergemeinschaftlichem Erwerb (Kz 89/93${ku ? "" : ", Vorsteuer Kz 61"}) – im Stapel mit dem Betrag ohne Umsatzsteuer ohne BU auf Erwerbskonten mit Steuerautomatik${konten.length ? ` (${konten.join(", ")})` : ""}; Konten vom Steuerberater bestätigt bzw. genannt, im Testimport prüfen.${zeitpunkt}${idnr}${fehlt}${schwelle}${kuSatz}`;
+  const kopf = gebucht.length
+    ? `${l.length} ${l.length === 1 ? "Beleg" : "Belege"} mit innergemeinschaftlichem Erwerb (Kz 89/93${ku ? "" : ", Vorsteuer Kz 61"}) – im Stapel mit dem Betrag ohne Umsatzsteuer ohne BU auf Erwerbskonten mit Steuerautomatik${konten.length ? ` (${konten.join(", ")})` : ""}; Konten vom Steuerberater bestätigt bzw. genannt, im Testimport prüfen.${zeitpunkt}`
+    : `${l.length} ${l.length === 1 ? "Beleg" : "Belege"} mit innergemeinschaftlichem Erwerb.`;
+  return `${kopf}${idnr}${fehlt}${schwelle}${einkaufSatz}${kuSatz}`;
 }
 
 /** Grund, warum eine Rechnung keine E-Rechnung im Paket hat – Privatkunde (nur die E-Mail fehlt) oder fehlende Angaben. */
@@ -1471,7 +1490,10 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const nummern = belegNummern([...s.belege, ...s.belegArchiv]);
   const belege = belegeImZeitraum(s, z);
   // E-227: Erwerbe ohne festgestellte Erwerbsbesteuerung (Erwerbsschwelle) – nicht im Stapel, LIESMICH nennt sie
-  const igeNicht = igeNichtGebucht(s, belege, ku);
+  // E-231: davon unter der Schwelle (Lage „nein“) als gewöhnlicher Einkauf im Stapel; nur „offen“ fehlt
+  const igeEinkauf = igeAlsEinkauf(s, belege, ku);
+  const igeEinkaufIds = new Set(igeEinkauf.map((b) => b.id));
+  const igeNicht = igeNichtGebucht(s, belege, ku).filter((b) => !igeEinkaufIds.has(b.id));
   const igeNichtIds = new Set(igeNicht.map((b) => b.id));
   const kapital = kapitalgesellschaft(s);
   // StB-Prüfung (A-4): bilanzierende Betriebe bekommen einen Soll-Stapel (Erlös mit der Rechnung) mit Zahlungseingängen
@@ -1540,7 +1562,7 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
     ...zahlungsBuchungen,
     ...euAnz.buchungen,
     ...zahlungsEingaenge,
-    ...buchungenAusBelegen(belege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab, kreditoren, igeNichtBuchen: igeNichtIds }),
+    ...buchungenAusBelegen(belege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab, kreditoren, igeNichtBuchen: igeNichtIds, igeAlsEinkauf: igeEinkaufIds }),
     ...skontoBuchungenBelege(skontoBelege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab, kreditoren }),
     ...kassenBuchungen(kasseImZeitraum, sb.kontenrahmen, { ...bo, kleinunternehmer: ku, kapitalgesellschaft: kapital }),
     // R12 GoBD: Kassendifferenzen (Kassenbuch = Kassenkonto) und Sachentnahmen
@@ -1570,7 +1592,7 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const mit13b = belege.filter(ist13b).length;
   // E-222: innergemeinschaftliche Erwerbe und Zeilen, die mangels Erwerbskonto im Stapel fehlen
   const mitIge = belege.some((b) => b.steuerschuld === "ige");
-  const igeFehlend = mitIge ? igErwerbOhneKonto(belege, sb.kontenrahmen, { ...bo, kapitalgesellschaft: kapital, kleinunternehmer: ku, igeNichtBuchen: igeNichtIds }) : [];
+  const igeFehlend = mitIge ? igErwerbOhneKonto(belege, sb.kontenrahmen, { ...bo, kapitalgesellschaft: kapital, kleinunternehmer: ku, igeNichtBuchen: igeNichtIds, igeAlsEinkauf: igeEinkaufIds }) : [];
   const rechtsform = rechtsformFuer(s);
   const dfv = s.profil["ust.dauerfristverlaengerung"] === true;
   const inhalt: Record<string, Uint8Array> = {};
@@ -1652,7 +1674,7 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const uneinbringlichMit = uneinbringlichHier.filter(uneinbringlichBerichtigt);
   const uneinbringlichOhne = uneinbringlichHier.filter((x) => !uneinbringlichBerichtigt(x));
   const uneinbringlichOhneGrund = (x: (typeof uneinbringlichAlle)[number]) =>
-    x.u.daten.kleinunternehmer === true ? "Kleinunternehmer-Rechnung" : x.u.daten.oss === true ? "OSS-Rechnung" : x.u.daten.abschlag === true ? "Abschlagsrechnung, mit der Zahlung versteuert" : "Kleinunternehmer-Zeitraum – ob und wo die Umsatzsteuer zu berichtigen ist, bitte prüfen";
+    x.u.daten.kleinunternehmer === true ? "Kleinunternehmer-Rechnung" : x.u.daten.oss === true ? "OSS-Rechnung" : x.u.daten.abschlag === true ? "Abschlagsrechnung, mit der Zahlung versteuert" : "Kleinunternehmer-Zeitraum: Die Umsatzsteuer kann berichtigt werden – bitte mit der Steuerberatung klären.";
   const uneinbringlichListe = uneinbringlichZeilen(s, z);
   if (uneinbringlichListe.length) inhalt[`Uneinbringlich_${z.name}.csv`] = utf8(csv(kopfAus(UNEINBRINGLICH_SPALTEN), uneinbringlichListe));
   // E-229 (T-303): Belege in fremder Währung mit gezahltem Euro-Betrag – Kursdifferenz (bei EÜR Teil der Betriebsausgabe)
@@ -1670,7 +1692,7 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
     ...(kapital && belege.some((b) => b.zahlung === "privat") ? [`Privat ausgelegte Belege der Gesellschaft stehen im Stapel auf dem Verrechnungskonto Gesellschafter (${k.verrechnungGesellschafter}) – ein Verrechnungskonto je Gesellschafter bitte in den Kontenvorgaben festlegen oder umbuchen (siehe Fragen).`] : []),
     // R11: Konten je nach Vorsteuerabzug – der Satz beschreibt, was im Stapel tatsächlich steht
     ...(mit13b ? [steuerschuldSatz(belege, sb.kontenrahmen, ku)] : []),
-    ...(mitIge ? [igErwerbSatz(belege, k, igeFehlend, ku, igeNicht)] : []),
+    ...(mitIge ? [igErwerbSatz(belege, k, igeFehlend, ku, igeNicht, igeEinkauf, sb.kontenrahmen)] : []),
     ...(ohneZahlung.length
       ? [
           istEuer

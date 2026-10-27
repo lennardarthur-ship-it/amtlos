@@ -106,8 +106,9 @@ describe("T-279: Kern-Check in Gesundheit/Pflege und Kosmetik fragt nach den Dat
   });
   it("Fragezahl: eine Frage mehr, bei Gesundheitsdaten, Video oder Ortung zwei", () => {
     // gemessen vor der Änderung (E-216): Kosmetik 27, Pflegedienst 24 Kernfragen (Durchlauf mit Nein/0/„keine“)
-    expect(felder(durchlaufen(KOSMETIK))).toHaveLength(28);
-    expect(felder(durchlaufen({ ...KOSMETIK, ...MIT_GESUNDHEIT }))).toHaveLength(29);
+    // E-231: Kleinunternehmer (Kosmetik) zusätzlich „Einkauf bei Unternehmen in anderen EU-Ländern?“ (§ 18 Abs. 4a UStG)
+    expect(felder(durchlaufen(KOSMETIK))).toHaveLength(29);
+    expect(felder(durchlaufen({ ...KOSMETIK, ...MIT_GESUNDHEIT }))).toHaveLength(30);
     expect(felder(durchlaufen(PFLEGE))).toHaveLength(25);
     expect(felder(durchlaufen({ ...PFLEGE, ...MIT_GESUNDHEIT }))).toHaveLength(26);
   });

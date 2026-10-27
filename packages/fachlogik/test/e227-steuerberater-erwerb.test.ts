@@ -122,7 +122,8 @@ describe("E-227: DATEV-Stapel (T-307)", () => {
 describe("E-227: Voranmeldung – Vermerk „Nicht vollständig“ (T-308)", () => {
   it("Wortlaut des Steuerberaters je Art", () => {
     expect(ustNichtVollstaendig(2, "ige")).toBe("Nicht vollständig: 2 Belege ohne Euro-Betrag (innergemeinschaftlicher Erwerb) fehlen");
-    expect(ustNichtVollstaendig(1, "13b")).toBe("Nicht vollständig: 1 Belege ohne Euro-Betrag (§ 13b) fehlen");
+    // E-231 (T-325): bei einem Beleg in der Einzahl
+    expect(ustNichtVollstaendig(1, "13b")).toBe("Nicht vollständig: 1 Beleg ohne Euro-Betrag (§ 13b) fehlt");
   });
 
   it("steht sichtbar oben auf dem PDF, vor den Kennzahlen; ohne Eintrag kein Abschnitt", () => {

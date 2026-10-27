@@ -108,6 +108,9 @@ export const CHECK_FELDER = [
   "ust.kleinunternehmer",
   // R12 (UX #3): Rhythmus der Voranmeldung, sobald die Kleinunternehmerregelung verneint ist – sonst bleibt „Dein Jahr“ leer
   "ust.voranmeldung_rhythmus",
+  // E-231 (T-337): Kleinunternehmer – Einkauf bei Unternehmen in anderen EU-Ländern (bestehende Frage), auf die sich die
+  // Voranmeldung nach § 18 Abs. 4a UStG stützt; sonst bliebe sie „hängt ab“ mit monatlichem Termin
+  "einkauf.eu_unternehmen",
   // E-212 (T-241): bei Betrieben mit Vorjahr die Angaben, die EÜR, Gewerbesteuererklärung und Vorauszahlungen einen
   // Termin geben (vorher nur bei „Genauer machen“) – nur, wo sie entscheiden (`FRAGE_PASST`)
   "gewinn.vorjahr",
@@ -228,6 +231,7 @@ const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
   "datenverarbeitung.arten": (p) => inBranche(p, "unterricht_sport_coaching", "transport_logistik", ...DSB_BRANCHEN),
   "datenschutz.dsb_gruende": (p) => inBranche(p, ...DSB_BRANCHEN) && Boolean(liste(p, "datenverarbeitung.arten")?.some((x) => DSB_HINWEISE.includes(x))),
   "ust.voranmeldung_rhythmus": (p) => p["ust.kleinunternehmer"] === false,
+  "einkauf.eu_unternehmen": (p) => p["ust.kleinunternehmer"] === true,
   // R11 (Nutzertest Gebäudereinigung #3): ab einer beschäftigten Person für alle – außer Beauty und Gebäudereinigung, die die Branche schon auslöst
   "personal.sofortmeldebranchen": (p) => mitTeam(p) && !inBranche(p, "beauty_kosmetik", "gebaeudereinigung"),
   "ifsg.beschaeftigte": (p) => mitTeam(p) && inBranche(p, "gastronomie_lebensmittel"),

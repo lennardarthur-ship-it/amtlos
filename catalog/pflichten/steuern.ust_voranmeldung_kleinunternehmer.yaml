@@ -1,0 +1,95 @@
+# Katalog C.37 · E-231 (Steuerberater 27.10.2026 zu T-324: Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG als
+# Katalogeintrag mit Frist) – neu als Entwurf, noch nicht fachlich geprüft
+schema_version: 1
+id: steuern.ust_voranmeldung_kleinunternehmer
+version: 1
+katalog_nr: C.37
+titel:
+  de: Umsatzsteuer-Voranmeldung als Kleinunternehmer bei § 13b und Erwerben aus dem EU-Ausland
+kurz:
+  de: Schuldest du als Kleinunternehmer Umsatzsteuer nach § 13b UStG oder auf Erwerbe aus dem EU-Ausland, gibst du für die
+    Monate, in denen diese Steuer entsteht, eine Voranmeldung ab – bis zum 10. des Folgemonats.
+erklaerung:
+  de: 'Auch als Kleinunternehmer schuldest du in zwei Fällen selbst Umsatzsteuer: als Leistungsempfänger nach § 13b UStG – zum
+    Beispiel für sonstige Leistungen eines Unternehmers aus dem übrigen Gemeinschaftsgebiet (§ 13b Abs. 1 UStG) – und auf
+    innergemeinschaftliche Erwerbe (§ 1 Abs. 1 Nr. 5 UStG), wenn deine Erwerbe die Erwerbsschwelle übersteigen oder du auf sie
+    verzichtet hast (§ 1a Abs. 3, 4 UStG). Wer ausschließlich Steuer für solche Umsätze zu entrichten hat, gibt Voranmeldungen
+    und eine Steuererklärung ab (§ 18 Abs. 4a Satz 1 UStG). Voranmeldungen sind nur für die Zeiträume abzugeben, in denen die
+    Steuer für diese Umsätze zu erklären ist (§ 18 Abs. 4a Satz 2 UStG): Für jeden Monat, in dem eine solche Steuer entsteht,
+    übermittelst du die Voranmeldung bis zum 10. des Folgemonats über ELSTER und zahlst die Steuer bis dahin (§ 18 Abs. 1
+    UStG). Eine Vorsteuer ziehst du als Kleinunternehmer nicht ab. Für das Jahr, in dem eine solche Steuer entstanden ist,
+    gibst du außerdem die Umsatzsteuer-Jahreserklärung ab. Amtlos erinnert jeden Monat, weil es die Steuer nur aus deinen
+    Belegen kennt – in Monaten ohne solche Steuer gibst du keine Voranmeldung ab.'
+rechtsgrundlage:
+- § 18 Abs. 4a UStG
+- § 18 Abs. 1 UStG
+- § 13b UStG
+- § 1 Abs. 1 Nr. 5, § 1a UStG
+kategorie: steuern
+ausloeser:
+  all:
+  - feld: profil.ust.kleinunternehmer
+    op: ==
+    wert: true
+    label:
+      de: Du nutzt die Kleinunternehmerregelung.
+  # ohne Angabe „hängt ab“ (E-206: unbekannt blendet keine Pflicht aus) – die App fragt dann nach dem Einkauf im EU-Ausland
+  - feld: profil.einkauf.eu_unternehmen
+    op: ==
+    wert: true
+    label:
+      de: Du kaufst bei Unternehmen in anderen EU-Ländern ein.
+frist:
+  typ: wiederkehrend
+  # Steuerberater 27.10.2026: nur für die Monate, in denen die Steuer entsteht, fällig am 10. des Folgemonats – die
+  # Engine kennt die Monate nicht (die Belege liegen nur auf dem Gerät), daher monatlich mit Hinweis im Text
+  rhythmus: monatlich
+  faellig: { art: tag_nach_periodenende, monate_nach: 1, tag: 10 }
+  verschiebung: { regel: naechster_werktag, kalender: bundesland }
+  erinnerung: [P7D, P2D]
+wiederholung: { art: periodisch }
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  # Wortlaut wie bei „Umsatzsteuer-Voranmeldung abgeben“ (steuern.ust_voranmeldung, freigegeben) – § 18 Abs. 4a Satz 1
+  # UStG verweist auf die Voranmeldungen nach Abs. 1 und 2
+  text: { de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO). Wer die Vorauszahlung nicht, nicht vollständig oder nicht rechtzeitig zahlt, riskiert außerdem ein Bußgeld bis 30.000 € (§ 26a Abs. 1, 3 UStG in Verbindung mit § 18 Abs. 1 Satz 4 UStG). Für eine verspätete Voranmeldung kann das Finanzamt einen Verspätungszuschlag festsetzen (§ 152 Abs. 1 AO). Gibst du keine Voranmeldung ab, kann das Finanzamt die Steuer schätzen (§ 162 AO); die Nichtabgabe kann als Steuerhinterziehung strafbar sein (§ 370 Abs. 1 Nr. 2 AO).' }
+  schwere: hoch
+automatisierung: formular_vorausfuellen
+aktion: { art: uebermittlung, ziel: elster.ust_va, nachweis_erforderlich: true }
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+  - titel: Umsatzsteuergesetz § 18
+    url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
+    abgerufen: '2026-10-27'
+  - titel: Umsatzsteuergesetz § 1a (Innergemeinschaftlicher Erwerb)
+    url: https://www.gesetze-im-internet.de/ustg_1980/__1a.html
+    abgerufen: '2026-10-27'
+  - titel: Umsatzsteuergesetz § 13b
+    url: https://www.gesetze-im-internet.de/ustg_1980/__13b.html
+    abgerufen: null
+  - titel: § 240 AO (Säumniszuschläge), Wortlaut (gesetze.legal)
+    url: https://gesetze.legal/bund/ao/240
+    abgerufen: '2026-10-22'
+  - titel: UStG § 26a (Bußgeldvorschriften)
+    url: https://www.gesetze-im-internet.de/ustg_1980/__26a.html
+    abgerufen: '2026-10-22'
+  - titel: Abgabenordnung § 152 (Verspätungszuschlag)
+    url: https://www.gesetze-im-internet.de/ao_1977/__152.html
+    abgerufen: '2026-10-22'
+  - titel: Abgabenordnung § 162 (Schätzung von Besteuerungsgrundlagen)
+    url: https://www.gesetze-im-internet.de/ao_1977/__162.html
+    abgerufen: null
+  - titel: Abgabenordnung § 370 (Steuerhinterziehung)
+    url: https://www.gesetze-im-internet.de/ao_1977/__370.html
+    abgerufen: null
+fachlich_zu_pruefen:
+  - 'E-231: neu als Entwurf auf Anweisung des Steuerberaters (27.10.2026, T-324) – Text nach dem Wortlaut von § 18 Abs. 4a Satz 1 und 2 UStG (gesetze-im-internet.de, 27.10.2026). (1) § 18 Abs. 4a Satz 2 spricht von „Voranmeldungszeiträumen“ (nach Abs. 2 grundsätzlich das Kalendervierteljahr); der Steuerberater nannte „Monate“ – Frist so übernommen, bitte bestätigen. (2) Auslöser: Kleinunternehmer und „kauft bei Unternehmen in anderen EU-Ländern ein“ (profil.einkauf.eu_unternehmen) – die Engine kennt die Belege nicht, daher monatliche Erinnerung mit dem Satz „in Monaten ohne solche Steuer keine Voranmeldung“; ohne Angabe zum Einkauf „hängt ab“ (E-206) – dann fragt die App danach; § 13b-Fälle im Inland (z. B. § 13b Abs. 2 Nr. 4 UStG) erfasst der Auslöser nicht – dort bleibt der Hinweis der App am Beleg und bei der Voranmeldung. (3) Jahreserklärung: nur als Satz im Text – der Eintrag „Umsatzsteuer-Jahreserklärung abgeben“ (C.27) gilt nur ohne Kleinunternehmerregelung. (4) Folgen: Wortlaut wie C.24 (Voranmeldung) übernommen, Einstufung „hoch“ wie dort – bitte prüfen (Steuerberater alles außer Folgen, Rechtsanwalt Folgen; PRUEFLISTE T-337)'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

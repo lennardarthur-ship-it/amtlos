@@ -103,9 +103,10 @@ describe("E-226 (4): Steuerberater – Warnungen v7 bestätigt, Fundstelle § 19
 });
 
 describe("E-226: alle Einträge mit Vermerk", () => {
-  it("230 von 230 mit Vermerk; Rechtsanwalt 168, Steuerberater 35", () => {
-    expect(pflichten).toHaveLength(230);
-    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id)).toEqual([]);
+  // E-231: dazu ein Entwurf ohne Vermerk (T-337)
+  it("230 von 231 mit Vermerk; Rechtsanwalt 168, Steuerberater 35", () => {
+    expect(pflichten).toHaveLength(231);
+    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id)).toEqual(["steuern.ust_voranmeldung_kleinunternehmer"]);
     const zahl = (r: string) => pflichten.filter((p) => p.pruefung?.geprueft_von?.includes(r)).length;
     expect([zahl("recht"), zahl("steuern")]).toEqual([168, 35]);
   });

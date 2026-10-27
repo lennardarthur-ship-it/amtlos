@@ -729,6 +729,13 @@ export interface BelegBuchungsOptionen extends BuchungsOptionen {
    * Erwerbsteuer buchen; der Aufrufer nennt sie in LIESMICH.
    */
   igeNichtBuchen?: ReadonlySet<string>;
+  /**
+   * E-231 (Steuerberater 27.10.2026, T-323): Belege mit innergemeinschaftlichem Erwerb ohne Erwerbsbesteuerung (unter der
+   * Erwerbsschwelle, kein Verzicht) – gewöhnlicher Einkauf mit nicht abziehbarer ausländischer Umsatzsteuer: Bruttobetrag
+   * ohne Steuerschlüssel auf dem Aufwandskonto des Belegs (Konto „ohne Vorsteuer“ der Kategorie, z. B. Wareneingang
+   * SKR03 3200 / SKR04 5200), ohne Feld 116.
+   */
+  igeAlsEinkauf?: ReadonlySet<string>;
 }
 
 /** Konto des Zahlungswegs eines Belegs, mit Personenkonten der Kreditor statt Verbindlichkeiten (E-165). */
@@ -828,6 +835,10 @@ export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen,
     if (!belegImStapel(b, o)) continue;
     if (b.steuerschuld === "ige" && o?.igeNichtBuchen?.has(b.id)) continue;
     const kat = kategorieFuer(b.kategorie);
+    if (b.steuerschuld === "ige" && o?.igeAlsEinkauf?.has(b.id)) {
+      aus.push(...igeEinkaufBuchungen(b, kontenrahmen, k, o));
+      continue;
+    }
     // E-227 (Steuerberater 27.10.2026): Erwerb zum Belegdatum; liegt es nach dem Ende des Monats nach dem Erwerb, trägt
     // Feld 116 den letzten Tag dieses Monats (§ 13 Abs. 1 Nr. 6 UStG); Feld 40 bleibt leer (USt-IdNr. des Lieferanten in LIESMICH)
     const tag116 = b.steuerschuld === "ige" && igeSteuerTag(b) !== b.datum ? igeSteuerTag(b) : null;
@@ -879,6 +890,36 @@ export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen,
   return aus;
 }
 
+/**
+ * E-231 (Steuerberater 27.10.2026, T-323): innergemeinschaftlicher Erwerb ohne Erwerbsbesteuerung als gewöhnlicher Einkauf –
+ * je Satz der Bruttobetrag des Belegs (samt der nicht abziehbaren ausländischen Umsatzsteuer, wie erfasst) auf dem
+ * Aufwandskonto der Kategorie ohne Vorsteuer (`belegSachkonto` mit Satz 0: Waren SKR03 3200 / SKR04 5200), ohne
+ * Steuerschlüssel und ohne Feld 116; Zahlungskonto wie bei jedem Beleg.
+ */
+function igeEinkaufBuchungen(b: Beleg, kontenrahmen: Kontenrahmen, k: Konten, o?: BelegBuchungsOptionen): Buchung[] {
+  const kat = kategorieFuer(b.kategorie);
+  const sachkonto = belegSachkonto(b, 0, kontenrahmen, k, { kleinunternehmer: true });
+  const zahlkonto = zahlkontoBeleg(b, k, o);
+  const buchungstext = kuerze(`${kuerze(b.lieferant, NAME_IM_TEXT)} ${kat.kurz}`, 60);
+  const belegfeld1 = belegfeld1Aus(belegKennung(b, o?.nummern?.get(b.id) ?? belegfeld1Aus(b.id).slice(0, 12).toUpperCase()));
+  return b.steuer
+    .filter((s) => s.brutto_cent && sachkonto)
+    .map((s) => ({
+      datum: b.datum,
+      betrag_cent: Math.abs(s.brutto_cent),
+      soll_haben: s.brutto_cent < 0 ? ("S" as const) : ("H" as const),
+      konto: zahlkonto,
+      gegenkonto: sachkonto,
+      bu_schluessel: "",
+      belegfeld1,
+      buchungstext,
+      ust_satz: null,
+      art: "ausgabe" as const,
+      quelle_id: b.id,
+      guid: buchungsGuid(b.id, s.satz),
+    }));
+}
+
 /** E-222: Erwerbskonto eines innergemeinschaftlichen Erwerbs nach Satz (0 % wie § 13b: 19 %) und Vorsteuerabzug – "" ohne Konto. */
 export function igErwerbKonto(k: Konten, satz: number, vst: boolean): string {
   const s = satz13b(satz);
@@ -902,7 +943,7 @@ export function igErwerbOhneKonto(belege: Beleg[], kontenrahmen: Kontenrahmen, o
   const k = kontenFuer(kontenrahmen, o?.vorgaben);
   const aus: IgErwerbOhneKonto[] = [];
   for (const b of belege) {
-    if (b.steuerschuld !== "ige" || !belegImStapel(b, o) || o?.igeNichtBuchen?.has(b.id)) continue;
+    if (b.steuerschuld !== "ige" || !belegImStapel(b, o) || o?.igeNichtBuchen?.has(b.id) || o?.igeAlsEinkauf?.has(b.id)) continue;
     const mitVst = b.vorsteuer && !o?.kleinunternehmer;
     const teil = mitVst && belegTeilabzug(b) ? vorsteuerAufteilung(b) : null;
     for (const s of b.steuer) {

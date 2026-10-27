@@ -1,14 +1,15 @@
 /**
  * E-227 (Steuerberater 27.10.2026, T-309): Fragen und Lage zur Erwerbsschwelle (§ 1a Abs. 3, 4 UStG) – am Beleg mit
  * innergemeinschaftlichem Erwerb und bei der Übernahme in die Voranmeldung, nur für Kleinunternehmer und Betriebe mit nur
- * steuerfreien Umsätzen. Die Antworten stehen im Profil (`VERZICHT_FELD`, `ueberFeld(jahr)`).
+ * steuerfreien Umsätzen. Die Antworten stehen im Profil (`VERZICHT_FELD`, `ueberFeld(jahr)`; E-231 `erneutFeld(jahr)`, wenn die
+ * Erwerbe des Jahres laut Belegen die Schwelle nach einem „Nein“ übersteigen).
  */
 import { View } from "react-native";
 import { T as TEXT } from "../texte";
 import { Hinweis, T, Wahl } from "../ui/bausteine";
 import { useFarben } from "../ui/thema";
 import { regelwert } from "../pflichten/check";
-import { ERWERBSSCHWELLE_REGELWERT, VERZICHT_FELD, erwerbsschwelleLage, ueberFeld, type ErwerbsschwelleLage } from "../unterlagen/erwerbsschwelle";
+import { ERWERBSSCHWELLE_REGELWERT, VERZICHT_FELD, erneutFeld, erwerbsschwelleLage, ueberFeld, type ErwerbsschwelleLage } from "../unterlagen/erwerbsschwelle";
 import { useAmtlos } from "../zustand";
 
 const EURO = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -25,6 +26,7 @@ export function lageText(l: ErwerbsschwelleLage): string {
   if (l.grund === "vorjahr") return TEXT.e227_status.vorjahr(String(Number(l.jahr) - 1), s);
   if (l.grund === "angabe") return TEXT.e227_status.angabe(s);
   if (l.grund === "verneint") return TEXT.e227_status.verneint(s);
+  if (l.grund === "erneut") return TEXT.e231_status_erneut(l.jahr, s);
   return TEXT.e227_status.offen;
 }
 
@@ -44,7 +46,14 @@ export function ErwerbsschwelleFragen({ jahr }: { jahr: string }) {
       <Wahl label={TEXT.e227_frage_verzicht} wert={jaNein(l.verzicht)} aendern={(w) => z.profilSetzen({ [VERZICHT_FELD]: w === "ja" })} optionen={[{ wert: "ja", text: TEXT.ja }, { wert: "nein", text: TEXT.nein }]} />
       {zweite ? (
         <View>
-          <Wahl label={TEXT.e227_frage_ueber(String(Number(jahr) - 1), jahr, schwelle)} wert={jaNein(l.ueber)} aendern={(w) => z.profilSetzen({ [ueberFeld(jahr)]: w === "ja" })} optionen={[{ wert: "ja", text: TEXT.ja }, { wert: "nein", text: TEXT.nein }]} />
+          {/* E-231: Erwerbe des Jahres laut Belegen über der Schwelle nach einem „Nein“ → dieselbe Frage noch einmal (eigenes Feld) */}
+          {l.jahr_ueber && l.ueber === false ? <Hinweis art="warnung" text={TEXT.e231_jahr_ueber(jahr, euro(l.jahr_cent), schwelle)} /> : null}
+          <Wahl
+            label={TEXT.e227_frage_ueber(String(Number(jahr) - 1), jahr, schwelle)}
+            wert={jaNein(l.jahr_ueber && l.ueber === false ? l.erneut : l.ueber)}
+            aendern={(w) => z.profilSetzen(l.jahr_ueber && l.ueber === false ? { [erneutFeld(jahr)]: w === "ja" } : { [ueberFeld(jahr)]: w === "ja", ...(l.jahr_ueber ? { [erneutFeld(jahr)]: w === "ja" } : {}) })}
+            optionen={[{ wert: "ja", text: TEXT.ja }, { wert: "nein", text: TEXT.nein }]}
+          />
           <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.e227_schwelle_belege(String(Number(jahr) - 1), euro(l.vorjahr_cent), jahr, euro(l.jahr_cent))}</T>
         </View>
       ) : null}

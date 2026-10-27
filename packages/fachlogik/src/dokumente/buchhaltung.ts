@@ -1499,7 +1499,9 @@ export const UST_OHNE_IGE = "Innergemeinschaftliche Erwerbe (Kz 89 bzw. 93 mit S
  * E-227 (Steuerberater 27.10.2026): Belege mit Steuerschuld ohne Euro-Betrag (fremde Währung ohne Umrechnung) – Hinweis und
  * Rückfrage in der App genügen, das PDF muss aber sichtbar diesen Satz tragen (Wortlaut des Steuerberaters, je Art).
  */
-export const ustNichtVollstaendig = (anzahl: number, art: "ige" | "13b") => `Nicht vollständig: ${anzahl} Belege ohne Euro-Betrag (${art === "ige" ? "innergemeinschaftlicher Erwerb" : "§ 13b"}) fehlen`;
+// E-231 (Steuerberater 27.10.2026, T-325): bei einem Beleg in der Einzahl („1 Beleg … fehlt“) – vom Steuerberater entschieden
+export const ustNichtVollstaendig = (anzahl: number, art: "ige" | "13b") =>
+  `Nicht vollständig: ${anzahl} ${anzahl === 1 ? "Beleg" : "Belege"} ohne Euro-Betrag (${art === "ige" ? "innergemeinschaftlicher Erwerb" : "§ 13b"}) ${anzahl === 1 ? "fehlt" : "fehlen"}`;
 /** Hinweis bei steuerfreien Umsätzen ohne Vorsteuerabzug (Voranmeldung, Steuerberater-Paket). */
 export const VORSTEUER_AUFTEILEN = "Steuerfreie Umsätze ohne Vorsteuerabzug und Vorsteuer im selben Zeitraum: Vorsteuer aus Eingangsleistungen, die diesen Umsätzen dienen, ist nicht abziehbar (§ 15 Abs. 2 UStG); dienen sie beiden Arten von Umsätzen, ist sie aufzuteilen (§ 15 Abs. 4 UStG). Bitte die Vorsteuer prüfen.";
 

@@ -88,7 +88,7 @@ describe("E-227: Voranmeldung (T-308, T-309)", () => {
     const ige0 = beleg({ id: "i0", fremd: { waehrung: "SEK", steuer: [{ satz: 19, brutto_cent: 1000000 }] }, steuer: [{ satz: 19, brutto_cent: 0 }] });
     const rc0 = beleg({ id: "r0", steuerschuld: "eu", kategorie: "buero", fremd: { waehrung: "USD", steuer: [{ satz: 0, brutto_cent: 5000 }] }, steuer: [{ satz: 0, brutto_cent: 0 }] });
     const r = umsaetzeFuer([], "2026-03", BETRIEB, "soll", [ige0, ige0 && { ...ige0, id: "i1" }, rc0], false)!;
-    expect(r.werte.unvollstaendig).toBe("Nicht vollständig: 2 Belege ohne Euro-Betrag (innergemeinschaftlicher Erwerb) fehlen\nNicht vollständig: 1 Belege ohne Euro-Betrag (§ 13b) fehlen");
+    expect(r.werte.unvollstaendig).toBe("Nicht vollständig: 2 Belege ohne Euro-Betrag (innergemeinschaftlicher Erwerb) fehlen\nNicht vollständig: 1 Beleg ohne Euro-Betrag (§ 13b) fehlt"); // E-231 (T-325): Einzahl
     const h = dokumentHtml(vorlageFuer("ust_voranmeldung")!, { versteuerung: "soll", ...r.werte }, BETRIEB).replace(/&nbsp;|\u00a0/g, " ");
     expect(h).toContain(`<strong>${ustNichtVollstaendig(2, "ige")}</strong>`);
     expect(h).toContain(`<strong>${ustNichtVollstaendig(1, "13b")}</strong>`);

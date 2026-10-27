@@ -17,8 +17,13 @@ gruende:
   bestaetigt_mit_version: Der Prüfer hat die Fassung mit diesem Punkt am 26.10.2026 per Mail bestätigt (E-213).
   neu_geprueft: Neuer Eintrag mit der Bitte um vollständige Prüfung; der Prüfer hat ihn danach freigegeben (Unterschrift siehe Register).
   entwurf_e223: Neuer Eintrag im Entwurf (E-223, Befund des externen Prüfers); die App zeigt „noch nicht fachlich geprüft“, die Prüfung läuft mit dem Prüfpaket für die neuen Einträge (PRUEFLISTE T-313).
+  entwurf_e231: Neuer Eintrag im Entwurf auf Anweisung des Steuerberaters (E-231); die App zeigt „noch nicht fachlich geprüft“, die Prüfung läuft mit dem Prüfpaket für diesen Eintrag (PRUEFLISTE T-337).
 offen: []
 erledigt:
+# E-231: Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG im Entwurf (Steuerberater 27.10.2026, T-324)
+- id: steuern.ust_voranmeldung_kleinunternehmer
+  punkt: 'E-231: neu als Entwurf auf Anweisung des Steuerberaters (27.'
+  grund: entwurf_e231
 # E-223: zwei neue Einträge im Entwurf (Preisermäßigung § 11 PAngV, Werbe-E-Mails § 7 UWG)
 # E-226: vom Rechtsanwalt am 27.10.2026 in seiner Fassung (v2) freigegeben
 - id: online.preisermaessigung
