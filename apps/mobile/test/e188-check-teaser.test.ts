@@ -66,7 +66,7 @@ describe("Kasse ohne Pro (E-188, GoBD § 147 AO)", () => {
     expect(q).toMatch(/if \(!alt && !kasseErfassenErlaubt\(z\.pro\)\)/);
     // das Kassenbuch teilt ohne Pro-Prüfung
     const kassenbuch = q.slice(q.indexOf("function KassenbuchSeite"), q.indexOf("export function KassenTagSeite"));
-    expect(kassenbuch).toMatch(/pdfTeilen/);
+    expect(kassenbuch).toMatch(/pdfAusgeben\(html, name, true, "teilen"\)/);
     expect(kassenbuch).not.toMatch(/sperre|kasseErfassenErlaubt|z\.pro/);
     expect(TEXT.r12_kostenlos).toMatch(/mit Pro[\s\S]*korrigierst[\s\S]*Kassenbuch[\s\S]*ohne Pro/);
   });

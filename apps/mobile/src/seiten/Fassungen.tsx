@@ -12,7 +12,8 @@ import { Feld, Fuss, Hinweis, Karte, Knopf, T, Wahl, Zeile } from "../ui/baustei
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, useFarben } from "../ui/thema";
-import { pdfTeilen } from "../unterlagen/pdf";
+import { pdfBytesAusgeben, pdfTeilen } from "../unterlagen/pdf";
+import { originalLesen } from "../unterlagen/pdfOriginal";
 import { heute, type Fassung } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Ansage } from "./felder";
@@ -71,8 +72,12 @@ export function FassungenKarte({ id }: { id: string }) {
   if (!u || !v || !u.fassungen?.length) return null;
   // E-220 (8b): eine frühere Fassung mit ihrem eigenen Absender bzw. genau wie damals gedruckt – nicht mit „Mein Betrieb“ von heute
   const teilen = async (f2: Fassung) => {
-    const ok = await pdfTeilen(fassungHtml(z.stand, u.vorlage, f2, z.pro), pdfDateiname(v, f2.daten, heute()), v.querformat).catch(() => false);
+    // E-228: das aufbewahrte PDF dieser Fassung unverändert, sonst aus dem festgehaltenen HTML
+    const name = pdfDateiname(v, f2.daten, heute());
+    const original = await originalLesen(f2.pdf, z.dateiLesen);
+    const ok = original ? await pdfBytesAusgeben(original, name, "teilen").catch(() => false) : await pdfTeilen(fassungHtml(z.stand, u.vorlage, f2, z.pro), name, v.querformat).catch(() => false);
     if (!ok) melden(TEXT.pdf_fehler, "info");
+    else if (f2.pdf && !original) melden(TEXT.e228_original_fehlt, "info");
   };
   const grund = (d: Daten) => (typeof d.fassung_grund === "string" && d.fassung_grund.trim() ? d.fassung_grund.trim() : null);
   const nr = u.fassungen.length + 1;

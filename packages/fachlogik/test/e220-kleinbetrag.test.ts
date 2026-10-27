@@ -35,10 +35,10 @@ describe("E-220 (4): Kleinbetragsrechnung nach § 33 UStDV", () => {
     expect(fehlendeAngaben(v, d)).toEqual(expect.arrayContaining(["Name oder Firma", "Anschrift"]));
   });
 
-  it("Privatperson im EU-Ausland ohne OSS (unter der Schwelle des § 3c Abs. 4 UStG): vorsorglich volle Angaben (T-299)", () => {
+  it("Privatperson im EU-Ausland ohne OSS (unter der Schwelle des § 3c Abs. 4 UStG): seit E-228 (T-299 beantwortet) mit deutscher Steuer Vereinfachung", () => {
     const d: Daten = { ...KLEIN, kunde_name: "Jan de Vries", kunde_anschrift: "Dam 1\n1012 Amsterdam\nNiederlande" };
-    expect(kleinbetrag(d)).toBe(false);
-    expect(html(d)).toContain("Leistungsdatum");
+    expect(kleinbetrag(d)).toBe(true);
+    expect(html(d)).not.toContain("Leistungsdatum");
   });
 
   it("§ 13b auch über den Freitext im Befreiungshinweis und innergemeinschaftliche Lieferung (§ 6a): keine Vereinfachung", () => {

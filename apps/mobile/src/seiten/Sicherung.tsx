@@ -16,6 +16,7 @@ import { pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
 import { ausgabeHtml } from "../unterlagen/ausgabe";
 import { archivRechnungen, offenesArchiv } from "../unterlagen/archiv";
 import { pdfBytes } from "../unterlagen/pdf";
+import { ausgabePdf } from "../unterlagen/pdfOriginal";
 import { letzteVollsicherung, nachweisText, vollsicherungFaellig } from "../unterlagen/sicherungNachweis";
 import { dateienImStand, heute, sicherungFaellig, ungesichert, zusammenfuehren, type Stand } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
@@ -77,7 +78,7 @@ export function SicherungSeite() {
     let bytes = 0;
     for (const n of namen) bytes += z.dateiGroesse(n);
     return { dateien: namen.size, mb: Math.round(bytes / 1e6) };
-  }, [z.stand.belege, z.stand.belegArchiv, z.stand.kasse, z.stand.mitarbeiter]);
+  }, [z.stand.belege, z.stand.belegArchiv, z.stand.kasse, z.stand.mitarbeiter, z.stand.unterlagen]);
   const gross = umfang.dateien > SICHERUNG_DATEIEN_WARNUNG || umfang.mb > SICHERUNG_MB_WARNUNG;
   const bereit = passwortBereit(pw, pw2);
   const letzte = letzteVollsicherung(z.stand.sicherungsNachweis);
@@ -179,7 +180,8 @@ export function OffenesArchiv() {
       if (v)
         for (const [i, u] of rechnungen.entries()) {
           setFortschritt(TEXT.r12g_archiv_fortschritt(i + 1, rechnungen.length));
-          const bytes = await pdfBytes(ausgabeHtml(s, u, z.pro), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
+          // E-228: das aufbewahrte Original-PDF (schon oben gelesen), sonst aus dem festgehaltenen Dokument neu erzeugt
+          const { bytes } = await ausgabePdf(u, async (n) => dateien[n] ?? null, () => pdfBytes(ausgabeHtml(s, u, z.pro), pdfDateiname(v, u.daten, heute()), v.querformat));
           if (bytes) rechnungsPdfs[u.id] = bytes;
         }
       setFortschritt(null);

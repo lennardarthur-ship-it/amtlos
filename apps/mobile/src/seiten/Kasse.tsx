@@ -12,7 +12,8 @@ import { istNativ, useFarben, weich } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
 import { belegFoto } from "../unterlagen/belegfoto";
 import { kassenMonat, kassenMonate, offeneLadenkasse, ruhetage } from "../unterlagen/kasse";
-import { pdfTeilen } from "../unterlagen/pdf";
+import { pdfAusgeben, pdfBytesAusgeben } from "../unterlagen/pdf";
+import { pdfAusgabe } from "../unterlagen/pdfOriginal";
 import { druckHtml } from "../unterlagen/druck";
 import { utf8 } from "../unterlagen/sicherung";
 import { dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
@@ -212,11 +213,25 @@ function KassenbuchSeite({ monat, standort }: { monat: string; standort: string 
   const teilen = async () => {
     setLaedt(true);
     try {
-      const ok = await pdfTeilen(html, `Kassenbuch-${monat}${standort ? `-${standort.replace(/[^A-Za-z0-9]/g, "")}` : ""}.pdf`, true);
-      if (!ok) return;
+      const name = `Kassenbuch-${monat}${standort ? `-${standort.replace(/[^A-Za-z0-9]/g, "")}` : ""}.pdf`;
+      // E-228: unverändert festgeschrieben → das aufbewahrte Original-PDF; sonst neu erzeugt und beim Festschreiben aufbewahrt
+      const erg = await pdfAusgabe(gleich && fest ? fest : {}, true, {
+        lesen: z.dateiLesen,
+        erzeugenUndAusgeben: () => pdfAusgeben(html, name, true, "teilen"),
+        bytesAusgeben: (b) => pdfBytesAusgeben(b, name, "teilen"),
+        ablegen: (b) => z.dateiSpeichern(b, "pdf"),
+        jetzt: () => new Date().toISOString(),
+      });
+      if (!erg.ok) return;
+      if (erg.originalFehlt) melden(TEXT.e228_original_fehlt, "info");
       // E-193 (4): Android meldet einen Abbruch des Teilens nicht – erst nach „Ja, festschreiben“
-      if (!(await versandBestaetigt({ festgeschrieben: gleich && fest ? fest.festgeschrieben : undefined }, v, false))) return;
-      z.kassenbuchFestschreiben(monat, standort, daten, bytesToHex(sha256(utf8(JSON.stringify(daten)))), z.stand.betrieb, html);
+      if (!(await versandBestaetigt({ festgeschrieben: gleich && fest ? fest.festgeschrieben : undefined }, v, false))) {
+        if (erg.neu) z.dateiVerwerfen(erg.neu.datei);
+        return;
+      }
+      z.kassenbuchFestschreiben(monat, standort, daten, bytesToHex(sha256(utf8(JSON.stringify(daten)))), z.stand.betrieb, html, erg.neu);
+      // gleicher Inhalt schon festgeschrieben: nichts zeigt auf die eben abgelegte Datei
+      if (erg.neu) z.dateiVerwerfen(erg.neu.datei);
       melden(TEXT.r12g_kassenbuch_geteilt);
     } catch {
       melden(TEXT.pdf_fehler, "info");

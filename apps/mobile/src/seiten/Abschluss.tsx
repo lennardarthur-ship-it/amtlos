@@ -10,9 +10,10 @@ import { Vorschau } from "../ui/Vorschau";
 import { Papier, PapierBlatt } from "./Papier";
 import { GrosserBetrag, RechtsHinweis } from "./gemeinsam";
 import { mitVorlagenHinweis } from "../rechtshinweis";
-import { drucken, pdfTeilenMitHash } from "../unterlagen/pdf";
+import { pdfAusgeben, pdfBytesAusgeben } from "../unterlagen/pdf";
+import { pdfAusgabe, pdfEinlesen } from "../unterlagen/pdfOriginal";
 import { NUMMER_DOPPELT, fehltFuer, lueckenFrage, vaOhneEuroFrage } from "../unterlagen/pruefung";
-import { dateiTeilen } from "../unterlagen/sicherungDatei";
+import { dateiTeilen, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { ausgabeHtml, druckBetrieb, druckFesthalten, nachgebildet } from "../unterlagen/ausgabe";
 import { absenderFuer, geteiltOffenLetzte, geteilteVersionen, heute, zahlungPruefen, type EuStornoGrund } from "../unterlagen/speicher";
 import { einMonatNach, euBerichtigungSchluessel, euFehlerErkannt, euMeldeArtVon, euStornoGrund, euStornoGrundFest, euStornoTag, periodeText } from "../unterlagen/ustAusRechnungen";
@@ -106,15 +107,32 @@ export function useTeilen(id: string) {
       // das damals gedruckte Dokument
       const absender = druckBetrieb(z.stand, u, z.pro);
       const html = u.festgeschrieben ? ausgabeHtml(z.stand, u, z.pro) : dokumentHtml(v, pdfDaten, absender);
-      const erg = art === "teilen" ? await pdfTeilenMitHash(html, pdfDateiname(v, u.daten, heute()), v.querformat) : { ok: await drucken(html, pdfDateiname(v, u.daten, heute()), v.querformat) };
-      // abgebrochen: nichts festschreiben, nichts vom Freikontingent verbrauchen
+      const name = pdfDateiname(v, u.daten, heute());
+      // E-228 (T-300): festgeschrieben mit aufbewahrtem PDF → genau dieses; sonst neu erzeugt, und bei der ersten Ausgabe
+      // einer Vorlage mit Festschreibung wird das ausgegebene PDF selbst aufbewahrt
+      const erg = await pdfAusgabe(u, Boolean(v.festschreiben), {
+        lesen: z.dateiLesen,
+        erzeugenUndAusgeben: () => pdfAusgeben(html, name, Boolean(v.querformat), art),
+        bytesAusgeben: (b) => pdfBytesAusgeben(b, name, art),
+        ablegen: (b) => z.dateiSpeichern(b, "pdf"),
+        jetzt: () => new Date().toISOString(),
+      });
+      // abgebrochen: nichts festschreiben, nichts vom Freikontingent verbrauchen (abgelegt wird erst nach dem Teilen)
       if (!erg.ok) return;
-      const sha = "sha256" in erg ? erg.sha256 : undefined;
+      const sha = erg.sha256;
+      if (erg.nachgereicht && !z.pdfOriginalSetzen(id, erg.nachgereicht)) z.dateiVerwerfen(erg.nachgereicht.datei);
+      if (erg.originalFehlt) melden(TEXT.e228_original_fehlt, "info");
+      if (u.festgeschrieben) return void z.ausgeben(id, pdfDaten, sha, absender, false, html);
       // E-193 (4): Android meldet einen Abbruch des Teilen-Menüs (und des Druckdialogs) nicht – erst nach „Ja“ festschreiben;
       // bei „Nein“ bleibt der Entwurf, die ausgegebene Fassung wird vermerkt (später „Doch verschickt – festschreiben“)
-      if (!(await versandBestaetigt(u, v, art === "drucken"))) return z.teilenOffen(id, { daten: pdfDaten, art: art === "drucken" ? "druck" : "pdf", ...(sha ? { pdfSha256: sha } : {}), absender, druck: druckFesthalten(html, absender.logo, new Date().toISOString()) });
+      if (!(await versandBestaetigt(u, v, art === "drucken"))) return z.teilenOffen(id, { daten: pdfDaten, art: art === "drucken" ? "druck" : "pdf", ...(sha ? { pdfSha256: sha } : {}), absender, druck: druckFesthalten(html, absender.logo, new Date().toISOString()), ...(erg.neu ? { pdf: erg.neu } : {}) });
       const erstesMal = !u.ausgegeben;
-      if (!z.ausgeben(id, pdfDaten, sha, absender, false, html)) return melden(TEXT.pdf_geaendert, "info");
+      if (!z.ausgeben(id, pdfDaten, sha, absender, false, html, erg.neu)) {
+        if (erg.neu) z.dateiVerwerfen(erg.neu.datei);
+        return melden(TEXT.pdf_geaendert, "info");
+      }
+      // ohne Festschreibung (Vorlage ohne `festschreiben`) zeigt nichts auf die Datei – nicht liegen lassen
+      if (erg.neu) z.dateiVerwerfen(erg.neu.datei);
       if (erstesMal && v.festschreiben) z.erfolg();
     } catch {
       setFehler(TEXT.pdf_fehler);
@@ -157,6 +175,54 @@ export function useTeilen(id: string) {
   return { laedt, fehler, eFehlt, frei, kontingent, los: () => ausgabe("teilen"), drucken: () => ausgabe("drucken"), eRechnung };
 }
 
+
+/**
+ * E-228 (T-300): Aufbewahrtes Original-PDF einer festgeschriebenen Unterlage – Hinweis mit Prüfwert. Ohne Original (vor
+ * dem Update festgeschrieben): das damals geteilte PDF einlesen (z. B. aus dem Postausgang der Mail); stimmt sein
+ * SHA-256 mit dem beim ersten Teilen gespeicherten Prüfwert überein, wird es als Original aufbewahrt, sonst nicht.
+ */
+function PdfOriginalZeile({ id }: { id: string }) {
+  const z = useAmtlos();
+  const [laedt, setLaedt] = useState(false);
+  const [meldung, setMeldung] = useState<{ art: "erfolg" | "warnung"; text: string } | null>(null);
+  const u = z.stand.unterlagen.find((x) => x.id === id);
+  if (!u?.festgeschrieben) return null;
+  const zeit = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  const einlesen = async () => {
+    setMeldung(null);
+    const d = await dateiWaehlenBytes(["application/pdf"]).catch(() => null);
+    if (!d) return;
+    setLaedt(true);
+    try {
+      const r = await pdfEinlesen(u, d.bytes, (b) => z.dateiSpeichern(b, "pdf"), new Date().toISOString());
+      if (r.pdf) {
+        if (z.pdfOriginalSetzen(id, r.pdf)) setMeldung({ art: "erfolg", text: TEXT.e228_einlesen_gleich });
+        else {
+          z.dateiVerwerfen(r.pdf.datei);
+          setMeldung({ art: "warnung", text: TEXT.e228_einlesen_fehler });
+        }
+      } else setMeldung({ art: "warnung", text: TEXT.e228_einlesen_ergebnis(r.ergebnis, r.sha256, u.pdfSha256 ?? null) });
+    } catch {
+      setMeldung({ art: "warnung", text: TEXT.e228_einlesen_fehler });
+    } finally {
+      setLaedt(false);
+    }
+  };
+  if (u.pdf)
+    return (
+      <View style={{ marginTop: 4 }}>
+        <T v="caption" leise>{TEXT.e228_original(zeit(u.pdf.am), u.pdf.sha256, u.pdf.quelle === "eingelesen")}</T>
+        {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
+      </View>
+    );
+  return (
+    <View style={{ marginTop: 4 }}>
+      <T v="caption" leise>{u.pdfFolgt ? TEXT.e228_original_folgt : TEXT.e228_ohne_original}</T>
+      {u.pdfFolgt ? null : <TextKnopf symbol="doc.text" text={laedt ? TEXT.e228_einlesen_laedt : TEXT.e228_einlesen} onPress={() => void einlesen()} />}
+      {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
+    </View>
+  );
+}
 
 /** R12: Angabe aus „Mein Betrieb“ ergänzen – Gesellschaftsangaben (§ 35a GmbHG; E-193: §§ 125, 177a HGB) bzw. Absender. */
 export function betriebOeffnen(nav: ReturnType<typeof useNav>, fehlt: string[]) {
@@ -339,6 +405,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             {storno ? <Hinweis art="erfolg" text={TEXT.storniert_durch(String(storno.daten.nummer ?? ""))} /> : null}
             {typeof d.storno_zu === "string" && d.storno_zu ? <Hinweis text={TEXT.storniert_zu(d.storno_zu)} /> : null}
             {nachbild ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.e220_nachgebildet(nachbild.nachgetragen ? zeitDe(nachbild.nachgetragen) : null, u.pdfSha256 ?? null)}</T> : null}
+            <PdfOriginalZeile id={id} />
             {v.storno && !u.storniertDurch ? <Zahlung id={id} /> : null}
           </View>
         ) : null}

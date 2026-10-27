@@ -100,6 +100,50 @@ export async function pdfTeilenMitHash(html: string, dateiname: string, quer = f
   }
 }
 
+/**
+ * E-228: PDF erzeugen und teilen bzw. drucken – mit den Bytes genau der ausgegebenen Datei (zum Aufbewahren als Original)
+ * und ihrem SHA-256. Im Web gibt es kein PDF (Fenster) – dann ohne Bytes.
+ */
+export async function pdfAusgeben(html: string, dateiname: string, quer: boolean, art: "teilen" | "drucken"): Promise<{ ok: boolean; sha256?: string; bytes?: Uint8Array }> {
+  if (Platform.OS === "web") {
+    imWebOeffnen(html);
+    return { ok: true };
+  }
+  const uri = await pdfErstellen(html, dateiname, quer);
+  try {
+    const bytes = new File(uri).bytesSync();
+    const ok = art === "drucken" || (Platform.OS !== "ios" && !(await Sharing.isAvailableAsync())) ? await druckenUri(uri) : await teilen(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", titel: dateiname });
+    return { ok, sha256: bytesToHex(sha256(bytes)), bytes };
+  } finally {
+    cacheDateiLoeschen(uri);
+  }
+}
+
+/**
+ * E-228: ein aufbewahrtes PDF (Original) unverändert teilen bzw. drucken – keine neue Erzeugung. Die Datei liegt nur für
+ * die Dauer des Teilens unverschlüsselt im Cache.
+ */
+export async function pdfBytesAusgeben(bytes: Uint8Array, dateiname: string, art: "teilen" | "drucken"): Promise<boolean> {
+  if (Platform.OS === "web") {
+    // Web (Vorschau mit Synchronisation): das Original als PDF im Fenster
+    const g = globalThis as unknown as { open?: (u: string, n: string) => unknown; URL: { createObjectURL(b: unknown): string; revokeObjectURL(u: string): void }; Blob: new (t: unknown[], o: { type: string }) => unknown };
+    const url = g.URL.createObjectURL(new g.Blob([bytes], { type: "application/pdf" }));
+    g.open?.(url, "_blank");
+    setTimeout(() => g.URL.revokeObjectURL(url), 60_000);
+    return true;
+  }
+  const ziel = new File(Paths.cache, dateiname);
+  if (ziel.exists) ziel.delete();
+  ziel.create();
+  try {
+    await ziel.write(bytes);
+    if (art === "drucken" || (Platform.OS !== "ios" && !(await Sharing.isAvailableAsync()))) return await druckenUri(ziel.uri);
+    return await teilen(ziel.uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", titel: dateiname });
+  } finally {
+    cacheDateiLoeschen(ziel.uri);
+  }
+}
+
 /** Druckdialog; ein Abbrechen meldet expo-print als Fehler – das ist hier kein Fehler, sondern false. */
 async function druckenUri(uri: string): Promise<boolean> {
   try {
