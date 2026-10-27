@@ -12,7 +12,6 @@
   rechtsgrundlage: ["§ 634a Abs. 1 Nr. 1 BGB"]
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 634a, url: "https://www.gesetze-im-internet.de/bgb/__634a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; Wert und gültig ab 01.01.2002 (Schuldrechtsmodernisierung) vom Rechtsanwalt am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -28,7 +27,6 @@
   rechtsgrundlage: ["§ 634a Abs. 1 Nr. 2 BGB"]
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 634a, url: "https://www.gesetze-im-internet.de/bgb/__634a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; Wert und gültig ab 01.01.2002 (Schuldrechtsmodernisierung) vom Rechtsanwalt am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -44,7 +42,6 @@
   rechtsgrundlage: ["§ 438 Abs. 1 Nr. 3 BGB"]
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 438, url: "https://www.gesetze-im-internet.de/bgb/__438.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; Wert und gültig ab 01.01.2002 (Schuldrechtsmodernisierung) vom Rechtsanwalt am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -60,5 +57,4 @@
   rechtsgrundlage: ["§ 477 BGB"]
   quellen:
     - { titel: Bürgerliches Gesetzbuch § 477, url: "https://www.gesetze-im-internet.de/bgb/__477.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Wert laut Prüfvermerk Rechtsanwalt 22.10.2026; Wert und gültig ab 01.01.2022 (Umsetzung der Warenkaufrichtlinie) vom Rechtsanwalt am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }

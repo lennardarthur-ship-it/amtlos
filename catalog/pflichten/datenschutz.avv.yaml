@@ -69,8 +69,6 @@ quellen:
 - titel: 'DSGVO Art. 83 (gesetze.legal)'
   url: https://gesetze.legal/eu/vo_eu_2016_679/83
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Frist „vor Beginn der Verarbeitung“ (Prüfvermerk Rechtsanwalt 22.10.2026) nur im Text – kein Ereignis „Dienstleister beauftragt“'
 pruefung:
   status: freigegeben
   geprueft_von:

@@ -148,9 +148,10 @@ export async function quellenVerknuepfen(tx: Tx, art: "pflicht_version" | "regel
  * (`fachlich_zu_pruefen`) und der Prüfstand aus dem Register (`pruefung`, von docs/freigabe-katalog/anwenden.py geschrieben;
  * in der Datenbank entstehen Freigaben nur im Studio, E-039). Wie `NICHT_VERGLICHEN` in anwenden.py: Ändern sie sich, ist
  * das keine neue Fassung. Der Import vergleicht ohne sie und lässt die gespeicherte Version unverändert (freigegebene
- * Versionen sind in der Datenbank unveränderlich, Trigger `status_schuetzen`).
+ * Versionen sind in der Datenbank unveränderlich, Trigger `status_schuetzen`). E-233: `nicht_vor_freigabe` (ob ein Entwurf
+ * schon in der App erscheint) ist ebenfalls kein Inhalt.
  */
-export const NICHT_INHALT = ["fachlich_zu_pruefen", "pruefung"] as const;
+export const NICHT_INHALT = ["fachlich_zu_pruefen", "pruefung", "nicht_vor_freigabe"] as const;
 
 /** Gleicher Inhalt einer Pflicht- bzw. Regelwert-Version, ohne Notizen und Prüfstand (NICHT_INHALT). */
 export function gleicherInhalt(a: unknown, b: unknown): boolean {

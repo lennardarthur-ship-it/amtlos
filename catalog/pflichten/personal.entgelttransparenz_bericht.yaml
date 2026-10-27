@@ -62,10 +62,9 @@ quellen:
   url: https://www.datev.de/web/de/unternehmen/loesungen/themen-im-fokus/aktuelle-themen-fuer-unternehmen/gesetzliche-aenderungen-sommer-2026-entgelttransparenz-minijobs-pflege-ki
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Rechtsstand 21.10.2026: kein deutsches Umsetzungsgesetz, kein veröffentlichter Referentenentwurf (BT-Drs. 21/7026: Vorbereitungen laufen) – nationale Stichtage und Schwellen nach Verkündung übernehmen'
-- 'Gruppe 100–149 Beschäftigte (ab 7.6.2031, Art. 9 Abs. 1 lit. c RL) nicht als eigene Regel abgebildet; Schwelle ≥ 150 und Termine bestätigt (Prüfvermerk Rechtsanwalt 22.10.2026)'
+- 'Rechtsstand 21.10.2026: kein deutsches Umsetzungsgesetz, kein veröffentlichter Referentenentwurf (BT-Drs. 21/7026: Vorbereitungen
+  laufen) – nationale Stichtage und Schwellen nach Verkündung übernehmen'
 - Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie)
-- Zählweise und Inhalt des Berichts nach Umsetzungsgesetz
 - Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: freigegeben

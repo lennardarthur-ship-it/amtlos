@@ -95,7 +95,6 @@ quellen:
   url: https://lexetius.com/AO/329,2
   abgerufen: '2026-10-22'
 # Merkposten (Produkt): Freibetrag (C.34) als Regelwert führen
-fachlich_zu_pruefen: []
 pruefung:
   status: freigegeben
   geprueft_von:

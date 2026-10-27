@@ -59,7 +59,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/sgb_7/__209.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Prüfprotokoll-Vorlage fehlt (Technik)'
+- Prüfprotokoll-Vorlage fehlt (Technik)
 pruefung:
   status: freigegeben
   geprueft_von:

@@ -42,7 +42,7 @@ const FELDNAMEN = {
   gueltig_bis: "Gültig bis", begriffe: "Fachbegriffe", begriff: "Begriff", titel_quelle: "Titel", url: "Adresse", abgerufen: "Abgerufen am",
   de: "Deutsch", en: "Englisch", radar: "Radar", wahrscheinlichkeit: "Wahrscheinlichkeit", versatz: "Versatz", datum: "Datum",
   verschiebung: "Verschiebung", faellig: "Fälligkeit", termine: "Termine", rhythmus: "Rhythmus", id: "ID", schwere: "Schwere",
-  dringend_ohne_termin: "Dringend ohne Termin",
+  dringend_ohne_termin: "Dringend ohne Termin", nicht_vor_freigabe: "Erst nach Freigabe anzeigen",
 };
 
 /** Ajv-Meldungen in verständliches Deutsch für die Redaktion. */
@@ -239,6 +239,17 @@ export function validiereKatalog(katalogDir, optionen = {}) {
     for (const f of pruefePflichtObjekt(p, { regelwertIds: new Set(regelwerte.keys()), pflichtIds, prod })) fehlerAus(datei, f);
     if (p?.id && path.basename(datei).replace(/\.ya?ml$/, "") !== p.id) fehlerAus(datei, `Dateiname muss der ID '${p.id}' entsprechen`);
   }
+  // E-233: Ein bis zur Freigabe zurückgehaltener Eintrag (nicht_vor_freigabe) fehlt im Bündel der App – kein anderer Eintrag
+  // darf ihn voraussetzen oder nennen (sonst verwiese die App auf etwas, das sie nicht zeigt)
+  const zurueck = pflichten.filter(({ inhalt: p }) => p?.nicht_vor_freigabe === true && p?.pruefung?.status !== "freigegeben");
+  for (const { inhalt: z } of zurueck)
+    for (const { datei, inhalt: p } of pflichten) {
+      if (!p || p.id === z.id) continue;
+      if ((p.voraussetzungen ?? []).includes(z.id)) fehlerAus(datei, `voraussetzungen: '${z.id}' ist bis zur Freigabe zurückgehalten (nicht_vor_freigabe)`);
+      const { fachlich_zu_pruefen: _n, ...inhalt } = p;
+      const text = JSON.stringify(inhalt);
+      if (text.includes(z.id) || (z.titel?.de && text.includes(z.titel.de))) fehlerAus(datei, `nennt '${z.id}', der bis zur Freigabe zurückgehalten ist (nicht_vor_freigabe)`);
+    }
   // Voraussetzungen dürfen keinen Kreis bilden (sonst ist im Gründungsassistenten nie etwas zu tun)
   const vor = new Map(pflichten.map((p) => [p.inhalt?.id, p.inhalt?.voraussetzungen ?? []]));
   const zustand = new Map();

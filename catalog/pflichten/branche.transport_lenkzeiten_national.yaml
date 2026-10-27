@@ -60,10 +60,6 @@ quellen:
 - titel: Fahrpersonalgesetz § 8 (Bußgeldvorschriften)
   url: https://www.gesetze-im-internet.de/fahrpersstg/__8.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: § 1 Abs. 1 Nr. 1, Abs. 6 FPersV und Sanktion bestätigt, Handwerkerausnahme § 1 Abs. 2 Nr. 3 FPersV ergänzt (nicht im Auslöser); § 21a ArbZG gilt erst ab 3,5 t – für diese Klasse nicht'
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
-- 'E-226: Einstufung der Folgen wieder „hoch“ auf Anweisung des Rechtsanwalts vom 27.10.2026 (v6, Text der Folgen unverändert) – die vorläufige Senkung der Vorprüfung ist damit aufgehoben; das Feld „dringend ohne Termin“ entfällt (bei „hoch“ dieselbe Wirkung auf „Heute“, der Validator verlangt es)'
 pruefung:
   status: freigegeben
   geprueft_von:

@@ -109,9 +109,6 @@ quellen:
 - titel: Umsatzsteuergesetz § 18
   url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Steuerberater 22.10.2026, Runde 2 – umgesetzt (v5): Umsatzbegriff vereinnahmte Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.). Auslöser über finanzen.umsatz.bezahlt_laufendes_jahr: nur tatsächliche Zahlungseingänge auf Rechnungen, Kasse und Sachentnahmen (§ 3 Abs. 1b UStG, bestätigt); offene Rechnungen zählen nicht (§ 14c Abs. 2 UStG) – liegt die Grenze nur mit ihnen darüber, zeigt Amtlos steuern.kleinunternehmer_grenze_offene_rechnungen; liegt finanzen.umsatz.bezahlt_vorjahr über 25.000 €, entfällt der Eintrag (dann gilt „Grenze überschritten“). Steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App heraus; Anlagenverkäufe kann sie nicht erkennen (Hinweis im Text). Zu prüfen: Wortlaut der Erklärung; der Server kennt keine Zahlungseingänge – dort gilt nur der Zweig aus den Profilangaben'
-- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: freigegeben
   geprueft_von:

@@ -67,9 +67,6 @@ quellen:
 - titel: Umsatzsteuer-Durchführungsverordnung § 34a (Rechnungen von Kleinunternehmern)
   url: https://www.gesetze-im-internet.de/ustdv_1980/__34a.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- Liste der Pflichtangaben (§ 14 Abs. 4 UStG) als Inhalt ergänzen
-- 'Steuerberater Runde 3 (23.10.2026) nennt für die Sechsmonatsfrist § 14 Abs. 2 Satz 1 Nr. 1 und 2 UStG. Laut Wortlaut der geltenden Fassung (lexmea.de, lxgesetze.de, 23.10.2026) steht die Frist in § 14 Abs. 2 Satz 2 (Nr. 1 andere Unternehmer, Nr. 2 juristische Personen, Nr. 3 Grundstücksleistungen auch an Privatkunden; nicht bei Umsätzen nach § 4 Nr. 8 bis 29 UStG) – so übernommen, vom Prüfer zu bestätigen. Als Text, nicht als Frist: es gibt kein Ereignis „Leistung ausgeführt“ (packages/rules-schema/ereignisse.json)'
 pruefung:
   status: freigegeben
   geprueft_von:

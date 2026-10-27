@@ -100,9 +100,9 @@ quellen:
   url: https://gesetze.legal/bund/bsig/65
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: Frist als „drei Monate ab Betroffenheit“ über die neue Angabe profil.nis2.betroffen_seit (Check-Frage nur bei NIS2 „ja“); BSI-Kulanz bis 31.7.2026 aus dem Kurztext gestrichen; Sanktion § 65 Abs. 2 Nr. 6, Abs. 5 Satz 1 Nr. 5 BSIG bestätigt'
-- 'E-217 (Rechtsanwalt 27.10.2026, T-287): NIS2 „ja“ ⇒ gilt unabhängig von der Größe (größenunabhängige Fälle über die Frage NIS2 ja/nein)'
-- 'E-217 (Rechtsanwalt 27.10.2026, T-278): ohne Angabe zu NIS2 unter 50 Beschäftigten nur in den NIS2-Branchen (IT, Andere, Gesundheit und Pflege, Transport und Logistik, Gastronomie und Lebensmittel) bei mehr als 10 Mio. € Umsatz, ohne Umsatzangabe „hängt ab“; die Jahresbilanzsumme fragt die App nicht (Technik) – dazu der Satz in der Bedingung'
+- 'E-217 (Rechtsanwalt 27.10.2026, T-278): ohne Angabe zu NIS2 unter 50 Beschäftigten nur in den NIS2-Branchen (IT, Andere,
+  Gesundheit und Pflege, Transport und Logistik, Gastronomie und Lebensmittel) bei mehr als 10 Mio. € Umsatz, ohne Umsatzangabe
+  „hängt ab“; die Jahresbilanzsumme fragt die App nicht (Technik) – dazu der Satz in der Bedingung'
 pruefung:
   status: freigegeben
   geprueft_von:

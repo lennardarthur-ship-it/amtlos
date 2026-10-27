@@ -157,10 +157,6 @@ quellen:
 - titel: Umsatzsteuergesetz § 14c
   url: https://www.gesetze-im-internet.de/ustg_1980/__14c.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'neu am 22.10.2026, Prüfung durch Steuerberater ausstehend (Steuer-Eintrag; Anlass: seine Rückmeldung Runde 2 zu steuern.kleinunternehmer_grenze_ueberschritten und …_naechstes_jahr)'
-- 'Auslöser: Zählung mit Ersatzregel (finanzen.umsatz.vereinnahmt_*, offene Rechnungen ab Rechnungsdatum) über einer Grenze, Zählung nur aus Zahlungseingängen (finanzen.umsatz.bezahlt_*) nicht – Gründungsjahr 25.000 €, laufendes Jahr 100.000 € und 25.000 € (ab 1. Januar), Vorjahr 25.000 €. Auf dem Server fehlen die Zahlungsfakten (dort keine Zahlungseingänge): Er zeigt den Hinweis, sobald seine Rechnungen nach Rechnungsdatum über einer Grenze liegen – fachlich prüfen, ob der Text dafür passt'
-- 'Formulierung „weist keine Umsatzsteuer aus, solange …“ nach Steuerberater (§ 14c Abs. 2 UStG); RDG: als Information formuliert – prüfen. Wortlaut § 19 UStG n. F. am 22.10.2026 nicht abrufbar (Allowlist), Inhalt nach Steuerberater'
 pruefung:
   status: freigegeben
   geprueft_von:

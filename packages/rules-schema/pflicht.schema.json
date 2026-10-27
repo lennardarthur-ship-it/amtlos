@@ -442,6 +442,10 @@
         }
       }
     },
+    "nicht_vor_freigabe": {
+      "type": "boolean",
+      "description": "E-233: Neuer Eintrag, der erst mit seiner fachlichen Freigabe erscheinen soll. Solange pruefung.status nicht 'freigegeben' ist, schreibt katalog-buendel.mjs ihn nicht ins Bündel der App und store-check zählt ihn nicht als Startblocker („jeder Eintrag freigegeben“), sondern nennt ihn als zurückgehalten. Nach der Freigabe ohne Wirkung. Kein Inhalt (nicht verglichen)."
+    },
     "fachlich_zu_pruefen": {
       "type": "array",
       "items": {

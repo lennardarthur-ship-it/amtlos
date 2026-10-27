@@ -48,8 +48,6 @@ quellen:
 - titel: § 14 UStG, Wortlaut (lxgesetze.de)
   url: https://lxgesetze.de/ustg/14
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: freigegeben
   geprueft_von:

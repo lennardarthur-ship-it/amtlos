@@ -67,10 +67,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/verpackdg/__66.html
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Prüfvermerk Rechtsanwalt 22.10.2026 (Fundstelle belegen): VerpackDG vom 13.7.2026, BGBl. 2026 I Nr. 207, in Kraft 12.8.2026 (Art. 8 Abs. 7) am 22.10.2026 auf gesetze-im-internet.de belegt; § 6 Abs. 1 Satz 1 „vor dem erstmaligen Bereitstellen“, § 7 Abs. 1 Satz 1 „vor der Bereitstellung“ gelesen. Abgrenzung systembeteiligungspflichtig nicht weiter geprüft'
-- 'Neue Herstellerpflichten aus der PPWR (z. B. Herstellerregister nach Art. 44, Kennzeichnung) und B2B-Verpackungen (§ 68 Abs. 9 VerpackDG, Übergang bis 31.12.2027) nicht abgebildet'
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: Frist mit Ereignis „erstes Inverkehrbringen“ – umgesetzt als relative Frist (vor Beginn) zur neuen Angabe profil.produkte.verpackung_ab („Ab wann bringst du zum ersten Mal verpackte Waren in Verkehr?“, nur bei verpackter Ware, ausdrücklich nur für Betriebe, die noch nicht begonnen haben); ohne Datum kein Termin – Bestandsbetriebe bekommen keine überfällige Frist; Sanktionen plausibel'
-- 'Freigabe Rechtsanwalt Runde 2 (23.10.2026): VerpackDG belegt, Frist mit Ereignis umgesetzt – freigegeben; Schwere „hoch“ bleibt'
+- Neue Herstellerpflichten aus der PPWR (z. B. Herstellerregister nach Art. 44, Kennzeichnung) und B2B-Verpackungen (§ 68
+  Abs. 9 VerpackDG, Übergang bis 31.12.2027) nicht abgebildet
 pruefung:
   status: freigegeben
   geprueft_von:

@@ -29,7 +29,7 @@ export const MARKER = /\[FACHLICH ZU PRÜFEN|fachlich zu prüfen|\bTODO\b|Platzh
 /** Vom Prüfstand braucht die App nur das (pruefer.ts: istGeprueft, pruefVermerk) – Rollen, nie Namen */
 export const PRUEFUNG_FELDER = ["status", "geprueft_von", "geprueft_am", "geprueft_version", "bestaetigt_am", "einschraenkung", "offen"];
 /** Felder, die nie ins Bündel gehören (intern oder nicht geprüft und nicht angezeigt) */
-export const INTERNE_FELDER = ["fachlich_zu_pruefen", "katalog_nr"];
+export const INTERNE_FELDER = ["fachlich_zu_pruefen", "katalog_nr", "nicht_vor_freigabe"];
 export const INTERNE_RADAR_FELDER = ["wahrscheinlichkeit", "vorbereitung"];
 
 /** Katalogeintrag bzw. Regelwert so, wie er ins Bündel der App geht */
@@ -42,6 +42,27 @@ export function ohneInterna(e) {
 
 const lesen = (p) => YAML.parse(fs.readFileSync(p, "utf8"));
 const yamlDateien = (o) => fs.readdirSync(o).filter((f) => /\.ya?ml$/.test(f)).sort().map((f) => path.join(o, f));
+
+/**
+ * E-233: Ein neuer Eintrag mit `nicht_vor_freigabe: true` erscheint erst mit seiner fachlichen Freigabe – bis dahin steht
+ * er nicht im Bündel der App (katalog-buendel.mjs) und ist kein Startblocker („jeder Eintrag fachlich freigegeben“ in
+ * store-check). Nach der Freigabe ist das Merkmal ohne Wirkung. Gedacht für Einträge, die nach dem Startstand dazukommen
+ * (erster Fall: steuern.ust_voranmeldung_kleinunternehmer, C.37) – nicht, um Bestehendes auszublenden.
+ */
+export const zurueckgehalten = (p) => p?.nicht_vor_freigabe === true && p?.pruefung?.status !== "freigegeben";
+
+/**
+ * Prüfstand des Katalogs aus catalog/pflichten (nicht aus dem Bündel): Entwürfe, die die App zeigen würde (Startblocker),
+ * und zurückgehaltene Einträge (nur Hinweis). Genutzt von store-check.mjs und Test e233.
+ */
+export function katalogEntwuerfe(wurzel = WURZEL) {
+  const alle = yamlDateien(path.join(wurzel, "catalog/pflichten")).map(lesen);
+  const offen = (p) => ["entwurf", "in_pruefung"].includes(p?.pruefung?.status);
+  return {
+    blockierend: alle.filter((p) => p?.pruefung?.status === "entwurf" && !zurueckgehalten(p)).map((p) => p.id),
+    zurueckgehalten: alle.filter((p) => zurueckgehalten(p) && offen(p)).map((p) => p.id),
+  };
+}
 const texte = (x, pfad = "", aus = []) => {
   if (typeof x === "string") aus.push([pfad, x]);
   else if (Array.isArray(x)) x.forEach((y, i) => texte(y, `${pfad}[${i}]`, aus));

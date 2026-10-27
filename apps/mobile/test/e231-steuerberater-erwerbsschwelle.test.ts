@@ -6,7 +6,8 @@
  * - Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG als Katalogeintrag im Entwurf.
  * - „1 Beleg … fehlt“ auf der Voranmeldung; Kleinunternehmer-Zeitraum uneinbringlich: sein Satz wörtlich.
  */
-import { readFileSync } from "node:fs";
+import fs, { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { strFromU8, unzipSync } from "fflate";
@@ -20,6 +21,8 @@ import { steuerpaket } from "../src/unterlagen/steuerpaket";
 import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
 
 const hier = path.dirname(fileURLToPath(import.meta.url));
+const WURZEL = path.resolve(hier, "../../..");
+const YAML = createRequire(path.join(WURZEL, "packages/rules-engine/package.json"))("yaml") as { parse: (s: string) => unknown };
 const lies = (p: string) => readFileSync(path.join(hier, "../src", p), "utf8");
 const t = (d: string) => new Date(`${d}T09:00:00Z`);
 const SCHWELLE = 12500;
@@ -51,7 +54,7 @@ describe("E-231: Erwerbsschwelle im laufenden Jahr überschritten (T-323)", () =
   it("Texte: Lage, erneute Frage, Satz zu neuen Fahrzeugen und verbrauchsteuerpflichtigen Waren", () => {
     expect(TEXT.e231_status_erneut("2026", "12.500 €")).toBe("Deine Erwerbe aus dem EU-Ausland liegen 2026 laut deinen Belegen schon über 12.500 € – bitte die Frage noch einmal beantworten.");
     expect(TEXT.e231_jahr_ueber("2026", "13.000,00 €", "12.500 €")).toContain("Bitte beantworte die Frage noch einmal.");
-    expect(TEXT.e227_schwelle_hinweis("12.500 €")).toContain("Bei der Erwerbsschwelle zählen sie nicht mit (§ 1a Abs. 3 Nr. 2 UStG): Die App erkennt sie an den Belegen nicht und zählt alle Erwerbe mit – zieh sie bei deiner Antwort ab.");
+    expect(TEXT.e227_schwelle_hinweis("12.500 €")).toContain("Bei der Erwerbsschwelle zählen sie nicht mit (§ 1a Abs. 5 Satz 1 UStG): Die App erkennt sie an den Belegen nicht und zählt alle Erwerbe mit – zieh sie bei deiner Antwort ab.");
     const ui = lies("seiten/Erwerbsschwelle.tsx");
     expect(ui).toContain("TEXT.e231_jahr_ueber(jahr, euro(l.jahr_cent), schwelle)");
     expect(ui).toContain("[erneutFeld(jahr)]: w === \"ja\"");
@@ -109,30 +112,28 @@ describe("E-231: Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG als 
   const ID = "steuern.ust_voranmeldung_kleinunternehmer";
   const KU: Profil = { rechtsform: "einzelunternehmen", gruendungsdatum: "2022-01-01", "taetigkeit.einordnung": "gewerbe", bundesland: "BY", "ust.kleinunternehmer": true, "umsatz.vorjahr": 20000, "einkauf.eu_unternehmen": true };
 
+  // E-233: bis zur Freigabe zurückgehalten (nicht_vor_freigabe) – der Eintrag steht im Katalog, nicht im Bündel der App;
+  // den Auslöser prüfen die Engine-Fixtures (catalog/fixtures/e231-ku-*.yaml) am ganzen Katalog
+  const C37 = YAML.parse(fs.readFileSync(path.join(WURZEL, `catalog/pflichten/${ID}.yaml`), "utf8")) as { pruefung: { status: string }; nicht_vor_freigabe: boolean; rechtsgrundlage: string[]; quellen: { url: string }[]; frist: { typ: string; rhythmus: string; faellig: { monate_nach: number; tag: number } }; erklaerung: { de: string } };
+
   it("im Katalog als Entwurf mit § 18 Abs. 4a UStG, Quelle gesetze-im-internet.de, monatlich fällig am 10. des Folgemonats", () => {
-    const p = KATALOG.pflichten.find((x) => x.id === ID) as unknown as { pruefung: { status: string }; rechtsgrundlage: string[]; quellen: { url: string }[]; frist: { typ: string; rhythmus: string; faellig: { monate_nach: number; tag: number } }; erklaerung: { de: string } };
+    const p = C37;
     expect(p.pruefung.status).toBe("entwurf");
+    expect(p.nicht_vor_freigabe).toBe(true);
     expect(p.rechtsgrundlage).toContain("§ 18 Abs. 4a UStG");
     expect(p.quellen.some((q) => q.url === "https://www.gesetze-im-internet.de/ustg_1980/__18.html")).toBe(true);
     expect(p.frist).toMatchObject({ typ: "wiederkehrend", rhythmus: "monatlich", faellig: { monate_nach: 1, tag: 10 } });
     for (const s of ["§ 18 Abs. 4a Satz 1 UStG", "§ 18 Abs. 4a Satz 2 UStG", "bis zum 10. des Folgemonats", "Umsatzsteuer-Jahreserklärung", "in Monaten ohne solche Steuer gibst du keine Voranmeldung ab"]) expect(p.erklaerung.de).toContain(s);
   });
 
-  it("gilt für Kleinunternehmer mit Einkauf im EU-Ausland – ohne Prüfvermerk, mit Termin am 10.; sonst nicht", () => {
+  it("E-233: die App zeigt ihn bis zur Freigabe nicht; der Kern-Check fragt Kleinunternehmer weiter nach dem Einkauf im EU-Ausland", () => {
+    expect(KATALOG.pflichten.map((x) => x.id)).not.toContain(ID);
     const a = auswertung(KU, "2026-10-27");
-    const p = a.gilt.find((x) => x.id === ID);
-    expect(p).toBeDefined();
-    expect(p!.geprueft).toBe(false);
-    expect(p!.naechsterTermin).toBe("2026-11-10");
-    // ohne Angabe zum Einkauf „hängt ab“ (E-206: unbekannt blendet nichts aus) – der Kern-Check fragt Kleinunternehmer danach
+    expect([...a.gilt, ...a.unbekannt].map((x) => x.id)).not.toContain(ID);
     const { "einkauf.eu_unternehmen": _e, ...unbekannt } = KU;
-    expect(auswertung(unbekannt, "2026-10-27").unbekannt.map((x) => x.id)).toContain(ID);
     expect(checkFragen(unbekannt).map((f) => f.feld)).toContain("einkauf.eu_unternehmen");
     expect(checkFragen({ ...unbekannt, "ust.kleinunternehmer": false }).map((f) => f.feld)).not.toContain("einkauf.eu_unternehmen");
-    const ohne = auswertung({ ...KU, "einkauf.eu_unternehmen": false }, "2026-10-27");
-    expect([...ohne.gilt, ...ohne.unbekannt].map((x) => x.id)).not.toContain(ID);
-    const regel = auswertung({ ...KU, "ust.kleinunternehmer": false }, "2026-10-27");
-    expect([...regel.gilt, ...regel.unbekannt].map((x) => x.id)).not.toContain(ID);
+    for (const f of ["e231-ku-voranmeldung-18-4a.yaml", "e231-ku-ohne-eu-einkauf.yaml"]) expect(fs.existsSync(path.join(WURZEL, "catalog/fixtures", f)), f).toBe(true);
   });
 });
 

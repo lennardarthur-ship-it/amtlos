@@ -12,7 +12,6 @@
   rechtsgrundlage: ["§ 1 MiLoG", "Fünfte Mindestlohnanpassungsverordnung vom 5.11.2025 (BGBl. 2025 I Nr. 268)"]
   quellen:
     - { titel: Mindestlohngesetz, url: "https://www.gesetze-im-internet.de/milog/", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: 13,90 € brutto je Zeitstunde ab 01.01.2026 bis 31.12.2026, Rechtsgrundlage Fünfte Mindestlohnanpassungsverordnung laut Rechtsanwalt 26.10.2026 (ersetzt v1)"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 3, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -28,7 +27,6 @@
   rechtsgrundlage: ["§ 1 MiLoG", "Fünfte Mindestlohnanpassungsverordnung vom 5.11.2025 (BGBl. 2025 I Nr. 268)"]
   quellen:
     - { titel: Mindestlohngesetz, url: "https://www.gesetze-im-internet.de/milog/", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: 14,60 € ab 01.01.2027, ebenfalls Fünfte Mindestlohnanpassungsverordnung (verkündet; „beschlossen, noch nicht in Kraft“ trifft für diesen Betrag zu) laut Rechtsanwalt 26.10.2026 (ersetzt v2)"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 4, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -44,7 +42,6 @@
   rechtsgrundlage: ["§ 8 Abs. 1a SGB IV"]
   quellen:
     - { titel: Sozialgesetzbuch IV § 8, url: "https://www.gesetze-im-internet.de/sgb_4/__8.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Rechtsgrundlage ergänzt"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -60,7 +57,6 @@
   rechtsgrundlage: ["§ 8 Abs. 1a SGB IV"]
   quellen:
     - { titel: Sozialgesetzbuch IV § 8, url: "https://www.gesetze-im-internet.de/sgb_4/__8.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Dynamische Kopplung an den Mindestlohn – 633 € ab 01.01.2027 vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -76,7 +72,6 @@
   rechtsgrundlage: ["§ 154 SGB IX"]
   quellen:
     - { titel: Sozialgesetzbuch IX § 154, url: "https://www.gesetze-im-internet.de/sgb_9_2018/__154.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2018 (SGB IX in der Fassung des BTHG; vorher inhaltsgleich § 71 SGB IX a. F.); jahresdurchschnittlich monatlich mindestens 20 Arbeitsplätze – Vergleich ≥ 20 – laut Rechtsanwalt 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -92,7 +87,6 @@
   rechtsgrundlage: ["§ 12 HinSchG"]
   quellen:
     - { titel: Hinweisgeberschutzgesetz § 12, url: "https://www.gesetze-im-internet.de/hinschg/__12.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 17.12.2023 für Beschäftigungsgeber mit 50 bis 249 Beschäftigten (§ 42 HinSchG; ab 250 schon seit 02.07.2023); in der Regel mindestens 50 – Vergleich ≥ 50 – laut Rechtsanwalt 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -108,7 +102,7 @@
   rechtsgrundlage: ["Richtlinie (EU) 2023/970"]
   quellen:
     - { titel: "Richtlinie (EU) 2023/970", url: "https://eur-lex.europa.eu/eli/dir/2023/970/oj", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: Vergleich ≥ 150 (Art. 9 RL (EU) 2023/970: 150 bis 249 Arbeitnehmer erstmals bis 07.06.2027) – Auslöser vergleicht schon mit „>=“; gültig ab offen, weil es noch kein deutsches Umsetzungsgesetz gibt (Stand 26.10.2026) – laut Rechtsanwalt 26.10.2026", "Deutsches Umsetzungsgesetz abwarten"]
+  fachlich_zu_pruefen: ["Deutsches Umsetzungsgesetz abwarten"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -124,5 +118,4 @@
   rechtsgrundlage: ["§ 26 DGUV Vorschrift 1"]
   quellen:
     - { titel: DGUV Vorschrift 1, url: "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab ohne Stichtag – der Wert gilt seit Inkrafttreten der DGUV Vorschrift 1 beim jeweiligen Unfallversicherungsträger (Musterfassung 2013, schon in der Vorgängervorschrift); bei 2 bis 20 anwesenden Versicherten mindestens ein Ersthelfer – Vergleich ≥ 2, gezählt werden die anwesenden Versicherten – laut Fachkraft für Arbeitssicherheit 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [arbeitsschutz], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }

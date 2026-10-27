@@ -60,9 +60,6 @@ quellen:
 - titel: Art. 83 DSGVO, Wortlaut (gdpr-text.com)
   url: https://gdpr-text.com/es/read/article-83
   abgerufen: '2026-10-21'
-fachlich_zu_pruefen:
-- Vorlage erst nach fachlicher Prüfung (6.4)
-- 'Frist „ab Live-Schaltung“ (Prüfvermerk Rechtsanwalt 22.10.2026) nur im Text – kein Ereignis dafür'
 pruefung:
   status: freigegeben
   geprueft_von:

@@ -54,10 +54,6 @@ quellen:
 - titel: Art. 33 DSGVO, Wortlaut (gesetze.legal)
   url: https://gesetze.legal/eu/vo_eu_2016_679/33
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: Katalogfrist auf PT72H (stundengenau ab Kenntnis) – Schema (dauer ohne Uhrzeit) und Fristen-Engine kennen keine Stunden; ohne neue Engine-Funktion konservativ P2D statt P3D: Das Ereignis trägt nur das Datum der Entdeckung, bei P3D läge der Kalendertermin (ganzer Tag) bis zu 24 Stunden hinter dem Fristende; P2D endet bei jeder Uhrzeit der Entdeckung spätestens mit Ablauf der 72 Stunden. Kurztext „binnen 72 Stunden“ belassen, Erklärung um „unverzüglich und möglichst binnen 72 Stunden“ und die Begründungspflicht (Art. 33 Abs. 1 Satz 2) ergänzt (Wortlaut gelesen 22.10.2026, gesetze.legal); der Countdown der App rechnet weiter stundengenau'
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: Benachrichtigung der Betroffenen bei hohem Risiko (Art. 34 DSGVO) als eigene Pflicht – neuer Eintrag datenschutz.datenpanne_benachrichtigung'
-- 'Freigabe Rechtsanwalt Runde 2 (23.10.2026): P2D als konservative Abbildung der 72 Stunden vertretbar; Text nach Art. 33 Abs. 1 richtig'
 pruefung:
   status: freigegeben
   geprueft_von:

@@ -51,7 +51,8 @@ quellen:
   url: https://www.bgn.de/praevention-arbeitshilfen/unsere-leistungen/arbeitsmedizinische-und-sicherheitstechnische-betreuung/unternehmermodell/Update_DGUV_Vorschrift2_Unternehmermodell.pdf
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Grenzen für das Unternehmermodell je BG als Daten ergänzen (laut Freigabe Sifa 22.10.2026 richtig, da BG-spezifisch, z. B. BGN > 10 bis 50 Beschäftigte; Technik)'
+- Grenzen für das Unternehmermodell je BG als Daten ergänzen (laut Freigabe Sifa 22.10.2026 richtig, da BG-spezifisch, z.
+  B. BGN > 10 bis 50 Beschäftigte; Technik)
 pruefung:
   status: freigegeben
   geprueft_von:

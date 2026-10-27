@@ -12,7 +12,6 @@
   rechtsgrundlage: ["§ 36 Abs. 3 VSBG"]
   quellen:
     - { titel: Verbraucherstreitbeilegungsgesetz § 36, url: "https://www.gesetze-im-internet.de/vsbg/__36.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.02.2017; Ausnahme für bis zu zehn Beschäftigte am 31. Dezember des Vorjahres – Vergleich > 10 – laut Rechtsanwalt 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -28,7 +27,6 @@
   rechtsgrundlage: ["§ 2 Nr. 17 BFSG", "§ 3 Abs. 3 BFSG"]
   quellen:
     - { titel: Barrierefreiheitsstärkungsgesetz, url: "https://www.gesetze-im-internet.de/bfsg/", abgerufen: null }
-  fachlich_zu_pruefen: ["Rechtsgrundlage ergänzt"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -44,5 +42,5 @@
   rechtsgrundlage: ["§ 2 Nr. 17 BFSG"]
   quellen:
     - { titel: Barrierefreiheitsstärkungsgesetz, url: "https://www.gesetze-im-internet.de/bfsg/", abgerufen: null }
-  fachlich_zu_pruefen: ["Alternative Bilanzsumme fehlt im Profil", "Rechtsgrundlage ergänzt"]
+  fachlich_zu_pruefen: ["Alternative Bilanzsumme fehlt im Profil"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }

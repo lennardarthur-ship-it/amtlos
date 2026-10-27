@@ -96,7 +96,8 @@ quellen:
   url: https://www.bzst.de/DE/Unternehmen/Umsatzsteuer/One-Stop-Shop_EU/one_stop_shop_eu_node.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Auslöser: die Lieferschwelle (10.000 € EU-weit, § 3c Abs. 4 UStG) fragt der Check nicht ab – die Pflicht „kommt in Frage“ bei B2C-Kunden in der EU mit Online- bzw. Fernabsatz'
+- 'Auslöser: die Lieferschwelle (10.000 € EU-weit, § 3c Abs. 4 UStG) fragt der Check nicht ab – die Pflicht „kommt in Frage“
+  bei B2C-Kunden in der EU mit Online- bzw. Fernabsatz'
 pruefung:
   status: freigegeben
   geprueft_von:

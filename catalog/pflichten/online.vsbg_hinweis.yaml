@@ -75,7 +75,9 @@ quellen:
   url: https://umwelt-online.de/recht/allgemei/wirtschaft/vsbg_in.htm
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: § 36 Abs. 1, 3 VSBG und Zählweise nach Köpfen bestätigt, Folge UWG-Abmahnung (§ 3a UWG) eingetragen, Auslöser Website (oder Onlineshop/App) statt AGB. Offen: Stichtag 31.12. des Vorjahres ist im Auslöser nicht abgebildet'
+- 'Prüfvermerk Rechtsanwalt 22.10.2026: § 36 Abs. 1, 3 VSBG und Zählweise nach Köpfen bestätigt, Folge UWG-Abmahnung (§ 3a
+  UWG) eingetragen, Auslöser Website (oder Onlineshop/App) statt AGB. Offen: Stichtag 31.12. des Vorjahres ist im Auslöser
+  nicht abgebildet'
 pruefung:
   status: freigegeben
   geprueft_von:

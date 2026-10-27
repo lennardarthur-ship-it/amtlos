@@ -55,11 +55,6 @@ quellen:
 - titel: Sozialgesetzbuch IV § 7a
   url: https://www.gesetze-im-internet.de/sgb_4/__7a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: Folgen (Freelancer-Seite) eingetragen, Frist „keine“; Auslöser „beschäftigt mindestens eine Person“ entfernt (Auftraggeber-Seite in personal.statusfeststellung_auftraggeber, Doppelung vermeiden)'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
-- 'E-226: Einstufung der Folgen wieder „hoch“ auf Anweisung des Rechtsanwalts vom 27.10.2026 (v5, Text der Folgen unverändert) – die vorläufige Senkung der Vorprüfung ist damit aufgehoben; das Feld „dringend ohne Termin“ entfällt (bei „hoch“ dieselbe Wirkung auf „Heute“, der Validator verlangt es)'
 pruefung:
   status: freigegeben
   geprueft_von:

@@ -59,7 +59,8 @@ LEBENSMITTEL_RECHT = {"branche.gastro_preisverzeichnis", "branche.gastro_mehrweg
 # Rollen statt Personen (E-196): Schlüssel in freigaben.yaml und in `pruefung.geprueft_von`
 RECHT, STEUERN, SIFA, LMH = "recht", "steuern", "arbeitsschutz", "hygiene"
 ROLLEN = {RECHT: "Rechtsanwalt", STEUERN: "Steuerberater", SIFA: "Fachkraft für Arbeitssicherheit", LMH: "Lebensmittelfachbeauftragter"}
-NICHT_VERGLICHEN = {"version", "pruefung", "fachlich_zu_pruefen", "aenderungsnotiz"}
+# E-233: `nicht_vor_freigabe` steuert nur, ob ein Entwurf schon im Bündel der App steht – kein Inhalt
+NICHT_VERGLICHEN = {"version", "pruefung", "fachlich_zu_pruefen", "aenderungsnotiz", "nicht_vor_freigabe"}
 # Wörter in `fachlich_zu_pruefen`, die eine weitere fachliche Prüfung verlangen – jeder solche Punkt muss in
 # offene-punkte.yaml als offen oder erledigt eingeordnet sein (E-196)
 OFFEN_STICHWORTE = [r'bestätigen lassen', r'bitte ganz prüfen', r'bitte prüfen', r'Nummer und Höhe bestätigen', r'Betriebsarzt',

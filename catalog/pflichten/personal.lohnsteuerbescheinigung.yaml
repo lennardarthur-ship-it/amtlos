@@ -77,13 +77,6 @@ quellen:
 - titel: ELSTER – Informationen für Arbeitgeber
   url: https://www.elster.de/eportal/infoseite/arbeitgeber
   abgerufen: '2026-10-25'
-fachlich_zu_pruefen:
-- 'Frist bei Ende des Dienstverhältnisses im laufenden Jahr: Das Lohnkonto wird beim Ausscheiden abgeschlossen (§ 41b Abs. 1 Satz 1 EStG); als Übermittlungsfrist ist der letzte Februartag des Folgejahres angenommen (§ 93c Abs. 1 Nr. 1 AO) – keine frühere Pflicht? Die App zeigt nur den Jahrestermin.'
-- 'Auslöser wie bei der Lohnsteuer-Anmeldung (Anmeldezeitraum nicht „keine“; seit E-206 auch ohne Angabe des Anmeldezeitraums): Betriebe, die nur Minijobs mit Pauschsteuer von 20 % nach § 40a Abs. 2a EStG beim Finanzamt anmelden, sehen den Eintrag, obwohl § 41b Abs. 6 EStG pauschal besteuerten Lohn ausnimmt – Hinweis im Text genügt, oder eigene Frage?'
-- 'Folgen: keine eigene Bußgeldvorschrift gefunden (§ 41b Abs. 2a EStG ist weggefallen, § 379 AO nennt § 93c AO nicht) – genannt sind nur die Haftung nach § 72a Abs. 4 AO und § 42d Abs. 1 Nr. 3 EStG. Vollständig? Zwangsgeld (§§ 328, 329 AO) erwähnen? Schwere „mittel“ angemessen?'
-- 'Verschiebung auf den nächsten Werktag (§ 108 Abs. 3 AO) auch für die Frist des § 93c Abs. 1 Nr. 1 AO? Kalender bundesland wie bei der Lohnsteuer-Anmeldung.'
-- 'Ausnahme Privathaushalt ohne maschinelle Lohnabrechnung mit nur geringfügig Beschäftigten (§ 41b Abs. 3 EStG, Papierbescheinigung) nicht erwähnt, weil die App Betriebe anspricht – in Ordnung?'
-- 'Doppelung geprüft: personal.lohnsteuer_anmeldung (§ 41a EStG) und personal.lohnabrechnung (Meldungen SV) decken § 41b EStG nicht ab. Ein Querverweis in personal.lohnsteuer_anmeldung wäre eine Änderung am freigegebenen Eintrag (PRUEFLISTE T-198).'
 pruefung:
   status: freigegeben
   geprueft_von:

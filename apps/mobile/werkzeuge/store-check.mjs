@@ -179,8 +179,17 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
   const katalog = JSON.parse(lies("src/pflichten/katalog.json"));
   const wartend = katalog.pflichten.filter((p) => p.pruefung?.status === "in_pruefung").map((p) => p.id);
   pruefe(!wartend.length, `Katalog: alle freigegebenen Einträge schriftlich bestätigt (E-197, Nachweis ohne Mail im Projekt, E-198)${wartend.length ? ` – ${wartend.length} warten auf die Bestätigung per E-Mail bzw. Nachprüfung (Nachprüfliste beim Gründer, PRUEFLISTE T-200)` : ""}`);
-  const entwurf = katalog.pflichten.filter((p) => p.pruefung?.status === "entwurf").map((p) => p.id);
-  pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; Prüfpaket beim Gründer, PRUEFLISTE T-198; E-223: Entwürfe sind Startblocker, PRUEFLISTE T-313)` : ""}`);
+  // E-223: Entwürfe im Bündel sind Startblocker. E-233: Einträge mit `nicht_vor_freigabe` stehen bis zur Freigabe nicht im
+  // Bündel (die App zeigt sie nicht) – kein Startblocker, nur genannt; ein Entwurf ohne das Merkmal bleibt Startblocker,
+  // auch wenn das Bündel veraltet ist (Prüfung am Katalog selbst).
+  {
+    const { katalogEntwuerfe, zurueckgehalten } = await import("./interna.mjs");
+    const kat = katalogEntwuerfe();
+    const entwurf = [...new Set([...katalog.pflichten.filter((p) => p.pruefung?.status === "entwurf").map((p) => p.id), ...kat.blockierend])].sort();
+    pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; Prüfpaket beim Gründer, PRUEFLISTE T-198; E-223: Entwürfe sind Startblocker, PRUEFLISTE T-313)` : ""}${kat.zurueckgehalten.length ? ` – bis zur Freigabe zurückgehalten, nicht in der App und kein Startblocker (E-233): ${kat.zurueckgehalten.join(", ")}` : ""}`);
+    const imBuendel = katalog.pflichten.filter((p) => kat.zurueckgehalten.includes(p.id) || zurueckgehalten(p)).map((p) => p.id);
+    pruefe(!imBuendel.length, `Bündel ohne zurückgehaltene Einträge (E-233, katalog-buendel.mjs)${imBuendel.length ? ` – ${imBuendel.join(", ")} (Bündel neu erzeugen)` : ""}`);
+  }
   // E-223 (a): keine freigegebene Fassung mit offener Prüfmarke; (b): nichts Internes im Bündel (katalog.json, Web-Export und
   // Website, falls gebaut) – Regeln in werkzeuge/interna.mjs
   {

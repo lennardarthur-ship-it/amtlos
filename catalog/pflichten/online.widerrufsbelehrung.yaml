@@ -60,9 +60,8 @@ quellen:
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Muster-Widerrufsbelehrung erst nach Prüfung
-- Muster nach Gestaltungshinweis 3 (Widerrufsbutton, Anlage 1 zu Art. 246a § 1 Abs. 2 S. 2 EGBGB) anpassen (Rechtsprüfung R11 Befund 9)
-- Verträge außerhalb von Geschäftsräumen als eigene Pflicht (branche.widerruf_ausserhalb_geschaeftsraeume)
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: § 312d, Art. 246a EGBGB, § 355, § 356 Abs. 3–5 n. F., § 357a Abs. 2 bestätigt; Muster nach Anlage 1 EGBGB mit Gestaltungshinweis (Stand 19.6.2026) und Ausnahmen § 312g Abs. 2 als Hinweis im Text'
+- Muster nach Gestaltungshinweis 3 (Widerrufsbutton, Anlage 1 zu Art. 246a § 1 Abs. 2 S. 2 EGBGB) anpassen (Rechtsprüfung
+  R11 Befund 9)
 pruefung:
   status: freigegeben
   geprueft_von:

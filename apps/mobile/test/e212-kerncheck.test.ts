@@ -136,14 +136,15 @@ describe("T-241: Kern-Check gibt OSS, EÜR, Gewerbesteuer und Vorauszahlungen ec
     expect(f).toEqual(expect.arrayContaining(["vorauszahlung.est_kst", "vorauszahlung.gewst"]));
     for (const x of ["gewinn.vorjahr", "steuern.buchfuehrung_mitteilung"]) expect(f).not.toContain(x);
   });
-  it("typisches Einzelunternehmen: nach dem Kern-Check hängt nur noch die Gewerbesteuererklärung bei kleinem Gewinn von Angaben ab", () => {
+  it("typisches Einzelunternehmen: nach dem Kern-Check hängt nichts mit Termin mehr von Angaben ab (E-233, T-265)", () => {
     const p = durchlaufen(solo);
-    // Gewinn im Vorjahr unter dem Freibetrag: es entscheidet noch der erwartete Gewinn dieses Jahres (Zusatzfrage) – bis
-    // dahin einmal im Jahr „falls es für dich gilt“ (Rückfall, E-207); OSS, EÜR, E-Bilanz und Vorauszahlungen sind geklärt
-    expect(datiertOffen(p)).toEqual(["steuern.gewst_erklaerung"]);
+    // E-233 (T-265): Gewinn im Vorjahr unter dem Freibetrag – der Kern-Check fragt jetzt den erwarteten Gewinn dieses Jahres
+    // (vorher Zusatzfrage mit „falls es für dich gilt“); OSS, EÜR, E-Bilanz, Vorauszahlungen und Gewerbesteuer sind geklärt
+    expect(felder(p)).toContain("gewinn.prognose_laufendes_jahr");
+    expect(datiertOffen(p)).toEqual([]);
     const zeiten = zeitenAm(p, "2026-10-25T08:00:00.000Z");
     const { a, e } = stand(p, zeiten);
-    expect(erinnerungen(a, e, heute).filter((x) => x.vielleicht).map((x) => x.pflichtId)).toEqual(["steuern.gewst_erklaerung"]);
+    expect(erinnerungen(a, e, heute).filter((x) => x.vielleicht).map((x) => x.pflichtId)).toEqual([]);
     expect(a.gilt.map((x) => x.id)).toContain("steuern.euer");
     // Vorauszahlungen festgesetzt, Gewinn über dem Freibetrag: echte Termine statt „falls es für dich gilt“
     const mit = stand(durchlaufen({ ...solo, "gewinn.vorjahr": 40000, "vorauszahlung.est_kst": true, "vorauszahlung.gewst": true }), zeiten);

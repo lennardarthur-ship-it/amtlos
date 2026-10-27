@@ -102,7 +102,8 @@ describe("E-201: Rückmeldungen Rechtsanwalt und Steuerberater im Katalog", () =
   it("alle 228 Einträge freigegeben, keine offenen Punkte mehr – E-217: auch die von E-215 und E-216 geänderten sind bestätigt (T-278, T-282)", () => {
     // E-223: zwei neue Einträge im Entwurf (T-313) – ohne Vermerk
     // E-231: Voranmeldung des Kleinunternehmers (§ 18 Abs. 4a UStG) im Entwurf (T-337) – ohne Vermerk
-    expect(pflichten.length).toBe(231);
+    // E-233: bis zur Freigabe zurückgehalten (nicht_vor_freigabe) – nicht im Bündel, alle 230 im Bündel mit Vermerk
+    expect(pflichten.length).toBe(230);
     const E206 = ["personal.lohnsteuer_anmeldung", "personal.lohnsteuerbescheinigung"];
     // E-215: neue Fassung nach der Empfehlung des Rechtsanwalts (T-278); E-216: Voranmeldung v8 mit dem Satz zur
     // Dauerfristverlängerung (Anregung des Steuerberaters, T-268) – Vermerk erst nach der Bestätigung (T-282)

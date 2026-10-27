@@ -45,8 +45,6 @@ quellen:
 - titel: Wasserhaushaltsgesetz
   url: https://www.gesetze-im-internet.de/whg_2009/
   abgerufen: null
-fachlich_zu_pruefen:
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: Folgen (§ 103 Abs. 1 Nr. 1, Abs. 2 WHG), Eigenkontrolle monatlich, Wartung halbjährlich, Generalinspektion alle fünf Jahre (DIN 1999-100/DIN EN 858-2, Anhang 49 AbwV) und AwSV als Hinweis übernommen; § 103 WHG und Anhang 49 AbwV nicht am Wortlaut gelesen, AwSV-Schwellen nicht beziffert'
 pruefung:
   status: freigegeben
   geprueft_von:

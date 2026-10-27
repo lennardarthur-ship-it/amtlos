@@ -86,7 +86,6 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - 'Steuerberater 22.10.2026: Übergangsfristen am 22.10.2026 unverändert – vor dem Start und vor dem 01.01.2027 erneut prüfen'
-- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: freigegeben
   geprueft_von:

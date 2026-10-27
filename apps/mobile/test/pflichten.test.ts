@@ -11,6 +11,10 @@ import { CHECK_FELDER, KATALOG, auswertung, checkFragen, ereignisseAusStand, dri
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/fixtures");
 const salon: Profil = { "taetigkeit.branchen": ["beauty_kosmetik"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "BY", "beschaeftigte.gesamt": 3, "kasse.elektronisch": true, "online.website": false, "ust.kleinunternehmer": false, gruendungsdatum: "2024-03-01" };
 const ids = (l: { id: string }[]) => l.map((p) => p.id);
+// E-233: Einträge mit nicht_vor_freigabe ohne Freigabe (nicht im Bündel der App)
+const ZURUECK = new Set(
+  fs.readdirSync(path.resolve(FIXTURES, "../pflichten")).map((f) => parse(fs.readFileSync(path.resolve(FIXTURES, "../pflichten", f), "utf8")) as { id: string; nicht_vor_freigabe?: boolean; pruefung?: { status?: string } }).filter((p) => p.nicht_vor_freigabe === true && p.pruefung?.status !== "freigegeben").map((p) => p.id),
+);
 
 describe("Pflichten-Check", () => {
   it("„Kurz klären“ fragt nur, was für den Betrieb gestellt wird – die Investoren-Frage nur bei Gesellschaften (R10)", () => {
@@ -122,6 +126,8 @@ describe("Pflichten-Check", () => {
       const a = auswertung(profil, fx.stichtag);
       for (const [id, erwartet] of Object.entries(fx.erwartet)) {
         if (KATALOG.pflichten.find((p) => p.id === id && ["entwurf", "beschlossen", "geplant"].includes(p.status_recht))) continue;
+        // E-233: bis zur Freigabe zurückgehaltene Einträge stehen nicht im Bündel – ihre Fixtures prüft die Regel-Engine am ganzen Katalog
+        if (ZURUECK.has(id)) continue;
         const ist = ids(a.gilt).includes(id) || ids(a.gruendung).includes(id) || ids(a.beiEinstellung).includes(id) ? "gilt" : ids(a.unbekannt).includes(id) ? "unbekannt" : "gilt_nicht";
         expect(ist, `${datei}: ${id}`).toBe(erwartet);
         geprueft++;

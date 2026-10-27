@@ -12,7 +12,6 @@
   rechtsgrundlage: ["§ 18 Abs. 2 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 18, url: "https://www.gesetze-im-internet.de/ustg_1980/__18.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2025 (Anhebung von 1.000 € durch das Wachstumschancengesetz) und Vergleich „nicht mehr als“ (≤, Befreiung im Ermessen des Finanzamts, § 18 Abs. 2 Satz 3 UStG) laut Steuerberater 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -28,7 +27,6 @@
   rechtsgrundlage: ["§ 18 Abs. 2 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 18, url: "https://www.gesetze-im-internet.de/ustg_1980/__18.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2025 (vorher 7.500 €), monatlich bei mehr als 9.000 € (Vergleich „>“, § 18 Abs. 2 Satz 2 UStG) laut Steuerberater 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -61,7 +59,6 @@
   rechtsgrundlage: ["§ 19 Abs. 1 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 19, url: "https://www.gesetze-im-internet.de/ustg_1980/__19.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2025; inklusive – Kleinunternehmer, wenn der Gesamtumsatz des Vorjahres 25.000 € nicht überschritten hat (≤) – laut Steuerberater 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -77,7 +74,6 @@
   rechtsgrundlage: ["§ 19 Abs. 1 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 19, url: "https://www.gesetze-im-internet.de/ustg_1980/__19.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2025; inklusive (≤ 100.000 €), beim Überschreiten ist schon der Umsatz regelbesteuert, mit dem die Grenze überschritten wird – laut Steuerberater 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -93,7 +89,6 @@
   rechtsgrundlage: ["§ 19 Abs. 1 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 19, url: "https://www.gesetze-im-internet.de/ustg_1980/__19.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2025; inklusive (≤ 25.000 €) im Jahr der Aufnahme der Tätigkeit, als eigener Regelwert richtig – laut Steuerberater 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -109,7 +104,6 @@
   rechtsgrundlage: ["§ 141 AO"]
   quellen:
     - { titel: Abgabenordnung § 141, url: "https://www.gesetze-im-internet.de/ao_1977/__141.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2024 (vorher 600.000 €); Vergleich „>“ (mehr als 800.000 € im Kalenderjahr); Pflicht erst ab dem Wirtschaftsjahr nach der Mitteilung des Finanzamts (§ 141 Abs. 2 AO), nicht für Freiberufler – laut Steuerberater 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -125,7 +119,6 @@
   rechtsgrundlage: ["§ 141 AO"]
   quellen:
     - { titel: Abgabenordnung § 141, url: "https://www.gesetze-im-internet.de/ao_1977/__141.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2024 (vorher 60.000 €); Vergleich „>“ (mehr als 80.000 € im Wirtschaftsjahr), sonst wie die Umsatzgrenze – laut Steuerberater 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -141,7 +134,6 @@
   rechtsgrundlage: ["§ 241a HGB"]
   quellen:
     - { titel: Handelsgesetzbuch § 241a, url: "https://www.gesetze-im-internet.de/hgb/__241a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2024; befreit bei ≤ 800.000 € Umsatzerlösen und ≤ 80.000 € Jahresüberschuss an zwei aufeinanderfolgenden Abschlussstichtagen (bei Neugründung der erste); nur für Einzelkaufleute (e. K.) – laut Steuerberater 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -157,7 +149,6 @@
   rechtsgrundlage: ["§ 241a HGB"]
   quellen:
     - { titel: Handelsgesetzbuch § 241a, url: "https://www.gesetze-im-internet.de/hgb/__241a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2024; wie die Umsatzgrenze (≤ 80.000 €); Jahresüberschuss mit dem angegebenen Gewinn gleichzusetzen ist als Näherung in Ordnung – laut Steuerberater 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -173,7 +164,6 @@
   rechtsgrundlage: ["§ 14 UStG", "§ 27 Abs. 38 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 27, url: "https://www.gesetze-im-internet.de/ustg_1980/__27.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Übergangsregel-Fundstelle (§ 27 Abs. 38 UStG) ergänzt, nicht aus Spezifikation", "Übergangszeitraum 01.01.2026 bis 31.12.2027 vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 # ---- Bauabschnitt 4 (Finanzen light) ----
@@ -190,7 +180,6 @@
   rechtsgrundlage: ["§ 147 AO", "§ 257 HGB"]
   quellen:
     - { titel: Abgabenordnung § 147, url: "https://www.gesetze-im-internet.de/ao_1977/__147.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: 8 Jahre seit 01.01.2025 (§ 147 Abs. 3 AO, § 257 Abs. 4 HGB, § 14b Abs. 1 UStG) für alle Unterlagen, deren Frist am 01.01.2025 noch nicht abgelaufen war; Fristbeginn mit dem Schluss des Kalenderjahres (§ 147 Abs. 4 AO, § 257 Abs. 5 HGB); kein Ablauf, solange die Festsetzungsfrist läuft (§ 147 Abs. 3 Satz 5 AO) – laut Steuerberater 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -206,7 +195,6 @@
   rechtsgrundlage: ["§ 147 AO", "§ 257 HGB"]
   quellen:
     - { titel: Abgabenordnung § 147, url: "https://www.gesetze-im-internet.de/ao_1977/__147.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Wert vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt; gültig ab 01.01.2026 ist der Beginn der Datenreihe, nicht das Inkrafttreten – so mitbestätigt, ein früheres Datum wäre eine neue Version (E-213, T-270; Notiz nachgezogen E-223)", "Rechtsgrundlagen ergänzt"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -222,7 +210,6 @@
   rechtsgrundlage: ["§ 147 AO", "§ 257 HGB"]
   quellen:
     - { titel: Abgabenordnung § 147, url: "https://www.gesetze-im-internet.de/ao_1977/__147.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Wert vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt; gültig ab 01.01.2026 ist der Beginn der Datenreihe, nicht das Inkrafttreten – so mitbestätigt, ein früheres Datum wäre eine neue Version (E-213, T-270; Notiz nachgezogen E-223)", "Rechtsgrundlagen ergänzt"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -237,7 +224,6 @@
   rechtsgrundlage: ["§ 12 Abs. 1 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 12, url: "https://www.gesetze-im-internet.de/ustg_1980/__12.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Steuersatz 19 % (§ 12 Abs. 1 UStG) vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)", "gültig ab 01.01.2026 ist der Beginn der Datenreihe, nicht das Inkrafttreten – so mitbestätigt, ein früheres Datum wäre eine neue Version (T-270)"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -252,7 +238,6 @@
   rechtsgrundlage: ["§ 12 Abs. 2 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 12, url: "https://www.gesetze-im-internet.de/ustg_1980/__12.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Steuersatz 7 % (§ 12 Abs. 2 UStG) vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)", "Welche Leistungen ermäßigt sind, entscheidet der Nutzer; einen Hilfetext dazu gibt es nicht – ein solcher Text gehört nicht zum Wert und bräuchte eine eigene Prüfung durch den Steuerberater (T-311)", "gültig ab 01.01.2026 ist der Beginn der Datenreihe, nicht das Inkrafttreten – so mitbestätigt, ein früheres Datum wäre eine neue Version (T-270)"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -269,5 +254,4 @@
   rechtsgrundlage: ["§ 1a Abs. 3 Nr. 2 UStG", "§ 1a Abs. 4 UStG", "§ 1a Abs. 5 UStG"]
   quellen:
     - { titel: Umsatzsteuergesetz § 1a, url: "https://www.gesetze-im-internet.de/ustg_1980/__1a.html", abgerufen: "2026-10-27" }
-  fachlich_zu_pruefen: ["E-227: Wert 12.500 € und Vergleich vom Steuerberater am 27.10.2026 vorgegeben – keine Erwerbsbesteuerung, wenn die Erwerbe im Vorjahr 12.500 € nicht überstiegen haben UND im laufenden Jahr voraussichtlich nicht übersteigen; Erwerbsbesteuerung bei „>“. Verzicht (§ 1a Abs. 4 UStG) bindet mindestens zwei Kalenderjahre, die Angabe der USt-IdNr. gegenüber dem Lieferanten gilt als Verzicht; neue Fahrzeuge und verbrauchsteuerpflichtige Waren immer (§ 1a Abs. 5 UStG). Gültig ab 01.01.2025 ist der Beginn der Datenreihe, nicht das Inkrafttreten (seit vielen Jahren unverändert)"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-27", geprueft_version: 1, bestaetigt_am: "2026-10-27" }

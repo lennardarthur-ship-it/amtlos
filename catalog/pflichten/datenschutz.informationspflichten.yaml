@@ -51,8 +51,6 @@ quellen:
 - titel: DSGVO Art. 13
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
   abgerufen: null
-fachlich_zu_pruefen:
-- Vorlage Datenschutzerklärung (6.4) erst nach Prüfung
 pruefung:
   status: freigegeben
   geprueft_von:

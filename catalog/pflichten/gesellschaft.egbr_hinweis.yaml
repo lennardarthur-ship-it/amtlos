@@ -55,9 +55,6 @@ quellen:
 - titel: Bürgerliches Gesetzbuch § 707
   url: https://www.gesetze-im-internet.de/bgb/__707.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'Freigabe Rechtsanwalt 22.10.2026: „Rechtsform ‚eGbR‘ im Fragebogen ergänzen“ – umgesetzt als Unterart der GbR, nicht als neue Rechtsform: die Registerfrage (profil.gesellschaft.handelsregister) wird auch der GbR gestellt (Gesellschaftsregister), „eingetragen“ = eGbR. abgeleitet.ist_eingetragene_gesellschaft gilt dann auch für die eGbR (Transparenzregister nur für die eingetragene GbR, § 20 Abs. 1 GwG); die GbR-Auslöser (Istkaufmann, Feststellungserklärung) gelten für GbR und eGbR unverändert; dieser Hinweis entfällt für die eingetragene GbR. Kein Auslöser eines freigegebenen Eintrags geändert'
-- 'Freigabe Rechtsanwalt Runde 2 (23.10.2026): Umsetzung als Registerfrage für die GbR sachgerecht; Rechtsfolgen (Transparenzregister nur eGbR, keine Handelsregisteranmeldung) bestätigt'
 pruefung:
   status: freigegeben
   geprueft_von:

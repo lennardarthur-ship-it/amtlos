@@ -64,8 +64,6 @@ quellen:
 - titel: BGB § 356a
   url: https://www.gesetze-im-internet.de/bgb/__356a.html
   abgerufen: '2026-10-21'
-fachlich_zu_pruefen:
-- 'Vorprüfung 21.10.2026 (G.68, T-29): Beschriftungen „Vertrag widerrufen“ / „Widerruf bestätigen“ (oder gleichbedeutend eindeutig) und Eingangsbestätigung auf dauerhaftem Datenträger mit Inhalt, Datum und Uhrzeit nach § 356a Abs. 1, 3, 4 BGB gelesen'
 pruefung:
   status: freigegeben
   geprueft_von:

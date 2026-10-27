@@ -55,7 +55,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Prüfabstand „spätestens alle zwei Jahre“ laut Prüfergebnis Sifa 22.10.2026 bestätigt – die Erledigung gilt in Amtlos weiter nur für das Kalenderjahr (laufend je Jahr); Abstand aus einem Prüfnachweis übernehmen (laut Freigabe Sifa 22.10.2026 fachlich richtig), sobald es eine Vorlage gibt (Technik)'
+- Prüfabstand „spätestens alle zwei Jahre“ laut Prüfergebnis Sifa 22.10.2026 bestätigt – die Erledigung gilt in Amtlos weiter
+  nur für das Kalenderjahr (laufend je Jahr); Abstand aus einem Prüfnachweis übernehmen (laut Freigabe Sifa 22.10.2026 fachlich
+  richtig), sobald es eine Vorlage gibt (Technik)
 pruefung:
   status: freigegeben
   geprueft_von:

@@ -20,7 +20,7 @@ describe("E-223: Import-Vergleich ohne Notizen und Prüfstand", () => {
     expect(gleicherInhalt(basis, { ...basis, gueltig_ab: "2007-01-01" })).toBe(false);
     expect(gleicherInhalt(basis, { ...basis, aenderungsnotiz: { de: "neu" } })).toBe(false);
   });
-  it("genau diese zwei Felder", () => {
-    expect([...NICHT_INHALT].sort()).toEqual(["fachlich_zu_pruefen", "pruefung"]);
+  it("genau diese drei Felder (E-233: dazu nicht_vor_freigabe)", () => {
+    expect([...NICHT_INHALT].sort()).toEqual(["fachlich_zu_pruefen", "nicht_vor_freigabe", "pruefung"]);
   });
 });

@@ -48,9 +48,6 @@ quellen:
 - titel: Gesetz gegen den unlauteren Wettbewerb § 20 (Bußgeldvorschriften)
   url: https://www.gesetze-im-internet.de/uwg_2004/__20.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'E-223: neu als Entwurf – Text nach dem Wortlaut von § 7 Abs. 2 Nr. 2, Nr. 3 Buchst. c und Abs. 3 UWG (gesetze-im-internet.de, 27.10.2026); Auslöser über die bestehende Angabe „Newsletter“ (profil.datenverarbeitung.arten) – andere Werbe-E-Mails ohne Newsletter erfasst die App nicht; Folgen: § 20 Abs. 1 UWG nennt nur Telefonwerbung und automatische Anrufmaschinen (Wortlaut lxgesetze.de, 27.10.2026), daher kein Bußgeld, Ansprüche nach § 8 UWG; Verhältnis zur Einwilligung nach DSGVO (datenschutz.*) nicht erwähnt – bitte ganz prüfen (Rechtsanwalt, PRUEFLISTE T-313)'
-- 'E-226: Rechtsanwalt 27.10.2026 „anpassen“ – Folgen in seiner Fassung ersetzt (nach dem UWG kein Bußgeld; Unterlassung durch Mitbewerber, Verbände und den Empfänger; Bußgeld der Datenschutzaufsicht nach Art. 83 Abs. 5 DSGVO, Schadensersatz nach Art. 82 DSGVO), sein Satz zur Nachweisbarkeit der Einwilligung (Art. 7 Abs. 1 DSGVO, Double-Opt-in) an die Erklärung angefügt, Rechtsgrundlage um „Art. 6 Abs. 1, Art. 7 DSGVO“ ergänzt (v2); Auslöser über „Newsletter“ und Einstufung „mittel“ von ihm bestätigt. So übernommen gilt der Eintrag ohne erneute Vorlage als freigegeben (Register freigaben.yaml)'
 pruefung:
   status: freigegeben
   geprueft_von:

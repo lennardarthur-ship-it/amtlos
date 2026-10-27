@@ -65,9 +65,8 @@ quellen:
   url: https://www.buzer.de/356_BGB.htm
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Neu nach Rechtsprüfung R11 (Befund 10) – Muster-Widerrufsbelehrung und Muster-Widerrufsformular für Verträge außerhalb von Geschäftsräumen erst nach Prüfung'
-- 'Auslöser über die Frage „Schließt du Verträge mit Privatkunden bei ihnen zu Hause oder unterwegs ab?“'
-- 'Prüfvermerk Rechtsanwalt 22.10.2026: Ausnahmen (§ 312g Abs. 2 Nr. 11, § 312 Abs. 2 Nr. 12), Form (Art. 246a § 4 Abs. 2 EGBGB) und Höchstfrist § 356 Abs. 4 Satz 1 n. F. bestätigt'
+- Neu nach Rechtsprüfung R11 (Befund 10) – Muster-Widerrufsbelehrung und Muster-Widerrufsformular für Verträge außerhalb von
+  Geschäftsräumen erst nach Prüfung
 pruefung:
   status: freigegeben
   geprueft_von:

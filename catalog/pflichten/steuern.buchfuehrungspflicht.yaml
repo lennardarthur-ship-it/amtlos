@@ -160,8 +160,6 @@ quellen:
 - titel: Strafgesetzbuch § 283 (Abs. 6)
   url: https://www.gesetze-im-internet.de/stgb/__283.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: freigegeben
   geprueft_von:

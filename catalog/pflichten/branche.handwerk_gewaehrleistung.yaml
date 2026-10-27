@@ -45,9 +45,6 @@ quellen:
 - titel: Bürgerliches Gesetzbuch § 634a
   url: https://www.gesetze-im-internet.de/bgb/__634a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'R12 (Nutzertest Bäckerei #13): Kaufrecht bei Herstellung und Lieferung beweglicher Sachen (§ 650 BGB) ergänzt'
-- 'Hinweis bestätigt; Fristen als Regelwerte (catalog/regelwerte/branche.yaml) und im Text nach Prüfvermerk Rechtsanwalt 22.10.2026'
 pruefung:
   status: freigegeben
   geprueft_von:

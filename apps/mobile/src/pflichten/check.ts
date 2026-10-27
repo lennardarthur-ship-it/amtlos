@@ -113,7 +113,11 @@ export const CHECK_FELDER = [
   "einkauf.eu_unternehmen",
   // E-212 (T-241): bei Betrieben mit Vorjahr die Angaben, die EÜR, Gewerbesteuererklärung und Vorauszahlungen einen
   // Termin geben (vorher nur bei „Genauer machen“) – nur, wo sie entscheiden (`FRAGE_PASST`)
+  // E-233 (T-265, nach der Linie des Gründers: Kernfrage statt „hängt ab“): beim e. K. der Umsatz des Vorjahres (§ 241a HGB,
+  // EÜR/E-Bilanz) und bei Gewinn im Vorjahr bis zum Freibetrag der erwartete Gewinn (Gewerbesteuererklärung)
+  "umsatz.vorjahr",
   "gewinn.vorjahr",
+  "gewinn.prognose_laufendes_jahr",
   "steuern.buchfuehrung_mitteilung",
   "vorauszahlung.est_kst",
   "vorauszahlung.gewst",
@@ -270,7 +274,34 @@ const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
   "steuern.buchfuehrung_mitteilung": (p) => mitVorjahr(p) && !freiberuflich(p) && !(typeof p.rechtsform === "string" && [...HANDELSGESELLSCHAFT, "ek"].includes(p.rechtsform)),
   "vorauszahlung.est_kst": (p) => mitVorjahr(p),
   "vorauszahlung.gewst": (p) => mitVorjahr(p) && !freiberuflich(p),
+  // E-233 (T-265): e. K. – Umsatz des Vorjahres entscheidet mit dem Gewinn über § 241a HGB (EÜR oder Bilanz/E-Bilanz)
+  "umsatz.vorjahr": (p) => mitVorjahr(p) && p.rechtsform === "ek",
+  // E-233 (T-265): Gewinn im Vorjahr höchstens beim Freibetrag – dann entscheidet der erwartete Gewinn über die
+  // Gewerbesteuererklärung (Betrag aus dem Auslöser des Katalogeintrags, nicht im Code)
+  "gewinn.prognose_laufendes_jahr": (p) => {
+    const g = zahl(p, "gewinn.vorjahr");
+    const f = gewstFreibetrag();
+    return mitVorjahr(p) && !freiberuflich(p) && !(typeof p.rechtsform === "string" && KRAFT_RECHTSFORM_GEWERBE.includes(p.rechtsform)) && g !== null && f !== null && g <= f;
+  },
 };
+
+/** E-233 (T-265): Schwelle „Gewinn im Vorjahr über …“ aus dem Auslöser von steuern.gewst_erklaerung (freigegebener Katalog) */
+let freibetragCache: number | null | undefined;
+function gewstFreibetrag(): number | null {
+  if (freibetragCache !== undefined) return freibetragCache;
+  const suche = (b: unknown): number | null => {
+    if (!b || typeof b !== "object") return null;
+    const o = b as { feld?: string; op?: string; wert?: unknown; all?: unknown[]; any?: unknown[]; not?: unknown };
+    if (o.feld === "profil.gewinn.vorjahr" && o.op === ">" && typeof o.wert === "number") return o.wert;
+    for (const x of [...(o.all ?? []), ...(o.any ?? []), ...(o.not ? [o.not] : [])]) {
+      const w = suche(x);
+      if (w !== null) return w;
+    }
+    return null;
+  };
+  freibetragCache = suche(KATALOG.pflichten.find((x) => x.id === "steuern.gewst_erklaerung")?.ausloeser);
+  return freibetragCache;
+}
 
 /**
  * R12 (UX #9): Optionen der Frage „Fällt deine Tätigkeit unter eine dieser Vorschriften?“ je Branche – ein Café sieht nicht

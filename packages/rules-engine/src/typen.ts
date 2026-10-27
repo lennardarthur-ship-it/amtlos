@@ -90,6 +90,8 @@ export interface Pflicht {
   sanktion: { text: Text; schwere: "niedrig" | "mittel" | "hoch" };
   /** Auch ohne Termin dringend („Jetzt dran“), unabhängig von der angezeigten Sanktionsschwere (Standard: false) */
   dringend_ohne_termin?: boolean;
+  /** E-233: Entwurf erscheint erst mit der Freigabe (nicht im Bündel der App, kein Startblocker) – nach der Freigabe ohne Wirkung */
+  nicht_vor_freigabe?: boolean;
   status_recht: StatusRecht;
   gueltig_ab: Datum | null;
   gueltig_bis?: Datum | null;

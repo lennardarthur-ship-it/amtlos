@@ -12,7 +12,6 @@
   rechtsgrundlage: ["§ 5 GmbHG"]
   quellen:
     - { titel: GmbH-Gesetz § 5, url: "https://www.gesetze-im-internet.de/gmbhg/__5.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.01.2002 (Euro-Umstellung), mindestens 25.000 € (§ 5 Abs. 1 GmbHG) laut Rechtsanwalt 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -28,7 +27,6 @@
   rechtsgrundlage: ["§ 7 Abs. 2 Satz 1 GmbHG"]
   quellen:
     - { titel: GmbH-Gesetz § 7, url: "https://www.gesetze-im-internet.de/gmbhg/__7.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: Rechtsanwalt 26.10.2026 – nicht „50 % des Stammkapitals“, sondern auf jeden Geschäftsanteil ein Viertel des Nennbetrags (soweit keine Sacheinlage); insgesamt mindestens die Hälfte des Mindeststammkapitals (eigener Regelwert gesellschaft.gmbh.mindesteinzahlung_gesamt); gültig ab 01.11.2008 (MoMiG); in der korrigierten Form vorab bestätigt"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -44,7 +42,6 @@
   rechtsgrundlage: ["§ 7 Abs. 2 Satz 2 GmbHG", "§ 5 Abs. 1 GmbHG"]
   quellen:
     - { titel: GmbH-Gesetz § 7, url: "https://www.gesetze-im-internet.de/gmbhg/__7.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: neu nach der Korrektur des Rechtsanwalts 26.10.2026 – insgesamt müssen Geldeinlagen plus Nennbeträge der Sacheinlagen die Hälfte des Mindeststammkapitals (§ 5 Abs. 1 GmbHG), also 12.500 €, erreichen; gültig ab 01.11.2008 (MoMiG); in der korrigierten Form vorab bestätigt"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -60,7 +57,6 @@
   rechtsgrundlage: ["§ 5a GmbHG"]
   quellen:
     - { titel: GmbH-Gesetz § 5a, url: "https://www.gesetze-im-internet.de/gmbhg/__5a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.11.2008 (MoMiG); Stammkapital unter 25.000 €, Geschäftsanteile auf volle Euro, also mindestens 1 € (§ 5a Abs. 1 i. V. m. § 5 Abs. 2 Satz 1 GmbHG) laut Rechtsanwalt 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }
 
 - schema_version: 1
@@ -76,5 +72,4 @@
   rechtsgrundlage: ["§ 5a Abs. 3 GmbHG"]
   quellen:
     - { titel: GmbH-Gesetz § 5a, url: "https://www.gesetze-im-internet.de/gmbhg/__5a.html", abgerufen: null }
-  fachlich_zu_pruefen: ["E-213: gültig ab 01.11.2008 (MoMiG); ein Viertel des um einen Verlustvortrag aus dem Vorjahr geminderten Jahresüberschusses (§ 5a Abs. 3 Satz 1 GmbHG) laut Rechtsanwalt 26.10.2026"]
   pruefung: { status: freigegeben, geprueft_von: [recht], geprueft_am: "2026-10-26", geprueft_version: 2, bestaetigt_am: "2026-10-26" }

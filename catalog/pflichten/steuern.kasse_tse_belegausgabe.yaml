@@ -62,8 +62,6 @@ quellen:
 - titel: Abgabenordnung § 162 (Schätzung von Besteuerungsgrundlagen)
   url: https://www.gesetze-im-internet.de/ao_1977/__162.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: freigegeben
   geprueft_von:

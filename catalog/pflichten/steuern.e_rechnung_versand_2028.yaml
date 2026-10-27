@@ -71,7 +71,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustdv_1980/__34.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Steuerberater 22.10.2026: Übergangsfristen am 22.10.2026 unverändert („sonst wie 2027“, siehe steuern.e_rechnung_versand_2027) – vor dem Start erneut prüfen'
+- 'Steuerberater 22.10.2026: Übergangsfristen am 22.10.2026 unverändert („sonst wie 2027“, siehe steuern.e_rechnung_versand_2027)
+  – vor dem Start erneut prüfen'
 pruefung:
   status: freigegeben
   geprueft_von:

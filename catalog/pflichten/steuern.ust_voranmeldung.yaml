@@ -193,9 +193,6 @@ quellen:
   - titel: Abgabenordnung § 370 (Steuerhinterziehung)
     url: https://www.gesetze-im-internet.de/ao_1977/__370.html
     abgerufen: null
-fachlich_zu_pruefen:
-  - "Steuerberater 22.10.2026: Neugründer ab 2027 im Gründungs- und Folgejahr monatlich (§ 18 Abs. 2 Satz 4 UStG) – nur als Hinweis im Text; der Rhythmus bei „weiß ich nicht“ bzw. ohne Angabe rechnet dann weiter vierteljährlich, weil die Regeln das Kalenderjahr des Stichtags nicht abfragen können (technische Grenze mit E-206 behoben: Rhythmus je Kalenderjahr)"
-  - "E-206 (externer Prüfer): „Weiß ich nicht“ ohne Steuer des Vorjahres rechnet jetzt vorläufig monatlich (früherer Termin) statt vierteljährlich – deckt Neugründer ab 2027 ab. Neugründer ab 2027: Gründungs- und Folgejahr jetzt je Kalenderjahr monatlich, auch gegen die Angabe „vierteljährlich“ und eine Vorjahressteuer bis 9.000 € (Regelwert steuern.ust_va.neugruender_monatlich_ab, Wert aus C.21); bei der Angabe „vierteljährlich“ zeigt die App den Satz aus der Erklärung als Hinweis. bitte mit v7 prüfen (PRUEFLISTE T-237)"
 pruefung:
   status: freigegeben
   geprueft_von:

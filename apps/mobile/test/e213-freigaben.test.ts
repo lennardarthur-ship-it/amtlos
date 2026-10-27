@@ -168,7 +168,8 @@ describe("E-213 B) Pflichten erneut bestätigt", () => {
     // E-217: alle vier am 27.10.2026 bestätigt (T-278, T-282)
     // E-222: Kleinunternehmer-Warnungen v7 warten auf den Steuerberater (T-310); E-223: zwei neue Einträge im Entwurf (T-313)
     // E-226: alle vier am 27.10.2026 freigegeben (T-310, T-313); E-231: ein neuer Entwurf (T-337)
-    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual(["steuern.ust_voranmeldung_kleinunternehmer"]);
+    // E-233: der Entwurf ist bis zur Freigabe zurückgehalten (nicht im Bündel) – im Bündel alle mit Vermerk
+    expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual([]);
   });
 });
 

@@ -74,17 +74,6 @@ quellen:
 - titel: Künstlersozialkasse, Informationsschrift Nr. 25 – Informationen für Steuerberater (Stand 09.2026)
   url: https://www.Kuenstlersozialkasse.de/fileadmin/Dokumente/Mediencenter_Unternehmer_Verwerter/Informationsschriften/Info_25_-_Informationen_fuer_Steuerberater.pdf
   abgerufen: '2026-10-25'
-fachlich_zu_pruefen:
-- 'Auslöser: Es gibt keine Frage nach Aufträgen an selbstständige Kreative. Vorläufig erscheint der Hinweis bei eigener Website oder Social-Media-Profil (typischer Anlass für Eigenwerbung, § 24 Abs. 2 KSVG) – vertretbar, oder zu breit? Vorschlag einer eigenen Frage für den Gründer: PRUEFLISTE T-197. Bis dahin Einordnung „Hinweis“ ohne Termin; mit eigener Frage als Pflicht mit Termin 31.3. (§ 27 Abs. 1 KSVG).'
-- 'Gliederung von § 24 KSVG: Eigenwerbung und Nutzung für Einnahmen sind als § 24 Abs. 2 (Satz 1 Nr. 1 und 2), die 1.000-€-Grenze als Teil von Abs. 2 zitiert; Abs. 3 ist weggefallen. Die Vorgabe der externen Prüfung („§ 24 Abs. 1 Satz 2 Generalklausel“, „§ 24 Abs. 3, 450 €“) entspricht nicht der aktuellen Fassung – Satz-Zitate bitte bestätigen.'
-- 'Geringfügigkeitsgrenze: Gesetzestext nennt 1.000 € im Kalenderjahr; laut KSK (Info 25) 450 € bis 2024, 700 € für 2025, 1.000 € ab 2026. Übergangsregel für 2025 nur aus der KSK-Schrift, nicht im Text genannt.'
-- 'Abgabesatz ändert sich jährlich: 4,9 % gilt nur für 2026; für 2027 ist laut Fachpresse 5,0 % angekündigt – nach Verkündung der Künstlersozialabgabe-Verordnung 2027 Text und Version anpassen (oder Satz als Regelwert pflegen).'
-- 'Beispiele „Grafik, Fotos oder Texte“ in der Kurzfassung: ob ein Auftrag (z. B. Webdesign mit technischem Schwerpunkt) künstlerisch oder publizistisch ist, entscheidet der Einzelfall – Formulierung in Ordnung?'
-- 'Zahlungen an juristische Personen und an OHG/KG zählen laut KSK nicht zur Bemessungsgrundlage (Info 25) – nicht in die Erklärung aufgenommen, weil nicht aus § 25 KSVG selbst; aufnehmen?'
-- 'Ausnahmen in § 24 Abs. 2 KSVG (höchstens drei Veranstaltungen im Jahr; Musikvereine mit Chorleitern/Dirigenten) nicht erwähnt – nötig?'
-- 'Kanal „post“ nach dem Wortlaut „Vordruck“ (§ 27 Abs. 1 KSVG); ob die KSK eine Online-Meldung anbietet, nicht geprüft. Erstmalige Erfassung bei der KSK (Anmeldung als Abgabepflichtiger) nicht eigens beschrieben.'
-- 'Prüfer: Rechtsanwalt (Sozialversicherungsrecht wie die übrigen Personal-Einträge); alternativ Steuerberater – siehe E-195.'
-- 'Rechtsanwalt 26.10.2026 (E-201, beim Gründer): Fragen beantwortet – Auslöser als Hinweis ohne Termin vertretbar, mit eigener Frage Pflicht mit Termin 31.3. (T-197); Zitate zu § 24 Abs. 2 bestätigt; Übergangswerte 450/700 € und die Ausnahmen nach Abs. 2 Satz 3 nicht in den Text; Erstanmeldung muss nicht beschrieben werden; Abgabesatz nicht als Zahl in den Text. v2 übernimmt seine Änderungen wörtlich.'
 pruefung:
   status: freigegeben
   geprueft_von:

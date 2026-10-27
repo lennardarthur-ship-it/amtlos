@@ -54,8 +54,6 @@ quellen:
 - titel: Umsatzsteuergesetz § 19
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'E-226: Fundstelle für die Regel, dass schon der Umsatz steuerpflichtig ist, mit dem die Grenze von 100.000 € überschritten wird, laut Steuerberater 27.10.2026: § 19 Abs. 1 Satz 1 UStG (Satz 1 enthält beide Grenzen), Abschnitt 19.1 UStAE (BMF-Schreiben vom 18.03.2025) – in der Rechtsgrundlage ergänzt (v4), Text unverändert'
 pruefung:
   status: freigegeben
   geprueft_von:

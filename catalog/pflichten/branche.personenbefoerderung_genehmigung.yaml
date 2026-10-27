@@ -65,10 +65,6 @@ quellen:
 - titel: Fahrerlaubnis-Verordnung § 48
   url: https://www.gesetze-im-internet.de/fev_2010/__48.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Freigabe Rechtsanwalt Runde 2 (23.10.2026): §§ 1, 2 PBefG und § 61 Abs. 1 Nr. 1, Abs. 2 (20.000 €) bestätigt. Ergänzt: Fahrerlaubnis zur Fahrgastbeförderung (§ 48 Abs. 1, 7 FeV, Wortlaut gelesen) und zuständige Stelle (Genehmigungsbehörde des Landes, meist Landkreis/kreisfreie Stadt)'
-- 'Hinweis „Freistellungen § 1 Abs. 2 PBefG (Gesamtentgelt deckt nur Betriebskosten; Werkverkehr mit eigenen Beschäftigten)“ nicht wie angegeben übernommen: § 1 Abs. 2 PBefG (gesetze-im-internet.de, 22.10.2026) nennt Pkw-Fahrten, die unentgeltlich sind oder deren Gesamtentgelt je Kilometer den Betrag nach § 5 Abs. 2 Satz 1 BRKG nicht übersteigt (steht schon im Text), und Krankenkraftwagen – weder Betriebskosten noch Werkverkehr. Stattdessen ergänzt: Freistellung nach § 1 Nr. 4 Buchst. h FrStllgV (unentgeltliche Beförderung von Arbeitnehmern durch den Arbeitgeber zu betrieblichen Zwecken zwischen Arbeitsstätten desselben Betriebes, Wortlaut gelesen) – vom Prüfer bestätigen lassen'
-- 'Auslöser: Angabe profil.fahrzeuge.befoerderung („Personen gegen Entgelt“), gefragt bei Transport und Logistik mit Firmenfahrzeugen'
 pruefung:
   status: freigegeben
   geprueft_von:

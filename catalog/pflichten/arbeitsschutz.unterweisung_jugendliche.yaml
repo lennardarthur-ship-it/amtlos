@@ -61,7 +61,9 @@ quellen:
   url: https://lxgesetze.de/jarbschg/59
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Frist je Jugendlichem ab dessen letzter Unterweisung führen (laut Freigabe Sifa 22.10.2026 fachlich gewünscht, Technik) – Amtlos rechnet ab der letzten erfassten Unterweisung im Betrieb, ohne Personen zu unterscheiden; bis dahin Hinweis im Text'
+- Frist je Jugendlichem ab dessen letzter Unterweisung führen (laut Freigabe Sifa 22.10.2026 fachlich gewünscht, Technik)
+  – Amtlos rechnet ab der letzten erfassten Unterweisung im Betrieb, ohne Personen zu unterscheiden; bis dahin Hinweis im
+  Text
 pruefung:
   status: freigegeben
   geprueft_von:

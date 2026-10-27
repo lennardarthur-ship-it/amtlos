@@ -58,9 +58,6 @@ quellen:
 - titel: Wirtschaftsstrafgesetz 1954 § 3
   url: https://www.gesetze-im-internet.de/wistrg_1954/__3.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'E-223: neu als Entwurf – Text nach dem Wortlaut von § 11 Abs. 1, 2 und 4 PAngV (gesetze-im-internet.de, 27.10.2026; Abs. 3 – nur Grundpreis – nicht erwähnt); Auslöser nur mit bestehenden Angaben (Verbraucher und Waren, § 11 gilt nur für Waren; „digital“ nicht aufgenommen); Bußgeld wie bei online.preisangaben (§ 20 Nr. 1 PAngV nennt § 11 Abs. 1 ausdrücklich) – bitte ganz prüfen (Rechtsanwalt, PRUEFLISTE T-313)'
-- 'E-226: Rechtsanwalt 27.10.2026 „anpassen“ – seine drei Ergänzungen wörtlich übernommen (v2): Satz zum Bezug einer Ermäßigung in Prozent bzw. eines durchgestrichenen Preises auf den niedrigsten Preis der letzten 30 Tage (EuGH C-330/23), Satz zum Grundpreis (§ 11 Abs. 3 PAngV, von § 20 Nr. 1 PAngV einbezogen), Abmahnung durch Mitbewerber und Verbände (§§ 3a, 8 UWG) in den Folgen; Auslöser und Einstufung „mittel“ von ihm bestätigt. So übernommen gilt der Eintrag ohne erneute Vorlage als freigegeben (Register freigaben.yaml)'
 pruefung:
   status: freigegeben
   geprueft_von:
