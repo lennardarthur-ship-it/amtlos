@@ -62,6 +62,12 @@ export interface Zahlung {
   minderung_cent?: number;
   /** Art der Minderung – nur zur Anzeige */
   art?: "skonto" | "minderung";
+  /**
+   * E-229 (Steuerberater 27.10.2026, T-304): mit einem Guthaben des Kunden verrechnet (Überzahlung einer anderen
+   * Rechnung) – kein neuer Geldeingang. `rechnung`: ID der Rechnung mit der Überzahlung, `eintrag`: ID der Überzahlung
+   * dort. Datum ist der Tag der Verrechnung; als Zahlung dieser Rechnung zählt sie ab diesem Tag (Ist-Versteuerung, EÜR).
+   */
+  guthaben?: { rechnung: string; eintrag: string };
 }
 
 const ISO_TAG = /^\d{4}-\d{2}-\d{2}$/;
@@ -76,7 +82,9 @@ export function zahlungenAus(roh: unknown): Zahlung[] {
     const betrag = Number(r.betrag_cent);
     const minderung = r.minderung_cent === undefined || r.minderung_cent === null ? 0 : Number(r.minderung_cent);
     if (typeof r.id !== "string" || !r.id || typeof r.datum !== "string" || !ISO_TAG.test(r.datum) || !Number.isInteger(betrag) || betrag < 0 || !Number.isInteger(minderung) || minderung < 0 || betrag + minderung === 0) continue;
-    aus.push({ id: r.id, datum: r.datum, betrag_cent: betrag, ...(minderung ? { minderung_cent: minderung, art: r.art === "minderung" ? "minderung" : "skonto" } : {}) });
+    const g = r.guthaben && typeof r.guthaben === "object" ? (r.guthaben as Record<string, unknown>) : null;
+    const guthaben = g && typeof g.rechnung === "string" && g.rechnung && typeof g.eintrag === "string" && g.eintrag ? { rechnung: g.rechnung, eintrag: g.eintrag } : null;
+    aus.push({ id: r.id, datum: r.datum, betrag_cent: betrag, ...(minderung ? { minderung_cent: minderung, art: r.art === "minderung" ? "minderung" : "skonto" } : {}), ...(guthaben ? { guthaben } : {}) });
   }
   return aus.sort((a, b) => a.datum.localeCompare(b.datum) || a.id.localeCompare(b.id));
 }

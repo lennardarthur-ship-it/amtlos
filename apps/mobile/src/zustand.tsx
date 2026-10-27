@@ -19,7 +19,7 @@ import { syncZusammenfuehren } from "./konto/sync";
 import { dateienImStand, doppeltePerson, korrigieren, personenZusammenfuehren, staetteLoeschen, staetteSetzen, unterlageStaette, type Betriebsstaette } from "./unterlagen/speicher";
 import { personenkontenVergeben } from "./unterlagen/steuerpaket";
 import { belegeFestschreiben, kassenbuchFestschreiben, kassensturzSpeichern, sachentnahmeLoeschen, sachentnahmeSpeichern } from "./unterlagen/speicher";
-import { LEERER_STAND, StandFehler, geteilteFassungFestschreiben, teilenOffenVermerken, type GeteilteFassung, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, type EuStornoGrund, euStornoSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
+import { LEERER_STAND, StandFehler, geteilteFassungFestschreiben, teilenOffenVermerken, type GeteilteFassung, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, type EuStornoGrund, euStornoSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, guthabenZurueckzahlen, guthabenVerrechnen, uneinbringlichSetzen, type UneinbringlichGrund, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /**
  * Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund),
@@ -124,6 +124,11 @@ interface Zustand {
   bezahltSetzen(id: string, datum: string | null): void;
   /** R12: Zahlungseingang mit Betrag (und ggf. Skonto/Minderung) vermerken */
   zahlungVermerken(id: string, z: Omit<Zahlung, "id">): void;
+  /** E-229: Guthaben aus einer Überzahlung zurücküberweisen bzw. mit einer offenen Rechnung desselben Kunden verrechnen */
+  guthabenZurueckzahlen(rechnungId: string, eintragId: string, datum: string, betrag_cent: number): void;
+  guthabenVerrechnen(quelleId: string, eintragId: string, zielId: string, datum: string, betrag_cent: number): void;
+  /** E-229: Forderung uneinbringlich vermerken bzw. (null) zurücknehmen */
+  uneinbringlichSetzen(id: string, angaben: { datum: string; grund: UneinbringlichGrund; text?: string } | null): void;
   /** R12: Tagesabschluss der Kasse speichern (festgeschrieben, sofort gespeichert) */
   kasseSpeichern(inhalt: KassenInhalt): Kassenabschluss | null;
   /** R12: Kassenabschluss korrigieren – nur mit Grund */
@@ -636,6 +641,9 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         setzen(s);
       },
       zahlungVermerken: (id, zahlung) => setzen(zahlungVermerken(aktuell.current, id, zahlung)),
+      guthabenZurueckzahlen: (rechnungId, eintragId, datum, betrag) => setzen(guthabenZurueckzahlen(aktuell.current, rechnungId, eintragId, datum, betrag)),
+      guthabenVerrechnen: (quelleId, eintragId, zielId, datum, betrag) => setzen(guthabenVerrechnen(aktuell.current, quelleId, eintragId, zielId, datum, betrag)),
+      uneinbringlichSetzen: (id, angaben) => setzen(uneinbringlichSetzen(aktuell.current, id, angaben)),
       kasseSpeichern: (inhalt) => {
         const [s0, k] = kasseSpeichern(aktuell.current, inhalt, new Date());
         if (!neuGeprueft(s0)) return null;

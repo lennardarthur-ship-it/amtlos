@@ -514,7 +514,8 @@ export function vorsteuerquoteAus(betrieb: Pick<Betrieb, "vorsteuerquote">): num
 }
 
 /** Festgeschriebene Rechnungen ohne vermerkten Zahlungseingang (nicht storniert, keine Stornorechnung, keine Gutschrift). */
-export const offeneRechnungen = (unterlagen: Unterlage[]) => festeRechnungen(unterlagen).filter((u) => !u.bezahlt && !u.storniertDurch && !(typeof u.daten.storno_zu === "string" && u.daten.storno_zu));
+// E-229: als uneinbringlich vermerkte Forderungen gelten nicht mehr als offen (keine Erinnerung, nicht in der Summe)
+export const offeneRechnungen = (unterlagen: Unterlage[]) => festeRechnungen(unterlagen).filter((u) => !u.bezahlt && !u.storniertDurch && !u.uneinbringlich?.datum && !(typeof u.daten.storno_zu === "string" && u.daten.storno_zu));
 
 /**
  * Kleinunternehmer für einen Zeitraum (Lea, Befund 4): Rechnungen des Zeitraums, die alle Kleinunternehmer-Rechnungen
@@ -575,6 +576,13 @@ export interface UstUebernahme {
   kasseFehlend: string[] | null;
   /** R12: Rechnungen mit Skonto bzw. Minderung, die im Zeitraum mindern */
   minderungen: number;
+  /**
+   * E-229 (§ 17 Abs. 2 Nr. 1 UStG, nur Soll): Rechnungen, deren Forderung im Zeitraum uneinbringlich geworden ist (Umsatz
+   * und Steuer des dann offenen Betrags gemindert), und Rechnungen, auf die nach der Uneinbringlichkeit im Zeitraum noch
+   * Geld einging (erneut berichtigt) – jeweils Nummer und Betrag netto je Zeile
+   */
+  uneinbringlich: { nummer: string; netto_cent: number; tag: string }[];
+  uneinbringlichZahlungen: { nummer: string; netto_cent: number; tag: string }[];
   /** StB-Prüfung (5.2): Nummern der Rechnungen ohne erkennbares Leistungsdatum (nach Rechnungsdatum zugeordnet) */
   ersatzNummern: string[];
   /** StB-Prüfung (5.2): OSS-Rechnungen im Zeitraum – nicht übernommen (OSS-Erklärung beim BZSt) */
@@ -620,6 +628,36 @@ export const istOssRechnung = (u: Unterlage) => u.daten.oss === true;
 
 const datumDe = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`;
 
+/** E-229: Beträge je Steuersatz (brutto, netto, Steuer). */
+export interface SatzTeil {
+  satz: number | null;
+  brutto_cent: number;
+  netto_cent: number;
+  ust_cent: number;
+}
+
+/**
+ * E-229 (Steuerberater 27.10.2026, T-304 c): Beträge einer als uneinbringlich vermerkten Forderung – am Tag der
+ * Uneinbringlichkeit noch offen (je Steuersatz, genau der Rest nach den Zahlungen und Minderungen bis zu diesem Tag) und
+ * die danach noch eingegangenen Zahlungen (erhaltener Teil je Steuersatz). null, wenn die Rechnung nicht (mehr) als
+ * uneinbringlich vermerkt ist oder keine Berichtigung trägt (Kleinunternehmer, OSS, Abschlag, Storno).
+ */
+export function uneinbringlichBetraege(u: Unterlage, betrieb: Betrieb): { tag: string; daten: RechnungsDaten; offen: SatzTeil[]; spaeter: { datum: string; zahlung: string; gruppen: SatzTeil[] }[] } | null {
+  const tag = u.uneinbringlich?.datum;
+  if (!tag || kuRechnung(u) || istStornoU(u) || istOssRechnung(u) || u.storniertDurch || u.daten.abschlag === true) return null;
+  const daten = eRechnungAus(u.daten, betrieb).daten;
+  const gruppen = restGruppen(daten);
+  const anteile = zahlungsAnteile(gruppen, u.zahlungen ?? []);
+  const offen = gruppen.map((g, i) => {
+    const bis = anteile.filter((a) => a.zahlung.datum <= tag);
+    const brutto = g.netto_cent + g.ust_cent - bis.reduce((x, a) => x + a.erhalten[i]!.brutto_cent + a.minderung[i]!.brutto_cent, 0);
+    const netto = g.netto_cent - bis.reduce((x, a) => x + a.erhalten[i]!.netto_cent + a.minderung[i]!.netto_cent, 0);
+    return { satz: g.satz, brutto_cent: brutto, netto_cent: netto, ust_cent: brutto - netto };
+  });
+  const spaeter = anteile.filter((a) => a.zahlung.datum > tag && a.zahlung.betrag_cent).map((a) => ({ datum: a.zahlung.datum, zahlung: a.zahlung.id, gruppen: a.erhalten.map((x) => ({ satz: x.satz, brutto_cent: x.brutto_cent, netto_cent: x.netto_cent, ust_cent: x.ust_cent })) }));
+  return { tag, daten, offen, spaeter };
+}
+
 /**
  * Felder der Voranmeldung für einen Zeitraum („JJJJ-MM“ oder „JJJJ-Qn“). `kleinunternehmer`: Antwort im Pflichten-Check
  * („ust.kleinunternehmer“); ohne Antwort gilt als Kleinunternehmer, wessen Rechnungen im Zeitraum alle Kleinunternehmer-
@@ -659,7 +697,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   // gesetzt, wenn es solche Belege gibt (von Hand eingetragene Erwerbe bleiben sonst stehen)
   const igeWerte: Record<string, string> = rc.ige_anzahl ? { ige_19: betragText(rc.ige_19_netto_cent), ige_7: betragText(rc.ige_7_netto_cent), vorsteuer_ige: rc.ige_vorsteuer_cent ? betragText(rc.ige_vorsteuer_cent) : "" } : {};
   const kasseFehlend = kasse?.abschluesse.length ? fehlendeTage(kasse.abschluesse, z.von, z.bis, kasse.ruhetage ?? [], kasse.heute) : null;
-  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl, igeBelege: 0, igeKu: rc.ige_anzahl + rc.ige_ohne_euro, igeAndere: 0, igeOhneEuro: 0, rcOhneEuro: rc.ohne_euro, kasseTage: 0, kasseFehlend: null, minderungen: 0, ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [] };
+  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl, igeBelege: 0, igeKu: rc.ige_anzahl + rc.ige_ohne_euro, igeAndere: 0, igeOhneEuro: 0, rcOhneEuro: rc.ohne_euro, kasseTage: 0, kasseFehlend: null, minderungen: 0, uneinbringlich: [], uneinbringlichZahlungen: [], ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [] };
   // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit;
   // 5.2: OSS-Rechnungen gehören in die OSS-Erklärung, nicht in die Voranmeldung
   const ossImZeitraum = alle.filter((x) => !kuRechnung(x.u) && istOssRechnung(x.u)).length;
@@ -695,6 +733,35 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
       mindert = true;
     }
     if (mindert) minderungen++;
+  }
+  // E-229 (Steuerberater 27.10.2026, T-304 c): uneinbringliche Forderung (§ 17 Abs. 2 Nr. 1 UStG) – nur bei Soll und nur
+  // für steuerpflichtige Teile (Steuersatz > 0): im Zeitraum, in dem sie uneinbringlich wurde, mindert der dann offene
+  // Betrag je Steuersatz; Geld, das danach noch eingeht, berichtigt erneut im Zeitraum der Zahlung. Abschläge (bei Soll
+  // mit der Zahlung versteuert) und Ist-Versteuerung: keine Berichtigung.
+  const uneinbringlich: UstUebernahme["uneinbringlich"] = [];
+  const uneinbringlichZahlungen: UstUebernahme["uneinbringlichZahlungen"] = [];
+  if (v === "soll") {
+    for (const u of festeRechnungen(unterlagen)) {
+      const ub = uneinbringlichBetraege(u, betrieb);
+      if (!ub) continue;
+      const steuerpflichtig = (g: { satz: number | null }) => Boolean(g.satz && g.satz > 0);
+      if (imZ(ub.tag)) {
+        const minder = ub.offen.map((g) => ({ satz: g.satz, netto_cent: steuerpflichtig(g) ? -g.netto_cent : 0 }));
+        const summeNetto = minder.reduce((x, g) => x + g.netto_cent, 0);
+        if (summeNetto) {
+          posten.push({ daten: ub.daten, gruppen: minder });
+          uneinbringlich.push({ nummer: ub.daten.nummer, netto_cent: summeNetto, tag: ub.tag });
+        }
+      }
+      for (const z2 of ub.spaeter) {
+        if (!imZ(z2.datum)) continue;
+        const mehr = z2.gruppen.map((g) => ({ satz: g.satz, netto_cent: steuerpflichtig(g) ? g.netto_cent : 0 }));
+        const summeNetto = mehr.reduce((x, g) => x + g.netto_cent, 0);
+        if (!summeNetto) continue;
+        posten.push({ daten: ub.daten, gruppen: mehr });
+        uneinbringlichZahlungen.push({ nummer: ub.daten.nummer, netto_cent: summeNetto, tag: z2.datum });
+      }
+    }
   }
   const summe = (f: (s: number | null) => boolean) => posten.reduce((a, p) => a + p.gruppen.filter((g) => f(g.satz)).reduce((b, g) => b + g.netto_cent, 0), 0);
   // Umsätze zu 0 % nach Kennzahl: igL → Kz 41; Steuerschuldnerschaft des Empfängers im Inland → Kz 60, an Unternehmen im
@@ -742,6 +809,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     rc.ige_ohne_euro ? TEXT.e224_ige_ohne_euro_pdf(rc.ige_ohne_euro) : "",
     rc.ohne_euro ? TEXT.e224_13b_ohne_euro_pdf(rc.ohne_euro) : "",
     rc.ige_andere_cent ? `Innergemeinschaftliche Erwerbe zu anderen Steuersätzen als 19 % und 7 % (${betragText(rc.ige_andere_cent)} €) nicht übernommen – bitte im ELSTER-Formular prüfen.` : "",
+    ...uneinbringlich.map((x) => TEXT.e229_uneinbringlich_pdf(x.nummer, datumDe(x.tag), betragText(-x.netto_cent))),
+    ...uneinbringlichZahlungen.map((x) => TEXT.e229_uneinbringlich_zahlung_pdf(x.nummer, datumDe(x.tag), betragText(x.netto_cent))),
   ].filter(Boolean);
   return {
     vorsteuerBelege: vst.anzahl,
@@ -762,6 +831,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     kasseTage: ka?.tage ?? 0,
     kasseFehlend,
     minderungen,
+    uneinbringlich,
+    uneinbringlichZahlungen,
     ersatzNummern: ersatzListe.map((x) => x.nummer),
     oss: ossImZeitraum,
     berichtigungen: ber.hier,

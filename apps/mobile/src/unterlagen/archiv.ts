@@ -8,7 +8,7 @@ import { KU_HINWEIS, belegNummern, eRechnungAus, kassenSummen, xrechnungUbl } fr
 import { APP_VERSION } from "../version";
 import { utf8 } from "./sicherung";
 import { absenderFuer, type Stand } from "./speicher";
-import { PROTOKOLL_SPALTEN, aenderungsprotokoll, belegDateiname, belegeCsv, csv, gestellteRechnungen, kassenCsv, paketZippen, rechnungDateiname, rechnungenCsv, type Zeitraum } from "./steuerpaket";
+import { GUTHABEN_SPALTEN, PROTOKOLL_SPALTEN, UNEINBRINGLICH_SPALTEN, aenderungsprotokoll, belegDateiname, belegeCsv, csv, gestellteRechnungen, guthabenZeilen, kassenCsv, paketZippen, rechnungDateiname, rechnungenCsv, uneinbringlichZeilen, type Zeitraum } from "./steuerpaket";
 import { MARKE } from "@amtlos/marke";
 
 const ALLES: Zeitraum = { von: "1900-01-01", bis: "9999-12-31", name: "alle" };
@@ -64,6 +64,11 @@ export function offenesArchiv(s: Stand, dateien: Record<string, Uint8Array>, jet
   inhalt["Belege.csv"] = utf8(belegeCsv(s, ALLES, new Map(), s.steuerberatung.kontenrahmen, nummern));
   inhalt["Belege_ungueltig.csv"] = utf8(csv([`${MARKE.name}-Belegnr.`, "Datum", "Lieferant", "Ungültig seit", "Grund"], s.belegArchiv.map((b) => [nummern.get(b.id) ?? "", b.datum, b.lieferant, b.ungueltig ?? "", b.ungueltig_grund ?? ""])));
   if (s.kasse.length) inhalt["Kassenabschluesse.csv"] = utf8(kassenCsv(s, ALLES));
+  // E-229: Guthaben der Kunden (Überzahlungen, Rückzahlungen, Verrechnungen) und uneinbringliche Forderungen
+  const guthaben = guthabenZeilen(s, ALLES);
+  if (guthaben.length) inhalt["Guthaben.csv"] = utf8(csv(GUTHABEN_SPALTEN.map((x) => x.name), guthaben));
+  const uneinbringlich = uneinbringlichZeilen(s, ALLES);
+  if (uneinbringlich.length) inhalt["Uneinbringlich.csv"] = utf8(csv(UNEINBRINGLICH_SPALTEN.map((x) => x.name), uneinbringlich));
   if (s.kassenstuerze.length) inhalt["Kassenstuerze.csv"] = utf8(csv(["Zeitpunkt (UTC)", "Standort", "Gezählt", "Stückelung (Cent: Anzahl)", "Endbestand letzter Abschluss", "Anwesend", "Notiz"], s.kassenstuerze.map((k) => [k.zeitpunkt, k.standort ?? "", betrag(k.gezaehlt_cent), Object.entries(k.stueckelung ?? {}).map(([w, n]) => `${w}: ${n}`).join(", "), typeof k.vortag_cent === "number" ? betrag(k.vortag_cent) : "", k.anwesend ?? "", k.notiz ?? ""])));
   if (s.sachentnahmen.length) inhalt["Sachentnahmen.csv"] = utf8(csv(["Datum", "Netto 7 %", "Netto 19 %", "Bezeichnung"], s.sachentnahmen.map((e) => [e.datum, betrag(e.netto7_cent), betrag(e.netto19_cent), e.text ?? ""])));
   const prot = aenderungsprotokoll(s, ALLES);
@@ -123,7 +128,7 @@ export function offenesArchiv(s: Stand, dateien: Record<string, Uint8Array>, jet
       "",
       "Formate",
       "- *.csv: Semikolon als Trenner, UTF-8 mit BOM, Zeilenende CRLF, Beträge mit Komma (1234,56), Datum TT.MM.JJJJ bzw. ISO; erste Zeile = Spaltenköpfe.",
-      `- daten/stand.json: der vollständige Datenbestand der App (JSON, UTF-8) – Zeitpunkte als ISO 8601 in UTC, Beträge in Cent (ganze Zahlen). Wichtige Felder: unterlagen[] (vorlage, daten, festgeschrieben, absender, xml, fassungen), belege[] (nr = ${MARKE.name}-Belegnummer, datum, lieferant, steuer[].brutto_cent, festgeschrieben, historie[]), belegArchiv[] (ungültig markiert, mit Grund), kasse[] (Tagesabschlüsse: datum, umsatz[], karte_cent, trinkgeld_cent, gutscheine[], bewegungen[] mit beleg_nr, erstellt = erfasst am, festgeschrieben, historie[] = frühere Fassungen mit Grund), kassenstuerze[], sachentnahmen[], protokoll[] (Löschungen und Korrekturen; E-214: „korrektur_nicht_uebernommen“ mit fassung_bis, geraet, eingang), geraet nur in Belegen und Historie (Gerät der Fassung), eingang (Eingang beim Synchronisationsserver: seit, version, zeit).`,
+      `- daten/stand.json: der vollständige Datenbestand der App (JSON, UTF-8) – Zeitpunkte als ISO 8601 in UTC, Beträge in Cent (ganze Zahlen). Wichtige Felder: unterlagen[] (vorlage, daten, festgeschrieben, absender, xml, fassungen), belege[] (nr = ${MARKE.name}-Belegnummer, datum, lieferant, steuer[].brutto_cent, festgeschrieben, historie[]), belegArchiv[] (ungültig markiert, mit Grund), kasse[] (Tagesabschlüsse: datum, umsatz[], karte_cent, trinkgeld_cent, gutscheine[], bewegungen[] mit beleg_nr, erstellt = erfasst am, festgeschrieben, historie[] = frühere Fassungen mit Grund), kassenstuerze[], sachentnahmen[], protokoll[] (Löschungen und Korrekturen; E-214: „korrektur_nicht_uebernommen“ mit fassung_bis, geraet, eingang), an Rechnungen zahlungen[] (Zahlungseingänge; guthaben = mit dem Guthaben einer Überzahlung verrechnet), guthaben[] (Überzahlungen und Rückzahlungen, auch in Guthaben.csv) und uneinbringlich (Tag und Grund, auch in Uneinbringlich.csv), geraet nur in Belegen und Historie (Gerät der Fassung), eingang (Eingang beim Synchronisationsserver: seit, version, zeit).`,
       `- Rechnungen/*.pdf, E-Rechnungen/*.xml (XRechnung 3.0, UBL – bei festgeschriebenen Rechnungen das bei der Festschreibung festgehaltene Original), Belege/ (Originaldateien, Dateiname beginnt mit der ${MARKE.name}-Belegnummer), Kasse/ (Z-Bons und Eigenbelege, frühere Fassungen mit „_Fassung-n“), Kassenbuecher/ (festgeschriebene Kassenbücher).`,
       `- Gleiche Dateinamen (z. B. dieselbe Rechnungsnummer von zwei Geräten) bekommen die interne Kennung angehängt („_<Kennung>“) – nichts wird überschrieben; dieselbe Kennung steht in daten/stand.json.`,
       `- „_Konfliktkopie“: eine abweichend festgeschriebene Fassung derselben Rechnung von einem anderen Gerät. Sie und doppelte Stornorechnungen zählen in Rechnungen.csv, Voranmeldung und EÜR nicht mit, sind aber aufbewahrt (PDF, XML und in daten/stand.json mit konfliktKopieVon).`,

@@ -38,6 +38,10 @@ import {
   rechnungenCsv,
   rechnungsSpalten,
   type Spalte,
+  GUTHABEN_SPALTEN,
+  UNEINBRINGLICH_SPALTEN,
+  guthabenZeilen,
+  uneinbringlichZeilen,
   type Zeitraum,
 } from "./steuerpaket";
 import { istGutschrift } from "./ustAusRechnungen";
@@ -57,6 +61,8 @@ export const PRUEFEXPORT = {
   kassenstuerze: "Kassenstuerze.csv",
   sachentnahmen: "Sachentnahmen.csv",
   protokoll: "Aenderungsprotokoll.csv",
+  guthaben: "Guthaben.csv",
+  uneinbringlich: "Uneinbringlich.csv",
   feldbeschreibung: "Feldbeschreibung.txt",
   xmlAus: "E-Rechnungen/ausgehend/",
   xmlEin: "E-Rechnungen/eingehend/",
@@ -243,6 +249,11 @@ export function pruefexport(s: Stand, dateien: Record<string, Uint8Array>, jetzt
   if (s.sachentnahmen.length) inhalt[PRUEFEXPORT.sachentnahmen] = utf8(sachentnahmenCsv(s.sachentnahmen));
   // das Änderungsprotokoll immer – auch leer (nur Kopfzeile), damit erkennbar ist, dass es nichts zu protokollieren gab
   inhalt[PRUEFEXPORT.protokoll] = utf8(csv(kopfAus(PROTOKOLL_SPALTEN), aenderungsprotokoll(s, z)));
+  // E-229: Guthaben der Kunden und uneinbringliche Forderungen – nur wenn es welche gibt
+  const guthaben = guthabenZeilen(s, z);
+  if (guthaben.length) inhalt[PRUEFEXPORT.guthaben] = utf8(csv(kopfAus(GUTHABEN_SPALTEN), guthaben));
+  const uneinbringlich = uneinbringlichZeilen(s, z);
+  if (uneinbringlich.length) inhalt[PRUEFEXPORT.uneinbringlich] = utf8(csv(kopfAus(UNEINBRINGLICH_SPALTEN), uneinbringlich));
 
   const dateienListe: { name: string; zweck: string; spalten?: readonly Spalte[] }[] = [
     { name: PRUEFEXPORT.rechnungen, zweck: `${anzahl(rechnungen.length - gutschriften.length, "gestellte Rechnung", "gestellte Rechnungen")} einschließlich Stornorechnungen, nach Datum; Summen je Steuersatz am Ende.`, spalten: rechnungsSpalten({ gutschriften: false, bis: z.bis, datei: false }) },
@@ -253,6 +264,8 @@ export function pruefexport(s: Stand, dateien: Record<string, Uint8Array>, jetzt
     ...(s.kassenstuerze.length ? [{ name: PRUEFEXPORT.kassenstuerze, zweck: `${anzahl(s.kassenstuerze.length, "Kassensturz", "Kassenstürze")} (Zählprotokolle des Bargeldbestands) mit gezähltem Bestand, Stückelung und Anwesenden, nach Zeitpunkt.`, spalten: KASSENSTURZ_SPALTEN }] : []),
     ...(s.sachentnahmen.length ? [{ name: PRUEFEXPORT.sachentnahmen, zweck: `${anzahl(s.sachentnahmen.length, "Sachentnahme", "Sachentnahmen")} (unentgeltliche Wertabgaben, z. B. nach den Pauschbeträgen) mit Bemessungsgrundlage und Umsatzsteuer je Steuersatz, nach Datum; Summe am Ende.`, spalten: SACHENTNAHME_SPALTEN }] : []),
     { name: PRUEFEXPORT.protokoll, zweck: "Änderungen nach der Festschreibung, Korrekturen, Löschungen, ungültig markierte Belege, Nacherfassungen, nach dem Teilen gelöschte Rechnungsentwürfe (deren Nummer vergeben bleibt) und Korrekturen, die beim Zusammenführen zweier Geräte (Synchronisation, Wiederherstellen) nicht übernommen wurden – mit Gerät und Eingang beim Server –, nach Zeitpunkt.", spalten: PROTOKOLL_SPALTEN },
+    ...(guthaben.length ? [{ name: PRUEFEXPORT.guthaben, zweck: "Überzahlungen von Kunden (Guthaben, kein Umsatz) mit Rückzahlungen und Verrechnungen mit anderen Rechnungen, nach Kunde und Datum.", spalten: GUTHABEN_SPALTEN }] : []),
+    ...(uneinbringlich.length ? [{ name: PRUEFEXPORT.uneinbringlich, zweck: "Als uneinbringlich vermerkte Forderungen (§ 17 Abs. 2 Nr. 1 UStG) mit Tag, Grund, offenem Betrag und danach noch Eingegangenem.", spalten: UNEINBRINGLICH_SPALTEN }] : []),
     { name: PRUEFEXPORT.feldbeschreibung, zweck: "diese Beschreibung." },
   ];
   const ordner = [

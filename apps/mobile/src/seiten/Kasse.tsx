@@ -394,8 +394,12 @@ export function KassenTagSeite({ id }: { id?: string }) {
     if (fehlerListe.includes("trinkgeld_zu_hoch")) return setFehler(TEXT.r12g_trinkgeld_zu_hoch);
     if (fehlerListe.includes("unbar_zu_hoch")) return setFehler(TEXT.r12_unbar_zu_hoch);
     if (fehlerListe.includes("gutschein_zu_hoch")) return setFehler(TEXT.r12g_gutschein_zu_hoch);
-    // E-221 Befund 5: bar kassierte Rechnung über dem offenen Betrag – nicht still kürzen, sondern ablehnen
-    const ueber = alt ? undefined : rechnungenBar.find((r) => zahlungPruefen(z.stand, r.id, { datum: tag, betrag_cent: r.betrag_cent }).fehler === "ueberzahlt");
+    // E-221 Befund 5: bar kassierte Rechnung über dem offenen Betrag – nicht still kürzen, sondern ablehnen. E-229: An der
+    // Kasse bleibt es dabei (zu viel Bargeld gibt man gleich zurück); eine Überzahlung per Bank wird an der Rechnung Guthaben
+    const ueber = alt ? undefined : rechnungenBar.find((r) => {
+      const p = zahlungPruefen(z.stand, r.id, { datum: tag, betrag_cent: r.betrag_cent });
+      return p.fehler === "ueberzahlt" || p.ueberzahlung > 0;
+    });
     if (ueber) {
       const u = z.stand.unterlagen.find((x) => x.id === ueber.id);
       return setFehler(TEXT.e221_bar_ueberzahlt(ueber.nummer, euro(u ? offenerBetrag(z.stand, u) : 0)));

@@ -675,6 +675,33 @@ export function zahlungsBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "
 }
 
 /**
+ * E-229 (Steuerberater 27.10.2026, T-304): Überzahlung bzw. Rückzahlung eines Guthabens des Kunden – wie die
+ * Zahlungseingänge (`zahlungsBuchungenRechnung`) nur bei bilanzierenden Betrieben mit „Zahlungseingänge buchen“: Bank an
+ * Forderungen (Debitor) zum Tag der Überzahlung, die Rückzahlung Forderungen an Bank (Bank im Haben). So bleibt das
+ * Guthaben bis zur Rückzahlung bzw. Verrechnung auf dem Forderungs- bzw. Debitorenkonto stehen (kein neues Konto). Die
+ * Verrechnung mit einer anderen Rechnung desselben Kunden bewegt kein Geld – keine Buchung. Ohne Steuer.
+ */
+export function guthabenBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde"> & Partial<Pick<AusgangsRechnungFuerBuchung, "personenkonto">>, eintraege: readonly { id: string; art: "ueberzahlung" | "rueckzahlung"; datum: string; betrag_cent: number }[], kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): Buchung[] {
+  const k = kontenFuer(kontenrahmen, o?.vorgaben);
+  return eintraege
+    .filter((e) => e.betrag_cent > 0)
+    .map((e): Buchung => ({
+      datum: e.datum,
+      betrag_cent: e.betrag_cent,
+      soll_haben: e.art === "ueberzahlung" ? "S" : "H",
+      konto: k.bank,
+      gegenkonto: r.personenkonto || k.forderungen,
+      bu_schluessel: "",
+      belegfeld1: belegfeld1Aus(r.nummer),
+      buchungstext: kuerze(`${e.art === "ueberzahlung" ? "Überzahlung" : "Rückzahl. Guthaben"} RE ${r.nummer} ${kuerze(r.kunde, NAME_IM_TEXT)}`, 60),
+      ust_satz: null,
+      art: "umbuchung",
+      quelle_id: r.id,
+      guid: buchungsGuid(`${r.id}|guthaben|${e.id}`, null),
+    }));
+}
+
+/**
  * Konto eines Belegs nach Zahlungsweg – bar nur gegen Kasse, wenn die App die Kasse an diesem Tag führt (R12).
  * R12 GoBD: Barbelege vor dem ersten Kassenabschluss (bzw. ohne Kasse in der App) gegen Privateinlage – aus der eigenen
  * Tasche bezahlt; Geldtransit wäre sonst ein Parkkonto mit Restsaldo (Frage im Paket).

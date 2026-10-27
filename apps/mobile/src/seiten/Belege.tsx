@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
-import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, fremdBetragText, fremdUmrechnen, kursAus, belegGezahlt, belegSummen, belegTeilabzug, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, ustIdnrEuAusland, vorsteuerAnteilAus, vorsteuerAufteilung, zeitDe, type Beleg } from "@amtlos/fachlogik";
+import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, fremdBetragText, fremdKursdifferenz, fremdUmrechnen, kursAus, belegGezahlt, belegSummen, belegTeilabzug, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, ustIdnrEuAusland, vorsteuerAnteilAus, vorsteuerAufteilung, zeitDe, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { regelwert } from "../pflichten/check";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -330,6 +330,8 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         {k.anlage ? <Wahl label={TEXT.stb_anlage_art} hilfe={TEXT.stb_anlage_art_hilfe} wert={b.anlage_art ?? "bga"} aendern={(w) => setze({ anlage_art: w })} optionen={ANLAGE_ARTEN} /> : null}
         <Wahl label={TEXT.beleg_zahlung} wert={b.zahlung} aendern={(w) => setze(w === "bar" && !b.bezahlt && b.datum ? { zahlung: w, bezahlt: b.datum } : { zahlung: w })} optionen={ZAHLUNGSWEGE} />
         <DatumFeld label={TEXT.beleg_bezahlt} hilfe={TEXT.beleg_bezahlt_hilfe} wert={b.bezahlt ?? null} aendern={(d) => setze({ bezahlt: d })} />
+        {/* E-229 (Steuerberater 27.10.2026, T-303): fremde Währung – tatsächlich gezahlter Euro-Betrag (EÜR: Betriebsausgabe, § 11 EStG) */}
+        {b.fremd ? <FremdGezahlt b={b} setze={setze} /> : null}
         {/* R12: beim Bezahlen abgezogenes Skonto – mindert die Vorsteuer im Monat der Zahlung (§ 17 UStG) */}
         {b.steuerschuld ? null : (
           <View>
@@ -403,6 +405,20 @@ function FremdTeil({ b, setze, umgerechnet }: { b: Beleg; setze: (w: Partial<Bel
           setze({ steuer, fremd: { ...f, kurs } });
         }} />
       ) : null}
+    </View>
+  );
+}
+
+/** E-229 (T-303): gezahlter Euro-Betrag laut Kontoauszug bei einer Rechnung in fremder Währung – mit Kursdifferenz. */
+function FremdGezahlt({ b, setze }: { b: Beleg; setze: (w: Partial<Beleg>) => void }) {
+  const f = b.fremd!;
+  const [text, setText] = useState(() => (f.gezahlt_eur_cent ? betragText(f.gezahlt_eur_cent) : ""));
+  const c = cent(text);
+  const diff = fremdKursdifferenz(b);
+  return (
+    <View>
+      <Feld label={TEXT.e229_gezahlt_eur} hilfe={TEXT.e229_gezahlt_eur_hilfe} wert={text} aendern={(w) => { setText(w); const x = cent(w); setze({ fremd: { ...f, gezahlt_eur_cent: x && x > 0 ? x : null } }); }} keyboardType="decimal-pad" placeholder="0,00" optional fehler={text.trim() && (c === null || c <= 0) ? TEXT.betrag_falsch : null} />
+      {diff ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.e229_kursdifferenz(euro(diff))}</T> : null}
     </View>
   );
 }
