@@ -11,7 +11,7 @@ import { Papier, PapierBlatt } from "./Papier";
 import { GrosserBetrag, RechtsHinweis } from "./gemeinsam";
 import { mitVorlagenHinweis } from "../rechtshinweis";
 import { drucken, pdfTeilenMitHash } from "../unterlagen/pdf";
-import { NUMMER_DOPPELT, fehltFuer, lueckenFrage } from "../unterlagen/pruefung";
+import { NUMMER_DOPPELT, fehltFuer, lueckenFrage, vaOhneEuroFrage } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
 import { ausgabeHtml, druckBetrieb, druckFesthalten, nachgebildet } from "../unterlagen/ausgabe";
 import { absenderFuer, geteiltOffenLetzte, geteilteVersionen, heute, zahlungPruefen, type EuStornoGrund } from "../unterlagen/speicher";
@@ -91,6 +91,9 @@ export function useTeilen(id: string) {
     // E-210: Lücken im Text („[bitte ergänzen]“) – nachfragen, bevor ein unvollständiges Impressum hinausgeht
     const luecken = lueckenFrage(v, u.daten, druckBetrieb(z.stand, u, z.pro));
     if (luecken && !(await bestaetigen(luecken))) return;
+    // E-224: Voranmeldung mit Erwerbs- bzw. § 13b-Belegen ohne Euro-Betrag im Zeitraum – nur nach Rückfrage hinaus
+    const ohneEuro = vaOhneEuroFrage(z.stand, u);
+    if (ohneEuro && !(await bestaetigen(ohneEuro))) return;
     // E-188: eine noch nie ausgegebene Rechnung bzw. Vorlage nur mit Pro; erneutes Teilen, Stornos und Kassenbuch gehen immer
     if (!ausgabeErlaubt(u, z.pro) && !sperre(ausgabeGrund(u), undefined, { entwurf: true })) return;
     setLaedt(art === "teilen");

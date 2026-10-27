@@ -528,6 +528,13 @@ export interface SteuerschuldSummen {
   ige_vorsteuer_cent: number;
   ige_andere_cent: number;
   ige_anzahl: number;
+  /**
+   * E-224: Belege ohne Betrag in Euro (0 € – typisch eine Rechnung in fremder Währung, für die noch kein Euro-Betrag bzw. Kurs
+   * eingetragen ist, E-221): nicht in den Summen und nicht in `anzahl`/`ige_anzahl`, sondern hier gezählt – § 13b
+   * (Kz 46/47, 84/85, 67) bzw. innergemeinschaftlicher Erwerb (Kz 89/93, 61). Die Voranmeldung warnt damit.
+   */
+  ohne_euro: number;
+  ige_ohne_euro: number;
 }
 
 /**
@@ -536,9 +543,15 @@ export interface SteuerschuldSummen {
  * Die Steuer schulden auch Kleinunternehmer (§ 13b Abs. 8 UStG); Vorsteuer (Kz 67) nur mit Vorsteuerabzug.
  */
 export function steuerschuldFuer(belege: Beleg[], von: string, bis: string): SteuerschuldSummen {
-  const r: SteuerschuldSummen = { eu_netto_cent: 0, eu_steuer_cent: 0, bau_netto_cent: 0, bau_steuer_cent: 0, vorsteuer_cent: 0, anzahl: 0, ige_19_netto_cent: 0, ige_19_steuer_cent: 0, ige_7_netto_cent: 0, ige_7_steuer_cent: 0, ige_vorsteuer_cent: 0, ige_andere_cent: 0, ige_anzahl: 0 };
+  const r: SteuerschuldSummen = { eu_netto_cent: 0, eu_steuer_cent: 0, bau_netto_cent: 0, bau_steuer_cent: 0, vorsteuer_cent: 0, anzahl: 0, ige_19_netto_cent: 0, ige_19_steuer_cent: 0, ige_7_netto_cent: 0, ige_7_steuer_cent: 0, ige_vorsteuer_cent: 0, ige_andere_cent: 0, ige_anzahl: 0, ohne_euro: 0, ige_ohne_euro: 0 };
   for (const b of belege) {
     if (b.ungueltig || !b.steuerschuld || b.datum < von || b.datum > bis) continue;
+    // E-224: ohne Euro-Betrag (fremde Währung ohne Umrechnung, E-221) trägt der Beleg nichts bei – nicht als übernommen zählen
+    if (!b.steuer.some((s) => s.brutto_cent)) {
+      if (b.steuerschuld === "ige") r.ige_ohne_euro++;
+      else r.ohne_euro++;
+      continue;
+    }
     // E-222: innergemeinschaftlicher Erwerb nach Belegdatum – die Steuer entsteht mit der Rechnung, spätestens mit Ablauf des
     // dem Erwerb folgenden Monats (§ 13 Abs. 1 Nr. 6 UStG; den Tag des Erwerbs kennt der Beleg nicht – Annahme in der Übernahme)
     if (b.steuerschuld === "ige") {

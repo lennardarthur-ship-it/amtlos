@@ -81,6 +81,7 @@ import { sachentnahmenFuer, type Sachentnahme } from "@amtlos/fachlogik";
 import { eRechnungAus, fehlendeTage, istEuAusland, kassenUmsatz, kennzahlBefreiung, restGruppen, steuerschuldFuer, summen, ustZeitraum, vorsteuerFuer, zahlungsAnteile, type Beleg, type Betrieb, type Kassenabschluss, type RechnungsDaten } from "@amtlos/fachlogik";
 import { EU_STORNO_GRUND, nichtZaehlend, type EuStornoGrund, type Unterlage } from "./speicher";
 import { MARKE } from "@amtlos/marke";
+import { T as TEXT } from "../texte";
 
 export type Versteuerung = "soll" | "ist";
 
@@ -562,6 +563,12 @@ export interface UstUebernahme {
   igeKu: number;
   /** E-222: Bemessungsgrundlage innergemeinschaftlicher Erwerbe zu anderen Sätzen als 19 %/7 % – ohne Kennzahl, nicht übernommen */
   igeAndere: number;
+  /**
+   * E-224: Belege ohne Euro-Betrag im Zeitraum (fremde Währung ohne Umrechnung, E-221) – innergemeinschaftlicher Erwerb bzw.
+   * § 13b; nicht übernommen, Warnung (TEXT.e224_*) und Zeile auf dem PDF
+   */
+  igeOhneEuro: number;
+  rcOhneEuro: number;
   /** R12: Kassenabschlüsse mit Umsatz im Zeitraum (übernommen) */
   kasseTage: number;
   /** R12: Tage im Zeitraum ohne Kassenabschluss – null, wenn es noch gar keinen Kassenabschluss gibt */
@@ -652,7 +659,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   // gesetzt, wenn es solche Belege gibt (von Hand eingetragene Erwerbe bleiben sonst stehen)
   const igeWerte: Record<string, string> = rc.ige_anzahl ? { ige_19: betragText(rc.ige_19_netto_cent), ige_7: betragText(rc.ige_7_netto_cent), vorsteuer_ige: rc.ige_vorsteuer_cent ? betragText(rc.ige_vorsteuer_cent) : "" } : {};
   const kasseFehlend = kasse?.abschluesse.length ? fehlendeTage(kasse.abschluesse, z.von, z.bis, kasse.ruhetage ?? [], kasse.heute) : null;
-  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl, igeBelege: 0, igeKu: rc.ige_anzahl, igeAndere: 0, kasseTage: 0, kasseFehlend: null, minderungen: 0, ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [] };
+  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl, igeBelege: 0, igeKu: rc.ige_anzahl + rc.ige_ohne_euro, igeAndere: 0, igeOhneEuro: 0, rcOhneEuro: rc.ohne_euro, kasseTage: 0, kasseFehlend: null, minderungen: 0, ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [] };
   // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit;
   // 5.2: OSS-Rechnungen gehören in die OSS-Erklärung, nicht in die Voranmeldung
   const ossImZeitraum = alle.filter((x) => !kuRechnung(x.u) && istOssRechnung(x.u)).length;
@@ -732,6 +739,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     ka?.tage ? `Kassenumsätze aus ${ka.tage} Tagesabschlüssen: Netto und Umsatzsteuer je Steuersatz aus dem Brutto herausgerechnet.` : "",
     ossImZeitraum ? `${ossImZeitraum} OSS-Rechnung(en) mit der Steuer des Bestimmungslands nicht übernommen – sie gehören in die OSS-Erklärung beim BZSt.` : "",
     rc.ige_anzahl ? IGE_ANNAHME(rc.ige_anzahl) : "",
+    rc.ige_ohne_euro ? TEXT.e224_ige_ohne_euro_pdf(rc.ige_ohne_euro) : "",
+    rc.ohne_euro ? TEXT.e224_13b_ohne_euro_pdf(rc.ohne_euro) : "",
     rc.ige_andere_cent ? `Innergemeinschaftliche Erwerbe zu anderen Steuersätzen als 19 % und 7 % (${betragText(rc.ige_andere_cent)} €) nicht übernommen – bitte im ELSTER-Formular prüfen.` : "",
   ].filter(Boolean);
   return {
@@ -748,6 +757,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     igeBelege: rc.ige_anzahl,
     igeKu: 0,
     igeAndere: rc.ige_andere_cent,
+    igeOhneEuro: rc.ige_ohne_euro,
+    rcOhneEuro: rc.ohne_euro,
     kasseTage: ka?.tage ?? 0,
     kasseFehlend,
     minderungen,

@@ -1,7 +1,7 @@
 /** Was einer Unterlage noch fehlt – Pflichtangaben der Vorlage plus Prüfungen über alle Unterlagen (doppelte Nummer). */
-import { GMBH_ANGABEN, KG_REGISTERGERICHT, KG_REGISTERNUMMER, fehlendeAngaben, offeneLuecken, vorlageFuer, type Betrieb, type Daten, type Vorlage } from "@amtlos/fachlogik";
+import { GMBH_ANGABEN, KG_REGISTERGERICHT, KG_REGISTERNUMMER, fehlendeAngaben, offeneLuecken, steuerschuldFuer, vorlageFuer, type Betrieb, type Daten, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { nummerDoppelt, type Stand, type Unterlage } from "./speicher";
+import { nummerDoppelt, zeitraumAusText, type Stand, type Unterlage } from "./speicher";
 
 export const NUMMER_DOPPELT = "Rechnungsnummer ist schon vergeben";
 
@@ -31,4 +31,19 @@ export function fehltFuer(s: Stand, u: Unterlage): string[] {
 export function lueckenFrage(v: Vorlage, d: Daten, b: Betrieb): { titel: string; text: string; ja: string } | null {
   const n = offeneLuecken(v, d, b);
   return n ? { titel: TEXT.e210_luecken_titel(n), text: TEXT.e210_luecken_text, ja: TEXT.e210_luecken_ja } : null;
+}
+
+/**
+ * E-224: Rückfrage vor Teilen bzw. Drucken einer Voranmeldung, solange in ihrem Zeitraum Belege mit innergemeinschaftlichem
+ * Erwerb oder § 13b ohne Euro-Betrag liegen (fremde Währung ohne Umrechnung, E-221) – sie fehlen in Kz 89/93/61 bzw.
+ * 46/47, 84/85, 67. Wie die Rückfrage bei Lücken (E-210): „Trotzdem weitergeben“ oder abbrechen. Sonst null.
+ */
+export function vaOhneEuroFrage(s: Stand, u: Unterlage): { titel: string; text: string; ja: string } | null {
+  if (u.vorlage !== "ust_voranmeldung") return null;
+  const z = zeitraumAusText(u.daten.zeitraum);
+  if (!z) return null;
+  const rc = steuerschuldFuer(s.belege, z.von, z.bis);
+  if (!rc.ige_ohne_euro && !rc.ohne_euro) return null;
+  const zeilen = [rc.ige_ohne_euro ? TEXT.e224_ige_ohne_euro(rc.ige_ohne_euro) : "", rc.ohne_euro ? TEXT.e224_13b_ohne_euro(rc.ohne_euro) : "", TEXT.e224_frage_text];
+  return { titel: TEXT.e224_frage_titel, text: zeilen.filter(Boolean).join("\n\n"), ja: TEXT.e224_frage_ja };
 }

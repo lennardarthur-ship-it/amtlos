@@ -118,8 +118,8 @@ describe("§ 13b-Belege und fremd adressierte E-Rechnung", () => {
   const BEL: Beleg = { id: "b1", datum: "2026-05-10", lieferant: "Kernbohrtechnik", kategorie: "fremdleistungen", steuer: [{ satz: 0, brutto_cent: 95500 }], vorsteuer: true, zahlung: "bank", erstellt: "2026-05-10", geaendert: "2026-05-10", steuerschuld: "bau" };
   it("Kz 84/85/67 für eine Bauleistung, Kz 46/47 für eine EU-Leistung; Kleinunternehmer ohne Kz 67", () => {
     const r = steuerschuldFuer([BEL, { ...BEL, id: "b2", steuerschuld: "eu", steuer: [{ satz: 0, brutto_cent: 46800 }], vorsteuer: false }], "2026-04-01", "2026-06-30");
-    // E-222: dazu die Felder der innergemeinschaftlichen Erwerbe (hier 0)
-    expect(r).toEqual({ bau_netto_cent: 95500, bau_steuer_cent: 18145, eu_netto_cent: 46800, eu_steuer_cent: 8892, vorsteuer_cent: 18145, anzahl: 2, ige_19_netto_cent: 0, ige_19_steuer_cent: 0, ige_7_netto_cent: 0, ige_7_steuer_cent: 0, ige_vorsteuer_cent: 0, ige_andere_cent: 0, ige_anzahl: 0 });
+    // E-222: dazu die Felder der innergemeinschaftlichen Erwerbe (hier 0); E-224: Belege ohne Euro-Betrag (hier keine)
+    expect(r).toEqual({ bau_netto_cent: 95500, bau_steuer_cent: 18145, eu_netto_cent: 46800, eu_steuer_cent: 8892, vorsteuer_cent: 18145, anzahl: 2, ige_19_netto_cent: 0, ige_19_steuer_cent: 0, ige_7_netto_cent: 0, ige_7_steuer_cent: 0, ige_vorsteuer_cent: 0, ige_andere_cent: 0, ige_anzahl: 0, ohne_euro: 0, ige_ohne_euro: 0 });
     // in der normalen Vorsteuer zählt er nicht, Brutto = Netto
     expect(vorsteuerFuer([BEL], "2026-04-01", "2026-06-30").cent).toBe(0);
     expect(belegSummen(BEL)).toEqual({ brutto_cent: 95500, netto_cent: 95500, ust_cent: 0, vorsteuer_cent: 0 });

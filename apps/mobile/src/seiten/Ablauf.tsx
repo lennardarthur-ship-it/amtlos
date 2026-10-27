@@ -94,6 +94,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           r.kuGemischt ? TEXT.ust_ku_gemischt : "",
           r.igeKu ? TEXT.ust_ku_ige(r.igeKu) : "",
           r.igeBelege ? TEXT.ust_ige_belege(r.igeBelege) : "",
+          r.igeOhneEuro ? TEXT.e224_ige_ohne_euro(r.igeOhneEuro) : "",
+          r.rcOhneEuro ? TEXT.e224_13b_ohne_euro(r.rcOhneEuro) : "",
           kasse?.text ?? "",
           r.kasseTage ? TEXT.r12_kasse_uebernommen(r.kasseTage) : "",
           r.minderungen ? TEXT.r12_minderungen(r.minderungen) : "",
@@ -152,6 +154,9 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           {/* E-222: innergemeinschaftliche Erwerbe aus Belegen; Kleinunternehmer: nicht übernommen (Erwerbsschwelle) */}
           {r.igeBelege ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_ige_belege(r.igeBelege)}</T> : null}
           {r.igeKu ? <T v="caption" farbe={f.bald}>{TEXT.ust_ku_ige(r.igeKu)}</T> : null}
+          {/* E-224: Belege ohne Euro-Betrag (fremde Währung) fehlen in den Kennzahlen – deutlich warnen */}
+          {r.igeOhneEuro ? <Hinweis art="warnung" text={TEXT.e224_ige_ohne_euro(r.igeOhneEuro)} /> : null}
+          {r.rcOhneEuro ? <Hinweis art="warnung" text={TEXT.e224_13b_ohne_euro(r.rcOhneEuro)} /> : null}
           {!r.kleinunternehmer && z.stand.profil["ust.dauerfristverlaengerung"] === true ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_dfv}</T> : null}
           {!r.kleinunternehmer && z.stand.profil["ust.dauerfristverlaengerung"] === true && uebernommen && /-12$/.test(uebernommen.periode) ? <T v="caption" farbe={f.bald}>{TEXT.ust_sondervorauszahlung}</T> : null}
         </View>
