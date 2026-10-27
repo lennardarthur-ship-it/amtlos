@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
-import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, fremdBetragText, fremdUmrechnen, kursAus, belegGezahlt, belegSummen, belegTeilabzug, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, ustIdnrEuAusland, vorsteuerAnteilAus, vorsteuerAufteilung, zeitDe, type Beleg } from "@amtlos/fachlogik";
+import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, fremdBetragText, fremdUmrechnen, kursAus, belegGezahlt, belegSummen, belegTeilabzug, cent, eRechnungAusPdf, eRechnungLesen, igeSteuerTag, kaeuferFremd, kategorieFuer, steuerschuldBetrag, ustIdnrEuAusland, vorsteuerAnteilAus, vorsteuerAufteilung, zeitDe, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { regelwert } from "../pflichten/check";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -14,6 +14,8 @@ import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDate
 import { BELEG_KONFLIKT_GRUND, belegEndgueltigLoeschbar, leererBeleg, neueId } from "../unterlagen/speicher";
 import { istKleinunternehmer } from "../unterlagen/steuerpaket";
 import { gemischteUmsaetze, nurSteuerfreieUmsaetze, vorsteuerquoteAus } from "../unterlagen/ustAusRechnungen";
+import { erwerbsJahr, erwerbsschwelleLage } from "../unterlagen/erwerbsschwelle";
+import { ErwerbsschwelleFragen, erwerbsschwelleEuro } from "./Erwerbsschwelle";
 import { useAmtlos } from "../zustand";
 import { erstellenErlaubt } from "../pro/regeln";
 import { ProSeite, useProSperre } from "./Pro";
@@ -319,7 +321,12 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
               <View>
                 <Feld label={TEXT.beleg_ige_ust_idnr} hilfe={TEXT.beleg_ige_ust_idnr_hilfe} wert={b.lieferant_ust_idnr ?? ""} aendern={(w) => setze({ lieferant_ust_idnr: w.replace(/\s+/g, "").toUpperCase() || null })} optional autoCapitalize="characters" />
                 {!ustIdnrEuAusland(b.lieferant_ust_idnr) ? <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{TEXT.beleg_ige_ohne_idnr}</T> : null}
-                {ku ? <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{TEXT.beleg_ige_ku}</T> : null}
+                {/* E-227: Tag des Erwerbs – Rechnungsdatum zählt nur bis zum Ende des Monats nach dem Erwerb (§ 13 Abs. 1 Nr. 6 UStG) */}
+                <DatumFeld label={TEXT.e227_erwerb_datum} hilfe={TEXT.e227_erwerb_datum_hilfe} wert={b.erwerb_datum ?? null} aendern={(d) => setze({ erwerb_datum: d })} />
+                {!b.erwerb_datum ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.e227_erwerb_datum_fehlt}</T> : igeSteuerTag(b) !== b.datum ? <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{TEXT.e227_erwerb_zeitraum(igeSteuerTag(b).split("-").reverse().join("."))}</T> : null}
+                {/* E-227: Erwerbsschwelle für Kleinunternehmer und Betriebe mit nur steuerfreien Umsätzen (§ 1a Abs. 3, 4 UStG) */}
+                {ku || nurSteuerfreieUmsaetze(z.stand.unterlagen, z.stand.betrieb) ? <ErwerbsschwelleFragen jahr={erwerbsJahr(b)} /> : null}
+                {ku && erwerbsschwelleLage(z.stand.profil, z.stand.belege, erwerbsJahr(b), erwerbsschwelleEuro()).status === "ja" ? <Hinweis art="warnung" text={TEXT.e227_ku_va_pflicht} /> : null}
               </View>
             ) : null}
           </View>

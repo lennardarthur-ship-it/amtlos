@@ -83,6 +83,7 @@ CODE_VERWENDUNG = {
     "steuern.ust.satz_ermaessigt": "Server-API Finanzen: Umsatzsteuersatz für Rechnungen (nicht in der App)",
     "steuern.ustg19.grenze_laufendes_jahr": "Server-API Finanzen: Warnung zur Kleinunternehmergrenze (nicht in der App)",
     "steuern.ustg19.grenze_gruendungsjahr": "Server-API Finanzen: Warnung zur Kleinunternehmergrenze (nicht in der App)",
+    "steuern.ust.erwerbsschwelle": "App: Erwerbsschwelle bei innergemeinschaftlichen Erwerben (Beleg, Voranmeldung, DATEV-Stapel) – E-227",
 }
 
 

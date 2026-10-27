@@ -18,6 +18,7 @@ import { Abschluss, FormHinweis, betriebOeffnen, festschreibenHinweis, useTeilen
 import { AuswahlSeite } from "../ui/auswahlseite";
 import { AbsenderSeite } from "./Betrieb";
 import { useProSperre } from "./Pro";
+import { ErwerbsschwelleFragen, erwerbsschwelleEuro } from "./Erwerbsschwelle";
 import { EUER_GESPERRT, bilanzierendeGewinnermittlung, euerUebernahme, jahreMitDaten, kassenHinweis, kassenHinweisMit, kassenLage, type EuerUebernahme } from "../unterlagen/steuerpaket";
 import { kasseFuerUst } from "../unterlagen/kasse";
 import { Ansage, Felder, useAnsage } from "./felder";
@@ -90,10 +91,10 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   useAnsage(
     r
       ? [
-          r.kleinunternehmer ? (r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku) : TEXT.aus_rechnungen_ok(r.anzahl),
+          r.kleinunternehmer ? (r.kuVoranmeldungPflicht ? TEXT.e227_ku_va_pflicht : r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku) : TEXT.aus_rechnungen_ok(r.anzahl),
           r.kuGemischt ? TEXT.ust_ku_gemischt : "",
-          r.igeKu ? TEXT.ust_ku_ige(r.igeKu) : "",
-          r.igeBelege ? TEXT.ust_ige_belege(r.igeBelege) : "",
+          r.igeKu ? TEXT.e227_ige_nicht(r.igeKu, r.erwerbsschwelle?.status !== "nein") : "",
+          r.igeBelege ? (r.kleinunternehmer ? TEXT.e227_ige_ku_uebernommen(r.igeBelege) : TEXT.ust_ige_belege(r.igeBelege)) : "",
           r.igeOhneEuro ? TEXT.e224_ige_ohne_euro(r.igeOhneEuro) : "",
           r.rcOhneEuro ? TEXT.e224_13b_ohne_euro(r.rcOhneEuro) : "",
           kasse?.text ?? "",
@@ -123,7 +124,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           aendern={(p) => {
             if (!sperre("ust_uebernahme")) return;
             const ku = z.stand.profil["ust.kleinunternehmer"];
-            const erg = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb, v, z.stand.belege, typeof ku === "boolean" ? ku : undefined, kasseFuerUst(z.stand));
+            // E-227: Erwerbsschwelle – Antworten im Profil, Wert aus dem Katalog
+            const erg = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb, v, z.stand.belege, typeof ku === "boolean" ? ku : undefined, kasseFuerUst(z.stand), { profil: z.stand.profil, schwelleEuro: erwerbsschwelleEuro() });
             if (!erg) return;
             z.setzen(id, erg.werte);
             setUebernommen({ periode: p, v, r: erg });
@@ -133,7 +135,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
       </ScrollView>
       {r ? (
         <View style={{ marginTop: 8, gap: 4 }}>
-          {r.kleinunternehmer ? <T v="caption" farbe={f.bald}>{r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku}</T> : <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>}
+          {/* E-227: Kleinunternehmer mit Erwerbsbesteuerung – Voranmeldung für diesen Zeitraum (§ 18 Abs. 4a UStG) */}
+          {r.kleinunternehmer ? (r.kuVoranmeldungPflicht ? <Hinweis art="warnung" text={TEXT.e227_ku_va_pflicht} /> : <T v="caption" farbe={f.bald}>{r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku}</T>) : <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>}
           {r.kuGemischt ? <T v="caption" farbe={f.bald}>{TEXT.ust_ku_gemischt}</T> : null}
           {kasse ? <Hinweis art={kasse.warnung ? "warnung" : "info"} symbol="banknote" text={kasse.text} /> : null}
           {r.kasseTage ? <T v="caption" farbe={f.amtTief}>{TEXT.r12_kasse_uebernommen(r.kasseTage)}</T> : null}
@@ -152,8 +155,11 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           {/* R10: § 13b-Belege, Dauerfristverlängerung und Sondervorauszahlung */}
           {r.steuerschuldBelege ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_13b_belege(r.steuerschuldBelege)}</T> : null}
           {/* E-222: innergemeinschaftliche Erwerbe aus Belegen; Kleinunternehmer: nicht übernommen (Erwerbsschwelle) */}
-          {r.igeBelege ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_ige_belege(r.igeBelege)}</T> : null}
-          {r.igeKu ? <T v="caption" farbe={f.bald}>{TEXT.ust_ku_ige(r.igeKu)}</T> : null}
+          {r.igeBelege ? <T v="caption" farbe={f.amtTief}>{r.kleinunternehmer ? TEXT.e227_ige_ku_uebernommen(r.igeBelege) : TEXT.ust_ige_belege(r.igeBelege)}</T> : null}
+          {r.igeKu ? <T v="caption" farbe={f.bald}>{TEXT.e227_ige_nicht(r.igeKu, r.erwerbsschwelle?.status !== "nein")}</T> : null}
+          {/* E-227: Erwerbsschwelle (§ 1a Abs. 3, 4 UStG) – Fragen; danach den Zeitraum noch einmal übernehmen */}
+          {r.erwerbsschwelle ? <ErwerbsschwelleFragen jahr={r.erwerbsschwelle.jahr} /> : null}
+          {r.erwerbsschwelle ? <T v="caption" leise>{TEXT.e227_neu_uebernehmen}</T> : null}
           {/* E-224: Belege ohne Euro-Betrag (fremde Währung) fehlen in den Kennzahlen – deutlich warnen */}
           {r.igeOhneEuro ? <Hinweis art="warnung" text={TEXT.e224_ige_ohne_euro(r.igeOhneEuro)} /> : null}
           {r.rcOhneEuro ? <Hinweis art="warnung" text={TEXT.e224_13b_ohne_euro(r.rcOhneEuro)} /> : null}

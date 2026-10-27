@@ -1489,6 +1489,11 @@ const UST_OHNE_STEUER: { id: string; kz?: string; text: string; hinweis?: string
  * (gedruckter Text: Vermerk der Vorlage entfällt bis zur Bestätigung, PRUEFLISTE T-308).
  */
 export const UST_OHNE_IGE = "Innergemeinschaftliche Erwerbe (Kz 89 bzw. 93 mit Steuer, Vorsteuer Kz 61) sind nicht enthalten. Die App übernimmt sie nur aus Belegen, die als „Waren aus dem EU-Ausland (innergemeinschaftlicher Erwerb)“ erfasst sind. Wer Waren aus anderen EU-Ländern bezieht, erfasst sie so oder trägt sie im Formular ein.";
+/**
+ * E-227 (Steuerberater 27.10.2026): Belege mit Steuerschuld ohne Euro-Betrag (fremde Währung ohne Umrechnung) – Hinweis und
+ * Rückfrage in der App genügen, das PDF muss aber sichtbar diesen Satz tragen (Wortlaut des Steuerberaters, je Art).
+ */
+export const ustNichtVollstaendig = (anzahl: number, art: "ige" | "13b") => `Nicht vollständig: ${anzahl} Belege ohne Euro-Betrag (${art === "ige" ? "innergemeinschaftlicher Erwerb" : "§ 13b"}) fehlen`;
 /** Hinweis bei steuerfreien Umsätzen ohne Vorsteuerabzug (Voranmeldung, Steuerberater-Paket). */
 export const VORSTEUER_AUFTEILEN = "Steuerfreie Umsätze ohne Vorsteuerabzug und Vorsteuer im selben Zeitraum: Vorsteuer aus Eingangsleistungen, die diesen Umsätzen dienen, ist nicht abziehbar (§ 15 Abs. 2 UStG); dienen sie beiden Arten von Umsätzen, ist sie aufzuteilen (§ 15 Abs. 4 UStG). Bitte die Vorsteuer prüfen.";
 
@@ -1570,6 +1575,8 @@ export const ustVoranmeldung: Vorlage = {
         // StB-Prüfung (5.2, Abschnitt 8): Zuordnungsannahmen der Übernahme – stehen auf dem PDF
         { id: "nach_rechnungsdatum", selten: true, art: "mehrzeilig", label: "Nach Rechnungsdatum zugeordnete Rechnungen", hilfe: "trägt „Aus Rechnungen übernehmen“ ein: Rechnungen ohne erkennbares Leistungsdatum, je Zeile „Nummer | Rechnungsdatum | Kunde | Netto“" },
         { id: "annahmen", selten: true, art: "mehrzeilig", label: "Weitere Zuordnungsannahmen", hilfe: "trägt „Aus Rechnungen übernehmen“ ein, z. B. Kassenumsätze aus dem Brutto aufgeteilt" },
+        // E-227 (Steuerberater 27.10.2026): Belege mit Steuerschuld ohne Euro-Betrag – steht oben auf dem PDF
+        { id: "unvollstaendig", selten: true, art: "mehrzeilig", label: "Nicht vollständig", hilfe: "trägt „Aus Rechnungen übernehmen“ ein: Belege mit innergemeinschaftlichem Erwerb bzw. § 13b ohne Euro-Betrag, die in den Kennzahlen fehlen – steht oben auf dem PDF" },
       ],
     },
   ],
@@ -1600,12 +1607,15 @@ export const ustVoranmeldung: Vorlage = {
     const ueberschuss = !leer && x.elsterZahllast < 0;
     const zuordnung = zuordnungZeilen(d);
     const annahmen = text(d, "annahmen").split("\n").map((z) => z.trim()).filter(Boolean);
+    const unvollstaendig = text(d, "unvollstaendig").split("\n").map((z) => z.trim()).filter(Boolean);
     return dokument({
       titel: "Umsatzsteuer-Voranmeldung",
       betrieb: b,
       unter: [text(d, "zeitraum"), "Übertragungshilfe für ELSTER"].filter(Boolean).join(", "),
       meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Zeitraum: ${text(d, "zeitraum") || KOPF_LINIE}`, `Besteuerung: ${ist ? "nach vereinnahmten Entgelten (§ 20 UStG)" : "nach vereinbarten Entgelten"}`].filter(Boolean).join("\n"),
       inhalt:
+        // E-227: fehlende Belege (ohne Euro-Betrag) sichtbar vor den Kennzahlen
+        (unvollstaendig.length ? abschnitt("Nicht vollständig", unvollstaendig.map((z) => `<p><strong>${esc(z)}</strong></p>`).join("")) : "") +
         abschnitt(
           "Steuerpflichtige Umsätze",
           kennzahlen([

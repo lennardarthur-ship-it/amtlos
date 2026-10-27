@@ -78,10 +78,10 @@
  *   (§ 10 Abs. 1 UStG, `euMinderungsTage`); nur ein Skonto nach der Meldung mindert im Zeitraum der Zahlung.
  */
 import { sachentnahmenFuer, type Sachentnahme } from "@amtlos/fachlogik";
-import { eRechnungAus, fehlendeTage, istEuAusland, kassenUmsatz, kennzahlBefreiung, restGruppen, steuerschuldFuer, summen, ustZeitraum, vorsteuerFuer, zahlungsAnteile, type Beleg, type Betrieb, type Kassenabschluss, type RechnungsDaten } from "@amtlos/fachlogik";
+import { eRechnungAus, fehlendeTage, igeSteuerTag, istEuAusland, kassenUmsatz, kennzahlBefreiung, restGruppen, steuerschuldFuer, summen, ustNichtVollstaendig, ustZeitraum, vorsteuerFuer, zahlungsAnteile, type Beleg, type Betrieb, type Kassenabschluss, type RechnungsDaten } from "@amtlos/fachlogik";
 import { EU_STORNO_GRUND, nichtZaehlend, type EuStornoGrund, type Unterlage } from "./speicher";
+import { erwerbsschwelleLage, type ErwerbsschwelleLage, type Schwellenerwerber } from "./erwerbsschwelle";
 import { MARKE } from "@amtlos/marke";
-import { T as TEXT } from "../texte";
 
 export type Versteuerung = "soll" | "ist";
 
@@ -469,6 +469,9 @@ export function perioden(unterlagen: Unterlage[], betrieb: Betrieb, v: Versteuer
   // R11 (Kosmetik #10): keine Voranmeldung für Zeiträume, die ganz in der Kleinunternehmerzeit liegen („Mein Betrieb“)
   const kuBis = (betrieb.ku_bis ?? "").trim();
   if (kuBis) for (const p of [...set]) if ((ustZeitraum(p)?.bis ?? "") <= kuBis) set.delete(p);
+  // E-227: innergemeinschaftliche Erwerbe nach `igeSteuerTag` – auch in der Kleinunternehmerzeit (Voranmeldung nach
+  // § 18 Abs. 4a UStG, wenn die Erwerbe zu versteuern sind)
+  for (const b of belege) if (b.steuerschuld === "ige" && !b.ungueltig) for (const p of periodenVon(igeSteuerTag(b))) set.add(p);
   return [...set].sort((a, b) => b.localeCompare(a) || (a.includes("Q") ? 1 : -1));
 }
 
@@ -561,6 +564,13 @@ export interface UstUebernahme {
    * der Erwerbsschwelle bzw. dem Verzicht darauf ab (§ 1a Abs. 3, 4 UStG) – das prüft die App nicht (PRUEFLISTE T-309).
    */
   igeKu: number;
+  /**
+   * E-227: Erwerbsschwelle (§ 1a Abs. 3 UStG) – nur für Kleinunternehmer und Betriebe mit nur steuerfreien Umsätzen, wenn
+   * es Erwerbsbelege im Zeitraum gibt; sonst null. `igeKu` zählt dann die nicht übernommenen Belege (auch „steuerfrei“).
+   */
+  erwerbsschwelle: (ErwerbsschwelleLage & { art: Schwellenerwerber }) | null;
+  /** E-227: Kleinunternehmer mit Erwerbsbesteuerung – Voranmeldung für diesen Zeitraum (§ 18 Abs. 4a UStG) */
+  kuVoranmeldungPflicht: boolean;
   /** E-222: Bemessungsgrundlage innergemeinschaftlicher Erwerbe zu anderen Sätzen als 19 %/7 % – ohne Kennzahl, nicht übernommen */
   igeAndere: number;
   /**
@@ -603,7 +613,16 @@ export interface KasseFuerUst {
  * Steuer entsteht mit der Ausstellung der Rechnung, spätestens mit Ablauf des dem Erwerb folgenden Monats (§ 13 Abs. 1
  * Nr. 6 UStG) – den Tag des Erwerbs kennt der Beleg nicht.
  */
-export const IGE_ANNAHME = (n: number) => `Innergemeinschaftliche Erwerbe aus ${n} ${n === 1 ? "Beleg" : "Belegen"} nach dem Belegdatum zugeordnet – die Steuer entsteht mit der Rechnung, spätestens mit Ablauf des Monats nach dem Erwerb (§ 13 Abs. 1 Nr. 6 UStG). Kam eine Rechnung später, gehört der Erwerb in den früheren Zeitraum.`;
+export const IGE_ANNAHME = (n: number) => `Innergemeinschaftliche Erwerbe aus ${n} ${n === 1 ? "Beleg" : "Belegen"} ohne Tag des Erwerbs nach dem Belegdatum zugeordnet – die Steuer entsteht mit der Rechnung, spätestens mit Ablauf des Monats nach dem Erwerb (§ 13 Abs. 1 Nr. 6 UStG). Kam eine Rechnung später, gehört der Erwerb in den früheren Zeitraum.`;
+
+/** E-227: Angaben zur Erwerbsschwelle für die Übernahme – Antworten im Profil und Regelwert (Euro). */
+export interface ErwerbsschwelleEingaben {
+  profil: Record<string, string | number | boolean | string[] | null>;
+  schwelleEuro: number | null;
+}
+
+/** E-227: Zeilen „Nicht vollständig: …“ für das PDF (Wortlaut des Steuerberaters), je Art eine Zeile. */
+export const unvollstaendigText = (igeOhneEuro: number, rcOhneEuro: number) => [igeOhneEuro ? ustNichtVollstaendig(igeOhneEuro, "ige") : "", rcOhneEuro ? ustNichtVollstaendig(rcOhneEuro, "13b") : ""].filter(Boolean).join("\n");
 
 /** Steuergruppen einer Rechnung mit Vorzeichen (Storno negativ). */
 const volleGruppen = (d: RechnungsDaten) => meldeGruppen(d).map((g) => ({ satz: g.satz, netto_cent: g.netto_cent * (d.art === "storno" ? -1 : 1) }));
@@ -625,7 +644,7 @@ const datumDe = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.s
  * („ust.kleinunternehmer“); ohne Antwort gilt als Kleinunternehmer, wessen Rechnungen im Zeitraum alle Kleinunternehmer-
  * Rechnungen sind. Dann wird nichts übernommen – auch keine Vorsteuer.
  */
-export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = [], kleinunternehmer?: boolean, kasse?: KasseFuerUst): UstUebernahme | null {
+export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = [], kleinunternehmer?: boolean, kasse?: KasseFuerUst, erwerb: ErwerbsschwelleEingaben = { profil: {}, schwelleEuro: null }): UstUebernahme | null {
   const z = ustZeitraum(periode);
   if (!z) return null;
   const korr = korrekturen(unterlagen, betrieb);
@@ -655,11 +674,27 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
           ...(mitVorsteuer && rc.vorsteuer_cent ? { vorsteuer_13b: betragText(rc.vorsteuer_cent) } : {}),
         }
       : {};
-  // E-222: innergemeinschaftliche Erwerbe (Kz 89/93, Vorsteuer Kz 61) – nur außerhalb der Kleinunternehmerzeit; nur
-  // gesetzt, wenn es solche Belege gibt (von Hand eingetragene Erwerbe bleiben sonst stehen)
-  const igeWerte: Record<string, string> = rc.ige_anzahl ? { ige_19: betragText(rc.ige_19_netto_cent), ige_7: betragText(rc.ige_7_netto_cent), vorsteuer_ige: rc.ige_vorsteuer_cent ? betragText(rc.ige_vorsteuer_cent) : "" } : {};
+  // E-222: innergemeinschaftliche Erwerbe (Kz 89/93, Vorsteuer Kz 61) – nur gesetzt, wenn es solche Belege gibt (von Hand
+  // eingetragene Erwerbe bleiben sonst stehen). E-227: Kleinunternehmer und Betriebe mit nur steuerfreien Umsätzen nur mit
+  // Erwerbsbesteuerung (Erwerbsschwelle, § 1a Abs. 3, 4 UStG); Kleinunternehmer ohne Vorsteuer (keine Kz 61)
+  const art: Schwellenerwerber | null = ku ? "ku" : !kuZeitraum && nurSteuerfreieUmsaetze(unterlagen, betrieb) ? "steuerfrei" : null;
+  const igeImZeitraum = rc.ige_anzahl + rc.ige_ohne_euro;
+  const schwelle = art && igeImZeitraum ? { ...erwerbsschwelleLage(erwerb.profil, belege, z.von.slice(0, 4), erwerb.schwelleEuro), art } : null;
+  const igeZaehlt = !schwelle || schwelle.status === "ja";
+  const igeWerte: Record<string, string> = rc.ige_anzahl && igeZaehlt ? { ige_19: betragText(rc.ige_19_netto_cent), ige_7: betragText(rc.ige_7_netto_cent), vorsteuer_ige: rc.ige_vorsteuer_cent && !ku ? betragText(rc.ige_vorsteuer_cent) : "" } : {};
+  const igeOhneEuro = igeZaehlt ? rc.ige_ohne_euro : 0;
+  const igeAnnahmen = igeZaehlt && rc.ige_anzahl ? [rc.ige_ohne_erwerbsdatum ? IGE_ANNAHME(rc.ige_ohne_erwerbsdatum) : "", rc.ige_andere_cent ? `Innergemeinschaftliche Erwerbe zu anderen Steuersätzen als 19 % und 7 % (${betragText(rc.ige_andere_cent)} €) nicht übernommen – bitte im ELSTER-Formular prüfen.` : ""] : [];
   const kasseFehlend = kasse?.abschluesse.length ? fehlendeTage(kasse.abschluesse, z.von, z.bis, kasse.ruhetage ?? [], kasse.heute) : null;
-  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl, igeBelege: 0, igeKu: rc.ige_anzahl + rc.ige_ohne_euro, igeAndere: 0, igeOhneEuro: 0, rcOhneEuro: rc.ohne_euro, kasseTage: 0, kasseFehlend: null, minderungen: 0, ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [] };
+  if (ku) {
+    const pflicht = !!schwelle && schwelle.status === "ja" && igeImZeitraum > 0;
+    return {
+      werte: { zeitraum: periodeText(periode), ...rcWerte(false), ...igeWerte, ...(pflicht || rc.anzahl || rc.ohne_euro ? { annahmen: igeAnnahmen.filter(Boolean).join("\n"), unvollstaendig: unvollstaendigText(igeOhneEuro, rc.ohne_euro) } : {}) },
+      anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl,
+      igeBelege: igeZaehlt ? rc.ige_anzahl : 0, igeKu: igeZaehlt ? 0 : igeImZeitraum, igeAndere: igeZaehlt ? rc.ige_andere_cent : 0, igeOhneEuro, rcOhneEuro: rc.ohne_euro,
+      erwerbsschwelle: schwelle, kuVoranmeldungPflicht: pflicht,
+      kasseTage: 0, kasseFehlend: null, minderungen: 0, ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [],
+    };
+  }
   // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit;
   // 5.2: OSS-Rechnungen gehören in die OSS-Erklärung, nicht in die Voranmeldung
   const ossImZeitraum = alle.filter((x) => !kuRechnung(x.u) && istOssRechnung(x.u)).length;
@@ -738,10 +773,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     ...ber.hier.map(berichtigungText),
     ka?.tage ? `Kassenumsätze aus ${ka.tage} Tagesabschlüssen: Netto und Umsatzsteuer je Steuersatz aus dem Brutto herausgerechnet.` : "",
     ossImZeitraum ? `${ossImZeitraum} OSS-Rechnung(en) mit der Steuer des Bestimmungslands nicht übernommen – sie gehören in die OSS-Erklärung beim BZSt.` : "",
-    rc.ige_anzahl ? IGE_ANNAHME(rc.ige_anzahl) : "",
-    rc.ige_ohne_euro ? TEXT.e224_ige_ohne_euro_pdf(rc.ige_ohne_euro) : "",
-    rc.ohne_euro ? TEXT.e224_13b_ohne_euro_pdf(rc.ohne_euro) : "",
-    rc.ige_andere_cent ? `Innergemeinschaftliche Erwerbe zu anderen Steuersätzen als 19 % und 7 % (${betragText(rc.ige_andere_cent)} €) nicht übernommen – bitte im ELSTER-Formular prüfen.` : "",
+    ...igeAnnahmen,
   ].filter(Boolean);
   return {
     vorsteuerBelege: vst.anzahl,
@@ -754,11 +786,13 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     gutschriften,
     vorsteuerPruefen: ohne.kz48 > 0 && vst.cent > 0,
     steuerschuldBelege: rc.anzahl,
-    igeBelege: rc.ige_anzahl,
-    igeKu: 0,
-    igeAndere: rc.ige_andere_cent,
-    igeOhneEuro: rc.ige_ohne_euro,
+    igeBelege: igeZaehlt ? rc.ige_anzahl : 0,
+    igeKu: igeZaehlt ? 0 : igeImZeitraum,
+    igeAndere: igeZaehlt ? rc.ige_andere_cent : 0,
+    igeOhneEuro,
     rcOhneEuro: rc.ohne_euro,
+    erwerbsschwelle: schwelle,
+    kuVoranmeldungPflicht: false,
     kasseTage: ka?.tage ?? 0,
     kasseFehlend,
     minderungen,
@@ -784,6 +818,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
       // 5.2: Zuordnungsannahmen stehen auf dem PDF der Voranmeldung (leer überschreibt Werte einer früheren Übernahme)
       nach_rechnungsdatum: ersatzListe.map((x) => x.zeile).join("\n"),
       annahmen: annahmen.join("\n"),
+      // E-227: fehlende Belege ohne Euro-Betrag sichtbar oben auf dem PDF (leer überschreibt eine frühere Übernahme)
+      unvollstaendig: unvollstaendigText(igeOhneEuro, rc.ohne_euro),
     },
   };
 }
