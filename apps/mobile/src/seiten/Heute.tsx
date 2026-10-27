@@ -24,7 +24,7 @@ import { kasseSichtbar } from "../unterlagen/kasse";
 import { useOeffnen, useStarten } from "./starten";
 import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { PartnerHinweis } from "./Partner";
-import { freiePflichten } from "../pro/regeln";
+import { erstellenErlaubt, freiePflichten } from "../pro/regeln";
 import { AboEndeHinweis } from "./AboEnde";
 import { EU_STORNO_ALT_HINWEIS, euBerichtigungen, euStornosOhneGrund, periodeText } from "../unterlagen/ustAusRechnungen";
 
@@ -94,11 +94,13 @@ export function Heute() {
   // R12 (UX #23): große Schrift – kompakte Bühne: kleinere Überschrift, Plaketten nur für VoiceOver, Knöpfe ohne Symbol
   const kompakt = grosseSchrift;
   const titelStil = kompakt ? undefined : { fontSize: 40, lineHeight: 44, letterSpacing: -1.4 };
+  // E-225 (T-296): ohne Pro sagen auch die schnellen Wege „· Pro“ (wie in „Unterlagen“, E-219)
+  const neuErlaubt = erstellenErlaubt(z.pro);
   const schnelleWege = (
     // große Schrift: nebeneinander ohne Symbol – untereinander füllten die Knöpfe die halbe Bühne
     <View style={{ flexDirection: "row", gap: 10 }}>
-      <Knopf glas symbol={kompakt ? undefined : "plus"} text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: 1, paddingHorizontal: kompakt ? 8 : 12 }} />
-      <Knopf glas symbol={kompakt ? undefined : "doc.viewfinder"} text={TEXT.kurz_beleg} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} stil={{ flex: 1, paddingHorizontal: kompakt ? 8 : 12 }} />
+      <Knopf glas symbol={kompakt ? undefined : "plus"} text={TEXT.mitPro(TEXT.kurz_rechnung, neuErlaubt)} onPress={() => starten("rechnung")} stil={{ flex: 1, paddingHorizontal: kompakt ? 8 : 12 }} />
+      <Knopf glas symbol={kompakt ? undefined : "doc.viewfinder"} text={TEXT.mitPro(TEXT.kurz_beleg, neuErlaubt)} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} stil={{ flex: 1, paddingHorizontal: kompakt ? 8 : 12 }} />
     </View>
   );
   const buehne = gemacht ? (

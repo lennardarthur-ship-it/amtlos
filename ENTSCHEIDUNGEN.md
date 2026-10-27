@@ -1816,6 +1816,13 @@ Befunde 10 und 12c eines externen Prüfers. Tests: `packages/fachlogik/test/e222
 
 **Geprüft:** `pnpm turbo run build --force`, `pnpm lint`, `pnpm typecheck` grün; vitest fachlogik 700, mobile 971, studio 6, web 14; `next build` von Studio und Web-App einzeln (16.4.3, ohne Hinweis); E2E wie in CI gegen ein lokales PostgreSQL 16 (danach gestoppt und gelöscht): Studio-Editor, Web-Rundgang (hell/dunkel, Desktop/mobil, axe) und Kern-Umfang bestanden; Web-Export und `e2e/rundgang.mjs` ohne Befund; Jahres-Szenarien einmal, alle Vergleiche stimmen (314/391/391/368/271/437, wie vorher), Ausgaben gelöscht; store-check unverändert 18 offene Punkte (Konsole/Konto, Katalog-/Vorlagenbestätigung). API-/Server-Tests gegen PostgreSQL nicht gelaufen (kein Server-Code geändert). PRUEFLISTE T-308 (Nachtrag), T-316.
 
+### E-225 · Gründerentscheidungen zu T-296, T-302, T-312, T-314 (2026-10-27)
+
+- **„· Pro“ auf Heute (T-296):** Die schnellen Wege „Rechnung“ und „Beleg“ auf der Bühne von „Heute“ tragen ohne Pro „· Pro“ wie in „Unterlagen“ (E-219). Wiederherstellen einer Sicherung bleibt frei (E-188).
+- **Briefkopf ausgegebener Unterlagen (T-302):** bestätigt wie in E-220 – Wiedergabe wie ausgegeben, auch nach dem Ende von Pro.
+- **Rechtsform „Andere“ (T-312):** keine eigenen Rechtsformen AG, eG, e. V. vor dem Start; „hängt ab“ mit Hinweis (E-223) bleibt.
+- **Weitere Lücken (T-314):** § 5b Abs. 3 UWG und § 7a UWG nicht vor dem Start.
+
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
 
 | Nr. | Frage | blockiert |
