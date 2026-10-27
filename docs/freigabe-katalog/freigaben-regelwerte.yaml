@@ -359,3 +359,17 @@
       version: 2
       stand: '2026-10-26'
       quelle: "Bestätigung per Mail zur ausgefüllten Prüfliste Regelwerte (beim Gründer); korrigierte bzw. präzisierte Fassung laut Anmerkung des Prüfers (Liste: arbeitsschutz.ersthelfer.schwelle_versicherte v1)"
+# E-227: Antwort des Steuerberaters vom 27.10.2026 zu T-309 – Erwerbsschwelle als Regelwert in seiner Fassung
+- pruefer: steuern
+  umfang: alles
+  nachweis:
+    art: mail
+    datum: '2026-10-27'
+    rolle: steuern
+    umfang: "Antwort zu T-309: Erwerbsschwelle 12.500 € (§ 1a Abs. 3 Nr. 2 UStG) als Regelwert vorgegeben – keine Erwerbsbesteuerung, wenn die Erwerbe im Vorjahr 12.500 € nicht überstiegen haben und im laufenden Jahr voraussichtlich nicht übersteigen, Erwerbsbesteuerung bei „>“; gültig ab Beginn der Datenreihe (seit vielen Jahren unverändert); Verzicht nach § 1a Abs. 4 UStG und Ausnahmen nach § 1a Abs. 5 UStG wie in der Notiz"
+    aufbewahrung: beim Gründer
+  eintraege:
+    steuern.ust.erwerbsschwelle:
+      version: 1
+      stand: '2026-10-27'
+      quelle: "Antwort des Steuerberaters per Mail vom 27.10.2026 (beim Gründer)"

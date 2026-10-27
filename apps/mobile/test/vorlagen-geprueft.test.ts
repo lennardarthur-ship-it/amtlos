@@ -28,7 +28,8 @@ describe("Vermerk je Vorlage in der App", () => {
     // E-208: Rechnung ohne Vermerk, bis der Steuerberater die geänderte Fassung bestätigt (Einzelpreis bei Bruttopreisen, T-245)
     // – seit E-213 (26.10.2026) bestätigt, in allen Varianten wieder mit Vermerk
     // E-222: Voranmeldung – Hinweis zu innergemeinschaftlichen Erwerben geändert, Vermerk bis zur Bestätigung weg (T-308)
-    const OHNE = ["handelsregister", "ust_voranmeldung"];
+    // E-227: Voranmeldung vom Steuerberater bestätigt (27.10.2026) – wieder mit Vermerk
+    const OHNE = ["handelsregister"];
     const cafe = { ...LEERER_STAND.betrieb, name: "Café Sonne", bundesland: "Berlin" };
     const coKg = { ...cafe, name: "Sonne GmbH & Co. KG", rechtsform: "GmbH & Co. KG" };
     for (const v of VORLAGEN) {

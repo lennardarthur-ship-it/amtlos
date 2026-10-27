@@ -254,3 +254,20 @@
     - { titel: Umsatzsteuergesetz § 12, url: "https://www.gesetze-im-internet.de/ustg_1980/__12.html", abgerufen: null }
   fachlich_zu_pruefen: ["Steuersatz 7 % (§ 12 Abs. 2 UStG) vom Steuerberater am 26.10.2026 wie vorgelegt bestätigt (E-213; Notiz nachgezogen E-223)", "Welche Leistungen ermäßigt sind, entscheidet der Nutzer; einen Hilfetext dazu gibt es nicht – ein solcher Text gehört nicht zum Wert und bräuchte eine eigene Prüfung durch den Steuerberater (T-311)", "gültig ab 01.01.2026 ist der Beginn der Datenreihe, nicht das Inkrafttreten – so mitbestätigt, ein früheres Datum wäre eine neue Version (T-270)"]
   pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-26", geprueft_version: 1, bestaetigt_am: "2026-10-26" }
+
+- schema_version: 1
+  id: steuern.ust.erwerbsschwelle
+  version: 1
+  bezeichnung: { de: "Erwerbsschwelle für innergemeinschaftliche Erwerbe (Kleinunternehmer, nur steuerfreie Umsätze u. a.)", en: "Acquisition threshold for intra-Community acquisitions" }
+  einheit: EUR
+  wert: 12500
+  # E-227: seit vielen Jahren unverändert (Steuerberater 27.10.2026) – gültig ab ist der Beginn der Datenreihe (Vorjahr des
+  # ersten App-Jahres), nicht das Inkrafttreten
+  gueltig_ab: "2025-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 1a Abs. 3 Nr. 2 UStG", "§ 1a Abs. 4 UStG", "§ 1a Abs. 5 UStG"]
+  quellen:
+    - { titel: Umsatzsteuergesetz § 1a, url: "https://www.gesetze-im-internet.de/ustg_1980/__1a.html", abgerufen: "2026-10-27" }
+  fachlich_zu_pruefen: ["E-227: Wert 12.500 € und Vergleich vom Steuerberater am 27.10.2026 vorgegeben – keine Erwerbsbesteuerung, wenn die Erwerbe im Vorjahr 12.500 € nicht überstiegen haben UND im laufenden Jahr voraussichtlich nicht übersteigen; Erwerbsbesteuerung bei „>“. Verzicht (§ 1a Abs. 4 UStG) bindet mindestens zwei Kalenderjahre, die Angabe der USt-IdNr. gegenüber dem Lieferanten gilt als Verzicht; neue Fahrzeuge und verbrauchsteuerpflichtige Waren immer (§ 1a Abs. 5 UStG). Gültig ab 01.01.2025 ist der Beginn der Datenreihe, nicht das Inkrafttreten (seit vielen Jahren unverändert)"]
+  pruefung: { status: freigegeben, geprueft_von: [steuern], geprueft_am: "2026-10-27", geprueft_version: 1, bestaetigt_am: "2026-10-27" }

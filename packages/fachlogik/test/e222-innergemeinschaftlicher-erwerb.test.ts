@@ -41,7 +41,7 @@ describe("E-222: innergemeinschaftlicher Erwerb am Beleg", () => {
 });
 
 describe("E-222: DATEV-Stapel", () => {
-  it("19 % mit Vorsteuer auf das Erwerbskonto (SKR03 3425 / SKR04 5425, UNSICHER), Betrag ohne Steuer, ohne BU", () => {
+  it("19 % mit Vorsteuer auf das Erwerbskonto (SKR03 3425 / SKR04 5425, bestätigt E-227), Betrag ohne Steuer, ohne BU", () => {
     const b = beleg({ steuerschuld: "ige" });
     const z3 = buchungenAusBelegen([b], "SKR03");
     expect(z3).toHaveLength(1);
@@ -50,17 +50,15 @@ describe("E-222: DATEV-Stapel", () => {
     expect(igErwerbOhneKonto([b], "SKR03")).toEqual([]);
   });
 
-  it("7 % und ohne Vorsteuer ohne Standard: keine Zeile, aber in der Liste für LIESMICH; mit Kontenvorgabe gebucht", () => {
+  it("7 % und ohne Vorsteuer: E-227 mit Standardkonto (Steuerberater 27.10.2026); mit Kontenvorgabe abweichend gebucht", () => {
     const b = beleg({ steuerschuld: "ige", steuer: [{ satz: 19, brutto_cent: 100000 }, { satz: 7, brutto_cent: 20000 }] });
-    expect(buchungenAusBelegen([b], "SKR03").map((x) => x.gegenkonto)).toEqual(["3425"]);
-    expect(igErwerbOhneKonto([b], "SKR03").map((x) => [x.satz, x.betrag_cent, x.vorsteuer])).toEqual([[7, 20000, true]]);
+    expect(buchungenAusBelegen([b], "SKR03").map((x) => x.gegenkonto)).toEqual(["3425", "3420"]);
+    expect(igErwerbOhneKonto([b], "SKR03")).toEqual([]);
     const vorgaben = { konten: { igErwerb7: "3999" } };
     expect(buchungenAusBelegen([b], "SKR03", { vorgaben }).map((x) => x.gegenkonto)).toEqual(["3425", "3999"]);
-    expect(igErwerbOhneKonto([b], "SKR03", { vorgaben })).toEqual([]);
-    // Kleinunternehmer bzw. ohne Vorsteuerabzug: kein Standard
-    expect(buchungenAusBelegen([beleg({ steuerschuld: "ige" })], "SKR03", { kleinunternehmer: true })).toEqual([]);
-    expect(igErwerbOhneKonto([beleg({ steuerschuld: "ige" })], "SKR03", { kleinunternehmer: true }).map((x) => x.vorsteuer)).toEqual([false]);
-    expect(kontenFuer("SKR04").igErwerb).toEqual({ mit: { 19: "5425", 7: "" }, ohne: { 19: "", 7: "" } });
+    // Kleinunternehmer bzw. ohne Vorsteuerabzug: Konto ohne Vorsteuer
+    expect(buchungenAusBelegen([beleg({ steuerschuld: "ige" })], "SKR03", { kleinunternehmer: true }).map((x) => x.gegenkonto)).toEqual(["3435"]);
+    expect(kontenFuer("SKR04").igErwerb).toEqual({ mit: { 19: "5425", 7: "5420" }, ohne: { 19: "5435", 7: "5430" } });
   });
 
   it("§ 13b-Belege unverändert auf 3123/3120", () => {

@@ -31,13 +31,14 @@ const REG = YAML.parse(fs.readFileSync(path.join(WURZEL, "docs/freigabe-katalog/
 
 describe("E-213 A) Regelwerte bestätigt", () => {
   it("alle 37 Regelwert-Versionen schriftlich bestätigt (Mail 26.10.2026), Rolle passt", () => {
-    expect(regelwerte).toHaveLength(37);
+    // E-227: dazu die Erwerbsschwelle (Steuerberater 27.10.2026) – 38 Versionen, alle bestätigt
+    expect(regelwerte).toHaveLength(38);
     for (const r of regelwerte) expect(regelwertBestaetigt(r), `${r.id}@${r.version}`).toBe(true);
-    for (const b of REG_RW) {
+    for (const b of REG_RW.filter((x) => x.nachweis.datum === "2026-10-26")) {
       expect(b.nachweis).toMatchObject({ art: "mail", datum: "2026-10-26", rolle: b.pruefer, aufbewahrung: "beim Gründer" });
       expect(b.nachweis.umfang).toMatch(/^Prüfliste Regelwerte Nr\. /);
     }
-    const rollen = (rolle: string) => REG_RW.filter((b) => b.pruefer === rolle).reduce((n, b) => n + Object.keys(b.eintraege).length, 0);
+    const rollen = (rolle: string) => REG_RW.filter((b) => b.pruefer === rolle && b.nachweis.datum === "2026-10-26").reduce((n, b) => n + Object.keys(b.eintraege).length, 0);
     expect([rollen("steuern"), rollen("recht"), rollen("arbeitsschutz")]).toEqual([18, 18, 1]);
   });
 

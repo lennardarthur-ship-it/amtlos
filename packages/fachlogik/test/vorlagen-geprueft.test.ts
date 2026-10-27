@@ -47,8 +47,9 @@ const STEUERN_23 = ["rechnung", "euer", "verfahrensdokumentation", "kassenmeldun
 // E-213: die Rechnung ist seit dem 26.10.2026 wieder bestätigt (Steuerberater) – keine Vorlage mehr ohne Vermerk wegen E-208
 const OHNE_VERMERK_E208: string[] = [];
 // E-222: Hinweis der Voranmeldung zu innergemeinschaftlichen Erwerben geändert (gedruckt in allen Varianten, dazu die Hilfe
-// im Formular) – ohne Vermerk, bis der Steuerberater die neue Fassung bestätigt (PRUEFLISTE T-308)
-const OHNE_VERMERK_E222 = ["ust_voranmeldung"];
+// im Formular) – ohne Vermerk, bis der Steuerberater die neue Fassung bestätigt (PRUEFLISTE T-308). E-227: bestätigt
+// (Steuerberater 27.10.2026, „ust_voranmeldung#1“ mit allen heutigen Teilsummen, samt Vermerk „Nicht vollständig“)
+const OHNE_VERMERK_E222: string[] = [];
 const MIT_VERMERK: string[] = ALLE.filter((id) => !OHNE_VERMERK_E208.includes(id) && !OHNE_VERMERK_E222.includes(id));
 /** E-202: neue, vorab freigegebene Fassungen (Prüfsumme nach dem Streichen von „fachlich zu prüfen“ bzw. Satzänderungen) */
 const NEUE_FASSUNG = ["unterweisung", "hautschutzplan", "gefaehrdungsbeurteilung", "datenschutzerklaerung_website", "video_hinweisschild"];
@@ -70,7 +71,7 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
       expect(Object.keys(PRUEF_ROLLEN), id).toContain(f.rolle);
       expect(f.pruefsumme, id).toMatch(/^[0-9a-f]{64}$/);
       expect(f.pruefsumme_alt, id).toMatch(/^[0-9a-f]{64}$/);
-      expect(["2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26"]).toContain(f.stand);
+      expect(["2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26", "2026-10-27"]).toContain(f.stand);
       // nie ein Name im Register der App
       expect(nenntName(JSON.stringify(f)), id).toBe(false);
     }
@@ -367,7 +368,9 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
     expect(VORLAGEN_GEPRUEFT.impressum!.weitere?.map((x) => [x.stand, x.rolle, x.varianten])).toEqual([["2026-10-26", "recht", ["rf:GmbH & Co. KG", "rf:UG (haftungsbeschränkt) & Co. KG"]]]);
     // E-202: je eine neue, vorab freigegebene Fassung (gleiche Rolle, Stand 26.10.2026)
     for (const id of NEUE_FASSUNG) expect(VORLAGEN_GEPRUEFT[id]!.weitere?.map((x) => [x.stand, x.rolle]), id).toEqual([["2026-10-26", VORLAGEN_GEPRUEFT[id]!.rolle]]);
-    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan" && id !== "rechnung" && id !== "impressum" && !NEUE_FASSUNG.includes(id)) expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
+    // E-227: Voranmeldung mit Erwerben aus Belegen und Vermerk „Nicht vollständig“ (Steuerberater 27.10.2026), alle Varianten
+    expect(VORLAGEN_GEPRUEFT.ust_voranmeldung!.weitere?.map((x) => [x.stand, x.rolle, x.varianten])).toEqual([["2026-10-27", "steuern", undefined]]);
+    for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan" && id !== "rechnung" && id !== "impressum" && id !== "ust_voranmeldung" && !NEUE_FASSUNG.includes(id)) expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
   });
 
   it("je Fassung eine eigene Prüfsumme: Beauty unterscheidet sich von der Lebensmittel-Fassung", () => {

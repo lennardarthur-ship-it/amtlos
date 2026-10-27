@@ -58,6 +58,12 @@ export interface Beleg {
    */
   steuerschuld?: Steuerschuld | null;
   /**
+   * E-227 (Steuerberater 27.10.2026): Tag der Lieferung bzw. des Erwerbs (ISO) bei innergemeinschaftlichem Erwerb. Die
+   * Steuer entsteht mit der Rechnung, spätestens mit Ablauf des dem Erwerb folgenden Monats (§ 13 Abs. 1 Nr. 6 UStG) – das
+   * Belegdatum (Rechnungsdatum) zählt nur bis zu diesem Tag (`igeSteuerTag`). Gehört zum Inhalt.
+   */
+  erwerb_datum?: string | null;
+  /**
    * R12: bei der Zahlung abgezogenes Skonto (brutto, in Cent) – eine Minderung des Entgelts (§ 17 Abs. 1 Satz 2 UStG):
    * Die Vorsteuer mindert sich im Zeitraum der Zahlung, die Betriebsausgabe ist der gezahlte Betrag.
    */
@@ -222,6 +228,8 @@ export interface BelegFassung {
   /** E-221: Fremdwährung (wie am Beleg) */
   fremd?: BelegFremd | null;
   steuerschuld?: Steuerschuld | null;
+  /** E-227: Tag des Erwerbs (wie am Beleg) */
+  erwerb_datum?: string | null;
   skonto_cent?: number | null;
   anlage_art?: AnlageArt | null;
   vorsteuer_anteil?: number | null;
@@ -505,6 +513,38 @@ export function steuerschuldBetrag(b: Pick<Beleg, "steuer"> & { steuerschuld?: S
   return b.steuer.reduce((a, s) => a + rundeCent((s.brutto_cent * satz13b(s.satz)) / 100), 0);
 }
 
+/** E-227: letzter Tag des Monats nach dem Monat von `iso` (ISO-Tag). */
+export function letzterTagFolgemonat(iso: string): string {
+  const j = Number(iso.slice(0, 4));
+  const m = Number(iso.slice(5, 7)); // 1–12; der Folgemonat ist m + 1
+  const ende = new Date(Date.UTC(j, m + 1, 0)); // Tag 0 des übernächsten Monats = letzter Tag des Folgemonats
+  return ende.toISOString().slice(0, 10);
+}
+
+/**
+ * E-227 (Steuerberater 27.10.2026): Tag, nach dem ein innergemeinschaftlicher Erwerb dem Zeitraum zugeordnet wird. Die
+ * Steuer entsteht mit der Ausstellung der Rechnung, spätestens mit Ablauf des dem Erwerb folgenden Kalendermonats (§ 13
+ * Abs. 1 Nr. 6 UStG): das Belegdatum (Rechnungsdatum), höchstens der letzte Tag des Monats nach dem Erwerb; kommt die
+ * Rechnung später oder fehlt sie, gehört der Erwerb in den Monat nach dem Erwerb. Ohne Tag des Erwerbs: das Belegdatum.
+ */
+export function igeSteuerTag(b: Pick<Beleg, "datum"> & { erwerb_datum?: string | null }): string {
+  const e = b.erwerb_datum && /^\d{4}-\d{2}-\d{2}$/.test(b.erwerb_datum) ? b.erwerb_datum : null;
+  if (!e) return b.datum;
+  const grenze = letzterTagFolgemonat(e);
+  return b.datum && /^\d{4}-\d{2}-\d{2}$/.test(b.datum) && b.datum <= grenze ? b.datum : grenze;
+}
+
+/** E-227: Tag, nach dem ein Beleg mit Steuerschuld der Voranmeldung zugeordnet wird – Erwerb nach `igeSteuerTag`, sonst Belegdatum. */
+export const steuerschuldTag = (b: Pick<Beleg, "datum"> & { steuerschuld?: Steuerschuld | null; erwerb_datum?: string | null }) => (b.steuerschuld === "ige" ? igeSteuerTag(b) : b.datum);
+
+/**
+ * E-227 (Erwerbsschwelle, § 1a Abs. 3 Nr. 2 UStG): Summe der innergemeinschaftlichen Erwerbe eines Kalenderjahres (Beträge
+ * ohne Umsatzsteuer, in Cent) nach dem Tag des Erwerbs (ohne Angabe: Belegdatum) – ungültige Belege zählen nicht.
+ */
+export function igeErwerbeImJahr(belege: Beleg[], jahr: string): number {
+  return belege.filter((b) => !b.ungueltig && b.steuerschuld === "ige" && (b.erwerb_datum || b.datum).startsWith(`${jahr}-`)).reduce((a, b) => a + b.steuer.reduce((x, s) => x + s.brutto_cent, 0), 0);
+}
+
 export interface SteuerschuldSummen {
   /** Kz 46/47: sonstige Leistungen nach § 13b Abs. 1 UStG (EU) – Bemessungsgrundlage und Steuer */
   eu_netto_cent: number;
@@ -535,6 +575,8 @@ export interface SteuerschuldSummen {
    */
   ohne_euro: number;
   ige_ohne_euro: number;
+  /** E-227: übernommene Erwerbsbelege ohne Tag des Erwerbs – nach dem Belegdatum zugeordnet (Annahme auf dem PDF) */
+  ige_ohne_erwerbsdatum: number;
 }
 
 /**
@@ -543,18 +585,21 @@ export interface SteuerschuldSummen {
  * Die Steuer schulden auch Kleinunternehmer (§ 13b Abs. 8 UStG); Vorsteuer (Kz 67) nur mit Vorsteuerabzug.
  */
 export function steuerschuldFuer(belege: Beleg[], von: string, bis: string): SteuerschuldSummen {
-  const r: SteuerschuldSummen = { eu_netto_cent: 0, eu_steuer_cent: 0, bau_netto_cent: 0, bau_steuer_cent: 0, vorsteuer_cent: 0, anzahl: 0, ige_19_netto_cent: 0, ige_19_steuer_cent: 0, ige_7_netto_cent: 0, ige_7_steuer_cent: 0, ige_vorsteuer_cent: 0, ige_andere_cent: 0, ige_anzahl: 0, ohne_euro: 0, ige_ohne_euro: 0 };
+  const r: SteuerschuldSummen = { eu_netto_cent: 0, eu_steuer_cent: 0, bau_netto_cent: 0, bau_steuer_cent: 0, vorsteuer_cent: 0, anzahl: 0, ige_19_netto_cent: 0, ige_19_steuer_cent: 0, ige_7_netto_cent: 0, ige_7_steuer_cent: 0, ige_vorsteuer_cent: 0, ige_andere_cent: 0, ige_anzahl: 0, ohne_euro: 0, ige_ohne_euro: 0, ige_ohne_erwerbsdatum: 0 };
   for (const b of belege) {
-    if (b.ungueltig || !b.steuerschuld || b.datum < von || b.datum > bis) continue;
+    if (b.ungueltig || !b.steuerschuld) continue;
+    // E-227: innergemeinschaftlicher Erwerb nach `igeSteuerTag` (Rechnung, spätestens Ablauf des Monats nach dem Erwerb)
+    const tag = steuerschuldTag(b);
+    if (tag < von || tag > bis) continue;
     // E-224: ohne Euro-Betrag (fremde Währung ohne Umrechnung, E-221) trägt der Beleg nichts bei – nicht als übernommen zählen
     if (!b.steuer.some((s) => s.brutto_cent)) {
       if (b.steuerschuld === "ige") r.ige_ohne_euro++;
       else r.ohne_euro++;
       continue;
     }
-    // E-222: innergemeinschaftlicher Erwerb nach Belegdatum – die Steuer entsteht mit der Rechnung, spätestens mit Ablauf des
-    // dem Erwerb folgenden Monats (§ 13 Abs. 1 Nr. 6 UStG; den Tag des Erwerbs kennt der Beleg nicht – Annahme in der Übernahme)
+    // E-222/E-227: innergemeinschaftlicher Erwerb – ohne Tag des Erwerbs nach Belegdatum (Annahme in der Übernahme)
     if (b.steuerschuld === "ige") {
+      if (!b.erwerb_datum) r.ige_ohne_erwerbsdatum++;
       for (const s of b.steuer) {
         const satz = satz13b(s.satz);
         const steuer = rundeCent((s.brutto_cent * satz) / 100);
@@ -699,6 +744,7 @@ function fassungAus(roh: unknown): BelegFassung | null {
     ...(anlageArtAus(r.anlage_art) ? { anlage_art: anlageArtAus(r.anlage_art) } : {}),
     ...teilabzugAus(r),
     ...(fremdAus(r.fremd) ? { fremd: fremdAus(r.fremd) } : {}),
+    ...(ISO_TAG.test(s("erwerb_datum")) ? { erwerb_datum: s("erwerb_datum") } : {}),
     ...(s("grund") ? { grund: s("grund").slice(0, 300) } : {}),
     ...(geraetAus(r.geraet) ? { geraet: geraetAus(r.geraet) } : {}),
     ...(belegEingangAus(r.eingang) ? { eingang: belegEingangAus(r.eingang) } : {}),
@@ -771,12 +817,13 @@ export function belegAus(roh: unknown): Beleg | null {
     ...(geraetAus(r.geraet) ? { geraet: geraetAus(r.geraet) } : {}),
     ...(belegEingangAus(r.eingang) ? { eingang: belegEingangAus(r.eingang) } : {}),
     ...(fremdAus(r.fremd) ? { fremd: fremdAus(r.fremd) } : {}),
+    ...(ISO_TAG.test(s("erwerb_datum")) ? { erwerb_datum: s("erwerb_datum") } : {}),
   };
 }
 
 /** Inhalt eines Belegs als frühere Fassung (für das Änderungsprotokoll); `grund`: warum sie ersetzt wurde (R12 GoBD). */
 export function belegFassung(b: Beleg, bis: string, grund?: string): BelegFassung {
-  return { ...(grund ? { grund: grund.trim().slice(0, 300) } : {}), bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}), ...(b.anlage_art ? { anlage_art: b.anlage_art } : {}), ...(b.vorsteuer_betrag_cent ? { vorsteuer_betrag_cent: b.vorsteuer_betrag_cent } : b.vorsteuer_anteil ? { vorsteuer_anteil: b.vorsteuer_anteil } : {}), ...(fremdAus(b.fremd) ? { fremd: fremdAus(b.fremd) } : {}) };
+  return { ...(grund ? { grund: grund.trim().slice(0, 300) } : {}), bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}), ...(b.anlage_art ? { anlage_art: b.anlage_art } : {}), ...(b.vorsteuer_betrag_cent ? { vorsteuer_betrag_cent: b.vorsteuer_betrag_cent } : b.vorsteuer_anteil ? { vorsteuer_anteil: b.vorsteuer_anteil } : {}), ...(fremdAus(b.fremd) ? { fremd: fremdAus(b.fremd) } : {}), ...(b.erwerb_datum && ISO_TAG.test(b.erwerb_datum) ? { erwerb_datum: b.erwerb_datum } : {}) };
 }
 
 /** Hat sich der Inhalt (nicht nur der Zeitstempel) eines Belegs geändert? */

@@ -70,8 +70,8 @@ describe("E-222: Voranmeldung aus Belegen mit innergemeinschaftlichem Erwerb", (
     expect(UST_OHNE_IGE).toContain("Waren aus dem EU-Ausland (innergemeinschaftlicher Erwerb)");
   });
 
-  it("Vermerk der Voranmeldung entfällt bis zur Bestätigung des geänderten Textes (T-308)", () => {
-    expect(vorlageGeprueft(vorlageFuer("ust_voranmeldung")!)).toBeUndefined();
+  it("Vermerk der Voranmeldung entfiel bis zur Bestätigung des geänderten Textes (T-308) – E-227: bestätigt am 27.10.2026", () => {
+    expect(vorlageGeprueft(vorlageFuer("ust_voranmeldung")!)?.stand).toBe("2026-10-27");
   });
 });
 
@@ -79,14 +79,14 @@ describe("E-222: Steuerberater-Paket", () => {
   const datei = (p: ReturnType<typeof steuerpaket>, name: string) => strFromU8(unzipSync(p.zip)[name]!);
   const zeitraum = { von: "2026-03-01", bis: "2026-03-31", name: "2026-03" };
 
-  it("Stapel: 19 % auf 3425 ohne BU; 7 % fehlt mangels Konto und steht in LIESMICH; Belegliste und Fragen nennen den Erwerb", () => {
+  it("Stapel: 19 % auf 3425 ohne BU; 7 % (E-227: Standard 3420); Belegliste und Fragen nennen den Erwerb", () => {
     const p = steuerpaket(stand({ belege }), zeitraum, SB, {}, "2026-04-10T08:00:00");
     const stapel = datei(p, "Buchungsliste_2026-03.csv");
     expect(stapel).toMatch(/1000,00;H;1610;3425;;/);
-    expect(stapel).not.toMatch(/;200,00;H;1610;/);
+    expect(stapel).toMatch(/200,00;H;1610;3420;;/);
     const lies = datei(p, "LIESMICH.txt");
     expect(lies).toContain("1 Beleg mit innergemeinschaftlichem Erwerb (Kz 89/93, Vorsteuer Kz 61)");
-    expect(lies).toContain("FEHLEN sie im Stapel: Fournitures SARL am 10.03.2026 über 200,00 € zu 7 % mit Vorsteuerabzug");
+    expect(lies).not.toContain("FEHLEN sie im Stapel");
     expect(datei(p, "Belege_2026-03.csv")).toContain("innergemeinschaftlicher Erwerb, Steuer 204,00, USt-IdNr. Lieferant FR12345678901");
     expect(datei(p, "Fragen_2026-03.txt")).toContain("Belege mit innergemeinschaftlichem Erwerb (Waren aus dem EU-Ausland) – Kz 89 bzw. 93, Vorsteuer Kz 61");
   });

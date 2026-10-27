@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import type { Beleg } from "@amtlos/fachlogik";
+import { ustNichtVollstaendig, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../src/texte";
 import { LEERER_STAND, type Stand, type Unterlage } from "../src/unterlagen/speicher";
 import { vaOhneEuroFrage } from "../src/unterlagen/pruefung";
@@ -32,7 +32,8 @@ describe("E-224: Voranmeldung warnt bei Steuerschuld-Belegen ohne Euro-Betrag", 
     expect(r.werte).not.toHaveProperty("ige_19");
     expect(TEXT.e224_ige_ohne_euro(2)).toContain("2 Belege mit innergemeinschaftlichem Erwerb ohne Euro-Betrag – nicht in Kz 89/93/61 enthalten");
     expect(TEXT.e224_ige_ohne_euro(1)).toContain("1 Beleg mit innergemeinschaftlichem Erwerb ohne Euro-Betrag – nicht in Kz 89/93/61 enthalten");
-    expect(r.werte.annahmen).toContain("1 Beleg mit innergemeinschaftlichem Erwerb ohne Euro-Betrag – nicht in Kz 89/93/61 enthalten");
+    // E-227: auf dem PDF jetzt im Wortlaut des Steuerberaters oben („Nicht vollständig“) statt unter den Annahmen
+    expect(r.werte.unvollstaendig).toBe(ustNichtVollstaendig(1, "ige"));
   });
 
   it("§ 13b in USD ohne Euro-Betrag: Warnung (Kz 46/47, 84/85, 67) – auch im Kleinunternehmer-Zeitraum", () => {
@@ -40,7 +41,7 @@ describe("E-224: Voranmeldung warnt bei Steuerschuld-Belegen ohne Euro-Betrag", 
     expect(r.steuerschuldBelege).toBe(0);
     expect(r.rcOhneEuro).toBe(1);
     expect(r.werte).not.toHaveProperty("rc_eu_netto");
-    expect(r.werte.annahmen).toContain(TEXT.e224_13b_ohne_euro_pdf(1));
+    expect(r.werte.unvollstaendig).toBe(ustNichtVollstaendig(1, "13b"));
     expect(TEXT.e224_13b_ohne_euro(1)).toContain("nicht in Kz 46/47, 84/85 und 67 enthalten");
     const ku = umsaetzeFuer([], "2026-03", BETRIEB, "soll", [rcUsd, igeSek], true)!;
     expect(ku.kleinunternehmer).toBe(true);

@@ -27,10 +27,10 @@ const freigabe = (version: number): PruefungRoh => ({ status: "freigegeben", gep
 const alleBestaetigt = regelwerte.map((r) => ({ ...r, pruefung: freigabe(r.version) }));
 
 describe("E-211 Inventar: Regelwerte im Bündel und ihre Verwendung", () => {
-  it("37 Regelwert-Versionen im Bündel, mit Prüfstand; seit E-213 alle bestätigt (vorher keine)", () => {
-    expect(imKatalog).toHaveLength(37);
+  it("38 Regelwert-Versionen im Bündel (E-227: Erwerbsschwelle), mit Prüfstand; seit E-213 alle bestätigt (vorher keine)", () => {
+    expect(imKatalog).toHaveLength(38);
     for (const r of imKatalog) expect(r.pruefung, r.id).toBeTruthy();
-    expect(imKatalog.filter(regelwertBestaetigt)).toHaveLength(37);
+    expect(imKatalog.filter(regelwertBestaetigt)).toHaveLength(38);
     expect(regelwerte.filter(regelwertBestaetigt)).toHaveLength(0);
   });
 

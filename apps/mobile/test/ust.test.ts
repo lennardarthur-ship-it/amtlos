@@ -21,7 +21,7 @@ describe("Rechnungen speisen die Umsatzsteuer-Voranmeldung (E-128)", () => {
     expect(perioden(s.unterlagen, LEERER_STAND.betrieb)).toEqual(["2026-Q4", "2026-Q3", "2026-10", "2026-09"].sort((a, b) => b.localeCompare(a) || (a.includes("Q") ? 1 : -1)));
     const okt = umsaetzeFuer(s.unterlagen, "2026-10", LEERER_STAND.betrieb)!;
     expect(okt.anzahl).toBe(3);
-    expect(okt.werte).toEqual({ zeitraum: "Oktober 2026", umsatz_19: "100,00", umsatz_7: "30,00", umsatz_igl: "0,00", umsatz_48: "0,00", umsatz_13b: "0,00", umsatz_21: "0,00", umsatz_45: "0,00", umsatz_87: "0,00", umsatz_43: "0,00", umsatz_frei: "0,00", nach_rechnungsdatum: "", annahmen: "" });
+    expect(okt.werte).toEqual({ zeitraum: "Oktober 2026", umsatz_19: "100,00", umsatz_7: "30,00", umsatz_igl: "0,00", umsatz_48: "0,00", umsatz_13b: "0,00", umsatz_21: "0,00", umsatz_45: "0,00", umsatz_87: "0,00", umsatz_43: "0,00", umsatz_frei: "0,00", nach_rechnungsdatum: "", annahmen: "", unvollstaendig: "" });
     const q3 = umsaetzeFuer(s.unterlagen, "2026-Q3", LEERER_STAND.betrieb)!;
     expect(q3.werte.umsatz_19).toBe("40,00");
     expect(periodeText("2026-Q4")).toBe("4. Quartal 2026");
