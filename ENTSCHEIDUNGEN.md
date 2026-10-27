@@ -1955,6 +1955,8 @@ Auftrag des Gründers am 27.10.2026: „Halte die Prüfliste immer geprüft und 
 
 **Geprüft:** `pnpm turbo run build --force`, `pnpm lint`, `pnpm typecheck` grün; vitest mobile 1088, fachlogik 737, rules-engine 832, i18n 89, server 37 (25 ohne PostgreSQL übersprungen), rules-schema (`node --test`) grün; `pnpm katalog:pruefen` gültig (231 Pflichten, 38 Regelwerte, 121 Fixtures); `anwenden.py --pruefen` ohne Abweichung (230 freigegeben, 1 Entwurf, Regelwerte 38/38); store-check 15 offene Punkte (nur Konsolen/Konten, Nutzungsbedingungen, Firebase – „jeder Eintrag fachlich freigegeben“ erfüllt, C.37 als zurückgehalten genannt); Interna-Prüfung von Bündel und Web-Export ohne Befund (C.37 nicht im Export); Web-Export und `e2e/rundgang.mjs` ohne Befund, danach gelöscht. Jahres-Szenarien nicht gelaufen (keine Rechen- oder Vorlagenlogik geändert).
 
+**Nachtrag 27.10.2026 – Prüferfragen gehen sofort raus (Gründer 27.10.2026); nur was das Fachurteil braucht; Selbstklärbares klärt Claude selbst.** Die Fragen der Gruppe B werden nicht mehr bis zum DATEV-Testimport zurückgehalten, sondern sind am 27.10.2026 versandt; PRUEFLISTE markiert sie mit „[B → Prüferrunde 27.10.2026 (versandt)]“ (Test `e233-triage` angepasst). T-221 bleibt für den Import selbst offen – die Testpakete (sechs Jahresszenarien, SKR03 und SKR04) liefert der Gründer nach.
+
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
 
 | Nr. | Frage | blockiert |

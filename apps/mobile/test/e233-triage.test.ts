@@ -9,7 +9,7 @@
  * 2) Fundstelle im Hinweis zur Erwerbsschwelle: neue Fahrzeuge und verbrauchsteuerpflichtige Waren nimmt § 1a Abs. 5 Satz 1
  *    UStG von Absatz 3 aus („Absatz 3 gilt nicht für den Erwerb neuer Fahrzeuge und verbrauchsteuerpflichtiger Waren.“) –
  *    nicht § 1a Abs. 3 Nr. 2 UStG (T-336 (2)).
- * 3) PRUEFLISTE: Zusammenfassung oben, jede offene Zeile mit Einordnung (B Sammelrunde, C Gründer, D Startblocker), keine
+ * 3) PRUEFLISTE: Zusammenfassung oben, jede offene Zeile mit Einordnung (B Prüferrunde, C Gründer, D Startblocker), keine
  *    doppelt offene Nummer.
  */
 import fs from "node:fs";
@@ -87,21 +87,21 @@ describe("E-233 (3): PRUEFLISTE eingeordnet", () => {
   const liste = fs.readFileSync(path.join(WURZEL, "PRUEFLISTE.md"), "utf8");
   const zeilen = liste.split("\n").filter((z) => /^\| [TGJ]-\d+ \|/.test(z));
   const offen = zeilen.filter((z) => !(z.split("|")[2] ?? "").trim().startsWith("~~"));
-  it("Zusammenfassung oben mit Datum, Zahlen je Gruppe und Ort der Sammelrunde", () => {
+  it("Zusammenfassung oben mit Datum, Zahlen je Gruppe und Ort der Prüferrunde", () => {
     const kopf = liste.slice(0, liste.indexOf("## Grundsätzliche Punkte"));
     expect(kopf).toMatch(/Triage 27\.10\.2026 \(E-233\)/);
     for (const g of ["A", "B", "C", "D"]) expect(kopf).toMatch(new RegExp(`\\*\\*${g}\\*\\*[^|\\n]*\\d+`));
     expect(kopf).toMatch(/beim Gründer/);
   });
   it("jede offene Zeile trägt ihre Einordnung, keine Nummer doppelt offen", () => {
-    const ohne = offen.filter((z) => !/\*\*\[(B → Sammelrunde 20\.11\.|C Gründer[^\]]*|D Startblocker[^\]]*)\]\*\*/.test(z)).map((z) => (z.split("|")[1] ?? "").trim());
+    const ohne = offen.filter((z) => !/\*\*\[(B → Prüferrunde 27\.10\.2026 \(versandt\)|C Gründer[^\]]*|D Startblocker[^\]]*)\]\*\*/.test(z)).map((z) => (z.split("|")[1] ?? "").trim());
     expect(ohne).toEqual([]);
     const nr = offen.map((z) => (z.split("|")[1] ?? "").trim());
     expect(nr.filter((n, i) => nr.indexOf(n) !== i)).toEqual([]);
   });
-  it("C.37 in der Sammelrunde, kein Startblocker; T-339 entschieden (ereignisbezogen, erst mit der Freigabe)", () => {
+  it("C.37 in der Prüferrunde, kein Startblocker; T-339 entschieden (ereignisbezogen, erst mit der Freigabe)", () => {
     const z = (t: string) => zeilen.find((x) => x.startsWith(`| ${t} |`)) ?? "";
-    expect(z("T-337")).toMatch(/\[B → Sammelrunde 20\.11\.\]/);
+    expect(z("T-337")).toMatch(/\[B → Prüferrunde 27\.10\.2026 \(versandt\)\]/);
     expect(z("T-337")).not.toMatch(/Startblocker:\*\* `steuern/);
     expect(z("T-339")).toMatch(/Selbst geklärt 27\.10\.2026 \(E-233\)/);
   });
