@@ -4,7 +4,7 @@
  * XML aus einem ZUGFeRD/Factur-X-PDF (mit eigenem Inflate nach RFC 1951) und der Beleg (belege.ts) aus der Rechnung.
  * Geprüft wird nur die Lesbarkeit – die Prüfung nach EN 16931 macht der KoSIT-Validator.
  */
-import type { Beleg, BelegSteuer } from "./belege.js";
+import { ausBrutto, kursGueltig, type Beleg, type BelegFremd, type BelegSteuer } from "./belege.js";
 import { rundeCent } from "./rechnung.js";
 
 // ---------------------------------------------------------------- XML-Elementbaum
@@ -192,7 +192,12 @@ export interface GeleseneRechnung {
   faellig: string | null;
   lieferant: { name: string; ust_idnr: string | null; steuernummer: string | null; iban: string | null; strasse?: string | null; plz?: string | null; ort?: string | null };
   empfaenger: { name: string; strasse?: string | null; plz?: string | null; ort?: string | null };
+  /** Rechnungswährung (BT-5) */
   waehrung: string;
+  /** E-221: Steuerwährung (BT-6), wenn angegeben */
+  steuerwaehrung?: string | null;
+  /** E-221: Umsatzsteuer gesamt in Steuerwährung (BT-111), wenn angegeben und abweichend von der Rechnungswährung */
+  ust_steuerwaehrung_cent?: number | null;
   summen: { netto_cent: number; ust_cent: number; brutto_cent: number; zu_zahlen_cent: number };
   /** je Steuersatz; `kategorie` nach UNTDID 5305 (S, E, AE, K, Z, …) */
   saetze: { satz: number; netto_cent: number; ust_cent: number; kategorie: string }[];
@@ -236,6 +241,10 @@ function ublLesen(w: XmlElement, vz: 1 | -1): GeleseneRechnung {
   const steuern = alle(w, "TaxTotal");
   // bei abweichender Steuerwährung gibt es zwei TaxTotal – das mit den Teilbeträgen ist das in Rechnungswährung
   const steuer = steuern.find((t) => kind(t, "TaxSubtotal")) ?? steuern[0] ?? null;
+  const waehrung = textVon(w, "DocumentCurrencyCode") ?? "EUR";
+  // E-221: BT-6 und BT-111 – das TaxTotal ohne Teilbeträge in der Steuerwährung
+  const steuerwaehrung = textVon(w, "TaxCurrencyCode");
+  const steuerEur = steuerwaehrung && steuerwaehrung !== waehrung ? steuern.map((t) => kind(t, "TaxAmount")).find((a) => attr(a, "currencyID") === steuerwaehrung) ?? null : null;
   const gesamt = kind(w, "LegalMonetaryTotal");
   const netto = geld(kind(gesamt, "TaxExclusiveAmount")) ?? geld(kind(gesamt, "LineExtensionAmount")) ?? 0;
   const ust = geld(kind(steuer, "TaxAmount")) ?? 0;
@@ -256,7 +265,9 @@ function ublLesen(w: XmlElement, vz: 1 | -1): GeleseneRechnung {
       ort: textVon(adresse, "CityName"),
     },
     empfaenger: { name: name(kunde), strasse: textVon(kind(kunde, "PostalAddress"), "StreetName"), plz: textVon(kind(kunde, "PostalAddress"), "PostalZone"), ort: textVon(kind(kunde, "PostalAddress"), "CityName") },
-    waehrung: textVon(w, "DocumentCurrencyCode") ?? "EUR",
+    waehrung,
+    steuerwaehrung: steuerwaehrung ?? null,
+    ust_steuerwaehrung_cent: geld(steuerEur),
     summen: { netto_cent: netto, ust_cent: ust, brutto_cent: brutto, zu_zahlen_cent: geld(kind(gesamt, "PayableAmount")) ?? brutto },
     saetze: alle(steuer, "TaxSubtotal").map((s) => ({
       satz: zahl(textVon(s, "TaxCategory", "Percent")) ?? 0,
@@ -300,6 +311,9 @@ function ciiLesen(w: XmlElement): GeleseneRechnung {
   // TaxTotalAmount kann doppelt vorkommen (Rechnungs- und Steuerwährung)
   const steuerSummen = alle(summe, "TaxTotalAmount");
   const steuerSumme = steuerSummen.find((t) => (attr(t, "currencyID") ?? waehrung) === waehrung) ?? steuerSummen[0] ?? null;
+  // E-221: BT-6 und BT-111
+  const steuerwaehrung = textVon(abrechnung, "TaxCurrencyCode");
+  const steuerEur = steuerwaehrung && steuerwaehrung !== waehrung ? steuerSummen.find((t) => attr(t, "currencyID") === steuerwaehrung) ?? null : null;
   const netto = geld(kind(summe, "TaxBasisTotalAmount")) ?? geld(kind(summe, "LineTotalAmount")) ?? 0;
   const ust = geld(steuerSumme) ?? 0;
   const brutto = geld(kind(summe, "GrandTotalAmount")) ?? netto + ust;
@@ -320,6 +334,8 @@ function ciiLesen(w: XmlElement): GeleseneRechnung {
     },
     empfaenger: { name: textVon(vereinbarung, "BuyerTradeParty", "Name") ?? "", strasse: textVon(vereinbarung, "BuyerTradeParty", "PostalTradeAddress", "LineOne"), plz: textVon(vereinbarung, "BuyerTradeParty", "PostalTradeAddress", "PostcodeCode"), ort: textVon(vereinbarung, "BuyerTradeParty", "PostalTradeAddress", "CityName") },
     waehrung,
+    steuerwaehrung: steuerwaehrung ?? null,
+    ust_steuerwaehrung_cent: geld(steuerEur),
     summen: { netto_cent: netto, ust_cent: ust, brutto_cent: brutto, zu_zahlen_cent: geld(kind(summe, "DuePayableAmount")) ?? brutto },
     saetze: alle(abrechnung, "ApplicableTradeTax").map((t) => ({
       satz: zahl(textVon(t, "RateApplicablePercent")) ?? 0,
@@ -347,6 +363,38 @@ function ciiLesen(w: XmlElement): GeleseneRechnung {
 // ---------------------------------------------------------------- Beleg aus der Rechnung
 
 const euro = (cent: number) => `${(cent / 100).toFixed(2).replace(".", ",")} €`;
+
+// ---------------------------------------------------------------- E-221: fremde Währung
+
+/** Betrag in einer fremden Währung: „119,00 USD“ (Hundertstel, wie gelesen). */
+export const fremdBetragText = (hundertstel: number, waehrung: string) => `${(hundertstel / 100).toFixed(2).replace(".", ",")} ${waehrung}`;
+
+/** Eingetragener Umrechnungskurs „1,0812“ (1 € = x Einheiten) → Zahl; null bei 0, Unsinn oder mehr als sechs Nachkommastellen. */
+export function kursAus(t: string): number | null {
+  const s = t.trim().replace(/\s/g, "").replace(",", ".");
+  if (!/^\d{1,7}(?:\.\d{1,6})?$/.test(s)) return null;
+  const k = Number(s);
+  return kursGueltig(k) ? k : null;
+}
+
+/** Euro-Beträge je Steuersatz aus den Beträgen in Rechnungswährung und dem eingetragenen Kurs (1 € = `kurs` Einheiten). */
+export const fremdUmrechnen = (f: BelegFremd, kurs: number): BelegSteuer[] => f.steuer.map((x) => ({ satz: x.satz, brutto_cent: rundeCent(x.brutto_cent / kurs) }));
+
+/**
+ * Euro-Brutto zu einem Steuersatz, dessen Umsatzsteuer (wie `ausBrutto` rechnet) genau `ust` ergibt – für eine Rechnung,
+ * die die Umsatzsteuer in Euro ausweist (BT-111). null, wenn es keinen solchen Betrag gibt.
+ */
+function bruttoZurSteuer(ust: number, satz: number): number | null {
+  const start = rundeCent((ust * (100 + satz)) / satz);
+  for (const d of [0, -1, 1, -2, 2, -3, 3]) if (ausBrutto(start + d, satz).ust_cent === ust) return start + d;
+  return null;
+}
+
+/** E-221: Hinweis im Beleg zur Währung – § 16 Abs. 6 UStG. */
+export const FREMD_HINWEIS = (betrag: string, ust: string | null) =>
+  `Rechnung in ${betrag.split(" ").pop()}: ${betrag}${ust ? ` (darin Umsatzsteuer ${ust})` : ""}. Bitte den Betrag in Euro eintragen – nicht einfach übernehmen: umgerechnet mit dem Durchschnittskurs, den das Bundesministerium der Finanzen für den Monat der Leistung bekannt gibt, oder – wenn das Finanzamt es gestattet hat – mit dem Tageskurs (§ 16 Abs. 6 UStG). Die App ruft keine Kurse ab.`;
+/** E-221: Hinweis, wenn die Umsatzsteuer in Euro auf der Rechnung steht (BT-6 = EUR, BT-111). */
+export const FREMD_UST_EUR_HINWEIS = (ust: string) => `Umsatzsteuer laut Rechnung in Euro: ${ust} – als Vorsteuer übernommen; der Euro-Betrag ist daraus abgeleitet, bitte mit dem tatsächlich gezahlten Euro-Betrag abgleichen.`;
 
 /** Rechtsformzusätze und Füllwörter, die beim Namensvergleich nicht zählen */
 const NAME_FUELL = new Set(["gmbh", "ug", "haftungsbeschränkt", "ag", "kg", "ohg", "gbr", "ek", "e", "k", "co", "und", "inh", "inhaber", "inhaberin", "mbh", "the", "der", "die", "das"]);
@@ -416,15 +464,31 @@ export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: str
     nachSatz.set(0, r.summen.brutto_cent);
     hinweise.push("Ohne Aufschlüsselung nach Steuersätzen – Gesamtbetrag als 0 % übernommen, bitte prüfen.");
   }
-  const steuer: BelegSteuer[] = [...nachSatz].sort((a, b) => b[0] - a[0]).map(([satz, brutto_cent]) => ({ satz, brutto_cent }));
-  const summeSaetze = steuer.reduce((a, s) => a + s.brutto_cent, 0);
-  if (summeSaetze !== r.summen.brutto_cent) hinweise.push(`Summe je Steuersatz (${euro(summeSaetze)}) weicht vom Rechnungsbetrag (${euro(r.summen.brutto_cent)}) ab.`);
+  const rechnungsSteuer: BelegSteuer[] = [...nachSatz].sort((a, b) => b[0] - a[0]).map(([satz, brutto_cent]) => ({ satz, brutto_cent }));
+  // E-221: fremde Währung (BT-5) – nie als Euro übernehmen
+  const waehrung = (r.waehrung || "EUR").trim().toUpperCase();
+  const istFremd = waehrung !== "EUR";
+  const betragText = (c: number) => (istFremd ? fremdBetragText(c, waehrung) : euro(c));
+  const summeSaetze = rechnungsSteuer.reduce((a, s) => a + s.brutto_cent, 0);
+  if (summeSaetze !== r.summen.brutto_cent) hinweise.push(`Summe je Steuersatz (${betragText(summeSaetze)}) weicht vom Rechnungsbetrag (${betragText(r.summen.brutto_cent)}) ab.`);
   // Reverse Charge: als § 13b-Beleg übernehmen – Anbieter aus dem EU-Ausland (USt-IdNr.) als sonstige Leistung, sonst wie eine Bauleistung im Inland (Kz 84/85)
   const ae = r.saetze.length > 0 && r.saetze.every((s) => s.kategorie === "AE");
   const auslandId = /^[A-Z]{2}/.exec((r.lieferant.ust_idnr ?? "").replace(/\s/g, "").toUpperCase())?.[0];
   const steuerschuld: Beleg["steuerschuld"] = ae ? (auslandId && auslandId !== "DE" ? "eu" : "bau") : null;
   if (r.saetze.some((s) => s.kategorie === "AE")) hinweise.push(ae ? "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge): als § 13b-Beleg übernommen – die Umsatzsteuer meldest du selbst an (bitte die Art der Leistung prüfen)." : "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge): Umsatzsteuer selbst anmelden und als Vorsteuer abziehen.");
   if (r.saetze.some((s) => s.kategorie === "K")) hinweise.push("Innergemeinschaftlicher Erwerb: Erwerbsteuer selbst anmelden und als Vorsteuer abziehen.");
+  // E-221: Euro-Beträge – mit der Umsatzsteuer in Euro laut Rechnung (BT-6 = EUR, BT-111) bei genau einem Satz daraus
+  // abgeleitet, sonst offen (0), bis der Betrieb den Euro-Betrag bzw. den Kurs einträgt
+  const ustEur = istFremd && (r.steuerwaehrung ?? "").toUpperCase() === "EUR" ? (r.ust_steuerwaehrung_cent ?? null) : null;
+  const einSatz = rechnungsSteuer.length === 1 ? rechnungsSteuer[0]! : null;
+  const ausUstEur = ustEur !== null && ustEur !== 0 && einSatz && einSatz.satz > 0 && !steuerschuld ? bruttoZurSteuer(ustEur, einSatz.satz) : null;
+  const steuer: BelegSteuer[] = !istFremd ? rechnungsSteuer : ausUstEur !== null ? [{ satz: einSatz!.satz, brutto_cent: ausUstEur }] : rechnungsSteuer.map((x) => ({ satz: x.satz, brutto_cent: 0 }));
+  const fremdW: BelegFremd | null = istFremd ? { waehrung, steuer: rechnungsSteuer.map((x) => ({ ...x })), ust: r.summen.ust_cent, ...(ustEur !== null ? { ust_eur_cent: ustEur } : {}) } : null;
+  if (istFremd) {
+    hinweise.unshift(FREMD_HINWEIS(fremdBetragText(r.summen.brutto_cent, waehrung), r.summen.ust_cent ? fremdBetragText(r.summen.ust_cent, waehrung) : null));
+    if (ausUstEur !== null) hinweise.splice(1, 0, FREMD_UST_EUR_HINWEIS(euro(ustEur!)));
+    else if (ustEur !== null) hinweise.splice(1, 0, `Umsatzsteuer laut Rechnung in Euro: ${euro(ustEur)} – bitte den Euro-Betrag je Steuersatz so eintragen, dass diese Umsatzsteuer herauskommt.`);
+  }
   const ohneAbzug = !!o.nurSteuerfrei && !o.kleinunternehmer && !fremd && (r.summen.ust_cent > 0 || !!steuerschuld);
   if (ohneAbzug) hinweise.push(NUR_STEUERFREI_HINWEIS);
   // E-165: gemischte Umsätze – anteilig nach der Vorsteuerquote des Betriebs bzw. ohne Quote erst einmal aus
@@ -458,6 +522,7 @@ export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: str
     erstellt: jetztIso,
     geaendert: jetztIso,
     ...(steuerschuld ? { steuerschuld } : {}),
+    ...(fremdW ? { fremd: fremdW } : {}),
   };
 }
 

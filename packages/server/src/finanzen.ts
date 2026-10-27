@@ -221,7 +221,21 @@ export interface GeleseneERechnung {
   brutto_cent: number | null;
   ust_cent: number | null;
   waehrung: string | null;
+  /** E-221: Steuerwährung (BT-6) und Umsatzsteuer gesamt in dieser Währung (BT-111), wenn abweichend angegeben */
+  steuerwaehrung: string | null;
+  ust_steuerwaehrung_cent: number | null;
   customization: string | null;
+}
+
+/**
+ * E-221 Befund 3: Beträge für app.beleg in Euro. Eine Rechnung in fremder Währung wird nie als Euro übernommen: Brutto
+ * bleibt leer (der Betrieb trägt den Euro-Betrag ein, § 16 Abs. 6 UStG), die Umsatzsteuer nur, wenn sie in Euro auf der
+ * Rechnung steht (BT-6 = EUR, BT-111). Währung und Originalbeträge bleiben in `e_rechnung`.
+ */
+export function belegBetraegeEuro(g: Pick<GeleseneERechnung, "waehrung" | "brutto_cent" | "ust_cent" | "steuerwaehrung" | "ust_steuerwaehrung_cent">): { brutto_cent: number | null; ust_cent: number | null } {
+  const w = (g.waehrung ?? "EUR").trim().toUpperCase();
+  if (w === "EUR") return { brutto_cent: g.brutto_cent, ust_cent: g.ust_cent };
+  return { brutto_cent: null, ust_cent: (g.steuerwaehrung ?? "").toUpperCase() === "EUR" ? g.ust_steuerwaehrung_cent : null };
 }
 
 const zuCent = (x: unknown) => {
@@ -252,21 +266,32 @@ export function eRechnungLesen(xml: string): GeleseneERechnung {
     const t = g(c, "SupplyChainTradeTransaction", "ApplicableHeaderTradeSettlement");
     const sum = g(t, "SpecifiedTradeSettlementHeaderMonetarySummation");
     const steuer = g(sum, "TaxTotalAmount");
+    const waehrung = txt(g(t, "InvoiceCurrencyCode"));
+    const steuerwaehrung = txt(g(t, "TaxCurrencyCode"));
+    const steuern = Array.isArray(steuer) ? steuer : steuer === undefined ? [] : [steuer];
+    const inWaehrung = (w: string | null) => steuern.find((x) => w && typeof x === "object" && x !== null && (x as Record<string, unknown>)["@_currencyID"] === w);
     return {
       syntax: "CII",
       nummer: txt(g(c, "ExchangedDocument", "ID")),
       datum: ciiDatum(g(c, "ExchangedDocument", "IssueDateTime", "DateTimeString")),
       verkaeufer: txt(g(c, "SupplyChainTradeTransaction", "ApplicableHeaderTradeAgreement", "SellerTradeParty", "Name")),
       brutto_cent: zuCent(g(sum, "GrandTotalAmount")),
-      ust_cent: zuCent(Array.isArray(steuer) ? steuer[0] : steuer),
-      waehrung: txt(g(t, "InvoiceCurrencyCode")),
+      ust_cent: zuCent(inWaehrung(waehrung) ?? steuern[0]),
+      waehrung,
+      steuerwaehrung,
+      ust_steuerwaehrung_cent: steuerwaehrung && steuerwaehrung !== waehrung && inWaehrung(steuerwaehrung) !== undefined ? zuCent(inWaehrung(steuerwaehrung)) : null,
       customization: txt(g(c, "ExchangedDocumentContext", "GuidelineSpecifiedDocumentContextParameter", "ID")),
     };
   }
   const u = d.Invoice ?? d.CreditNote;
   if (u) {
     const steuer = g(u, "TaxTotal");
-    const tax = Array.isArray(steuer) ? steuer[0] : steuer;
+    const waehrung = txt(g(u, "DocumentCurrencyCode"));
+    const steuerwaehrung = txt(g(u, "TaxCurrencyCode"));
+    const totals = Array.isArray(steuer) ? steuer : steuer === undefined ? [] : [steuer];
+    const inWaehrung = (w: string | null) => totals.find((x) => w && (g(x, "TaxAmount", "@_currencyID") as unknown) === w);
+    const tax = inWaehrung(waehrung) ?? totals[0];
+    const taxEur = steuerwaehrung && steuerwaehrung !== waehrung ? inWaehrung(steuerwaehrung) : undefined;
     return {
       syntax: "UBL",
       nummer: txt(g(u, "ID")),
@@ -274,7 +299,9 @@ export function eRechnungLesen(xml: string): GeleseneERechnung {
       verkaeufer: txt(g(u, "AccountingSupplierParty", "Party", "PartyLegalEntity", "RegistrationName")) ?? txt(g(u, "AccountingSupplierParty", "Party", "PartyName", "Name")),
       brutto_cent: zuCent(g(u, "LegalMonetaryTotal", "TaxInclusiveAmount")),
       ust_cent: zuCent(g(tax, "TaxAmount")),
-      waehrung: txt(g(u, "DocumentCurrencyCode")),
+      waehrung,
+      steuerwaehrung,
+      ust_steuerwaehrung_cent: taxEur !== undefined ? zuCent(g(taxEur, "TaxAmount")) : null,
       customization: txt(g(u, "CustomizationID")),
     };
   }

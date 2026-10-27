@@ -23,6 +23,7 @@ import type PgBoss from "pg-boss";
 import { z } from "zod";
 import {
   Datenbank,
+  belegBetraegeEuro,
   dokumentAblegen,
   eRechnungLesen,
   fehlendFuerERechnung,
@@ -475,7 +476,8 @@ export class FinanzenController {
           `insert into app.beleg (unternehmen_id, dokument_id, belegdatum, lieferant, belegnummer, brutto_cent, ust_cent, quelle, e_rechnung, erfasst_von)
            values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
            returning *, brutto_cent::float8 as brutto_cent, ust_cent::float8 as ust_cent`,
-          [k.unternehmenId, dok.id, gelesen?.datum ?? null, gelesen?.verkaeufer ?? null, gelesen?.nummer ?? null, gelesen?.brutto_cent ?? null, gelesen?.ust_cent ?? null,
+          // E-221 Befund 3: fremde Währung nie als Euro – Brutto offen, Steuer nur in Euro laut Rechnung (BT-6/BT-111)
+          [k.unternehmenId, dok.id, gelesen?.datum ?? null, gelesen?.verkaeufer ?? null, gelesen?.nummer ?? null, gelesen ? belegBetraegeEuro(gelesen).brutto_cent : null, gelesen ? belegBetraegeEuro(gelesen).ust_cent : null,
            gelesen ? "e_rechnung" : endung === "pdf" ? "upload" : "foto", gelesen ? JSON.stringify(gelesen) : null, k.kontoId],
         );
       })
