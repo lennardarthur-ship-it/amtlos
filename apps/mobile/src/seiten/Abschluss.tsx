@@ -325,7 +325,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const euErledigt = z.stand.erledigt[euBerichtigungSchluessel(u.id)];
   // E-218 (T-273 (4)): älteres Storno einer innergemeinschaftlichen Lieferung ohne Grund – Grund nachtragen
   const euStornoOrig = d.storno_zu && u.stornoZuId ? z.stand.unterlagen.find((x) => x.id === u.stornoZuId) : undefined;
-  const euGrundNachtragen = !!euStornoOrig && !euStornoGrundFest(u) && euMeldeArtVon(euStornoOrig, z.stand.betrieb) === "L";
+  const euGrundNachtragen = !!euStornoOrig && !euStornoGrundFest(u) && euMeldeArtVon(euStornoOrig, z.stand.betrieb) !== null;
   // Rechnung an jemanden: auf der Bühne Stand und Empfänger – der Betrag steht groß auf dem Papier darunter (A13)
   const kunde = typeof d.kunde_name === "string" ? d.kunde_name.trim() : "";
   const kurzDatum = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.`;
@@ -892,7 +892,7 @@ function BetragErhalten({ id, offen, fertig }: { id: string; offen: number; fert
   // E-221 Befund 5: nie still kürzen – Überzahlung, Skonto ohne Zahlung, mehr als das vereinbarte Skonto und „ganz
   // gemindert, nichts erhalten“ werden abgelehnt (zahlungPruefen); gespeichert wird genau, was gemeldet wird
   const pruefung = betrag === null ? null : zahlungPruefen(z.stand, id, zahlung);
-  const fehlerText = !pruefung?.fehler || pruefung.fehler === "betrag" ? null : pruefung.fehler === "ueberzahlt" ? TEXT.e221_ueberzahlt(euroText((betrag ?? 0) + minderung - offen), euroText(offen)) : pruefung.fehler === "skonto_zu_hoch" ? TEXT.e221_skonto_zu_hoch(euroText(pruefung.skontoHoechstens ?? 0)) : pruefung.fehler === "skonto_ohne_zahlung" ? TEXT.e221_skonto_ohne_zahlung : TEXT.e221_nichts_erhalten;
+  const fehlerText = !pruefung?.fehler || pruefung.fehler === "betrag" ? null : pruefung.fehler === "ueberzahlt" ? TEXT.e221_ueberzahlt(euroText((betrag ?? 0) + minderung - offen), euroText(offen), minderung > 0) : pruefung.fehler === "skonto_zu_hoch" ? TEXT.e221_skonto_zu_hoch(euroText(pruefung.skontoHoechstens ?? 0)) : pruefung.fehler === "skonto_ohne_zahlung" ? TEXT.e221_skonto_ohne_zahlung : TEXT.e221_nichts_erhalten;
   const speichern = async () => {
     if (betrag === null || !pruefung || pruefung.fehler) return;
     // ohne vereinbartes Skonto ausdrücklich nachfragen (eine Obergrenze gibt es dann nicht)

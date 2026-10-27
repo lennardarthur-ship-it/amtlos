@@ -9,7 +9,7 @@ import { HAUPT_STAETTE, PERSONEN_LISTE, STAETTEN_VORLAGEN, betriebFehlt, persone
 import { FassungenKarte, KorrekturSeite } from "./Fassungen";
 import { StaettenWahl } from "./BetriebStaetten";
 import { fehltFuer } from "../unterlagen/pruefung";
-import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type EuBerichtigung, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
+import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type EuBerichtigung, type EuSchlussFehlt, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
 import { ossFuer, ossQuartale, zmFuer, zmPerioden } from "../unterlagen/euMeldungen";
 import { useAmtlos } from "../zustand";
 import { mitVorlagenHinweis } from "../rechtshinweis";
@@ -107,6 +107,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           r.oss ? TEXT.stb_oss_nicht_va(r.oss) : "",
           r.berichtigungen.length ? TEXT.e214_va_berichtigung(r.berichtigungen.map((b) => b.stornoNr)) : "",
           ...anderswoTexte(r.berichtigungenAnderswo),
+          ...r.schlussFehlt.map(schlussFehltText),
           r.offen ? TEXT.aus_rechnungen_offen(r.offen) : "",
           r.vorsteuerBelege || r.ohneVorsteuer ? TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer) : "",
           r.vorsteuerPruefen ? VORSTEUER_AUFTEILEN : "",
@@ -152,6 +153,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           {/* E-214: Stornos „Fehler in der Rechnung“ berichtigen den ursprünglichen Zeitraum */}
           {r.berichtigungen.length ? <Hinweis art="warnung" text={TEXT.e214_va_berichtigung(r.berichtigungen.map((b) => b.stornoNr))} /> : null}
           {anderswoTexte(r.berichtigungenAnderswo).map((t) => <T key={t} v="caption" farbe={f.bald}>{t}</T>)}
+          {/* E-235: Abschlag auf einen EU-Umsatz ohne Schlussrechnung – Lieferung bzw. Leistung trotzdem melden */}
+          {r.schlussFehlt.map((x) => <Hinweis key={x.abschlagId} art="warnung" text={schlussFehltText(x)} />)}
           {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
           {r.vorsteuerBelege || r.ohneVorsteuer ? <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer)}</T> : null}
           {r.vorsteuerPruefen ? <T v="caption" farbe={f.bald}>{VORSTEUER_AUFTEILEN}</T> : null}
@@ -174,6 +177,10 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   );
 }
 
+const BETRAG_DE = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/** E-235: Warnung „Schlussrechnung fehlt – trotzdem melden“ (§ 18b Satz 2 bzw. 3 UStG) */
+const schlussFehltText = (x: EuSchlussFehlt) => TEXT.e235_schluss_fehlt(x.art, x.nummer, x.kunde, textAus(x.leistung), `${periodeText(x.monat)} bzw. ${periodeText(x.quartal)}`, BETRAG_DE.format(x.anzahlungNetto / 100));
+
 /** E-214: je ursprünglichem Zeitraum ein Satz „Storno … zählt als Berichtigung in …“ */
 function anderswoTexte(l: EuBerichtigung[]): string[] {
   const je = new Map<string, string[]>();
@@ -193,7 +200,7 @@ function EuAusRechnungen({ id, art }: { id: string; art: "oss" | "zm" }) {
   const f = useFarben();
   const sperre = useProSperre();
   const v: Versteuerung = z.stand.betrieb.versteuerung === "ist" ? "ist" : "soll";
-  const [ergebnis, setErgebnis] = useState<{ periode: string; anzahl: number; zeilen: number; berichtigungen?: EuBerichtigung[]; anderswo?: EuBerichtigung[]; minderungen?: number } | null>(null);
+  const [ergebnis, setErgebnis] = useState<{ periode: string; anzahl: number; zeilen: number; berichtigungen?: EuBerichtigung[]; anderswo?: EuBerichtigung[]; minderungen?: number; schlussFehlt?: EuSchlussFehlt[] } | null>(null);
   const liste = art === "oss" ? ossQuartale(z.stand.unterlagen, z.stand.betrieb, v) : zmPerioden(z.stand.unterlagen, z.stand.betrieb);
   useAnsage(ergebnis ? TEXT.stb_eu_ok(ergebnis.anzahl, ergebnis.zeilen) : null);
   if (!liste.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.stb_eu_leer[art]}</T>;
@@ -209,7 +216,7 @@ function EuAusRechnungen({ id, art }: { id: string; art: "oss" | "zm" }) {
             const erg = art === "oss" ? ossFuer(z.stand.unterlagen, p, z.stand.betrieb, v) : zmFuer(z.stand.unterlagen, p, z.stand.betrieb);
             if (!erg) return;
             z.setzen(id, erg.werte as Daten);
-            setErgebnis({ periode: p, anzahl: erg.anzahl, zeilen: erg.zeilen.length, ...("berichtigungen" in erg ? { berichtigungen: erg.berichtigungen, anderswo: erg.berichtigungenAnderswo, minderungen: erg.minderungen } : {}) });
+            setErgebnis({ periode: p, anzahl: erg.anzahl, zeilen: erg.zeilen.length, ...("berichtigungen" in erg ? { berichtigungen: erg.berichtigungen, anderswo: erg.berichtigungenAnderswo, minderungen: erg.minderungen, schlussFehlt: erg.schlussFehlt } : {}) });
           }}
           optionen={liste.map((p) => ({ wert: p, text: periodeText(p) }))}
         />
@@ -219,6 +226,7 @@ function EuAusRechnungen({ id, art }: { id: string; art: "oss" | "zm" }) {
       {ergebnis?.berichtigungen?.length ? <View style={{ marginTop: 6 }}><Hinweis art="warnung" text={`${TEXT.e214_va_berichtigung(ergebnis.berichtigungen.map((b) => b.stornoNr))} ${TEXT.e214_zm_berichtigung(textAus(ergebnis.berichtigungen.map((b) => b.zmFrist).sort()[0]!))}`} /></View> : null}
       {anderswoTexte(ergebnis?.anderswo ?? []).map((t) => <T key={t} v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{t}</T>)}
       {ergebnis?.minderungen ? <T v="caption" farbe={f.amtTief} stil={{ marginTop: 4 }}>{TEXT.e214_zm_minderung(ergebnis.minderungen)}</T> : null}
+      {(ergebnis?.schlussFehlt ?? []).map((x) => <View key={x.abschlagId} style={{ marginTop: 6 }}><Hinweis art="warnung" text={schlussFehltText(x)} /></View>)}
       <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{art === "oss" ? TEXT.stb_oss_frist : TEXT.stb_zm_frist}</T>
     </View>
   );

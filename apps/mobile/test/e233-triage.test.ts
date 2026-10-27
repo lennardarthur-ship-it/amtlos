@@ -79,9 +79,9 @@ describe("E-233 (1): Entwurf C.37 erscheint erst mit der Freigabe", () => {
 });
 
 describe("E-233 (2): Fundstelle neue Fahrzeuge / verbrauchsteuerpflichtige Waren", () => {
-  it("§ 1a Abs. 5 Satz 1 UStG statt § 1a Abs. 3 Nr. 2 UStG", () => {
+  it("§ 1a Abs. 5 UStG statt § 1a Abs. 3 Nr. 2 UStG (E-235: ohne Satzangabe, wie vom Steuerberater gewünscht)", () => {
     const h = TEXT.e227_schwelle_hinweis("12.500 €");
-    expect(h).toContain("Bei der Erwerbsschwelle zählen sie nicht mit (§ 1a Abs. 5 Satz 1 UStG)");
+    expect(h).toContain("Bei der Erwerbsschwelle zählen sie nicht mit (§ 1a Abs. 5 UStG)");
     expect(h).not.toContain("§ 1a Abs. 3 Nr. 2 UStG");
   });
 });

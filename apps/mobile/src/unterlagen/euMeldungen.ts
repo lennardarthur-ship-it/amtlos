@@ -22,7 +22,7 @@
  */
 import { eRechnungAus, restGruppen, ustZeitraum, zahlungsAnteile, type Betrieb, type RechnungsDaten } from "@amtlos/fachlogik";
 import type { Unterlage } from "./speicher";
-import { euBerichtigungenFuer, euMeldeArt, euMinderungsTage, istGutschrift, meldeGruppen, periodeText, zuordnungsTage, type EuBerichtigung, type Versteuerung } from "./ustAusRechnungen";
+import { euBerichtigungenFuer, euMeldeArt, euMinderungsTage, euSchlussFehlt, euSchlussFehltFuer, istGutschrift, meldeGruppen, periodeText, zuordnungsTage, type EuBerichtigung, type EuSchlussFehlt, type Versteuerung } from "./ustAusRechnungen";
 
 const betragText = (cent: number) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cent / 100);
 const quartal = (tag: string) => `${tag.slice(0, 4)}-Q${Math.floor((Number(tag.slice(5, 7)) - 1) / 3) + 1}`;
@@ -120,11 +120,16 @@ export function zmPerioden(unterlagen: Unterlage[], betrieb: Betrieb): string[] 
     set.add(p.tag.slice(0, 7));
     set.add(quartal(p.tag));
   }
+  // E-235: Zeitraum, in dem eine Lieferung bzw. Leistung ohne Schlussrechnung zu melden ist – dort steht die Warnung
+  for (const x of euSchlussFehlt(unterlagen, betrieb, null)) {
+    set.add(x.meldeTag.slice(0, 7));
+    set.add(quartal(x.meldeTag));
+  }
   return [...set].sort((a, b) => b.localeCompare(a) || (a.includes("Q") ? 1 : -1));
 }
 
 /** Zusammenfassende Meldung für einen Monat oder ein Quartal je USt-IdNr. und Art (volle Euro), mit den Werten für „zm_meldung“. */
-export function zmFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb): { zeilen: ZmZeile[]; anzahl: number; werte: Record<string, unknown>; berichtigungen: EuBerichtigung[]; berichtigungenAnderswo: EuBerichtigung[]; minderungen: number } | null {
+export function zmFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb): { zeilen: ZmZeile[]; anzahl: number; werte: Record<string, unknown>; berichtigungen: EuBerichtigung[]; berichtigungenAnderswo: EuBerichtigung[]; minderungen: number; schlussFehlt: EuSchlussFehlt[] } | null {
   const z = ustZeitraum(periode);
   if (!z) return null;
   const alle = zmPosten(unterlagen, betrieb).filter((p) => p.tag >= z.von && p.tag <= z.bis);
@@ -146,5 +151,7 @@ export function zmFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrie
     berichtigungen: ber.hier,
     berichtigungenAnderswo: ber.anderswo,
     minderungen: new Set(alle.filter((p) => p.minderung).map((p) => p.u.id)).size,
+    // E-235 (Steuerberater 27.10.2026): ohne Schlussrechnung trotzdem zu melden – nicht in den Zeilen enthalten
+    schlussFehlt: euSchlussFehltFuer(unterlagen, periode, betrieb),
   };
 }
