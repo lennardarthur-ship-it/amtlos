@@ -54,7 +54,7 @@ describe("E-231: Erwerbsschwelle im laufenden Jahr überschritten (T-323)", () =
   it("Texte: Lage, erneute Frage, Satz zu neuen Fahrzeugen und verbrauchsteuerpflichtigen Waren", () => {
     expect(TEXT.e231_status_erneut("2026", "12.500 €")).toBe("Deine Erwerbe aus dem EU-Ausland liegen 2026 laut deinen Belegen schon über 12.500 € – bitte die Frage noch einmal beantworten.");
     expect(TEXT.e231_jahr_ueber("2026", "13.000,00 €", "12.500 €")).toContain("Bitte beantworte die Frage noch einmal.");
-    expect(TEXT.e227_schwelle_hinweis("12.500 €")).toContain("Bei der Erwerbsschwelle zählen sie nicht mit (§ 1a Abs. 5 Satz 1 UStG): Die App erkennt sie an den Belegen nicht und zählt alle Erwerbe mit – zieh sie bei deiner Antwort ab.");
+    expect(TEXT.e227_schwelle_hinweis("12.500 €")).toContain("Bei der Erwerbsschwelle zählen sie nicht mit (§ 1a Abs. 5 UStG): Die App erkennt sie an den Belegen nicht und zählt alle Erwerbe mit – zieh sie bei deiner Antwort ab.");
     const ui = lies("seiten/Erwerbsschwelle.tsx");
     expect(ui).toContain("TEXT.e231_jahr_ueber(jahr, euro(l.jahr_cent), schwelle)");
     expect(ui).toContain("[erneutFeld(jahr)]: w === \"ja\"");
@@ -78,13 +78,13 @@ describe("E-231: DATEV-Stapel – Erwerb ohne Erwerbsbesteuerung als gewöhnlich
     expect(liste).toMatch(/1190,00;H;1610;3200;;/);
     expect(liste).not.toMatch(/;343[05];/);
     const l = datei(p, "LIESMICH.txt");
-    expect(l).toContain("Unter der Erwerbsschwelle ohne Verzicht (§ 1a Abs. 3 UStG) – keine Erwerbsbesteuerung: Dieser Erwerb ist ein gewöhnlicher Einkauf, die ausländische Umsatzsteuer ist nicht abziehbar; im Stapel mit dem Bruttobetrag ohne Steuerschlüssel auf dem Aufwandskonto des Belegs: Fournitures SARL am 15.05.2026 über 1.190,00 € auf 3200.");
+    expect(l).toContain("Nicht über der Erwerbsschwelle ohne Verzicht (§ 1a Abs. 3 UStG) – keine Erwerbsbesteuerung: Dieser Erwerb ist ein gewöhnlicher Einkauf, die ausländische Umsatzsteuer ist nicht abziehbar; im Stapel mit dem Bruttobetrag ohne Steuerschlüssel auf dem Aufwandskonto des Belegs: Fournitures SARL am 15.05.2026 über 1.190,00 € auf 3200.");
     expect(l).not.toContain("FEHLEN sie im Stapel");
     expect(l).not.toContain("Feld 116");
     expect(l).not.toContain("§ 18 Abs. 4a UStG");
     const belege = datei(p, "Belege_2026-05.csv");
-    expect(belege).toContain("ja – gewöhnlicher Einkauf (unter der Erwerbsschwelle)");
-    expect(belege).toContain("keine Erwerbsbesteuerung (unter der Erwerbsschwelle) – gewöhnlicher Einkauf");
+    expect(belege).toContain("ja – gewöhnlicher Einkauf (nicht über der Erwerbsschwelle)");
+    expect(belege).toContain("keine Erwerbsbesteuerung (nicht über der Erwerbsschwelle) – gewöhnlicher Einkauf");
   });
 
   it("ohne Antworten (offen) fehlt der Erwerb weiter im Stapel; nach Überschreiten im Jahr ebenso, bis erneut geantwortet", () => {

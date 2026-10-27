@@ -26,7 +26,7 @@ import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { PartnerHinweis } from "./Partner";
 import { erstellenErlaubt, freiePflichten } from "../pro/regeln";
 import { AboEndeHinweis } from "./AboEnde";
-import { EU_STORNO_ALT_HINWEIS, euBerichtigungen, euStornosOhneGrund, periodeText } from "../unterlagen/ustAusRechnungen";
+import { EU_STORNO_ALT_HINWEIS, EU_STORNO_ALT_HINWEIS_S, euBerichtigungen, euSchlussFehlt, euStornoHinweisListe, periodeText } from "../unterlagen/ustAusRechnungen";
 
 
 // Formatter einmal anlegen (R9 Performance)
@@ -77,8 +77,10 @@ export function Heute() {
   const ueberfaellig = useMemo(() => unterlagen.filter((u) => (ueberJe.get(u.id) ?? 0) > 0).sort((x, y) => (ueberJe.get(y.id) ?? 0) - (ueberJe.get(x.id) ?? 0)).slice(0, 2), [unterlagen, ueberJe]);
   // E-214: Stornos „Fehler in der Rechnung“ bei EU-Umsätzen – ZM und Voranmeldung des ursprünglichen Zeitraums berichtigen
   const berichtigen = useMemo(() => euBerichtigungen(unterlagen, betrieb, erledigt).filter((b) => !b.erledigt), [unterlagen, betrieb, erledigt]);
-  // E-218 (T-273 (4)): einmaliger Hinweis auf ältere Stornos innergemeinschaftlicher Lieferungen ohne Grund
-  const ohneGrund = useMemo(() => (erledigt[EU_STORNO_ALT_HINWEIS] ? [] : euStornosOhneGrund(unterlagen, betrieb)), [unterlagen, betrieb, erledigt]);
+  // E-218 (T-273 (4)): einmaliger Hinweis auf ältere Stornos von EU-Umsätzen ohne Grund (E-235: auch EU-Leistungen)
+  const ohneGrund = useMemo(() => euStornoHinweisListe(unterlagen, betrieb, erledigt), [unterlagen, betrieb, erledigt]);
+  // E-235 (Steuerberater 27.10.2026): Abschlag auf einen EU-Umsatz, Schlussrechnung fehlt – trotzdem melden (§ 18b UStG)
+  const schlussFehlt = useMemo(() => euSchlussFehlt(unterlagen, betrieb, tag), [unterlagen, betrieb, tag]);
   const hatRechnungen = unterlagen.some((u) => u.vorlage === "rechnung" && u.festgeschrieben);
   const zuletzt = useMemo(() => sortiert({ unterlagen } as Stand).slice(0, 3), [unterlagen]);
   const jetzt = new Date();
@@ -159,7 +161,14 @@ export function Heute() {
       {ohneGrund.length ? (
         <Karte stil={{ marginBottom: 18 }}>
           <Zeile symbol="questionmark.circle" ton="bald" titel={TEXT.e218_alt_grund_titel(ohneGrund.length)} text={TEXT.e218_alt_grund_text(ohneGrund.map((u) => String(u.daten.nummer ?? "")).join(", "))} onPress={() => oeffnen(ohneGrund[0]!.id)} letzte={false} />
-          <TextKnopf symbol="xmark" leise text={TEXT.e218_alt_grund_aus} onPress={() => erledigtSetzen(EU_STORNO_ALT_HINWEIS, tag)} />
+          <TextKnopf symbol="xmark" leise text={TEXT.e218_alt_grund_aus} onPress={() => { erledigtSetzen(EU_STORNO_ALT_HINWEIS, tag); erledigtSetzen(EU_STORNO_ALT_HINWEIS_S, tag); }} />
+        </Karte>
+      ) : null}
+      {schlussFehlt.length ? (
+        <Karte stil={{ marginBottom: 18 }}>
+          {schlussFehlt.map((x, i, l) => (
+            <Zeile key={x.abschlagId} symbol="exclamationmark.triangle" ton="frist" titel={TEXT.e235_schluss_fehlt_titel(1)} text={TEXT.e235_schluss_fehlt(x.art, x.nummer, x.kunde, textAus(x.leistung), `${periodeText(x.monat)} bzw. ${periodeText(x.quartal)}`, new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(x.anzahlungNetto / 100))} onPress={() => oeffnen(x.abschlagId)} letzte={i === l.length - 1} />
+          ))}
         </Karte>
       ) : null}
       {/* R12: Betriebe mit Kasse oder Laden – der Tagesabschluss gehört zum Tag */}

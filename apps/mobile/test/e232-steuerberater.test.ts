@@ -100,9 +100,9 @@ describe("E-232 (T-332 a): Überzahlung in der EÜR am Tag des Geldeingangs", ()
     let s = fall();
     s = guthabenVerrechnen(s, "r1", "z1-ue", "r2", "2026-12-21", 5000, t("2026-12-21"));
     const l = datei(steuerpaket(s, { von: "2026-01-01", bis: "2026-12-31", name: "2026" }, SB, {}, "2027-01-02T10:00:00.000Z"), "LIESMICH.txt");
-    expect(l).toContain("EÜR (§ 11 EStG): Einnahme ist der Geldeingang am Tag der Überzahlung");
-    expect(l).toContain("dann zählt bei Ist-Versteuerung schon der Tag des Geldeingangs");
-    expect(TEXT.e229_ueberzahlung("31,00 €", "119,00 €")).toContain("bei Ist-Versteuerung zählt dann schon der Tag des Geldeingangs für die Umsatzsteuer");
+    expect(l).toContain("EÜR (§ 11 EStG): Die Überzahlung ist schon am Tag des Eingangs Einnahme"); // E-235 (S7 Nr. 60)
+    expect(l).toContain("für die Umsatzsteuer zählt schon der Tag des Geldeingangs, bei Soll- wie bei Ist-Versteuerung");
+    expect(TEXT.e229_ueberzahlung("31,00 €", "119,00 €")).toContain("dann zählt für die Umsatzsteuer schon der Tag des Geldeingangs, bei Soll- wie bei Ist-Versteuerung");
   });
 });
 

@@ -165,11 +165,11 @@ describe("E-218 (2d): ältere Stornos innergemeinschaftlicher Lieferungen ohne G
     expect(zm(s, "2026-09")).toEqual([{ ust_idnr: "ATU12345675", art: "L", betrag_cent: 100000 }, { ust_idnr: "ATU69876543", art: "L", betrag_cent: 0 }]);
   });
 
-  it("ein beim Stornieren gewählter Grund bleibt; EU-Leistungen und Inlandsrechnungen erscheinen nicht im Hinweis", () => {
+  it("ein beim Stornieren gewählter Grund bleibt; EU-Leistungen erscheinen seit E-235 (Steuerberater, T-294) auch im Hinweis", () => {
     const s = storno(lieferung(), "r1", "st1", "2026-11-05", "betrag");
     expect(euStornoSetzen(s, "st1", { grund: "rechnung" }, t("2026-12-01"))).toBe(s);
     const leistung = storno(rechnung(leer(), "r1", "2026-09-15", { leistung_gleich: false, leistung: "10.09.2026", hinweise: ["reverse_charge"], positionen: pos("300,00") }), "r1", "st1", "2026-11-05");
-    expect(euStornosOhneGrund(leistung.unterlagen, leistung.betrieb)).toEqual([]);
+    expect(euStornosOhneGrund(leistung.unterlagen, leistung.betrieb).map((u) => u.id)).toEqual(["st1"]);
   });
 });
 

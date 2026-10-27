@@ -382,17 +382,86 @@ export function euBerichtigungen(unterlagen: Unterlage[], betrieb: Betrieb, erle
 export const EU_STORNO_ALT_HINWEIS = "eu-storno-grund-hinweis";
 
 /**
- * E-218 (Steuerberater 27.10.2026, T-273 (4)): geteilte Stornos innergemeinschaftlicher Lieferungen ohne Grund (ältere
- * Daten von vor E-214) – für den einmaligen Hinweis, den Grund nachzutragen (`euStornoSetzen`). Ohne Grund gilt bei
- * Lieferungen „Betrag hat sich geändert“.
+ * E-218 (Steuerberater 27.10.2026, T-273 (4)): geteilte Stornos von Rechnungen mit EU-Umsatz ohne Grund (ältere Daten von
+ * vor E-214) – für den einmaligen Hinweis, den Grund nachzutragen (`euStornoSetzen`). Ohne Grund gilt bei Lieferungen
+ * „Betrag hat sich geändert“, bei Leistungen die frühere Regel. E-235 (Steuerberater 27.10.2026, T-294): auch für
+ * EU-Leistungen (ZM „S“) – „Fehler in der Rechnung“ heißt dann wie bei Lieferungen, dass die ZM (und die Voranmeldung)
+ * des ursprünglichen Zeitraums zu berichtigen ist (§ 18a Abs. 10 UStG, `euBerichtigungen`).
  */
 export function euStornosOhneGrund(unterlagen: Unterlage[], betrieb: Betrieb): Unterlage[] {
   const feste = festeRechnungen(unterlagen);
   return feste.filter((st) => {
     if (!istStornoU(st) || !st.stornoZuId || euStornoGrund(st)) return false;
     const orig = feste.find((x) => x.id === st.stornoZuId);
-    return !!orig && euArtVon(orig, betrieb) === "L";
+    return !!orig && euArtVon(orig, betrieb) !== null;
   });
+}
+
+/**
+ * E-235: Ein beim Ausblenden vor E-235 gesetztes `EU_STORNO_ALT_HINWEIS` galt nur für Lieferungen – Stornos von
+ * EU-Leistungen erscheinen dann einmal, bis auch dieser Schlüssel gesetzt ist (Ausblenden setzt beide).
+ */
+export const EU_STORNO_ALT_HINWEIS_S = "eu-storno-grund-hinweis-s";
+
+/** E-218/E-235: Stornos ohne Grund für den einmaligen Hinweis auf „Heute“ – nach dem Ausblenden keine mehr. */
+export function euStornoHinweisListe(unterlagen: Unterlage[], betrieb: Betrieb, erledigt: Record<string, string>): Unterlage[] {
+  if (erledigt[EU_STORNO_ALT_HINWEIS_S]) return [];
+  const l = euStornosOhneGrund(unterlagen, betrieb);
+  if (!erledigt[EU_STORNO_ALT_HINWEIS]) return l;
+  return l.filter((st) => {
+    const orig = unterlagen.find((x) => x.id === st.stornoZuId);
+    return !!orig && euArtVon(orig, betrieb) === "S";
+  });
+}
+
+/** E-235: Abschlagsrechnung auf einen EU-Umsatz, deren Lieferung bzw. Leistung ohne Schlussrechnung trotzdem zu melden ist. */
+export interface EuSchlussFehlt {
+  abschlagId: string;
+  nummer: string;
+  kunde: string;
+  art: "L" | "S";
+  /** Tag der Lieferung bzw. Leistung laut Abschlagsrechnung (Leistungsdatum bzw. Ende des Leistungszeitraums) */
+  leistung: string;
+  /** Tag, nach dem die Lieferung bzw. Leistung zu melden ist: Lieferung letzter Tag des Folgemonats, Leistung ihr Tag */
+  meldeTag: string;
+  monat: string;
+  quartal: string;
+  /** netto abgerechnete Anzahlung dieser Abschlagsrechnung – nicht das zu meldende Entgelt */
+  anzahlungNetto: number;
+}
+
+/**
+ * E-235 (Steuerberater 27.10.2026, zu T-293): Liegt bis zum Ende des Monats nach der Lieferung keine Schlussrechnung
+ * vor, ist die innergemeinschaftliche Lieferung trotzdem zu melden (§ 18b Satz 2 UStG: spätestens im Zeitraum, in dem
+ * der auf die Ausführung folgende Monat endet). Für EU-Leistungen gilt nach § 18b Satz 3 UStG der Zeitraum der
+ * Ausführung – ebenfalls unabhängig von der Rechnung. Die App meldet Abschläge auf EU-Umsätze nicht (E-214) und kennt
+ * die Lieferung nur aus dem Leistungsdatum der Abschlagsrechnung (voraussichtlich) und das volle Entgelt nur aus der
+ * Schlussrechnung – deshalb nur eine Warnung, keine Zahl in Voranmeldung und ZM: geteilte, nicht stornierte
+ * Abschlagsrechnungen mit ZM-Art, ohne Schlussrechnung (`schlussZuAbschlag`), mit Leistungsdatum und mit `meldeTag`
+ * vor `heute` (bei `heute` = null alle – für die Übernahme eines Zeitraums). Ohne Leistungsdatum keine Warnung.
+ */
+export function euSchlussFehlt(unterlagen: Unterlage[], betrieb: Betrieb, heute: string | null): EuSchlussFehlt[] {
+  const aus: EuSchlussFehlt[] = [];
+  for (const u of festeRechnungen(unterlagen)) {
+    if (u.daten.abschlag !== true || istStornoU(u) || u.storniertDurch) continue;
+    const art = euArtVon(u, betrieb);
+    const leistung = art ? leistungVon(u, betrieb) : null;
+    if (!art || !leistung || schlussZuAbschlag(unterlagen, u)) continue;
+    const meldeTag = art === "L" ? endeFolgemonat(leistung) : leistung;
+    // Leistung: gemeldet wird im Zeitraum der Ausführung – fällig ist die Angabe nach dessen Ende
+    const faellig = art === "L" ? meldeTag : new Date(Date.UTC(Number(leistung.slice(0, 4)), Number(leistung.slice(5, 7)), 0)).toISOString().slice(0, 10);
+    if (heute !== null && !(faellig < heute)) continue;
+    const { daten } = eRechnungAus(u.daten, betrieb);
+    const [monat, quartal] = periodenVon(meldeTag) as [string, string];
+    aus.push({ abschlagId: u.id, nummer: typeof u.daten.nummer === "string" ? u.daten.nummer : "", kunde: typeof u.daten.kunde_name === "string" ? u.daten.kunde_name : "", art, leistung, meldeTag, monat, quartal, anzahlungNetto: summen(daten.positionen, daten.kleinunternehmer).netto_cent });
+  }
+  return aus.sort((a, b) => a.meldeTag.localeCompare(b.meldeTag) || a.nummer.localeCompare(b.nummer));
+}
+
+/** E-235: Fälle aus `euSchlussFehlt`, die im Zeitraum `periode` (Monat bzw. Quartal) zu melden sind. */
+export function euSchlussFehltFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb): EuSchlussFehlt[] {
+  const z = ustZeitraum(periode);
+  return z ? euSchlussFehlt(unterlagen, betrieb, null).filter((x) => x.meldeTag >= z.von && x.meldeTag <= z.bis) : [];
 }
 
 /** E-214: Berichtigungen, deren ursprünglicher Zeitraum in `periode` liegt (Monat bzw. Quartal), und Stornos dieses Zeitraums, die anderswo zählen. */
@@ -467,6 +536,8 @@ export function perioden(unterlagen: Unterlage[], betrieb: Betrieb, v: Versteuer
     if (z.tag) for (const p of periodenVon(z.tag)) set.add(p);
   }
   for (const u of gestellt(unterlagen)) if (istGutschrift(u)) for (const p of periodenVon(gutschriftTag(u, betrieb))) set.add(p);
+  // E-235: Zeitraum, in dem eine Lieferung bzw. Leistung ohne Schlussrechnung zu melden ist – dort steht die Warnung
+  for (const x of euSchlussFehlt(unterlagen, betrieb, null)) for (const p of periodenVon(x.meldeTag)) set.add(p);
   // R11 (Kosmetik #10): keine Voranmeldung für Zeiträume, die ganz in der Kleinunternehmerzeit liegen („Mein Betrieb“)
   const kuBis = (betrieb.ku_bis ?? "").trim();
   if (kuBis) for (const p of [...set]) if ((ustZeitraum(p)?.bis ?? "") <= kuBis) set.delete(p);
@@ -612,6 +683,8 @@ export interface UstUebernahme {
    */
   berichtigungen: EuBerichtigung[];
   berichtigungenAnderswo: EuBerichtigung[];
+  /** E-235: Abschläge auf EU-Umsätze ohne Schlussrechnung, deren Lieferung bzw. Leistung in diesem Zeitraum zu melden ist */
+  schlussFehlt: EuSchlussFehlt[];
 }
 
 /** R12: Kassenabschlüsse für die Voranmeldung – Ruhetage (Wochentage 0–6) und heutiger Tag für die fehlenden Tage. */
@@ -768,7 +841,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
       anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl,
       igeBelege: igeZaehlt ? rc.ige_anzahl : 0, igeKu: igeZaehlt ? 0 : igeImZeitraum, igeAndere: igeZaehlt ? rc.ige_andere_cent : 0, igeOhneEuro, rcOhneEuro: rc.ohne_euro,
       erwerbsschwelle: schwelle, kuVoranmeldungPflicht: pflicht,
-      kasseTage: 0, kasseFehlend: null, minderungen: 0, uneinbringlich: [], uneinbringlichZahlungen: [], uneinbringlichNicht: nicht, ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [],
+      kasseTage: 0, kasseFehlend: null, minderungen: 0, uneinbringlich: [], uneinbringlichZahlungen: [], uneinbringlichNicht: nicht, ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [], schlussFehlt: [],
     };
   }
   // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit;
@@ -874,8 +947,11 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     return { nummer: daten.nummer, zeile: [daten.nummer, datumDe(daten.rechnungsdatum), daten.kunde.name.replace(/\s*\|\s*/g, " "), betragText(volleGruppen(daten).reduce((a, g) => a + g.netto_cent, 0))].join(" | ") };
   });
   const ber = euBerichtigungenFuer(unterlagen, periode, betrieb);
+  // E-235 (Steuerberater 27.10.2026): Lieferung bzw. Leistung ohne Schlussrechnung trotzdem zu melden – nicht enthalten
+  const schlussFehlt = euSchlussFehltFuer(unterlagen, periode, betrieb);
   const annahmen = [
     ...ber.hier.map(berichtigungText),
+    ...schlussFehlt.map((x) => TEXT.e235_schluss_fehlt_kurz(x.art, x.nummer, datumDe(x.leistung), periodeText(x.monat), betragText(x.anzahlungNetto))),
     ka?.tage ? `Kassenumsätze aus ${ka.tage} Tagesabschlüssen: Netto und Umsatzsteuer je Steuersatz aus dem Brutto herausgerechnet.` : "",
     ossImZeitraum ? `${ossImZeitraum} OSS-Rechnung(en) mit der Steuer des Bestimmungslands nicht übernommen – sie gehören in die OSS-Erklärung beim BZSt.` : "",
     ...igeAnnahmen,
@@ -910,6 +986,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     oss: ossImZeitraum,
     berichtigungen: ber.hier,
     berichtigungenAnderswo: ber.anderswo,
+    schlussFehlt,
     werte: {
       zeitraum: periodeText(periode),
       umsatz_19: betragText(summe((s) => s === 19) + (ka?.je[19].netto ?? 0) + se.netto19),
