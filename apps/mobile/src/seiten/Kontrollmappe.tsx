@@ -14,6 +14,7 @@ import { istErledigt } from "../pflichten/check";
 import { useAuswertung } from "./Pflichten";
 import { useOeffnen, useStarten } from "./starten";
 import { pdfBytes } from "../unterlagen/pdf";
+import { originalLesen } from "../unterlagen/pdfOriginal";
 import { ausgabeHtml, fassungHtml } from "../unterlagen/ausgabe";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
 import { HAUPT_STAETTE, alleStaetten, heute, personenSortiert, staetteVon } from "../unterlagen/speicher";
@@ -207,7 +208,9 @@ export function KontrollmappeSeite() {
         // Absender), nicht mit „Mein Betrieb“ von heute
         const fassung = e.daten && u ? u.fassungen?.find((f) => f.daten === e.daten || JSON.stringify(f.daten) === JSON.stringify(e.daten)) : undefined;
         const html = fassung && u ? fassungHtml(z.stand, u.vorlage, fassung, z.pro) : u && !e.daten ? ausgabeHtml(z.stand, u, z.pro) : dokumentHtml(v, daten, b);
-        const bytes = await pdfBytes(html, pdfDateiname(v, daten, tag), v.querformat);
+        // E-228: festgeschrieben mit aufbewahrtem Original-PDF → genau diese Datei
+        const original = fassung && u ? await originalLesen(fassung.pdf, z.dateiLesen) : u?.festgeschrieben && !e.daten ? await originalLesen(u.pdf, z.dateiLesen) : null;
+        const bytes = original ?? (await pdfBytes(html, pdfDateiname(v, daten, tag), v.querformat));
         if (!bytes) throw new Error("pdf");
         teile.push(bytes);
         drin.push(e);

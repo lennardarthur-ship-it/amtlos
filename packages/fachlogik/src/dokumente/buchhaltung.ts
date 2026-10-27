@@ -125,18 +125,24 @@ export const istNullsatzText = (t: string | null | undefined) => NULLSATZ_IM_TEX
  * und Gutschrift. § 33 Satz 3 UStDV: „Die Sätze 1 und 2 gelten nicht für Rechnungen über Leistungen im Sinne der
  * §§ 3c, 6a und 13b des Gesetzes.“ – also nicht bei Steuerschuldnerschaft des Empfängers (auch „§ 13b“ im
  * Befreiungshinweis, wie `steuerartAus`), innergemeinschaftlicher Lieferung und Fernverkauf. E-220: Fernverkauf = OSS
- * eingeschaltet (Steuer des Bestimmungslands, § 3c UStG); vorsorglich auch jede Privatperson im EU-Ausland ohne OSS
- * (Fernverkauf unter der Schwelle des § 3c Abs. 4 UStG – ob § 33 Satz 3 dann greift, klärt T-299). Die App trennt
- * Waren und Dienstleistungen nicht; die vollen Angaben nach § 14 Abs. 4 UStG sind in jedem Fall zulässig.
+ * eingeschaltet (Steuer des Bestimmungslands, § 3c UStG). E-228 (Steuerberater, T-299): Unter der Schwelle des § 3c
+ * Abs. 4 UStG ist ein Fernverkauf kein Fall des § 3c (in Deutschland steuerbar) – Vereinfachung erlaubt, außer bei
+ * Verzicht auf die Schwelle (§ 3c Abs. 4 Satz 2 UStG; dann OSS). Sonstige Leistungen an Privatpersonen im EU-Ausland mit
+ * Ort im Inland (§ 3a Abs. 1 UStG): ebenso; mit Ort im Ausland (z. B. § 3a Abs. 5 UStG, Grundstück dort) volle Angaben.
+ * Entschieden wird nach dem, was die Rechnung ausweist: Privatperson im EU-Ausland ohne OSS mit deutscher Umsatzsteuer
+ * auf jeder Position (bzw. Kleinunternehmer nach § 19 UStG) → Vereinfachung; eine Position ohne deutsche Steuer (0 %,
+ * Ort womöglich im Ausland) → vorsorglich volle Angaben. Die vollen Angaben nach § 14 Abs. 4 UStG sind immer zulässig.
  */
 export const KLEINBETRAG_CENT = 25000;
 export function kleinbetrag(d: Daten): boolean {
   if (text(d, "storno_zu") || auswahl(d, "hinweise").includes("gutschrift")) return false;
   const art = steuerartAus(d);
   if (art === "reverse_charge" || art === "igl") return false;
-  if ((ja(d, "oss") && !kuFuer(d)) || euPrivatLand(d)) return false;
+  if (ja(d, "oss") && !kuFuer(d)) return false;
   const pos = positionen(d);
   if (!pos.length) return false;
+  // E-228: Privatperson im EU-Ausland – nur mit deutscher Steuer auf der Rechnung (Ort der Leistung im Inland)
+  if (euPrivatLand(d) && !kuFuer(d) && pos.some((x) => !((x.p.ust_satz ?? 0) > 0))) return false;
   const brutto = summen(pos.map((x) => x.p), kuFuer(d)).brutto_cent;
   return brutto > 0 && brutto <= KLEINBETRAG_CENT;
 }

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
 import { ausgabeHtml } from "../unterlagen/ausgabe";
 import { pdfBytes } from "../unterlagen/pdf";
+import { ausgabePdf } from "../unterlagen/pdfOriginal";
 import { View } from "react-native";
 import { T as TEXT } from "../texte";
 import { ChipLeiste, Feld, Fuss, Hinweis, Karte, Knopf, T, TextKnopf, Wahl } from "../ui/bausteine";
@@ -101,7 +102,8 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
       if (v)
         for (const [i, u] of rechnungenImZeitraum.entries()) {
           setFortschritt(TEXT.steuerpaket_fortschritt_pdfs(i + 1, rechnungenImZeitraum.length));
-          const bytes = await pdfBytes(ausgabeHtml(z.stand, u, z.pro), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
+          // E-228: das aufbewahrte Original-PDF, sonst aus dem festgehaltenen Dokument neu erzeugt
+          const { bytes } = await ausgabePdf(u, z.dateiLesen, () => pdfBytes(ausgabeHtml(z.stand, u, z.pro), pdfDateiname(v, u.daten, heute()), v.querformat));
           if (bytes) rechnungsPdfs[u.id] = bytes;
         }
       setFortschritt(TEXT.steuerpaket_fortschritt_zip);

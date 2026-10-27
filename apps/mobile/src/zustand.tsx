@@ -19,6 +19,7 @@ import { syncZusammenfuehren } from "./konto/sync";
 import { dateienImStand, doppeltePerson, korrigieren, personenZusammenfuehren, staetteLoeschen, staetteSetzen, unterlageStaette, type Betriebsstaette } from "./unterlagen/speicher";
 import { personenkontenVergeben } from "./unterlagen/steuerpaket";
 import { belegeFestschreiben, kassenbuchFestschreiben, kassensturzSpeichern, sachentnahmeLoeschen, sachentnahmeSpeichern } from "./unterlagen/speicher";
+import { pdfOriginalSetzen, type PdfOriginal } from "./unterlagen/speicher";
 import { LEERER_STAND, StandFehler, geteilteFassungFestschreiben, teilenOffenVermerken, type GeteilteFassung, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, type EuStornoGrund, euStornoSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /**
@@ -87,7 +88,14 @@ interface Zustand {
    * PDF neu erzeugen. Die Festschreibung wird sofort gespeichert (G3).
    */
   /** E-220 (8b): `absender` wie gedruckt (nach der Pro-Regel), `html` das gedruckte Dokument – beides wird festgehalten */
-  ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean, html?: string): boolean;
+  ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean, html?: string, pdf?: PdfOriginal): boolean;
+  /**
+   * E-228: aufbewahrtes PDF einer festgeschriebenen Unterlage nachträglich setzen (eingelesen bzw. neu erzeugt mit gleichem
+   * Prüfwert, oder das erste PDF nach der XRechnung) – false, wenn es nicht passt (dann bleibt alles, wie es war).
+   */
+  pdfOriginalSetzen(id: string, pdf: PdfOriginal): boolean;
+  /** E-228: eine eben abgelegte Datei wieder entfernen, wenn der Stand nicht auf sie zeigt (Festschreiben verworfen) */
+  dateiVerwerfen(name: string): void;
   /** E-193 (4): Android – geteilt, aber „Nein, noch nicht“ verschickt: die ausgegebene Fassung merken, nicht festschreiben */
   teilenOffen(id: string, f: Omit<GeteilteFassung, "am">): void;
   /**
@@ -134,7 +142,7 @@ interface Zustand {
   sachentnahmeSpeichern(e: Omit<Sachentnahme, "id" | "erstellt">): void;
   sachentnahmeLoeschen(id: string): void;
   /** R12 GoBD: Kassenbuch aus den Tagesabschlüssen beim Teilen festschreiben */
-  kassenbuchFestschreiben(monat: string, standort: string, daten: Daten, sha256: string, absender?: Betrieb, html?: string): void;
+  kassenbuchFestschreiben(monat: string, standort: string, daten: Daten, sha256: string, absender?: Betrieb, html?: string, pdf?: PdfOriginal): void;
   /** R12 GoBD: Belege festschreiben (nach dem Steuerberater-Paket) */
   belegeFestschreiben(ids: string[]): void;
   /** R12 Personal: festgeschriebenen Nachweis korrigieren – neue Fassung mit Grund, die alte bleibt (sofort gespeichert) */
@@ -559,12 +567,22 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       personenZusammenfuehren: (art, bleibt, weg) => setzen(personenZusammenfuehren(aktuell.current, art, bleibt, weg)),
       profilSetzen: (werte, bl) => setzen(profilSetzen(aktuell.current, werte, bl)),
       erledigtSetzen: (pid, datum, termin) => setzen(erledigtSetzen(aktuell.current, pid, datum, termin)),
-      ausgeben: (id, daten, pdfSha256, absender, eRechnung, html) => {
+      ausgeben: (id, daten, pdfSha256, absender, eRechnung, html, pdf) => {
         if (!ausgabeMoeglich(aktuell.current, id, daten)) return false;
-        setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256, absender, eRechnung, html));
+        setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256, absender, eRechnung, html, pdf));
         // Festschreibung sofort speichern, nicht erst nach der Wartezeit (G3)
         schreiben();
         return true;
+      },
+      pdfOriginalSetzen: (id, pdf) => {
+        const neu = pdfOriginalSetzen(aktuell.current, id, pdf);
+        if (neu === aktuell.current) return false;
+        setzen(neu);
+        schreiben();
+        return true;
+      },
+      dateiVerwerfen: (name) => {
+        if (!dateienImStand(aktuell.current).includes(name)) dateiEntfernen(name);
       },
       teilenOffen: (id, f) => {
         setzen(teilenOffenVermerken(aktuell.current, id, new Date(), f));
@@ -722,8 +740,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         setzen(sachentnahmeLoeschen(aktuell.current, id, new Date()));
         schreiben();
       },
-      kassenbuchFestschreiben: (monat, standort, daten, sha, absender, html) => {
-        setzen(kassenbuchFestschreiben(aktuell.current, monat, standort, daten, sha, new Date(), undefined, absender, html));
+      kassenbuchFestschreiben: (monat, standort, daten, sha, absender, html, pdf) => {
+        setzen(kassenbuchFestschreiben(aktuell.current, monat, standort, daten, sha, new Date(), undefined, absender, html, pdf));
         schreiben();
       },
       belegLoeschen: (id, grund) => {

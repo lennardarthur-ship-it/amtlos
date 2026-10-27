@@ -171,6 +171,24 @@ export const T = {
   // E-220 (8b): vor dieser Version festgeschrieben – kein festgehaltenes Dokument, die Ansicht ist nachgebildet
   e220_nachgebildet: (nachgetragen: string | null, pdfSha256: string | null) =>
     `Vor dem Update festgeschrieben: Die Ansicht ist aus den festgeschriebenen Daten nachgebildet${nachgetragen ? ` – mit den Angaben aus „Mein Betrieb“ vom ${nachgetragen}, nicht unbedingt denen beim Teilen` : ""}. Maßgeblich ist das damals geteilte PDF${pdfSha256 ? ` (Prüfwert SHA-256 ${pdfSha256.slice(0, 16)}…)` : ""}.`,
+  // E-228 (T-300): das zuerst geteilte PDF selbst ist aufbewahrt – bzw. lässt sich einlesen und prüfen
+  e228_original: (am: string, sha256: string, eingelesen: boolean) =>
+    `Original-PDF aufbewahrt (${eingelesen ? `eingelesen am ${am}, Prüfwert stimmt mit dem beim ersten Teilen überein` : `vom ${am}`}; SHA-256 ${sha256.slice(0, 16)}…). Erneutes Teilen und Drucken, Steuerberater-Paket und offenes Archiv geben genau diese Datei weiter.`,
+  e228_original_folgt: "Zuerst als E-Rechnung geteilt: Das erste PDF, das du teilst oder druckst, wird als Original aufbewahrt.",
+  e228_ohne_original: "Das damals geteilte PDF ist hier nicht aufbewahrt. Hast du es noch (z. B. im Postausgang deiner Mail), lies es ein: Stimmt es mit dem Prüfwert vom ersten Teilen überein, bewahrt die App es als Original auf.",
+  e228_einlesen: "Geteiltes PDF einlesen und prüfen",
+  e228_einlesen_laedt: "Wird geprüft …",
+  e228_einlesen_gleich: "Stimmt überein: Das PDF ist byte-genau das damals geteilte und jetzt als Original aufbewahrt.",
+  e228_einlesen_fehler: "Das PDF ließ sich nicht aufbewahren. Bitte noch einmal versuchen.",
+  e228_einlesen_ergebnis: (ergebnis: string, sha256: string, erwartet: string | null) =>
+    ergebnis === "abweichend"
+      ? `Stimmt nicht überein: Der Prüfwert dieser Datei (SHA-256 ${sha256.slice(0, 16)}…) weicht vom Prüfwert beim ersten Teilen ab${erwartet ? ` (${erwartet.slice(0, 16)}…)` : ""}. Es ist nicht die damals geteilte Datei – z. B. später neu erzeugt, beim Versand verändert (manche Mail-Programme tun das) oder eine andere Unterlage. Sie wird nicht als Original aufbewahrt; such nach der Datei, wie sie hinausging (Anhang der gesendeten Mail).`
+      : ergebnis === "ohne_pruefwert"
+        ? "Beim ersten Ausgeben wurde kein Prüfwert gespeichert (z. B. gedruckt oder zuerst als E-Rechnung geteilt). Ob diese Datei die damals ausgegebene ist, lässt sich nicht nachprüfen – sie wird deshalb nicht als Original aufbewahrt. Bewahre sie selbst mit auf."
+        : ergebnis === "kein_pdf"
+          ? "Die gewählte Datei ist kein PDF (oder größer als 10 MB) – nichts aufbewahrt."
+          : "Für diese Unterlage ist schon ein Original-PDF aufbewahrt.",
+  e228_original_fehlt: "Das aufbewahrte Original-PDF liegt auf diesem Gerät (noch) nicht vor – z. B. bis die Synchronisation es geladen hat. Weitergegeben wurde eine neu erzeugte Wiedergabe.",
   festgeschrieben_text: (datum: string, storno: boolean) => `Festgeschrieben am ${datum}. Änderungen und Löschen sind nicht mehr möglich${storno ? " – korrigieren lässt sie sich nur per Stornorechnung." : "."}`,
   festgeschrieben_kurz: "festgeschrieben",
   storniert: "storniert",
