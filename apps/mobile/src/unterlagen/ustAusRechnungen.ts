@@ -82,6 +82,7 @@ import { eRechnungAus, fehlendeTage, igeSteuerTag, istEuAusland, kassenUmsatz, k
 import { EU_STORNO_GRUND, nichtZaehlend, type EuStornoGrund, type Unterlage } from "./speicher";
 import { erwerbsschwelleLage, type ErwerbsschwelleLage, type Schwellenerwerber } from "./erwerbsschwelle";
 import { MARKE } from "@amtlos/marke";
+import { T as TEXT } from "../texte";
 
 export type Versteuerung = "soll" | "ist";
 
