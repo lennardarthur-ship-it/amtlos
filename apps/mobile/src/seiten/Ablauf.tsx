@@ -92,6 +92,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
       ? [
           r.kleinunternehmer ? (r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku) : TEXT.aus_rechnungen_ok(r.anzahl),
           r.kuGemischt ? TEXT.ust_ku_gemischt : "",
+          r.igeKu ? TEXT.ust_ku_ige(r.igeKu) : "",
+          r.igeBelege ? TEXT.ust_ige_belege(r.igeBelege) : "",
           kasse?.text ?? "",
           r.kasseTage ? TEXT.r12_kasse_uebernommen(r.kasseTage) : "",
           r.minderungen ? TEXT.r12_minderungen(r.minderungen) : "",
@@ -147,6 +149,9 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           {r.vorsteuerPruefen ? <T v="caption" farbe={f.bald}>{VORSTEUER_AUFTEILEN}</T> : null}
           {/* R10: § 13b-Belege, Dauerfristverlängerung und Sondervorauszahlung */}
           {r.steuerschuldBelege ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_13b_belege(r.steuerschuldBelege)}</T> : null}
+          {/* E-222: innergemeinschaftliche Erwerbe aus Belegen; Kleinunternehmer: nicht übernommen (Erwerbsschwelle) */}
+          {r.igeBelege ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_ige_belege(r.igeBelege)}</T> : null}
+          {r.igeKu ? <T v="caption" farbe={f.bald}>{TEXT.ust_ku_ige(r.igeKu)}</T> : null}
           {!r.kleinunternehmer && z.stand.profil["ust.dauerfristverlaengerung"] === true ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_dfv}</T> : null}
           {!r.kleinunternehmer && z.stand.profil["ust.dauerfristverlaengerung"] === true && uebernommen && /-12$/.test(uebernommen.periode) ? <T v="caption" farbe={f.bald}>{TEXT.ust_sondervorauszahlung}</T> : null}
         </View>

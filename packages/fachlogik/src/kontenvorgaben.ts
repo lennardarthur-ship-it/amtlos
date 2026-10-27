@@ -28,6 +28,10 @@ export type KontenvorgabeKonto =
   | "erloesKz43"
   | "anzahlungenErhalten"
   | "anzahlungEuEuer"
+  | "igErwerb19"
+  | "igErwerb7"
+  | "igErwerbOhneVst19"
+  | "igErwerbOhneVst7"
   | "homeoffice"
   | "anlageMaschinen"
   | "anlageBga"
@@ -75,6 +79,11 @@ export const KONTENVORGABE_FELDER: readonly { id: KontenvorgabeKonto; titel: str
   { id: "erloesKz43", titel: "Erlöse sonstige steuerfreie Umsätze (§ 4 Nr. 2–7 UStG, Kz 43)", hilfe: "Übrige steuerfreie Umsätze mit Vorsteuerabzug, z. B. Umsätze für die Seeschifffahrt und Luftfahrt (§ 4 Nr. 2 UStG). Standard SKR03 8150 / SKR04 4150 „Sonstige steuerfreie Umsätze § 4 Nr. 2–7 UStG“." },
   { id: "anzahlungenErhalten", titel: "Erhaltene Anzahlungen auf Bestellungen (Bilanz)", hilfe: "Bilanzierende Betriebe: bezahlte Anzahlungen auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland – ohne Steuerschlüssel, mit der Schlussrechnung verrechnet. Standard SKR03 1710 / SKR04 3250 (vom Steuerberater genannt)." },
   { id: "anzahlungEuEuer", titel: "Anzahlungen auf EU-Umsätze: Erlöskonto ohne Umsatzsteuer (EÜR)", hilfe: "Einnahmen-Überschuss-Rechnung: bezahlte Anzahlungen auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland sind mit der Zahlung Einnahme, gehören aber nicht in die Voranmeldung – ein Erlöskonto ohne Umsatzsteuerfunktion; mit der Schlussrechnung umgebucht. Kein Standard: das Konto legt die Kanzlei fest. Ohne Eintrag fehlen diese Buchungen im Stapel." },
+  // E-222: innergemeinschaftlicher Erwerb – Automatikkonten für Erwerbsteuer (Kz 89/93) und Vorsteuer (Kz 61)
+  { id: "igErwerb19", titel: "Innergemeinschaftlicher Erwerb 19 % (mit Vorsteuer)", hilfe: "Waren von Unternehmen aus anderen EU-Ländern: Automatikkonto für 19 % Vorsteuer und 19 % Umsatzsteuer, gebucht mit dem Betrag ohne Umsatzsteuer. Standard SKR03 3425 / SKR04 5425 – noch nicht von der Steuerberatung bestätigt." },
+  { id: "igErwerb7", titel: "Innergemeinschaftlicher Erwerb 7 % (mit Vorsteuer)", hilfe: "Wie 19 %, für Waren zu 7 %. Kein Standard: das Konto legt die Kanzlei fest. Ohne Eintrag fehlen diese Buchungen im Stapel." },
+  { id: "igErwerbOhneVst19", titel: "Innergemeinschaftlicher Erwerb 19 % (ohne Vorsteuer)", hilfe: "Erwerb ohne Vorsteuerabzug (z. B. Kleinunternehmer über der Erwerbsschwelle, nur steuerfreie Umsätze): Automatikkonto nur für die Umsatzsteuer. Kein Standard: das Konto legt die Kanzlei fest. Ohne Eintrag fehlen diese Buchungen im Stapel." },
+  { id: "igErwerbOhneVst7", titel: "Innergemeinschaftlicher Erwerb 7 % (ohne Vorsteuer)", hilfe: "Wie 19 % ohne Vorsteuer, für Waren zu 7 %. Kein Standard: das Konto legt die Kanzlei fest. Ohne Eintrag fehlen diese Buchungen im Stapel." },
   { id: "homeoffice", titel: "Homeoffice-Pauschale / Arbeitszimmer" },
   { id: "anlageMaschinen", titel: "Anlagen: Maschinen" },
   { id: "anlageBga", titel: "Anlagen: Betriebs- und Geschäftsausstattung" },

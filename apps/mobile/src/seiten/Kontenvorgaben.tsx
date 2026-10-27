@@ -30,6 +30,15 @@ function standardKonto(id: KontenvorgabeKonto, kr: "SKR03" | "SKR04"): string {
       return k.anzahlungenErhalten;
     case "anzahlungEuEuer":
       return k.anzahlungEuEuer;
+    // E-222: innergemeinschaftlicher Erwerb – Standard nur 19 % mit Vorsteuer
+    case "igErwerb19":
+      return k.igErwerb.mit[19];
+    case "igErwerb7":
+      return k.igErwerb.mit[7];
+    case "igErwerbOhneVst19":
+      return k.igErwerb.ohne[19];
+    case "igErwerbOhneVst7":
+      return k.igErwerb.ohne[7];
     case "anlageMaschinen":
       return k.anlagen.maschinen;
     case "anlageBga":

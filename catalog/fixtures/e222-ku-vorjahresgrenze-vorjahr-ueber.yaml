@@ -1,0 +1,17 @@
+persona: grenzfall
+beschreibung: 'E-222: Vorjahr laut Profil über 25.000 € – keine Warnung vor der Grenze von 25.000 €, sondern „Grenze überschritten“'
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: freiberuf
+  profil.gruendungsdatum: '2022-01-01'
+  profil.taetigkeit.einordnung: freiberuf
+  profil.ust.kleinunternehmer: true
+  profil.umsatz.vorjahr: 30000
+  profil.bundesland: BY
+  profil.gemeinde_ags: 09162000
+  finanzen.umsatz.vereinnahmt_laufendes_jahr: 21000
+  finanzen.umsatz.bezahlt_laufendes_jahr: 21000
+erwartet:
+  steuern.kleinunternehmer_warnung_80: gilt_nicht
+  steuern.kleinunternehmer_warnung_95: gilt_nicht
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt

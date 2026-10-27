@@ -1475,8 +1475,12 @@ const UST_OHNE_STEUER: { id: string; kz?: string; text: string; hinweis?: string
   { id: "umsatz_frei", text: "Weitere steuerfreie oder nicht steuerbare Umsätze", hinweis: `${KZ_FREI_HINWEIS[0]!.toUpperCase()}${KZ_FREI_HINWEIS.slice(1)}` },
 ];
 
-/** Steuerberater (Durchsicht 23.10.2026): ausdrücklicher Hinweis, wenn keine innergemeinschaftlichen Erwerbe eingetragen sind. */
-export const UST_OHNE_IGE = "Innergemeinschaftliche Erwerbe (Kz 89 bzw. 93 mit Steuer, Vorsteuer Kz 61) sind nicht enthalten – die App übernimmt sie nicht aus den Belegen. Wer Waren aus anderen EU-Ländern bezieht, trägt sie im Formular ein.";
+/**
+ * Steuerberater (Durchsicht 23.10.2026): ausdrücklicher Hinweis, wenn keine innergemeinschaftlichen Erwerbe eingetragen sind.
+ * E-222: Die App übernimmt sie jetzt aus Belegen, die als „Waren aus dem EU-Ausland“ erfasst sind – Wortlaut angepasst
+ * (gedruckter Text: Vermerk der Vorlage entfällt bis zur Bestätigung, PRUEFLISTE T-308).
+ */
+export const UST_OHNE_IGE = "Innergemeinschaftliche Erwerbe (Kz 89 bzw. 93 mit Steuer, Vorsteuer Kz 61) sind nicht enthalten. Die App übernimmt sie nur aus Belegen, die als „Waren aus dem EU-Ausland (innergemeinschaftlicher Erwerb)“ erfasst sind. Wer Waren aus anderen EU-Ländern bezieht, erfasst sie so oder trägt sie im Formular ein.";
 /** Hinweis bei steuerfreien Umsätzen ohne Vorsteuerabzug (Voranmeldung, Steuerberater-Paket). */
 export const VORSTEUER_AUFTEILEN = "Steuerfreie Umsätze ohne Vorsteuerabzug und Vorsteuer im selben Zeitraum: Vorsteuer aus Eingangsleistungen, die diesen Umsätzen dienen, ist nicht abziehbar (§ 15 Abs. 2 UStG); dienen sie beiden Arten von Umsätzen, ist sie aufzuteilen (§ 15 Abs. 4 UStG). Bitte die Vorsteuer prüfen.";
 
@@ -1537,10 +1541,11 @@ export const ustVoranmeldung: Vorlage = {
       ],
     },
     {
-      // Steuerberater (Durchsicht 23.10.2026): betrifft jeden Betrieb, der Waren aus anderen EU-Ländern bezieht – die App kann
-      // die Erwerbe nicht aus den Rechnungen ableiten, deshalb zum Eintragen
+      // Steuerberater (Durchsicht 23.10.2026): betrifft jeden Betrieb, der Waren aus anderen EU-Ländern bezieht – aus den
+      // Ausgangsrechnungen nicht ableitbar; E-222: aus Belegen mit der Art „innergemeinschaftlicher Erwerb“ übernommen
       titel: "Innergemeinschaftliche Erwerbe",
-      hilfe: "Wenn du Waren von Unternehmen aus anderen EU-Ländern bezogen hast: Bemessungsgrundlage nach Steuersatz, darauf schuldest du die Umsatzsteuer; die Vorsteuer daraus steht in Kz 61. Die App übernimmt die Erwerbe nicht aus deinen Belegen – bitte von Hand eintragen.",
+      // E-222: „Aus Rechnungen übernehmen“ trägt Belege ein, die als innergemeinschaftlicher Erwerb erfasst sind
+      hilfe: "Wenn du Waren von Unternehmen aus anderen EU-Ländern bezogen hast: Bemessungsgrundlage nach Steuersatz, darauf schuldest du die Umsatzsteuer; die Vorsteuer daraus steht in Kz 61. „Aus Rechnungen übernehmen“ trägt Belege ein, die als „Waren aus dem EU-Ausland (innergemeinschaftlicher Erwerb)“ erfasst sind – sonst bitte von Hand eintragen.",
       felder: [
         { id: "ige_19", selten: true, art: "betrag", label: "Innergemeinschaftliche Erwerbe zum Steuersatz 19 % (Kz 89) (€)", hilfe: "Bemessungsgrundlage ohne Umsatzsteuer" },
         { id: "ige_7", selten: true, art: "betrag", label: "Innergemeinschaftliche Erwerbe zum Steuersatz 7 % (Kz 93) (€)", hilfe: "Bemessungsgrundlage ohne Umsatzsteuer" },

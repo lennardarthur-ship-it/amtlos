@@ -51,6 +51,10 @@ export interface Beleg {
    * Eingangsleistung selbst. „bau“: Bauleistung eines im Inland ansässigen Unternehmers (§ 13b Abs. 2 Nr. 4, Abs. 5
    * Satz 2 UStG); „eu“: sonstige Leistung eines im übrigen Gemeinschaftsgebiet ansässigen Unternehmers (§ 13b Abs. 1
    * UStG). Die Beträge in `steuer` sind dann die Rechnungsbeträge ohne Umsatzsteuer (Bemessungsgrundlage).
+   * E-222: „ige“ – innergemeinschaftlicher Erwerb (§ 1 Abs. 1 Nr. 5, § 1a UStG): Waren von einem Unternehmer aus einem
+   * anderen EU-Land, der steuerfrei liefert; der Betrieb schuldet die Erwerbsteuer (§ 13a Abs. 1 Nr. 2 UStG, Kz 89/93) und
+   * zieht sie mit Vorsteuerabzug als Vorsteuer ab (§ 15 Abs. 1 Satz 1 Nr. 3 UStG, Kz 61) – kein Fall des § 13b, aber
+   * gleich erfasst (Beträge ohne Umsatzsteuer, Steuer selbst angemeldet).
    */
   steuerschuld?: Steuerschuld | null;
   /**
@@ -141,11 +145,17 @@ export const ANLAGE_ARTEN: { wert: AnlageArt; text: string }[] = [
 ];
 const anlageArtAus = (w: unknown): AnlageArt | null => (w === "maschinen" || w === "bga" || w === "kfz" || w === "software" ? w : null);
 
-export type Steuerschuld = "bau" | "eu";
+export type Steuerschuld = "bau" | "eu" | "ige";
 export const STEUERSCHULD_ARTEN: { wert: Steuerschuld; text: string }[] = [
   { wert: "eu", text: "Dienstleistung aus dem EU-Ausland" },
   { wert: "bau", text: "Bauleistung aus Deutschland" },
+  // E-222: innergemeinschaftlicher Erwerb – Waren, nicht § 13b
+  { wert: "ige", text: "Waren aus dem EU-Ausland (innergemeinschaftlicher Erwerb)" },
 ];
+/** E-222: Kurztext der Art für Listen (Belegliste, Fragen, LIESMICH). */
+export const steuerschuldText = (s: Steuerschuld) => (s === "ige" ? "innergemeinschaftlicher Erwerb" : s === "eu" ? "sonstige Leistung EU" : "Bauleistung Inland");
+/** E-222: § 13b-Beleg (Kz 46/47, 84/85, 67) – nicht der innergemeinschaftliche Erwerb. */
+export const ist13b = (b: { steuerschuld?: Steuerschuld | null }) => b.steuerschuld === "eu" || b.steuerschuld === "bau";
 
 /** Eine frühere Fassung eines Belegs: Inhalt, wie er bis `bis` galt. */
 export interface BelegFassung {
@@ -436,8 +446,8 @@ export function vorsteuerFuer(belege: Beleg[], von: string, bis: string): { cent
   return { cent: cent + skonto, anzahl, ohne, skonto_cent: skonto };
 }
 
-/** Steuersatz einer § 13b-Eingangsleistung: der erfasste Satz, bei 0 % der Regelsatz 19 %. */
-const satz13b = (satz: number) => (satz > 0 ? satz : 19);
+/** Steuersatz einer § 13b-Eingangsleistung (E-222: auch des innergemeinschaftlichen Erwerbs): der erfasste Satz, bei 0 % der Regelsatz 19 %. */
+export const satz13b = (satz: number) => (satz > 0 ? satz : 19);
 
 /** Umsatzsteuer, die der Betrieb für eine § 13b-Eingangsleistung schuldet (0 ohne Steuerschuldnerschaft). */
 export function steuerschuldBetrag(b: Pick<Beleg, "steuer"> & { steuerschuld?: Steuerschuld | null }): number {
@@ -454,7 +464,20 @@ export interface SteuerschuldSummen {
   bau_steuer_cent: number;
   /** Kz 67: Vorsteuer aus Leistungen nach § 13b UStG (nur bei Vorsteuerabzug) */
   vorsteuer_cent: number;
+  /** § 13b-Belege (ohne innergemeinschaftliche Erwerbe) */
   anzahl: number;
+  /**
+   * E-222: innergemeinschaftliche Erwerbe – Kz 89 (19 %) und Kz 93 (7 %) mit Bemessungsgrundlage und Steuer, Vorsteuer
+   * Kz 61 (nur mit Vorsteuerabzug, zum abziehbaren Teil), Zahl der Belege; `ige_andere_cent`: Bemessungsgrundlage zu
+   * anderen Sätzen (16 %/5 % aus 2020) – ohne Kennzahl in der Vorlage, nicht übernommen.
+   */
+  ige_19_netto_cent: number;
+  ige_19_steuer_cent: number;
+  ige_7_netto_cent: number;
+  ige_7_steuer_cent: number;
+  ige_vorsteuer_cent: number;
+  ige_andere_cent: number;
+  ige_anzahl: number;
 }
 
 /**
@@ -463,9 +486,27 @@ export interface SteuerschuldSummen {
  * Die Steuer schulden auch Kleinunternehmer (§ 13b Abs. 8 UStG); Vorsteuer (Kz 67) nur mit Vorsteuerabzug.
  */
 export function steuerschuldFuer(belege: Beleg[], von: string, bis: string): SteuerschuldSummen {
-  const r: SteuerschuldSummen = { eu_netto_cent: 0, eu_steuer_cent: 0, bau_netto_cent: 0, bau_steuer_cent: 0, vorsteuer_cent: 0, anzahl: 0 };
+  const r: SteuerschuldSummen = { eu_netto_cent: 0, eu_steuer_cent: 0, bau_netto_cent: 0, bau_steuer_cent: 0, vorsteuer_cent: 0, anzahl: 0, ige_19_netto_cent: 0, ige_19_steuer_cent: 0, ige_7_netto_cent: 0, ige_7_steuer_cent: 0, ige_vorsteuer_cent: 0, ige_andere_cent: 0, ige_anzahl: 0 };
   for (const b of belege) {
     if (b.ungueltig || !b.steuerschuld || b.datum < von || b.datum > bis) continue;
+    // E-222: innergemeinschaftlicher Erwerb nach Belegdatum – die Steuer entsteht mit der Rechnung, spätestens mit Ablauf des
+    // dem Erwerb folgenden Monats (§ 13 Abs. 1 Nr. 6 UStG; den Tag des Erwerbs kennt der Beleg nicht – Annahme in der Übernahme)
+    if (b.steuerschuld === "ige") {
+      for (const s of b.steuer) {
+        const satz = satz13b(s.satz);
+        const steuer = rundeCent((s.brutto_cent * satz) / 100);
+        if (satz === 19) {
+          r.ige_19_netto_cent += s.brutto_cent;
+          r.ige_19_steuer_cent += steuer;
+        } else if (satz === 7) {
+          r.ige_7_netto_cent += s.brutto_cent;
+          r.ige_7_steuer_cent += steuer;
+        } else r.ige_andere_cent += s.brutto_cent;
+      }
+      if (b.vorsteuer) r.ige_vorsteuer_cent += vorsteuerAufteilung(b).filter((x) => satz13b(x.satz) === 19 || satz13b(x.satz) === 7).reduce((a, x) => a + x.abziehbar_cent, 0);
+      r.ige_anzahl++;
+      continue;
+    }
     const netto = b.steuer.reduce((a, s) => a + s.brutto_cent, 0);
     const steuer = steuerschuldBetrag(b);
     if (b.steuerschuld === "eu") {
@@ -608,7 +649,7 @@ function fassungAus(roh: unknown): BelegFassung | null {
 /** Skonto eines Belegs: ganze Cent größer 0, sonst nichts */
 const skontoAusRoh = (w: unknown): number | null => (typeof w === "number" && Number.isInteger(w) && w > 0 ? w : null);
 
-const steuerschuldAus = (w: unknown): Steuerschuld | null => (w === "bau" || w === "eu" ? w : null);
+const steuerschuldAus = (w: unknown): Steuerschuld | null => (w === "bau" || w === "eu" || w === "ige" ? w : null);
 
 /** E-165: Anteil der abziehbaren Vorsteuer in Prozent – größer 0, kleiner 100, auf zwei Nachkommastellen; sonst null. */
 export function vorsteuerAnteilAus(w: unknown): number | null {

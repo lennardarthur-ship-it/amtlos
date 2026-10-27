@@ -17,7 +17,9 @@
  *   rechnung gehören in den Zeitraum der ursprünglichen Leistung – sie heben sich dort auf. Ändert sich das Entgelt,
  *   zählt die Ersatzrechnung im Zeitraum des Stornos, so dass dort nur die Differenz wirkt (§ 17 UStG).
  * - Kennzahlen 21 (EU-Leistung), 45 (Drittland), 43, 87 (Nullsteuersatz); § 13b-Belege in Kz 46/47, 84/85 und 67 –
- *   auch für Kleinunternehmer (ohne Kz 67); Vorsteuer aus Gutschriften.
+ *   auch für Kleinunternehmer (ohne Kz 67); Vorsteuer aus Gutschriften. E-222: Belege mit innergemeinschaftlichem
+ *   Erwerb in Kz 89/93 (Bemessungsgrundlage) und Kz 61 (Vorsteuer, nur mit Abzug) nach Belegdatum – nicht für
+ *   Kleinunternehmer (Erwerbsschwelle, § 1a Abs. 3 UStG, prüft die App nicht).
  * - Kleinunternehmer je Zeitraum: Sind alle Rechnungen des Zeitraums Kleinunternehmer-Rechnungen (bzw. keine), gilt
  *   das für diesen Zeitraum – auch wenn der Pflichten-Check heute etwas anderes sagt (Wechsel zum Jahreswechsel).
  *
@@ -551,6 +553,15 @@ export interface UstUebernahme {
   vorsteuerPruefen: boolean;
   /** § 13b-Belege im Zeitraum (Kz 46/47, 84/85, 67) */
   steuerschuldBelege: number;
+  /** E-222: Belege mit innergemeinschaftlichem Erwerb im Zeitraum, übernommen in Kz 89/93 und Kz 61 */
+  igeBelege: number;
+  /**
+   * E-222: Kleinunternehmer-Zeitraum – innergemeinschaftliche Erwerbe nicht übernommen: Ob sie steuerbar sind, hängt von
+   * der Erwerbsschwelle bzw. dem Verzicht darauf ab (§ 1a Abs. 3, 4 UStG) – das prüft die App nicht (PRUEFLISTE T-309).
+   */
+  igeKu: number;
+  /** E-222: Bemessungsgrundlage innergemeinschaftlicher Erwerbe zu anderen Sätzen als 19 %/7 % – ohne Kennzahl, nicht übernommen */
+  igeAndere: number;
   /** R12: Kassenabschlüsse mit Umsatz im Zeitraum (übernommen) */
   kasseTage: number;
   /** R12: Tage im Zeitraum ohne Kassenabschluss – null, wenn es noch gar keinen Kassenabschluss gibt */
@@ -579,6 +590,13 @@ export interface KasseFuerUst {
   /** R12 GoBD: Sachentnahmen (unentgeltliche Wertabgaben, § 3 Abs. 1b UStG) – Kz 86/81 */
   sachentnahmen?: Sachentnahme[];
 }
+
+/**
+ * E-222: Zuordnungsannahme für innergemeinschaftliche Erwerbe – nach dem Belegdatum (Rechnungsdatum des Lieferanten); die
+ * Steuer entsteht mit der Ausstellung der Rechnung, spätestens mit Ablauf des dem Erwerb folgenden Monats (§ 13 Abs. 1
+ * Nr. 6 UStG) – den Tag des Erwerbs kennt der Beleg nicht.
+ */
+export const IGE_ANNAHME = (n: number) => `Innergemeinschaftliche Erwerbe aus ${n} ${n === 1 ? "Beleg" : "Belegen"} nach dem Belegdatum zugeordnet – die Steuer entsteht mit der Rechnung, spätestens mit Ablauf des Monats nach dem Erwerb (§ 13 Abs. 1 Nr. 6 UStG). Kam eine Rechnung später, gehört der Erwerb in den früheren Zeitraum.`;
 
 /** Steuergruppen einer Rechnung mit Vorzeichen (Storno negativ). */
 const volleGruppen = (d: RechnungsDaten) => meldeGruppen(d).map((g) => ({ satz: g.satz, netto_cent: g.netto_cent * (d.art === "storno" ? -1 : 1) }));
@@ -630,8 +648,11 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
           ...(mitVorsteuer && rc.vorsteuer_cent ? { vorsteuer_13b: betragText(rc.vorsteuer_cent) } : {}),
         }
       : {};
+  // E-222: innergemeinschaftliche Erwerbe (Kz 89/93, Vorsteuer Kz 61) – nur außerhalb der Kleinunternehmerzeit; nur
+  // gesetzt, wenn es solche Belege gibt (von Hand eingetragene Erwerbe bleiben sonst stehen)
+  const igeWerte: Record<string, string> = rc.ige_anzahl ? { ige_19: betragText(rc.ige_19_netto_cent), ige_7: betragText(rc.ige_7_netto_cent), vorsteuer_ige: rc.ige_vorsteuer_cent ? betragText(rc.ige_vorsteuer_cent) : "" } : {};
   const kasseFehlend = kasse?.abschluesse.length ? fehlendeTage(kasse.abschluesse, z.von, z.bis, kasse.ruhetage ?? [], kasse.heute) : null;
-  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl, kasseTage: 0, kasseFehlend: null, minderungen: 0, ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [] };
+  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl, igeBelege: 0, igeKu: rc.ige_anzahl, igeAndere: 0, kasseTage: 0, kasseFehlend: null, minderungen: 0, ersatzNummern: [], oss: 0, berichtigungen: [], berichtigungenAnderswo: [] };
   // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit;
   // 5.2: OSS-Rechnungen gehören in die OSS-Erklärung, nicht in die Voranmeldung
   const ossImZeitraum = alle.filter((x) => !kuRechnung(x.u) && istOssRechnung(x.u)).length;
@@ -710,6 +731,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     ...ber.hier.map(berichtigungText),
     ka?.tage ? `Kassenumsätze aus ${ka.tage} Tagesabschlüssen: Netto und Umsatzsteuer je Steuersatz aus dem Brutto herausgerechnet.` : "",
     ossImZeitraum ? `${ossImZeitraum} OSS-Rechnung(en) mit der Steuer des Bestimmungslands nicht übernommen – sie gehören in die OSS-Erklärung beim BZSt.` : "",
+    rc.ige_anzahl ? IGE_ANNAHME(rc.ige_anzahl) : "",
+    rc.ige_andere_cent ? `Innergemeinschaftliche Erwerbe zu anderen Steuersätzen als 19 % und 7 % (${betragText(rc.ige_andere_cent)} €) nicht übernommen – bitte im ELSTER-Formular prüfen.` : "",
   ].filter(Boolean);
   return {
     vorsteuerBelege: vst.anzahl,
@@ -722,6 +745,9 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     gutschriften,
     vorsteuerPruefen: ohne.kz48 > 0 && vst.cent > 0,
     steuerschuldBelege: rc.anzahl,
+    igeBelege: rc.ige_anzahl,
+    igeKu: 0,
+    igeAndere: rc.ige_andere_cent,
     kasseTage: ka?.tage ?? 0,
     kasseFehlend,
     minderungen,
@@ -743,6 +769,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
       umsatz_frei: betragText(frei - verteilt + (ka?.je[0].netto ?? 0)),
       ...(belege.length || vstGutschriften ? { vorsteuer: betragText(vst.cent + vstGutschriften) } : {}),
       ...rcWerte(true),
+      ...igeWerte,
       // 5.2: Zuordnungsannahmen stehen auf dem PDF der Voranmeldung (leer überschreibt Werte einer früheren Übernahme)
       nach_rechnungsdatum: ersatzListe.map((x) => x.zeile).join("\n"),
       annahmen: annahmen.join("\n"),
