@@ -13,9 +13,8 @@ import { ANDROID } from "../plattform";
 import { autoSchluesselHolen, autoSchluesselLoeschen, autoSchluesselSpeichern } from "../unterlagen/schluesselbund";
 import { dateiTeilenBytes, sicherungTeilen, sicherungWaehlen, zufall, type GewaehlteSicherung } from "../unterlagen/sicherungDatei";
 import { dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
-import { offenesArchiv } from "../unterlagen/archiv";
+import { archivRechnungen, offenesArchiv } from "../unterlagen/archiv";
 import { pdfBytes } from "../unterlagen/pdf";
-import { gestellteRechnungen } from "../unterlagen/steuerpaket";
 import { betriebFuerDokument } from "../pro/regeln";
 import { letzteVollsicherung, nachweisText, vollsicherungFaellig } from "../unterlagen/sicherungNachweis";
 import { absenderFuer, dateienImStand, heute, sicherungFaellig, ungesichert, zusammenfuehren, type Stand } from "../unterlagen/speicher";
@@ -175,7 +174,8 @@ export function OffenesArchiv() {
       }
       const rechnungsPdfs: Record<string, Uint8Array> = {};
       const v = vorlageFuer("rechnung");
-      const rechnungen = gestellteRechnungen(s);
+      // E-221 Befund 9: auch Konfliktkopien und doppelte Stornos (festgeschrieben, aufzubewahren)
+      const rechnungen = archivRechnungen(s);
       if (v)
         for (const [i, u] of rechnungen.entries()) {
           setFortschritt(TEXT.r12g_archiv_fortschritt(i + 1, rechnungen.length));

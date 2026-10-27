@@ -216,7 +216,9 @@ describe("4: Android – Teilen abgebrochen zählt nicht als verschickt", () => 
   });
 
   it("App: Frage nur auf Android und nur vor der ersten Festschreibung – PDF, Druck, E-Rechnung und Kassenbuch; iPhone unverändert", () => {
-    expect(lies("seiten/versand.ts")).toContain("if (!android || !v.festschreiben || u.festgeschrieben) return true;");
+    // E-221: dazwischen die Frage vor der ersten Ausgabe der Voranmeldung (schreibt Belege fest) – sonst unverändert
+    expect(lies("seiten/versand.ts")).toContain("if (!android) return true;");
+    expect(lies("seiten/versand.ts")).toContain("if (!v.festschreiben || u.festgeschrieben) return true;");
     const a = lies("seiten/Abschluss.tsx");
     expect(a).toContain('if (!(await versandBestaetigt(u, v, art === "drucken"))) return z.teilenOffen(id, { daten: pdfDaten, art: art === "drucken" ? "druck" : "pdf"');
     expect(a).toContain('if (!(await versandBestaetigt(u, v, false))) return z.teilenOffen(id, { daten: xmlDaten, art: "xml", absender });');

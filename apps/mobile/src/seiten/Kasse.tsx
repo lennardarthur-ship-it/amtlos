@@ -16,7 +16,7 @@ import { pdfTeilen } from "../unterlagen/pdf";
 import { utf8 } from "../unterlagen/sicherung";
 import { dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { kassenbuchAnzeige } from "../unterlagen/kassenbuchAnzeige";
-import { HAUPT_STAETTE, alleStaetten, heute, kassenbuchFest, offenerBetrag, vaAbgegebenFuer } from "../unterlagen/speicher";
+import { HAUPT_STAETTE, alleStaetten, heute, kassenbuchFest, offenerBetrag, vaAbgegebenFuer, zahlungPruefen } from "../unterlagen/speicher";
 import { istKleinunternehmer } from "../unterlagen/steuerpaket";
 import { offeneRechnungen } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
@@ -392,6 +392,12 @@ export function KassenTagSeite({ id }: { id?: string }) {
     if (fehlerListe.includes("trinkgeld_zu_hoch")) return setFehler(TEXT.r12g_trinkgeld_zu_hoch);
     if (fehlerListe.includes("unbar_zu_hoch")) return setFehler(TEXT.r12_unbar_zu_hoch);
     if (fehlerListe.includes("gutschein_zu_hoch")) return setFehler(TEXT.r12g_gutschein_zu_hoch);
+    // E-221 Befund 5: bar kassierte Rechnung über dem offenen Betrag – nicht still kürzen, sondern ablehnen
+    const ueber = alt ? undefined : rechnungenBar.find((r) => zahlungPruefen(z.stand, r.id, { datum: tag, betrag_cent: r.betrag_cent }).fehler === "ueberzahlt");
+    if (ueber) {
+      const u = z.stand.unterlagen.find((x) => x.id === ueber.id);
+      return setFehler(TEXT.e221_bar_ueberzahlt(ueber.nummer, euro(u ? offenerBetrag(z.stand, u) : 0)));
+    }
     if (form.kassenbericht && !form.geschlossen && gezaehlt === null) return setFehler(TEXT.r12_gezaehlt_pflicht);
     if (alt && !grund.trim()) return setFehler(TEXT.r12_grund_fehlt);
     if (alt && !grundGenuegt(grund)) return setFehler(TEXT.r12g_grund_kurz);

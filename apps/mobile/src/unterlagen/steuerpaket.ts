@@ -29,6 +29,7 @@ import {
   belegKennung,
   belegNummern,
   belegSummen,
+  fremdBetragText,
   belegnummerNormal,
   cent,
   restGruppen,
@@ -1058,6 +1059,11 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
   const dazu = (titel: string, zeilen: string[]) => zeilen.length && abschnitte.push({ titel, zeilen });
 
   dazu("Belege mit Zahlungsweg Überweisung/Karte ohne Zahltag – für die EÜR wurde das Belegdatum verwendet. Wann wurde bezahlt?", belege.filter((b) => b.zahlung === "bank" && !b.bezahlt).map((b) => bz(b)));
+  // E-221 Befund 3: Rechnungen in fremder Währung – Originalbetrag, Euro-Betrag und Kurs zum Prüfen
+  dazu(
+    "Belege aus Rechnungen in fremder Währung (umgerechnet nach § 16 Abs. 6 UStG; ohne Euro-Betrag zählen sie noch nirgends mit): Stimmen Euro-Betrag und Kurs?",
+    belege.filter((b) => b.fremd).map((b) => bz(b, ` · Original ${fremdBetragText(b.fremd!.steuer.reduce((a, x) => a + x.brutto_cent, 0), b.fremd!.waehrung)}${b.fremd!.kurs ? ` · Kurs 1 € = ${String(b.fremd!.kurs).replace(".", ",")} ${b.fremd!.waehrung}${b.fremd!.kurs_datum ? ` (${datumDe(b.fremd!.kurs_datum)})` : ""}` : " · ohne Kurs"}${belegSummen(b).brutto_cent ? "" : " · EURO-BETRAG FEHLT"}`)),
+  );
   dazu(`Belege ohne Belegnummer des Lieferanten – im Buchungsstapel steht die ${MARKE.name}-Belegnummer. Hat der Beleg eine Nummer?`, belege.filter((b) => !belegnummerNormal(b.nummer)).map((b) => bz(b)));
   const offen = gestellteRechnungen(s)
     .filter((u) => !istGutschrift(u) && String(u.daten.datum) <= z.bis)
@@ -1477,7 +1483,8 @@ export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, da
   const xmlNeu: string[] = [];
   for (const u of alle) {
     const { daten, fehlt } = eRechnungAus(u.daten, absenderFuer(s, u));
-    if (fehlt.length) {
+    // E-221 Befund 9: ein festgehaltenes Original geht immer mit – auch wenn die Daten heute nicht mehr für eine E-Rechnung reichen
+    if (fehlt.length && !u.xml) {
       ohneXmlListe.push(`- ${daten.nummer || "ohne Nummer"} (${daten.kunde.name || "ohne Namen"}): ${grundOhneXml(fehlt, daten.kunde.ust_idnr)}`);
       continue;
     }

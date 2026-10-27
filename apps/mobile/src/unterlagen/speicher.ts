@@ -4,7 +4,7 @@
  */
 import { letzteVollsicherung, nachweisText, nachweiseAus, type SicherungsNachweis } from "./sicherungNachweis";
 import { KU_HINWEIS, zeitDe, belegEingangAus, eingangVergleich, geraetAus, type BelegEingang, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, kontenvorgabenAus, kontenvorgabenGesetzt, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Kontenvorgaben, type Sachentnahme } from "@amtlos/fachlogik";
-import { LEERER_BETRIEB, STORNO_ABSCHLAEGE, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, istGutschriftNummer, leereDaten, type Beleg, naechsteNummer, zahlbetrag, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
+import { LEERER_BETRIEB, STORNO_ABSCHLAEGE, skontoBetrag, skontoFuer, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, istGutschriftNummer, leereDaten, type Beleg, naechsteNummer, zahlbetrag, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 import { sha256 } from "@noble/hashes/sha2";
 import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils";
 import { partnerIdAus } from "../partner/partner";
@@ -1259,14 +1259,55 @@ export function offenerBetrag(s: Stand, u: Unterlage): number {
 }
 
 /**
+ * E-221 Befund 5: Warum ein Zahlungseingang so nicht vermerkt wird.
+ * - „ueberzahlt“: mehr erhalten (samt Skonto/Minderung) als offen – nie still kürzen; die Überzahlung gehört nicht zu
+ *   dieser Rechnung (zurückzahlen bzw. mit der Steuerberatung klären), vermerkt wird höchstens der offene Betrag.
+ * - „skonto_ohne_zahlung“: Skonto wird beim Bezahlen abgezogen – ohne Zahlung kein Skonto.
+ * - „skonto_zu_hoch“: mehr als das vereinbarte Skonto (Prozent laut Rechnung vom Rechnungsbetrag, abzüglich schon
+ *   vermerkten Skontos) – ein darüber hinaus akzeptierter Abzug ist eine Minderung.
+ * Kein Fehler, aber `ohneVereinbarung`: Skonto, obwohl auf der Rechnung keins steht – die App fragt ausdrücklich nach
+ * (eine Obergrenze ohne Vereinbarung gibt es nicht; T-304).
+ * - „nichts_erhalten“: die Rechnung wäre ohne jeden Zahlungseingang ganz durch Skonto/Minderung erledigt. Das ist kein
+ *   Skonto, sondern Uneinbringlichkeit oder Erlass (§ 17 Abs. 2 Nr. 1 UStG) bzw. bei falscher Rechnung ein Storno – eine
+ *   Abschreibung kennt die App nicht (PRUEFLISTE T-304).
+ */
+export type ZahlungsFehler = "betrag" | "ueberzahlt" | "skonto_ohne_zahlung" | "skonto_zu_hoch" | "nichts_erhalten";
+
+/** E-221: Zahlungseingang prüfen, bevor er vermerkt wird – `offen` vorher, `skontoHoechstens` noch zulässiges Skonto. */
+export function zahlungPruefen(s: Stand, id: string, z: Omit<Zahlung, "id">): { fehler: ZahlungsFehler | null; offen: number; skontoHoechstens: number | null; ohneVereinbarung: boolean } {
+  const u = s.unterlagen.find((x) => x.id === id);
+  if (!u || u.vorlage !== "rechnung") return { fehler: "betrag", offen: 0, skontoHoechstens: null, ohneVereinbarung: false };
+  const brutto = bruttoVon(s, u);
+  const bisher = zahlungenVon(s, u);
+  const offen = u.bezahlt && !u.zahlungen?.length ? 0 : zahlungsStand(brutto, bisher).offen;
+  const sk = skontoFuer(u.daten, s.betrieb.bundesland);
+  const skontoHoechstens = sk ? Math.max(0, skontoBetrag(brutto, sk.prozent) - bisher.reduce((a, x) => a + (x.art !== "minderung" ? (x.minderung_cent ?? 0) : 0), 0)) : null;
+  const betrag = z.betrag_cent;
+  const minderung = z.minderung_cent ?? 0;
+  const istSkonto = minderung > 0 && (z.art ?? "skonto") === "skonto";
+  const ergebnis = (fehler: ZahlungsFehler | null) => ({ fehler, offen, skontoHoechstens, ohneVereinbarung: istSkonto && skontoHoechstens === null });
+  if (!Number.isInteger(betrag) || betrag < 0 || !Number.isInteger(minderung) || minderung < 0 || betrag + minderung === 0) return ergebnis("betrag");
+  if (betrag + minderung > offen) return ergebnis("ueberzahlt");
+  if (istSkonto) {
+    if (!betrag) return ergebnis("skonto_ohne_zahlung");
+    if (skontoHoechstens !== null && minderung > skontoHoechstens) return ergebnis("skonto_zu_hoch");
+  }
+  const erhalten = bisher.reduce((a, x) => a + x.betrag_cent, 0) + betrag;
+  if (minderung && !erhalten && betrag + minderung === offen) return ergebnis("nichts_erhalten");
+  return ergebnis(null);
+}
+
+/**
  * R12: Zahlungseingang mit Betrag vermerken – optional mit Skonto bzw. Minderung (§ 17 UStG). Ist danach nichts mehr
- * offen, gilt die Rechnung ab diesem Tag als bezahlt; sonst bleibt der Rest offen (Teilzahlung).
+ * offen, gilt die Rechnung ab diesem Tag als bezahlt; sonst bleibt der Rest offen (Teilzahlung). E-221: Was
+ * `zahlungPruefen` ablehnt, wird nicht (auch nicht gekürzt) vermerkt – der Stand bleibt unverändert.
  */
 export function zahlungVermerken(s: Stand, id: string, z: Omit<Zahlung, "id">, jetzt = new Date(), zid = neueId()): Stand {
   const u = s.unterlagen.find((x) => x.id === id);
   if (!u || u.vorlage !== "rechnung") return s;
   const neu: Zahlung = { id: zid, datum: z.datum, betrag_cent: Math.max(0, Math.round(z.betrag_cent)), ...(z.minderung_cent ? { minderung_cent: Math.max(0, Math.round(z.minderung_cent)), art: z.art ?? "skonto" } : {}) };
   if (!neu.betrag_cent && !neu.minderung_cent) return s;
+  if (zahlungPruefen(s, id, neu).fehler) return s;
   // eine ältere Vollzahlung ohne Liste wird zur ersten Zahlung
   const zahlungen = [...zahlungenVon(s, u), neu];
   const alle = zahlungenAus(zahlungen);

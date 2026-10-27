@@ -15,6 +15,40 @@ const ALLES: Zeitraum = { von: "1900-01-01", bis: "9999-12-31", name: "alle" };
 const betrag = (c: number) => (c / 100).toFixed(2).replace(".", ",");
 const sicher = (s: string) => s.replace(/[^A-Za-z0-9._-]+/g, "-").slice(0, 60) || "ohne-name";
 
+/**
+ * E-221 Befund 9: alle festgeschriebenen Rechnungen (inkl. Stornos und Gutschriften) – auch die, die nirgends mitzählen
+ * (Konfliktkopien K1, doppelte Stornos K2): Sie sind hinausgegangen bzw. festgeschrieben und aufzubewahren.
+ */
+export const archivRechnungen = (s: Stand) => s.unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string");
+
+/**
+ * E-221 Befund 9: eindeutige, von der Reihenfolge unabhängige Dateinamen. Kommt ein Name (ohne Groß-/Kleinschreibung –
+ * entpackt auf Windows/macOS wäre es dieselbe Datei) mehrfach vor, bekommt jeder dieser Einträge seine Kennung angehängt;
+ * einmalige Namen bleiben wie bisher.
+ */
+export function eindeutigeNamen(eintraege: readonly { schluessel: string; name: string; kennung: string }[]): Map<string, string> {
+  const anzahl = new Map<string, number>();
+  for (const e of eintraege) anzahl.set(e.name.toLowerCase(), (anzahl.get(e.name.toLowerCase()) ?? 0) + 1);
+  const aus = new Map<string, string>();
+  const vergeben = new Set<string>();
+  const mitZusatz = (name: string, zusatz: string) => name.replace(/(\.[A-Za-z0-9]+)?$/, (endung) => `_${zusatz}${endung}`);
+  // zuerst die eindeutigen, dann die mit Kennung – jeweils nach Schlüssel sortiert, damit das Ergebnis nicht von der Reihenfolge abhängt
+  const sortiert = [...eintraege].sort((a, b) => a.schluessel.localeCompare(b.schluessel));
+  for (const e of sortiert) if (anzahl.get(e.name.toLowerCase()) === 1) {
+    aus.set(e.schluessel, e.name);
+    vergeben.add(e.name.toLowerCase());
+  }
+  for (const e of sortiert) {
+    if (aus.has(e.schluessel)) continue;
+    const basis = mitZusatz(e.name, sicher(e.kennung));
+    let name = basis;
+    for (let i = 2; vergeben.has(name.toLowerCase()); i++) name = mitZusatz(basis, String(i));
+    vergeben.add(name.toLowerCase());
+    aus.set(e.schluessel, name);
+  }
+  return aus;
+}
+
 export interface ArchivErgebnis {
   zip: Uint8Array;
   dateiname: string;
@@ -34,19 +68,44 @@ export function offenesArchiv(s: Stand, dateien: Record<string, Uint8Array>, jet
   if (s.sachentnahmen.length) inhalt["Sachentnahmen.csv"] = utf8(csv(["Datum", "Netto 7 %", "Netto 19 %", "Bezeichnung"], s.sachentnahmen.map((e) => [e.datum, betrag(e.netto7_cent), betrag(e.netto19_cent), e.text ?? ""])));
   const prot = aenderungsprotokoll(s, ALLES);
   if (prot.length) inhalt["Aenderungsprotokoll.csv"] = utf8(csv(PROTOKOLL_SPALTEN.map((x) => x.name), prot));
-  // Originaldateien: Belege, Z-Bons, Eigenbelege
+  // Originaldateien: Belege, Z-Bons, Eigenbelege – E-221: Namen eindeutig (nichts überschreibt sich), jede Datei einmal
   let n = 0;
-  for (const b of [...s.belege, ...s.belegArchiv]) if (b.datei && dateien[b.datei]) { inhalt[`Belege/${belegDateiname(b, nummern.get(b.id))}`] = dateien[b.datei]!; n++; }
+  const belegListe = [...s.belege, ...s.belegArchiv].filter((b) => b.datei && dateien[b.datei]);
+  const belegNamen = eindeutigeNamen(belegListe.map((b) => ({ schluessel: b.id, name: belegDateiname(b, nummern.get(b.id)), kennung: b.id })));
+  for (const b of belegListe) { inhalt[`Belege/${belegNamen.get(b.id)!}`] = dateien[b.datei!]!; n++; }
+  // Kasse: Z-Bons und Eigenbelege der geltenden und der früheren Fassungen (E-221: wie die Prüfexporte)
+  const kassenDateien: { schluessel: string; name: string; kennung: string; datei: string }[] = [];
+  const gesehen = new Set<string>();
   for (const k of s.kasse) {
-    if (k.datei && dateien[k.datei]) { inhalt[`Kasse/${k.datum}_Z${sicher(k.zbon ?? k.id)}.${k.datei.split(".").pop()}`] = dateien[k.datei]!; n++; }
-    for (const b of k.bewegungen) if (b.datei && dateien[b.datei]) { inhalt[`Kasse/${k.datum}_${sicher(b.beleg_nr ?? b.art)}.${b.datei.split(".").pop()}`] = dateien[b.datei]!; n++; }
+    for (const [i, f] of [k, ...(k.historie ?? [])].entries()) {
+      const zusatz = i ? `_Fassung-${i}` : "";
+      if (f.datei && dateien[f.datei] && !gesehen.has(f.datei)) {
+        gesehen.add(f.datei);
+        kassenDateien.push({ schluessel: f.datei, name: `${f.datum}_Z${sicher(f.zbon ?? k.id)}${zusatz}.${f.datei.split(".").pop()}`, kennung: k.id, datei: f.datei });
+      }
+      for (const b of f.bewegungen) if (b.datei && dateien[b.datei] && !gesehen.has(b.datei)) {
+        gesehen.add(b.datei);
+        kassenDateien.push({ schluessel: b.datei, name: `${f.datum}_${sicher(b.beleg_nr ?? b.art)}${zusatz}.${b.datei.split(".").pop()}`, kennung: k.id, datei: b.datei });
+      }
+    }
   }
-  // Rechnungen: PDF (vom Aufrufer) und XRechnung – das festgehaltene Original, sonst aus den festgeschriebenen Daten
-  for (const u of gestellteRechnungen(s)) {
-    const { daten, fehlt } = eRechnungAus(u.daten, absenderFuer(s, u));
+  const kassenNamen = eindeutigeNamen(kassenDateien);
+  for (const d of kassenDateien) { inhalt[`Kasse/${kassenNamen.get(d.schluessel)!}`] = dateien[d.datei]!; n++; }
+  // Rechnungen: PDF (vom Aufrufer) und XRechnung – das festgehaltene Original immer, sonst aus den festgeschriebenen Daten
+  // (wenn sie für eine E-Rechnung reichen). E-221: auch Konfliktkopien und doppelte Stornos; PDF und XML gleich benannt
+  const rechnungen = archivRechnungen(s);
+  const rechnungsNamen = eindeutigeNamen(rechnungen.map((u) => {
     const name = rechnungDateiname(String(u.daten.nummer ?? ""), String(u.daten.kunde_name ?? ""));
+    return { schluessel: u.id, name: u.konfliktKopieVon ? name.replace(/\.pdf$/, "_Konfliktkopie.pdf") : name, kennung: u.id };
+  }));
+  for (const u of rechnungen) {
+    const name = rechnungsNamen.get(u.id)!;
     if (o.rechnungsPdfs?.[u.id]) inhalt[`Rechnungen/${name}`] = o.rechnungsPdfs[u.id]!;
-    if (!fehlt.length) inhalt[`E-Rechnungen/${name.replace(/\.pdf$/, ".xml")}`] = utf8(u.xml ?? xrechnungUbl(daten, KU_HINWEIS));
+    const xml = u.xml ?? (() => {
+      const { daten, fehlt } = eRechnungAus(u.daten, absenderFuer(s, u));
+      return fehlt.length ? null : xrechnungUbl(daten, KU_HINWEIS);
+    })();
+    if (xml) inhalt[`E-Rechnungen/${name.replace(/\.pdf$/, ".xml")}`] = utf8(xml);
   }
   // festgeschriebene Kassenbücher: Inhalt als CSV (die PDFs entstehen daraus jederzeit neu)
   for (const u of s.unterlagen.filter((x) => x.vorlage === "kassenbuch" && x.festgeschrieben)) {
@@ -65,10 +124,12 @@ export function offenesArchiv(s: Stand, dateien: Record<string, Uint8Array>, jet
       "Formate",
       "- *.csv: Semikolon als Trenner, UTF-8 mit BOM, Zeilenende CRLF, Beträge mit Komma (1234,56), Datum TT.MM.JJJJ bzw. ISO; erste Zeile = Spaltenköpfe.",
       `- daten/stand.json: der vollständige Datenbestand der App (JSON, UTF-8) – Zeitpunkte als ISO 8601 in UTC, Beträge in Cent (ganze Zahlen). Wichtige Felder: unterlagen[] (vorlage, daten, festgeschrieben, absender, xml, fassungen), belege[] (nr = ${MARKE.name}-Belegnummer, datum, lieferant, steuer[].brutto_cent, festgeschrieben, historie[]), belegArchiv[] (ungültig markiert, mit Grund), kasse[] (Tagesabschlüsse: datum, umsatz[], karte_cent, trinkgeld_cent, gutscheine[], bewegungen[] mit beleg_nr, erstellt = erfasst am, festgeschrieben, historie[] = frühere Fassungen mit Grund), kassenstuerze[], sachentnahmen[], protokoll[] (Löschungen und Korrekturen; E-214: „korrektur_nicht_uebernommen“ mit fassung_bis, geraet, eingang), geraet nur in Belegen und Historie (Gerät der Fassung), eingang (Eingang beim Synchronisationsserver: seit, version, zeit).`,
-      `- Rechnungen/*.pdf, E-Rechnungen/*.xml (XRechnung 3.0, UBL – bei festgeschriebenen Rechnungen das bei der Festschreibung festgehaltene Original), Belege/ (Originaldateien, Dateiname beginnt mit der ${MARKE.name}-Belegnummer), Kasse/ (Z-Bons und Eigenbelege), Kassenbuecher/ (festgeschriebene Kassenbücher).`,
+      `- Rechnungen/*.pdf, E-Rechnungen/*.xml (XRechnung 3.0, UBL – bei festgeschriebenen Rechnungen das bei der Festschreibung festgehaltene Original), Belege/ (Originaldateien, Dateiname beginnt mit der ${MARKE.name}-Belegnummer), Kasse/ (Z-Bons und Eigenbelege, frühere Fassungen mit „_Fassung-n“), Kassenbuecher/ (festgeschriebene Kassenbücher).`,
+      `- Gleiche Dateinamen (z. B. dieselbe Rechnungsnummer von zwei Geräten) bekommen die interne Kennung angehängt („_<Kennung>“) – nichts wird überschrieben; dieselbe Kennung steht in daten/stand.json.`,
+      `- „_Konfliktkopie“: eine abweichend festgeschriebene Fassung derselben Rechnung von einem anderen Gerät. Sie und doppelte Stornorechnungen zählen in Rechnungen.csv, Voranmeldung und EÜR nicht mit, sind aber aufbewahrt (PDF, XML und in daten/stand.json mit konfliktKopieVon).`,
       "",
       "Umfang",
-      `- ${gestellteRechnungen(s).length} Rechnungen, ${s.belege.length} Belege (${s.belegArchiv.length} ungültig markiert), ${s.kasse.length} Kassenabschlüsse (Umsatz ${betrag(kasseSumme)} € brutto), ${s.kassenstuerze.length} Kassenstürze, ${n} Dateien.`,
+      `- ${gestellteRechnungen(s).length} Rechnungen${rechnungen.length > gestellteRechnungen(s).length ? ` (dazu ${rechnungen.length - gestellteRechnungen(s).length} nicht zählende: Konfliktkopien bzw. doppelte Stornos)` : ""}, ${s.belege.length} Belege (${s.belegArchiv.length} ungültig markiert), ${s.kasse.length} Kassenabschlüsse (Umsatz ${betrag(kasseSumme)} € brutto), ${s.kassenstuerze.length} Kassenstürze, ${n} Dateien.`,
       "",
       "Nicht enthalten: die Daten der Kasse selbst (Einzelaufzeichnungen, DSFinV-K-Export, TSE-Export) – sie liegen im Kassensystem und sind dort aufzubewahren.",
     ].join("\r\n"),

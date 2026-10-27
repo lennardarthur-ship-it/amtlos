@@ -17,6 +17,9 @@ import { useProSperre } from "./Pro";
 import type { Kanzlei } from "../partner/kanzleien";
 import { KanzleienAbschnitt, kanzleienSichtbar } from "./Kanzleien";
 import { KontenvorgabenSeite, kontenvorgabenAnzahl } from "./Kontenvorgaben";
+import { ANDROID } from "../plattform";
+import { bestaetigen } from "../ui/bestaetigen";
+import { paketUebergeben } from "../unterlagen/paketUebergabe";
 
 /** Ab so vielen MB warnt das Paket (R9 Performance): Es entsteht ganz im Arbeitsspeicher. */
 export const PAKET_MB_WARNUNG = 300;
@@ -60,6 +63,8 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
   const [fortschritt, setFortschritt] = useState<string | null>(null);
   // Paket für eine gelistete Kanzlei: dasselbe Paket, im Teilen-Menü mit deren Adresse (Mail-Composer ist nicht eingebaut)
   const [ziel, setZiel] = useState<Kanzlei | null>(null);
+  // E-221 Befund 6: auf Android geteilt, aber nicht als übergeben bestätigt – Belege des Pakets noch nicht festgeschrieben
+  const [offenesPaket, setOffenesPaket] = useState<{ ids: string[]; name: string } | null>(null);
   const sb = z.stand.steuerberatung;
   const zr = liste.find((x) => x.name === wahl)!;
   const anzahlR = gestellteRechnungen(z.stand).filter((u) => String(u.daten.datum) >= zr.von && String(u.daten.datum) <= zr.bis).length;
@@ -75,6 +80,7 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
   const los = async (kanzlei?: Kanzlei) => {
     setFehler(null);
     setHinweis(null);
+    setOffenesPaket(null);
     setZiel(kanzlei ?? null);
     // Pro wie bisher – auch für das Paket an eine Kanzlei; Liste und Kontakt bleiben frei
     if (!sperre("steuerberater")) return;
@@ -105,9 +111,17 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
       z.personenkontenVergeben();
       const p = steuerpaket(z.stand, zr, sb, dateien, new Date().toISOString(), { rechnungsPdfs });
       setFortschritt(null);
-      if (!(await dateiTeilenBytes(p.dateiname, p.zip, "application/zip"))) return;
-      // R12 GoBD: was im Paket steckt, ist ab jetzt festgeschrieben (ändern nur mit Grund, nie löschen)
-      z.belegeFestschreiben(z.stand.belege.filter((b) => b.datum >= zr.von && b.datum <= zr.bis).map((b) => b.id));
+      // R12 GoBD: was im Paket steckt, wird festgeschrieben (ändern nur mit Grund, nie löschen) – die Belege so, wie sie
+      // beim Packen im Zeitraum lagen. E-221 Befund 6: nur nach einer Übergabe; auf Android erst nach „Ja, übergeben“
+      const ids = z.stand.belege.filter((b) => b.datum >= zr.von && b.datum <= zr.bis).map((b) => b.id);
+      const ergebnis = await paketUebergeben({
+        teilen: () => dateiTeilenBytes(p.dateiname, p.zip, "application/zip"),
+        bestaetigen: () => bestaetigen({ titel: TEXT.e221_paket_frage, text: TEXT.e221_paket_frage_text(ids.length), ja: TEXT.e221_paket_ja, nein: TEXT.e221_paket_nein }),
+        festschreiben: () => z.belegeFestschreiben(ids),
+        android: ANDROID,
+      });
+      if (ergebnis === "abgebrochen") return;
+      if (ergebnis === "offen") return setOffenesPaket({ ids, name: nameVon(wahl) });
       melden(TEXT.steuerpaket_fertig(p.buchungen));
       if (p.ohneXml) setHinweis(TEXT.steuerpaket_ohne_xml(p.ohneXml));
     } catch {
@@ -164,6 +178,12 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
           {ziel ? <Hinweis symbol="envelope" text={TEXT.kanzlei_senden_ziel(ziel.name, ziel.email)} /> : null}
           {fortschritt ? <Hinweis text={fortschritt} /> : null}
           {hinweis ? <Hinweis text={hinweis} /> : null}
+          {offenesPaket ? (
+            <View>
+              <Hinweis art="warnung" symbol="lock.open" text={TEXT.e221_paket_offen(offenesPaket.name, offenesPaket.ids.length)} />
+              <TextKnopf symbol="lock" text={TEXT.e221_paket_doch} onPress={() => { z.belegeFestschreiben(offenesPaket.ids); setOffenesPaket(null); melden(TEXT.e221_paket_fest(offenesPaket.ids.length)); }} />
+            </View>
+          ) : null}
           {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
         </View>
         {kanzleienZuerst ? null : kanzleien}

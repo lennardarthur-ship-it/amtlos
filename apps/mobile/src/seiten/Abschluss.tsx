@@ -13,7 +13,7 @@ import { mitVorlagenHinweis } from "../rechtshinweis";
 import { drucken, pdfTeilenMitHash } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer, lueckenFrage } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
-import { absenderFuer, geteiltOffenLetzte, geteilteVersionen, heute, type EuStornoGrund } from "../unterlagen/speicher";
+import { absenderFuer, geteiltOffenLetzte, geteilteVersionen, heute, zahlungPruefen, type EuStornoGrund } from "../unterlagen/speicher";
 import { einMonatNach, euBerichtigungSchluessel, euFehlerErkannt, euMeldeArtVon, euStornoGrund, euStornoGrundFest, euStornoTag, periodeText } from "../unterlagen/ustAusRechnungen";
 import { euroText, faelligAm, offenBrutto, rechnungBrutto } from "../unterlagen/ablage";
 import { useAmtlos } from "../zustand";
@@ -656,10 +656,17 @@ function BetragErhalten({ id, offen, fertig }: { id: string; offen: number; fert
   const betrag = centAus(text);
   const differenz = betrag === null ? 0 : offen - betrag;
   const datumDe = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`;
-  const speichern = () => {
-    if (betrag === null || betrag < 0) return;
-    const minderung = differenz > 0 && rest !== "offen" ? differenz : 0;
-    z.zahlungVermerken(id, { datum, betrag_cent: Math.min(betrag, offen), ...(minderung ? { minderung_cent: minderung, art: rest === "minderung" ? "minderung" : "skonto" } : {}) });
+  const minderung = differenz > 0 && rest !== "offen" ? differenz : 0;
+  const zahlung = { datum, betrag_cent: betrag ?? 0, ...(minderung ? { minderung_cent: minderung, art: rest === "minderung" ? ("minderung" as const) : ("skonto" as const) } : {}) };
+  // E-221 Befund 5: nie still kürzen – Überzahlung, Skonto ohne Zahlung, mehr als das vereinbarte Skonto und „ganz
+  // gemindert, nichts erhalten“ werden abgelehnt (zahlungPruefen); gespeichert wird genau, was gemeldet wird
+  const pruefung = betrag === null ? null : zahlungPruefen(z.stand, id, zahlung);
+  const fehlerText = !pruefung?.fehler || pruefung.fehler === "betrag" ? null : pruefung.fehler === "ueberzahlt" ? TEXT.e221_ueberzahlt(euroText((betrag ?? 0) - offen), euroText(offen)) : pruefung.fehler === "skonto_zu_hoch" ? TEXT.e221_skonto_zu_hoch(euroText(pruefung.skontoHoechstens ?? 0)) : pruefung.fehler === "skonto_ohne_zahlung" ? TEXT.e221_skonto_ohne_zahlung : TEXT.e221_nichts_erhalten;
+  const speichern = async () => {
+    if (betrag === null || !pruefung || pruefung.fehler) return;
+    // ohne vereinbartes Skonto ausdrücklich nachfragen (eine Obergrenze gibt es dann nicht)
+    if (pruefung.ohneVereinbarung && !(await bestaetigen({ titel: TEXT.e221_skonto_ohne_vereinbarung_titel, text: TEXT.e221_skonto_ohne_vereinbarung_text(euroText(minderung)), ja: TEXT.e221_skonto_ohne_vereinbarung_ja }))) return;
+    z.zahlungVermerken(id, zahlung);
     melden(TEXT.r12_zahlung_vermerkt(euroText(betrag)));
     z.erfolg();
     fertig();
@@ -669,6 +676,7 @@ function BetragErhalten({ id, offen, fertig }: { id: string; offen: number; fert
       <T v="klein" fett accessibilityRole="header">{TEXT.r12_zahlung_titel}</T>
       <DatumFeld label={TEXT.r12_zahlung_datum} wert={datum} aendern={(d) => d && setDatum(d)} />
       <Feld label={TEXT.r12_zahlung_betrag} wert={text} aendern={setText} keyboardType="decimal-pad" placeholder="0,00" fehler={text.trim() && betrag === null ? TEXT.betrag_falsch : betrag !== null && betrag > offen ? TEXT.r12_ueberzahlt : null} />
+      {pruefung?.fehler === "ueberzahlt" && offen > 0 ? <TextKnopf text={TEXT.e221_nur_offen(euroText(offen))} onPress={() => setText(BETRAG_FELD.format(offen / 100))} /> : null}
       {sk ? <T v="caption" leise>{inFrist ? TEXT.r12_skonto_passt(euroText(skBetrag), datumDe(sk.bis)) : TEXT.r12_skonto_spaet(datumDe(sk.bis))}</T> : null}
       {differenz > 0 && betrag !== null ? (
         <View style={{ gap: 4 }}>
@@ -677,7 +685,8 @@ function BetragErhalten({ id, offen, fertig }: { id: string; offen: number; fert
           {rest !== "offen" ? <T v="caption" leise>{TEXT.r12_minderung_hilfe}</T> : null}
         </View>
       ) : null}
-      <Knopf ton symbol="checkmark" text={TEXT.r12_zahlung_vermerken} deaktiviert={betrag === null || betrag <= 0 && differenz <= 0} onPress={speichern} />
+      {fehlerText ? <Hinweis art="warnung" text={fehlerText} /> : null}
+      <Knopf ton symbol="checkmark" text={TEXT.r12_zahlung_vermerken} deaktiviert={betrag === null || Boolean(pruefung?.fehler)} onPress={() => void speichern()} />
     </View>
   );
 }

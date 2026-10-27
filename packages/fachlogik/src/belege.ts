@@ -97,6 +97,8 @@ export interface Beleg {
    * verschiedenen Korrekturen desselben festgeschriebenen Belegs, welche zuletzt kam. Gehört nicht zum Inhalt.
    */
   eingang?: BelegEingang | null;
+  /** E-221: Rechnung in fremder Währung – Originalwährung, -beträge und eingetragener Kurs (gehört zum Inhalt) */
+  fremd?: BelegFremd | null;
 }
 
 /**
@@ -147,6 +149,52 @@ export const STEUERSCHULD_ARTEN: { wert: Steuerschuld; text: string }[] = [
   { wert: "bau", text: "Bauleistung aus Deutschland" },
 ];
 
+/**
+ * E-221: Eingangsrechnung in fremder Währung (BT-5 ≠ EUR). Der Beleg rechnet nur in Euro (`steuer`); hier stehen
+ * Originalwährung und -beträge, damit die Umrechnung nachvollziehbar bleibt. Die App ruft keine Kurse ab: Den Euro-Betrag
+ * bzw. den Kurs trägt der Betrieb ein (§ 16 Abs. 6 UStG: Durchschnittskurs, den das BMF für den Monat bekannt gibt; der
+ * Tageskurs nur mit Gestattung des Finanzamts).
+ */
+export interface BelegFremd {
+  /** Währung der Rechnung (ISO 4217, z. B. „USD“) */
+  waehrung: string;
+  /** Beträge je Steuersatz in der Rechnungswährung (in Hundertsteln), wie `steuer` aufgebaut */
+  steuer: BelegSteuer[];
+  /** ausgewiesene Umsatzsteuer in der Rechnungswährung (Hundertstel) */
+  ust?: number | null;
+  /** Umsatzsteuer in Euro laut Rechnung (BT-111 bei Steuerwährung EUR, BT-6) */
+  ust_eur_cent?: number | null;
+  /** eingetragener Umrechnungskurs: 1 € = `kurs` Einheiten der Rechnungswährung */
+  kurs?: number | null;
+  /** Tag bzw. Monat, für den der Kurs gilt (ISO-Tag) */
+  kurs_datum?: string | null;
+}
+
+const WAEHRUNG = /^[A-Z]{3}$/;
+/** E-221: Kurs aus dem Stand – größer 0, höchstens sechs Nachkommastellen. */
+export const kursGueltig = (w: unknown): w is number => typeof w === "number" && Number.isFinite(w) && w > 0 && w < 1e7 && Math.abs(Math.round(w * 1e6) - w * 1e6) < 1e-6;
+
+/** E-221: Fremdwährung eines Belegs lesen – Unlesbares fällt weg (dann kein Feld). */
+export function fremdAus(w: unknown): BelegFremd | null {
+  if (!w || typeof w !== "object") return null;
+  const r = w as Record<string, unknown>;
+  if (typeof r.waehrung !== "string" || !WAEHRUNG.test(r.waehrung) || r.waehrung === "EUR" || !Array.isArray(r.steuer)) return null;
+  const steuer = (r.steuer as unknown[])
+    .filter((x): x is Record<string, unknown> => Boolean(x && typeof x === "object"))
+    .map((x) => ({ satz: Number(x.satz), brutto_cent: Number(x.brutto_cent) }))
+    .filter((x) => Number.isInteger(x.brutto_cent) && Number.isFinite(x.satz) && x.satz >= 0 && x.satz < 100);
+  if (!steuer.length) return null;
+  const ganz = (x: unknown) => (typeof x === "number" && Number.isInteger(x) ? x : null);
+  return {
+    waehrung: r.waehrung,
+    steuer,
+    ...(ganz(r.ust) !== null ? { ust: ganz(r.ust) } : {}),
+    ...(ganz(r.ust_eur_cent) !== null ? { ust_eur_cent: ganz(r.ust_eur_cent) } : {}),
+    ...(kursGueltig(r.kurs) ? { kurs: r.kurs } : {}),
+    ...(typeof r.kurs_datum === "string" && /^\d{4}-\d{2}-\d{2}$/.test(r.kurs_datum) ? { kurs_datum: r.kurs_datum } : {}),
+  };
+}
+
 /** Eine frühere Fassung eines Belegs: Inhalt, wie er bis `bis` galt. */
 export interface BelegFassung {
   /** galt bis zu diesem Zeitpunkt (ISO) */
@@ -161,6 +209,8 @@ export interface BelegFassung {
   bezahlt?: string | null;
   notiz?: string | null;
   datei?: string | null;
+  /** E-221: Fremdwährung (wie am Beleg) */
+  fremd?: BelegFremd | null;
   steuerschuld?: Steuerschuld | null;
   skonto_cent?: number | null;
   anlage_art?: AnlageArt | null;
@@ -594,6 +644,7 @@ function fassungAus(roh: unknown): BelegFassung | null {
     ...(skontoAusRoh(r.skonto_cent) ? { skonto_cent: skontoAusRoh(r.skonto_cent) } : {}),
     ...(anlageArtAus(r.anlage_art) ? { anlage_art: anlageArtAus(r.anlage_art) } : {}),
     ...teilabzugAus(r),
+    ...(fremdAus(r.fremd) ? { fremd: fremdAus(r.fremd) } : {}),
     ...(s("grund") ? { grund: s("grund").slice(0, 300) } : {}),
     ...(geraetAus(r.geraet) ? { geraet: geraetAus(r.geraet) } : {}),
     ...(belegEingangAus(r.eingang) ? { eingang: belegEingangAus(r.eingang) } : {}),
@@ -665,12 +716,13 @@ export function belegAus(roh: unknown): Beleg | null {
     ...(textAus(r.lieferant_anschrift, 300) ? { lieferant_anschrift: textAus(r.lieferant_anschrift, 300) } : {}),
     ...(geraetAus(r.geraet) ? { geraet: geraetAus(r.geraet) } : {}),
     ...(belegEingangAus(r.eingang) ? { eingang: belegEingangAus(r.eingang) } : {}),
+    ...(fremdAus(r.fremd) ? { fremd: fremdAus(r.fremd) } : {}),
   };
 }
 
 /** Inhalt eines Belegs als frühere Fassung (für das Änderungsprotokoll); `grund`: warum sie ersetzt wurde (R12 GoBD). */
 export function belegFassung(b: Beleg, bis: string, grund?: string): BelegFassung {
-  return { ...(grund ? { grund: grund.trim().slice(0, 300) } : {}), bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}), ...(b.anlage_art ? { anlage_art: b.anlage_art } : {}), ...(b.vorsteuer_betrag_cent ? { vorsteuer_betrag_cent: b.vorsteuer_betrag_cent } : b.vorsteuer_anteil ? { vorsteuer_anteil: b.vorsteuer_anteil } : {}) };
+  return { ...(grund ? { grund: grund.trim().slice(0, 300) } : {}), bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}), ...(b.anlage_art ? { anlage_art: b.anlage_art } : {}), ...(b.vorsteuer_betrag_cent ? { vorsteuer_betrag_cent: b.vorsteuer_betrag_cent } : b.vorsteuer_anteil ? { vorsteuer_anteil: b.vorsteuer_anteil } : {}), ...(fremdAus(b.fremd) ? { fremd: fremdAus(b.fremd) } : {}) };
 }
 
 /** Hat sich der Inhalt (nicht nur der Zeitstempel) eines Belegs geändert? */

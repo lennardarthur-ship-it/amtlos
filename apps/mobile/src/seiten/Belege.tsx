@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
-import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegGezahlt, belegSummen, belegTeilabzug, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, vorsteuerAnteilAus, vorsteuerAufteilung, zeitDe, type Beleg } from "@amtlos/fachlogik";
+import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, fremdBetragText, fremdUmrechnen, kursAus, belegGezahlt, belegSummen, belegTeilabzug, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, vorsteuerAnteilAus, vorsteuerAufteilung, zeitDe, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { regelwert } from "../pflichten/check";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -76,6 +76,8 @@ export function useBelegErfassen() {
           const b = { ...belegAusERechnung(gelesen, neueId(), new Date().toISOString(), { kleinunternehmer: ku || kuZeit(gelesen.datum), nurSteuerfrei: nurSteuerfreieUmsaetze(z.stand.unterlagen, z.stand.betrieb), gemischt: gemischteUmsaetze(z.stand.unterlagen, z.stand.betrieb), vorsteuerquote: vorsteuerquoteAus(z.stand.betrieb), betrieb }), datei: name };
           anlegen(b, false);
           if (kaeuferFremd(gelesen, betrieb)) melden(TEXT.beleg_kaeufer_fremd, "info");
+          // E-221 Befund 3: fremde Währung – nie als Euro melden; ohne Euro-Betrag ausdrücklich darauf hinweisen
+          else if (b.fremd) melden(belegSummen(b).brutto_cent ? TEXT.e221_erechnung_fremd_ust(gelesen.lieferant.name, fremdBetragText(gelesen.summen.brutto_cent, b.fremd.waehrung)) : TEXT.e221_erechnung_fremd(gelesen.lieferant.name, fremdBetragText(gelesen.summen.brutto_cent, b.fremd.waehrung)), "info");
           else melden(TEXT.erechnung_gelesen(gelesen.lieferant.name, euro(gelesen.summen.brutto_cent)));
           return;
         }
@@ -276,6 +278,8 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
             {b.steuer.length > 1 ? <TextKnopf symbol="xmark" leise text={TEXT.entfernen} label={TEXT.satz_entfernen(x.satz)} onPress={() => { weich(); setBetraege(betraege.filter((_, j) => j !== i)); setze({ steuer: b.steuer.filter((_, j) => j !== i) }); }} /> : null}
           </View>
         ))}
+        {/* E-221 Befund 3: Rechnung in fremder Währung – Original, Kurs und Umrechnung (keine Kurse aus dem Netz) */}
+        {b.fremd ? <FremdTeil b={b} setze={setze} umgerechnet={(st) => setBetraege(st.map((x) => betragText(x.brutto_cent)))} /> : null}
         {b.steuer.length < 3 ? <TextKnopf symbol="plus" text={TEXT.beleg_weiterer_satz} onPress={() => { weich(); setBetraege([...betraege, ""]); setze({ steuer: [...b.steuer, { satz: b.steuer.some((x) => x.satz === 7) ? 0 : 7, brutto_cent: 0 }] }); }} stil={{ marginTop: 6 }} /> : null}
         <Karte stil={{ marginTop: 14, paddingVertical: 10 }}>
           {[
@@ -352,6 +356,34 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
           stil={{ marginTop: 24 }}
         />}
     </BuehnenBlatt>
+  );
+}
+
+/**
+ * E-221 Befund 3: Beleg aus einer Rechnung in fremder Währung. Zeigt den Originalbetrag; der Euro-Betrag steht in den
+ * Betragsfeldern darüber. Mit eingetragenem Kurs (1 € = x Einheiten, z. B. Umsatzsteuer-Umrechnungskurs des BMF für den
+ * Monat der Leistung, § 16 Abs. 6 UStG) rechnet „In Euro umrechnen“ die Beträge je Steuersatz um; Kurs und Datum bleiben
+ * am Beleg (nachvollziehbar). Die App ruft keine Kurse ab.
+ */
+function FremdTeil({ b, setze, umgerechnet }: { b: Beleg; setze: (w: Partial<Beleg>) => void; umgerechnet: (steuer: Beleg["steuer"]) => void }) {
+  const f = b.fremd!;
+  const [kursText, setKursText] = useState(() => (f.kurs ? String(f.kurs).replace(".", ",") : ""));
+  const kurs = kursAus(kursText);
+  const brutto = f.steuer.reduce((a, x) => a + x.brutto_cent, 0);
+  const offen = !belegSummen(b).brutto_cent;
+  return (
+    <View style={{ marginTop: 10 }}>
+      <Hinweis art={offen ? "warnung" : "info"} symbol="globe" text={TEXT.e221_fremd_hinweis(fremdBetragText(brutto, f.waehrung), f.ust ? fremdBetragText(f.ust, f.waehrung) : null, f.ust_eur_cent ? euro(f.ust_eur_cent) : null, offen)} />
+      <Feld label={TEXT.e221_kurs(f.waehrung)} hilfe={TEXT.e221_kurs_hilfe} wert={kursText} aendern={(w) => { setKursText(w); const k = kursAus(w); setze({ fremd: { ...f, kurs: k } }); }} keyboardType="decimal-pad" placeholder="z. B. 1,0812" optional fehler={kursText.trim() && kurs === null ? TEXT.e221_kurs_falsch : null} />
+      <DatumFeld label={TEXT.e221_kurs_datum} hilfe={TEXT.e221_kurs_datum_hilfe} wert={f.kurs_datum ?? null} aendern={(d) => setze({ fremd: { ...f, kurs_datum: d } })} />
+      {kurs ? (
+        <TextKnopf symbol="arrow.triangle.2.circlepath" text={TEXT.e221_umrechnen(fremdBetragText(brutto, f.waehrung), euro(fremdUmrechnen(f, kurs).reduce((a, x) => a + x.brutto_cent, 0)))} onPress={() => {
+          const steuer = fremdUmrechnen(f, kurs);
+          umgerechnet(steuer);
+          setze({ steuer, fremd: { ...f, kurs } });
+        }} />
+      ) : null}
+    </View>
   );
 }
 
