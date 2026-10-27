@@ -1,7 +1,7 @@
 # Katalog C.24. Zeigt: Rhythmus abhängig von Fakten, Regelwerte, Dauerfristverlängerung. StB-Durchsicht 22.10.2026 umgesetzt.
 schema_version: 1
 id: steuern.ust_voranmeldung
-version: 7
+version: 8
 katalog_nr: C.24
 titel:
   de: Umsatzsteuer-Voranmeldung abgeben
@@ -16,8 +16,11 @@ erklaerung:
     Weißt du ihn nicht und kennt Amtlos die Steuer des Vorjahres nicht, rechnet Amtlos
     vorläufig mit monatlich – das ist der frühere Termin; vierteljährlich wäre zu spät, wenn
     das Finanzamt monatlich verlangt. Hast du 2026 oder später gegründet, gibst du ab 2027 im
-    Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG). Amtlos bereitet
-    die Zahlen vor; du übermittelst selbst.
+    Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG). Eine
+    Dauerfristverlängerung bleibt möglich, auch wenn du als Neugründer monatlich abgibst: Die
+    Voranmeldung ist dann einen Monat später fällig (§ 18 Abs. 1 UStG, §§ 46 ff. UStDV), und du
+    zahlst einmal im Jahr eine Sondervorauszahlung – siehe „Sondervorauszahlung zur Umsatzsteuer
+    leisten“. Amtlos bereitet die Zahlen vor; du übermittelst selbst.
 rechtsgrundlage: ["§ 18 UStG"]
 kategorie: steuern
 ausloeser:
@@ -162,8 +165,10 @@ sanktion:
   # Steuerberater 22.10.2026: „hoch“ – Bußgeld bis 30.000 €, Strafbarkeit, die Zahllast ist fremdes Geld
   schwere: hoch
 automatisierung: formular_vorausfuellen
+# E-216 (Gründer 27.10.2026, T-268): Anregung des Steuerberaters zu v7 – Satz zur Dauerfristverlängerung, nur aus Wortlaut des
+# bestätigten Katalogs (steuern.ust_va_neugruender_radar, steuern.ust_sondervorauszahlung); v8 braucht seine Bestätigung (T-282)
 aenderungsnotiz:
-  de: Weißt du den Rhythmus nicht, rechnet Amtlos jetzt vorläufig mit monatlichen Terminen – dem früheren Termin – statt vierteljährlich. Hast du 2026 oder später gegründet, zeigt Amtlos ab 2027 im Gründungsjahr und im Folgejahr monatliche Termine.
+  de: 'Ergänzt: Eine Dauerfristverlängerung bleibt auch bei monatlicher Abgabe als Neugründer möglich (mit Sondervorauszahlung).'
 aktion: { art: uebermittlung, ziel: elster.ust_va, nachweis_erforderlich: true }
 status_recht: in_kraft
 # Steuerberater 22.10.2026: Fassung der Grenzen 9.000 € / 2.000 € ab 01.01.2025
@@ -192,9 +197,6 @@ fachlich_zu_pruefen:
   - "Steuerberater 22.10.2026: Neugründer ab 2027 im Gründungs- und Folgejahr monatlich (§ 18 Abs. 2 Satz 4 UStG) – nur als Hinweis im Text; der Rhythmus bei „weiß ich nicht“ bzw. ohne Angabe rechnet dann weiter vierteljährlich, weil die Regeln das Kalenderjahr des Stichtags nicht abfragen können (technische Grenze mit E-206 behoben: Rhythmus je Kalenderjahr)"
   - "E-206 (externer Prüfer): „Weiß ich nicht“ ohne Steuer des Vorjahres rechnet jetzt vorläufig monatlich (früherer Termin) statt vierteljährlich – deckt Neugründer ab 2027 ab. Neugründer ab 2027: Gründungs- und Folgejahr jetzt je Kalenderjahr monatlich, auch gegen die Angabe „vierteljährlich“ und eine Vorjahressteuer bis 9.000 € (Regelwert steuern.ust_va.neugruender_monatlich_ab, Wert aus C.21); bei der Angabe „vierteljährlich“ zeigt die App den Satz aus der Erklärung als Hinweis. bitte mit v7 prüfen (PRUEFLISTE T-237)"
 pruefung:
-  status: freigegeben
-  geprueft_von:
-    - steuern
-  geprueft_am: '2026-10-26'
-  geprueft_version: 7
-  bestaetigt_am: '2026-10-26'
+  status: in_pruefung
+  geprueft_von: null
+  geprueft_am: null

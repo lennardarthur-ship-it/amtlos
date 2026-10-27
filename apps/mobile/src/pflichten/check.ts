@@ -95,6 +95,9 @@ export const CHECK_FELDER = [
   "oeffentliche_wiedergabe",
   // R12 (Coach #5, Kurier #8): Gesundheitsdaten der Teilnehmenden, Ortung der Fahrer
   "datenverarbeitung.arten",
+  // E-216 (T-279): in Gesundheit/Pflege und Kosmetik die bestehende Folgefrage zum Datenschutzbeauftragten (v4) – nur, wenn
+  // er nach den Angaben zu den Daten noch offen wäre (Gesundheitsdaten, Video oder Ortung)
+  "datenschutz.dsb_gruende",
   "alg1_bezug",
   // R12 (Kurier #14, Coach #14): erst Bargeld, dann Kasse – „keine Kasse, nur Rechnungen“
   "kasse.bargeld",
@@ -148,6 +151,12 @@ const zahl = (p: Profil, feld: string) => (typeof p[feld] === "number" ? (p[feld
 const liste = (p: Profil, feld: string) => (Array.isArray(p[feld]) ? (p[feld] as string[]) : null);
 /** R12 (Coach #1): Einzelperson ohne versicherungspflichtige Beschäftigte – keine Beschäftigten oder nur Minijobs */
 const ohneVersicherungspflichtigeBeschaeftigte = (p: Profil) => ohneTeam(p) || (zahl(p, "beschaeftigte.gesamt") !== null && zahl(p, "beschaeftigte.minijob") === zahl(p, "beschaeftigte.gesamt"));
+/**
+ * E-216 (T-279): Branchen, in denen der Datenschutzbeauftragte ohne Angaben „hängt ab“ (Auslöser von `datenschutz.dsb` v4),
+ * und die Angaben zu den Daten, nach denen er erst mit den Fällen des § 38 BDSG entschieden ist – wie im Katalog.
+ */
+const DSB_BRANCHEN = ["gesundheit_pflege", "beauty_kosmetik"];
+const DSB_HINWEISE = ["gesundheitsdaten", "videoueberwachung", "ortung"];
 /** R12 (Kurier #2): Fahrzeuge zwischen 2,5 und 3,5 t – nur dann entscheidet die Frage nach Auslandsfahrten */
 const MITTELSCHWER = ["2_5_bis_2_8t", "2_8_bis_3_5t"];
 
@@ -214,7 +223,10 @@ const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
   // Gaststätte mit Alkohol löst den Jugendschutz schon aus; gefragt wird bei Läden, Kiosken und Lebensmittelbetrieben ohne Ausschank
   "verkauf.alkohol_tabak": (p) => inBranche(p, "onlinehandel", "sonstige") || (inBranche(p, "gastronomie_lebensmittel") && p["erlaubnis.gaststaette"] === false),
   "oeffentliche_wiedergabe": (p) => inBranche(p, "gastronomie_lebensmittel", "beauty_kosmetik", "unterricht_sport_coaching", "gesundheit_pflege"),
-  "datenverarbeitung.arten": (p) => inBranche(p, "unterricht_sport_coaching", "transport_logistik"),
+  // E-216 (T-279, Gründer 27.10.2026): auch Gesundheit/Pflege und Kosmetik – dort steht der Datenschutzbeauftragte (v4)
+  // ohne diese Angabe als „hängt ab“ (E-215)
+  "datenverarbeitung.arten": (p) => inBranche(p, "unterricht_sport_coaching", "transport_logistik", ...DSB_BRANCHEN),
+  "datenschutz.dsb_gruende": (p) => inBranche(p, ...DSB_BRANCHEN) && Boolean(liste(p, "datenverarbeitung.arten")?.some((x) => DSB_HINWEISE.includes(x))),
   "ust.voranmeldung_rhythmus": (p) => p["ust.kleinunternehmer"] === false,
   // R11 (Nutzertest Gebäudereinigung #3): ab einer beschäftigten Person für alle – außer Beauty und Gebäudereinigung, die die Branche schon auslöst
   "personal.sofortmeldebranchen": (p) => mitTeam(p) && !inBranche(p, "beauty_kosmetik", "gebaeudereinigung"),

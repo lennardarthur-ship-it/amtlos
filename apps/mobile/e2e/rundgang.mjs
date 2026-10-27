@@ -189,6 +189,9 @@ try {
     // E-212: „Wo sitzen deine Kunden?“ (Mehrfachauswahl im Kern-Check) – nur Deutschland
     const inland = p.getByRole("checkbox", { name: "Deutschland", exact: true }).locator("visible=true");
     if (await inland.count()) { await inland.last().click(); await knopf("Weiter").click(); continue; }
+    // E-216 (T-279): „Welche Daten über Menschen verarbeitest du?“ im Kern-Check bei Kosmetik – nur Kundendaten (keine Folgefrage)
+    const kundendaten = p.getByRole("checkbox", { name: "Kundendaten", exact: true }).locator("visible=true");
+    if (await kundendaten.count()) { await kundendaten.last().click(); await knopf("Weiter").click(); continue; }
     const ja = p.getByRole("radio", { name: "Ja", exact: true }).locator("visible=true");
     if ((await sichtbar(/Kasse/)) && (await ja.count())) { await ja.last().click(); continue; }
     const nein = p.getByRole("radio", { name: /^Nein/ }).locator("visible=true");
