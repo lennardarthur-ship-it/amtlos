@@ -132,6 +132,10 @@ export const istNullsatzText = (t: string | null | undefined) => NULLSATZ_IM_TEX
  * Entschieden wird nach dem, was die Rechnung ausweist: Privatperson im EU-Ausland ohne OSS mit deutscher Umsatzsteuer
  * auf jeder Position (bzw. Kleinunternehmer nach § 19 UStG) → Vereinfachung; eine Position ohne deutsche Steuer (0 %,
  * Ort womöglich im Ausland) → vorsorglich volle Angaben. Die vollen Angaben nach § 14 Abs. 4 UStG sind immer zulässig.
+ * E-232 (Steuerberater, T-327): 0-%-Positionen mit Hinweis auf eine Befreiung im Inland (§ 4 UStG, z. B. „steuerfrei nach
+ * § 4 Nr. 14 UStG“) dürfen die Vereinfachung nutzen – § 33 Satz 1 Nr. 4 UStDV verlangt dann den Hinweis auf die Befreiung
+ * statt des Steuersatzes (er wird gedruckt, Summenzeile bzw. Hinweise). Kleinunternehmer: richtig bei Ort der Leistung im
+ * Inland; der Hinweis auf § 19 UStG steht auch auf der Kleinbetragsrechnung.
  */
 export const KLEINBETRAG_CENT = 25000;
 export function kleinbetrag(d: Daten): boolean {
@@ -142,10 +146,18 @@ export function kleinbetrag(d: Daten): boolean {
   const pos = positionen(d);
   if (!pos.length) return false;
   // E-228: Privatperson im EU-Ausland – nur mit deutscher Steuer auf der Rechnung (Ort der Leistung im Inland)
-  if (euPrivatLand(d) && !kuFuer(d) && pos.some((x) => !((x.p.ust_satz ?? 0) > 0))) return false;
+  // E-232 (Steuerberater, T-327): 0 % mit Befreiung im Inland (z. B. § 4 Nr. 14 UStG) ebenso – der Hinweis auf die
+  // Befreiung steht dann statt des Steuersatzes auf der Rechnung (§ 33 Satz 1 Nr. 4 UStDV); ohne ihn volle Angaben
+  if (euPrivatLand(d) && !kuFuer(d) && pos.some((x) => !((x.p.ust_satz ?? 0) > 0)) && !befreiungImInland(d)) return false;
   const brutto = summen(pos.map((x) => x.p), kuFuer(d)).brutto_cent;
   return brutto > 0 && brutto <= KLEINBETRAG_CENT;
 }
+
+/**
+ * E-232: Hinweis auf eine Steuerbefreiung im Inland nach § 4 UStG (Nr. 1 Buchst. a, Nr. 2 bis 29 – wie
+ * `kennzahlBefreiung`; Nr. 1 Buchst. b ist die igL) im Befreiungshinweis, der mit einer 0-%-Position gedruckt wird.
+ */
+const befreiungImInland = (d: Daten) => kennzahlBefreiung(befreiungText(d)) !== null;
 
 const istGutschriftD = (d: Daten) => !text(d, "storno_zu") && auswahl(d, "hinweise").includes("gutschrift");
 const gutschriftD = (d: Daten) => auswahl(d, "hinweise").includes("gutschrift");

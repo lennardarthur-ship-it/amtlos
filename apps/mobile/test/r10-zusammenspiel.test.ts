@@ -83,7 +83,8 @@ describe("Kleinunternehmer mit Erwerbsbesteuerung und uneinbringlicher Forderung
     // die Voranmeldung der App berichtigt hier nichts – der Text darf nichts anderes sagen
     expect(l).not.toContain("Die Voranmeldung der App mindert Umsatz und Steuer");
     expect(l).toContain("Ohne Umsatzsteuerberichtigung in der Voranmeldung der App: RE 2026-001 (Kleinunternehmer-Rechnung).");
-    expect(l).toContain("deshalb FEHLEN die Ausbuchung im Stapel");
+    // E-232 (T-333): EÜR – keine Ausbuchung im Stapel (nur die Liste), ohne Satz über eine Umsatzsteuerberichtigung
+    expect(l).toContain("Einnahmen-Überschuss-Rechnung: keine Ausbuchung (es ist nichts zugeflossen).");
   });
 
   it("Rechnung mit Umsatzsteuer aus der Zeit vor dem Wechsel, im Kleinunternehmer-Zeitraum uneinbringlich: nicht still übergangen", () => {
@@ -168,8 +169,10 @@ describe("Regelbesteuerung: Erwerb in fremder Währung, Überzahlung und uneinbr
     const e = euerUebernahme(s, "2026");
     // Waren: 935,40 € + 440,00 € (Erwerb ohne Kurs, gezahlt laut Kontoauszug)
     expect(e.ausgaben.find((z) => /Waren/.test(z.text ?? ""))!.betrag).toBe("1.375,40");
-    // Einnahmen: 119 € von r1 + 31 € Verrechnung an r2 = 126,05 € netto
-    expect(e.einnahmen.find((z) => z.text === "Umsätze aus Rechnungen (netto)")!.betrag).toBe("126,05");
+    // E-232 (Steuerberater 27.10.2026, T-332): Einnahmen 119 € von r1 (100 € netto) und die Überzahlung 31 € am Tag des
+    // Geldeingangs; die Verrechnung an r2 ist kein neuer Zufluss (vorher 126,05 € netto mit der Verrechnung)
+    expect(e.einnahmen.find((z) => z.text === "Umsätze aus Rechnungen (netto)")!.betrag).toBe("100,00");
+    expect(e.einnahmen.find((z) => (z.text ?? "").startsWith("Überzahlungen von Kunden"))!.betrag).toBe("31,00");
   });
 
   it("Steuerberater-Paket: Erwerbskonten, Kursdifferenz des Erwerbs, Guthaben- und Uneinbringlich-Liste nebeneinander", () => {
@@ -177,7 +180,9 @@ describe("Regelbesteuerung: Erwerb in fremder Währung, Überzahlung und uneinbr
     const p = steuerpaket(s, { von: "2026-06-01", bis: "2026-06-30", name: "2026-06" }, SB, {}, "2026-07-10T08:00:00.000Z");
     const l = datei(p, "LIESMICH.txt");
     expect(datei(p, "Buchungsliste_2026-06.csv")).toMatch(/920,00;H;1610;3425;;/);
-    expect(l).toContain("F-77: umgerechnet 920,00 €, gezahlt 935,40 €, Differenz 15,40 €");
+    // E-232 (T-331): Kursdifferenz als eigene Zeile zum Zahltag
+    expect(l).toContain("F-77: umgerechnet 920,00 €, gezahlt 935,40 € am 15.06.2026, Differenz 15,40 €");
+    expect(datei(p, "Buchungsliste_2026-06.csv")).toMatch(/15\.06\.2026;15,40;H;1610;2150;;F-77;/);
     expect(l).toContain("Guthaben_2026-06.csv");
     expect(l).toContain("Uneinbringlich_2026-06.csv");
     expect(l).toContain("Die Voranmeldung der App mindert Umsatz und Steuer");

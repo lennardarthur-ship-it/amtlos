@@ -29,15 +29,16 @@ describe("E-229 (T-303): gezahlter Euro-Betrag in der App", () => {
     expect(standAus(JSON.stringify(s)).belege[0]!.fremd!.gezahlt_eur_cent).toBe(11180);
   });
 
-  it("Steuerberater-Paket: Stapel weiter nur Euro (umgerechnet), Frage und LIESMICH nennen gezahlten Betrag und Kursdifferenz", () => {
+  it("Steuerberater-Paket: Stapel nur Euro (umgerechnet, E-232: Kursdifferenz als eigene Zeile), Frage und LIESMICH nennen gezahlten Betrag und Kursdifferenz", () => {
     const s = belegSetzen(BASIS, USD, t("2026-10-06"));
     const p = steuerpaket(s, { von: "2026-10-01", bis: "2026-10-31", name: "2026-10" }, SB, {}, "2026-11-01T10:00:00.000Z");
     expect(datei(p, "Buchungsliste_2026-10.csv")).toMatch(/05\.10\.2026;110,06;H;1610;4930;9;INV-1001;/);
     expect(datei(p, "Fragen_2026-10.txt")).toContain("Original 119,00 USD · Kurs 1 € = 1,0812 USD (01.10.2026) · gezahlt laut Kontoauszug 111,80 €");
     const l = datei(p, "LIESMICH.txt");
-    expect(l).toContain("INV-1001: umgerechnet 110,06 €, gezahlt 111,80 €, Differenz 1,74 €");
-    expect(l).toContain("Einnahmen-Überschuss-Rechnung: Betriebsausgabe ist der gezahlte Euro-Betrag (§ 11 Abs. 2 EStG)");
-    expect(l).toContain("kein Konto für Kursdifferenzen festgelegt");
+    expect(l).toContain("INV-1001: umgerechnet 110,06 €, gezahlt 111,80 € am 12.10.2026, Differenz 1,74 €");
+    expect(l).toContain("die EÜR rechnet mit dem gezahlten Euro-Betrag (§ 11 Abs. 2 EStG)");
+    // E-232 (Steuerberater 27.10.2026, T-331): Konto für Kursdifferenzen festgelegt – eigene Zeile im Stapel
+    expect(l).not.toContain("kein Konto für Kursdifferenzen festgelegt");
     // ohne gezahlten Betrag kein Satz (bisherige Pakete unverändert)
     const ohne = steuerpaket(belegSetzen(BASIS, { ...USD, fremd: { ...USD.fremd!, gezahlt_eur_cent: null } }, t("2026-10-06")), { von: "2026-10-01", bis: "2026-10-31", name: "2026-10" }, SB, {}, "2026-11-01T10:00:00.000Z");
     expect(datei(ohne, "LIESMICH.txt")).not.toContain("gezahltem Euro-Betrag");

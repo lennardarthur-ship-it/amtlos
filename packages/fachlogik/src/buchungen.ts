@@ -45,7 +45,7 @@
  *   nicht abziehbare Teil brutto ohne Steuerschlüssel auf demselben Aufwandskonto (Automatikkonto: BU 40). § 13b-Belege
  *   entsprechend auf die Konten „mit“ bzw. „ohne Vorsteuer“.
  */
-import { belegKennung, belegSkonto, belegTeilabzug, igeSteuerTag, kategorieFuer, satz13b, vorsteuerAufteilung, vorsteuerVerhaeltnis, zahltag, type AnlageArt, type Beleg } from "./belege.js";
+import { belegKennung, belegSkonto, fremdKursdifferenz, belegTeilabzug, igeSteuerTag, kategorieFuer, satz13b, vorsteuerAufteilung, vorsteuerVerhaeltnis, zahltag, type AnlageArt, type Beleg } from "./belege.js";
 import { formImNamen } from "./dokumente/betrieb.js";
 import type { Kontenvorgaben } from "./kontenvorgaben.js";
 import { restGruppen, summen, type Abschlag, type Position } from "./rechnung.js";
@@ -327,12 +327,26 @@ export const BUCHUNGSKONTEN: Record<
      * Sätze (16 %/5 % aus 2020) haben kein Konto: diese Zeilen fehlen im Stapel, LIESMICH nennt sie.
      */
     igErwerb: { mit: { 19: string; 7: string }; ohne: { 19: string; 7: string } };
+    /**
+     * E-232 (Steuerberater 27.10.2026, T-331): Kursdifferenz bei Belegen in fremder Währung als eigene Zeile, ohne
+     * Steuerschlüssel – Aufwendungen aus Kursdifferenzen SKR03 2150 / SKR04 6880, Erträge aus Kursdifferenzen SKR03 2660 /
+     * SKR04 4840. Aufwandskonto und Vorsteuer bleiben beim umgerechneten Rechnungsbetrag (§ 16 Abs. 6 UStG); zusammen
+     * ergibt das den gezahlten Betrag (auch EÜR). Kontenvorgaben `kursAufwand`, `kursErtrag`.
+     */
+    kursAufwand: string;
+    kursErtrag: string;
+    /**
+     * E-232 (Steuerberater 27.10.2026, T-333): Forderungsverluste mit Umsatzsteuer-Automatik (bilanzierende Betriebe),
+     * Bruttobetrag gegen die Forderung bzw. den Debitor: 19 % SKR03 2406 / SKR04 6936, 7 % SKR03 2401 / SKR04 6931; die
+     * Umsatzsteuer wird im Buchungszeitraum berichtigt. Kontenvorgaben `forderungsverlust19`, `forderungsverlust7`.
+     */
+    forderungsverlust: { 19: string; 7: string };
   }
 > = {
   // Forderungen/Verbindlichkeiten ohne Kontokorrent (1410/1610 bzw. 1210/3310), damit beim Bankabruf kein OPOS nötig ist
-  SKR03: { bank: "1200", verrechnungGesellschafter: "0731", homeoffice: "4288", anlagen: { maschinen: "0400", bga: "0420", kfz: "0320", software: "0027" }, forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338", nullsatz: "8290", oss: "8320", ausfuhr: "8120", befreit43: "8150" }, gutschrift: "3100", gutscheinVerbindlichkeit: "1700", kassendifferenzAufwand: "4900", kassendifferenzErtrag: "", sachentnahme: { 19: "8910", 7: "8915" }, skontiGewaehrtIgl: "8743", skontiGewaehrtRc: "8741", anzahlungenErhalten: "1710", anzahlungEuEuer: "", igErwerb: { mit: { 19: "3425", 7: "3420" }, ohne: { 19: "3435", 7: "3430" } } },
+  SKR03: { bank: "1200", verrechnungGesellschafter: "0731", homeoffice: "4288", anlagen: { maschinen: "0400", bga: "0420", kfz: "0320", software: "0027" }, forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338", nullsatz: "8290", oss: "8320", ausfuhr: "8120", befreit43: "8150" }, gutschrift: "3100", gutscheinVerbindlichkeit: "1700", kassendifferenzAufwand: "4900", kassendifferenzErtrag: "", sachentnahme: { 19: "8910", 7: "8915" }, skontiGewaehrtIgl: "8743", skontiGewaehrtRc: "8741", anzahlungenErhalten: "1710", anzahlungEuEuer: "", igErwerb: { mit: { 19: "3425", 7: "3420" }, ohne: { 19: "3435", 7: "3430" } }, kursAufwand: "2150", kursErtrag: "2660", forderungsverlust: { 19: "2406", 7: "2401" } },
   // UNSICHER: verrechnungGesellschafter 3560 – SKR04-Gegenstück zu 0731 laut Kanzlei folgt
-  SKR04: { bank: "1800", verrechnungGesellschafter: "3560", homeoffice: "6348", anlagen: { maschinen: "0440", bga: "0650", kfz: "0520", software: "0135" }, forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", privatentnahmen: "2100", geldtransit: "1460", skontiGewaehrt: { 19: "4736", 7: "4731", 0: "4730" }, skontiErhalten: { 19: "5736", 7: "5731", 0: "5730" }, erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338", nullsatz: "4290", oss: "4320", ausfuhr: "4120", befreit43: "4150" }, gutschrift: "5900", gutscheinVerbindlichkeit: "3500", kassendifferenzAufwand: "6300", kassendifferenzErtrag: "", sachentnahme: { 19: "4620", 7: "4610" }, skontiGewaehrtIgl: "4743", skontiGewaehrtRc: "4741", anzahlungenErhalten: "3250", anzahlungEuEuer: "", igErwerb: { mit: { 19: "5425", 7: "5420" }, ohne: { 19: "5435", 7: "5430" } } },
+  SKR04: { bank: "1800", verrechnungGesellschafter: "3560", homeoffice: "6348", anlagen: { maschinen: "0440", bga: "0650", kfz: "0520", software: "0135" }, forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", privatentnahmen: "2100", geldtransit: "1460", skontiGewaehrt: { 19: "4736", 7: "4731", 0: "4730" }, skontiErhalten: { 19: "5736", 7: "5731", 0: "5730" }, erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338", nullsatz: "4290", oss: "4320", ausfuhr: "4120", befreit43: "4150" }, gutschrift: "5900", gutscheinVerbindlichkeit: "3500", kassendifferenzAufwand: "6300", kassendifferenzErtrag: "", sachentnahme: { 19: "4620", 7: "4610" }, skontiGewaehrtIgl: "4743", skontiGewaehrtRc: "4741", anzahlungenErhalten: "3250", anzahlungEuEuer: "", igErwerb: { mit: { 19: "5425", 7: "5420" }, ohne: { 19: "5435", 7: "5430" } }, kursAufwand: "6880", kursErtrag: "4840", forderungsverlust: { 19: "6936", 7: "6931" } },
 };
 
 /** Wirksame Konten eines Stapels: Kontenrahmen plus Kontenvorgaben der Kanzlei. */
@@ -366,6 +380,10 @@ export function kontenFuer(kontenrahmen: Kontenrahmen, vorgaben?: Kontenvorgaben
     anzahlungEuEuer: w(v.anzahlungEuEuer, k.anzahlungEuEuer),
     // E-222/E-227: innergemeinschaftlicher Erwerb – Standardkonten laut Steuerberater, über die Kontenvorgaben änderbar
     igErwerb: { mit: { 19: w(v.igErwerb19, k.igErwerb.mit[19]), 7: w(v.igErwerb7, k.igErwerb.mit[7]) }, ohne: { 19: w(v.igErwerbOhneVst19, k.igErwerb.ohne[19]), 7: w(v.igErwerbOhneVst7, k.igErwerb.ohne[7]) } },
+    // E-232: Kursdifferenzen und Forderungsverluste – Standard laut Steuerberater, über die Kontenvorgaben änderbar
+    kursAufwand: w(v.kursAufwand, k.kursAufwand),
+    kursErtrag: w(v.kursErtrag, k.kursErtrag),
+    forderungsverlust: { 19: w(v.forderungsverlust19, k.forderungsverlust[19]), 7: w(v.forderungsverlust7, k.forderungsverlust[7]) },
     erloese: { ...k.erloese, nullsatz: w(v.erloesNullsatz, k.erloese.nullsatz), oss: w(v.erloesOss, k.erloese.oss), ausfuhr: w(v.erloesAusfuhr, k.erloese.ausfuhr), befreit43: w(v.erloesKz43, k.erloese.befreit43) },
     anlagen: { maschinen: w(v.anlageMaschinen, k.anlagen.maschinen), bga: w(v.anlageBga, k.anlagen.bga), kfz: w(v.anlageKfz, k.anlagen.kfz), software: w(v.anlageSoftware, k.anlagen.software) },
   };
@@ -918,6 +936,77 @@ function igeEinkaufBuchungen(b: Beleg, kontenrahmen: Kontenrahmen, k: Konten, o?
       quelle_id: b.id,
       guid: buchungsGuid(b.id, s.satz),
     }));
+}
+
+/**
+ * E-232 (Steuerberater 27.10.2026, T-331): Kursdifferenz eines Belegs in fremder Währung mit eingetragenem gezahltem
+ * Euro-Betrag (`fremdKursdifferenz`) als eigene Zeile, zum Zahltag, ohne Steuerschlüssel – gegen dasselbe Konto wie der
+ * Beleg (Verbindlichkeiten bzw. Kreditor, Bank, Kasse, Privat bzw. Verrechnungskonto). Mehr gezahlt: Aufwendungen aus
+ * Kursdifferenzen (Konto im Haben, wie die Ausgabe); weniger gezahlt: Erträge aus Kursdifferenzen. Aufwandskonto und
+ * Vorsteuer des Belegs bleiben beim umgerechneten Betrag (§ 16 Abs. 6 UStG); zusammen ergibt das den gezahlten Betrag –
+ * die Verbindlichkeit ist mit der Zahlung ausgeglichen, die Kasse zählt den gezahlten Betrag. Nicht bei Belegen, die
+ * nicht im Stapel stehen (Personal, Erwerb ohne festgestellte Erwerbsbesteuerung).
+ */
+export function kursdifferenzBuchungenBelege(belege: Beleg[], kontenrahmen: Kontenrahmen, o?: BelegBuchungsOptionen): Buchung[] {
+  const k = kontenFuer(kontenrahmen, o?.vorgaben);
+  const aus: Buchung[] = [];
+  for (const b of belege) {
+    if (b.ungueltig || !belegImStapel(b, o) || (b.steuerschuld === "ige" && o?.igeNichtBuchen?.has(b.id))) continue;
+    const diff = fremdKursdifferenz(b);
+    if (!diff) continue;
+    const mehr = diff > 0;
+    aus.push({
+      datum: zahltag(b),
+      betrag_cent: Math.abs(diff),
+      soll_haben: mehr ? "H" : "S",
+      konto: zahlkontoBeleg(b, k, o),
+      gegenkonto: mehr ? k.kursAufwand : k.kursErtrag,
+      bu_schluessel: "",
+      belegfeld1: belegfeld1Aus(belegKennung(b, o?.nummern?.get(b.id) ?? belegfeld1Aus(b.id).slice(0, 12).toUpperCase())),
+      buchungstext: kuerze(`Kursdifferenz ${kuerze(b.lieferant, NAME_IM_TEXT)} ${b.fremd?.waehrung ?? ""}`.trim(), 60),
+      ust_satz: null,
+      art: mehr ? "ausgabe" : "einnahme",
+      quelle_id: b.id,
+      guid: buchungsGuid(`${b.id}|kursdifferenz`, null),
+    });
+  }
+  return aus;
+}
+
+/**
+ * E-232 (Steuerberater 27.10.2026, T-333): Ausbuchung einer uneinbringlichen Forderung bei bilanzierenden Betrieben – je
+ * Steuersatz 19 % bzw. 7 % der am Tag offene Bruttobetrag auf das Konto „Forderungsverluste“ mit Umsatzsteuer-Automatik
+ * (ohne Steuerschlüssel) gegen die Forderung bzw. den Debitor, zum Tag der Uneinbringlichkeit (die Umsatzsteuer wird im
+ * Buchungszeitraum berichtigt). Andere Steuersätze (0 %, 16 %/5 %) haben kein Konto: `ohneKonto` (LIESMICH). Später
+ * eingegangenes Geld bucht die App nicht (keine Angabe dazu) – LIESMICH nennt es.
+ */
+export function forderungsverlustBuchungen(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde"> & Partial<Pick<AusgangsRechnungFuerBuchung, "personenkonto">>, tag: string, offen: readonly { satz: number | null; brutto_cent: number }[], kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): { buchungen: Buchung[]; ohneKonto: { satz: number | null; brutto_cent: number }[] } {
+  const k = kontenFuer(kontenrahmen, o?.vorgaben);
+  const buchungen: Buchung[] = [];
+  const ohneKonto: { satz: number | null; brutto_cent: number }[] = [];
+  for (const g of offen) {
+    if (g.brutto_cent <= 0) continue;
+    const konto = g.satz === 19 || g.satz === 7 ? k.forderungsverlust[g.satz] : "";
+    if (!konto) {
+      ohneKonto.push({ satz: g.satz, brutto_cent: g.brutto_cent });
+      continue;
+    }
+    buchungen.push({
+      datum: tag,
+      betrag_cent: g.brutto_cent,
+      soll_haben: "H",
+      konto: r.personenkonto || k.forderungen,
+      gegenkonto: konto,
+      bu_schluessel: "",
+      belegfeld1: belegfeld1Aus(r.nummer),
+      buchungstext: kuerze(`Forderungsverlust RE ${r.nummer} ${kuerze(r.kunde, NAME_IM_TEXT)}`, 60),
+      ust_satz: g.satz,
+      art: "ausgabe",
+      quelle_id: r.id,
+      guid: buchungsGuid(`${r.id}|forderungsverlust`, g.satz),
+    });
+  }
+  return { buchungen, ohneKonto };
 }
 
 /** E-222: Erwerbskonto eines innergemeinschaftlichen Erwerbs nach Satz (0 % wie § 13b: 19 %) und Vorsteuerabzug – "" ohne Konto. */

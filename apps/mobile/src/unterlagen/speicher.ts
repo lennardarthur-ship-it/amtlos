@@ -10,9 +10,9 @@ import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils";
 import { partnerIdAus } from "../partner/partner";
 import { istKompakt, kompaktAufloesen } from "./kompakt";
 import { druckFesthalten, type DruckFassung } from "./druck";
-import { pdfOriginalAus, type PdfOriginal } from "./pdfOriginal";
+import { pdfOriginalAus, pdfSelbstAus, type PdfOriginal, type PdfSelbst } from "./pdfOriginal";
 export type { DruckFassung } from "./druck";
-export type { PdfOriginal } from "./pdfOriginal";
+export type { PdfOriginal, PdfSelbst } from "./pdfOriginal";
 import { zustimmungAus, type Zustimmung } from "../rechtliches";
 
 export interface Unterlage {
@@ -87,6 +87,11 @@ export interface Unterlage {
    * Original. Entfällt, sobald `pdf` steht.
    */
   pdfFolgt?: boolean;
+  /**
+   * E-232 (T-328 c): Das PDF der ersten Ausgabe war größer als 10 MB und ist nicht aufbewahrt – der Nutzer muss das
+   * geteilte PDF selbst aufbewahren (Hinweis an der Unterlage). Entfällt, sobald `pdf` steht.
+   */
+  pdfSelbst?: PdfSelbst;
   /** R12 GoBD: XRechnung (UBL) der festgeschriebenen Rechnung, wie sie ausgegeben wurde – das Paket nimmt dieses Original */
   xml?: string;
   /**
@@ -178,6 +183,8 @@ export interface GeteilteFassung {
   druck?: DruckFassung;
   /** E-228: das geteilte bzw. gedruckte PDF dieser Ausgabe selbst – wird beim Festschreiben das Original */
   pdf?: PdfOriginal;
+  /** E-232: das PDF dieser Ausgabe war zu groß zum Aufbewahren (der Nutzer bewahrt es selbst auf) */
+  pdfSelbst?: PdfSelbst;
   /** E-200: SHA-256 (hex) über Inhalt und Absender dieser Ausgabe (`fassungHash`) – beim Vermerken festgehalten */
   inhaltSha256?: string;
 }
@@ -237,6 +244,8 @@ export interface Fassung {
   druck?: DruckFassung;
   /** E-228: das PDF dieser Fassung selbst, wie es geteilt wurde */
   pdf?: PdfOriginal;
+  /** E-232: das PDF dieser Fassung war zu groß zum Aufbewahren (der Nutzer bewahrt es selbst auf) */
+  pdfSelbst?: PdfSelbst;
 }
 
 /** R12: Betriebsstätte (Filiale). Betriebsstätte 1 ist der Betrieb selbst (Anschrift aus „Mein Betrieb“, ID „haupt“). */
@@ -531,6 +540,10 @@ function unterlageAus(u: Record<string, unknown>): Unterlage {
   if (pdf) r.pdf = pdf;
   else delete r.pdf;
   if (u.pdfFolgt !== true || !r.festgeschrieben || r.pdf) delete r.pdfFolgt;
+  // E-232: Vermerk „PDF selbst aufbewahren“ nur an Festgeschriebenem ohne Original
+  const selbst = r.festgeschrieben && !r.pdf ? pdfSelbstAus(u.pdfSelbst) : null;
+  if (selbst) r.pdfSelbst = selbst;
+  else delete r.pdfSelbst;
   if (r.fassungen) r.fassungen = r.fassungen.map(fassungSauber);
   if (typeof u.xml !== "string" || !u.xml.startsWith("<")) delete r.xml;
   if (!(istObjekt(u.kassenbuch) && typeof u.kassenbuch.monat === "string" && typeof u.kassenbuch.standort === "string")) delete r.kassenbuch;
@@ -598,6 +611,9 @@ function fassungSauber(f: Fassung): Fassung {
   const pdf = pdfOriginalAus(roh.pdf);
   if (pdf) r.pdf = pdf;
   else delete r.pdf;
+  const selbst = !pdf ? pdfSelbstAus(roh.pdfSelbst) : null;
+  if (selbst) r.pdfSelbst = selbst;
+  else delete r.pdfSelbst;
   return r;
 }
 
@@ -629,7 +645,7 @@ function geteiltOffenAus(roh: unknown): GeteilteFassung[] {
   if (!Array.isArray(roh)) return [];
   return (roh as unknown[])
     .filter((x): x is Record<string, unknown> => istObjekt(x) && istIso(x.am) && (x.art === "pdf" || x.art === "druck" || x.art === "xml") && istObjekt(x.daten))
-    .map((x) => ({ am: x.am as string, art: x.art as GeteilteFassung["art"], daten: x.daten as Daten, ...(typeof x.pdfSha256 === "string" && x.pdfSha256 ? { pdfSha256: x.pdfSha256 } : {}), ...(istObjekt(x.absender) ? { absender: { ...LEERER_BETRIEB, ...Object.fromEntries(Object.entries(x.absender).filter(([, w]) => typeof w === "string")) } as Betrieb } : {}), ...(typeof x.inhaltSha256 === "string" && /^[0-9a-f]{64}$/.test(x.inhaltSha256) ? { inhaltSha256: x.inhaltSha256 } : {}), ...(druckAus(x.druck) ? { druck: druckAus(x.druck)! } : {}), ...(pdfOriginalAus(x.pdf) ? { pdf: pdfOriginalAus(x.pdf)! } : {}) }))
+    .map((x) => ({ am: x.am as string, art: x.art as GeteilteFassung["art"], daten: x.daten as Daten, ...(typeof x.pdfSha256 === "string" && x.pdfSha256 ? { pdfSha256: x.pdfSha256 } : {}), ...(istObjekt(x.absender) ? { absender: { ...LEERER_BETRIEB, ...Object.fromEntries(Object.entries(x.absender).filter(([, w]) => typeof w === "string")) } as Betrieb } : {}), ...(typeof x.inhaltSha256 === "string" && /^[0-9a-f]{64}$/.test(x.inhaltSha256) ? { inhaltSha256: x.inhaltSha256 } : {}), ...(druckAus(x.druck) ? { druck: druckAus(x.druck)! } : {}), ...(pdfOriginalAus(x.pdf) ? { pdf: pdfOriginalAus(x.pdf)! } : {}), ...(!pdfOriginalAus(x.pdf) && pdfSelbstAus(x.pdfSelbst) ? { pdfSelbst: pdfSelbstAus(x.pdfSelbst)! } : {}) }))
     // E-200: vollständig – keine Ausgabe fällt weg
     .sort((a, b) => a.am.localeCompare(b.am));
 }
@@ -1014,13 +1030,13 @@ export function korrigieren(s: Stand, id: string, grund: string, jetzt: Date): S
   const fassungen = [...(u.fassungen ?? []), fassung];
   const daten: Daten = { ...u.daten, fassung_nr: String(fassungen.length + 1), fassung_ersetzt: heute(new Date(u.festgeschrieben)), fassung_grund: grund.trim(), fassung_stand: heute(jetzt) };
   // E-220 (8b): der Entwurf zeigt wieder „Mein Betrieb“ von heute; Absender und HTML gehören zur abgelösten Fassung
-  const { festgeschrieben: _f, pdfSha256: _p, absender: _a, absenderGedruckt: _g, absenderNachgetragen: _n, druck: _d, pdf: _o, pdfFolgt: _pf, ...rest } = u;
+  const { festgeschrieben: _f, pdfSha256: _p, absender: _a, absenderGedruckt: _g, absenderNachgetragen: _n, druck: _d, pdf: _o, pdfFolgt: _pf, pdfSelbst: _ps, ...rest } = u;
   return { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...rest, daten, geaendert: iso, fassungen } : x)) };
 }
 
 /** E-220 (8b): Absender, Merker und festgehaltenes HTML einer festgeschriebenen Unterlage – für ihre Fassung in der Historie. */
-function druckAngaben(u: Pick<Unterlage, "absender" | "absenderGedruckt" | "absenderNachgetragen" | "druck" | "pdf">): Pick<Fassung, "absender" | "absenderGedruckt" | "absenderNachgetragen" | "druck" | "pdf"> {
-  return { ...(u.absender ? { absender: u.absender } : {}), ...(u.absenderGedruckt ? { absenderGedruckt: true } : {}), ...(u.absenderNachgetragen ? { absenderNachgetragen: u.absenderNachgetragen } : {}), ...(u.druck ? { druck: u.druck } : {}), ...(u.pdf ? { pdf: u.pdf } : {}) };
+function druckAngaben(u: Pick<Unterlage, "absender" | "absenderGedruckt" | "absenderNachgetragen" | "druck" | "pdf" | "pdfSelbst">): Pick<Fassung, "absender" | "absenderGedruckt" | "absenderNachgetragen" | "druck" | "pdf" | "pdfSelbst"> {
+  return { ...(u.absender ? { absender: u.absender } : {}), ...(u.absenderGedruckt ? { absenderGedruckt: true } : {}), ...(u.absenderNachgetragen ? { absenderNachgetragen: u.absenderNachgetragen } : {}), ...(u.druck ? { druck: u.druck } : {}), ...(u.pdf ? { pdf: u.pdf } : u.pdfSelbst ? { pdfSelbst: u.pdfSelbst } : {}) };
 }
 
 /** R12: Tag (YYYY-MM-DD), an dem die Fassung festgeschrieben bzw. zuletzt geteilt wurde. */
@@ -1041,12 +1057,12 @@ export function ausgabeMoeglich(s: Stand, id: string, daten?: Daten): boolean {
  * Als PDF geteilt oder gedruckt: merken, und Vorlagen mit `festschreiben` festschreiben. Mit `daten` (Inhalt des PDFs)
  * nur, wenn die Unterlage noch genau diesen Inhalt hat – sonst bleibt der Stand unverändert (siehe `ausgabeMoeglich`).
  */
-export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean, druck?: string | DruckFassung, pdf?: PdfOriginal): Stand {
+export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean, druck?: string | DruckFassung, pdf?: PdfOriginal, pdfSelbst?: PdfSelbst): Stand {
   if (!ausgabeMoeglich(s, id, daten)) return s;
   // E-156: als E-Rechnung geteilt – vermerken (danach immer wieder teilbar, auch ohne Pro)
   if (eRechnung) {
     const vor = s.unterlagen.find((u) => u.id === id);
-    const mit = ausgeben(s, id, jetzt, daten, pdfSha256, absender, false, druck, pdf);
+    const mit = ausgeben(s, id, jetzt, daten, pdfSha256, absender, false, druck, pdf, pdfSelbst);
     // E-228: mit der XRechnung festgeschrieben, ohne PDF – das erste PDF, das danach hinausgeht, wird das Original
     const folgt = (u: Unterlage) => Boolean(vor && !vor.festgeschrieben && u.festgeschrieben && !u.pdf && !u.pdfSha256);
     return { ...mit, unterlagen: mit.unterlagen.map((u) => (u.id === id ? { ...u, ...(!u.eRechnungGeteilt ? { eRechnungGeteilt: jetzt.toISOString() } : {}), ...(folgt(u) ? { pdfFolgt: true } : {}) } : u)) };
@@ -1067,10 +1083,12 @@ export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSh
       const e = v?.eRechnung ? eRechnungAus(u.daten, betrieb) : null;
       const iso = jetzt.toISOString();
       const d = typeof druck === "string" ? druckFesthalten(druck, betrieb.logo, iso) : druck;
-      const { absenderNachgetragen: _n, druck: _d, pdf: _o, pdfFolgt: _pf, ...ohne } = u;
+      const { absenderNachgetragen: _n, druck: _d, pdf: _o, pdfFolgt: _pf, pdfSelbst: _ps, ...ohne } = u;
       // E-228: das PDF selbst nur, wenn es zum Prüfwert dieser Ausgabe passt
       const original = pdf && (!pdfSha256 || pdf.sha256 === pdfSha256) ? pdf : undefined;
-      return { ...ohne, ausgegeben: u.ausgegeben ?? iso, festgeschrieben: iso, ...(pdfSha256 ?? original ? { pdfSha256: pdfSha256 ?? original!.sha256 } : {}), absender: { ...betrieb }, ...(absender ? { absenderGedruckt: true } : {}), ...(d ? { druck: d } : {}), ...(original ? { pdf: original } : {}), ...(e && !e.fehlt.length ? { xml: xrechnungUbl(e.daten, KU_HINWEIS) } : {}) };
+      // E-232: zu groß zum Aufbewahren – vermerken, dass der Nutzer das geteilte PDF selbst aufbewahrt
+      const selbst = !original && pdfSelbst ? pdfSelbstAus(pdfSelbst) : null;
+      return { ...ohne, ausgegeben: u.ausgegeben ?? iso, festgeschrieben: iso, ...(pdfSha256 ?? original ? { pdfSha256: pdfSha256 ?? original!.sha256 } : {}), absender: { ...betrieb }, ...(absender ? { absenderGedruckt: true } : {}), ...(d ? { druck: d } : {}), ...(original ? { pdf: original } : {}), ...(selbst ? { pdfSelbst: selbst } : {}), ...(e && !e.fehlt.length ? { xml: xrechnungUbl(e.daten, KU_HINWEIS) } : {}) };
     }),
   };
   // R12 GoBD: eine abgegebene (geteilte) Voranmeldung schreibt die Belege ihres Zeitraums fest
@@ -1091,7 +1109,7 @@ export function teilenOffenVermerken(s: Stand, id: string, jetzt: Date, f: Omit<
     ...s,
     unterlagen: s.unterlagen.map((u) => {
       if (u.id !== id || u.festgeschrieben || !vorlageFuer(u.vorlage)?.festschreiben) return u;
-      const g: GeteilteFassung = { am: jetzt.toISOString(), art: f.art, daten: f.daten, ...(f.pdfSha256 ? { pdfSha256: f.pdfSha256 } : {}), ...(f.absender ? { absender: { ...f.absender } } : {}), ...(f.druck ? { druck: f.druck } : {}), ...(f.pdf ? { pdf: f.pdf } : {}) };
+      const g: GeteilteFassung = { am: jetzt.toISOString(), art: f.art, daten: f.daten, ...(f.pdfSha256 ? { pdfSha256: f.pdfSha256 } : {}), ...(f.absender ? { absender: { ...f.absender } } : {}), ...(f.druck ? { druck: f.druck } : {}), ...(f.pdf ? { pdf: f.pdf } : f.pdfSelbst ? { pdfSelbst: f.pdfSelbst } : {}) };
       // E-200: Prüfwert über Inhalt und Absender gleich festhalten; der Vermerk wird nur angehängt, nie gekürzt
       return { ...u, geteiltOffen: [...(u.geteiltOffen ?? []), { ...g, inhaltSha256: fassungHash(g) }] };
     }),
@@ -1154,7 +1172,8 @@ export function geteilteFassungFestschreiben(s: Stand, id: string, jetzt: Date, 
   // zuletzt die XRechnung derselben Fassung geteilt wurde
   const h = fassungHash(f);
   const mitPdf = f.pdf ? f : u.geteiltOffen!.find((g) => g.pdf && fassungHash(g) === h);
-  const fest = ausgeben(vorher, id, jetzt, f.daten, mitPdf?.pdfSha256 ?? f.pdfSha256, f.absender, !mitPdf && f.art === "xml", f.druck, mitPdf?.pdf);
+  const mitSelbst = mitPdf ? undefined : (f.pdfSelbst ? f : u.geteiltOffen!.find((g) => g.pdfSelbst && fassungHash(g) === h))?.pdfSelbst;
+  const fest = ausgeben(vorher, id, jetzt, f.daten, mitPdf?.pdfSha256 ?? f.pdfSha256, f.absender, !mitPdf && !mitSelbst && f.art === "xml", f.druck, mitPdf?.pdf, mitSelbst);
   return { ...fest, unterlagen: fest.unterlagen.map((x) => (x.id === id && x.festgeschrieben ? { ...x, ausgegeben: erste } : x)) };
 }
 
@@ -2015,6 +2034,13 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
       if (!r.pdfSha256) r.pdfSha256 = r.pdf.sha256;
       delete r.pdfFolgt;
     } else if (basis.pdfFolgt || zweite.pdfFolgt) r.pdfFolgt = true;
+    // E-232: Vermerk „PDF selbst aufbewahren“ bleibt, solange es kein Original gibt (der frühere, auf allen Geräten gleich)
+    const selbst = [basis.pdfSelbst, zweite.pdfSelbst].filter((x): x is PdfSelbst => Boolean(x)).sort((a, b) => a.am.localeCompare(b.am))[0];
+    delete r.pdfSelbst;
+    if (!r.pdf && selbst) {
+      r.pdfSelbst = selbst;
+      delete r.pdfFolgt;
+    }
   }
   // E-193 (4): unbestätigte Ausgaben beider Seiten (nach Zeitpunkt) – keine geht verloren
   const offen = new Map<string, GeteilteFassung>();
@@ -2539,8 +2565,24 @@ export function pdfOriginalSetzen(s: Stand, id: string, pdf: PdfOriginal): Stand
   if (!passt) return s;
   return { ...s, unterlagen: s.unterlagen.map((x) => {
     if (x.id !== id) return x;
-    const { pdfFolgt: _pf, ...rest } = x;
+    const { pdfFolgt: _pf, pdfSelbst: _ps, ...rest } = x;
     return { ...rest, pdf, pdfSha256: x.pdfSha256 ?? pdf.sha256 };
+  }) };
+}
+
+/**
+ * E-232 (T-328 c): Das PDF, das das Original geworden wäre, war größer als 10 MB und ist nicht aufbewahrt – an der
+ * festgeschriebenen Unterlage ohne Original vermerken, dass der Nutzer es selbst aufbewahren muss. Mit `pdfFolgt`
+ * (zuerst XRechnung) war dieses PDF das erste; es kommt kein weiteres als Original.
+ */
+export function pdfSelbstVermerken(s: Stand, id: string, selbst: PdfSelbst): Stand {
+  const u = s.unterlagen.find((x) => x.id === id);
+  const v = pdfSelbstAus(selbst);
+  if (!u || !u.festgeschrieben || u.pdf || u.pdfSelbst || !v) return s;
+  return { ...s, unterlagen: s.unterlagen.map((x) => {
+    if (x.id !== id) return x;
+    const { pdfFolgt: _pf, ...rest } = x;
+    return { ...rest, pdfSelbst: v };
   }) };
 }
 

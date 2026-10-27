@@ -72,7 +72,7 @@ describe("5: Daten für die Betriebsprüfung – kostenlos, genau die verlangten
   const e = pruefexport(s, dateien, "2026-10-26T10:00:00.000Z");
   const zip = unzipSync(e.zip);
 
-  it("ZIP: Listen (CSV), Änderungsprotokoll, E-Rechnungen ein- und ausgehend, Originalbelege, Feldbeschreibung – kein DATEV, keine Sicherung, keine PDFs der Rechnungen", () => {
+  it("ZIP: Listen (CSV), Änderungsprotokoll, E-Rechnungen ein- und ausgehend, Originalbelege, Feldbeschreibung – kein DATEV, keine Sicherung, keine neu erzeugten Rechnungs-PDFs (E-232: aufbewahrte Originale ja, siehe e232-pdf-original)", () => {
     const namen = Object.keys(zip).sort();
     expect(namen).toEqual(e.inhalt);
     for (const n of [PRUEFEXPORT.rechnungen, PRUEFEXPORT.belege, PRUEFEXPORT.kasse, PRUEFEXPORT.protokoll, PRUEFEXPORT.feldbeschreibung]) expect(namen, n).toContain(n);
@@ -80,7 +80,7 @@ describe("5: Daten für die Betriebsprüfung – kostenlos, genau die verlangten
     expect(namen.filter((n) => n.startsWith(PRUEFEXPORT.xmlEin))).toEqual([expect.stringMatching(/^E-Rechnungen\/eingehend\/B2026-\d+_.*\.xml$/)]);
     expect(namen.filter((n) => n.startsWith(PRUEFEXPORT.belegDateien))).toHaveLength(2);
     expect(namen.filter((n) => n.startsWith(PRUEFEXPORT.kasseDateien))).toEqual(["Kasse/2026-10-05_Z17.jpg"]);
-    // nur diese Arten – kein DATEV-Buchungsstapel (Pro), keine eigene Sicherung, keine Rechnungs-PDFs
+    // nur diese Arten – kein DATEV-Buchungsstapel (Pro), keine eigene Sicherung, keine Rechnungs-PDFs (hier ohne aufbewahrtes Original)
     for (const n of namen) expect(n).toMatch(/^(Rechnungen|Belege|Kassenabschluesse|Aenderungsprotokoll)\.csv$|^Feldbeschreibung\.txt$|^E-Rechnungen\/(aus|ein)gehend\/|^Belege\/|^Kasse\//);
     expect(namen.join(" ")).not.toMatch(/EXTF|Buchungsstapel|stand\.json|\.amtlos|Rechnungen\/.*\.pdf/);
     expect(e).toMatchObject({ rechnungen: 2, belege: 3, kasse: 1, xmlAusgehend: 2, xmlEingehend: 1, originale: 3, fehlend: [] });

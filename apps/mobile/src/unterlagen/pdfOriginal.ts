@@ -57,6 +57,26 @@ export function pdfOriginalFuer(datei: string, bytes: Uint8Array, am: string, qu
   return { datei, sha256: pdfPruefwert(bytes), groesse: bytes.length, am, ...(quelle ? { quelle } : {}) };
 }
 
+/**
+ * E-232 (Steuerberater zu T-328 c): Ein PDF über `PDF_ORIGINAL_MAX` bewahrt die App nicht auf – dann muss der Nutzer das
+ * geteilte PDF selbst aufbewahren. Die App sagt es beim Teilen und vermerkt es an der Unterlage (Größe, Zeitpunkt).
+ */
+export interface PdfSelbst {
+  groesse: number;
+  am: string;
+}
+
+/** Gespeicherten Vermerk „PDF selbst aufbewahren“ lesen – nur mit Größe über der Grenze und Zeitpunkt. */
+export function pdfSelbstAus(roh: unknown): PdfSelbst | null {
+  if (!roh || typeof roh !== "object" || Array.isArray(roh)) return null;
+  const r = roh as Record<string, unknown>;
+  if (typeof r.groesse !== "number" || !Number.isFinite(r.groesse) || r.groesse <= PDF_ORIGINAL_MAX || !istIso(r.am)) return null;
+  return { groesse: Math.round(r.groesse), am: r.am };
+}
+
+/** Ist das ein PDF, das nur wegen seiner Größe nicht aufbewahrt werden kann? */
+export const zuGrossZumAufbewahren = (bytes: Uint8Array | null | undefined): bytes is Uint8Array => Boolean(bytes && bytes.length > PDF_ORIGINAL_MAX && istPdf(bytes));
+
 /** Lassen sich diese Bytes aufbewahren (PDF, nicht leer, nicht zu groß)? */
 export const aufbewahrbar = (bytes: Uint8Array | null | undefined): bytes is Uint8Array => Boolean(bytes && bytes.length <= PDF_ORIGINAL_MAX && istPdf(bytes));
 
@@ -137,6 +157,11 @@ export interface PdfAusgabeErgebnis {
   neu?: PdfOriginal;
   /** festgeschrieben ohne Original: das eben ausgegebene PDF ist das erste bzw. passt zum Prüfwert – nachträglich setzen */
   nachgereicht?: PdfOriginal;
+  /**
+   * E-232 (T-328 c): das eben ausgegebene PDF wäre das Original, ist aber größer als `PDF_ORIGINAL_MAX` und wird nicht
+   * aufbewahrt – der Nutzer muss es selbst aufbewahren (Hinweis beim Teilen, Vermerk an der Unterlage).
+   */
+  zuGross?: PdfSelbst;
 }
 
 /**
@@ -155,6 +180,12 @@ export async function pdfAusgabe(u: MitPdf, aufbewahren: boolean, e: PdfAusgabeU
   }
   const erg = await e.erzeugenUndAusgeben();
   const r: PdfAusgabeErgebnis = { ok: erg.ok, ...(erg.sha256 ? { sha256: erg.sha256 } : {}), original: false, originalFehlt };
+  if (erg.ok && zuGrossZumAufbewahren(erg.bytes)) {
+    // E-232: wäre das Original geworden (erste Ausgabe bzw. erstes PDF nach der XRechnung bzw. passt zum Prüfwert)
+    const waereOriginal = u.festgeschrieben ? !u.pdf && (erstesPdf(u) || (Boolean(u.pdfSha256) && pdfPruefwert(erg.bytes) === u.pdfSha256)) : aufbewahren;
+    if (waereOriginal) r.zuGross = { groesse: erg.bytes.length, am: e.jetzt() };
+    return r;
+  }
   if (!erg.ok || !aufbewahrbar(erg.bytes)) return r;
   const bytes = erg.bytes;
   const ablegen = async (quelle?: "eingelesen") => {

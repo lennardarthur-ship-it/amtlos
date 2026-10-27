@@ -32,6 +32,10 @@ export type KontenvorgabeKonto =
   | "igErwerb7"
   | "igErwerbOhneVst19"
   | "igErwerbOhneVst7"
+  | "kursAufwand"
+  | "kursErtrag"
+  | "forderungsverlust19"
+  | "forderungsverlust7"
   | "homeoffice"
   | "anlageMaschinen"
   | "anlageBga"
@@ -84,6 +88,11 @@ export const KONTENVORGABE_FELDER: readonly { id: KontenvorgabeKonto; titel: str
   { id: "igErwerb7", titel: "Innergemeinschaftlicher Erwerb 7 % (mit Vorsteuer)", hilfe: "Wie 19 %, für Waren zu 7 %. Standard SKR03 3420 / SKR04 5420." },
   { id: "igErwerbOhneVst19", titel: "Innergemeinschaftlicher Erwerb 19 % (ohne Vorsteuer)", hilfe: "Erwerb ohne Vorsteuerabzug (z. B. Kleinunternehmer mit Erwerbsbesteuerung, nur steuerfreie Umsätze): Automatikkonto nur für die Umsatzsteuer. Standard SKR03 3435 / SKR04 5435." },
   { id: "igErwerbOhneVst7", titel: "Innergemeinschaftlicher Erwerb 7 % (ohne Vorsteuer)", hilfe: "Wie 19 % ohne Vorsteuer, für Waren zu 7 %. Standard SKR03 3430 / SKR04 5430." },
+  // E-232 (Steuerberater 27.10.2026): Kursdifferenzen bei Belegen in fremder Währung, Forderungsverluste (Bilanz)
+  { id: "kursAufwand", titel: "Aufwendungen aus Kursdifferenzen", hilfe: "Beleg in fremder Währung: mehr in Euro gezahlt als umgerechnet – eigene Zeile ohne Steuerschlüssel. Standard SKR03 2150 / SKR04 6880 (vom Steuerberater genannt)." },
+  { id: "kursErtrag", titel: "Erträge aus Kursdifferenzen", hilfe: "Beleg in fremder Währung: weniger in Euro gezahlt als umgerechnet – eigene Zeile ohne Steuerschlüssel. Standard SKR03 2660 / SKR04 4840 (vom Steuerberater genannt)." },
+  { id: "forderungsverlust19", titel: "Forderungsverluste 19 % (Bilanz)", hilfe: "Bilanzierende Betriebe: uneinbringliche Forderung, Bruttobetrag gegen die Forderung bzw. den Debitor, Umsatzsteuer-Automatik. Standard SKR03 2406 / SKR04 6936 (vom Steuerberater genannt)." },
+  { id: "forderungsverlust7", titel: "Forderungsverluste 7 % (Bilanz)", hilfe: "Wie 19 %, für Forderungen zu 7 %. Standard SKR03 2401 / SKR04 6931 (vom Steuerberater genannt)." },
   { id: "homeoffice", titel: "Homeoffice-Pauschale / Arbeitszimmer" },
   { id: "anlageMaschinen", titel: "Anlagen: Maschinen" },
   { id: "anlageBga", titel: "Anlagen: Betriebs- und Geschäftsausstattung" },
