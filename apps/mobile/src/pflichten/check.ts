@@ -11,6 +11,8 @@ import { SCHRITTE, type Frage } from "@amtlos/i18n/fragen";
 import { QUELLFAKTEN, auswerten, entscheidendeSaetze, zuErfragendeFakten, type Ereignis, type Katalog, type Knoten, type Pflicht } from "@amtlos/rules-engine";
 import roh from "./katalog.json";
 import { istGeprueft, offeneRegelwerte, pruefVermerk, type PruefungRoh, type RegelwertRoh } from "./pruefer";
+import { KU_VA_ID, kuVaFiltern, kuVaTermine } from "./kuVoranmeldung";
+import { T as TEXT_APP } from "../texte";
 
 export const KATALOG = roh as unknown as Katalog;
 /** E-211: Regelwerte mit Prüfstand – nicht bestätigte stehen im Vermerk der Pflichten, die auf sie verweisen */
@@ -397,6 +399,11 @@ export interface PflichtInfo {
   uebermittelnVortag?: boolean;
   /** E-206: Hinweise aus dem Katalog zum gewählten Rhythmus, z. B. warum monatlich statt der Angabe „vierteljährlich“ */
   rhythmusHinweise?: string[];
+  /**
+   * E-237 (T-339): Termine nur für Zeiträume mit Steuer laut Belegen (Voranmeldung des Kleinunternehmers, C.37) – ohne
+   * solche Belege steht der Eintrag ohne Termin unter „gilt“; nach dem Rhythmus wird dann nicht gefragt
+   */
+  nurZeitraeumeMitSteuer?: boolean;
   /** alle Termine ab heute in den nächsten zwölf Monaten (ISO, aufsteigend) – für den Jahresblick */
   termine: string[];
   /**
@@ -713,8 +720,11 @@ function profilFelder(k: Knoten, aus = new Set<string>()): string[] {
  * Ereignisse leitet `ereignisseAusStand` aus Profil und Unterlagen ab (z. B. Beschäftigte ⇒ Einstellung).
  * `finanzen`: Fakten aus Rechnungen, Kasse und Zahlungseingängen auf dem Gerät mit vollem Pfad (`finanzen.*`, z. B. der
  * vereinnahmte Umsatz für die Kleinunternehmer-Wächter aus unterlagen/kuUmsatz.ts `umsatzFakten`).
+ * E-237 (T-339): `opt.kuVaZeitraeume` – Zeiträume mit Steuer nach § 13b UStG bzw. auf Erwerbe mit Erwerbsbesteuerung laut
+ * Belegen (pflichten/kuVoranmeldung.ts `kuVaZeitraeume`). Damit zeigt die App Termine der Voranmeldung des
+ * Kleinunternehmers (C.37) nur für diese Zeiträume – ein Filter der Anzeige, kein Auslöser. Ohne Angabe wie im Katalog.
  */
-export function auswertung(antworten: Profil, stichtag: string, unterlagen: readonly UnterlageFuerEreignis[] = [], mitarbeiter: readonly MitarbeiterFuerCheck[] = [], finanzen: Readonly<Record<string, number>> = {}): Auswertung {
+export function auswertung(antworten: Profil, stichtag: string, unterlagen: readonly UnterlageFuerEreignis[] = [], mitarbeiter: readonly MitarbeiterFuerCheck[] = [], finanzen: Readonly<Record<string, number>> = {}, opt: { kuVaZeitraeume?: ReadonlySet<string> } = {}): Auswertung {
   const profil = profilMitStand(antworten, stichtag, mitarbeiter);
   const fakten: Record<string, unknown> = { ...Object.fromEntries(Object.entries(profil).filter(([, w]) => w !== null && w !== undefined).map(([k, w]) => [`profil.${k}`, w])), ...Object.fromEntries(Object.entries(finanzen).filter(([k, w]) => k.startsWith("finanzen.") && Number.isFinite(w))) };
   const ereignisse = ereignisseAusStand(profil, stichtag, unterlagen, mitarbeiter);
@@ -733,7 +743,11 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
   // E-192: auch die Termine der letzten 13 Monate – ein versäumter Termin bleibt sichtbar, bis er abgehakt ist (`terminStand`)
   const ergebnisse = auswerten({ katalog: KATALOG, fakten, ereignisse, stichtag, kalender: new StandardKalender(), fenster: { von: plusMonate(stichtag, -RUECKBLICK_MONATE), bis: plusMonate(stichtag, 12) } });
   const nachId = new Map(KATALOG.pflichten.map((p) => [p.id, p]));
-  const info = (e: (typeof ergebnisse)[number]): PflichtInfo => {
+  // E-237: Voranmeldung des Kleinunternehmers nur in Zeiträumen mit solcher Steuer laut Belegen (nur mit Einkauf in der EU)
+  const kuVa = opt.kuVaZeitraeume && kuVaFiltern(profil) ? opt.kuVaZeitraeume : null;
+  const info = (e0: (typeof ergebnisse)[number]): PflichtInfo => {
+    const gefiltert = Boolean(kuVa && e0.pflicht_id === KU_VA_ID && e0.ergebnis === "gilt");
+    const e = gefiltert ? { ...e0, termine: kuVaTermine(e0.termine, kuVa!) } : e0;
     const p = nachId.get(e.pflicht_id) as Pflicht & { stelle?: unknown; quellen?: { titel: string; url?: string }[]; pruefung?: PruefungRoh };
     const termine = e.termine.map((t) => t.faellig_am).filter((d) => d >= stichtag).sort();
     const termin = termine[0] ?? null;
@@ -765,7 +779,8 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       vorlagen: VORLAGEN_JE_PFLICHT.get(p.id) ?? [],
       naechsterTermin: termin,
       ...(e.termine.some((t) => "eingang_am" in t && t.eingang_am) ? { uebermittelnVortag: true } : {}),
-      ...(e.hinweis_texte?.length ? { rhythmusHinweise: e.hinweis_texte.map(text).filter(Boolean) } : {}),
+      ...(e.hinweis_texte?.length || gefiltert ? { rhythmusHinweise: [...(e.hinweis_texte ?? []).map(text).filter(Boolean), ...(gefiltert ? [TEXT_APP.e237_ku_va_hinweis(e.termine.length > 0)] : [])] } : {}),
+      ...(gefiltert ? { nurZeitraeumeMitSteuer: true } : {}),
       termine,
       vergangeneTermine: vergangen,
       ...(einmaligFest ? { einmaligFest: true } : {}),
@@ -841,7 +856,7 @@ export function offeneFragenNachWirkung(a: Auswertung, profil: Profil): { feld: 
     return (!b || b.in.includes(String(profil[b.feld]))) && passtImmer(f, profil);
   };
   // R10: auch geltende Pflichten ohne Termin, deren Rhythmus noch offen ist (z. B. Umsatzsteuer-Voranmeldung)
-  const offenerRhythmus = a.gilt.filter((p) => !p.termine.length && p.offeneFragen.length && KATALOG.pflichten.find((k) => k.id === p.id)?.frist.typ === "wiederkehrend");
+  const offenerRhythmus = a.gilt.filter((p) => !p.termine.length && !p.nurZeitraeumeMitSteuer && p.offeneFragen.length && KATALOG.pflichten.find((k) => k.id === p.id)?.frist.typ === "wiederkehrend");
   for (const p of a.unbekannt) for (const f of p.offeneFragen) if (!beantwortet(profil, f) && passt(f)) zaehler.set(f, (zaehler.get(f) ?? 0) + 1);
   // beim offenen Rhythmus direkt nach dem Rhythmus fragen statt nach der Steuer des Vorjahres (Nutzertest Mehmet: „weiß ich nicht“)
   for (const p of offenerRhythmus)
@@ -1147,7 +1162,7 @@ export function dringlichkeit(a: Auswertung, e: Erledigt, heute: string) {
   const terminBald = mitTermin.filter((p) => p.naechsterTermin! <= bald);
   // Hinweise und Optionen ohne Termin sind nie „dringend“ (außer offenen Klärungen, R12)
   // R12 (Coach #3): die offene Einordnung (Gewerbe oder freier Beruf?) ist ein Hinweis, aber „jetzt dran“
-  const wichtigOhne = selbst.filter((p) => !p.naechsterTermin && dringendOhneTermin(p) && (p.einordnung === "pflicht" || OFFEN_TROTZ_BESTAND.has(p.id)));
+  const wichtigOhne = selbst.filter((p) => !p.naechsterTermin && !p.nurZeitraeumeMitSteuer && dringendOhneTermin(p) && (p.einordnung === "pflicht" || OFFEN_TROTZ_BESTAND.has(p.id)));
   const jetzt = [...terminBald, ...wichtigOhne];
   const naechsteWochen = mitTermin.filter((p) => p.naechsterTermin! > bald && p.naechsterTermin! <= spaeter);
   const imBlick = offen.filter((p) => !jetzt.includes(p) && !naechsteWochen.includes(p));

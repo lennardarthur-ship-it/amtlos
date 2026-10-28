@@ -29,18 +29,16 @@ const C37 = YAML.parse(fs.readFileSync(path.join(WURZEL, `catalog/pflichten/${ID
 const KU: Profil = { rechtsform: "einzelunternehmen", gruendungsdatum: "2022-01-01", "taetigkeit.einordnung": "gewerbe", bundesland: "BY", "ust.kleinunternehmer": true, "umsatz.vorjahr": 20000, "einkauf.eu_unternehmen": true };
 
 describe("E-233 (1): Entwurf C.37 erscheint erst mit der Freigabe", () => {
-  it("im Katalog als Entwurf mit nicht_vor_freigabe", () => {
-    // E-234: Folgen vom Rechtsanwalt freigegeben, Steuerberater steht aus ⇒ in_pruefung (weiter ohne Freigabe)
-    expect(["entwurf", "in_pruefung"]).toContain(C37.pruefung.status);
-    expect(C37.nicht_vor_freigabe).toBe(true);
-    expect(zurueckgehalten(C37)).toBe(true);
+  // E-237: C.37 ist seit dem 28.10.2026 freigegeben (v3) – das Merkmal ist entfernt, der Eintrag steht im Bündel
+  it("E-237: freigegeben, ohne nicht_vor_freigabe, nicht mehr zurückgehalten", () => {
+    expect(C37.pruefung.status).toBe("freigegeben");
+    expect(C37.nicht_vor_freigabe).toBeUndefined();
+    expect(zurueckgehalten(C37)).toBe(false);
   });
-  it("nicht im Bündel der App – die Auswertung zeigt ihn weder als „gilt“ noch als „hängt ab“", () => {
-    expect(KATALOG.pflichten.map((p) => p.id)).not.toContain(ID);
+  it("E-237: im Bündel der App – die Auswertung zeigt ihn als „gilt“; das Merkmal steht nie im Bündel", () => {
+    expect(KATALOG.pflichten.map((p) => p.id)).toContain(ID);
     const a = auswertung(KU, "2026-10-27");
-    expect([...a.gilt, ...a.unbekannt].map((x) => x.id)).not.toContain(ID);
-    const unterlagen = JSON.parse(fs.readFileSync(path.join(__dirname, "../src/unterlagen/katalog.json"), "utf8")) as { id: string }[];
-    expect(unterlagen.map((p) => p.id)).not.toContain(ID);
+    expect(a.gilt.map((x) => x.id)).toContain(ID);
     for (const datei of ["../src/pflichten/katalog.json", "../src/unterlagen/katalog.json"]) expect(fs.readFileSync(path.join(__dirname, datei), "utf8")).not.toContain("nicht_vor_freigabe");
   });
   it("der Hinweis der App zu § 18 Abs. 4a UStG bleibt (Beleg, Übernahme in die Voranmeldung)", () => {
@@ -53,8 +51,8 @@ describe("E-233 (1): Entwurf C.37 erscheint erst mit der Freigabe", () => {
     expect(checkFragen({ ...ohne, "einkauf.ausland_unternehmen": true }).map((f) => f.feld)).toContain("einkauf.eu_unternehmen");
     expect(fs.readFileSync(path.join(WURZEL, "catalog/pflichten/gruendung.ust_idnr.yaml"), "utf8")).toContain("profil.einkauf.eu_unternehmen");
   });
-  it("store-check: kein blockierender Entwurf, C.37 als zurückgehalten genannt", () => {
-    expect(katalogEntwuerfe()).toEqual({ blockierend: [], zurueckgehalten: [ID] });
+  it("store-check: kein blockierender Entwurf, keiner mehr zurückgehalten (E-237)", () => {
+    expect(katalogEntwuerfe()).toEqual({ blockierend: [], zurueckgehalten: [] });
   });
   it("Regel: nur ohne Freigabe zurückgehalten; ein Entwurf ohne Merkmal bleibt Startblocker; das Merkmal geht nie ins Bündel", () => {
     expect(zurueckgehalten({ nicht_vor_freigabe: true, pruefung: { status: "freigegeben" } })).toBe(false);
@@ -66,6 +64,11 @@ describe("E-233 (1): Entwurf C.37 erscheint erst mit der Freigabe", () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "e233-"));
     try {
       fs.cpSync(path.join(WURZEL, "catalog"), tmp, { recursive: true });
+      expect(validiereKatalog(tmp).fehler).toEqual([]);
+      // E-237: C.37 ist freigegeben – für die Probe als zurückgehaltener Entwurf
+      const c37Datei = path.join(tmp, `pflichten/${ID}.yaml`);
+      const c37 = YAML.parse(fs.readFileSync(c37Datei, "utf8")) as Record<string, unknown>;
+      fs.writeFileSync(c37Datei, YAML.stringify({ ...c37, nicht_vor_freigabe: true, pruefung: { status: "entwurf", geprueft_von: null, geprueft_am: null } }));
       expect(validiereKatalog(tmp).fehler).toEqual([]);
       const datei = path.join(tmp, "pflichten/steuern.ust_voranmeldung.yaml");
       const p = YAML.parse(fs.readFileSync(datei, "utf8")) as { erklaerung: { de: string } };
@@ -106,7 +109,9 @@ describe("E-233 (3): PRUEFLISTE eingeordnet", () => {
     const z = (t: string) => zeilen.find((x) => x.startsWith(`| ${t} |`)) ?? "";
     // E-234: T-337 beantwortet, Rest in T-345 (Prüferrunde)
     expect(z("T-337")).toMatch(/Beantwortet 27\.10\.2026 \(E-234\)/);
-    expect(z("T-345")).toMatch(/\[B → Prüferrunde 27\.10\.2026 \(versandt\)\]/);
+    // E-237: T-345 beantwortet (Nachtrag des Steuerberaters), C.37 freigegeben; T-339 umgesetzt
+    expect(z("T-345")).toMatch(/Beantwortet 28\.10\.2026 \(E-237/);
+    expect(z("T-339")).toMatch(/Umgesetzt 28\.10\.2026 \(E-237\)/);
     expect(z("T-337")).not.toMatch(/Startblocker:\*\* `steuern/);
     expect(z("T-339")).toMatch(/Selbst geklärt 27\.10\.2026 \(E-233\)/);
   });

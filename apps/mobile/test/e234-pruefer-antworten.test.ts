@@ -48,25 +48,26 @@ describe("E-234 S5 b: Kern-Frage nach dem Einkauf im Ausland", () => {
   });
 });
 
-describe("E-234 S5/R1: C.37 v2 bleibt bis zur Freigabe zurückgehalten", () => {
+// E-237: seit dem Nachtrag vom 28.10.2026 als v3 freigegeben (Steuerberater ohne Folgen, Rechtsanwalt Folgen) und im Bündel
+describe("E-234 S5/R1: C.37 nach der Antwort des Steuerberaters (E-237: v3 freigegeben)", () => {
   const c37 = YAML.parse(lies(`catalog/pflichten/${ID}.yaml`)) as { version: number; nicht_vor_freigabe: boolean; kurz: { de: string }; erklaerung: { de: string }; pruefung: { status: string } };
-  it("v2 mit Kurztext des Steuerberaters, Jahreserklärung bis 31.07. (§ 149 Abs. 2 AO), weiter zurückgehalten", () => {
-    expect(c37.version).toBe(2);
-    expect(c37.nicht_vor_freigabe).toBe(true);
+  it("Kurztext des Steuerberaters, Jahreserklärung bis 31.07. (§ 149 Abs. 2 AO); E-237: v3, nicht mehr zurückgehalten", () => {
+    expect(c37.version).toBe(3);
+    expect(c37.nicht_vor_freigabe).toBeUndefined();
     expect(c37.kurz.de).toContain("für die Voranmeldungszeiträume, in denen diese Steuer entsteht, eine Voranmeldung ab – bis zum 10. Tag nach Ablauf des Zeitraums.");
     expect(c37.erklaerung.de).toContain("bis zum 31.07. des Folgejahres (§ 149 Abs. 2 AO");
     expect(c37.erklaerung.de).toContain("§ 13b Abs. 2 Nr. 1 UStG");
     expect(c37.erklaerung.de).not.toMatch(/jeden Monat/);
-    expect(KATALOG.pflichten.map((p) => p.id)).not.toContain(ID);
-    expect(katalogEntwuerfe()).toEqual({ blockierend: [], zurueckgehalten: [ID] });
+    expect(KATALOG.pflichten.map((p) => p.id)).toContain(ID);
+    expect(katalogEntwuerfe()).toEqual({ blockierend: [], zurueckgehalten: [] });
   });
-  it("Register: Folgen vom Rechtsanwalt freigegeben (Umfang sanktion), Steuerberater steht aus ⇒ in_pruefung", () => {
-    expect(c37.pruefung.status).toBe("in_pruefung");
+  it("Register: Folgen vom Rechtsanwalt freigegeben (Umfang sanktion); E-237: Steuerberater ohne Folgen ⇒ freigegeben", () => {
+    expect(c37.pruefung.status).toBe("freigegeben");
     expect(lies("docs/freigabe-katalog/anwenden.py")).toContain('"steuer_folgen_recht": [(STEUERN, "ohne_sanktion"), (RECHT, "sanktion")]');
     const reg = YAML.parse(lies("docs/freigabe-katalog/freigaben.yaml")) as { pruefer: string; umfang: string; eintraege: Record<string, unknown> }[];
     expect(reg.some((b) => b.pruefer === "recht" && b.umfang === "sanktion" && ID in b.eintraege)).toBe(true);
-    expect(reg.some((b) => b.pruefer === "steuern" && ID in b.eintraege)).toBe(false);
-    expect(execFileSync("python3", [path.join(WURZEL, "docs/freigabe-katalog/anwenden.py"), "--pruefen"], { cwd: WURZEL, encoding: "utf8" })).toContain("'in_pruefung': 1");
+    expect(reg.some((b) => b.pruefer === "steuern" && b.umfang === "ohne_sanktion" && ID in b.eintraege)).toBe(true);
+    expect(execFileSync("python3", [path.join(WURZEL, "docs/freigabe-katalog/anwenden.py"), "--pruefen"], { cwd: WURZEL, encoding: "utf8" })).toContain("{'freigegeben': 231, 'in_pruefung': 0, 'entwurf': 0}");
   });
 });
 

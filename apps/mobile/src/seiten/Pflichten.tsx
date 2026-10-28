@@ -8,11 +8,13 @@ import { useMeldung } from "../ui/meldung";
 import { BausteinListe, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, SCHRIFT, useFarben, weich } from "../ui/thema";
-import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, type Auswertung, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringendOhneTermin, dringlichkeit, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, hakenOhne, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, terminStand, zaehlung, type PflichtInfo } from "../pflichten/check";
+import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, type Auswertung, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringendOhneTermin, dringlichkeit, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, hakenOhne, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, regelwert, selten, terminStand, zaehlung, type PflichtInfo } from "../pflichten/check";
 import { erinnerungsPlan } from "../pflichten/erinnerungsplan";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { LEERER_STAND, heute } from "../unterlagen/speicher";
 import { umsatzFakten } from "../unterlagen/kuUmsatz";
+import { ERWERBSSCHWELLE_REGELWERT } from "../unterlagen/erwerbsschwelle";
+import { kuVaZeitraeume } from "../pflichten/kuVoranmeldung";
 import { useAmtlos, useStandWahl } from "../zustand";
 import { Antwort, CheckAblauf } from "./Check";
 import { SicherungsKarte } from "./Sicherung";
@@ -64,8 +66,13 @@ function useAuswertungOhneHaken() {
   const rechnungen = useMemo(() => unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben).map((u) => `${u.id}:${u.bezahlt ?? ""}:${JSON.stringify(u.zahlungen ?? [])}:${u.storniertDurch ?? ""}:${u.konfliktKopieVon ?? ""}`).join("|"), [unterlagen]);
   const finanzen = useMemo(() => umsatzFakten({ ...LEERER_STAND, profil, unterlagen, kasse, sachentnahmen, betrieb }, tag), [profil, rechnungen, kasse, sachentnahmen, betrieb, tag]);
   const umsatz = JSON.stringify(finanzen);
-  // `schluessel`, `personen` und `umsatz` stehen für alles, was die Auswertung daraus liest – bewusst statt der Listen
-  return useMemo(() => auswertung(profil, tag, unterweisungen, mitarbeiter, finanzen), [profil, schluessel, personen, umsatz, tag]);
+  // E-237 (T-339): Zeiträume mit Steuer nach § 13b UStG bzw. auf Erwerbe mit Erwerbsbesteuerung laut Belegen – die Voranmeldung
+  // des Kleinunternehmers (C.37) zeigt Frist und Erinnerung nur für diese Zeiträume
+  const belege = useStandWahl((s) => s.belege);
+  const kuVa = useMemo(() => kuVaZeitraeume(belege, profil, regelwert(ERWERBSSCHWELLE_REGELWERT)), [belege, profil]);
+  const kuVaSchluessel = [...kuVa].sort().join("|");
+  // `schluessel`, `personen`, `umsatz` und `kuVaSchluessel` stehen für alles, was die Auswertung daraus liest – bewusst statt der Listen
+  return useMemo(() => auswertung(profil, tag, unterweisungen, mitarbeiter, finanzen, { kuVaZeitraeume: kuVa }), [profil, schluessel, personen, umsatz, kuVaSchluessel, tag]);
 }
 
 /**

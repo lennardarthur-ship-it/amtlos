@@ -5,9 +5,11 @@ import { T as TEXT } from "../texte";
 import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Stempel, Symbol, Karte, Knopf, MehrfachWahl, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
-import { CHECK_FELDER, WEISS_NICHT_FELDER, auswertung, checkFragenAnzahl, beantwortet, checkFragen, dringlichkeit, istErledigt, folgeAntworten, offeneFragenNachWirkung, selten, terminStand, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
+import { CHECK_FELDER, WEISS_NICHT_FELDER, auswertung, checkFragenAnzahl, beantwortet, checkFragen, dringlichkeit, istErledigt, folgeAntworten, offeneFragenNachWirkung, regelwert, selten, terminStand, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { umsatzFakten } from "../unterlagen/kuUmsatz";
+import { ERWERBSSCHWELLE_REGELWERT } from "../unterlagen/erwerbsschwelle";
+import { kuVaZeitraeume } from "../pflichten/kuVoranmeldung";
 import { GesperrtePflichten, PflichtZeile } from "./Pflichten";
 import { langBestehend, schonDaKandidaten } from "./schonDa";
 import { WasHastDuSchon } from "./WasHastDu";
@@ -211,7 +213,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
       setZwischen(true);
     }
   }, [voll, amEnde, zusatz, z.stand.profil, liste]);
-  const roh = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen, z.stand.mitarbeiter, umsatzFakten(z.stand, heute())) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen, z.stand.mitarbeiter, z.stand.kasse, z.stand.sachentnahmen]);
+  const roh = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen, z.stand.mitarbeiter, umsatzFakten(z.stand, heute()), { kuVaZeitraeume: kuVaZeitraeume(z.stand.belege, z.stand.profil, regelwert(ERWERBSSCHWELLE_REGELWERT)) }) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen, z.stand.mitarbeiter, z.stand.kasse, z.stand.sachentnahmen, z.stand.belege]);
   // E-192: mit dem Stand der Haken – ein versäumter Termin steht vorn (wie im Pflichten-Tab)
   const a = useMemo(() => (roh ? terminStand(roh, z.stand, heute()) : null), [roh, z.stand.erledigt, z.stand.zeiten]);
   const d = useMemo(() => (a ? dringlichkeit(a, { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb }, heute()) : null), [a, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb]);

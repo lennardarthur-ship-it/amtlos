@@ -198,7 +198,9 @@ pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche 
     const { katalogEntwuerfe, zurueckgehalten } = await import("./interna.mjs");
     const kat = katalogEntwuerfe();
     const entwurf = [...new Set([...katalog.pflichten.filter((p) => p.pruefung?.status === "entwurf").map((p) => p.id), ...kat.blockierend])].sort();
-    pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; Prüfpaket beim Gründer, PRUEFLISTE T-198; E-223: Entwürfe sind Startblocker, PRUEFLISTE T-313)` : ""}${kat.zurueckgehalten.length ? ` – bis zur Freigabe zurückgehalten, nicht in der App und kein Startblocker (E-233): ${kat.zurueckgehalten.join(", ")}` : ""}`);
+    // E-237: mit Zahl (freigegeben von allen im Bündel) – seit C.37 wieder alle Einträge des Katalogs im Bündel
+    const frei = katalog.pflichten.filter((p) => p.pruefung?.status === "freigegeben").length;
+    pruefe(!entwurf.length, `Katalog: jeder Eintrag fachlich freigegeben (${frei} von ${katalog.pflichten.length} im Bündel)${entwurf.length ? ` – ${entwurf.length} neue Einträge noch ohne Freigabe (${entwurf.join(", ")}; Prüfpaket beim Gründer, PRUEFLISTE T-198; E-223: Entwürfe sind Startblocker, PRUEFLISTE T-313)` : ""}${kat.zurueckgehalten.length ? ` – bis zur Freigabe zurückgehalten, nicht in der App und kein Startblocker (E-233): ${kat.zurueckgehalten.join(", ")}` : ""}`);
     const imBuendel = katalog.pflichten.filter((p) => kat.zurueckgehalten.includes(p.id) || zurueckgehalten(p)).map((p) => p.id);
     pruefe(!imBuendel.length, `Bündel ohne zurückgehaltene Einträge (E-233, katalog-buendel.mjs)${imBuendel.length ? ` – ${imBuendel.join(", ")} (Bündel neu erzeugen)` : ""}`);
   }

@@ -36,7 +36,7 @@ describe("E-234 (a): Voranmeldungszeitraum nach § 18 Abs. 2 UStG", () => {
     const genau = lauf({ "profil.einkauf.ausland_unternehmen": true, "profil.ust.zahllast_vorjahr": 9000 }, "2026-10-27", { von: "2026-11-01", bis: "2027-01-31" });
     expect(genau.termine.map((t) => t.periode)).toEqual(["2026-Q4"]);
   });
-  it("Neugründer: bis zur Antwort des Steuerberaters vierteljährlich (kein Neugründer-Zweig wie in C.24)", () => {
+  it("Neugründer: vierteljährlich (kein Neugründer-Zweig wie in C.24; E-237: Neugründer-Regel gilt für Kleinunternehmer nicht)", () => {
     const r = lauf({ "profil.einkauf.ausland_unternehmen": true, "profil.gruendungsdatum": "2027-01-04" }, "2026-10-27", { von: "2027-01-01", bis: "2027-12-31" });
     expect(r.termine.map((t) => t.periode)).toEqual(["2027-Q1", "2027-Q2", "2027-Q3"]);
   });

@@ -15,7 +15,8 @@ const imCheck = (p: Profil, am = "2026-10-25T08:00:00.000Z") => Object.fromEntri
 const jung: Profil = { "taetigkeit.branchen": ["it_agentur_freelancer"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "BE", "beschaeftigte.gesamt": 0, "ust.kleinunternehmer": true, gruendungsdatum: "2026-09-01", steuerberater: false, "online.website": false };
 /** typisches Einzelunternehmen nach dem Pflichten-Check (Kleinunternehmer, keine Fragen zum Vorjahr beantwortet) */
 // E-231: Kleinunternehmer ohne Einkauf im EU-Ausland (Kern-Check-Frage seit E-231) – sonst „hängt ab“ die Voranmeldung nach § 18 Abs. 4a UStG mit monatlichem Termin
-const solo: Profil = { "taetigkeit.branchen": ["handwerk"], rechtsform: "einzelunternehmen", "gesellschaft.handelsregister": false, "taetigkeit.einordnung": "gewerbe", bundesland: "NW", "beschaeftigte.gesamt": 0, "ust.kleinunternehmer": true, gruendungsdatum: "2023-01-01", steuerberater: false, "online.website": false, "einkauf.eu_unternehmen": false };
+// E-237: C.37 steht wieder im Bündel (freigegeben) – ohne Antwort zum Einkauf im Ausland (Kern-Frage seit E-234) „hängt ab“ mit Terminen je Vierteljahr
+const solo: Profil = { "taetigkeit.branchen": ["handwerk"], rechtsform: "einzelunternehmen", "gesellschaft.handelsregister": false, "taetigkeit.einordnung": "gewerbe", bundesland: "NW", "beschaeftigte.gesamt": 0, "ust.kleinunternehmer": true, gruendungsdatum: "2023-01-01", steuerberater: false, "online.website": false, "einkauf.eu_unternehmen": false, "einkauf.ausland_unternehmen": false };
 const stand = (p: Profil, heute: string, erledigt: Record<string, string> = {}, zeiten: Record<string, string> | undefined = imCheck(p)) => {
   const a = terminStand(auswertung(p, heute), { erledigt, zeiten }, heute);
   return { a, e: { erledigt, zeiten, unterlagen: [], betrieb, heute } };

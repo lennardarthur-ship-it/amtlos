@@ -4,13 +4,15 @@
 # Hinweis der App am Beleg und bei der Übernahme in die Voranmeldung (§ 18 Abs. 4a UStG) bleibt
 # E-234 (Steuerberater 27.10.2026, S5 und Prüfpaket): v2 – Voranmeldungszeitraum nach § 18 Abs. 2 UStG statt „Monate“,
 # Auslöser auf Waren und Leistungen von Unternehmen im Ausland erweitert, Jahreserklärung mit Frist; Folgen unverändert
-# (vom Rechtsanwalt am 27.10.2026 bestätigt, Register). Bleibt zurückgehalten, bis der Steuerberater die Neugründer-Frage
-# beantwortet und v2 freigibt (PRUEFLISTE T-345).
+# (vom Rechtsanwalt am 27.10.2026 bestätigt, Register).
+# E-237 (Steuerberater, Nachtrag 28.10.2026 zu S5 a): Die Neugründer-Regel gilt für Kleinunternehmer nicht (Abschnitt 18.7
+# Abs. 1 Satz 4 UStAE) – v3: Kalendervierteljahr auch im Gründungs- und Folgejahr, Kalendermonat nur bei mehr als 9.000 €
+# Steuer im Vorjahr, keine freiwillige monatliche Abgabe (§ 18 Abs. 4a Satz 3 UStG). Freigegeben (Steuerberater alles außer
+# Folgen, Rechtsanwalt Folgen) – nicht mehr zurückgehalten, steht im Bündel der App.
 schema_version: 1
 id: steuern.ust_voranmeldung_kleinunternehmer
-version: 2
+version: 3
 katalog_nr: C.37
-nicht_vor_freigabe: true
 titel:
   de: Umsatzsteuer-Voranmeldung als Kleinunternehmer bei § 13b und Erwerben aus dem EU-Ausland
 # Steuerberater 27.10.2026 (Prüfpaket, Punkt 1): Kurztext in seiner Fassung
@@ -64,26 +66,22 @@ ausloeser:
         de: Du kaufst bei Unternehmen in anderen EU-Ländern ein.
 frist:
   typ: wiederkehrend
-  # Steuerberater 27.10.2026 (S5 a): Voranmeldungszeitraum nach § 18 Abs. 2 UStG – in der Regel das Kalendervierteljahr, der
-  # Kalendermonat bei mehr als 9.000 € Steuer im Vorjahr (Regelwert wie C.24); fällig am 10. Tag nach Ablauf. Ob die
-  # Neugründer-Regel (§ 18 Abs. 2 Satz 4 UStG) hier gilt, klärt er noch – bis dahin vierteljährlich (keine Neugründer-Zweige
-  # wie in C.24). Die Engine kennt die Zeiträume mit solcher Steuer nicht (Belege nur auf dem Gerät) – Erinnerung je Zeitraum
-  # mit Hinweis im Text; nur in Zeiträumen mit Steuer erst mit der Freigabe (T-339)
+  # Steuerberater 27.10.2026 (S5 a) und Nachtrag 28.10.2026: Voranmeldungszeitraum ist das Kalendervierteljahr (§ 18 Abs. 4a
+  # Satz 2 i. V. m. Abs. 2 Satz 1 UStG), auch im Gründungs- und Folgejahr – die Neugründer-Regel (§ 18 Abs. 2 Satz 4 UStG) gilt
+  # für Kleinunternehmer nicht (Abschnitt 18.7 Abs. 1 Satz 4 UStAE); der Kalendermonat nur, wenn die Steuer des Vorjahres mehr
+  # als 9.000 € betrug (§ 18 Abs. 2 Satz 2 UStG, Regelwert wie C.24). Eine freiwillige monatliche Abgabe ist ausgeschlossen
+  # (§ 18 Abs. 4a Satz 3 UStG) – deshalb zählt die Angabe zum Rhythmus (profil.ust.voranmeldung_rhythmus) hier nicht. Fällig
+  # am 10. Tag nach Ablauf. Die Engine kennt die Zeiträume mit solcher Steuer nicht (Belege nur auf dem Gerät): Server und
+  # Web rechnen jeden Zeitraum (Satz im Text); die App zeigt Frist und Erinnerung nur für Zeiträume mit solcher Steuer laut
+  # Belegen (E-237, T-339: Filter der Anzeige in apps/mobile/src/pflichten/kuVoranmeldung.ts, kein Auslöser)
   rhythmus:
     waehle:
       - wenn:
-          any:
-            - all:
-                - { feld: profil.ust.voranmeldung_rhythmus, op: vorhanden }
-                - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: monatlich }
-            - all:
-                - any:
-                    - { feld: profil.ust.voranmeldung_rhythmus, op: nicht_vorhanden }
-                    - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: unklar }
-                - { feld: profil.ust.zahllast_vorjahr, op: vorhanden }
-                - feld: profil.ust.zahllast_vorjahr
-                  op: ">"
-                  wert: { regelwert: steuern.ust_va.grenze_monatlich }
+          all:
+            - { feld: profil.ust.zahllast_vorjahr, op: vorhanden }
+            - feld: profil.ust.zahllast_vorjahr
+              op: ">"
+              wert: { regelwert: steuern.ust_va.grenze_monatlich }
         dann: monatlich
     sonst: quartalsweise
   faellig: { art: tag_nach_periodenende, monate_nach: 1, tag: 10 }
@@ -133,14 +131,16 @@ quellen:
     url: https://www.gesetze-im-internet.de/ao_1977/__370.html
     abgerufen: null
 fachlich_zu_pruefen:
-- 'E-234: v2 nach der Antwort des Steuerberaters vom 27.10.2026 (S5 und Prüfpaket: „anpassen“): Voranmeldungszeitraum nach
-  § 18 Abs. 2 UStG (in der Regel Kalendervierteljahr, Kalendermonat bei mehr als 9.000 € Steuer im Vorjahr), Frist 10. Tag
-  nach Ablauf; Auslöser auf Waren und Leistungen von Unternehmen im Ausland erweitert (§ 13b Abs. 1 und Abs. 2 Nr. 1 UStG,
-  neue Frage profil.einkauf.ausland_unternehmen); Jahreserklärung bis 31.07. des Folgejahres (§ 149 Abs. 2 AO), nur für Jahre
-  mit solcher Steuer – Kurztext und Sätze in seiner Fassung. Offen: Ob die Neugründer-Regel (§ 18 Abs. 2 Satz 4 UStG) hier
-  greift, klärt er noch – bis dahin vierteljährlich; danach v2 (bzw. v3 mit Neugründer-Zweig) bitte freigeben (Steuerberater
-  alles außer Folgen; die Folgen hat der Rechtsanwalt am 27.10.2026 bestätigt; PRUEFLISTE T-345)'
+- 'E-237: Quelle zum Voranmeldungszeitraum (Steuerberater, Nachtrag 28.10.2026): Abschnitt 18.7 Abs. 1 Satz 4 UStAE – die
+  monatliche Abgabe im Gründungs- und Folgejahr (§ 18 Abs. 2 Satz 4 UStG) erfasst keine Neugründungen, bei denen aufgrund der
+  Tätigkeit keine Umsatzsteuer festzusetzen ist; Kleinunternehmer (§ 19 Abs. 1 UStG) sind dort ausdrücklich genannt. Daher
+  Kalendervierteljahr (§ 18 Abs. 4a Satz 2 i. V. m. Abs. 2 Satz 1 UStG), Kalendermonat nur bei mehr als 9.000 € Steuer im
+  Vorjahr (§ 18 Abs. 2 Satz 2 UStG), keine freiwillige monatliche Abgabe (§ 18 Abs. 4a Satz 3 UStG).'
 pruefung:
-  status: in_pruefung
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - steuern
+    - recht
+  geprueft_am: '2026-10-27'
+  geprueft_version: 3
+  bestaetigt_am: '2026-10-28'

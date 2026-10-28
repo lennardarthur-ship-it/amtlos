@@ -119,18 +119,19 @@ describe("E-231: Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG als 
   // E-234 (Steuerberater 27.10.2026, S5): v2 – Voranmeldungszeitraum statt „Monate“, Status in_pruefung (Folgen vom Rechtsanwalt freigegeben)
   it("im Katalog als Entwurf mit § 18 Abs. 4a UStG, Quelle gesetze-im-internet.de, fällig am 10. Tag nach Ablauf des Voranmeldungszeitraums", () => {
     const p = C37;
-    expect(["entwurf", "in_pruefung"]).toContain(p.pruefung.status);
-    expect(p.nicht_vor_freigabe).toBe(true);
+    // E-237: v3 freigegeben, nicht mehr zurückgehalten
+    expect(p.pruefung.status).toBe("freigegeben");
+    expect(p.nicht_vor_freigabe).toBeUndefined();
     expect(p.rechtsgrundlage).toContain("§ 18 Abs. 4a UStG");
     expect(p.quellen.some((q) => q.url === "https://www.gesetze-im-internet.de/ustg_1980/__18.html")).toBe(true);
     expect(p.frist).toMatchObject({ typ: "wiederkehrend", rhythmus: { sonst: "quartalsweise" }, faellig: { monate_nach: 1, tag: 10 } });
     for (const s of ["§ 18 Abs. 4a Satz 1 UStG", "§ 18 Abs. 4a Satz 2 UStG", "bis zum 10. Tag nach Ablauf des Zeitraums", "Umsatzsteuer-Jahreserklärung", "in Zeiträumen ohne solche Steuer gibst du keine Voranmeldung ab"]) expect(p.erklaerung.de).toContain(s);
   });
 
-  it("E-233: die App zeigt ihn bis zur Freigabe nicht; der Kern-Check fragt Kleinunternehmer weiter nach dem Einkauf im EU-Ausland", () => {
-    expect(KATALOG.pflichten.map((x) => x.id)).not.toContain(ID);
+  it("E-237: seit der Freigabe zeigt die App ihn; der Kern-Check fragt Kleinunternehmer weiter nach dem Einkauf im EU-Ausland", () => {
+    expect(KATALOG.pflichten.map((x) => x.id)).toContain(ID);
     const a = auswertung(KU, "2026-10-27");
-    expect([...a.gilt, ...a.unbekannt].map((x) => x.id)).not.toContain(ID);
+    expect(a.gilt.map((x) => x.id)).toContain(ID);
     const { "einkauf.eu_unternehmen": _e, ...unbekannt } = KU;
     // E-234: zuerst „im Ausland“ (EU und Drittländer), die EU-Frage bei „ja“
     expect(checkFragen({ ...unbekannt, "einkauf.ausland_unternehmen": true }).map((f) => f.feld)).toContain("einkauf.eu_unternehmen");

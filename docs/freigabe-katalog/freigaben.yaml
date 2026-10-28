@@ -2576,3 +2576,24 @@
       version: 1
       quelle: ausgefülltes Prüfpaket C.37 vom 27.10.2026 (beim Gründer)
       stand: '2026-10-27'
+- pruefer: steuern
+  umfang: ohne_sanktion
+  nachweis:
+    art: mail
+    datum: '2026-10-28'
+    rolle: steuern
+    umfang: 'Neuer Eintrag Voranmeldung des Kleinunternehmers (C.37) – alles außer den Folgen bei Verstoß, in seiner Fassung laut Prüfpaket
+      und Nachtrag 28.10.2026: Antworten zu S5 a–d und Korrekturen im Prüfpaket vom 27.10.2026 (Kurztext, Beispiele, § 13b Abs. 2 Nr. 1
+      UStG, Jahreserklärung mit Frist) und Nachtrag vom 28.10.2026 (Neugründer-Regel gilt für Kleinunternehmer nicht, Abschnitt 18.7 Abs. 1
+      Satz 4 UStAE; Kalendervierteljahr, Kalendermonat nur bei mehr als 9.000 € Vorjahressteuer, keine freiwillige monatliche Abgabe nach
+      § 18 Abs. 4a Satz 3 UStG) wörtlich übernommen; keine Frage offen – auf Entscheidung des Gründers als Freigabe eingetragen (aktualisierte
+      ausgefüllte Dateien und Mail)'
+    aufbewahrung: beim Gründer
+  felder_fehlen: []
+  hinweis: 'E-237: Nachtrag des Steuerberaters vom 28.10.2026 (Mail beim Gründer); Folgen hat der Rechtsanwalt am 27.10.2026 freigegeben
+    (Block recht/sanktion, v1 – Folgen in v3 unverändert); nicht mehr zurückgehalten'
+  eintraege:
+    steuern.ust_voranmeldung_kleinunternehmer:
+      version: 3
+      quelle: ausgefülltes Prüfpaket C.37 und Nachtrag per Mail vom 28.10.2026 (beim Gründer)
+      stand: '2026-10-28'

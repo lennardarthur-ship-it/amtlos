@@ -212,11 +212,12 @@ describe("E-217: alle Einträge mit Vermerk", () => {
   // E-226: Warnungen bestätigt und die zwei neuen Einträge freigegeben – 230 von 230 mit Vermerk
   // E-231: dazu ein Entwurf ohne Vermerk (T-337)
   // E-233: der Entwurf C.37 ist bis zur Freigabe zurückgehalten (nicht im Bündel)
-  it("230 Einträge im Bündel, alle mit Vermerk; Rechtsanwalt 168, Steuerberater 35 (E-226, E-231, E-233)", () => {
-    expect(pflichten).toHaveLength(230);
+  // E-237: C.37 freigegeben und im Bündel
+  it("231 Einträge im Bündel, alle mit Vermerk; Rechtsanwalt 169, Steuerberater 36 (E-226, E-231, E-233, E-237)", () => {
+    expect(pflichten).toHaveLength(231);
     expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id).sort()).toEqual([]);
     const zahl = (r: string) => pflichten.filter((p) => pruefVermerk(p.version, p.pruefung, AM) && p.pruefung!.geprueft_von!.includes(r)).length;
-    expect([zahl("recht"), zahl("steuern")]).toEqual([168, 35]);
+    expect([zahl("recht"), zahl("steuern")]).toEqual([169, 36]);
   });
   it("PRUEFLISTE: T-278, T-282 und T-287 erledigt", () => {
     for (const t of ["T-278", "T-282", "T-287"]) expect(PRUEFLISTE.find((z) => z.startsWith(`| ${t} |`)), t).toMatch(/Erledigt 27\.10\.2026.*E-217/);

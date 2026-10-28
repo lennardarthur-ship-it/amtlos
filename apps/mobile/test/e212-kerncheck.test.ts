@@ -9,7 +9,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { LEERER_STAND, erledigtSetzen } from "../src/unterlagen/speicher";
-import { WEISS_NICHT_FELDER, auswertung, beantwortet, checkFragen, dringlichkeit, istErledigt, terminStand, type Profil } from "../src/pflichten/check";
+import { WEISS_NICHT_FELDER, auswertung, beantwortet, checkFragen, dringlichkeit, folgeAntworten, istErledigt, terminStand, type Profil } from "../src/pflichten/check";
 import { erinnerungen } from "../src/pflichten/erinnerungsplan";
 import { freiePflichten, weiterePflichten } from "../src/pro/regeln";
 import { T as TEXT } from "../src/texte";
@@ -97,7 +97,9 @@ function durchlaufen(vorgabe: Profil): Profil {
       if (f.feld in p) continue;
       const opt = Object.keys(f.optionen ?? {});
       const keine = opt.find((o) => o.startsWith("keine"));
-      p = { ...p, [f.feld]: f.feld in vorgabe ? vorgabe[f.feld]! : f.art === "janein" ? false : f.art === "zahl" || f.art === "betrag" ? 0 : f.art === "mehrfach" ? [keine ?? opt[0]!] : f.art === "auswahl" ? opt[0]! : null };
+      const wert = f.feld in vorgabe ? vorgabe[f.feld]! : f.art === "janein" ? false : f.art === "zahl" || f.art === "betrag" ? 0 : f.art === "mehrfach" ? [keine ?? opt[0]!] : f.art === "auswahl" ? opt[0]! : null;
+      // E-237: mit den Folgeantworten wie in der App (z. B. „kein Einkauf im Ausland“ ⇒ kein Einkauf in der EU, E-234)
+      p = { ...p, [f.feld]: wert, ...folgeAntworten(f.feld, wert, p) };
       neu = true;
     }
     if (!neu) break;

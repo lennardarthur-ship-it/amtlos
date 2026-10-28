@@ -21,11 +21,7 @@ gruende:
   entwurf_e234: Entwurf nach der Antwort des Steuerberaters überarbeitet (E-234); bis zur Freigabe zurückgehalten (nicht_vor_freigabe, nicht in der App), Rest in PRUEFLISTE T-345.
 offen: []
 erledigt:
-# E-231: Voranmeldung des Kleinunternehmers nach § 18 Abs. 4a UStG im Entwurf (Steuerberater 27.10.2026, T-324);
-# E-234: v2 nach seiner Antwort (S5), Neugründer-Frage offen (T-345)
-- id: steuern.ust_voranmeldung_kleinunternehmer
-  punkt: 'E-234: v2 nach der Antwort des Steuerberaters vom 27.10.2026'
-  grund: entwurf_e234
+# E-231/E-234: Voranmeldung des Kleinunternehmers (C.37) – E-237: freigegeben (v3), die Notiz nennt nur die Quelle (kein Prüfpunkt)
 # weitere eingeordnete Punkte (E-196 ff.); E-233: Notizen, die durch die Freigabe erledigt waren, sind aus dem Katalog und von hier entfernt
 - id: datenschutz.dsb_streichung
   punkt: 'Rechtsstand 21.10.2026: nur Ankündigung (Modernisierungsagen'

@@ -40,9 +40,10 @@ describe("E-211 Inventar: Regelwerte im Bündel und ihre Verwendung", () => {
     expect(regelwertVerweise(pflicht("datenschutz.avv"))).toEqual([]);
   });
 
-  it("Zahlen: 19 Pflichten verweisen auf 18 Regelwert-Versionen (E-206: Neugründer ab 2027), alle offen", () => {
+  // E-237: dazu die Voranmeldung des Kleinunternehmers (C.37, Rhythmus mit der Grenze für den Monat) – jetzt im Bündel
+  it("Zahlen: 20 Pflichten verweisen auf 18 Regelwert-Versionen (E-206: Neugründer ab 2027), alle offen", () => {
     const mit = pflichten.filter((p) => offeneRegelwerte(p, regelwerte, HEUTE).length);
-    expect(mit).toHaveLength(19);
+    expect(mit).toHaveLength(20);
     expect(new Set(mit.flatMap((p) => offeneRegelwerte(p, regelwerte, HEUTE).map((r) => `${r.id}@${r.version}`))).size).toBe(18);
     expect(pflichten.filter((p) => offeneRegelwerte(p, alleBestaetigt, HEUTE).length)).toHaveLength(0);
   });

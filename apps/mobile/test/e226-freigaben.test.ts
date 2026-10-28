@@ -105,11 +105,12 @@ describe("E-226 (4): Steuerberater – Warnungen v7 bestätigt, Fundstelle § 19
 describe("E-226: alle Einträge mit Vermerk", () => {
   // E-231: dazu ein Entwurf ohne Vermerk (T-337)
   // E-233: der Entwurf C.37 ist bis zur Freigabe zurückgehalten (nicht im Bündel)
-  it("230 von 230 im Bündel mit Vermerk; Rechtsanwalt 168, Steuerberater 35", () => {
-    expect(pflichten).toHaveLength(230);
+  // E-237: C.37 freigegeben und im Bündel
+  it("231 von 231 im Bündel mit Vermerk; Rechtsanwalt 169, Steuerberater 36", () => {
+    expect(pflichten).toHaveLength(231);
     expect(pflichten.filter((p) => !pruefVermerk(p.version, p.pruefung, AM)).map((p) => p.id)).toEqual([]);
     const zahl = (r: string) => pflichten.filter((p) => p.pruefung?.geprueft_von?.includes(r)).length;
-    expect([zahl("recht"), zahl("steuern")]).toEqual([168, 35]);
+    expect([zahl("recht"), zahl("steuern")]).toEqual([169, 36]);
   });
   it("PRUEFLISTE: T-310, T-311 (1) und T-313 erledigt, T-311 (2) bleibt offen", () => {
     for (const t of ["T-310", "T-313"]) expect(zeile(t), t).toMatch(/Erledigt 27\.10\.2026.*E-226/);
