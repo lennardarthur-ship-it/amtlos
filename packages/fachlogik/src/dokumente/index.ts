@@ -66,7 +66,7 @@ export { BILANZ_ANHANG, BILANZ_FORM, BILANZ_OHNE_ANHANG, BILANZ_UNTERSCHRIFT, BI
 export { SV_GESCHLECHT_HILFE } from "./lohn.js";
 export { BIO_SCHUTZSTUFE_BLUT } from "./betriebsanweisungen.js";
 export { hautschutzFriseur } from "./branchen.js";
-export { HR_ALLE_MELDEN, HR_HAFTEINLAGE } from "./betrieb.js";
+export { HR_ALLE_MELDEN, HR_CO_KG_KEINE_TYPISCHE, HR_HAFTEINLAGE } from "./betrieb.js";
 
 export const BEREICHE: { id: Bereich; titel: string }[] = [
   { id: "steuern", titel: "Steuern und Buchhaltung" },

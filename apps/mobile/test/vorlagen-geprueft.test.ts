@@ -37,7 +37,8 @@ describe("Vermerk je Vorlage in der App", () => {
       expect(pruefHinweisFuer(v, d, cafe) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id));
       // E-200: Rechnung der GmbH & Co. KG vom Steuerberater nachgeprüft (26.10.2026)
       // E-210: Impressum der GmbH & Co. KG geändert (Vertretung durch die Komplementärin) – seit E-213 vom Rechtsanwalt bestätigt
-      expect(pruefHinweisFuer(v, d, coKg) !== PRUEFHINWEIS, v.id).toBe(!OHNE.includes(v.id));
+      // E-236: Handelsregister seit dem 28.10.2026 auch für die GmbH & Co. KG freigegeben (ohne Rechtsform – Café – weiter nicht)
+      expect(pruefHinweisFuer(v, d, coKg) !== PRUEFHINWEIS, v.id).toBe(true);
       if (v.id === "hygieneplan") expect(pruefHinweisFuer(v, { art: "beauty" }, cafe)).toContain("von einem Rechtsanwalt (Länderzusatz nur für Bayern geprüft)");
     }
     // E-208: gemeinsamer Teil der Rechnung geändert – E-213: vom Steuerberater bestätigt, Vermerk in jeder Variante mit Stand 26.10.2026

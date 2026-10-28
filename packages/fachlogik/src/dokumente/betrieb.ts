@@ -189,6 +189,12 @@ const HR_STELLUNG = [
 ];
 export const HR_ALLE_MELDEN = "Bei OHG und KG melden alle Gesellschafter die Gesellschaft zur Eintragung an (§ 106 Abs. 7 HGB).";
 export const HR_HAFTEINLAGE = "Bei einer KG je Kommanditistin bzw. Kommanditist den Betrag der Hafteinlage angeben (§ 162 Abs. 1 HGB).";
+/**
+ * E-236 (Rechtsanwalt 28.10.2026): In der GmbH & Co. KG bzw. UG & Co. KG ist die Komplementärin die persönlich haftende
+ * Gesellschafterin, die übrigen Gesellschafter sind Kommanditisten. Haftet zusätzlich eine natürliche Person persönlich,
+ * ist es keine typische Co. KG – Hinweis in seinem Wortlaut (Rechtsform eingesetzt).
+ */
+export const HR_CO_KG_KEINE_TYPISCHE = (rechtsform: string) => `Haftet zusätzlich eine natürliche Person persönlich, ist die Gesellschaft keine typische ${rechtsform} – wähle dann die Rechtsform KG.`;
 const hrRechtsform = (d: Daten, b?: Betrieb) => rechtsformAus(text(d, "rechtsform") || b?.rechtsform, HR_FORMEN.map((o) => o.wert));
 
 export const handelsregister: Vorlage = {
@@ -240,7 +246,9 @@ export const handelsregister: Vorlage = {
   pruefen(d, b) {
     const rechtsform = hrRechtsform(d, b);
     const f: string[] = [];
-    if (HR_KG.includes(rechtsform) && liste(d, "gesellschafter").some((x) => text(x, "name") && text(x, "stellung") === "kommandit" && !text(x, "hafteinlage").trim())) f.push(HR_HAFTEINLAGE);
+    // E-236: in der Co. KG sind alle eingetragenen Gesellschafter Kommanditisten (Stellung fest) – jeder mit Hafteinlage
+    const coKg = HR_CO_KG.includes(rechtsform);
+    if (HR_KG.includes(rechtsform) && liste(d, "gesellschafter").some((x) => text(x, "name") && (coKg || text(x, "stellung") === "kommandit") && !text(x, "hafteinlage").trim())) f.push(HR_HAFTEINLAGE);
     const c = cent(text(d, "kapital"));
     if (c === null || !text(d, "kapital").trim()) return f;
     if (rechtsform === "GmbH" && c < 2_500_000) f.push(HR_KAPITAL_GMBH);
@@ -249,6 +257,13 @@ export const handelsregister: Vorlage = {
     return f;
   },
   pruefenZu: { [HR_KAPITAL_GMBH]: "kapital", [HR_KAPITAL_UG]: "kapital", [HR_KAPITAL_EURO]: "kapital" },
+  // E-236 (Rechtsanwalt 28.10.2026): Co. KG mit einer natürlichen Person „persönlich haftend“ – Hinweis auf die Rechtsform KG
+  // (eine Funktion: gehört nicht zur Prüfsumme und ändert keinen gedruckten Text)
+  hinweise(d, b) {
+    const rechtsform = hrRechtsform(d, b);
+    const phg = liste(d, "gesellschafter").some((x) => text(x, "name") && text(x, "stellung") === "phg");
+    return HR_CO_KG.includes(rechtsform) && phg ? [HR_CO_KG_KEINE_TYPISCHE(rechtsform)] : [];
+  },
   html(d, b) {
     const ges = liste(d, "gesellschafter").filter((x) => text(x, "name"));
     const gf = liste(d, "fuehrung").filter((x) => text(x, "name"));
@@ -262,9 +277,11 @@ export const handelsregister: Vorlage = {
     // E-234 (Rechtsanwalt 27.10.2026, R3): e. K. ohne Gesellschafter – „Ort der Handelsniederlassung“ (§ 29 HGB), Inhaber/in
     const ek = rechtsform === "e. K.";
     const coKg = HR_CO_KG.includes(rechtsform);
+    // E-236 (Rechtsanwalt 28.10.2026): in der Co. KG ist die Stellung fest „Kommanditist/in“ – persönlich haftet die Komplementärin
     const stellung = (x: Eintrag) => {
-      const st = HR_STELLUNG.find((o) => o.wert === text(x, "stellung"))?.text ?? "";
-      const he = text(x, "stellung") === "kommandit" && text(x, "hafteinlage") ? `Hafteinlage ${euro(cent(text(x, "hafteinlage")) ?? 0)}` : "";
+      const kommandit = coKg || text(x, "stellung") === "kommandit";
+      const st = coKg ? "Kommanditist/in" : (HR_STELLUNG.find((o) => o.wert === text(x, "stellung"))?.text ?? "");
+      const he = kommandit && text(x, "hafteinlage") ? `Hafteinlage ${euro(cent(text(x, "hafteinlage")) ?? 0)}` : "";
       return [st, he].filter(Boolean).join(", ");
     };
     const gesellschafterTabelle = () =>
@@ -307,7 +324,7 @@ export const handelsregister: Vorlage = {
         (ek
           ? ""
           : personengesellschaft
-            ? abschnitt(coKg ? "Weitere Gesellschafter" : kg ? "Gesellschafter (persönlich haftende und Kommanditisten)" : "Gesellschafter", gesellschafterTabelle() + (kg ? nachsatz(HR_HAFTEINLAGE) : ""))
+            ? abschnitt(coKg ? "Kommanditisten" : kg ? "Gesellschafter (persönlich haftende und Kommanditisten)" : "Gesellschafter", gesellschafterTabelle() + (kg ? nachsatz(HR_HAFTEINLAGE) : ""))
             : ges.length || kapitalgesellschaft
               ? abschnitt("Gesellschafter", person(ges, true, 3))
               : "") +

@@ -1995,6 +1995,24 @@ Antwort des Steuerberaters (Rolle Steuern, Mail und ausgefüllte Liste beim Grü
 
 **Geprüft:** `pnpm turbo run build --force`, `pnpm lint`, `pnpm typecheck` grün; vitest mobile 1105 (alle grün, darunter die Interna-Prüfung); Jahres-Szenarien einmal alle Vergleiche ok (314/391/391/368/271/437, wie vorher), Ausgaben gelöscht; Web-Export und `e2e/rundgang.mjs` ohne Befund (65 Bilder), danach gelöscht; store-check 15 offene Punkte (nur Konsolen/Konten, Nutzungsbedingungen, Firebase – wie vorher), Bündel und Web-Export ohne interne Notizen. Nur `apps/mobile` geändert (fachlogik nicht berührt).
 
+### E-236 · Antwort des Rechtsanwalts vom 28.10.2026: Handelsregister für e. K., GmbH & Co. KG und UG & Co. KG freigegeben – bei der Co. KG Abschnitt „Kommanditisten“ (2026-10-28)
+
+Antwort per Mail (beim Gründer, E-199) auf die Beispiel-PDFs aus E-234 (T-347), in unseren Worten. Test: `packages/fachlogik/test/e236-handelsregister-kommanditisten.test.ts` (9, gegen den Stand vorher alle rot); angepasst `e234-handelsregister.test.ts` und `vorlagen-geprueft.test.ts` (fachlogik und mobile: Vermerk jetzt auch für e. K. und Co. KG, weitere Freigabe vom 28.10.2026).
+
+**e. K.:** wie vorgelegt freigegeben (§ 29 HGB; Überschrift „Unternehmen“ richtig) – nichts geändert, die Teilsumme `rf:e. K.` ist die der vorgelegten Fassung.
+
+**GmbH & Co. KG und UG (haftungsbeschränkt) & Co. KG:** freigegeben mit einer Änderung, die ohne erneute Vorlage als freigegeben gilt: In der Co. KG ist die Komplementärin die persönlich haftende Gesellschafterin, die übrigen Gesellschafter sind Kommanditisten. Umgesetzt (betrieb.ts, nur gedruckter Text der Co. KG): Abschnitt „Kommanditisten“ statt „Weitere Gesellschafter“; Spalte „Stellung, Hafteinlage“ immer „Kommanditist/in“ mit Hafteinlage, keine natürliche Person „persönlich haftend“ (auch wenn im Eintrag gewählt). Prüfung: in der Co. KG braucht jeder eingetragene Gesellschafter die Hafteinlage (§ 162 Abs. 1 HGB). Haftet laut Eintrag eine natürliche Person persönlich, zeigt die App vor dem Teilen den Hinweis in seiner Fassung `HR_CO_KG_KEINE_TYPISCHE`: „Haftet zusätzlich eine natürliche Person persönlich, ist die Gesellschaft keine typische GmbH & Co. KG – wähle dann die Rechtsform KG.“ (bei der UG & Co. KG mit deren Bezeichnung; `hinweise`, hindert nicht am Teilen, gehört nicht zur Prüfsumme). „Mein Betrieb“ kennt keine Gesellschafter mit Stellung – der Hinweis kommt deshalb aus den Angaben der Vorlage.
+
+**Formular unverändert:** Die Auswahl „Stellung“ und die Rechtsform-Auswahl gehören zur gemeinsamen Teilsumme `basis` aller Freigaben dieser Vorlage; jede Änderung daran hätte auch die Freigaben GmbH/OHG/KG und UG aufgehoben. Deshalb bleibt „persönlich haftend“ im Formular wählbar (gedruckt wird bei der Co. KG trotzdem „Kommanditist/in“, dazu der Hinweis). **Auswahl „UG (haftungsbeschränkt) & Co. KG“ (T-347) selbst entschieden: nicht aufnehmen** – die Rechtsform kommt aus „Mein Betrieb“ (`ausBetrieb`, Rückfall in `hrRechtsform`), die Vorlage und der Vermerk erkennen die UG & Co. KG auch ohne Option (Test); die Option änderte die Prüfsumme aller drei Freigaben. Beides bei der nächsten ohnehin nötigen Vorlage (T-354).
+
+**Freigabe:** weitere Freigabe `handelsregister#2` (Rolle recht, 28.10.2026, Nachweis Mail, Umfang „e. K. wie vorgelegt; Co. KG mit Abschnitt Kommanditisten laut seiner Antwort“, `rechtsformen: ["e. K.", "GmbH & Co. KG", "UG (haftungsbeschränkt) & Co. KG"]`), `pruefsumme` = heutige Fassung `13d8fc2f3018…`, `pruefsumme_alt` = vorgelegte Fassung aus E-234 `a306a094a488…`; Teilsummen in geprueft-teilsummen.ts, Prüfstände neu erzeugt (nur die neue Zeile kam hinzu). Die Vorlage ist damit für alle angebotenen Rechtsformen freigegeben: GmbH, OHG, KG (25.10.2026), UG (27.10.2026), e. K., GmbH & Co. KG, UG & Co. KG (28.10.2026). Neue Prüfsumme für seine Unterlagen (Gesamtsumme und Teilsummen je Rechtsform): T-353.
+
+**Freigaben unverändert:** `handelsregister` (615ef77b91ab) und `handelsregister#1` (828f3ad39739) mit gleichen Teilsummen (Test), alle übrigen 54 Prüfstände unverändert (pruefstaende.ts: nur die neue Zeile); kein Katalogeintrag, kein Regelwert.
+
+**PRUEFLISTE:** T-347 erledigt; neu T-353 (Prüfsumme an den Rechtsanwalt) und T-354 (Formular bei der nächsten Vorlage); Zusammenfassung C 48.
+
+**Geprüft:** `pnpm turbo run build --force`, `pnpm lint`, `pnpm typecheck` grün; vitest fachlogik 753 und mobile 1117 (alle grün); `werkzeuge/dokumente-pruefen.mjs` ohne Befund (43 Vorlagen × 3); Web-Export und `e2e/rundgang.mjs` einmal ohne Befund (65 Bilder), danach gelöscht; store-check 15 offene Punkte (nur Konsolen/Konten, Nutzungsbedingungen, Firebase – wie vorher). Geändert nur `packages/fachlogik` (Vorlage, Register, Teilsummen, Prüfstände, Tests) und ein mobile-Test.
+
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
 
 | Nr. | Frage | blockiert |

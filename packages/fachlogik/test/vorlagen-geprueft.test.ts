@@ -71,7 +71,7 @@ describe("Vorlagen fachlich durchgesehen: Register (geprueft.ts)", () => {
       expect(Object.keys(PRUEF_ROLLEN), id).toContain(f.rolle);
       expect(f.pruefsumme, id).toMatch(/^[0-9a-f]{64}$/);
       expect(f.pruefsumme_alt, id).toMatch(/^[0-9a-f]{64}$/);
-      expect(["2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26", "2026-10-27"]).toContain(f.stand);
+      expect(["2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26", "2026-10-27", "2026-10-28"]).toContain(f.stand);
       // nie ein Name im Register der App
       expect(nenntName(JSON.stringify(f)), id).toBe(false);
     }
@@ -371,8 +371,8 @@ describe("Mehrere Freigaben je Vorlage (je Fassung eigene Prüfsumme, 24.10.2026
     for (const id of NEUE_FASSUNG) expect(VORLAGEN_GEPRUEFT[id]!.weitere?.map((x) => [x.stand, x.rolle]), id).toEqual([["2026-10-26", VORLAGEN_GEPRUEFT[id]!.rolle]]);
     // E-227: Voranmeldung mit Erwerben aus Belegen und Vermerk „Nicht vollständig“ (Steuerberater 27.10.2026), alle Varianten
     expect(VORLAGEN_GEPRUEFT.ust_voranmeldung!.weitere?.map((x) => [x.stand, x.rolle, x.varianten])).toEqual([["2026-10-27", "steuern", undefined]]);
-    // E-234 (Rechtsanwalt 27.10.2026, R3): Handelsregister zusätzlich für die UG
-    expect(VORLAGEN_GEPRUEFT.handelsregister!.weitere?.map((x) => [x.stand, x.rolle, x.rechtsformen])).toEqual([["2026-10-27", "recht", ["UG (haftungsbeschränkt)"]]]);
+    // E-234 (Rechtsanwalt 27.10.2026, R3): Handelsregister zusätzlich für die UG; E-236 (28.10.2026): e. K. und die Co. KG
+    expect(VORLAGEN_GEPRUEFT.handelsregister!.weitere?.map((x) => [x.stand, x.rolle, x.rechtsformen])).toEqual([["2026-10-27", "recht", ["UG (haftungsbeschränkt)"]], ["2026-10-28", "recht", ["e. K.", "GmbH & Co. KG", "UG (haftungsbeschränkt) & Co. KG"]]]);
     for (const id of Object.keys(VORLAGEN_GEPRUEFT)) if (id !== "hygieneplan" && id !== "rechnung" && id !== "impressum" && id !== "ust_voranmeldung" && id !== "handelsregister" && !NEUE_FASSUNG.includes(id)) expect(VORLAGEN_GEPRUEFT[id]!.weitere, id).toBeUndefined();
   });
 

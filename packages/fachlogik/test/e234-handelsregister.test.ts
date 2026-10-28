@@ -65,10 +65,12 @@ describe("E-234: Handelsregister – UG", () => {
     expect(text(betrieb("UG (haftungsbeschränkt)"))).toContain("Stammkapital vor der Anmeldung voll und in bar einzahlen, Sacheinlagen sind ausgeschlossen (§ 5a Abs. 2 GmbHG).");
     for (const rf of ["GmbH", "OHG", "KG", "e. K.", "GmbH & Co. KG"]) expect(text(betrieb(rf)), rf).not.toContain("§ 5a Abs. 2 GmbHG");
   });
-  it("Vermerk für UG (eigene Freigabe vom 27.10.2026), weiter für GmbH, OHG, KG; nicht für e. K. und die Co. KG", () => {
+  it("Vermerk für UG (eigene Freigabe vom 27.10.2026), weiter für GmbH, OHG, KG; e. K. und Co. KG seit E-236", () => {
     expect(pruefHinweisFuer(v, {}, betrieb("UG (haftungsbeschränkt)"))).toContain("Stand 27.10.2026");
     for (const rf of ["GmbH", "OHG", "KG"]) expect(pruefHinweisFuer(v, {}, betrieb(rf)), rf).toContain("Stand 25.10.2026");
-    for (const rf of ["e. K.", "GmbH & Co. KG", "UG (haftungsbeschränkt) & Co. KG"]) expect(pruefHinweisFuer(v, {}, betrieb(rf)), rf).toBe(PRUEFHINWEIS);
+    // E-236: seit der Antwort vom 28.10.2026 auch für e. K. und die Co. KG (e236-handelsregister-kommanditisten.test.ts)
+    for (const rf of ["e. K.", "GmbH & Co. KG", "UG (haftungsbeschränkt) & Co. KG"]) expect(pruefHinweisFuer(v, {}, betrieb(rf)), rf).toContain("Stand 28.10.2026");
+    expect(pruefHinweisFuer(v, {}, betrieb("GbR"))).toBe(PRUEFHINWEIS);
   });
   it("Freigabe GmbH/OHG/KG unverändert: heutige Teilsummen = freigegebene", () => {
     const [erste, ug] = freigabenFuer("handelsregister");
