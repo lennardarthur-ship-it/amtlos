@@ -34,6 +34,7 @@ import { MitarbeiterZusatz, StaatWahl, mitarbeiterWerte } from "./Mitarbeiter";
 import { StaettenSeite, staettenText } from "./BetriebStaetten";
 import { syncAngeboten } from "../konto/konfig";
 import { useKonto } from "../konto/konto";
+import { betriebKuBisSichtbar, betriebUstIdSichtbar, betriebVersteuerungSichtbar, mitarbeiterSichtbar, relevanz } from "../ui/sichtbarkeit";
 
 /** Eine gespeicherte Person bearbeiten (E-124). Eine neue Person ohne Namen verschwindet beim Verlassen wieder. */
 export function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boolean }) {
@@ -204,6 +205,20 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
     fehler: verlassen.has(k) ? pruefung(k, b[k] ?? "") : null,
     onBlur: () => setVerlassen((v) => (v.has(k) ? v : new Set(v).add(k))),
   });
+  // E-239: Steuerangaben je nach Profil sofort oder hinter „Weitere Angaben“ (beim Aufklappen festgehalten – nichts springt)
+  const rel = relevanz(stand);
+  const weitereSteuerJetzt = [
+    ...(betriebUstIdSichtbar(rel, stand.profil, b.ust_idnr ?? "") ? [] : ["ust_idnr"]),
+    ...(betriebVersteuerungSichtbar(rel, b.versteuerung ?? "") ? [] : ["versteuerung"]),
+    ...(betriebKuBisSichtbar(stand.profil, b.ku_bis ?? "") ? [] : ["ku_bis"]),
+  ];
+  const [steuerOffen, setSteuerOffen] = useState<string[] | null>(null);
+  const weitereSteuer = steuerOffen ?? weitereSteuerJetzt;
+  const ustIdFeld = <Feld label={TEXT.b_ust_idnr} {...feld("ust_idnr")} autoCapitalize="characters" autoCorrect={false} spellCheck={false} />;
+  // R11 (Kosmetik #25): Soll ist der Normalfall und vorausgewählt; Ist nur auf Antrag
+  const versteuerungWahl = <Wahl label={TEXT.b_versteuerung} hilfe={TEXT.b_versteuerung_hilfe} wert={b.versteuerung || "soll"} aendern={(w) => feld("versteuerung").aendern(w)} optionen={VERSTEUERUNG.map((o) => ({ wert: o.wert, text: TEXT.r11_versteuerung[o.wert] ?? o.text }))} />;
+  // R11 (Kosmetik #2/#8): Wechsel von der Kleinunternehmerregelung – bis wann galt sie?
+  const kuBisFeld = <DatumFeld label={TEXT.b_ku_bis} hilfe={TEXT.b_ku_bis_hilfe} wert={b.ku_bis || null} aendern={(w) => feld("ku_bis").aendern(w ?? "")} ohneHeute />;
   // E-193 (8a): GmbH & Co. KG bzw. UG & Co. KG – Angaben zur Komplementärin
   const coKg = istCoKg(b);
   const zeigt = (t: Teil) => (teile ? teile.includes(t) : !teil || teil === t) && (t !== "gesellschaft" || Boolean(teil) || mitGesellschaft(stand.profil, b));
@@ -254,7 +269,7 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
           {kopf("steuer", TEXT.b_steuer)}
           <Karte stil={{ paddingBottom: 14 }}>
             <Feld label={TEXT.b_steuernummer} {...feld("steuernummer")} keyboardType="numbers-and-punctuation" autoCorrect={false} spellCheck={false} />
-            <Feld label={TEXT.b_ust_idnr} {...feld("ust_idnr")} autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
+            {weitereSteuer.includes("ust_idnr") ? null : ustIdFeld}
             <Feld label={TEXT.b_iban} {...feld("iban")} autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
             <View style={{ flexDirection: "row", gap: 10 }}>
               <View style={{ flex: 2 }}>
@@ -264,12 +279,20 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
                 <Feld label={TEXT.b_bic} {...feld("bic")} autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
               </View>
             </View>
-            {/* R11 (Kosmetik #25): Soll ist der Normalfall und vorausgewählt; Ist nur auf Antrag */}
-            <Wahl label={TEXT.b_versteuerung} hilfe={TEXT.b_versteuerung_hilfe} wert={b.versteuerung || "soll"} aendern={(w) => feld("versteuerung").aendern(w)} optionen={VERSTEUERUNG.map((o) => ({ wert: o.wert, text: TEXT.r11_versteuerung[o.wert] ?? o.text }))} />
-            {/* R11 (Kosmetik #2/#8): Wechsel von der Kleinunternehmerregelung – bis wann galt sie? */}
-            <DatumFeld label={TEXT.b_ku_bis} hilfe={TEXT.b_ku_bis_hilfe} wert={b.ku_bis || null} aendern={(w) => feld("ku_bis").aendern(w ?? "")} ohneHeute />
+            {weitereSteuer.includes("versteuerung") ? null : versteuerungWahl}
+            {weitereSteuer.includes("ku_bis") ? null : kuBisFeld}
             {/* E-165 (StB-Prüfung 5.2): Vorsteuerquote nur bei steuerfreien und steuerpflichtigen Umsätzen */}
             {gemischt || (b.vorsteuerquote ?? "").trim() ? <Feld label={TEXT.b_vorsteuerquote} hilfe={TEXT.b_vorsteuerquote_hilfe} {...feld("vorsteuerquote")} keyboardType="decimal-pad" placeholder="z. B. 13" optional fehler={(b.vorsteuerquote ?? "").trim() && vorsteuerquoteAus(b) === null ? TEXT.beleg_vst_anteil_falsch : null} /> : null}
+            {/* E-239: Angaben, die laut Pflichten-Check nicht passen (USt-IdNr. ohne EU-Bezug, Soll/Ist und „Kleinunternehmer bis“
+                als Kleinunternehmer) – hinter „Weitere Angaben“, mit Eintrag immer sichtbar */}
+            {weitereSteuer.length ? (
+              <View>
+                <TextKnopf symbol={steuerOffen ? "chevron.up" : "chevron.down"} text={steuerOffen ? TEXT.weniger_angaben : TEXT.weitere_angaben(weitereSteuer.length)} erweitert={Boolean(steuerOffen)} onPress={() => { weich(); setSteuerOffen(steuerOffen ? null : weitereSteuerJetzt); }} stil={{ marginTop: 10 }} />
+                {steuerOffen && weitereSteuer.includes("ust_idnr") ? ustIdFeld : null}
+                {steuerOffen && weitereSteuer.includes("versteuerung") ? versteuerungWahl : null}
+                {steuerOffen && weitereSteuer.includes("ku_bis") ? kuBisFeld : null}
+              </View>
+            ) : null}
           </Karte>
         </View>
       ) : null}
@@ -432,6 +455,10 @@ export function Betrieb() {
   // R11 (Berater d): Beschäftigte laut Check, aber noch niemand eingetragen – Brücke zur Liste
   const ausCheck = ausCheckBeschaeftigte(z.stand.profil);
   const teileSichtbar = TEILE.filter((t) => t !== "gesellschaft" || mitGesellschaft(z.stand.profil, b));
+  // E-239: Mitarbeiter nur, wenn der Check Beschäftigte nennt (oder nicht danach gefragt hat) bzw. schon jemand eingetragen ist
+  const [teamOffen, setTeamOffen] = useState(false);
+  const ohneTeam = !mitarbeiterSichtbar(relevanz(z.stand));
+  const personenArten: PersonenArt[] = ohneTeam && !teamOffen ? ["kunde"] : ["mitarbeiter", "kunde"];
   return (
     <BuehnenSeite key={zaehler} ueber={betriebFehlt(b) ? undefined : TEXT.betrieb_titel} buehne={<BetriebKopf b={b} onPress={betriebFehlt(b) ? oeffneAlles : () => oeffneTeil("angaben")} />}>
       <ProZeile />
@@ -461,7 +488,7 @@ export function Betrieb() {
       </Gruppe>
       <Gruppe titel={TEXT.personen_gruppe}>
         <Karte>
-          {(["mitarbeiter", "kunde"] as PersonenArt[]).map((art, i) => {
+          {personenArten.map((art, i) => {
             const l = personen(art);
             return (
               <Zeile
@@ -470,11 +497,13 @@ export function Betrieb() {
                 titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel}
                 text={l.length ? TEXT.personen_anzahl[art](l.length) : art === "mitarbeiter" && ausCheck ? TEXT.r11_mitarbeiter_bruecke(ausCheck) : TEXT.personen_leer_kurz[art]}
                 onPress={() => nav.oeffnen(`personen-${art}`, () => <PersonenSeite art={art} />)}
-                letzte={i === 1}
+                letzte={i === personenArten.length - 1}
               />
             );
           })}
         </Karte>
+        {/* E-239: ohne Beschäftigte laut Check (und ohne eingetragene) – „Mitarbeiter“ unter „Weitere Optionen“ */}
+        {ohneTeam ? <TextKnopf symbol={teamOffen ? "chevron.up" : "chevron.down"} leise text={teamOffen ? TEXT.e239_weniger_optionen : TEXT.e239_weitere_optionen(1)} erweitert={teamOffen} onPress={() => { weich(); setTeamOffen(!teamOffen); }} /> : null}
       </Gruppe>
       <Gruppe titel={TEXT.daten_titel} fuss={syncAn ? TEXT.daten_text_sync : syncAngeboten ? TEXT.r11_daten_text_ohne_sync : TEXT.daten_text}>
         <Datenschutz />

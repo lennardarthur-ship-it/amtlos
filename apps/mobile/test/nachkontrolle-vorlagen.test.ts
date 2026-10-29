@@ -26,7 +26,9 @@ describe("Schriftform im NachwG-Ablauf", () => {
     const abschluss = quelle("src/seiten/Abschluss.tsx");
     const kasten = abschluss.indexOf("<FormHinweis v={v} d={d} />");
     expect(kasten).toBeGreaterThan(0);
-    expect(kasten).toBeLessThan(abschluss.indexOf("v.hinweise?.(d, z.stand.betrieb"));
+    // E-239: die übrigen Hinweise werden vorher geordnet und erst danach gezeichnet (HinweisStapel)
+    expect(abschluss).toContain("v.hinweise?.(d, z.stand.betrieb");
+    expect(kasten).toBeLessThan(abschluss.indexOf("<HinweisStapel bereit={fertig}"));
     expect(abschluss).toContain('v.formHinweis?.(d)?.form === "schrift"');
     expect(abschluss).toContain(".filter((h) => h !== v.formHinweis?.(d)?.text)");
   });

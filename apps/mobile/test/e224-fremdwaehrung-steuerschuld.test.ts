@@ -75,8 +75,9 @@ describe("E-224: Voranmeldung warnt bei Steuerschuld-Belegen ohne Euro-Betrag", 
     const ausgabe = abschluss.slice(abschluss.indexOf("const ausgabe = async"), abschluss.indexOf("const eRechnung = async"));
     expect(ausgabe).toMatch(/vaOhneEuroFrage\(z\.stand, u\)/);
     expect(ausgabe.indexOf("vaOhneEuroFrage")).toBeLessThan(ausgabe.indexOf("pdfAusgabe(u, "));
-    const ablauf = lies("seiten/Ablauf.tsx");
-    expect(ablauf).toMatch(/r\.igeOhneEuro \? <Hinweis art="warnung"[^>]*TEXT\.e224_ige_ohne_euro\(r\.igeOhneEuro\)/);
-    expect(ablauf).toMatch(/r\.rcOhneEuro \? <Hinweis art="warnung"[^>]*TEXT\.e224_13b_ohne_euro\(r\.rcOhneEuro\)/);
+    // E-239: als Blocker (sichtbarer Kasten) in ustMeldungen.ts
+    const ablauf = lies("seiten/ustMeldungen.ts");
+    expect(ablauf).toMatch(/r\.igeOhneEuro \? blocker\(TEXT\.e224_ige_ohne_euro\(r\.igeOhneEuro\)\)/);
+    expect(ablauf).toMatch(/r\.rcOhneEuro \? blocker\(TEXT\.e224_13b_ohne_euro\(r\.rcOhneEuro\)\)/);
   });
 });

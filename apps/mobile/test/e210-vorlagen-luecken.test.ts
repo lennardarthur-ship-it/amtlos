@@ -48,6 +48,8 @@ describe("E-210: Lücken im Text von Impressum und Datenschutzerklärung", () =>
     expect(ausgabe).toMatch(/lueckenFrage\(v, u\.daten, druckBetrieb\(z\.stand, u, z\.pro\)\)[\s\S]*if \(luecken && !\(await bestaetigen\(luecken\)\)\) return;[\s\S]*pdfAusgabe\(u, /);
     const text = a.slice(a.indexOf("symbol: \"doc.on.doc\""), a.indexOf("symbol: \"plus.circle\""));
     expect(text).toMatch(/lueckenFrage\(v, d, absenderFuer\(z\.stand, u\)\)[\s\S]*bestaetigen\(luecken\)[\s\S]*Share\.share/);
+    // E-239: als Blocker (im Kasten „Fehlt noch“ bzw. im eigenen Kasten) – und in der Vorschau
     expect(a.match(/TEXT\.e210_luecken_hinweis\(luecken\)/g)).toHaveLength(2);
+    expect(a).toContain("luecken ? blocker(TEXT.e210_luecken_hinweis(luecken)) : null");
   });
 });

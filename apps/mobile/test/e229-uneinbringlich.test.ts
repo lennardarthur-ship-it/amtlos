@@ -106,7 +106,10 @@ describe("E-229 (T-304 c): Forderung uneinbringlich", () => {
 
   it("Oberfläche: Aktion an der Rechnung, Storno-Sperre mit Meldung", () => {
     const a = lies("seiten/Abschluss.tsx");
-    expect(a).toContain("uneinbringlichMoeglich(z.stand, u) ? <Uneinbringlich id={id} />");
+    // E-239: ab Fälligkeit sofort sichtbar, vorher unter „Weitere Optionen“
+    expect(a).toContain("const uneinbringlich = !erstattung && uneinbringlichMoeglich(z.stand, u);");
+    expect(a).toContain("{uneinbringlich && uneinbringlichDa ? <Uneinbringlich id={id} /> : null}");
+    expect(a).toContain("{optionen && weitere.includes(\"uneinbringlich\") ? <Uneinbringlich id={id} /> : null}");
     expect(a).toContain("z.uneinbringlichSetzen(id, { datum, grund,");
     expect(a).toContain("melden(TEXT.e229_uneinbringlich_storno");
   });

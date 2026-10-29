@@ -154,7 +154,8 @@ describe("E-227: Voranmeldung (T-308, T-309)", () => {
     const ablauf = lies("seiten/Ablauf.tsx");
     expect(ablauf).toContain("<ErwerbsschwelleFragen");
     expect(ablauf).toContain("schwelleEuro: erwerbsschwelleEuro()");
-    expect(ablauf).toContain("TEXT.e227_ku_va_pflicht");
+    // E-239: die Übernahme ordnet ihre Meldungen in ustMeldungen.ts – die Voranmeldungspflicht als Blocker
+    expect(lies("seiten/ustMeldungen.ts")).toContain("blocker(TEXT.e227_ku_va_pflicht)");
     expect(lies("seiten/Erwerbsschwelle.tsx")).toContain("TEXT.e227_frage_verzicht");
   });
 });

@@ -371,6 +371,12 @@ try {
   // auf dem Papier (E-144): Positionen und Summe stehen da; Antippen springt zum Schritt und zurück
   pruefe((await sichtbar("Haarschnitt")) && (await sichtbar("2 × 29,75 €")), "Positionen fehlen auf dem Papier");
   await foto("abschluss");
+  // E-239: Hinweise ruhig in einer Zeile („Alles bereit – N Hinweise“); aufgeklappt der Hinweis zur IBAN mit „IBAN eintragen“
+  pruefe((await sichtbar(/^Alles bereit – \d+ Hinweis/)) && !(await sichtbar("Ohne IBAN steht keine Bankverbindung")), "Hinweise im Abschluss nicht als „Alles bereit – N Hinweise“ zusammengefasst");
+  await tippe(p.getByRole("button", { name: /^Alles bereit – \d+ Hinweis/ }).locator("visible=true").last());
+  await warte(400);
+  pruefe((await sichtbar("Ohne IBAN steht keine Bankverbindung")) && (await knopf("IBAN eintragen").count()) > 0, "aufgeklappte Hinweise ohne Hinweis zur IBAN bzw. „IBAN eintragen“");
+  await foto("abschluss-hinweise");
   await tippe(p.getByRole("button", { name: /^Rechnungsempfänger(:| bearbeiten)/ }).locator("visible=true").last());
   await warte(800);
   pruefe((await feld("Name oder Firma").inputValue()) === "Kim Beispiel", "Antippen auf dem Papier springt nicht zum Empfänger");
@@ -634,6 +640,12 @@ try {
   pruefe(await sichtbar("Aus der E-Rechnung übernommen"), "E-Rechnung nicht als Beleg übernommen");
   pruefe((await feld("Lieferant oder Geschäft").inputValue()) === "Friseurbedarf Müller GmbH" && (await feld("Betrag brutto (€)").inputValue()) === "77,35", "Lieferant oder Betrag aus der E-Rechnung falsch");
   await foto("beleg-erechnung");
+  // E-239: regelbesteuert (nach dem Einkauf im Ausland nicht gefragt) – „Ich schulde die Umsatzsteuer“ bleibt sichtbar; das
+  // seltene Skonto steht hinter „Weitere Angaben (1)“ und ist von dort erreichbar
+  pruefe((await sichtbar("Ich schulde die Umsatzsteuer")) && !(await sichtbar("Skonto abgezogen (brutto)")), "Beleg: § 13b nicht sichtbar oder Skonto nicht hinter „Weitere Angaben“");
+  await tippe(knopf("Weitere Angaben (1)"));
+  await warte(300);
+  pruefe(await sichtbar("Skonto abgezogen (brutto)"), "Beleg: Skonto unter „Weitere Angaben“ nicht erreichbar");
   await knopf("Fertig").click();
   await warte(700);
   await zurueck();
