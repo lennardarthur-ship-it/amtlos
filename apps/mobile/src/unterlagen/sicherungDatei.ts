@@ -51,7 +51,7 @@ export async function dateiTeilenBytes(name: string, bytes: Uint8Array, mimeType
   ziel.create();
   await ziel.write(bytes);
   try {
-    return await teilen(ziel.uri, { mimeType, titel: name, UTI: mimeType === "application/zip" ? "public.zip-archive" : mimeType === "application/pdf" ? "com.adobe.pdf" : mimeType === "application/xml" ? "public.xml" : mimeType.startsWith("image/") ? "public.jpeg" : undefined });
+    return await teilen(ziel.uri, { mimeType, titel: name, UTI: mimeType === "application/zip" ? "public.zip-archive" : mimeType === "application/pdf" ? "com.adobe.pdf" : mimeType === "application/xml" ? "public.xml" : mimeType.startsWith("image/") ? "public.jpeg" : mimeType === "text/calendar" ? "com.apple.ical.ics" : undefined });
   } finally {
     try {
       ziel.delete();

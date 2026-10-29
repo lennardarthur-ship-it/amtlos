@@ -390,10 +390,19 @@ export const T = {
   erinnern: "An Fristen erinnern",
   // E-192: drei Tage vorher und am Tag selbst, Versäumtes weiter, bis es abgehakt ist – auch wenn die App zu bleibt
   // E-207: ehrlich – geplant wird beim Öffnen; die letzte Mitteilung bittet darum, die App wieder zu öffnen
-  erinnern_hilfe: `Dein ${W.geraet} erinnert dich drei Tage vor jeder Frist und am Tag selbst, jeweils um 9 Uhr – an Versäumtes, bis du es abhakst, und an Fristen, die noch von deinen Angaben abhängen. Auch wenn ${MARKE.name} geschlossen bleibt: Geplant wird beim Öffnen für die nächsten Monate, und bevor der Plan endet, meldet sich dein ${W.geraet}.`,
+  // E-238: Android plant alle Fristen der zwölf Monate (auch nach einem Neustart); das iPhone hält nur eine begrenzte
+  // Zahl – dort plant die App so weit wie möglich voraus. Unabhängig von der App: Fristen in den Kalender übernehmen.
+  erinnern_hilfe: ANDROID
+    ? `Dein ${W.geraet} erinnert dich drei Tage vor jeder Frist und am Tag selbst, jeweils um 9 Uhr – an Versäumtes, bis du es abhakst, und an Fristen, die noch von deinen Angaben abhängen. Auch wenn ${MARKE.name} geschlossen bleibt: Geplant werden alle Fristen der nächsten zwölf Monate, auch über einen Neustart des ${W.geraetGenitiv} hinweg; bevor der Plan endet, meldet sich dein ${W.geraet}.`
+    : `Dein ${W.geraet} erinnert dich drei Tage vor jeder Frist und am Tag selbst, jeweils um 9 Uhr – an Versäumtes, bis du es abhakst, und an Fristen, die noch von deinen Angaben abhängen. Auch wenn ${MARKE.name} geschlossen bleibt: Geplant wird beim Öffnen so weit voraus, wie dein ${W.geraet} Mitteilungen annimmt, und bevor der Plan endet, meldet sich dein ${W.geraet}.`,
   erinnern_hilfe_frei: `Mit Pro erinnert dich dein ${W.geraet} drei Tage vor jeder Frist und am Tag selbst, jeweils um 9 Uhr.`,
-  /** E-192: Ehrlichkeitshinweis, wenn die geplanten Mitteilungen (höchstens 60, Grenze des Systems) vor dem Ende der Fristen enden */
-  erinnern_geplant_bis: (datum: string) => `Erinnerungen sind bis ${datum} geplant – öffne ${MARKE.name} bis dahin einmal, dann plant es die nächsten Fristen.`,
+  /** E-192: Ehrlichkeitshinweis, wenn die geplanten Mitteilungen (Grenze des Systems) vor dem Ende der Fristen enden */
+  erinnern_geplant_bis: (datum: string) => `Erinnerungen sind bis ${datum} geplant – öffne ${MARKE.name} bis dahin einmal, dann plant es die nächsten Fristen. Oder übernimm die Fristen in deinen Kalender.`,
+  // E-238: Kalenderdatei (.ics) – ohne Kalenderzugriff, über das Teilen-Menü
+  e238_kalender: "Fristen in den Kalender übernehmen",
+  e238_kalender_hilfe: `Alle Fristen der nächsten zwölf Monate als Kalenderdatei, mit Erinnerung drei Tage vorher und am Tag selbst um 9 Uhr – sie meldet dein Kalender, auch wenn du ${MARKE.name} nicht öffnest. Ändern sich Fristen oder hakst du etwas ab, übernimm sie erneut; Kalender, die das können, aktualisieren die Einträge dann, statt sie doppelt anzulegen.`,
+  e238_kalender_leer: "In den nächsten zwölf Monaten steht keine Frist mit Datum an.",
+  e238_kalender_fehler: "Die Kalenderdatei ließ sich nicht teilen. Versuch es bitte noch einmal.",
   /** E-192: Mitteilungen (lokal, 9 Uhr) */
   mitteilung_mehrere: (n: number) => `${n} Fristen`,
   mitteilung_vorher: (datum: string) => `Fällig am ${datum}`,
@@ -1243,6 +1252,16 @@ export const T = {
   r12p_staette_hinzufuegen: "Betriebsstätte hinzufügen",
   r12p_staette_ohne_anschrift: "Anschrift fehlt noch",
   r12p_staette_label: "Betriebsstätte",
+  // E-238: Staatsangehörigkeit als Auswahl; ältere Freitexte bleiben lesbar
+  e238_staat: "Staatsangehörigkeit",
+  e238_staat_hilfe: "Mit EU-, EWR- oder Schweizer Staatsangehörigkeit (auch als eine von mehreren) braucht es keinen Aufenthaltstitel.",
+  e238_staat_aendern: "Ändern",
+  e238_staat_erkannt: (text: string) => `Erkannt aus „${text}“ – auf den Unterlagen steht weiter „${text}“.`,
+  e238_staat_unklar: (text: string) => `„${text}“ können wir keinem Staat sicher zuordnen. Wähle die Staatsangehörigkeit aus der Liste – bis dahin ist „Aufenthaltstitel prüfen und Kopie aufbewahren“ bei deinen Pflichten offen.`,
+  e238_staat_genauer: (text: string) => `Eingetragen ist „${text}“. Wähle den Staat aus der Liste, damit er auf den Unterlagen richtig steht.`,
+  e238_staat_vorschlag: (name: string) => `Meintest du ${name}? Übernehmen`,
+  e238_staat_ungeklaert: "Solange die Staatsangehörigkeit ungeklärt ist, prüfe vor Beginn, ob die Person bei dir arbeiten darf – „Aufenthaltstitel prüfen und Kopie aufbewahren“ ist bei deinen Pflichten offen.",
+  e238_pflicht_unklar: (namen: string[]) => `Bei ${namen.join(", ")} ist die Staatsangehörigkeit nicht sicher zuzuordnen. Wähle sie unter „Mitarbeiter“ aus der Liste – dann zeigt ${MARKE.name}, ob diese Pflicht gilt.`,
   r12p_staette_person_hilfe: "Wo die Person überwiegend arbeitet – für Personalübersicht und Kontrollmappe",
   r12p_staette_unterlage_hilfe: "Für die Kontrollmappe dieser Betriebsstätte",
   r12p_kasse_staette_hilfe: "Die Kassenmeldung geht je Betriebsstätte (§ 146a Abs. 4 AO)",

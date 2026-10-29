@@ -4,7 +4,7 @@
  * Titel, Texte, Termine und Einstufungen kommen aus dem Katalog (fachlich noch ungeprüft, das sagt die App).
  * Reine Funktionen, ohne Gerät testbar.
  */
-import { VORLAGEN, fehlendeAngaben, vorlageFuer, type Betrieb } from "@amtlos/fachlogik";
+import { VORLAGEN, fehlendeAngaben, staatsangehoerigkeitArt, vorlageFuer, type Betrieb } from "@amtlos/fachlogik";
 // Monatsende-Regel der Fristen: 31.01. + 1 Monat = 28./29.02., 29.02. + 12 Monate = 28.02.
 import { StandardKalender, plusMonate } from "@amtlos/fristen";
 import { SCHRITTE, type Frage } from "@amtlos/i18n/fragen";
@@ -578,19 +578,22 @@ export interface MitarbeiterFuerCheck {
   name?: string | null;
   geburtsdatum?: string | null;
   beginn?: string | null;
-  /** R11: Freitext aus dem Personalfragebogen, z. B. „deutsch“, „polnisch“, „syrisch“ */
+  /** R11: Freitext aus dem Personalfragebogen, z. B. „deutsch“, „polnisch“, „syrisch“ – seit E-238 der Text für die Unterlagen */
   staatsangehoerigkeit?: string | null;
+  /** E-238: Auswahl (Staat der EU/des EWR/Schweiz als Code, „mehrere_frei“, „andere“, „staatenlos“, „ungeklaert“) */
+  staat?: string | null;
   /** R12: Art der Beschäftigung (vollzeit, teilzeit, minijob …) und „Beschäftigt bis“ */
   art?: string | null;
   ende?: string | null;
 }
 
-/** R11 (Nutzertest Gebäudereinigung #5): Staatsangehörigkeiten aus EU, EWR und Schweiz – ohne Aufenthaltstitel arbeitsberechtigt. */
-const EU_EWR_CH = /^(deutsch|deutschland|belgisch|bulgarisch|dänisch|daenisch|estnisch|finnisch|französisch|franzoesisch|griechisch|irisch|italienisch|kroatisch|lettisch|litauisch|luxemburgisch|maltesisch|niederländisch|niederlaendisch|österreichisch|oesterreichisch|polnisch|portugiesisch|rumänisch|rumaenisch|schwedisch|slowakisch|slowenisch|spanisch|tschechisch|ungarisch|zyprisch|isländisch|islaendisch|liechtensteinisch|norwegisch|schweizerisch|schweizer|eu|ewr)$/i;
-/** Staatsangehörigkeit eindeutig außerhalb von EU, EWR und Schweiz? Mehrere Angaben (z. B. „deutsch, türkisch“): eine aus der EU genügt. */
+/**
+ * Staatsangehörigkeit sicher außerhalb von EU, EWR und Schweiz (oder staatenlos)? Mehrere Angaben (z. B. „deutsch,
+ * türkisch“): eine aus EU, EWR oder Schweiz genügt. E-238: nur, was der Erkenner sicher kennt – „deutsche“ ist deutsch,
+ * „deustch“ ist unbekannt (nicht Drittstaat).
+ */
 export function drittstaat(text: string | null | undefined): boolean {
-  const teile = (text ?? "").split(/[,/;]|\bund\b/).map((x) => x.trim().toLowerCase()).filter(Boolean);
-  return teile.length > 0 && !teile.some((t) => EU_EWR_CH.test(t));
+  return staatsangehoerigkeitArt({ staatsangehoerigkeit: text }) === "drittstaat";
 }
 
 /** Alter in vollen Jahren am Stichtag (ISO-Daten). */
@@ -603,8 +606,15 @@ const alter = (geburt: string, tag: string) => Number(tag.slice(0, 4)) - Number(
  */
 export function profilMitStand(profil: Profil, stichtag: string, mitarbeiter: readonly MitarbeiterFuerCheck[] = []): Profil {
   profil = abgeleiteteAntworten(profil);
-  // R11: gespeicherte Mitarbeiter aus Drittstaaten ⇒ „Beschäftigst du Menschen aus Drittstaaten?“ ist mit Ja beantwortet
-  if (profil["personal.drittstaaten"] !== true && mitarbeiter.some((m) => drittstaat(m.staatsangehoerigkeit))) profil = { ...profil, "personal.drittstaaten": true };
+  // R11: gespeicherte Mitarbeiter aus Drittstaaten ⇒ „Beschäftigst du Menschen aus Drittstaaten?“ ist mit Ja beantwortet.
+  // E-238: Ist eine Staatsangehörigkeit nicht sicher zuzuordnen, gilt ein „Nein“ nicht – die Pflicht ist „zu prüfen“
+  // (hängt ab), nie still ausgeblendet und nie als geltend angenommen.
+  const arten = mitarbeiter.map((m) => staatsangehoerigkeitArt({ staat: m.staat, staatsangehoerigkeit: m.staatsangehoerigkeit }));
+  if (profil["personal.drittstaaten"] !== true && arten.includes("drittstaat")) profil = { ...profil, "personal.drittstaaten": true };
+  else if (profil["personal.drittstaaten"] === false && arten.includes("unbekannt")) {
+    const { ["personal.drittstaaten"]: _weg, ...ohne } = profil;
+    profil = ohne;
+  }
   const jung = mitarbeiter.filter((m) => typeof m.geburtsdatum === "string" && ISO.test(m.geburtsdatum) && alter(m.geburtsdatum, stichtag) < 18 && alter(m.geburtsdatum, stichtag) >= 0).length;
   if (!jung) return profil;
   const angegeben = typeof profil["beschaeftigte.jugendlich"] === "number" ? (profil["beschaeftigte.jugendlich"] as number) : 0;

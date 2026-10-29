@@ -25,8 +25,17 @@ import { differenzTage, plusMonate, plusTage } from "@amtlos/fristen";
 import { T as TEXT } from "../texte";
 import { istErledigt, type Auswertung, type Erledigt } from "./check";
 
-/** Höchstens so viele Mitteilungen auf einmal (iOS: 64 je App; der Rest bleibt als Reserve frei). */
+/** Höchstens so viele Mitteilungen auf einmal auf dem iPhone (iOS: 64 je App; der Rest bleibt als Reserve frei). */
 export const MAX_MITTEILUNGEN = 60;
+/**
+ * E-238: Android kennt keine Grenze wie iOS. expo-notifications legt je Mitteilung einen Wecker beim System an (AlarmManager)
+ * und speichert die Mitteilungen; nach einem Neustart oder einem Update der App setzt es sie selbst neu (Empfänger für
+ * BOOT_COMPLETED, REBOOT, MY_PACKAGE_REPLACED; RECEIVE_BOOT_COMPLETED steht in app.json). Das System erlaubt bis zu 500
+ * Wecker je App – 400 lassen Abstand und reichen für alle Termine der zwölf Monate (typisch 20 bis 120 Tage).
+ */
+export const MAX_MITTEILUNGEN_ANDROID = 400;
+/** Höchstzahl für das Gerät (E-238). */
+export const maxMitteilungen = (plattform: "ios" | "android" | "web"): number => (plattform === "android" ? MAX_MITTEILUNGEN_ANDROID : MAX_MITTEILUNGEN);
 /** Tage vor dem Termin für die Vorab-Erinnerung */
 export const VORLAUF_TAGE = 3;
 /** Erinnerungen an einen versäumten Termin: Tage nach heute (morgen, dann wöchentlich) */
@@ -140,13 +149,25 @@ export const WEITERPLANEN_NACH_MONATEN = 11;
 const weiter = (am: string): Mitteilung => ({ am, titel: TEXT.mitteilung_weiterplanen_titel, text: TEXT.mitteilung_weiterplanen, erinnerungen: [], weiterplanen: true });
 
 /**
- * Der Plan für das Gerät: eine Mitteilung je Tag, nach Datum, höchstens `max` – die letzte davon ist der Hinweis
- * „weiterplanen“ (E-207). `geplantBis`: letzter Tag mit geplanter Erinnerung, wenn die Höchstzahl den Plan kürzt.
+ * E-238: Kern einer Erinnerung – der Fälligkeitstag, drei Tage vorher und die erste Erinnerung an Versäumtes. Weitere
+ * Erinnerungen an Versäumtes (nach einer und nach zwei Wochen) und „falls es für dich gilt“ sind Zusatz: Reicht die
+ * Höchstzahl nicht (iPhone), bekommen sie keinen eigenen Tag, sondern stehen nur mit in der Mitteilung eines Tages, der
+ * ohnehin eine hat – so reicht der Plan mit gleich vielen Mitteilungen weiter.
+ *
+ * Der Plan für das Gerät: eine Mitteilung je Tag (alle Termine des Tages zusammen), nach Datum, höchstens `max` – die
+ * letzte davon ist der Hinweis „weiterplanen“ (E-207). Passt nicht alles (iPhone), gehen die Kern-Erinnerungen vor:
+ * Tage mit Kern-Erinnerungen nach Datum, Zusatz nur an diesen Tagen; bleibt Platz, auch eigene Tage für Zusatz.
+ * `geplantBis`: letzter Tag mit geplanter Kern-Erinnerung, wenn die Höchstzahl die Kern-Erinnerungen kürzt.
  */
 export function erinnerungsPlan(a: Auswertung, e: Erledigt, heute: string, o: { vorlauf?: number; amTag?: boolean; max?: number } = {}): ErinnerungsPlan {
   const max = o.max ?? MAX_MITTEILUNGEN;
+  const liste = erinnerungen(a, e, heute, o);
+  // erste Erinnerung je versäumtem Termin (Kern); die weiteren sind Zusatz
+  const erst = new Map<string, string>();
+  for (const x of liste) if (x.art === "ueberfaellig" && !erst.has(`${x.pflichtId}|${x.termin}`)) erst.set(`${x.pflichtId}|${x.termin}`, x.am);
+  const kern = (x: Erinnerung) => !x.vielleicht && (x.art !== "ueberfaellig" || erst.get(`${x.pflichtId}|${x.termin}`) === x.am);
   const tage = new Map<string, Erinnerung[]>();
-  for (const x of erinnerungen(a, e, heute, o)) tage.set(x.am, [...(tage.get(x.am) ?? []), x]);
+  for (const x of liste) tage.set(x.am, [...(tage.get(x.am) ?? []), x]);
   const alle = [...tage.entries()].map(([am, l]) => mitteilung(am, l));
   if (!alle.length) return { mitteilungen: [], geplantBis: null };
   if (alle.length < max) {
@@ -159,7 +180,22 @@ export function erinnerungsPlan(a: Auswertung, e: Erledigt, heute: string, o: { 
     const hinweis = gleich ? { ...gleich, text: `${gleich.text}\n${TEXT.mitteilung_weiterplanen}`, weiterplanen: true } : weiter(am);
     return { mitteilungen: nachher.length ? [...alle, weiter(plusTage(nachher[nachher.length - 1]!.am, 1))] : [...vorher, hinweis], geplantBis: null };
   }
-  const mitteilungen = alle.slice(0, max - 1);
-  const bis = mitteilungen[mitteilungen.length - 1]?.am ?? heute;
-  return { mitteilungen: [...mitteilungen, weiter(plusTage(bis, 1))], geplantBis: bis };
+  // E-238: zu viele Tage – Kern-Tage zuerst (nach Datum), Zusatz nur an diesen Tagen, freie Plätze für Zusatz-Tage
+  const platz = max - 1;
+  const kernTage = [...tage.keys()].filter((t) => tage.get(t)!.some(kern)).sort();
+  const gewaehlt = new Set(kernTage.slice(0, platz));
+  const kernGekuerzt = kernTage.length > platz;
+  if (!kernGekuerzt) for (const t of [...tage.keys()].sort()) if (gewaehlt.size < platz && !gewaehlt.has(t)) gewaehlt.add(t);
+  const mitteilungen = [...gewaehlt].sort().map((t) => mitteilung(t, tage.get(t)!));
+  const letzte = mitteilungen[mitteilungen.length - 1]?.am ?? heute;
+  if (!kernGekuerzt) {
+    // alle Kern-Erinnerungen sind geplant – nur Zusatz fehlt: Hinweis wie beim vollständigen Plan
+    const am = plusMonate(heute, WEITERPLANEN_NACH_MONATEN);
+    if (letzte >= am) return { mitteilungen: [...mitteilungen, weiter(plusTage(letzte, 1))], geplantBis: null };
+    // eine Mitteilung je Tag – fällt der Hinweis auf einen Tag mit Erinnerungen, steht er in derselben Mitteilung
+    const gleich = mitteilungen.find((m) => m.am === am);
+    if (gleich) return { mitteilungen: mitteilungen.map((m) => (m === gleich ? { ...m, text: `${m.text}\n${TEXT.mitteilung_weiterplanen}`, weiterplanen: true } : m)), geplantBis: null };
+    return { mitteilungen: [...mitteilungen, weiter(am)].sort((x, y) => x.am.localeCompare(y.am)), geplantBis: null };
+  }
+  return { mitteilungen: [...mitteilungen, weiter(plusTage(letzte, 1))], geplantBis: letzte };
 }

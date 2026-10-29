@@ -282,6 +282,13 @@ try {
   await warte(800);
   pruefe(await sichtbar(/^1 von \d+/), "Abhaken zählt nicht im Fortschritt");
   await foto("start-mit-pflichten");
+  // E-238: mit Pro die Fristen der nächsten zwölf Monate als Kalenderdatei (im Web als Download)
+  const kalender = knopf("Fristen in den Kalender übernehmen");
+  await kalender.evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await foto("kalender");
+  const [ics] = await Promise.all([p.waitForEvent("download"), kalender.click()]);
+  const icsText = fs.readFileSync(await ics.path(), "utf8");
+  pruefe(/\.ics$/.test(ics.suggestedFilename()) && icsText.startsWith("BEGIN:VCALENDAR\r\n") && icsText.includes("BEGIN:VEVENT\r\n") && icsText.includes("TRIGGER:-P2DT15H\r\n") && icsText.endsWith("END:VCALENDAR\r\n"), "Kalenderdatei fehlt oder ist nicht gültig");
 
   // R12: Kassenabschluss – Betrieb mit Kasse sieht „Kasse“ auf „Heute“; Tagesabschluss in wenigen Feldern
   await p.getByRole("tab", { name: "Heute" }).click();
@@ -495,6 +502,23 @@ try {
   await warte(800);
   await feld("Vor- und Nachname").fill("Sam Muster");
   await feld("Tätigkeit").fill("Friseur/in");
+  // E-238: Staatsangehörigkeit aus der Liste – nach der Wahl nur die Wahl mit „Ändern“, keine Kopie des Aufenthaltstitels
+  const staat = p.getByRole("radiogroup", { name: "Staatsangehörigkeit" }).locator("visible=true").last();
+  pruefe((await staat.count()) > 0, "Staatsangehörigkeit ist keine Auswahl");
+  await tippe(staat.getByRole("radio", { name: "Deutschland", exact: true }));
+  await warte(500);
+  pruefe((await staat.getByRole("radio").count()) === 1 && (await p.getByRole("button", { name: "Ändern", exact: true }).locator("visible=true").count()) > 0, "Staatsangehörigkeit: nach der Wahl nicht nur die Wahl mit „Ändern“");
+  pruefe(!(await sichtbar("Kopie des Aufenthaltstitels")), "Aufenthaltstitel bei deutscher Staatsangehörigkeit angeboten");
+  await foto("mitarbeiter-staat");
+  await tippe(knopf("Ändern"));
+  await warte(400);
+  await tippe(staat.getByRole("radio", { name: "Anderer Staat (außerhalb von EU, EWR und Schweiz)", exact: true }));
+  await warte(500);
+  pruefe(await sichtbar("Kopie des Aufenthaltstitels"), "Aufenthaltstitel bei Staat außerhalb nicht angeboten");
+  await tippe(knopf("Ändern"));
+  await warte(400);
+  await tippe(staat.getByRole("radio", { name: "Deutschland", exact: true }));
+  await warte(400);
   await knopf("Fertig").click();
   await warte(800);
   pruefe(await sichtbar("Sam Muster"), "Mitarbeiter nicht gespeichert");
@@ -796,6 +820,11 @@ try {
   await foto("erinnerung-frei");
   await erinnern.click();
   await bezahlschirm("Erinnerung vor jeder Frist – mit Pro", "pro-erinnerungen");
+  await zurueck();
+  await warte(800);
+  // E-238: Fristen in den Kalender übernehmen – gehört wie die Erinnerungen zu Pro
+  await tippe(knopf("Fristen in den Kalender übernehmen · Pro"));
+  await bezahlschirm("Erinnerung vor jeder Frist – mit Pro", "pro-kalender");
   await zurueck();
   await warte(800);
 

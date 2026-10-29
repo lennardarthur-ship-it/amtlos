@@ -2,14 +2,17 @@ import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useMemo, useState } from "react";
 import { AppState, Linking, View } from "react-native";
 import { plusTage } from "@amtlos/fristen";
-import { vorlageFuer } from "@amtlos/fachlogik";
+import { staatsangehoerigkeitArt, vorlageFuer } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
 import { BausteinListe, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, SCHRIFT, useFarben, weich } from "../ui/thema";
 import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, type Auswertung, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringendOhneTermin, dringlichkeit, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, hakenOhne, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, regelwert, selten, terminStand, zaehlung, type PflichtInfo } from "../pflichten/check";
-import { erinnerungsPlan } from "../pflichten/erinnerungsplan";
+import { erinnerungsPlan, maxMitteilungen } from "../pflichten/erinnerungsplan";
+import { fristenIcs, kalenderDateiname, kalenderTermine } from "../pflichten/kalender";
+import { PLATTFORM } from "../plattform";
+import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { LEERER_STAND, heute } from "../unterlagen/speicher";
 import { umsatzFakten } from "../unterlagen/kuUmsatz";
@@ -57,7 +60,7 @@ function useAuswertungOhneHaken() {
   const schluessel = unterweisungen.map((u) => `${u.id}:${String(u.daten.datum ?? "")}`).join("|");
   // R10: aus „Mitarbeiter“ zählen Geburtsdatum (unter 18) und „Beschäftigt seit“ (Neueinstellung)
   // R12 (Zoll #1, #6): Name, Art und „Beschäftigt bis“ bestimmen die Nachweise je Person
-  const personen = mitarbeiter.map((m) => `${m.name ?? ""}:${m.geburtsdatum ?? ""}:${m.beginn ?? ""}:${m.art ?? ""}:${m.ende ?? ""}:${m.staatsangehoerigkeit ?? ""}`).join("|");
+  const personen = mitarbeiter.map((m) => `${m.name ?? ""}:${m.geburtsdatum ?? ""}:${m.beginn ?? ""}:${m.art ?? ""}:${m.ende ?? ""}:${m.staatsangehoerigkeit ?? ""}:${m.staat ?? ""}`).join("|");
   // Kleinunternehmer-Wächter (C.23, Steuerberater 22.10.2026): vereinnahmter Umsatz aus Rechnungen, Zahlungseingängen und Kasse
   const kasse = useStandWahl((s) => s.kasse);
   const sachentnahmen = useStandWahl((s) => s.sachentnahmen);
@@ -115,6 +118,9 @@ export function Balken({ prozent, grund, farbe, label }: { prozent: number; grun
   );
 }
 
+/** E-238: Pflichten, die an der Staatsangehörigkeit der Beschäftigten hängen (Katalog D.38 und die laufende Aufbewahrung). */
+const AUFENTHALT_PFLICHTEN = ["personal.aufenthaltstitel", "personal.aufenthaltstitel_laufend"];
+
 export function PflichtDetail({ id }: { id: string }) {
   const z = useAmtlos();
   const f = useFarben();
@@ -151,6 +157,7 @@ export function PflichtDetail({ id }: { id: string }) {
   const bestaetigen = p.erledigung.art === "bestaetigen" ? p.erledigung.bestaetigung ?? TEXT.als_erledigt_kurz : null;
   const laufendBis = unterlageFertig && p.erledigung.art === "laufend" && p.erledigung.naechsterTerminAus ? gueltigBis(unterlageFertig, p.erledigung.naechsterTerminAus) : null;
   const zeitraumText = (iso: string) => (p.erledigung.zeitraum === "jahr" ? iso.slice(0, 4) : new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long", year: "numeric" }).format(new Date(`${iso.slice(0, 10)}T12:00:00Z`)));
+  const unklareStaaten = z.stand.mitarbeiter.filter((m) => m.name?.trim() && staatsangehoerigkeitArt(m) === "unbekannt").map((m) => m.name.trim());
   const lohnWer = p.lohnbuero ? TEXT.r10_lohn_wer[String(z.stand.profil["personal.lohn_durch"])] : undefined;
   // erste Zeile ohne Linie oben – sonst doppelte Linie am Kartenrand
   let erste = true;
@@ -224,6 +231,8 @@ export function PflichtDetail({ id }: { id: string }) {
       {durchUnterlage ? <Hinweis art="erfolg" text={laufendBis ? `${TEXT.erledigt_durch_unterlage} ${TEXT.r10_laufend_bis(datumDe(laufendBis))}` : TEXT.erledigt_durch_unterlage} /> : null}
       {p.einordnung !== "pflicht" ? <Hinweis text={TEXT.r10_einordnung[p.einordnung] ?? ""} /> : null}
       {lohnWer ? <Hinweis text={TEXT.r10_lohn_hinweis(lohnWer)} /> : null}
+      {/* E-238: nicht sicher zuzuordnende Staatsangehörigkeit – darum ist die Pflicht „zu prüfen“; wo man es klärt */}
+      {AUFENTHALT_PFLICHTEN.includes(p.id) && unklareStaaten.length ? <Hinweis art="warnung" text={TEXT.e238_pflicht_unklar(unklareStaaten)} /> : null}
       {gilt && !abgehakt ? <NachweisJePerson p={p} /> : null}
       {gilt && vorher.length ? <Hinweis text={TEXT.r11_erst_erledigen(vorher.map((x) => x.titel))} /> : null}
       {gilt && vorhanden ? (
@@ -751,7 +760,8 @@ function ErinnerungsSchalter() {
   const sperre = useProSperre();
   const [fehler, setFehler] = useState(false);
   const plan = useErinnerungsPlan();
-  if (!erinnerungenMoeglich && z.pro) return null;
+  // Web mit Pro: keine Mitteilungen, aber die Kalenderdatei (E-238)
+  if (!erinnerungenMoeglich && z.pro) return <Karte stil={{ marginTop: 16, paddingBottom: 12 }}><KalenderExport /></Karte>;
   const einschalten = () => void erlaubnisAnfragen().then((ok) => (ok ? z.erinnerungenSetzen(true) : setFehler(true)));
   return (
     <Karte stil={{ marginTop: 16, paddingBottom: 12 }}>
@@ -775,11 +785,37 @@ function ErinnerungsSchalter() {
           <TextKnopf symbol="gearshape" text={TEXT.einstellungen_oeffnen} onPress={() => void Linking.openSettings()} />
         </View>
       ) : null}
+      <KalenderExport />
     </Karte>
   );
 }
 
-/** E-192: der Plan der Mitteilungen (alle Termine der nächsten zwölf Monate, höchstens 60 Tage) – leer ohne Pro bzw. Schalter. */
+/**
+ * E-238: „Fristen in den Kalender übernehmen“ – Kalenderdatei (.ics) mit den Fristen der nächsten zwölf Monate und ihren
+ * Erinnerungen über das Teilen-Menü; ohne Kalenderzugriff. Gehört wie die Erinnerungen zu Pro (ohne Pro: Bezahlschirm).
+ */
+function KalenderExport() {
+  const z = useAmtlos();
+  const sperre = useProSperre();
+  const melden = useMeldung();
+  const a = useAuswertung();
+  const exportieren = () => {
+    const tag = heute();
+    const { erledigt, unterlagen, betrieb } = z.stand;
+    const termine = kalenderTermine(a, { erledigt, unterlagen, betrieb }, tag);
+    if (!termine.length) return melden(TEXT.e238_kalender_leer, "info");
+    const ics = fristenIcs(termine, tag, new Date());
+    void dateiTeilenBytes(kalenderDateiname(tag), new TextEncoder().encode(ics), "text/calendar").catch(() => melden(TEXT.e238_kalender_fehler, "info"));
+  };
+  return (
+    <View style={{ marginTop: 10 }}>
+      <TextKnopf symbol="calendar" text={TEXT.mitPro(TEXT.e238_kalender, z.pro)} onPress={() => (sperre("erinnerungen") ? exportieren() : undefined)} />
+      <T v="caption" leise stil={{ marginTop: 2 }}>{TEXT.e238_kalender_hilfe}</T>
+    </View>
+  );
+}
+
+/** E-192: der Plan der Mitteilungen (alle Termine der nächsten zwölf Monate, auf dem iPhone höchstens 60 Tage) – leer ohne Pro bzw. Schalter. */
 function useErinnerungsPlan() {
   const z = useAmtlos();
   const a = useAuswertung();
@@ -787,7 +823,8 @@ function useErinnerungsPlan() {
   const aktiv = erinnerungenAktiv(z.stand.erinnerungen, z.pro);
   const { erledigt, unterlagen, betrieb } = z.stand;
   const tag = heute();
-  return useMemo(() => (aktiv ? erinnerungsPlan(a, { erledigt, unterlagen, betrieb }, tag) : { mitteilungen: [], geplantBis: null }), [a, erledigt, unterlagen, betrieb, aktiv, tag]);
+  // E-238: Android plant alle Termine der zwölf Monate (keine Grenze wie die 64 des iPhones)
+  return useMemo(() => (aktiv ? erinnerungsPlan(a, { erledigt, unterlagen, betrieb }, tag, { max: maxMitteilungen(PLATTFORM) }) : { mitteilungen: [], geplantBis: null }), [a, erledigt, unterlagen, betrieb, aktiv, tag]);
 }
 
 /**

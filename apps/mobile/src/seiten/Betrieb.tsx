@@ -30,7 +30,7 @@ import { SteuerberatungSeite } from "./Steuerberatung";
 import { KontrollmappeSeite } from "./Kontrollmappe";
 import { KontoZeile } from "./Konto";
 import { gemischteUmsaetze, vorsteuerquoteAus } from "../unterlagen/ustAusRechnungen";
-import { MitarbeiterZusatz } from "./Mitarbeiter";
+import { MitarbeiterZusatz, StaatWahl, mitarbeiterWerte } from "./Mitarbeiter";
 import { StaettenSeite, staettenText } from "./BetriebStaetten";
 import { syncAngeboten } from "../konto/konfig";
 import { useKonto } from "../konto/konto";
@@ -54,7 +54,8 @@ export function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; ne
   return (
     <Unterseite titel={p.name.trim() || TEXT.person_neu[art]}>
       <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 4, paddingBottom: 32 }}>
-        <Felder felder={PERSONEN_FELDER[art]} werte={p} fehlt={[]} setze={(k, w) => z.personSetzen(art, { ...p, [k]: typeof w === "string" ? w : null })} />
+        {/* E-238: Staatsangehörigkeit als Auswahl – die Bedingungen der Felder rechnen mit der (auch aus älterem Text erkannten) Wahl */}
+        <Felder felder={PERSONEN_FELDER[art]} werte={art === "mitarbeiter" ? mitarbeiterWerte(p) : p} fehlt={[]} setze={(k, w) => z.personSetzen(art, { ...p, [k]: typeof w === "string" ? w : null })} eigen={art === "mitarbeiter" ? (f) => (f.id === "staat" ? <StaatWahl p={p} /> : undefined) : undefined} />
         {/* R12 Personal: Betriebsstätte, Aufenthaltstitel, doppelter Name */}
         {art === "mitarbeiter" ? <MitarbeiterZusatz p={p} /> : null}
         {/* E-165: Personenkonto des Kunden – vergeben von der App, nur zum Ansehen */}

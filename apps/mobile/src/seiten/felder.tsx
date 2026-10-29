@@ -27,7 +27,7 @@ export const gefuellt = (w: unknown) => (typeof w === "string" ? w.trim() !== ""
  * Felder eines Schritts oder Eintrags (E-124). Seltene Felder stehen hinter „Weitere Angaben“ – außer sie sind
  * schon ausgefüllt oder werden unter „Fehlt noch“ genannt. Listen zeichnet der Aufrufer (`liste`).
  */
-export function Felder({ felder, werte, setze, fehlt, liste, kontext }: { felder: Feld[]; werte: Daten | Eintrag; setze: (k: string, w: EintragWert) => void; fehlt: string[]; liste?: (f: ListenFeld) => ReactNode; /** ganze Unterlage, wenn `werte` ein Listeneintrag ist (Vorschläge aus anderen Listen) */ kontext?: Daten }) {
+export function Felder({ felder, werte, setze, fehlt, liste, kontext, eigen }: { felder: Feld[]; werte: Daten | Eintrag; setze: (k: string, w: EintragWert) => void; fehlt: string[]; liste?: (f: ListenFeld) => ReactNode; /** ganze Unterlage, wenn `werte` ein Listeneintrag ist (Vorschläge aus anderen Listen) */ kontext?: Daten; /** E-238: eigene Eingabe für ein Feld (z. B. Staatsangehörigkeit) – `undefined`: die übliche */ eigen?: (f: EinfachesFeld) => ReactNode | undefined }) {
   const [alle, setAlle] = useState(false);
   // Branche aus dem Pflichten-Check: Vorschläge und Bausteine passend zum Betrieb (R10)
   const branchen = useStandWahl((s) => s.profil["taetigkeit.branchen"]);
@@ -43,7 +43,11 @@ export function Felder({ felder, werte, setze, fehlt, liste, kontext }: { felder
   return (
     <EingabeKontext.Provider value={umfeld}>
       <View>
-      {zeigen.map((x) => (x.art === "liste" ? <View key={x.id}>{liste?.(x)}</View> : <Eingabe key={x.id} feld={x as EinfachesFeld} wert={werte[x.id] as EintragWert} setzen={(w) => setze(x.id, w)} />))}
+      {zeigen.map((x) => {
+        if (x.art === "liste") return <View key={x.id}>{liste?.(x)}</View>;
+        const anders = eigen?.(x as EinfachesFeld);
+        return anders !== undefined ? <View key={x.id}>{anders}</View> : <Eingabe key={x.id} feld={x as EinfachesFeld} wert={werte[x.id] as EintragWert} setzen={(w) => setze(x.id, w)} />;
+      })}
       {selten.length && (alle || selten.some(versteckt)) ? (
         <TextKnopf symbol={alle ? "chevron.up" : "chevron.down"} text={alle ? TEXT.weniger_angaben : TEXT.weitere_angaben(selten.filter(versteckt).length)} onPress={() => { weich(); setAlle(!alle); }} stil={{ marginTop: 14 }} />
       ) : null}

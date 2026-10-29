@@ -4,9 +4,9 @@
  */
 import { useEffect, useState } from "react";
 import { Image, View } from "react-native";
-import type { Person } from "@amtlos/fachlogik";
+import { STAAT_NAMEN, STAAT_OPTIONEN, STAAT_UNGEKLAERT, staatAuswahl, staatsangehoerigkeitArt, staatsangehoerigkeitErkennen, staatsangehoerigkeitText, type Person } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Hinweis, Karte, Knopf, Symbol, T, TextKnopf } from "../ui/bausteine";
+import { Auswahl, Hinweis, Karte, Knopf, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { bestaetigen } from "../ui/bestaetigen";
 import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
@@ -21,11 +21,55 @@ import { StaettenWahl } from "./BetriebStaetten";
 const endung = (name: string) => (name.split(".").pop() ?? "").toLowerCase();
 const MIME: Record<string, string> = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", pdf: "application/pdf" };
 
-/** Braucht die Person einen Aufenthaltstitel? Nicht bei deutscher Staatsangehörigkeit; sonst, sobald etwas dazu eingetragen ist oder eine andere Staatsangehörigkeit. */
+/**
+ * Braucht die Person einen Aufenthaltstitel? Bei einer Staatsangehörigkeit sicher außerhalb von EU, EWR und Schweiz (auch
+ * staatenlos) oder wenn schon etwas dazu eingetragen ist. E-238: „deutsche“, „Polin“, „deutsch/türkisch“ nicht; nicht
+ * sicher zuzuordnende Angaben auch nicht – dort bittet die Auswahl, den Staat zu wählen.
+ */
 export function mitAufenthalt(p: Person): boolean {
-  const sa = (p.staatsangehoerigkeit ?? "").trim().toLocaleLowerCase("de");
   if (p.aufenthalt_datei || p.aufenthalt_bis || p.aufenthalt_art) return true;
-  return sa !== "" && sa !== "deutsch";
+  return staatsangehoerigkeitArt(p) === "drittstaat";
+}
+
+/** Werte für die Felder einer beschäftigten Person: die Auswahl auch bei älteren Daten (aus dem Text sicher erkannt). */
+export function mitarbeiterWerte(p: Person): Person {
+  return { ...p, staat: staatAuswahl(p) ?? "" };
+}
+
+/**
+ * E-238: Staatsangehörigkeit aus der Liste wählen (Deutschland, EU, EWR, Schweiz, mehrere, anderer Staat, staatenlos,
+ * ungeklärt). Ist etwas gewählt, steht nur die Wahl da („Ändern“ zeigt die Liste). Ältere Freitexte bleiben lesbar: sicher
+ * erkannt → als Wahl vorbelegt; sonst der Text mit der Bitte, aus der Liste zu wählen (bei einem Tippfehler mit Vorschlag).
+ */
+export function StaatWahl({ p }: { p: Person }) {
+  const z = useAmtlos();
+  const gewaehlt = staatAuswahl(p);
+  const gespeichert = typeof p.staat === "string" && p.staat !== "";
+  const [offen, setOffen] = useState(!gewaehlt);
+  const text = (p.staatsangehoerigkeit ?? "").trim();
+  const art = staatsangehoerigkeitArt(p);
+  const vorschlag = !gewaehlt && text ? staatsangehoerigkeitErkennen(text).vorschlag : undefined;
+  const waehlen = (w: string) => {
+    z.personSetzen("mitarbeiter", { ...p, staat: w, staatsangehoerigkeit: staatsangehoerigkeitText(w, p.staatsangehoerigkeit) || null } as Person);
+    setOffen(false);
+  };
+  const optionen = offen || !gewaehlt ? [...STAAT_OPTIONEN] : STAAT_OPTIONEN.filter((o) => o.wert === gewaehlt);
+  return (
+    <View>
+      <Auswahl label={TEXT.e238_staat} hilfe={TEXT.e238_staat_hilfe} wert={gewaehlt} aendern={waehlen} optionen={optionen} />
+      {gewaehlt && !offen ? <TextKnopf symbol="chevron.down" text={TEXT.e238_staat_aendern} onPress={() => setOffen(true)} stil={{ marginTop: 4 }} /> : null}
+      {/* älterer Freitext, sicher erkannt: zeigen, woraus die Wahl kommt */}
+      {gewaehlt && !gespeichert && text ? <T v="caption" leise stil={{ marginTop: 6 }}>{TEXT.e238_staat_erkannt(text)}</T> : null}
+      {/* nicht sicher zuzuordnen: nie still Drittstaat – die Pflicht ist „zu prüfen“, bis gewählt ist */}
+      {!gewaehlt && text ? (
+        <View style={{ marginTop: 8 }}>
+          <Hinweis art="warnung" text={art === "frei" ? TEXT.e238_staat_genauer(text) : TEXT.e238_staat_unklar(text)} />
+          {vorschlag ? <TextKnopf symbol="checkmark" text={TEXT.e238_staat_vorschlag(STAAT_NAMEN[vorschlag] ?? vorschlag)} onPress={() => waehlen(vorschlag)} /> : null}
+        </View>
+      ) : null}
+      {gewaehlt === STAAT_UNGEKLAERT ? <View style={{ marginTop: 8 }}><Hinweis text={TEXT.e238_staat_ungeklaert} /></View> : null}
+    </View>
+  );
 }
 
 /** Kopie des Aufenthaltstitels: aufnehmen bzw. wählen, ansehen, teilen, ersetzen. */

@@ -9,6 +9,7 @@ import { KUNDEN_ARTEN } from "./kundenarten.js";
 const AUFENTHALTSTITEL = ["Aufenthaltserlaubnis", "Niederlassungserlaubnis", "Blaue Karte EU", "Erlaubnis zum Daueraufenthalt – EU", "Fiktionsbescheinigung", "Duldung mit Beschäftigungserlaubnis", "Aufenthaltsgestattung mit Beschäftigungserlaubnis"];
 import type { Daten, EinfachesFeld, Person, PersonAngaben, PersonenArt, Vorlage } from "./typen.js";
 import { MARKE } from "@amtlos/marke";
+import { STAAT_ANDERE, STAAT_MEHRERE_FREI, STAAT_OPTIONEN, STAAT_STAATENLOS, staatAuswahl } from "../staatsangehoerigkeit.js";
 
 /** Ein Satz je Vorlage, ohne Paragrafen – für Listen in der App. */
 export const KURZ: Record<string, string> = {
@@ -92,10 +93,14 @@ export const PERSONEN_FELDER: Record<PersonenArt, EinfachesFeld[]> = {
     { id: "geburtsdatum", art: "datum", label: "Geburtsdatum" },
     { id: "geburtsort", art: "text", label: "Geburtsort" },
     { id: "geburtsname", art: "text", label: "Geburtsname", hilfe: "falls abweichend", selten: true },
-    { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit", vorschlaege: ["deutsch"] },
+    // E-238: Auswahl statt Freitext („deutsche“ galt als Drittstaat). Ältere Freitexte bleiben in `staatsangehoerigkeit`; die
+    // App zeigt dafür die sicher erkannte Auswahl (`staatAuswahl`) – die Bedingungen unten rechnen mit diesem Wert.
+    { id: "staat", art: "wahl", label: "Staatsangehörigkeit", optionen: [...STAAT_OPTIONEN] },
+    // Text für Personalfragebogen, Lohnkonto & Co. – bei einem Staat dessen Name (oder der passende ältere Text), sonst eintragen
+    { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit(en) für die Unterlagen", hilfe: "so steht es auf Personalfragebogen und Lohnkonto, z. B. „deutsch, türkisch“", wenn: { feld: "staat", ist: [STAAT_MEHRERE_FREI, STAAT_ANDERE] } },
     // R12 (Zoll #5): Aufenthaltstitel bei Staatsangehörigen außerhalb von EU, EWR und Schweiz – Kopie als Datei in der App
-    { id: "aufenthalt_art", art: "text", label: "Aufenthaltstitel", hilfe: "nur bei Staatsangehörigkeit außerhalb von EU, EWR und Schweiz", selten: true, wenn: { feld: "staatsangehoerigkeit", ist: ["deutsch", "Deutsch"], nicht: true }, vorschlaege: AUFENTHALTSTITEL },
-    { id: "aufenthalt_bis", art: "datum", label: "Aufenthaltstitel gültig bis", hilfe: `${MARKE.name} erinnert auf „Heute“ rechtzeitig vor dem Ablauf`, selten: true, wenn: { feld: "staatsangehoerigkeit", ist: ["deutsch", "Deutsch"], nicht: true } },
+    { id: "aufenthalt_art", art: "text", label: "Aufenthaltstitel", hilfe: "nur bei Staatsangehörigkeit außerhalb von EU, EWR und Schweiz", selten: true, wenn: { feld: "staat", ist: [STAAT_ANDERE, STAAT_STAATENLOS] }, vorschlaege: AUFENTHALTSTITEL },
+    { id: "aufenthalt_bis", art: "datum", label: "Aufenthaltstitel gültig bis", hilfe: `${MARKE.name} erinnert auf „Heute“ rechtzeitig vor dem Ablauf`, selten: true, wenn: { feld: "staat", ist: [STAAT_ANDERE, STAAT_STAATENLOS] } },
     { id: "taetigkeit", art: "text", label: "Tätigkeit" },
     { id: "beginn", art: "datum", label: "Beschäftigt seit" },
     // R12 (Zoll #4, #8): Art, Umfang und Entgelt – für Minijob- und Mindestlohnprüfung und die Personalübersicht
@@ -153,8 +158,12 @@ const gleicherName = (a: string, b: string) => a.trim().toLocaleLowerCase("de") 
 /** Person merken: gleicher Name ergänzt den vorhandenen Eintrag (neue Werte gewinnen, leere überschreiben nichts). */
 export function personMerken(liste: Person[], neu: PersonAngaben, id: string): Person[] {
   const alt = liste.find((p) => gleicherName(p.name, neu.name));
-  const werte = Object.fromEntries(Object.entries(neu).filter(([, w]) => typeof w === "string" && w.trim()));
+  const werte: Record<string, string | null> = Object.fromEntries(Object.entries(neu).filter(([, w]) => typeof w === "string" && w.trim()));
   if (!alt) return [...liste, { ...werte, id, name: neu.name.trim() } as Person];
+  // E-238: steht in der Unterlage eine andere Staatsangehörigkeit als zur gespeicherten Auswahl passt, gilt der neue Text –
+  // die alte Auswahl entfällt (die App erkennt die Auswahl dann aus dem Text oder fragt nach)
+  const text = typeof werte.staatsangehoerigkeit === "string" ? werte.staatsangehoerigkeit : null;
+  if (text && alt.staat && text.trim() !== (alt.staatsangehoerigkeit ?? "").trim() && staatAuswahl({ staatsangehoerigkeit: text }) !== alt.staat) werte.staat = null;
   return liste.map((p) => (p === alt ? ({ ...p, ...werte, id: p.id, name: p.name } as Person) : p));
 }
 
