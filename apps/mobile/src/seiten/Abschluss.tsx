@@ -23,13 +23,16 @@ import { versandBestaetigt } from "./versand";
 import { bestaetigen, hinweisen } from "../ui/bestaetigen";
 import { AbsenderSeite } from "./Betrieb";
 import { BetriebTeilSeite } from "./Absender";
-import { handwerkLaut, ohneZahlungsweg } from "./rechnungHinweise";
+import { handwerkLaut, ohneZahlungsweg, rechnungHinweisStufe } from "./rechnungHinweise";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { useProSperre } from "./Pro";
 import { ausgabeErlaubt, ausgabeGrund, eRechnungErlaubt, erstellenErlaubt } from "../pro/regeln";
 import { Ansage, useAnsage } from "./felder";
 import { GEWERBE_VORLAGE } from "../gewerbe/felder";
 import { GewerbeOnlineSeite } from "./GewerbeOnline";
+import { HinweisStapel } from "../ui/hinweisStapel";
+import { blocker, hinweis, info, ordnen } from "../ui/hinweisStufen";
+import { uneinbringlichSichtbar } from "../ui/sichtbarkeit";
 
 /**
  * Nachkontrolle Rechtsanwalt (21.10.2026): Form der Unterlage als Kasten – am Anfang des Ablaufs und im Abschluss vor dem
@@ -186,7 +189,7 @@ export function useTeilen(id: string) {
  * dem Update festgeschrieben): das damals geteilte PDF einlesen (z. B. aus dem Postausgang der Mail); stimmt sein
  * SHA-256 mit dem beim ersten Teilen gespeicherten Prüfwert überein, wird es als Original aufbewahrt, sonst nicht.
  */
-function PdfOriginalZeile({ id }: { id: string }) {
+function PdfOriginalZeile({ id, erklaerung }: { id: string; /** E-239: weitere Erklärung (nachgebildetes Dokument) – unter „Mehr erfahren“ */ erklaerung?: string | null }) {
   const z = useAmtlos();
   const [laedt, setLaedt] = useState(false);
   const [meldung, setMeldung] = useState<{ art: "erfolg" | "warnung"; text: string } | null>(null);
@@ -218,17 +221,19 @@ function PdfOriginalZeile({ id }: { id: string }) {
     return (
       <View style={{ marginTop: 4 }}>
         <Hinweis art="warnung" text={TEXT.e232_pdf_selbst_vermerk(zeit(u.pdfSelbst.am), u.pdfSelbst.groesse)} />
+        <HinweisStapel meldungen={[info(erklaerung)]} oben={0} />
       </View>
     );
   if (u.pdf)
     return (
       <View style={{ marginTop: 4 }}>
-        <T v="caption" leise>{TEXT.e228_original(zeit(u.pdf.am), u.pdf.sha256, u.pdf.quelle === "eingelesen")}</T>
         {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
+        <HinweisStapel meldungen={[info(TEXT.e228_original(zeit(u.pdf.am), u.pdf.sha256, u.pdf.quelle === "eingelesen")), info(erklaerung)]} oben={0} />
       </View>
     );
   return (
     <View style={{ marginTop: 4 }}>
+      <HinweisStapel meldungen={[info(erklaerung)]} oben={0} />
       <T v="caption" leise>{u.pdfFolgt ? TEXT.e228_original_folgt : TEXT.e228_ohne_original}</T>
       {u.pdfFolgt ? null : <TextKnopf symbol="doc.text" text={laedt ? TEXT.e228_einlesen_laedt : TEXT.e228_einlesen} onPress={() => void einlesen()} />}
       {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
@@ -328,6 +333,21 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const euGrundNachtragen = !!euStornoOrig && !euStornoGrundFest(u) && euMeldeArtVon(euStornoOrig, z.stand.betrieb) !== null;
   // Rechnung an jemanden: auf der Bühne Stand und Empfänger – der Betrag steht groß auf dem Papier darunter (A13)
   const kunde = typeof d.kunde_name === "string" ? d.kunde_name.trim() : "";
+  // E-239: Lücken im Text (E-210) als Blocker; Zahlungsweg, Plausibilität (G6) und fachliche Hinweise der Vorlage (R10:
+  // Leitweg-ID, EU-Kunde, Abweichung vom Pflichten-Check) in Stufen – kein Hindernis, Wortlaut unverändert. Fehlt noch etwas,
+  // stehen die Blocker im Kasten „Fehlt noch“ (höchstens ein Kasten), sonst in einem eigenen.
+  const meldungen = fest
+    ? null
+    : ordnen([
+        luecken ? blocker(TEXT.e210_luecken_hinweis(luecken)) : null,
+        v.storno && ohneZahlungsweg(d, z.stand.betrieb.iban) ? hinweis(`${TEXT.r12_iban_frage(kunde)} ${TEXT.r12_iban_text}`, { aktion: { symbol: "building.columns", text: TEXT.r12_iban_eintragen, onPress: () => nav.oeffnen("betrieb-bank", () => <BetriebTeilSeite teil="bank" />, true) } }) : null,
+        v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? hinweis(TEXT.betrag_unplausibel) : null,
+        ...(v.hinweise?.(d, z.stand.betrieb, { kleinunternehmer: typeof z.stand.profil["ust.kleinunternehmer"] === "boolean" ? (z.stand.profil["ust.kleinunternehmer"] as boolean) : null, handwerk: handwerkLaut(z.stand.profil) }) ?? [])
+          // steht schon im Kasten zur Form
+          .filter((h) => h !== v.formHinweis?.(d)?.text)
+          // Hinweise auf eine wahrscheinlich falsche steuerliche Behandlung bleiben sichtbar (rechnungHinweisStufe)
+          .map((h) => (v.id === "rechnung" && rechnungHinweisStufe(h) === "blocker" ? blocker(h) : hinweis(h))),
+      ]);
   const kurzDatum = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.`;
   const faellig = v.storno && !d.storno_zu ? faelligAm(u) : null;
   const empfaengerZeile = v.storno && kunde ? [TEXT.an_empfaenger(kunde), u.bezahlt ? TEXT.bezahlt_am_kurz(kurzDatum(u.bezahlt)) : faellig ? TEXT.faellig_kurz(kurzDatum(faellig)) : ""].filter(Boolean).join("\u00a0· ") : "";
@@ -368,16 +388,13 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
               ) : null}
             </View>
           ))}
+          {/* E-239: Lücken im Text (E-210) und steuerliche Widersprüche im selben Kasten – höchstens einer mit dem, was vor dem Teilen zu tun ist */}
+          {(meldungen?.blocker ?? []).map((m) => (
+            <View key={m.text} style={{ minHeight: 44, justifyContent: "center", paddingVertical: 8, borderTopWidth: HAARLINIE, borderColor: f.linie }}>
+              <T v="klein">{m.text}</T>
+            </View>
+          ))}
           <T v="caption" leise stil={{ marginTop: 6 }}>{v.kundendokument ? TEXT.fehlt_kunde : TEXT.fehlt_text}</T>
-        </View>
-      ) : null}
-
-      {/* R12 (UX #4): „Alle Pflichtangaben sind drin“, aber kein Zahlungsweg – gelbe Zeile mit Sprung zur IBAN */}
-      {!fest && v.storno && ohneZahlungsweg(d, z.stand.betrieb.iban) ? (
-        <View accessibilityRole="summary" style={{ marginTop: 12, backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12, gap: 2 }}>
-          <T v="klein" fett>{TEXT.r12_iban_frage(kunde)}</T>
-          <T v="caption">{TEXT.r12_iban_text}</T>
-          <TextKnopf symbol="building.columns" text={TEXT.r12_iban_eintragen} onPress={() => nav.oeffnen("betrieb-bank", () => <BetriebTeilSeite teil="bank" />, true)} />
         </View>
       ) : null}
 
@@ -416,8 +433,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             {geteilt ? <Hinweis art="erfolg" symbol="checkmark.circle" text={TEXT.geteilt_text(datumDe(u.festgeschrieben!))} /> : <Hinweis symbol="lock" text={TEXT.festgeschrieben_text(datumDe(u.festgeschrieben!), Boolean(v.storno))} />}
             {storno ? <Hinweis art="erfolg" text={TEXT.storniert_durch(String(storno.daten.nummer ?? ""))} /> : null}
             {typeof d.storno_zu === "string" && d.storno_zu ? <Hinweis text={TEXT.storniert_zu(d.storno_zu)} /> : null}
-            {nachbild ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.e220_nachgebildet(nachbild.nachgetragen ? zeitDe(nachbild.nachgetragen) : null, u.pdfSha256 ?? null)}</T> : null}
-            <PdfOriginalZeile id={id} />
+            {/* E-239: Herkunft des Dokuments (nachgebildet, Original mit Prüfwert) als Erklärung unter „Mehr erfahren“ */}
+            <PdfOriginalZeile id={id} erklaerung={nachbild ? TEXT.e220_nachgebildet(nachbild.nachgetragen ? zeitDe(nachbild.nachgetragen) : null, u.pdfSha256 ?? null) : null} />
             {v.storno && !u.storniertDurch ? <Zahlung id={id} /> : null}
           </View>
         ) : null}
@@ -482,19 +499,16 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           </View>
         ) : null}
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
-        {/* E-210: Lücken im Text – auch wenn alle Pflichtfelder ausgefüllt sind */}
-        {!fest && luecken ? <Hinweis art="warnung" text={TEXT.e210_luecken_hinweis(luecken)} /> : null}
-        {/* Plausibilität (G6): nur ein Hinweis, kein Hindernis */}
-        {v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? <Hinweis art="warnung" text={TEXT.betrag_unplausibel} /> : null}
         {/* Nachkontrolle Rechtsanwalt: die Form vor dem Teilen als eigener Kasten – Schriftform auch nach dem Teilen (ausdrucken) */}
         {!fest || v.formHinweis?.(d)?.form === "schrift" || v.formHinweis?.(d)?.form === "unterschrift" ? <FormHinweis v={v} d={d} /> : null}
-        {/* R10: fachliche Hinweise der Vorlage (Leitweg-ID, EU-Kunde, Abweichung vom Pflichten-Check) – kein Hindernis */}
-        {!fest
-          ? (v.hinweise?.(d, z.stand.betrieb, { kleinunternehmer: typeof z.stand.profil["ust.kleinunternehmer"] === "boolean" ? (z.stand.profil["ust.kleinunternehmer"] as boolean) : null, handwerk: handwerkLaut(z.stand.profil) }) ?? [])
-              // steht schon im Kasten zur Form
-              .filter((h) => h !== v.formHinweis?.(d)?.text)
-              .map((h) => <Hinweis key={h} art="warnung" text={h} />)
-          : null}
+        {/* E-239: Lücken im Text (E-210) als Blocker – fehlt noch etwas, stehen sie im Kasten „Fehlt noch“; Zahlungsweg,
+            Plausibilität (G6) und fachliche Hinweise der Vorlage (R10: Leitweg-ID, EU-Kunde, Abweichung vom Pflichten-Check)
+            ruhig in einer Zeile „Alles bereit – N Hinweise“ – kein Hindernis, Wortlaut unverändert */}
+        {!fest ? (
+          <HinweisStapel bereit={fertig} geordnet={meldungen && !fertig ? { ...meldungen, blocker: [] } : meldungen ?? undefined} />
+        ) : v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? (
+          <HinweisStapel meldungen={[hinweis(TEXT.betrag_unplausibel)]} />
+        ) : null}
         {/* Phase 1 (RDG): in der App, nie im PDF – die Unterlage gehört dem Betrieb; Rechnungen ohne (Geschäftsvorgang) */}
         {mitVorlagenHinweis(v) ? <RechtsHinweis art="vorlage" oben={4} /> : null}
         {/* Nachkontrolle Lebensmittelfachbeauftragter (23.10.2026): „Vorlagen fachlich durchgesehen (Stand …)“, solange die Vorlage dem
@@ -676,6 +690,8 @@ function Zahlung({ id }: { id: string }) {
   const melden = useMeldung();
   const [anders, setAnders] = useState(false);
   const [betragOffen, setBetragOffen] = useState(false);
+  // E-239: seltene Möglichkeiten (nochmal Geld erhalten, Forderung uneinbringlich) hinter „Weitere Optionen“
+  const [optionen, setOptionen] = useState(false);
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const erstattung = typeof u?.daten.storno_zu === "string" && u.daten.storno_zu !== "";
   const vermerken = (d: string) => {
@@ -690,6 +706,9 @@ function Zahlung({ id }: { id: string }) {
   // R12: offener Betrag nach Teilzahlungen und Skonto – auch für die Zahlungserinnerung
   const offen = offenBrutto(u, z.stand.betrieb);
   const zahlungen = u.zahlungen ?? [];
+  const uneinbringlich = !erstattung && uneinbringlichMoeglich(z.stand, u);
+  const uneinbringlichDa = uneinbringlichSichtbar(u, faellig, heute());
+  const weitere = [...(u.bezahlt && !erstattung && !betragOffen ? ["nochmal"] : []), ...(uneinbringlich && !uneinbringlichDa ? ["uneinbringlich"] : [])];
   // freundliche Zahlungserinnerung als Text ins Teilen-Menü – Mail, Nachrichten, WhatsApp; nichts wird verschickt, ohne dass man es sieht
   const erinnern = () => {
     const b = z.stand.betrieb;
@@ -717,8 +736,8 @@ function Zahlung({ id }: { id: string }) {
       {/* E-229: Guthaben aus Überzahlungen dieser Rechnung – zurücküberweisen oder verrechnen */}
       {(u.guthaben ?? []).some((e) => e.art === "ueberzahlung") ? <GuthabenAbschnitt id={id} /> : null}
       {u.bezahlt || zahlungen.length ? (guthabenVerwendet(z.stand, id) ? <T v="caption" leise>{TEXT.e229_entfernen_gesperrt}</T> : <TextKnopf symbol="xmark" text={zahlungen.length ? TEXT.r12_zahlungen_entfernen : TEXT.zahlung_entfernen} onPress={() => z.bezahltSetzen(id, null)} />) : null}
-      {/* E-229: auch nach vollständiger Zahlung kann noch Geld kommen (doppelt überwiesen) – wird Guthaben */}
-      {u.bezahlt && !erstattung ? (betragOffen ? <BetragErhalten id={id} offen={0} fertig={() => setBetragOffen(false)} /> : <TextKnopf symbol="eurosign" text={TEXT.e229_nochmal_erhalten} onPress={() => setBetragOffen(true)} />) : null}
+      {/* E-229: auch nach vollständiger Zahlung kann noch Geld kommen (doppelt überwiesen) – wird Guthaben (E-239: unter „Weitere Optionen“) */}
+      {u.bezahlt && !erstattung && betragOffen ? <BetragErhalten id={id} offen={0} fertig={() => setBetragOffen(false)} /> : null}
       {u.uneinbringlich?.datum ? <T v="klein" fett>{TEXT.e229_uneinbringlich_seit(datumDe(u.uneinbringlich.datum), TEXT.e229_uneinbringlich_gruende[u.uneinbringlich.grund ?? "sonstiges"])}</T> : null}
       {!u.bezahlt ? (
         <View style={{ gap: 4 }}>
@@ -730,8 +749,13 @@ function Zahlung({ id }: { id: string }) {
           {erstattung ? null : betragOffen || zahlungen.length ? <BetragErhalten id={id} offen={offen} fertig={() => setBetragOffen(false)} /> : <TextKnopf symbol="eurosign" text={TEXT.r12_betrag_erhalten} onPress={() => setBetragOffen(true)} />}
         </View>
       ) : null}
-      {!erstattung && uneinbringlichMoeglich(z.stand, u) ? <Uneinbringlich id={id} /> : null}
-      <T v="caption" leise>{TEXT.bezahlt_hilfe}</T>
+      {/* E-229: Forderung uneinbringlich – ab Fälligkeit sichtbar, vorher unter „Weitere Optionen“ (E-239) */}
+      {uneinbringlich && uneinbringlichDa ? <Uneinbringlich id={id} /> : null}
+      {weitere.length ? <TextKnopf symbol={optionen ? "chevron.up" : "chevron.down"} leise text={optionen ? TEXT.e239_weniger_optionen : TEXT.e239_weitere_optionen(weitere.length)} erweitert={optionen} onPress={() => setOptionen(!optionen)} /> : null}
+      {optionen && weitere.includes("nochmal") ? <TextKnopf symbol="eurosign" text={TEXT.e229_nochmal_erhalten} onPress={() => { setBetragOffen(true); setOptionen(false); }} /> : null}
+      {optionen && weitere.includes("uneinbringlich") ? <Uneinbringlich id={id} /> : null}
+      {/* Erklärung: unter „Weitere Optionen“, sonst hinter „Mehr erfahren“ */}
+      {weitere.length ? (optionen ? <T v="caption" leise>{TEXT.bezahlt_hilfe}</T> : null) : <HinweisStapel meldungen={[info(TEXT.bezahlt_hilfe)]} oben={0} />}
     </Karte>
   );
 }

@@ -1871,4 +1871,14 @@ export const T = {
   e237_ku_va_hinweis: (mitTermin: boolean) =>
     `${MARKE.name} zeigt die Frist und erinnert nur für Zeiträume, in denen laut deinen Belegen solche Steuer entsteht: Belege mit „Ich schulde die Umsatzsteuer“ – Waren aus dem EU-Ausland nur mit Erwerbsbesteuerung.${mitTermin ? "" : " Bisher gibt es keinen solchen Zeitraum – deshalb keine Frist."} Leistungen von Unternehmen aus Drittländern erkennt ${MARKE.name} an Belegen nicht: Für Zeiträume mit solchen Leistungen gibst du die Voranmeldung trotzdem ab.`,
   stb_vollsicherung_icloud: `Die automatische ${ANDROID ? "Sicherung in deinen Ordner" : "iCloud-Sicherung"} läuft. Einmal im Monat zusätzlich als Datei oder offenes Archiv sichern – das ist der Nachweis außerhalb des Geräts.`,
+  // E-239 (externe Rückmeldung 29.10.2026): weniger auf einmal – Hinweise zusammengefasst, Fortgeschrittenes hinter einer Zeile
+  e239_hinweise: (n: number) => (n === 1 ? "1 Hinweis" : `${n} Hinweise`),
+  e239_bereit: (n: number) => `Alles bereit – ${n === 1 ? "1 Hinweis" : `${n} Hinweise`}`,
+  e239_wichtig: (n: number) => `Bitte zuerst ansehen (${n})`,
+  e239_mehr_erfahren: "Mehr erfahren",
+  e239_weitere_optionen: (n: number) => `Weitere Optionen (${n})`,
+  e239_weniger_optionen: "Weniger Optionen",
+  e239_besondere_faelle: "Für besondere Fälle",
+  e239_weitere_vorlagen: (n: number) => `Weitere Vorlagen (${n})`,
+  e239_weitere_vorlagen_text: "Passen laut deinem Pflichten-Check gerade nicht zu deinem Betrieb – du kannst sie trotzdem jederzeit nutzen.",
 };

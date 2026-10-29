@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { VORSTEUER_AUFTEILEN, fehlendeAngaben, istPrivatperson, personAus, personIn, profilStartwerte, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
+import { fehlendeAngaben, istPrivatperson, personAus, personIn, profilStartwerte, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Betrag, Fuss, Hinweis, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf, textAus } from "../ui/bausteine";
+import { Betrag, Fuss, Hinweis, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { RADIUS, RAND,  useFarben } from "../ui/thema";
 import { HAUPT_STAETTE, PERSONEN_LISTE, STAETTEN_VORLAGEN, betriebFehlt, personenSortiert } from "../unterlagen/speicher";
@@ -25,6 +25,9 @@ import { Ansage, Felder, useAnsage } from "./felder";
 import { InfoSeite } from "./InfoSeite";
 import { ListenSchritt } from "./Liste";
 import { trennen } from "../ui/trennen";
+import { nebensacheFuer, relevanz } from "../ui/sichtbarkeit";
+import { HinweisStapel } from "../ui/hinweisStapel";
+import { euMeldungen, ustAnsage, ustErgebnis, ustMeldungen } from "./ustMeldungen";
 
 /** Fehlende Angaben je Schritt – für „Fast fertig“ und die Übersicht. Prüfungen gegen „Mein Betrieb“ stehen extra. */
 export function fehltJeSchritt(v: Vorlage, d: Daten): string[][] {
@@ -87,33 +90,11 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   // Kleinunternehmer geben keine Voranmeldung ab – dann kein Kassenhinweis
   // R12: mit Kassenabschlüssen nur noch fehlende Tage nennen
   const kasse = r && !r.kleinunternehmer ? kassenHinweisMit(kassenLage(z.stand.profil), "ust", r.kasseFehlend) : null;
-  // Ergebnis und Warnungen der Übernahme ansagen (VoiceOver bemerkt die neuen Zeilen sonst nicht)
-  useAnsage(
-    r
-      ? [
-          r.kleinunternehmer ? (r.kuVoranmeldungPflicht ? TEXT.e227_ku_va_pflicht : r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku) : TEXT.aus_rechnungen_ok(r.anzahl),
-          r.kuGemischt ? TEXT.ust_ku_gemischt : "",
-          r.uneinbringlichNicht.length ? TEXT.e229_uneinbringlich_ku(r.uneinbringlichNicht.length) : "",
-          r.igeKu ? TEXT.e227_ige_nicht(r.igeKu, r.erwerbsschwelle?.status !== "nein") : "",
-          r.igeBelege ? (r.kleinunternehmer ? TEXT.e227_ige_ku_uebernommen(r.igeBelege) : TEXT.ust_ige_belege(r.igeBelege)) : "",
-          r.igeOhneEuro ? TEXT.e224_ige_ohne_euro(r.igeOhneEuro) : "",
-          r.rcOhneEuro ? TEXT.e224_13b_ohne_euro(r.rcOhneEuro) : "",
-          kasse?.text ?? "",
-          r.kasseTage ? TEXT.r12_kasse_uebernommen(r.kasseTage) : "",
-          r.minderungen ? TEXT.r12_minderungen(r.minderungen) : "",
-          r.gutschriften ? TEXT.aus_rechnungen_gutschriften(r.gutschriften) : "",
-          r.ersatz ? TEXT.aus_rechnungen_ersatz(r.ersatz) : "",
-          r.ersatzNummern.length ? TEXT.stb_ersatz_nummern(r.ersatzNummern) : "",
-          r.oss ? TEXT.stb_oss_nicht_va(r.oss) : "",
-          r.berichtigungen.length ? TEXT.e214_va_berichtigung(r.berichtigungen.map((b) => b.stornoNr)) : "",
-          ...anderswoTexte(r.berichtigungenAnderswo),
-          ...r.schlussFehlt.map(schlussFehltText),
-          r.offen ? TEXT.aus_rechnungen_offen(r.offen) : "",
-          r.vorsteuerBelege || r.ohneVorsteuer ? TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer) : "",
-          r.vorsteuerPruefen ? VORSTEUER_AUFTEILEN : "",
-        ].filter(Boolean).join(" ")
-      : null,
-  );
+  // E-239: Ergebnis, Blocker sichtbar, Hinweise in einer Zeile, Erklärungen unter „Mehr erfahren“ (ustMeldungen.ts)
+  const meldungen = r ? ustMeldungen(r, { kasse, dfv: z.stand.profil["ust.dauerfristverlaengerung"] === true, dezember: Boolean(uebernommen && /-12$/.test(uebernommen.periode)) }) : null;
+  const ergebnisText = r ? ustErgebnis(r) : null;
+  // Ergebnis, Blocker und Zahl der Hinweise ansagen (VoiceOver bemerkt die neuen Zeilen sonst nicht)
+  useAnsage(r && meldungen ? ustAnsage(r, meldungen) : null);
   if (!liste.length)
     return <T v="caption" leise stil={{ marginTop: 10 }}>{v === "ist" && offen ? TEXT.aus_rechnungen_ist_leer(offen) : TEXT.aus_rechnungen_leer}</T>;
   return (
@@ -135,60 +116,17 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           optionen={liste.map((p) => ({ wert: p, text: periodeText(p) }))}
         />
       </ScrollView>
-      {r ? (
+      {r && meldungen ? (
         <View style={{ marginTop: 8, gap: 4 }}>
-          {/* E-227: Kleinunternehmer mit Erwerbsbesteuerung – Voranmeldung für diesen Zeitraum (§ 18 Abs. 4a UStG) */}
-          {r.kleinunternehmer ? (r.kuVoranmeldungPflicht ? <Hinweis art="warnung" text={TEXT.e227_ku_va_pflicht} /> : <T v="caption" farbe={f.bald}>{r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku}</T>) : <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>}
-          {r.kuGemischt ? <T v="caption" farbe={f.bald}>{TEXT.ust_ku_gemischt}</T> : null}
-          {/* E-229: Rechnung mit Umsatzsteuer im Kleinunternehmer-Zeitraum uneinbringlich – nicht berichtigt (T-335) */}
-          {r.uneinbringlichNicht.length ? <Hinweis art="warnung" text={TEXT.e229_uneinbringlich_ku(r.uneinbringlichNicht.length)} /> : null}
-          {kasse ? <Hinweis art={kasse.warnung ? "warnung" : "info"} symbol="banknote" text={kasse.text} /> : null}
-          {r.kasseTage ? <T v="caption" farbe={f.amtTief}>{TEXT.r12_kasse_uebernommen(r.kasseTage)}</T> : null}
-          {r.minderungen ? <T v="caption" farbe={f.amtTief}>{TEXT.r12_minderungen(r.minderungen)}</T> : null}
-          {r.gutschriften ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_gutschriften(r.gutschriften)}</T> : null}
-          {r.ersatz ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ersatz(r.ersatz)}</T> : null}
-          {/* StB-Prüfung (5.2): welche Rechnungen nach dem Rechnungsdatum zählen; OSS gehört nicht in die Voranmeldung */}
-          {r.ersatzNummern.length ? <T v="caption" farbe={f.bald}>{TEXT.stb_ersatz_nummern(r.ersatzNummern)}</T> : null}
-          {r.oss ? <T v="caption" farbe={f.bald}>{TEXT.stb_oss_nicht_va(r.oss)}</T> : null}
-          {/* E-214: Stornos „Fehler in der Rechnung“ berichtigen den ursprünglichen Zeitraum */}
-          {r.berichtigungen.length ? <Hinweis art="warnung" text={TEXT.e214_va_berichtigung(r.berichtigungen.map((b) => b.stornoNr))} /> : null}
-          {anderswoTexte(r.berichtigungenAnderswo).map((t) => <T key={t} v="caption" farbe={f.bald}>{t}</T>)}
-          {/* E-235: Abschlag auf einen EU-Umsatz ohne Schlussrechnung – Lieferung bzw. Leistung trotzdem melden */}
-          {r.schlussFehlt.map((x) => <Hinweis key={x.abschlagId} art="warnung" text={schlussFehltText(x)} />)}
-          {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
-          {r.vorsteuerBelege || r.ohneVorsteuer ? <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer)}</T> : null}
-          {r.vorsteuerPruefen ? <T v="caption" farbe={f.bald}>{VORSTEUER_AUFTEILEN}</T> : null}
-          {/* R10: § 13b-Belege, Dauerfristverlängerung und Sondervorauszahlung */}
-          {r.steuerschuldBelege ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_13b_belege(r.steuerschuldBelege)}</T> : null}
-          {/* E-222: innergemeinschaftliche Erwerbe aus Belegen; Kleinunternehmer: nicht übernommen (Erwerbsschwelle) */}
-          {r.igeBelege ? <T v="caption" farbe={f.amtTief}>{r.kleinunternehmer ? TEXT.e227_ige_ku_uebernommen(r.igeBelege) : TEXT.ust_ige_belege(r.igeBelege)}</T> : null}
-          {r.igeKu ? <T v="caption" farbe={f.bald}>{TEXT.e227_ige_nicht(r.igeKu, r.erwerbsschwelle?.status !== "nein")}</T> : null}
+          {ergebnisText ? <T v="caption" farbe={r.kleinunternehmer ? f.bald : f.amtTief}>{ergebnisText}</T> : null}
           {/* E-227: Erwerbsschwelle (§ 1a Abs. 3, 4 UStG) – Fragen; danach den Zeitraum noch einmal übernehmen */}
           {r.erwerbsschwelle ? <ErwerbsschwelleFragen jahr={r.erwerbsschwelle.jahr} /> : null}
           {r.erwerbsschwelle ? <T v="caption" leise>{TEXT.e227_neu_uebernehmen}</T> : null}
-          {/* E-224: Belege ohne Euro-Betrag (fremde Währung) fehlen in den Kennzahlen – deutlich warnen */}
-          {r.igeOhneEuro ? <Hinweis art="warnung" text={TEXT.e224_ige_ohne_euro(r.igeOhneEuro)} /> : null}
-          {r.rcOhneEuro ? <Hinweis art="warnung" text={TEXT.e224_13b_ohne_euro(r.rcOhneEuro)} /> : null}
-          {!r.kleinunternehmer && z.stand.profil["ust.dauerfristverlaengerung"] === true ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_dfv}</T> : null}
-          {!r.kleinunternehmer && z.stand.profil["ust.dauerfristverlaengerung"] === true && uebernommen && /-12$/.test(uebernommen.periode) ? <T v="caption" farbe={f.bald}>{TEXT.ust_sondervorauszahlung}</T> : null}
+          <HinweisStapel geordnet={meldungen} bereit oben={0} />
         </View>
       ) : null}
     </View>
   );
-}
-
-const BETRAG_DE = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-/** E-235: Warnung „Schlussrechnung fehlt – trotzdem melden“ (§ 18b Satz 2 bzw. 3 UStG) */
-const schlussFehltText = (x: EuSchlussFehlt) => TEXT.e235_schluss_fehlt(x.art, x.nummer, x.kunde, textAus(x.leistung), `${periodeText(x.monat)} bzw. ${periodeText(x.quartal)}`, BETRAG_DE.format(x.anzahlungNetto / 100));
-
-/** E-214: je ursprünglichem Zeitraum ein Satz „Storno … zählt als Berichtigung in …“ */
-function anderswoTexte(l: EuBerichtigung[]): string[] {
-  const je = new Map<string, string[]>();
-  for (const b of l) {
-    const z = `${periodeText(b.monat)} bzw. ${periodeText(b.quartal)}`;
-    je.set(z, [...(je.get(z) ?? []), b.stornoNr]);
-  }
-  return [...je].map(([z, nr]) => TEXT.e214_va_anderswo(nr, z));
 }
 
 /**
@@ -222,12 +160,8 @@ function EuAusRechnungen({ id, art }: { id: string; art: "oss" | "zm" }) {
         />
       </ScrollView>
       {ergebnis ? <T v="caption" farbe={f.amtTief} stil={{ marginTop: 8 }}>{TEXT.stb_eu_ok(ergebnis.anzahl, ergebnis.zeilen)}</T> : null}
-      {/* E-214: Berichtigung (Fehler in der Rechnung), Stornos, die anderswo zählen, und Skonti im Zeitraum der Zahlung */}
-      {ergebnis?.berichtigungen?.length ? <View style={{ marginTop: 6 }}><Hinweis art="warnung" text={`${TEXT.e214_va_berichtigung(ergebnis.berichtigungen.map((b) => b.stornoNr))} ${TEXT.e214_zm_berichtigung(textAus(ergebnis.berichtigungen.map((b) => b.zmFrist).sort()[0]!))}`} /></View> : null}
-      {anderswoTexte(ergebnis?.anderswo ?? []).map((t) => <T key={t} v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{t}</T>)}
-      {ergebnis?.minderungen ? <T v="caption" farbe={f.amtTief} stil={{ marginTop: 4 }}>{TEXT.e214_zm_minderung(ergebnis.minderungen)}</T> : null}
-      {(ergebnis?.schlussFehlt ?? []).map((x) => <View key={x.abschlagId} style={{ marginTop: 6 }}><Hinweis art="warnung" text={schlussFehltText(x)} /></View>)}
-      <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{art === "oss" ? TEXT.stb_oss_frist : TEXT.stb_zm_frist}</T>
+      {/* E-214/E-235: Berichtigung und fehlende Schlussrechnung sichtbar; Frist, andere Zeiträume und Skonti als Hinweise (E-239) */}
+      <HinweisStapel geordnet={euMeldungen(art, ergebnis)} bereit={Boolean(ergebnis)} />
     </View>
   );
 }
@@ -318,7 +252,7 @@ function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbs
         <Hinweis art="warnung" symbol="banknote" text={kassenLage(z.stand.profil) === "shop" ? TEXT.shop_ust_schritt : TEXT.kasse_ust_schritt} />
       ) : null}
       {v.id === "euer" && index === 0 ? <EuerAusDaten id={id} /> : null}
-      <Felder felder={a.felder} werte={daten} fehlt={fehlt} setze={(k, w) => { if (formVorher === undefined) setFormVorher(form ?? null); z.setzen(id, { [k]: w }); }} liste={(f) => <ListenSchritt feld={f} id={id} />} />
+      <Felder felder={a.felder} werte={daten} fehlt={fehlt} nebensache={nebensacheFuer(v.id, relevanz(z.stand), daten)} setze={(k, w) => { if (formVorher === undefined) setFormVorher(form ?? null); z.setzen(id, { [k]: w }); }} liste={(f) => <ListenSchritt feld={f} id={id} />} />
       {formUnten ? <View style={{ marginTop: 16 }}><FormHinweis v={v} d={daten} unten={0} /></View> : null}
     </View>
   );

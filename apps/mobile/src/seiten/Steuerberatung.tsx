@@ -18,6 +18,7 @@ import { useProSperre } from "./Pro";
 import type { Kanzlei } from "../partner/kanzleien";
 import { KanzleienAbschnitt, kanzleienSichtbar } from "./Kanzleien";
 import { KontenvorgabenSeite, kontenvorgabenAnzahl } from "./Kontenvorgaben";
+import { kontenvorgabenSichtbar, relevanz } from "../ui/sichtbarkeit";
 import { ANDROID } from "../plattform";
 import { bestaetigen } from "../ui/bestaetigen";
 import { paketUebergeben } from "../unterlagen/paketUebergabe";
@@ -67,6 +68,8 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
   // E-221 Befund 6: auf Android geteilt, aber nicht als übergeben bestätigt – Belege des Pakets noch nicht festgeschrieben
   const [offenesPaket, setOffenesPaket] = useState<{ ids: string[]; name: string } | null>(null);
   const sb = z.stand.steuerberatung;
+  const kvDa = kontenvorgabenSichtbar(relevanz(z.stand), kontenvorgabenAnzahl(sb.kontenvorgaben));
+  const [kvOffen, setKvOffen] = useState(false);
   const zr = liste.find((x) => x.name === wahl)!;
   const anzahlR = gestellteRechnungen(z.stand).filter((u) => String(u.daten.datum) >= zr.von && String(u.daten.datum) <= zr.bis).length;
   const anzahlB = z.stand.belege.filter((b) => b.datum >= zr.von && b.datum <= zr.bis).length;
@@ -163,10 +166,15 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
         </View>
         <T v="caption" leise stil={{ marginTop: 6 }}>{TEXT.steuerpaket_nummern_hilfe}</T>
         {/* StB-Prüfung (B-6 u. a.): Kontenvorgaben der Kanzlei – Verrechnungskonto, Gutscheine, Kassendifferenz, Bank, Anlagen */}
-        <View style={{ marginTop: 10 }}>
-          <TextKnopf symbol="list.number" text={TEXT.stb_kv_einstieg} onPress={() => nav.oeffnen("kontenvorgaben", () => <KontenvorgabenSeite />, true)} />
-          <T v="caption" leise>{TEXT.stb_kv_einstieg_text(kontenvorgabenAnzahl(sb.kontenvorgaben))}</T>
-        </View>
+        {/* E-239: ohne Steuerberatung laut Check, ohne Bilanz und ohne eingetragene Vorgaben hinter „Weitere Optionen“ */}
+        {kvDa || kvOffen ? (
+          <View style={{ marginTop: 10 }}>
+            <TextKnopf symbol="list.number" text={TEXT.stb_kv_einstieg} onPress={() => nav.oeffnen("kontenvorgaben", () => <KontenvorgabenSeite />, true)} />
+            <T v="caption" leise>{TEXT.stb_kv_einstieg_text(kontenvorgabenAnzahl(sb.kontenvorgaben))}</T>
+          </View>
+        ) : (
+          <TextKnopf symbol="chevron.down" leise text={TEXT.e239_weitere_optionen(1)} erweitert={false} onPress={() => setKvOffen(true)} stil={{ marginTop: 10 }} />
+        )}
         <View style={{ marginTop: 14 }}>
           {/* R10 UI: Kasse bzw. Shop laut Check – vor dem Kauf sagen, dass diese Umsätze im Paket fehlen */}
           {/* R12: mit Kassenabschlüssen nur fehlende Tage nennen */}

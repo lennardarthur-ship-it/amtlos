@@ -14,6 +14,7 @@ import { BEREICH_SYMBOL, BuehnenBlatt, Gruppe, Inhalt, datumKurz } from "./gemei
 import { useOeffnen, useStarten, useZiel } from "./starten";
 import { BelegErfassenSeite } from "./Belege";
 import { KontrollmappeSeite } from "./Kontrollmappe";
+import { relevanz, vorlagePasst } from "../ui/sichtbarkeit";
 
 /** R11 (UX #1): Suchbegriffe, bei denen die Kontrollmappe als erster Treffer erscheint */
 const KONTROLLE = /kontroll|mappe|prüf|pruef|zoll|gesundheitsamt|lebensmittel(ü|ue)berwachung|gewerbeaufsicht|berufsgenossenschaft|\bbg\b|nachweis/;
@@ -137,10 +138,27 @@ function VorlagenListe({ liste }: { liste: Vorlage[] }) {
 }
 
 export function AnlassSeite({ a }: { a: Anlass }) {
+  // E-239: Vorlagen, die laut Pflichten-Check nicht passen (OSS, ZM, Bilanz, Lohn ohne Beschäftigte), unter „Weitere Vorlagen“
+  const profil = useStandWahl((x) => x.profil);
+  const unterlagen = useStandWahl((x) => x.unterlagen);
+  const betrieb = useStandWahl((x) => x.betrieb);
+  const steuerberatung = useStandWahl((x) => x.steuerberatung);
+  const mitarbeiter = useStandWahl((x) => x.mitarbeiter);
+  const [weitere, setWeitere] = useState(false);
+  const r = relevanz({ profil, unterlagen, betrieb, steuerberatung, mitarbeiter });
+  const passt = a.vorlagen.filter((id) => vorlagePasst(a.id, id, r, { unterlagen }));
+  const andere = a.vorlagen.filter((id) => !passt.includes(id));
   return (
     <Unterseite titel={a.titel} unter={a.text}>
       <Inhalt>
-        <VorlagenListe liste={a.vorlagen.map((id) => vorlageFuer(id)!)} />
+        <VorlagenListe liste={passt.map((id) => vorlageFuer(id)!)} />
+        {andere.length ? <TextKnopf symbol={weitere ? "chevron.up" : "chevron.down"} text={weitere ? TEXT.e239_weniger_optionen : TEXT.e239_weitere_vorlagen(andere.length)} erweitert={weitere} onPress={() => setWeitere(!weitere)} stil={{ marginTop: 12 }} /> : null}
+        {andere.length && weitere ? (
+          <View style={{ gap: 8 }}>
+            <T v="caption" leise>{TEXT.e239_weitere_vorlagen_text}</T>
+            <VorlagenListe liste={andere.map((id) => vorlageFuer(id)!)} />
+          </View>
+        ) : null}
       </Inhalt>
     </Unterseite>
   );

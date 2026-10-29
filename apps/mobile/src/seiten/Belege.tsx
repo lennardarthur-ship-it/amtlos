@@ -22,6 +22,7 @@ import { ProSeite, useProSperre } from "./Pro";
 import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, GrosserBetrag, datumKurz } from "./gemeinsam";
 import { useAnsage } from "./felder";
+import { belegSkontoSichtbar, belegSteuerschuldSichtbar, relevanz } from "../ui/sichtbarkeit";
 
 // Formatter einmal anlegen (R9 Performance)
 const EURO = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -213,7 +214,9 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
   // Kleinunternehmer ziehen keine Vorsteuer ab: der Schalter steht dann unter „Weitere Angaben“ (außer er ist an)
   const ku = istKleinunternehmer(z.stand);
   const kuBis = (z.stand.betrieb.ku_bis ?? "").trim();
-  const [vorsteuerOffen, setVorsteuerOffen] = useState(false);
+  // E-239: seltene Angaben (§ 13b/Erwerb ohne Auslandseinkauf laut Check, Skonto, Vorsteuer bei Kleinunternehmern) hinter einer Zeile
+  // aufgeklappt: die Teile, die beim Aufklappen unter „Weitere Angaben“ standen – so springt beim Eintragen nichts
+  const [mehr, setMehr] = useState<string[] | null>(null);
   // E-165: steuerfreie und steuerpflichtige Umsätze – Hinweis „voll nur bei rein steuerpflichtiger Verwendung“
   const gemischt = gemischteUmsaetze(z.stand.unterlagen, z.stand.betrieb);
   // R12: Skonto beim Bezahlen als Text, damit „4,“ beim Tippen nicht verloren geht
@@ -242,6 +245,51 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
     setBetraege(neuTexte);
     setze({ steuer: b.steuer.map((x, j) => (j === i ? { ...x, brutto_cent: cent(text) ?? 0 } : x)) });
   };
+  // E-239: Teile, die je nach Profil und Daten sofort oder unter „Weitere Angaben“ stehen (sichtbarkeit.ts)
+  const rel = relevanz(z.stand);
+  const steuerschuldDa = belegSteuerschuldSichtbar(rel, b);
+  const skontoDa = belegSkontoSichtbar(b);
+  const weitereJetzt = [...(ku && !b.vorsteuer ? ["vorsteuer"] : []), ...(!b.steuerschuld && !skontoDa ? ["skonto"] : []), ...(!steuerschuldDa ? ["steuerschuld"] : [])];
+  const weitere = mehr ?? weitereJetzt;
+  // R10: § 13b als Leistungsempfänger – auch für Kleinunternehmer
+  const steuerschuldTeil = (
+    <View>
+        <Schalter label={TEXT.beleg_steuerschuld} hilfe={TEXT.beleg_steuerschuld_hilfe} wert={!!b.steuerschuld} aendern={(w) => setze({ steuerschuld: w ? (b.steuerschuld ?? "eu") : null })} />
+        {b.steuerschuld ? (
+          <View>
+            <Wahl label={TEXT.beleg_steuerschuld_art} wert={b.steuerschuld} aendern={(w) => setze({ steuerschuld: w })} optionen={STEUERSCHULD_ARTEN} />
+            <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.beleg_steuerschuld_betrag(euro(steuerschuldBetrag(b)))}</T>
+            {/* E-222: innergemeinschaftlicher Erwerb – USt-IdNr. des Lieferanten aus einem anderen EU-Land; Kleinunternehmer: Erwerbsschwelle */}
+            {b.steuerschuld === "ige" ? (
+              <View>
+                <Feld label={TEXT.beleg_ige_ust_idnr} hilfe={TEXT.beleg_ige_ust_idnr_hilfe} wert={b.lieferant_ust_idnr ?? ""} aendern={(w) => setze({ lieferant_ust_idnr: w.replace(/\s+/g, "").toUpperCase() || null })} optional autoCapitalize="characters" />
+                {!ustIdnrEuAusland(b.lieferant_ust_idnr) ? <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{TEXT.beleg_ige_ohne_idnr}</T> : null}
+                {/* E-227: Tag des Erwerbs – Rechnungsdatum zählt nur bis zum Ende des Monats nach dem Erwerb (§ 13 Abs. 1 Nr. 6 UStG) */}
+                <DatumFeld label={TEXT.e227_erwerb_datum} hilfe={TEXT.e227_erwerb_datum_hilfe} wert={b.erwerb_datum ?? null} aendern={(d) => setze({ erwerb_datum: d })} />
+                {!b.erwerb_datum ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.e227_erwerb_datum_fehlt}</T> : igeSteuerTag(b) !== b.datum ? <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{TEXT.e227_erwerb_zeitraum(igeSteuerTag(b).split("-").reverse().join("."))}</T> : null}
+                {/* E-227: Erwerbsschwelle für Kleinunternehmer und Betriebe mit nur steuerfreien Umsätzen (§ 1a Abs. 3, 4 UStG) */}
+                {ku || nurSteuerfreieUmsaetze(z.stand.unterlagen, z.stand.betrieb) ? <ErwerbsschwelleFragen jahr={erwerbsJahr(b)} /> : null}
+                {ku && erwerbsschwelleLage(z.stand.profil, z.stand.belege, erwerbsJahr(b), erwerbsschwelleEuro()).status === "ja" ? <Hinweis art="warnung" text={TEXT.e227_ku_va_pflicht} /> : null}
+              </View>
+            ) : null}
+          </View>
+        ) : null}
+    </View>
+  );
+  // R12: beim Bezahlen abgezogenes Skonto – mindert die Vorsteuer im Monat der Zahlung (§ 17 UStG); nicht bei § 13b
+  const skontoTeil = b.steuerschuld ? null : (
+          <View>
+            <Feld label={TEXT.r12_beleg_skonto} hilfe={TEXT.r12_beleg_skonto_hilfe} wert={skontoText} aendern={(w) => { setSkontoText(w); const c = cent(w); setze({ skonto_cent: c && c > 0 && c < s.brutto_cent ? c : null }); }} keyboardType="decimal-pad" placeholder="0,00" optional fehler={skontoText.trim() && (cent(skontoText) === null || (cent(skontoText) ?? 0) >= s.brutto_cent) ? TEXT.betrag_falsch : null} />
+            {b.skonto_cent ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.r12_beleg_gezahlt(euro(belegGezahlt(b)))}</T> : null}
+          </View>
+  );
+  // Kleinunternehmer ziehen keine Vorsteuer ab – der Schalter bleibt für Ausnahmen erreichbar
+  const vorsteuerKuTeil = (
+    <View style={{ marginTop: 14 }}>
+      <T v="caption" leise>{TEXT.beleg_ku_keine_vorsteuer}</T>
+      <Schalter label={TEXT.beleg_vorsteuer} hilfe={TEXT.beleg_vorsteuer_hilfe} wert={b.vorsteuer} aendern={(w) => setze({ vorsteuer: w })} />
+    </View>
+  );
   return (
     <BuehnenBlatt
       titel={neu ? TEXT.beleg_neu : TEXT.beleg_titel}
@@ -310,27 +358,7 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         {ku ? null : <Schalter label={TEXT.beleg_vorsteuer} hilfe={TEXT.beleg_vorsteuer_hilfe} wert={b.vorsteuer} aendern={(w) => setze({ vorsteuer: w })} />}
         {/* E-165 (StB-Prüfung 5.2): Vorsteuer voll oder anteilig abziehbar (§ 15 Abs. 4 UStG) */}
         {!ku && b.vorsteuer ? <VorsteuerTeil b={b} setze={setze} gemischt={gemischt} /> : null}
-        {/* R10: § 13b als Leistungsempfänger – auch für Kleinunternehmer */}
-        <Schalter label={TEXT.beleg_steuerschuld} hilfe={TEXT.beleg_steuerschuld_hilfe} wert={!!b.steuerschuld} aendern={(w) => setze({ steuerschuld: w ? (b.steuerschuld ?? "eu") : null })} />
-        {b.steuerschuld ? (
-          <View>
-            <Wahl label={TEXT.beleg_steuerschuld_art} wert={b.steuerschuld} aendern={(w) => setze({ steuerschuld: w })} optionen={STEUERSCHULD_ARTEN} />
-            <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.beleg_steuerschuld_betrag(euro(steuerschuldBetrag(b)))}</T>
-            {/* E-222: innergemeinschaftlicher Erwerb – USt-IdNr. des Lieferanten aus einem anderen EU-Land; Kleinunternehmer: Erwerbsschwelle */}
-            {b.steuerschuld === "ige" ? (
-              <View>
-                <Feld label={TEXT.beleg_ige_ust_idnr} hilfe={TEXT.beleg_ige_ust_idnr_hilfe} wert={b.lieferant_ust_idnr ?? ""} aendern={(w) => setze({ lieferant_ust_idnr: w.replace(/\s+/g, "").toUpperCase() || null })} optional autoCapitalize="characters" />
-                {!ustIdnrEuAusland(b.lieferant_ust_idnr) ? <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{TEXT.beleg_ige_ohne_idnr}</T> : null}
-                {/* E-227: Tag des Erwerbs – Rechnungsdatum zählt nur bis zum Ende des Monats nach dem Erwerb (§ 13 Abs. 1 Nr. 6 UStG) */}
-                <DatumFeld label={TEXT.e227_erwerb_datum} hilfe={TEXT.e227_erwerb_datum_hilfe} wert={b.erwerb_datum ?? null} aendern={(d) => setze({ erwerb_datum: d })} />
-                {!b.erwerb_datum ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.e227_erwerb_datum_fehlt}</T> : igeSteuerTag(b) !== b.datum ? <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{TEXT.e227_erwerb_zeitraum(igeSteuerTag(b).split("-").reverse().join("."))}</T> : null}
-                {/* E-227: Erwerbsschwelle für Kleinunternehmer und Betriebe mit nur steuerfreien Umsätzen (§ 1a Abs. 3, 4 UStG) */}
-                {ku || nurSteuerfreieUmsaetze(z.stand.unterlagen, z.stand.betrieb) ? <ErwerbsschwelleFragen jahr={erwerbsJahr(b)} /> : null}
-                {ku && erwerbsschwelleLage(z.stand.profil, z.stand.belege, erwerbsJahr(b), erwerbsschwelleEuro()).status === "ja" ? <Hinweis art="warnung" text={TEXT.e227_ku_va_pflicht} /> : null}
-              </View>
-            ) : null}
-          </View>
-        ) : null}
+        {weitere.includes("steuerschuld") ? null : steuerschuldTeil}
         <AuswahlZeile label={TEXT.beleg_kategorie} wert={b.kategorie} aendern={(w) => setze({ kategorie: w })} optionen={KATEGORIEN.map((x) => ({ wert: x.id, text: x.titel }))} />
         {k.hinweis ? <T v="caption" leise stil={{ marginTop: 4 }}>{k.hinweis}</T> : null}
         {/* StB-Prüfung (B-10): Anlagenkonto nach Art des Anlageguts */}
@@ -339,22 +367,15 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         <DatumFeld label={TEXT.beleg_bezahlt} hilfe={TEXT.beleg_bezahlt_hilfe} wert={b.bezahlt ?? null} aendern={(d) => setze({ bezahlt: d })} />
         {/* E-229 (Steuerberater 27.10.2026, T-303): fremde Währung – tatsächlich gezahlter Euro-Betrag (EÜR: Betriebsausgabe, § 11 EStG) */}
         {b.fremd ? <FremdGezahlt b={b} setze={setze} /> : null}
-        {/* R12: beim Bezahlen abgezogenes Skonto – mindert die Vorsteuer im Monat der Zahlung (§ 17 UStG) */}
-        {b.steuerschuld ? null : (
-          <View>
-            <Feld label={TEXT.r12_beleg_skonto} hilfe={TEXT.r12_beleg_skonto_hilfe} wert={skontoText} aendern={(w) => { setSkontoText(w); const c = cent(w); setze({ skonto_cent: c && c > 0 && c < s.brutto_cent ? c : null }); }} keyboardType="decimal-pad" placeholder="0,00" optional fehler={skontoText.trim() && (cent(skontoText) === null || (cent(skontoText) ?? 0) >= s.brutto_cent) ? TEXT.betrag_falsch : null} />
-            {b.skonto_cent ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.r12_beleg_gezahlt(euro(belegGezahlt(b)))}</T> : null}
-          </View>
-        )}
+        {weitere.includes("skonto") ? null : skontoTeil}
         <Feld label={TEXT.beleg_notiz} wert={b.notiz ?? ""} aendern={(w) => setze({ notiz: w || null })} mehrzeilig />
-        {ku ? (
+        {ku && !weitere.includes("vorsteuer") ? vorsteuerKuTeil : null}
+        {weitere.length ? (
           <View style={{ marginTop: 14 }}>
-            <T v="caption" leise>{TEXT.beleg_ku_keine_vorsteuer}</T>
-            {vorsteuerOffen || b.vorsteuer ? (
-              <Schalter label={TEXT.beleg_vorsteuer} hilfe={TEXT.beleg_vorsteuer_hilfe} wert={b.vorsteuer} aendern={(w) => setze({ vorsteuer: w })} />
-            ) : (
-              <TextKnopf symbol="chevron.down" text={TEXT.weitere_angaben(1)} erweitert={false} onPress={() => { weich(); setVorsteuerOffen(true); }} />
-            )}
+            <TextKnopf symbol={mehr ? "chevron.up" : "chevron.down"} text={mehr ? TEXT.weniger_angaben : TEXT.weitere_angaben(weitere.length)} erweitert={Boolean(mehr)} onPress={() => { weich(); setMehr(mehr ? null : weitereJetzt); }} />
+            {mehr && weitere.includes("vorsteuer") ? vorsteuerKuTeil : null}
+            {mehr && weitere.includes("skonto") ? skontoTeil : null}
+            {mehr && weitere.includes("steuerschuld") ? steuerschuldTeil : null}
           </View>
         ) : null}
         </View>

@@ -105,9 +105,9 @@ describe("Kleinunternehmer mit Erwerbsbesteuerung und uneinbringlicher Forderung
     expect(l).not.toContain("Die Voranmeldung der App mindert Umsatz und Steuer");
     expect(l).toContain("offen 1.190,00 € brutto, davon Umsatzsteuer 190,00 €");
     expect(l).toContain("Ohne Umsatzsteuerberichtigung in der Voranmeldung der App: RE 2025-001 (Kleinunternehmer-Zeitraum");
-    // in der Oberfläche als Warnung
-    const ablauf = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "../src/seiten/Ablauf.tsx"), "utf8");
-    expect(ablauf).toContain("r.uneinbringlichNicht.length ? <Hinweis art=\"warnung\" text={TEXT.e229_uneinbringlich_ku(r.uneinbringlichNicht.length)} />");
+    // in der Oberfläche als Warnung – E-239: als Blocker (sichtbar, nicht unter „N Hinweise“)
+    const ablauf = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "../src/seiten/ustMeldungen.ts"), "utf8");
+    expect(ablauf).toContain("r.uneinbringlichNicht.length ? blocker(TEXT.e229_uneinbringlich_ku(r.uneinbringlichNicht.length)) : null");
     // ohne Erwerb: der Zeitraum steht trotzdem zur Auswahl, der Hinweis auf der Voranmeldung ebenso
     const ohneErwerb: Stand = { ...s, belege: [] };
     expect(perioden(ohneErwerb.unterlagen, ohneErwerb.betrieb, "soll", [])).toContain("2026-05");
