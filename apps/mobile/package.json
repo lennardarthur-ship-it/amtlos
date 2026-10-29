@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint src test",
-    "web": "expo export --platform web --output-dir web-export"
+    "web": "expo export --platform web --output-dir web-export",
+    "inhalte-gate": "node werkzeuge/inhalte-gate.mjs"
   },
   "dependencies": {
     "@amtlos/fachlogik": "workspace:*",
@@ -50,6 +51,7 @@
     "expo-store-review": "~58.0.2",
     "expo-symbols": "~58.0.4",
     "expo-system-ui": "~58.0.6",
+    "expo-updates": "~58.0.18",
     "expo-web-browser": "~58.0.6",
     "fflate": "0.8.3",
     "hyphen": "1.14.1",

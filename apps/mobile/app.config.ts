@@ -46,10 +46,32 @@ export function mitBuild(config: ExpoConfig, sync: boolean): ExpoConfig {
   };
 }
 
+/**
+ * E-240: Inhalts-Updates über expo-updates (Katalog, Texte, JS – keine nativen Änderungen), Runbook
+ * docs/inhalte-aktualisieren.md. **Standard aus:** Die App fragt dann nie einen Update-Server an (`updates.enabled: false`,
+ * es gilt nur das eingebaute Bündel). Eingeschaltet nur mit `INHALTS_UPDATES=1` beim Build – erst, wenn die
+ * Datenschutzhinweise die Abfrage beim Update-Server nennen und freigegeben sind (PRUEFLISTE T-367, Gründerentscheidung
+ * T-366); der Store-Check verlangt das.
+ *
+ * Server: EAS Update (`https://u.expo.dev/<projectId>`, braucht `eas init`) oder ein eigener Server nach dem
+ * expo-updates-Protokoll (`INHALTS_UPDATES_URL`, z. B. beim eigenen Hoster). Laden beim Start im Hintergrund, ohne auf das
+ * Netz zu warten (`fallbackToCacheTimeout: 0`); ein geladenes Update gilt erst beim nächsten Start, nie mitten in der
+ * Sitzung. `runtimeVersion` per Fingerabdruck der nativen Teile: ein Update erreicht nur Builds mit genau denselben
+ * nativen Modulen und derselben nativen Konfiguration (kein Absturz durch fehlende Module, auch wenn `version` beim
+ * Store-Release nicht erhöht wurde).
+ */
+export function mitInhaltsUpdates(config: ExpoConfig, env: Record<string, string | undefined>): ExpoConfig {
+  const projectId = (config.extra as { eas?: { projectId?: string } } | undefined)?.eas?.projectId ?? "";
+  const url = (env.INHALTS_UPDATES_URL ?? "").trim() || (projectId ? `https://u.expo.dev/${projectId}` : "");
+  const an = env.INHALTS_UPDATES === "1" && url.length > 0;
+  if (!an) return { ...config, updates: { enabled: false, checkAutomatically: "NEVER" } };
+  return { ...config, runtimeVersion: { policy: "fingerprint" }, updates: { enabled: true, url, checkAutomatically: "ON_LOAD", fallbackToCacheTimeout: 0 } };
+}
+
 /** Sichtbaren Namen einsetzen: {{MARKE}} in allen Texten, Anzeigename auf dem Home-Bildschirm. */
 export function mitMarke(config: ExpoConfig): ExpoConfig {
   const c = markeEinsetzenTief(config);
   return { ...c, name: MARKE.name, ios: { ...c.ios, infoPlist: { ...c.ios?.infoPlist, CFBundleDisplayName: MARKE.name } } };
 }
 
-export default ({ config }: ConfigContext): ExpoConfig => mitBuild(mitMarke(config as ExpoConfig), (process.env.EXPO_PUBLIC_API_URL ?? "").trim().length > 0);
+export default ({ config }: ConfigContext): ExpoConfig => mitInhaltsUpdates(mitBuild(mitMarke(config as ExpoConfig), (process.env.EXPO_PUBLIC_API_URL ?? "").trim().length > 0), process.env);

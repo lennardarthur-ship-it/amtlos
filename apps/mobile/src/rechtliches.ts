@@ -52,6 +52,12 @@ export const LINKS = {
 /** Store-Seite der laufenden Plattform für „Weiterempfehlen“ – leer, solange nicht veröffentlicht. */
 export const storeLink = (android: boolean = ANDROID) => (android ? LINKS.googlePlay : LINKS.appStore);
 
+/**
+ * E-240: Ziel von „bitte App aktualisieren“ – die Store-Seite der App. Google Play kennt die Seite schon über den
+ * Paketnamen; im App Store braucht sie die App-ID (LINKS.appStore, store-check meldet sie). Leer → nur Text, kein Link.
+ */
+export const aktualisierenLink = (android: boolean = ANDROID) => (android ? LINKS.googlePlay || `https://play.google.com/store/apps/details?id=${MARKE.technisch.bundleId}` : LINKS.appStore);
+
 /** „Abo verwalten“ der laufenden Plattform (E-205): Abo-Seite des App Store bzw. von Google Play für dieses Paket. */
 export const aboVerwaltenLink = (android: boolean = ANDROID) => (android ? LINKS.aboVerwaltenAndroid : LINKS.aboVerwaltenIos);
 

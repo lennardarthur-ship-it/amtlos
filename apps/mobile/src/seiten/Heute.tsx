@@ -26,6 +26,7 @@ import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { PartnerHinweis } from "./Partner";
 import { erstellenErlaubt, freiePflichten } from "../pro/regeln";
 import { AboEndeHinweis } from "./AboEnde";
+import { RechtsstandHinweis } from "./RechtsstandHinweis";
 import { EU_STORNO_ALT_HINWEIS, EU_STORNO_ALT_HINWEIS_S, euBerichtigungen, euSchlussFehlt, euStornoHinweisListe, periodeText } from "../unterlagen/ustAusRechnungen";
 
 
@@ -141,6 +142,8 @@ export function Heute() {
       {z.speicherFehler ? <Hinweis art="fehler" text={z.speicherFehlerArt === "schreiben" ? TEXT.speicher_fehler_schreiben : TEXT.speicher_fehler} /> : null}
       {/* E-200: Pro gekündigt bzw. beendet – Aufzeichnungs- und Aufbewahrungspflichten laufen weiter, Export kostenlos */}
       <AboEndeHinweis />
+      {/* E-240: Katalog alt – „Rechtsstand vom … – bitte App aktualisieren“, sperrt nichts */}
+      <RechtsstandHinweis />
       {/* R11 (UX #12): solange der Check fehlt, steht seine Einladung über jeder Erinnerung */}
       {gemacht ? <SicherungsKarte /> : null}
       {/* R12 (Zoll #5): Aufenthaltstitel, die bald ablaufen – vor jeder anderen Erinnerung */}

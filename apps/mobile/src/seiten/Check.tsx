@@ -18,6 +18,7 @@ import { checkHinweis, rechtsHinweis } from "../rechtshinweis";
 import { bezahlschirmNachCheck, freiePflichten, weiterePflichten } from "../pro/regeln";
 import { paywallVerfuegbar } from "../pro/kauf";
 import { ProSeite } from "./Pro";
+import { RechtsstandHinweis } from "./RechtsstandHinweis";
 
 /**
  * R11 (UX #3/#5): Branchen aus Schritt 1, die auch Sofortmelde-Branchen sind – vorbelegt, damit niemand „Gastronomie“
@@ -272,6 +273,8 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
                 <Symbol name="info.circle" groesse={17} farbe={f.minze} gewicht="semibold" />
                 <T v="klein" farbe={f.buehneLeise} stil={{ flex: 1 }}>{checkHinweis()}</T>
               </View>
+              {/* E-240: Katalog alt – Hinweis in der Einleitung, der Check bleibt nutzbar */}
+              <RechtsstandHinweis buehne />
             </View>
           ) : zwischenschirm ? (
             <View style={{ paddingTop: 16 }}>

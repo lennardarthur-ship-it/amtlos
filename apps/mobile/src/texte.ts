@@ -28,6 +28,11 @@ export const T = {
   fehler_bericht_hinweis: "Der Bericht enthält nur die technische Fehlermeldung, die App-Version und das System – nicht deine gespeicherten Daten. Du siehst ihn, bevor du ihn abschickst.",
   zurueck: "Zurück",
   heute: "Heute",
+  // E-240: Katalog alt – ruhig, aber deutlich; die App sperrt nie etwas
+  e240_veraltet_titel: (datum: string) => `Rechtsstand vom ${datum} – bitte App aktualisieren`,
+  e240_veraltet_alter: `Seitdem können sich Gesetze, Fristen oder Beträge geändert haben. Die neue Version ${ANDROID ? "in Google Play" : "im App Store"} bringt den aktuellen Stand mit. Bis dahin kannst du ${MARKE.name} wie gewohnt nutzen.`,
+  e240_veraltet_stichtag: (datum: string) => `Seit dem ${datum} können Änderungen gelten, die dieser Stand noch nicht enthält. Die neue Version ${ANDROID ? "in Google Play" : "im App Store"} bringt den aktuellen Stand mit. Bis dahin kannst du ${MARKE.name} wie gewohnt nutzen.`,
+  e240_aktualisieren: `${ANDROID ? "In Google Play" : "Im App Store"} aktualisieren`,
   tabs: { heute: "Heute", pflichten: "Pflichten", meine: "Unterlagen", betrieb: "Mein Betrieb" },
   /** Wort in der Pille der Tab-Leiste (kurz, damit „+“ Platz behält) */
   tabs_kurz: { heute: "Heute", pflichten: "Pflichten", meine: "Unterlagen", betrieb: "Betrieb" },
