@@ -32,10 +32,10 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
-    "@swc/core": "^1.10.0",
+    "@swc/core": "^1.16.22",
     "@types/express": "^5.0.0",
-    "@types/supertest": "^6.0.2",
-    "supertest": "^7.0.0",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.3.2",
     "unplugin-swc": "^1.5.1"
   },
   "files": [
